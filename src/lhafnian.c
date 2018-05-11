@@ -1,5 +1,7 @@
 #include "lhafnian.h"
 
+
+#include <stdio.h>
 void evals(double complex z[], double complex vals[], int n){
   /*
     Calculates the eigenvalues of the complex n x n matrix z
@@ -18,8 +20,19 @@ void evals(double complex z[], double complex vals[], int n){
 		      NULL, n, &(z[0]), lda,
 		      &sdim, &(vals[0]),
 		      NULL, ldvs );
-  assert(info==0);  
+  assert(info==0);
+  /*
+  fprintf(stdout,"\n");
+  for(int i=0;i<n;i++){
+    fprintf(stdout,"%lf %lf\n",creal(vals[i]),cimag(vals[i]));
+  }
+  */
+  
 }
+
+
+
+
 
 void powtrace(double complex z[], int n, telem traces[], int l){
   /*
@@ -48,6 +61,41 @@ void powtrace(double complex z[], int n, telem traces[], int l){
     } 
   }
 }
+
+void dec2bin(char *dst, unsigned long long int x, unsigned char len)
+{
+  /*
+  Convert decimal number in  x to character vector dst of length len 
+  representing binary number
+  */
+
+  char i; // this variable cannot be unsigned
+  for (i = len - 1; i >= 0; --i)
+    *dst++ = x >> i & 1;
+}
+
+
+unsigned char find2(char *dst, unsigned char len, unsigned char *pos){
+  /* Given a string of length len
+     it finds in which positions it has a one
+     and stores its position i, as 2*i and 2*i+1 in consecutive slots
+     of the array pos.
+     It also returns (twice) the number of ones in array dst
+  */
+  unsigned char sum=0;
+  unsigned char j=0;
+  for(unsigned char i=0;i<len;i++){
+    if(1==dst[i]){
+      sum++;
+      pos[2*j]=2*i;
+      pos[2*j+1]=2*i+1;
+      j++;
+    }
+  }
+  return 2*sum;
+}
+
+
 
 telem do_chunk(telem mat[], int n, unsigned long long int X, unsigned long long int chunksize){
   /*
@@ -101,7 +149,7 @@ telem do_chunk(telem mat[], int n, unsigned long long int X, unsigned long long 
       for(j=1;j<=(n/(2*i));j++){
 	powfactor=powfactor*factor/j;
 	for(k=i*j+1;k<=n/2+1;k++){
-	  comb[1-cntindex][k-1]=comb[1-cntindex][k-1]+comb[cntindex][k-i*j-1]*powfactor;
+	  comb[1-cntindex][k-1]+=comb[cntindex][k-i*j-1]*powfactor;
 	}
       }
     }
@@ -120,7 +168,7 @@ telem do_chunk(telem mat[], int n, unsigned long long int X, unsigned long long 
 void haf(telem mat[], int n, double res[]){
   /*
     This is a wrapper for the function hafnian. Instead of returning the Hafnian of the matrix
-    mat by value it does it by reference with two doubles for the real an imaginary respectively.
+    mat by value it does by reference with two doubles for the real an imaginary respectively.
   */
   
   telem result=hafnian(mat,n);

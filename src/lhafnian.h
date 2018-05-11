@@ -7,7 +7,7 @@
 #include <omp.h>
 
 #include <math.h>
-#include "hafutils.h"
+
 
 typedef double complex telem;
 typedef unsigned char sint;
