@@ -21,12 +21,6 @@ void evals(double complex z[], double complex vals[], int n){
 		      &sdim, &(vals[0]),
 		      NULL, ldvs );
   assert(info==0);
-  /*
-  fprintf(stdout,"\n");
-  for(int i=0;i<n;i++){
-    fprintf(stdout,"%lf %lf\n",creal(vals[i]),cimag(vals[i]));
-  }
-  */
   
 }
 

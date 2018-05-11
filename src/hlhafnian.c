@@ -9,11 +9,9 @@ void evals(double complex z[], double vals[], int n){
   lapack_int info;
   
   char jobvs='N';
-  //  char sort ='N';
+
 
   lapack_int lda=n;
-  //  lapack_int sdim=0;
-  //  lapack_int ldvs=n;
   char uplo='U';
   info=LAPACKE_zheev(LAPACK_ROW_MAJOR, jobvs,uplo,n, &(z[0]),lda,vals);
   assert(info==0);
@@ -134,15 +132,9 @@ double do_chunk(double complex mat[], int n, unsigned long long int X, unsigned 
       for(j=1;j<=(n/(2*i));j++){
 	powfactor=powfactor*factor/j;
 	for(k=i*j+1;k<=n/2+1;k++){
-	  //	  comb[1-cntindex][k-1]=comb[1-cntindex][k-1]+comb[cntindex][k-i*j-1]*powfactor;
 	  comb[1-cntindex][k-1]+=comb[cntindex][k-i*j-1]*powfactor;
-	  //	  comb[1-cntindex][k-1]+=comb[cntindex][k-i*j-1];
+
 	}
-	/*
-	for(k=i*j+1;k<=n/2+1;k++){
-	  comb[1-cntindex][k-1]=comb[1-cntindex][k-1]*powfactor;
-	  }*/
-	
       }
     }
     if(((sum/2)%2) == (n/2 %2)){

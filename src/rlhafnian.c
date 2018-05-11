@@ -25,12 +25,6 @@ void evals(double z[], double complex vals[], int n){
   for(int i=0;i<n;i++){
 	  vals[i] = wr[i]+I*wi[i];
   }
-  /*
-  fprintf(stdout,"\n");
-  for(int i=0;i<n;i++){
-    fprintf(stdout,"%lf %lf\n",creal(vals[i]),cimag(vals[i]));
-  }
-  */
   
 }
 
