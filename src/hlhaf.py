@@ -8,8 +8,6 @@ tol=1e-12
 path = os.path.dirname(__file__)
 sofile = os.path.join(path, "hlhafnian.so")
 cdll = ctypes.CDLL(sofile)
-#cdll1 = ctypes.CDLL("libgsl.so")
-#cdll2 = ctypes.CDLL("liblapacke.so")
 
 _calc_hafnian = cdll.dhaf
 _calc_hafnian.restype = ctypes.c_double

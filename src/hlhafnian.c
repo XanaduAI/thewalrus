@@ -1,5 +1,4 @@
 #include "hlhafnian.h"
-#include "hafutils.h"
 #include <stdio.h>
 void evals(double complex z[], double vals[], int n){
   /*

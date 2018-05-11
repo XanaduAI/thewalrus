@@ -8,8 +8,6 @@ tol=1e-12
 path = os.path.dirname(__file__)
 sofile = os.path.join(path, "rlhafnian.so")
 cdll = ctypes.CDLL(sofile)
-#cdll1 = ctypes.CDLL("libgsl.so")
-#cdll2 = ctypes.CDLL("liblapacke.so")
 
 _calc_hafnian = cdll.dhaf
 _calc_hafnian.restype = ctypes.c_double
@@ -34,6 +32,6 @@ def hafnian(l):
         rr=np.float64(np.array([0.0,0.0]))
         arr=rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
         res = _calc_hafnian(a, matshape[0], arr)
-        return rr[0]+1j*rr[1]
+        return rr[0]
 
 
