@@ -14,8 +14,8 @@ typedef unsigned char sint;
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void haf(double mat[], int n, double res[]);
-telem hafnian(double mat[], int n);
-void evals(double z[], double complex vals[], int n);
+void haf (double mat[], int n, double res[]);
+telem hafnian (double mat[], int n);
+void evals (double z[], double complex vals[], int n);
 
 #endif
