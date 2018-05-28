@@ -1,0 +1,11 @@
+*~
+*.pyc
+docs/_build
+build
+dist
+hafnian.egg-info
+.idea
+examples/*ipynp*
+*.egg-info*
+hafnian/__pycache__/*
+tests/__pycache__/*
