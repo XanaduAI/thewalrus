@@ -4,18 +4,14 @@ Hafnian
 :Release: |release|
 :Date: |today|
 
-Library for efficiently calculating the exact hafnian in polynomial time.
+Library for efficiently calculating the exact hafnian in exponential time.
 
 Features
 ========
 
-* Super fast
+* Fastest calculation of the hafnian and loop hafnian
 
-* Easy to install
-
-* Causes a collapse of the polynomial hierarchy to the third top-level
-
-* Potential solution to the P=NP problem - further testing needed
+* The algorithms in this library are what  Ryser's formula is to the permanent.
 
 Getting started
 ===============
@@ -37,7 +33,7 @@ If you are having issues, please let us know, either by email or by posting the 
 License
 =======
 
-The Machine Learning Toolbox is **free** and **open source**, released under the Apache License, Version 2.0.
+The hafnian library is **free** and **open source**, released under the Apache License, Version 2.0.
 
 .. toctree::
    :maxdepth: 2
@@ -69,10 +65,10 @@ The Machine Learning Toolbox is **free** and **open source**, released under the
    :maxdepth: 2
    :caption: Hafnian API
    :hidden:
-
+   
    code/python
    code/C
-
+			      
 Indices and tables
 ==================
 
