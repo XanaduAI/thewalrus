@@ -68,7 +68,7 @@ They can be installed via ``pip``:
 To build the HTML documentation, go to the top-level directory and run the command
 ::
 
-  $ make docs
+  $ make doc
 
 The documentation can then be found in the ``doc/_build/html/`` directory.
 
