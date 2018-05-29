@@ -39,7 +39,7 @@ clean:
 	rm -rf dist
 	rm -rf build
 
-docs: docs/_build
+doc:
 	make -C docs html
 
 .PHONY : clean-docs
