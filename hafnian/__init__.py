@@ -49,7 +49,7 @@ from .rlhaf import hafnian as haf_real
 __all__ = ['hafnian', 'haf_complex', 'haf_real', 'version']
 
 
-def hafnian(l):
+def hafnian(l, tol=1e-12):
     """Returns the hafnian of matrix l via the C hafnian library.
 
     .. note::
@@ -74,6 +74,22 @@ def hafnian(l):
         np.float64: the hafnian of matrix l
     """
     if isinstance(l, np.ndarray):
+        matshape=l.shape
+        if matshape[0] != matshape[1]:
+            raise ValueError("Input matrix must be square.")
+
+        if matshape[0] % 2 != 0:
+            raise ValueError("Input matrix must be of even dimensions.")
+
+        if np.linalg.norm(l-np.transpose(l)) >= tol:
+            raise ValueError("Input matrix must be symmetric.")
+
+        if matshape[0] == 2:
+            return l[0][1]
+        if matshape[0] == 4:
+            return l[0][1]*l[2][3]+l[0][2]*l[1][3]+l[0][3]*l[1][2]
+
+        
         if l.dtype == np.float:
             return haf_real(l)
         elif l.dtype == np.complex:

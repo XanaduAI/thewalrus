@@ -30,4 +30,4 @@ Since the exact calculation of the permanent of 0-1 matrices is  in the \#P comp
 :cite:`valiant1979complexity` the last identity shows that the hafnian of (at least) certain 0-1 block matrices is also in the \#P complete class.
    
 
-In this paper we implement an algorithm that allows to count the perfect matchings of a graph with :math:`n` vertices in time :math:`O(n^3 2^{n/2})` for graphs with and without loops. This two algorithms are encapsulated in the hafnian and loophafnian function.
+In this library we implement an algorithm that allows to count the perfect matchings of a graph with :math:`n` vertices in time :math:`O(n^3 2^{n/2})` for graphs with and without loops. This two algorithms are encapsulated in the hafnian and loophafnian function.

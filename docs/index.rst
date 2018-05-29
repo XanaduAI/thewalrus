@@ -4,7 +4,7 @@ Hafnian
 :Release: |release|
 :Date: |today|
 
-Library for efficiently calculating the exact hafnian in exponential time.
+Fastest exact hafnian library/
 
 Features
 ========

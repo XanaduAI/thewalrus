@@ -43,38 +43,20 @@ _calc_hafnian = cdll.dhaf
 _calc_hafnian.restype = ctypes.c_double
 
 
-def hafnian(l, tol=1e-12):
+def hafnian(l):
     """Returns the hafnian of a complex matrix l via the C hafnian library.
 
     Args:
         l (array): a complex, square, symmetric array of even dimensions.
-        tol (float): the tolerance when checking that the matrix is
-            symmetric. Default tolerance is 1e-12.
 
     Returns:
         np.complex128: the hafnian of matrix l
     """
+    if l.dtype != np.complex128:
+        l = l.astype(np.complex128)
     matshape=l.shape
-    if matshape[0] != matshape[1]:
-        raise ValueError("Input matrix must be square.")
-
-    if not isinstance(l, np.ndarray):
-        raise ValueError("Input matrix must be a NumPy array.")
-
-    if matshape[0] % 2 != 0:
-        raise ValueError("Input matrix must be of even dimensions.")
-
-    if np.linalg.norm(l-np.transpose(l)) >= tol:
-        raise ValueError("Input matrix must be symmetric.")
-
-    if matshape[0] == 2:
-        return l[0][1]
-    else:
-        if l.dtype != np.complex128:
-            l = l.astype(np.complex128)
-
-        a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-        rr = np.float64(np.array([0.0, 0.0]))
-        arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-        res = _calc_hafnian(a, matshape[0], arr)
-        return rr[0] + 1j*rr[1]
+    a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
+    rr = np.float64(np.array([0.0, 0.0]))
+    arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
+    res = _calc_hafnian(a, matshape[0], arr)
+    return rr[0] + 1j*rr[1]
