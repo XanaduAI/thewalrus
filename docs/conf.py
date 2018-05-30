@@ -62,7 +62,8 @@ extensions = [
     # 'sphinx.ext.inheritance_diagram',
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
-    'edit_on_github'
+    'edit_on_github',
+    'nbsphinx'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
