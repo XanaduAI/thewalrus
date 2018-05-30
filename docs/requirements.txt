@@ -1,0 +1,4 @@
+sphinxcontrib-bibtex
+sphinx>=1.4
+ipykernel
+nbsphinx
