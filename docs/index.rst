@@ -58,6 +58,7 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :caption: Tutorials
    :hidden:
 
+   hafnian.ipynb
    tutorials/python_tutorial
    tutorials/C_tutorial
 
