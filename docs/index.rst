@@ -4,21 +4,21 @@ Hafnian
 :Release: |release|
 :Date: |today|
 
-Fastest exact hafnian library/
+The fastest exact hafnian library.
 
 Features
 ========
 
-* Fastest calculation of the hafnian and loop hafnian
+* Provides the fastest calculation of the hafnian and loop hafnian.
 
-* The algorithms in this library are what  Ryser's formula is to the permanent.
+* The algorithms in this library are what Ryser's formula is to the permanent.
 
 Getting started
 ===============
 
 To get the Hafnian package installed and running on your system, begin at the :ref:`download and installation guide <installation>`. Then, familiarise yourself with some :ref:`background information on the Hafnian <hafnian>` and :ref:`the computational algorithm <algorithms>`.
 
-For getting started with using the Hafnian library in your own code, have a look at the :ref:`Python tutorial <python_tutorial>` and the  :ref:`C tutorial <C_tutorial>`.
+For getting started with using the Hafnian library in your own code, have a look at the `Python tutorial <hafnian_tutorial.ipynb>`_.
 
 Finally, detailed documentation on the code and API is provided.
 
@@ -29,6 +29,16 @@ Support
 - **Issue Tracker:** https://github.com/XanaduAI/hafnian/issues
 
 If you are having issues, please let us know, either by email or by posting the issue on our Github issue tracker.
+
+Authors
+=======
+
+Nicolás Quesada and Brajesh Gupt.
+
+If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1804.03159>`_:
+
+  Nathan Killoran, Josh Izaac, Nicolás Quesada, Ville Bergholm, Matthew Amy, and Christian Weedbrook. Strawberry Fields: A Software Platform for Photonic Quantum Computing. *arXiv*, 2018. arXiv:1804.03159
+
 
 License
 =======
@@ -59,17 +69,14 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    hafnian_tutorial.ipynb
-   tutorials/python_tutorial
-   tutorials/C_tutorial
 
 .. toctree::
    :maxdepth: 2
    :caption: Hafnian API
    :hidden:
-   
+
    code/python
-   code/C
-			      
+
 Indices and tables
 ==================
 

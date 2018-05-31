@@ -74,7 +74,7 @@ def hafnian(l, tol=1e-12):
         np.float64: the hafnian of matrix l
     """
     if isinstance(l, np.ndarray):
-        matshape=l.shape
+        matshape = l.shape
         if matshape[0] != matshape[1]:
             raise ValueError("Input matrix must be square.")
 
@@ -87,9 +87,8 @@ def hafnian(l, tol=1e-12):
         if matshape[0] == 2:
             return l[0][1]
         if matshape[0] == 4:
-            return l[0][1]*l[2][3]+l[0][2]*l[1][3]+l[0][3]*l[1][2]
+            return l[0][1]*l[2][3] + l[0][2]*l[1][3] + l[0][3]*l[1][2]
 
-        
         if l.dtype == np.float:
             return haf_real(l)
         elif l.dtype == np.complex:

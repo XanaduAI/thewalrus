@@ -1,18 +1,15 @@
 Hafnian
 ########
 
-Library for efficiently calculating the exact hafnian in polynomial time.
+The fastest exact hafnian library.
 
 Features
 ========
 
-* Super fast
+* Provides the fastest calculation of the hafnian and loop hafnian.
 
-* Easy to install
+* The algorithms in this library are what Ryser's formula is to the permanent.
 
-* Causes a collapse of the polynomial hierarchy to the third top-level
-
-* Potential solution to the P=NP problem - further testing needed
 
 Dependencies
 ============
@@ -42,7 +39,7 @@ Installation
 Installation of Hafnian, as well as all required Python packages mentioned above, can be done using pip:
 ::
 
-    $ python -m pip install strawberryfields
+    $ python -m pip install hafnian
 
 
 Software tests
@@ -54,23 +51,25 @@ Insert test instructions here.
 Documentation
 =============
 
-The Hafnian documentation is built automatically and hosted at `Read the Docs <https://hafnian.readthedocs.io>`_.
+The Hafnian documentation is built automatically and hosted at `Read the Docs <https://hafnian.readthedocs.io>`_. To build it locally, you need to have the following packages installed:
 
 * `Sphinx <http://sphinx-doc.org/>`_ >=1.5
 * `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >=0.3.6
+* `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_
+* `Pandoc <https://pandoc.org/>`_
 
-They can be installed via ``pip``:
+They can be installed via a combination of ``pip`` and ``apt`` if on a Debian-based system:
 ::
 
-    $ pip3 install sphinx --user
-    $ pip3 install sphinxcontrib-bibtex --user
+    $ sudo apt install pandoc
+    $ pip3 install sphinx sphinxcontrib-bibtex nbsphinx --user
 
 To build the HTML documentation, go to the top-level directory and run the command
 ::
 
   $ make doc
 
-The documentation can then be found in the ``doc/_build/html/`` directory.
+The documentation can then be found in the ``docs/_build/html/`` directory.
 
 Authors
 =======

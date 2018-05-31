@@ -54,7 +54,7 @@ def hafnian(l):
     """
     if l.dtype != np.complex128:
         l = l.astype(np.complex128)
-    matshape=l.shape
+    matshape = l.shape
     a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     rr = np.float64(np.array([0.0, 0.0]))
     arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))

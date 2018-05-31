@@ -43,20 +43,18 @@ _calc_hafnian = cdll.dhaf
 _calc_hafnian.restype = ctypes.c_double
 
 
-def hafnian(l, tol=1e-12):
+def hafnian(l):
     """Returns the hafnian of real matrix l via the C hafnian library.
 
     Args:
         l (array): a real, square, symmetric array of even dimensions.
-        tol (float): the tolerance when checking that the matrix is
-            symmetric. Default tolerance is 1e-12.
 
     Returns:
         np.float64: the hafnian of matrix l
     """
     if l.dtype != np.float64:
         l = l.astype(np.float64)
-    matshape=l.shape
+    matshape = l.shape
     a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     rr = np.float64(np.array([0.0,0.0]))
     arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
