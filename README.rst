@@ -1,7 +1,31 @@
 Hafnian
 ########
 
-The fastest exact hafnian library.
+.. image:: https://img.shields.io/travis/XanaduAI/hafnian/master.svg?style=for-the-badge
+    :alt: Travis
+    :target: https://travis-ci.org/XanaduAI/hafnian
+
+.. image:: https://img.shields.io/codecov/c/github/xanaduai/hafnian/master.svg?style=for-the-badge
+    :alt: Codecov coverage
+    :target: https://codecov.io/gh/XanaduAI/hafnian
+
+.. image:: https://img.shields.io/codacy/grade/df94d22534cf4c05b1bddcf697011a82.svg?style=for-the-badge
+    :alt: Codacy grade
+    :target: https://app.codacy.com/app/XanaduAI/hafnian?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/hafnian&utm_campaign=badger
+
+.. image:: https://img.shields.io/readthedocs/hafnian.svg?style=for-the-badge
+    :alt: Read the Docs
+    :target: https://hafnian.readthedocs.io
+
+.. image:: https://img.shields.io/pypi/v/hafnian.svg?style=for-the-badge
+    :alt: PyPI
+    :target: https://pypi.org/project/hafnian
+
+.. image:: https://img.shields.io/pypi/pyversions/hafnian.svg?style=for-the-badge
+    :alt: PyPI - Python Version
+    :target: https://pypi.org/project/hafnian
+
+The fastest exact hafnian library for real and complex matrices. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
 
 Features
 ========
@@ -41,6 +65,14 @@ Installation of Hafnian, as well as all required Python packages mentioned above
 
     $ python -m pip install hafnian
 
+
+Software tests
+==============
+
+To ensure that the Hafnian library is working correctly after installation, the test suite can be run by navigating to the source code folder and running
+::
+
+  make test
 
 Documentation
 =============
