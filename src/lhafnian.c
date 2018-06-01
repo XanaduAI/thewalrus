@@ -32,7 +32,7 @@ evals (double complex z[], double complex vals[], int n)
   lapack_int sdim = 0;
   lapack_int ldvs = n;
   info = LAPACKE_zgees (LAPACK_ROW_MAJOR, jobvs, sort,
-			NULL, n, &(z[0]), lda, &sdim, &(vals[0]), NULL, ldvs);
+      NULL, n, &(z[0]), lda, &sdim, &(vals[0]), NULL, ldvs);
   assert (info == 0);
 
 }
@@ -42,7 +42,7 @@ evals (double complex z[], double complex vals[], int n)
 
 
 void
-powtrace (double complex z[], int n, double complex traces[], int l)
+powtrace (double complex z[], int n, telem traces[], int l)
 {
   /*
      given a complex matrix z of dimensions n x n
@@ -51,11 +51,11 @@ powtrace (double complex z[], int n, double complex traces[], int l)
      using the orutine evals
    */
   double complex vals[n];
-  double complex pvals[n];
+  telem pvals[n];
 
   evals (z, vals, n);
   int i, j;
-  double complex sum;
+  telem sum;
   for (j = 0; j < n; j++)
     {
       pvals[j] = vals[j];
@@ -64,14 +64,14 @@ powtrace (double complex z[], int n, double complex traces[], int l)
     {
       sum = 0.0;
       for (j = 0; j < n; j++)
-	{
-	  sum += pvals[j];
-	}
+  {
+    sum += pvals[j];
+  }
       traces[i] = sum;
       for (j = 0; j < n; j++)
-	{
-	  pvals[j] = pvals[j] * vals[j];
-	}
+  {
+    pvals[j] = pvals[j] * vals[j];
+  }
     }
 }
 
@@ -83,7 +83,7 @@ dec2bin (char *dst, unsigned long long int x, unsigned char len)
      representing binary number
    */
 
-  char i;			// this variable cannot be unsigned
+  char i;     // this variable cannot be unsigned
   for (i = len - 1; i >= 0; --i)
     *dst++ = x >> i & 1;
 }
@@ -103,36 +103,36 @@ find2 (char *dst, unsigned char len, unsigned char *pos)
   for (unsigned char i = 0; i < len; i++)
     {
       if (1 == dst[i])
-	{
-	  sum++;
-	  pos[2 * j] = 2 * i;
-	  pos[2 * j + 1] = 2 * i + 1;
-	  j++;
-	}
+  {
+    sum++;
+    pos[2 * j] = 2 * i;
+    pos[2 * j + 1] = 2 * i + 1;
+    j++;
+  }
     }
   return 2 * sum;
 }
 
 
 
-double complex
-do_chunk (double complex mat[], int n, unsigned long long int X,
-	  unsigned long long int chunksize)
+telem
+do_chunk (telem mat[], int n, unsigned long long int X,
+    unsigned long long int chunksize)
 {
   /*
      This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the 
      Hafnian of matrix mat
    */
 
-  double complex res = 0.0;
+  telem res = 0.0;
   for (unsigned long long int x = X; x < X + chunksize; x++)
     {
 
-      double complex summand = 0.0;
+      telem summand = 0.0;
       sint m = n / 2;
       int i, j, k;
-      double complex factor;
-      double complex powfactor;
+      telem factor;
+      telem powfactor;
 
 
       char dst[m];
@@ -142,57 +142,56 @@ do_chunk (double complex mat[], int n, unsigned long long int X,
       sum = find2 (dst, m, pos);
       double complex B[sum * sum];
       for (i = 0; i < sum; i++)
-	{
-	  for (j = 0; j < sum; j++)
-	    {
-	      B[i * sum + j] =
-		(double complex) mat[pos[i] * n + ((pos[j]) ^ 1)];
-	    }
-	}
-      double complex traces[m];
+  {
+    for (j = 0; j < sum; j++)
+      {
+        B[i * sum + j] =
+    (double complex) mat[pos[i] * n + ((pos[j]) ^ 1)];
+      }
+  }
+      telem traces[m];
       powtrace (B, sum, traces, m);
-
       char cnt;
       sint cntindex;
       cnt = 1;
       cntindex = 0;
-      double complex comb[2][m + 1];
+      telem comb[2][m + 1];
       for (i = 0; i < n / 2 + 1; i++)
-	{
-	  comb[0][i] = 0.0;
-	}
+  {
+    comb[0][i] = 0.0;
+  }
       comb[0][0] = 1.0;
 
       for (i = 1; i <= n / 2; i++)
-	{
-	  factor = traces[i - 1] / (2 * i);
-	  powfactor = 1.0;
-	  //the following line is significantly different than in Octave
-	  //It basically reassings  the first column of comb to the second and viceversa
-	  cnt = -cnt;
-	  cntindex = (1 + cnt) / 2;
-	  for (j = 0; j < n / 2 + 1; j++)
-	    {
-	      comb[1 - cntindex][j] = comb[cntindex][j];
-	    }
-	  for (j = 1; j <= (n / (2 * i)); j++)
-	    {
-	      powfactor = powfactor * factor / j;
-	      for (k = i * j + 1; k <= n / 2 + 1; k++)
-		{
-		  comb[1 - cntindex][k - 1] +=
-		    comb[cntindex][k - i * j - 1] * powfactor;
-		}
-	    }
-	}
+  {
+    factor = traces[i - 1] / (2 * i);
+    powfactor = 1.0;
+    //the following line is significantly different than in Octave
+    //It basically reassings  the first column of comb to the second and viceversa
+    cnt = -cnt;
+    cntindex = (1 + cnt) / 2;
+    for (j = 0; j < n / 2 + 1; j++)
+      {
+        comb[1 - cntindex][j] = comb[cntindex][j];
+      }
+    for (j = 1; j <= (n / (2 * i)); j++)
+      {
+        powfactor = powfactor * factor / j;
+        for (k = i * j + 1; k <= n / 2 + 1; k++)
+    {
+      comb[1 - cntindex][k - 1] +=
+        comb[cntindex][k - i * j - 1] * powfactor;
+    }
+      }
+  }
       if (((sum / 2) % 2) == (n / 2 % 2))
-	{
-	  summand = comb[1 - cntindex][n / 2];
-	}
+  {
+    summand = comb[1 - cntindex][n / 2];
+  }
       else
-	{
-	  summand = -comb[1 - cntindex][n / 2];
-	}
+  {
+    summand = -comb[1 - cntindex][n / 2];
+  }
       res += summand;
     }
 
@@ -200,14 +199,14 @@ do_chunk (double complex mat[], int n, unsigned long long int X,
 }
 
 void
-haf (double complex mat[], int n, double res[])
+haf (telem mat[], int n, double res[])
 {
   /*
      This is a wrapper for the function hafnian. Instead of returning the Hafnian of the matrix
      mat by value it does by reference with two doubles for the real an imaginary respectively.
    */
 
-  double complex result = 0.0; //hafnian (mat, n);
+  telem result = hafnian (mat, n);
   res[0] = creal (result);
   res[1] = cimag (result);
 }
@@ -215,12 +214,12 @@ haf (double complex mat[], int n, double res[])
 void
 dhaf (double *mat, int n, double *res)
 {
-  haf ((double complex *) mat, n, res);
+  haf ((telem *) mat, n, res);
 }
 
 
-double complex
-hafnian (double complex * mat, int n)
+telem
+hafnian (telem * mat, int n)
 {
   /*
      Add all the terms necessary to calculate the Hafnian of the matrix mat of size n
@@ -229,8 +228,8 @@ hafnian (double complex * mat, int n)
   assert (n % 2 == 0);
   sint m = n / 2;
   sint mm = m / 2;
-  double complex res = 0.0;
-  unsigned long long int pow1 = ((unsigned long long int) pow (2.0, (double) m));	//-1;
+  telem res = 0.0;
+  unsigned long long int pow1 = ((unsigned long long int) pow (2.0, (double) m)); //-1;
   unsigned long long int workers =
     ((unsigned long long int) pow (2.0, (double) mm));
   workers = MIN (workers, pow1);
@@ -238,314 +237,20 @@ hafnian (double complex * mat, int n)
 
 #pragma omp parallel
   {
-    double complex summand;
+    telem summand;
 #pragma omp for
     for (unsigned long long int X = 1; X <= pow1; X += chunksize)
       {
-	summand = do_chunk (mat, n, X, chunksize);
+  summand = do_chunk (mat, n, X, chunksize);
 #pragma omp critical
-	res += summand;
-      }				//end for X
+  res += summand;
+      }       //end for X
   }
   return res;
 }
 
-double complex
+telem
 dhafnian (double *mat, int n)
 {
-  return hafnian ((double complex *) mat, n);
+  return hafnian ((telem *) mat, n);
 }
-
-void vector_update(double complex mat[], double complex vec[], int n){
-  double complex tmp_vec[n];
-  double complex tmp = 0.0;
-  for(int i=0; i<n; i++){
-    tmp = 0.0;         
-    
-    for(int j=0; j<n; j++){
-      tmp += vec[j]*mat[j*n+i];
-    }
-    
-    tmp_vec[i] = tmp;
-  }
-  for(int i=0; i<n; i++){
-    vec[i] = tmp_vec[i];
-  }
-
-}
-
-
-double complex do_chunk_loops(double complex mat[], double complex C[], double complex D[], int n, unsigned long long int X, unsigned long long int chunksize){
-  /*
-     This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the 
-     Hafnian of matrix mat
-   */
-
-  double complex res = 0.0;
-  for (unsigned long long int x = X; x < X + chunksize; x++)
-    {
-
-      double complex summand = 0.0;
-      sint m = n / 2;
-      int i, j, k;
-      double complex factor;
-      double complex powfactor;
-
-
-      char dst[m];
-      sint pos[n];
-      char sum;
-      dec2bin (dst, x, m);
-      sum = find2 (dst, m, pos);
-      double complex B[sum * sum], Bprod[sum*sum];
-      double complex C1[sum], D1[sum];
-      for (i = 0; i < sum; i++)
-	{
-	  for (j = 0; j < sum; j++)
-	    {
-	      Bprod[i * sum + j] = B[i * sum + j] =
-		(double complex) mat[pos[i] * n + ((pos[j]) ^ 1)];
-	    }
-	  C1[i] = C[pos[i]];
-	  D1[i] = D[pos[i]];
-	}
-      double complex traces[m];
-      powtrace (B, sum, traces, m);
-
-      char cnt;
-      sint cntindex;
-      cnt = 1;
-      cntindex = 0;
-      double complex comb[2][m + 1];
-      for (i = 0; i < n / 2 + 1; i++)
-	{
-	  comb[0][i] = 0.0;
-	}
-      comb[0][0] = 1.0;
-      
-      double complex loopfactor=0.0;
-      for(i=0; i<sum; i++){
-	loopfactor += C1[i]*D1[i];
-      }
-      
-      vector_update(Bprod,C1,sum);
-      loopfactor=0.*loopfactor;
-      //      fprintf(stdout,"%lf\n",loopfactor);
-
-
-      
-      for (i = 1; i <= n / 2; i++)
-	{
-	  factor = loopfactor + traces[i - 1] / (2 * i);
-	  powfactor = 1.0;
-	  //the following line is significantly different than in Octave
-	  //It basically reassings  the first column of comb to the second and viceversa
-	  cnt = -cnt;
-	  cntindex = (1 + cnt) / 2;
-	  for (j = 0; j < n / 2 + 1; j++)
-	    {
-	      comb[1 - cntindex][j] = comb[cntindex][j];
-	    }
-	  for (j = 1; j <= (n / (2 * i)); j++)
-	    {
-	      powfactor = powfactor * factor / j;
-	      for (k = i * j + 1; k <= n / 2 + 1; k++)
-		{
-		  comb[1 - cntindex][k - 1] +=
-		    comb[cntindex][k - i * j - 1] * powfactor;
-		}
-	    }
-	}
-      if (((sum / 2) % 2) == (n / 2 % 2))
-	{
-	  summand = comb[1 - cntindex][n / 2];
-	}
-      else
-	{
-	  summand = -comb[1 - cntindex][n / 2];
-	}
-      res += summand;
-    }
-
-  return res;
-
-
-
-}
-
-
-double complex old_do_chunk_loops(double complex mat[], double complex C[], double complex D[], int n, unsigned long long int X, unsigned long long int chunksize){
-  /*
-    This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the 
-    Hafnian of matrix mat
-   */
-  
-  double complex res=0.0;
-  for (unsigned long long int x = X; x < X + chunksize; x++){  
-   
-    double complex summand=0.0;
-    sint m=n/2;
-    int i,j,k;
-    double complex factor, loopfactor;
-    double complex powfactor;
-    
-    
-    char dst[m];
-    sint pos[n];
-    sint sum;
-    dec2bin(dst,x,m);
-    sum=find2(dst,m,pos);
-    
-    double complex B[sum*sum], B_powtrace[sum*sum];    
-    double complex C1[sum], D1[sum];
-    
-    
-    for(i=0;i<sum;i++){
-      for(j=0;j<sum;j++){
-	B[i*sum+j] = (double complex) mat[pos[i]*n+((pos[j])^1)];
-    	B_powtrace[i*sum+j] = (double complex) mat[pos[i]*n+((pos[j])^1)];
-      }
-      C1[i] = C[pos[i]];
-      D1[i] = D[pos[i]];
-    }
-    
-    
-    double complex traces[m];
-    powtrace(B,sum,traces,m);
-    char cnt;
-    sint cntindex;
-    cnt=1;
-    cntindex=0;
-    double complex comb[2][m+1];
-    for(i=0;i<n/2+1;i++){
-      comb[0][i]=0.0;
-    }
-    comb[0][0]=1.0;
-    /*
-    for(i=1;i<=n/2;i++){
-      loopfactor = 0.0;
-    }
-      
-    
-    for(int i=0; i<sum; i++){
-      factor += C1[i]*D1[i]/2;
-    }
-    
-    //Being matrix vector multiplication
-    double complex tmp_c1[sum];
-    double complex tmp = 0.0;
-    for(int i=0; i<sum; i++){
-      tmp = 0.0;         
-      
-      for(int j=0; j<sum; j++){
-	tmp += C1[j]*B[j*sum+i];
-      }
-      
-      tmp_c1[i] = tmp;
-    }
-    for(int i=0; i<sum; i++){
-      C1[i] = tmp_c1[i];
-    }
-    //End matrix vector multiplication
-    */
-    factor=traces[i-1]/(2*i);//+loopfactor;
-    powfactor=1.0;
-    //the following line is significantly different than in Octave
-    //It basically reassings  the first column of comb to the second and viceversa
-    cnt=-cnt;
-    cntindex=(1+cnt)/2;
-    for(j=0;j<n/2+1;j++){
-      comb[1-cntindex][j]=comb[cntindex][j];
-    }
-    
-    for(j=1;j<=(n/(2*i));j++){
-      powfactor=powfactor*factor/j;
-      for(k=i*j+1;k<=n/2+1;k++){
-	comb[1-cntindex][k-1]=comb[1-cntindex][k-1]+comb[cntindex][k-i*j-1]*powfactor;
-      }
-    }
-    
-// Combinations from open walks with loops at both ends and regular perfect matchings
-    if(((sum/2)%2) == (n/2 %2)){
-      summand= comb[1-cntindex][n/2];
-    }
-    else{
-      summand= -comb[1-cntindex][n/2];
-    }
-    res+=summand;
-  }
-
-  
-  return res; 
-}
-
-
-
-void
-haf_loops (double complex mat[], int n, double res[])
-{
-  /*
-     This is a wrapper for the function hafnian. Instead of returning the Hafnian of the matrix
-     mat by value it does by reference with two doubles for the real an imaginary respectively.
-   */
-
-  double complex result = 0.0;//hafnian_loops (mat, n);
-  res[0] = creal (result);
-  res[1] = cimag (result);
-}
-
-void
-dhaf_loops (double *mat, int n, double *res)
-{
-  haf_loops ((double complex *) mat, n, res);
-}
-
-
-double complex
-hafnian_loops (double complex mat [], int n)
-{
-  /*
-     Add all the terms necessary to calculate the Hafnian of the matrix mat of size n
-     It additionally uses open MP to parallelize the summation
-   */
-  assert (n % 2 == 0);
-  sint m = n / 2;
-  sint mm = m / 2;
-  double complex res = 0.0;
-  unsigned long long int pow1 = ((unsigned long long int) pow (2.0, (double) m));	//-1;
-  unsigned long long int workers =
-    ((unsigned long long int) pow (2.0, (double) mm));
-  workers = MIN (workers, pow1);
-  unsigned long long int chunksize = pow1 / workers;
-  double complex D[n];
-  double complex C[n];
-  for(int i=0; i<n; i++){
-    D[i] = mat[i*n+i];
-  }
-
-  for(int i=0; i<n; i+=2){ 
-      C[i] = D[i+1];
-      C[i+1] = D[i];
-  }
-
-  
-#pragma omp parallel
-  {
-    double complex summand;
-#pragma omp for
-    for (unsigned long long int X = 1; X <= pow1; X += chunksize)
-      {
-	summand = do_chunk_loops (mat, C, D, n, X, chunksize);
-#pragma omp critical
-	res += summand;
-      }				//end for X
-  }
-  return res;
-}
-
-double complex
-dhafnian_loops (double *mat, int n)
-{
-  return hafnian_loops ((double complex *) mat, n);
-}
-

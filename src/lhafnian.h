@@ -21,14 +21,15 @@
 
 #include <math.h>
 
+
+typedef double complex telem;
 typedef unsigned char sint;
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void haf (double complex mat[], int n, double res[]);
-double complex hafnian_loops (double complex mat [], int n);
+void haf (telem mat[], int n, double res[]);
+telem hafnian (telem mat[], int n);
 void evals (double complex z[], double complex vals[], int n);
-double complex hafnian (double complex * mat, int n);
 
 #endif

@@ -42,12 +42,6 @@ Installation of Hafnian, as well as all required Python packages mentioned above
     $ python -m pip install hafnian
 
 
-Software tests
-==============
-
-Insert test instructions here.
-
-
 Documentation
 =============
 
@@ -74,11 +68,11 @@ The documentation can then be found in the ``docs/_build/html/`` directory.
 Authors
 =======
 
-Nicolás Quesada and Brajesh Gupt.
+Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
 
 If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
 
- A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer *arXiv*, 2018. arxiv:1805.12498
+ Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer *arXiv*, 2018. arxiv:1805.12498
 
 
 Support
