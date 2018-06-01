@@ -13,9 +13,9 @@
 # limitations under the License.
 """Tests for the hlhaf Python function, which calls hlhafnian.so"""
 import unittest
+from math import factorial as fac
 
 import numpy as np
-from math import factorial as fac
 from hafnian.hlhaf import hafnian
 
 

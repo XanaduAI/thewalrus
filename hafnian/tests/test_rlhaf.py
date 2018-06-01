@@ -14,9 +14,9 @@
 """Tests for the rlhaf Python function, which calls rlhafnian.so"""
 
 import unittest
+from math import factorial as fac
 
 import numpy as np
-from math import factorial as fac
 from hafnian.rlhaf import hafnian
 
 
