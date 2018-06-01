@@ -91,11 +91,12 @@ def hafnian(l, tol=1e-12):
 
         if l.dtype == np.float or l.dtype == np.int:
             return haf_real(l)
-        elif l.dtype == np.complex:
+
+        if l.dtype == np.complex:
             if np.any(np.iscomplex(l)):
                 return haf_complex(l)
-            else:
-                return haf_real(np.float64(l.real))
+
+            return haf_real(np.float64(l.real))
     else:
         raise TypeError("Input matrix must be a NumPy array.")
 

@@ -9,3 +9,5 @@ examples/*ipynp*
 *.egg-info*
 hafnian/__pycache__/*
 tests/__pycache__/*
+.coverage
+

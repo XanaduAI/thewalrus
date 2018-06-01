@@ -28,7 +28,7 @@ class TestLhaf(unittest.TestCase):
         A = np.complex128(np.random.random([2, 2])) + 1j*np.random.random([2, 2])
         A = A + A.T
         haf = hafnian(A)
-        self.assertEqual(haf, A[0, 1])
+        self.assertTrue(np.allclose(haf, A[0, 1]))
 
     def test_4x4(self):
         A = np.complex128(np.random.random([4, 4]))
@@ -37,12 +37,12 @@ class TestLhaf(unittest.TestCase):
         haf = hafnian(A)
         expected = A[0, 1]*A[2, 3] + \
             A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
-        self.assertEqual(haf, expected)
+        self.assertTrue(np.allclose(haf, expected))
 
     def test_identity(self):
         A = np.identity(self.n)
         haf = hafnian(A)
-        self.assertEqual(haf, 0)
+        self.assertTrue(np.allclose(haf, 0))
 
     def test_ones(self):
         A = np.complex128(np.ones([2*self.n, 2*self.n]))
@@ -58,7 +58,7 @@ class TestLhaf(unittest.TestCase):
         A = np.complex128(A)
         haf = hafnian(A)
         expected = float(fac(self.n))
-        self.assertTrue(haf, expected)
+        self.assertTrue(np.allclose(haf, expected))
 
 
 if __name__ == '__main__':

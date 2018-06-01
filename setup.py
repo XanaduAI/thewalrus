@@ -64,7 +64,8 @@ info = {
     'url': 'http://xanadu.ai',
     'license': 'Apache License 2.0',
     'packages': [
-                    'hafnian'
+                    'hafnian',
+                    'hafnian/tests'
                 ],
     # 'package_data': {'hafnian': ['backends/data/*']},
     # 'include_package_data': True,
