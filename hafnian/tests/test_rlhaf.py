@@ -16,7 +16,7 @@
 import unittest
 
 import numpy as np
-from scipy.special import factorial as fac
+from math import factorial as fac
 from hafnian.rlhaf import hafnian
 
 

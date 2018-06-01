@@ -1,6 +1,6 @@
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y liblapacke-dev
+  - sudo apt-get install -y liblapacke-dev libgomp1
 language: python
 cache: pip
 python:
