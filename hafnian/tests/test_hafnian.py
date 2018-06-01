@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Tests for the Python hafnian wrapper function"""
 import unittest
 
 import numpy as np
@@ -20,45 +20,55 @@ from hafnian import hafnian, haf_real, haf_complex
 
 
 class TestVersion(unittest.TestCase):
+    """Test the version number is correctly imported"""
     def test_version_number(self):
+        """returns true if returns a string"""
         res = hf.version()
         self.assertTrue(isinstance(res, str))
 
 
 class TestPythonInterfaceWrapper(unittest.TestCase):
+    """Various Hafnian consistency checks"""
 
     def test_array_exception(self):
+        """Check exception for non-matrix argument"""
         with self.assertRaises(TypeError):
             hafnian(1)
 
     def test_square_exception(self):
+        """Check exception for non-square argument"""
         A = np.zeros([2, 3])
         with self.assertRaises(ValueError):
             hafnian(A)
 
     def test_odd_dim_exception(self):
+        """Check exception for matrix with odd dimensions"""
         A = np.zeros([3, 3])
         with self.assertRaises(ValueError):
             hafnian(A)
 
     def test_non_symmetric_exception(self):
+        """Check exception for non-symmetric matrix"""
         A = np.ones([4, 4])
         A[0, 1] = 0.
         with self.assertRaises(ValueError):
             hafnian(A)
 
     def test_nan(self):
+        """Check exception for non-finite matrix"""
         A = np.array([[2, 1], [1, np.nan]])
         with self.assertRaises(ValueError):
             hafnian(A)
 
     def test_2x2(self):
+        """Check 2x2 hafnian"""
         A = np.random.random([2, 2])
         A += A.T
         haf = hafnian(A)
         self.assertEqual(haf, A[0, 1])
 
     def test_4x4(self):
+        """Check 4x4 hafnian"""
         A = np.random.random([4, 4])
         A += A.T
         haf = hafnian(A)
@@ -67,6 +77,9 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         self.assertEqual(haf, expected)
 
     def test_real(self):
+        """Check hafnian(A)=haf_real(A) for a random
+        real matrix.
+        """
         A = np.random.random([6, 6])
         A += A.T
         haf = hafnian(A)
@@ -81,6 +94,9 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         self.assertEqual(haf, expected)
 
     def test_complex(self):
+        """Check hafnian(A)=haf_complex(A) for a random
+        real matrix.
+        """
         A = np.complex128(np.random.random([6, 6]))
         A += 1j*np.random.random([6, 6])
         A += A.T

@@ -14,3 +14,4 @@
 """
 Tests for the Python hafnian interface
 """
+# pragma: no cover

@@ -11,23 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
+"""This module performs benchmarking on the Python interface lhaf"""
 import time
 
 import numpy as np
-
-from hafnian import haf_real
-
+from hafnian import haf_complex
 
 header = ["Size", "Time(complex128)", "Result(complex128)"]
 
 print("{: >5} {: >15} {: >25} ".format(*header))
 
-for n in range(2,23):
-    mat2 = np.ones([2*n, 2*n], dtype=np.float64)
-    init2 = time.clock()
-    x2 = np.real(haf_real(mat2))
-    end2 = time.clock()
-    row = [2*n, end2-init2,x2]
 
+for n in range(2, 23):
+    mat2 = np.ones([2*n, 2*n], dtype=np.complex128)
+    init2 = time.clock()
+    x2 = np.real(haf_complex(mat2))
+    end2 = time.clock()
+    row = [2*n, end2-init2, x2]
     print("{: >5} {: >15} {: >25}".format(*row))

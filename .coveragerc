@@ -1,6 +1,7 @@
 # .coveragerc to control coverage.py
 [run]
-source = qmlt
+source = hafnian
+omit= hafnian/tests/__init__.py
 
 [report]
 # Regexes for lines to exclude from consideration

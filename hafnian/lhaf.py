@@ -30,7 +30,6 @@ Code details
 """
 import ctypes
 import os
-import sys
 import numpy as np
 
 
@@ -58,5 +57,5 @@ def hafnian(l):
     a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     rr = np.float64(np.array([0.0, 0.0]))
     arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-    res = _calc_hafnian(a, matshape[0], arr)
+    res = _calc_hafnian(a, matshape[0], arr) # pylint: disable=unused-variable
     return rr[0] + 1j*rr[1]

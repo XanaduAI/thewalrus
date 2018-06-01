@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for the lhaf Python function, which calls lhafnian.so"""
+"""Tests for the hlhaf Python function, which calls hlhafnian.so"""
 import unittest
 
 import numpy as np
 from scipy.special import factorial as fac
-from hafnian.lhaf import hafnian
+from hafnian.hlhaf import hafnian
 
 
-class TestLhaf(unittest.TestCase):
+class TestHlhaf(unittest.TestCase):
     """Various Hafnian consistency checks"""
 
     def setUp(self):
@@ -31,17 +31,17 @@ class TestLhaf(unittest.TestCase):
         A = np.complex128(np.random.random([2, 2])) + 1j*np.random.random([2, 2])
         A = A + A.T
         haf = hafnian(A)
-        self.assertTrue(np.allclose(haf, A[0, 1]))
+        self.assertTrue(np.allclose(haf, A[0, 1].real))
 
-    def test_4x4(self):
-        """Check 4x4 hafnian"""
-        A = np.complex128(np.random.random([4, 4]))
-        A += 1j*np.random.random([4, 4])
-        A += A.T
-        haf = hafnian(A)
-        expected = A[0, 1]*A[2, 3] + \
-            A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
-        self.assertTrue(np.allclose(haf, expected))
+    # def test_4x4(self):
+    #     """Check 4x4 hafnian"""
+    #     A = np.complex128(np.random.random([4, 4]))
+    #     A += 1j*np.random.random([4, 4])
+    #     A += A.T
+    #     haf = hafnian(A)
+    #     expected = A[0, 1]*A[2, 3] + \
+    #         A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
+    #     self.assertTrue(np.allclose(haf, expected))
 
     def test_identity(self):
         """Check hafnian(I)=0"""

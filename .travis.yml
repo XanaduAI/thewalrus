@@ -1,0 +1,15 @@
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y liblapacke-dev
+language: python
+cache: pip
+python:
+  - 3.5
+install:
+  - pip install -r requirements.txt
+  - pip install wheel coverage codecov
+  - python3 install -e .
+script:
+  - make coverage
+after_success:
+  - codecov

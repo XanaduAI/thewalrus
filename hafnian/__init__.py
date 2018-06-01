@@ -70,35 +70,35 @@ def hafnian(l, tol=1e-12):
     Returns:
         np.float64 or np.complex128: the hafnian of matrix l
     """
-    if isinstance(l, np.ndarray):
-        matshape = l.shape
-        if matshape[0] != matshape[1]:
-            raise ValueError("Input matrix must be square.")
-
-        if matshape[0] % 2 != 0:
-            raise ValueError("Input matrix must be of even dimensions.")
-
-        if np.isnan(l).any():
-            raise ValueError("Input matrix must not contain NaNs.")
-
-        if np.linalg.norm(l-np.transpose(l)) >= tol:
-            raise ValueError("Input matrix must be symmetric.")
-
-        if matshape[0] == 2:
-            return l[0][1]
-        if matshape[0] == 4:
-            return l[0][1]*l[2][3] + l[0][2]*l[1][3] + l[0][3]*l[1][2]
-
-        if l.dtype == np.float or l.dtype == np.int:
-            return haf_real(l)
-
-        if l.dtype == np.complex:
-            if np.any(np.iscomplex(l)):
-                return haf_complex(l)
-
-            return haf_real(np.float64(l.real))
-    else:
+    if not isinstance(l, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")
+
+    matshape = l.shape
+
+    if matshape[0] != matshape[1]:
+        raise ValueError("Input matrix must be square.")
+
+    if matshape[0] % 2 != 0:
+        raise ValueError("Input matrix must be of even dimensions.")
+
+    if np.isnan(l).any():
+        raise ValueError("Input matrix must not contain NaNs.")
+
+    if np.linalg.norm(l-np.transpose(l)) >= tol:
+        raise ValueError("Input matrix must be symmetric.")
+
+    if matshape[0] == 2:
+        return l[0][1]
+    if matshape[0] == 4:
+        return l[0][1]*l[2][3] + l[0][2]*l[1][3] + l[0][3]*l[1][2]
+
+    if l.dtype == np.complex:
+        if np.any(np.iscomplex(l)):
+            return haf_complex(l)
+
+        return haf_real(np.float64(l.real))
+
+    return haf_real(l)
 
 
 def version():
