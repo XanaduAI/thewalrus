@@ -76,9 +76,9 @@ Authors
 
 Nicolás Quesada and Brajesh Gupt.
 
-If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1804.03159>`_:
+If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
 
-  Nathan Killoran, Josh Izaac, Nicolás Quesada, Ville Bergholm, Matthew Amy, and Christian Weedbrook. Strawberry Fields: A Software Platform for Photonic Quantum Computing. *arXiv*, 2018. arXiv:1804.03159
+ A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer *arXiv*, 2018. arxiv:1805.12498
 
 
 Support
