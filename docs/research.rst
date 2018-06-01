@@ -4,7 +4,7 @@ Research and contribution
 Research
 ---------------
 
-If you are doing research using the Hafnian library please reference this page and our paper.
+If you are doing research using the Hafnian library please reference this page and our `our paper <https://arxiv.org/abs/1805.12498>`_.
 
 We are always open for collaboration, and can be contacted at research@xanadu.ai. 
 
