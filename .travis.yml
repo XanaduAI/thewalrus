@@ -21,14 +21,15 @@ matrix:
         - docker
       env:
         - WHEEL=1
-        - PIP=pip3
-        - CIBW_BEFORE_BUILD=yum install -y lapack-devel
+        - PIP=pip
+        - CIBW_BEFORE_BUILD=wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo && yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils lapack-devel && source /opt/rh/devtoolset-2/enable
 
     - os: osx
+      osx_image: xcode6.4 # = OS X 10.10
       language: generic
       env:
         - WHEEL=1
-        - PIP=pip
+        - PIP=pip3
 
 before_install:
   - |
@@ -43,13 +44,6 @@ install:
       pip install -r requirements.txt
       pip install wheel coverage codecov
       pip install -e .
-    fi
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [ "$WHEEL" = "1" ]; then
-      wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo
-      yum install devtoolset-2-gcc devtoolset-2-binutils
-      yum install devtoolset-2-gcc-c++
-      source /opt/rh/devtoolset-2/enable
     fi
 
 script:
