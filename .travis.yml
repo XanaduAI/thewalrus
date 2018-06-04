@@ -22,14 +22,14 @@ matrix:
       env:
         - WHEEL=1
         - PIP=pip
-        - CIBW_BEFORE_BUILD="wget http://www.netlib.org/lapack/lapack-3.4.2.tgz && tar xvzf lapack-3.4.2.tgz && cd lapack-3.4.2 && cp make.inc.example make.inc && make lapacklib && make -C lapacke && cd ../ && cp lapack-3.4.2/*.a /usr/local/lib/ && chmod 555 /usr/local/*.a && cp lapack-3.4.2/lapacke/include/* /usr/local/include/"
+        - CIBW_BEFORE_BUILD="wget http://www.netlib.org/lapack/lapack-3.4.2.tgz && tar xvzf lapack-3.4.2.tgz && cd lapack-3.4.2 && cp make.inc.example make.inc && make lapacklib && make -C lapacke && cd ../ && cp lapack-3.4.2/*.a /usr/local/lib/ && chmod 555 /usr/local/lib/*.a && cp lapack-3.4.2/lapacke/include/* /usr/local/include/"
 
     - os: osx
       osx_image: xcode6.4 # = OS X 10.10
       language: generic
       env:
         - WHEEL=1
-        - PIP=pip
+        - PIP=pip2
 
 before_install:
   - |
