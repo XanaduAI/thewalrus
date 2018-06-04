@@ -1,51 +1,51 @@
 language: python
-
 env:
   global:
-    - CIBW_SKIP="cp27-* cp34-*"
-
+  - CIBW_SKIP="cp27-* cp34-* cp35-manylinux1_x86_64 cp36-manylinux1_x86_64"
+  - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
+  - secure: AlHQEqtlwvZgFrK/zcDsFNdshwZjA0+7MXz5VGLt9bOYoNjv1AadtAHJryap46feuxS2fLcvI0+JBP2sDeyB/8oUx8NSH0ubzGuPAlzylS9Z6E3ppmSGl6F6h8Ws9mSIk1UDe27tC9G2nEAHMW34DLECUUP9rgmagOjXkqwzkZF4c7ZFJ9K8kxr4ur0fNsLK3LpS/Ybu7KoAO4cy1TagKkvXczNVlnN4Kc+VfUrMJa8I26pO+W6gvZ7k6GKhOYZFSZxZfnyzkfrlWrVzuEFoZK2pr3yQwR+D6A2VDhwKE5NhZdCyRnsgNFxV8kxvLYwhVjzz2WFdVG/raLafDKzGOofwW7pW1gSdnGde6gnVOLo/M8TC+6Ef5NMEK3b88sq/kRrt6EjWExsyIRXOoazsMneB7ZRBHRMUdWWskW3+jxkphHAs4FE5EfOVRRMBuY/fqiW1+uVzHCPGcy23pQyjU18SLlrRvyDZYiNgF7I5goSgWgHGFQuYnOuknI0CPymHBeY7gLcPiz4yRf1NHBuw6ErUNBwgEEN22ThY7K0Hy4w7f61CS+Kj+01I2AmwWBO7ZagALX0aignRMm5mnDDHXN3jUWR63whp1XsyZVxKpUjb0OQAkqONVEPM3urU3REzKzdiF20TSwFZwKb8xp8/lPEM05kKe8oQ9bkY4T6pI0c=
 matrix:
   include:
-    - python: 3.5
-      cache: pip
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-4.8
-      env: WHEEL=0
-
-    - sudo: required
-      services:
-        - docker
-      env:
-        - WHEEL=1
-        - PIP=pip
-        - CIBW_BEFORE_BUILD="if [ ! -f built-lib ]; then wget https://s3.amazonaws.com/xanadu-img/lapack-3.4.2.tgz && tar xzf lapack-3.4.2.tgz && cd lapack-3.4.2 && make install PREFIX=/usr/local && cd ../ && touch built-lib; fi"
-
+  - python: 3.5
+    cache: pip
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-4.8
+    env: WHEEL=0
+  - sudo: required
+    services:
+    - docker
+    env:
+    - WHEEL=1
+    - PIP=pip
+    - CIBW_BEFORE_BUILD="if [ ! -f built-lib ]; then wget https://s3.amazonaws.com/xanadu-img/lapack-3.4.2.tgz
+      && tar xzf lapack-3.4.2.tgz && cd lapack-3.4.2 && make install PREFIX=/usr/local
+      && cd ../ && touch built-lib; fi"
 before_install:
-  - |
-    if [ "$WHEEL" = "0" ]; then
-      sudo apt-get -qq update;
-      sudo apt-get install -y liblapacke-dev;
-    fi
-
+- |
+  if [ "$WHEEL" = "0" ]; then
+    sudo apt-get -qq update;
+    sudo apt-get install -y liblapacke-dev;
+  fi
 install:
-  - |
-    if [ "$WHEEL" = "0" ]; then
-      pip install -r requirements.txt
-      pip install wheel coverage codecov
-      pip install -e .
-    fi
-
+- |
+  if [ "$WHEEL" = "0" ]; then
+    pip install -r requirements.txt
+    pip install wheel coverage codecov
+    pip install -e .
+  fi
 script:
-  - if [ "$WHEEL" = "0" ]; then make coverage; fi
-  - |
-    if [ "$WHEEL" = "1" ]; then
-      $PIP install cibuildwheel==0.8.0
-      cibuildwheel --output-dir wheelhouse
-    fi
-
+- if [ "$WHEEL" = "0" ]; then make coverage; fi
+- |
+  if [ "$WHEEL" = "1" ]; then
+    $PIP install cibuildwheel==0.8.0
+    cibuildwheel --output-dir wheelhouse
+    $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
+    $PIP install wheelhouse-uploader
+    wheelhouse_uploader upload --local-folder wheelhouse/ xanadu-img
+  fi
 after_success:
-  - if [ "$WHEEL" = "0" ]; then make codecov; fi
+- if [ "$WHEEL" = "0" ]; then make codecov; fi
