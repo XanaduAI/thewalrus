@@ -1,21 +1,69 @@
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y liblapacke-dev libgomp1
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.8
 language: python
-cache: pip
-python:
-  - 3.5
+
+env:
+  global:
+    - CIBW_SKIP=cp27-*
+
+matrix:
+  include:
+    - python: 3.5
+    - cache: pip
+    - addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.8
+    - env: WHEEL=0
+
+    - sudo: required
+      services:
+        - docker
+      env:
+        - WHEEL=1
+        - PIP=pip3
+        - CIBW_BEFORE_BUILD=yum install -y lapack-devel
+
+    - os: osx
+      language: generic
+      env:
+        - WHEEL=1
+        - PIP=pip
+
+before_install:
+  - |
+    if [ "$WHEEL" = "0" ]; then
+      sudo apt-get -qq update;
+      sudo apt-get install -y liblapacke-dev;
+    fi
+
 install:
-  - pip install -r requirements.txt
-  - pip install wheel coverage codecov
-  - pip install -e .
+  - |
+    if [ "$WHEEL" = "0" ]; then
+      pip install -r requirements.txt
+      pip install wheel coverage codecov
+      pip install -e .
+    fi
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [ "$WHEEL" = "1" ]; then
+      wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo
+      yum install devtoolset-2-gcc devtoolset-2-binutils
+      yum install devtoolset-2-gcc-c++
+      source /opt/rh/devtoolset-2/enable
+    fi
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update
+      brew install 
+    fi
+
 script:
-  - make coverage
+  - if [ "$WHEEL" = "0" ]; then make coverage; fi
+  - |
+    if [ "$WHEEL" = "1" ]; then
+      $PIP install cibuildwheel==0.8.0
+      cibuildwheel --output-dir wheelhouse
+    fi
+
 after_success:
-  - codecov
+  - if [ "$WHEEL" = "0" ]; then make codecov; fi
