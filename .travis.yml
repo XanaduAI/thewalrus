@@ -22,14 +22,14 @@ matrix:
       env:
         - WHEEL=1
         - PIP=pip
-        - CIBW_BEFORE_BUILD="wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo && yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils lapack-devel && source /opt/rh/devtoolset-2/enable"
+        - CIBW_BEFORE_BUILD="wget http://www.netlib.org/lapack/lapack-3.4.2.tgz && tar xvzf lapack-3.4.2.tar.gz && cd lapack-3.4.2 && cp make.inc.example make.inc && make lapacklib && make -C lapacke && cd ../ && mkdir /usr/local/lapack/lib && cp lapack-3.4.2/*.a /usr/local/lib/ && cp lapack-3.4.2/lapacke/*.a /usr/local/lib/ && chmod 555 /usr/local/*.a && cp lapack-3.4.2/lapacke/include /usr/local/include/"
 
     - os: osx
       osx_image: xcode6.4 # = OS X 10.10
       language: generic
       env:
         - WHEEL=1
-        - PIP=pip3
+        - PIP=pip
 
 before_install:
   - |
