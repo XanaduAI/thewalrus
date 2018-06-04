@@ -51,11 +51,6 @@ install:
       yum install devtoolset-2-gcc-c++
       source /opt/rh/devtoolset-2/enable
     fi
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      brew update
-      brew install 
-    fi
 
 script:
   - if [ "$WHEEL" = "0" ]; then make coverage; fi
