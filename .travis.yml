@@ -22,7 +22,7 @@ matrix:
       env:
         - WHEEL=1
         - PIP=pip
-        - CIBW_BEFORE_BUILD=wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo && yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils lapack-devel && source /opt/rh/devtoolset-2/enable
+        - CIBW_BEFORE_BUILD="wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo && yum install -y devtoolset-2-gcc devtoolset-2-gcc-c++ devtoolset-2-binutils lapack-devel && source /opt/rh/devtoolset-2/enable"
 
     - os: osx
       osx_image: xcode6.4 # = OS X 10.10
