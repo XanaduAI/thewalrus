@@ -17,10 +17,6 @@ Hafnian
     :alt: Read the Docs
     :target: https://hafnian.readthedocs.io
 
-.. image:: https://img.shields.io/pypi/v/hafnian.svg?style=for-the-badge
-    :alt: PyPI
-    :target: https://pypi.org/project/hafnian
-
 .. image:: https://img.shields.io/pypi/pyversions/hafnian.svg?style=for-the-badge
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/hafnian
