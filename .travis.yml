@@ -2,7 +2,7 @@ language: python
 
 env:
   global:
-    - CIBW_SKIP=cp27-*
+    - CIBW_SKIP="cp27-* cp34-*"
 
 matrix:
   include:
@@ -22,7 +22,7 @@ matrix:
       env:
         - WHEEL=1
         - PIP=pip
-        - CIBW_BEFORE_BUILD="wget https://s3.amazonaws.com/xanadu-img/lapack-3.4.2.tgz && tar xvzf lapack-3.4.2.tgz && cd lapack-3.4.2 && make install PREFIX=/usr/local && cd ../"
+        - CIBW_BEFORE_BUILD="if [ ! -f built-lib ]; then wget https://s3.amazonaws.com/xanadu-img/lapack-3.4.2.tgz && tar xzf lapack-3.4.2.tgz && cd lapack-3.4.2 && make install PREFIX=/usr/local && cd ../; fi"
 
 before_install:
   - |
