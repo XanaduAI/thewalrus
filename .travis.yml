@@ -7,14 +7,14 @@ env:
 matrix:
   include:
     - python: 3.5
-    - cache: pip
-    - addons:
+      cache: pip
+      addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
             - gcc-4.8
-    - env: WHEEL=0
+      env: WHEEL=0
 
     - sudo: required
       services:
