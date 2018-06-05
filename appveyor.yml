@@ -15,7 +15,6 @@ cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
 platform:
-  - x86
   - x64
 
 matrix:
@@ -28,7 +27,7 @@ install:
   - conda update -q conda
   - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION% 
   - activate python%PYTHON_VERSION%
-  - conda install -c conda-forge lapack
+  - conda install -c conda-forge openblas
   - if "%PLATFORM%" == "x86" set C_INCLUDE_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\include
   - if "%PLATFORM%" == "x86" set LD_LIBRARY_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\lib
   - if "%PLATFORM%" == "x64" set C_INCLUDE_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\include
