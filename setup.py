@@ -46,9 +46,11 @@ with open("hafnian/_version.py") as f:
 
 if os.name == 'nt':
     cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
+    libraries = ['lopenblas']
     extra_link_args = ['-fopenmp', '-lopenblas']
 else:
     cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
+    libraries = ['lapacke']
     extra_link_args = ['-fopenmp', '-llapacke']
 
 LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
@@ -85,7 +87,7 @@ info = {
             sources=["src/lhafnian.c",],
             depends=["src/lhafnian.h"],
             include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=['lapacke'],
+            libraries=libraries,
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
             extra_link_args=extra_link_args
@@ -94,7 +96,7 @@ info = {
             sources=["src/rlhafnian.c"],
             depends=["src/rlhafnian.h"],
             include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=['lapacke'],
+            libraries=libraries,
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
             extra_link_args=extra_link_args
@@ -103,7 +105,7 @@ info = {
             sources=["src/hlhafnian.c"],
             depends=["src/hlhafnian.h"],
             include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=['lapacke'],
+            libraries=libraries,
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
             extra_link_args=extra_link_args

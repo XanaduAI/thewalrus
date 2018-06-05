@@ -90,25 +90,33 @@ install:
       } Else {
           $OPENBLAS = $env:OPENBLAS_64
       }
+
       $clnt = new-object System.Net.WebClient
       $file = "$(New-TemporaryFile).zip"
       $tmpdir = New-TemporaryFile | %{ rm $_; mkdir $_ }
       $destination = "$PYTHON\lib\openblas.a"
+
       echo $file
       echo $tmpdir
       echo $OPENBLAS
+
       $clnt.DownloadFile($OPENBLAS,$file)
       Get-FileHash $file | Format-List
+
       Expand-Archive $file $tmpdir
+
       rm $tmpdir\$PYTHON_ARCH\lib\*.dll.a
       $lib = ls $tmpdir\$PYTHON_ARCH\lib\*.a | ForEach { ls $_ } | Select-Object -first 1
       echo $lib
+
       cp $lib $destination
       ls $destination
+
       cmd /c curl -fsS -o lapacke.h $env:WINDOWS_LAPACKE_HEADER
       cp $tmpdir\$PYTHON_ARCH\include\lapacke_*.h $PYTHON\include\
       cp lapacke.h $PYTHON\include\
       ls $PYTHON\include\lapacke.h
+
       cp .ci\distutils.cfg $PYTHON\lib\distutils\distutils.cfg
       rm -r -Force $PYTHON\lib\distutils\cygwinccompiler.py
       cp .ci\cygwinccompiler.py $PYTHON\lib\distutils\cygwinccompiler.py
