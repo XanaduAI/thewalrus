@@ -70,8 +70,8 @@ install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
-  - if [%PYTHON_ARCH%]==[32] SET PATH=%MINGW_32%;%PATH% & SET OPENBLAS=%OPENBLAS_32%
-  - if [%PYTHON_ARCH%]==[64] SET PATH=%MINGW_64%;%PATH% & SET OPENBLAS=%OPENBLAS_64%
+  - if [%PYTHON_ARCH%]==[32] SET PATH=%MINGW_32%;%PYTHON%;%PYTHON%\Scripts;%PATH%
+  - if [%PYTHON_ARCH%]==[64] SET PATH=%MINGW_64%;%PYTHON%;%PYTHON%\Scripts;%PATH%
 
   # Check that we have the expected version and architecture for Python
   - python --version
