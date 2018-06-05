@@ -105,6 +105,7 @@ install:
       cp $lib $destination
       ls $destination
       cmd /c curl -fsS -o lapacke.h $env:WINDOWS_LAPACKE_HEADER
+      cp $tmpdir\$PYTHON_ARCH\lib\lapacke_*.h $PYTHON\include\
       cp lapacke.h $PYTHON\include\
       ls $PYTHON\include\lapacke.h
   # Upgrade to the latest pip.
