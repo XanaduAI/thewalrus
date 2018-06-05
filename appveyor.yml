@@ -96,7 +96,7 @@ install:
       $clnt = new-object System.Net.WebClient
       $file = "$(New-TemporaryFile).zip"
       $tmpdir = New-TemporaryFile | %{ rm $_; mkdir $_ }
-      $destination = "$PYTHON\lib\openblas.a"
+      $destination = "$PYTHON\lib\libopenblas.a"
 
       echo $file
       echo $tmpdir
@@ -124,7 +124,7 @@ install:
       cp .ci\cygwinccompiler.py $PYTHON\lib\distutils\cygwinccompiler.py
 
       ls $PYTHON\lib
-      ls $MINGW\bin
+      ls $MINGW
   # Upgrade to the latest pip.
   - '%CMD_IN_ENV% python -m pip install -U pip setuptools wheel'
 
