@@ -8,8 +8,6 @@ environment:
       OPENBLAS_32: https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com/openblas-5f998ef_gcc7_1_0_win32.zip
       OPENBLAS_64: https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com/openblas-5f998ef_gcc7_1_0_win64.zip
       WINDOWS_LAPACKE_HEADER: https://s3.amazonaws.com/xanadu-img/lapacke.h
-      DISTUTILS_CFG_32: distutils_mingw32.cfg
-      DISTUTILS_CFG_64: distutils_mingw64.cfg
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
       TEST_TIMEOUT: 1000
@@ -89,10 +87,8 @@ install:
       $PYTHON = $env:PYTHON
       If ($PYTHON_ARCH -eq 32) {
           $OPENBLAS = $env:OPENBLAS_32
-          $CFG = $env:DISTUTILS_CFG_32
       } Else {
           $OPENBLAS = $env:OPENBLAS_64
-          $CFG = $env:DISTUTILS_CFG_64
       }
       $clnt = new-object System.Net.WebClient
       $file = "$(New-TemporaryFile).zip"
@@ -113,7 +109,7 @@ install:
       cp $tmpdir\$PYTHON_ARCH\include\lapacke_*.h $PYTHON\include\
       cp lapacke.h $PYTHON\include\
       ls $PYTHON\include\lapacke.h
-      cp .ci\$CFG $PYTHON\lib\distutils\distutils.cfg
+      cp .ci\distutils.cfg $PYTHON\lib\distutils\distutils.cfg
   # Upgrade to the latest pip.
   - '%CMD_IN_ENV% python -m pip install -U pip setuptools wheel'
 
