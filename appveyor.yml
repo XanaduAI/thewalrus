@@ -110,6 +110,8 @@ install:
       cp lapacke.h $PYTHON\include\
       ls $PYTHON\include\lapacke.h
       cp .ci\distutils.cfg $PYTHON\lib\distutils\distutils.cfg
+      rm -r -Force $PYTHON\lib\distutils\cygwinccompiler.py
+      cp .ci\cygwinccompiler.py $PYTHON\lib\distutils\cygwinccompiler.py
   # Upgrade to the latest pip.
   - '%CMD_IN_ENV% python -m pip install -U pip setuptools wheel'
 
