@@ -87,8 +87,10 @@ install:
       $PYTHON = $env:PYTHON
       If ($PYTHON_ARCH -eq 32) {
           $OPENBLAS = $env:OPENBLAS_32
+          $MINGW = $env:MINGW_32 
       } Else {
           $OPENBLAS = $env:OPENBLAS_64
+          $MINGW = $env:MINGW_64
       }
 
       $clnt = new-object System.Net.WebClient
@@ -120,6 +122,9 @@ install:
       cp .ci\distutils.cfg $PYTHON\lib\distutils\distutils.cfg
       rm -r -Force $PYTHON\lib\distutils\cygwinccompiler.py
       cp .ci\cygwinccompiler.py $PYTHON\lib\distutils\cygwinccompiler.py
+
+      ls $PYTHON\lib
+      ls $MINGW\bin
   # Upgrade to the latest pip.
   - '%CMD_IN_ENV% python -m pip install -U pip setuptools wheel'
 
