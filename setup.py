@@ -46,7 +46,7 @@ with open("hafnian/_version.py") as f:
 
 if os.name == 'nt':
     cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
-    libraries = ['lopenblas']
+    libraries = ['openblas']
     extra_link_args = ['-fopenmp', '-lopenblas']
 else:
     cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
