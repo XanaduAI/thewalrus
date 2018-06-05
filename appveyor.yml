@@ -103,7 +103,7 @@ install:
       echo $lib
       cp $lib $destination
       ls $destination
-      cp $tmpdir\$PYTHON_ARCH\lib\* $PYTHON\include\
+      cp $tmpdir\$PYTHON_ARCH\include\* $PYTHON\include\
       ls $PYTHON\include\
   # Upgrade to the latest pip.
   - '%CMD_IN_ENV% python -m pip install -U pip setuptools wheel'
