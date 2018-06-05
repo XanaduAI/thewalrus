@@ -44,14 +44,9 @@ with open("hafnian/_version.py") as f:
 
 # cmdclass = {'build_docs': BuildDoc}
 
-if os.name == 'nt':
-    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
-    libraries = ['openblas']
-    extra_link_args = ['-fopenmp', '-lopenblas']
-else:
-    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
-    libraries = ['lapacke']
-    extra_link_args = ['-fopenmp', '-llapacke']
+cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
+libraries = ['lapacke']
+extra_link_args = ['-fopenmp', '-llapacke']
 
 LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
 C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":")

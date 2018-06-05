@@ -29,6 +29,12 @@ install:
   - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION% 
   - activate python%PYTHON_VERSION%
   - conda install -c conda-forge lapack
+  - if "%PLATFORM%" == "x86" set C_INCLUDE_PATH=%CONDPATH%\envs\python%PYTHON_VERSION%\Library\include
+  - if "%PLATFORM%" == "x86" set LD_LIBRARY_PATH=%CONDPATH%\envs\python%PYTHON_VERSION%\Library\lib
+  - if "%PLATFORM%" == "x64" set C_INCLUDE_PATH=%CONDPATH%-x64\envs\python%PYTHON_VERSION%\Library\include
+  - if "%PLATFORM%" == "x64" set LD_LIBRARY_PATH=%CONDPATH%-x64\envs\python%PYTHON_VERSION%\Library\lib
+  - if "%PLATFORM%" == "x86" ls %CONDPATH%\envs\python%PYTHON_VERSION%
+  - if "%PLATFORM%" == "x64" ls %CONDPATH%-x64\envs\python%PYTHON_VERSION%
   - conda install -q --name python%PYTHON_VERSION% setuptools numpy wheel pip setuptools
   - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c anaconda libpython
   - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c msys2 m2w64-toolchain
