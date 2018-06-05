@@ -22,19 +22,19 @@ matrix:
   fast_finish: false
 
 install:
-  - if "%PLATFORM%" == "x86" set PATH=%CONDPATH%\bin;%CONDAPATH%\Scripts;%PATH%
-  - if "%PLATFORM%" == "x64" set PATH=%CONDPATH%-x64\bin;%CONDAPATH%-x64\Scripts;%PATH%
+  - if "%PLATFORM%" == "x86" set PATH=%CONDAPATH%\bin;%CONDAPATH%\Scripts;%PATH%
+  - if "%PLATFORM%" == "x64" set PATH=%CONDAPATH%-x64\bin;%CONDAPATH%-x64\Scripts;%PATH%
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION% 
   - activate python%PYTHON_VERSION%
   - conda install -c conda-forge lapack
-  - if "%PLATFORM%" == "x86" set C_INCLUDE_PATH=%CONDPATH%\envs\python%PYTHON_VERSION%\Library\include
-  - if "%PLATFORM%" == "x86" set LD_LIBRARY_PATH=%CONDPATH%\envs\python%PYTHON_VERSION%\Library\lib
-  - if "%PLATFORM%" == "x64" set C_INCLUDE_PATH=%CONDPATH%-x64\envs\python%PYTHON_VERSION%\Library\include
-  - if "%PLATFORM%" == "x64" set LD_LIBRARY_PATH=%CONDPATH%-x64\envs\python%PYTHON_VERSION%\Library\lib
-  - if "%PLATFORM%" == "x86" ls %CONDPATH%\envs\python%PYTHON_VERSION%
-  - if "%PLATFORM%" == "x64" ls %CONDPATH%-x64\envs\python%PYTHON_VERSION%
+  - if "%PLATFORM%" == "x86" set C_INCLUDE_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\include
+  - if "%PLATFORM%" == "x86" set LD_LIBRARY_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\lib
+  - if "%PLATFORM%" == "x64" set C_INCLUDE_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\include
+  - if "%PLATFORM%" == "x64" set LD_LIBRARY_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\lib
+  - if "%PLATFORM%" == "x86" ls %CONDAPATH%\envs\python%PYTHON_VERSION%
+  - if "%PLATFORM%" == "x64" ls %CONDAPATH%-x64\envs\python%PYTHON_VERSION%
   - conda install -q --name python%PYTHON_VERSION% setuptools numpy wheel pip setuptools
   - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c anaconda libpython
   - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c msys2 m2w64-toolchain
