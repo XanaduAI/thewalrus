@@ -120,10 +120,10 @@ build_script:
       $PYTHON_ARCH = $env:PYTHON_ARCH
       If ($PYTHON_ARCH -eq 32) {
           $MINGW = $env:MINGW_32 
-          $CC = mingw32
+          $CC = "mingw32"
       } Else {
           $MINGW = $env:MINGW_64
-          $CC = mingw64
+          $CC = "mingw64"
       }
       $env:Path += ";$MINGW"
       mkdir wheelhouse
