@@ -44,7 +44,12 @@ with open("hafnian/_version.py") as f:
 
 # cmdclass = {'build_docs': BuildDoc}
 
-cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
+if os.name == 'nt':
+    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
+    extra_link_args = ['-fopenmp', '-lopenblas']
+else:
+    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
+    extra_link_args = ['-fopenmp', '-llapacke']
 
 LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
 C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":")
@@ -83,7 +88,7 @@ info = {
             libraries=['lapacke'],
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
-            extra_link_args=['-fopenmp', '-llapacke']
+            extra_link_args=extra_link_args
             ),
         CTypes("rlhafnian",
             sources=["src/rlhafnian.c"],
@@ -92,7 +97,7 @@ info = {
             libraries=['lapacke'],
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
-            extra_link_args=['-fopenmp', '-llapacke']
+            extra_link_args=extra_link_args
             ),
         CTypes("hlhafnian",
             sources=["src/hlhafnian.c"],
@@ -101,7 +106,7 @@ info = {
             libraries=['lapacke'],
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
-            extra_link_args=['-fopenmp', '-llapacke']
+            extra_link_args=extra_link_args
             )
     ],
     'cmdclass': {'build_ext': build_ext},
