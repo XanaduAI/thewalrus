@@ -127,7 +127,7 @@ build_script:
       }
       $env:Path += ";$MINGW"
       mkdir wheelhouse
-      pip wheel . -w wheelhouse --no-deps --compiler=$CC
+      pip wheel . -w wheelhouse --no-deps --build-option --compiler=$CC
 
 artifacts:
   - path: "wheelhouse\\*.whl"
