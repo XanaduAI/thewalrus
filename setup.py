@@ -15,8 +15,10 @@
 #!/usr/bin/env python3
 import sys
 import os
-from setuptools import setup, Extension
-from distutils.command.build_ext import build_ext
+
+import setuptools
+from numpy.distutils.core import Extension, setup
+from numpy.distutils.command.build_ext import build_ext
 
 
 class build_ext(build_ext):
