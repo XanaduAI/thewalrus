@@ -39,7 +39,8 @@ C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":")
 CFLAGS = os.environ.get('CFLAGS', cflags_default).split()
 
 requirements = [
-    "numpy>=1.13"
+    "numpy>=1.13",
+    "cython"
 ]
 
 os.environ['OPT'] = ''
