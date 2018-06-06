@@ -23,7 +23,7 @@ matrix:
     - PIP=pip
     - CIBW_MANYLINUX1_X86_64_IMAGE=josh146/manylinux1_lapack_3.4.2_x86_64:firstcommit
     - CIBW_MANYLINUX1_I686_IMAGE=josh146/manylinux1_lapack_3.4.2_i686:firstcommit
-    - CIBW_BEFORE_BUILD='{pip} install numpy cython && export NUMPY_INCLUDE=$({python} -c "import numpy; print(numpy.get_include())") && ln -s $NUMPY_INCLUDE /usr/local/include/numpy'
+    - CIBW_BEFORE_BUILD='{pip} install numpy cython && export NUMPY_INCLUDE=$({python} -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"'
 before_install:
 - |
   if [ "$WHEEL" = "0" ]; then
@@ -36,7 +36,7 @@ install:
     pip install -r requirements.txt
     pip install wheel coverage codecov
     export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
-    ln -s $NUMPY_INCLUDE /usr/local/include/numpy
+    export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"
     pip install -e .
   fi
 script:
