@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Complex hafnian function
+Real hafnian function
 ========================
 
-**Module name:** :mod:`hafnian.hlhaf`
+**Module name:** :mod:`hafnian.rlhaf`
 
-.. currentmodule:: hafnian.hlhaf
+.. currentmodule:: hafnian.rlhaf
 
 Summary
 --------
@@ -34,30 +34,37 @@ import numpy as np
 
 
 path = os.path.dirname(__file__)
-sofile = os.path.join(path, "lib/hlhafnian.so")
+sofile = os.path.join(path, "lib/rlhafnian.so")
 cdll = ctypes.CDLL(sofile)
 
 
 _calc_hafnian = cdll.dhaf
 _calc_hafnian.restype = ctypes.c_double
 
+_calc_hafnian_loops = cdll.dhaf_loops
+_calc_hafnian_loops.restype = ctypes.c_double
 
-def hafnian(l):
-    """Returns the hafnian of a complex matrix l via the C hafnian library.
 
-    This function uses the Hermitian method of computing the hafnian.
+def hafnian(l, loop=False):
+    """Returns the hafnian of real matrix l via the C hafnian library.
 
     Args:
-        l (array): a complex, square, symmetric array of even dimensions.
+        l (array): a real, square, symmetric array of even dimensions.
+        loop (bool): If ``True``, the loop hafnian is returned. Default false.
 
     Returns:
-        np.complex128: the hafnian of matrix l
+        np.float64: the hafnian of matrix l
     """
-    if l.dtype != np.complex128:
-        l = l.astype(np.complex128)
+    if l.dtype != np.float64:
+        l = l.astype(np.float64)
     matshape = l.shape
     a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     rr = np.float64(np.array([0.0, 0.0]))
     arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-    res = _calc_hafnian(a, matshape[0], arr) # pylint: disable=unused-variable
-    return rr[0] + 1j*rr[1]
+
+    if loop:
+        res = _calc_hafnian_loops(a, matshape[0], arr) # pylint: disable=unused-variable
+    else:
+        res = _calc_hafnian(a, matshape[0], arr) # pylint: disable=unused-variable
+
+    return rr[0]

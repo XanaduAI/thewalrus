@@ -6,7 +6,9 @@ n=size(A,1);
 D = diag(A);
 P=kron(eye(n/2),[0 1;1 0]);
 A=A*P;
-C = (P * D)';
+C = (P * D).';
+C
+D
 comb = zeros(2, n/2+1);
 res = 0;
 for X=1:2^(n/2)-1,
@@ -14,7 +16,7 @@ for X=1:2^(n/2)-1,
     P=kron(sieve, [1 1]);
     ix=find(P==1);
     B=A(ix,ix);
-    C1=conj(C(ix));
+    C1=C(ix);
     D1=D(ix);
     E=eig(B); % O(n^3)
     %Compute combinations in O(n^2log n) time
@@ -27,6 +29,7 @@ for X=1:2^(n/2)-1,
         % Also, combinations from open walks with 
         % loops at both ends
         factor = sum(E.^i) / (2*i) + C1*D1/2;
+        C1*D1
         C1 = C1*B;
         powfactor = 1;
         cnt = 3 - cnt;

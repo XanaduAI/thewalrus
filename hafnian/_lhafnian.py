@@ -41,12 +41,16 @@ cdll = ctypes.CDLL(sofile)
 _calc_hafnian = cdll.dhaf
 _calc_hafnian.restype = ctypes.c_double
 
+_calc_hafnian_loops = cdll.dhaf_loops
+_calc_hafnian_loops.restype = ctypes.c_double
 
-def hafnian(l):
+
+def hafnian(l, loop=False):
     """Returns the hafnian of a complex matrix l via the C hafnian library.
 
     Args:
         l (array): a complex, square, symmetric array of even dimensions.
+        loop (bool): If ``True``, the loop hafnian is returned. Default false.
 
     Returns:
         np.complex128: the hafnian of matrix l
@@ -57,5 +61,10 @@ def hafnian(l):
     a = l.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     rr = np.float64(np.array([0.0, 0.0]))
     arr = rr.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-    res = _calc_hafnian(a, matshape[0], arr) # pylint: disable=unused-variable
+
+    if loop:
+        res = _calc_hafnian_loops(a, matshape[0], arr) # pylint: disable=unused-variable
+    else:
+        res = _calc_hafnian(a, matshape[0], arr) # pylint: disable=unused-variable
+
     return rr[0] + 1j*rr[1]

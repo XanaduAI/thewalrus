@@ -100,15 +100,6 @@ info = {
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
             extra_link_args=extra_link_args
-            ),
-        CTypes("hlhafnian",
-            sources=["src/hlhafnian.c"],
-            depends=["src/hlhafnian.h"],
-            include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args
             )
     ],
     'cmdclass': {'build_ext': build_ext},

@@ -16,6 +16,9 @@ CFLAGS1= -std=c99 -O3 -Wall -fPIC -shared -I/usr/include -fopenmp  -llapacke -I.
 timing.out:timing.o lhafnian.o 
 	$(CC) $^ $(LFLAGS) -o $@
 
+loopex.out:loopex.o lhafnian.o 
+	$(CC) $^ $(LFLAGS) -o $@
+
 htiming.out:timing.o hlhafnian.o 
 	$(CC) $^ $(LFLAGS) -o $@
 

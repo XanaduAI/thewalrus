@@ -31,7 +31,7 @@ for X=1:2^(n/2)-1,
             end
         end
     end
-    if (mod(sum(sieve) - n/2, 2) == 0,
+    if (mod(sum(sieve) - n/2, 2)) == 0,
         res += comb(cnt, n/2+1);
     else
         res -= comb(cnt, n/2+1);

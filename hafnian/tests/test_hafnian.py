@@ -66,6 +66,8 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         A += A.T
         haf = hafnian(A)
         self.assertEqual(haf, A[0, 1])
+        haf = hafnian(A, loop=True)
+        self.assertEqual(haf, A[0, 1]+A[0, 0]*A[1, 1])
 
     def test_4x4(self):
         """Check 4x4 hafnian"""
@@ -76,6 +78,15 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
             A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
         self.assertEqual(haf, expected)
 
+        haf = hafnian(A, loop=True)
+        expected = A[0, 1]*A[2, 3] \
+            + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2] \
+            + A[0, 0]*A[1, 1]*A[2, 3] + A[0, 1]*A[2, 2]*A[3, 3] \
+            + A[0, 2]*A[1, 1]*A[3, 3] + A[0, 0]*A[2, 2]*A[1, 3] \
+            + A[0, 0]*A[3, 3]*A[1, 2] + A[0, 3]*A[1, 1]*A[2, 2] \
+            + A[0, 0]*A[1, 1]*A[2, 2]*A[3, 3]
+        self.assertEqual(haf, expected)
+
     def test_real(self):
         """Check hafnian(A)=haf_real(A) for a random
         real matrix.
@@ -84,6 +95,10 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         A += A.T
         haf = hafnian(A)
         expected = haf_real(A)
+        self.assertEqual(haf, expected)
+
+        haf = hafnian(A, loop=True)
+        expected = haf_real(A, loop=True)
         self.assertEqual(haf, expected)
 
         A = np.random.random([6, 6])
@@ -102,6 +117,10 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         A += A.T
         haf = hafnian(A)
         expected = haf_complex(A)
+        self.assertTrue(np.allclose(haf, expected))
+
+        haf = hafnian(A, loop=True)
+        expected = haf_complex(A, loop=True)
         self.assertEqual(haf, expected)
 
 
