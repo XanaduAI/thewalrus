@@ -19,6 +19,8 @@ from setuptools import setup, Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
+import numpy as np
+
 
 with open("hafnian/_version.py") as f:
     version = f.readlines()[-1].split()[-1].strip("\"'")
@@ -35,7 +37,7 @@ else:
     extra_link_args = ['-fopenmp', '-llapacke']
 
 LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
-C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":")
+C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
 CFLAGS = os.environ.get('CFLAGS', cflags_default).split()
 
 requirements = [
@@ -65,7 +67,7 @@ info = {
         Extension("libhaf",
             sources=["hafnian/lhafnian.pyx", "src/lhafnian.c",],
             depends=["src/lhafnian.h"],
-            # include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
+            include_dirs=C_INCLUDE_PATH,
             libraries=libraries,
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
@@ -73,7 +75,7 @@ info = {
         Extension("librhaf",
             sources=["hafnian/rlhafnian.pyx", "src/rlhafnian.c"],
             depends=["src/rlhafnian.h"],
-            # include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
+            include_dirs=C_INCLUDE_PATH,
             libraries=libraries,
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
