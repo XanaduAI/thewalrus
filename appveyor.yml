@@ -34,7 +34,7 @@ install:
   - if "%PLATFORM%" == "x64" set LD_LIBRARY_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\lib
   - if "%PLATFORM%" == "x86" ls %CONDAPATH%\envs\python%PYTHON_VERSION%
   - if "%PLATFORM%" == "x64" ls %CONDAPATH%-x64\envs\python%PYTHON_VERSION%
-  - conda install -q --name python%PYTHON_VERSION% setuptools numpy wheel pip setuptools
+  - conda install -q --name python%PYTHON_VERSION% setuptools numpy wheel pip setuptools cython
   - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c anaconda libpython
   - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c msys2 m2w64-toolchain
   - if "%PYTHON_VERSION%" == "3.4" pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy
