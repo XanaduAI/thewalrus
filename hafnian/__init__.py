@@ -71,6 +71,7 @@ def hafnian(A, loop=False, tol=1e-12):
     Returns:
         np.float64 or np.complex128: the hafnian of matrix l
     """
+    # pylint: disable=too-many-return-statements
     if not isinstance(A, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")
 
