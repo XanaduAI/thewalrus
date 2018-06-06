@@ -16,31 +16,12 @@
 import sys
 import os
 from setuptools import setup, Extension
-from distutils.command.build_ext import build_ext
-
-
-class build_ext(build_ext):
-    def build_extension(self, ext):
-        self._ctypes = isinstance(ext, CTypes)
-        return super().build_extension(ext)
-
-    def get_export_symbols(self, ext):
-        if self._ctypes:
-            return ext.export_symbols
-        return super().get_export_symbols(ext)
-
-    def get_ext_filename(self, ext_name):
-        if self._ctypes:
-            return ext_name + '.so'
-        return super().get_ext_filename(ext_name)
-
-
-class CTypes(Extension):
-    pass
+from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 
 
 with open("hafnian/_version.py") as f:
-	version = f.readlines()[-1].split()[-1].strip("\"'")
+    version = f.readlines()[-1].split()[-1].strip("\"'")
 
 # cmdclass = {'build_docs': BuildDoc}
 
@@ -81,26 +62,15 @@ info = {
     'provides': ["hafnian"],
     'install_requires': requirements,
     # 'extras_require': extra_requirements,
-    'ext_package': 'hafnian.lib',
     'ext_modules': [
-        CTypes("lhafnian",
-            sources=["src/lhafnian.c",],
-            depends=["src/lhafnian.h"],
-            include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
+        Extension("libhafnian",
+            sources=["hafnian/libhafnian.pyx", "src/lhafnian.c", "src/rlhafnian.c"],
+            depends=["src/lhafnian.h", "src/rlhafnian.h"],
+            # include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
             libraries=libraries,
             library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
             extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args
-            ),
-        CTypes("rlhafnian",
-            sources=["src/rlhafnian.c"],
-            depends=["src/rlhafnian.h"],
-            include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args
-            )
+            extra_link_args=extra_link_args)
     ],
     'cmdclass': {'build_ext': build_ext},
     'command_options': {
