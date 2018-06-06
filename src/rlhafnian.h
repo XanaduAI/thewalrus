@@ -28,8 +28,8 @@ typedef unsigned char sint;
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 void haf (double mat[], int n, double res[]);
-telem hafnian (double mat[], int n);
+double hafnian (double *mat, int n);
 void evals (double z[], double complex vals[], int n);
-telem hafnian_loops(telem *mat, int n);
+double hafnian_loops(double *mat, int n);
 
 #endif

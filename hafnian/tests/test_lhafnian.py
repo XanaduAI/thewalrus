@@ -16,7 +16,7 @@ import unittest
 from math import factorial as fac
 
 import numpy as np
-from hafnian._lhafnian import hafnian
+from hafnian.lib.libhaf import haf_complex as hafnian
 
 
 hyp1f1 = {
@@ -69,7 +69,7 @@ class TestLhaf(unittest.TestCase):
 
     def test_identity(self):
         """Check hafnian(I)=0"""
-        A = np.identity(self.n)
+        A = np.complex128(np.identity(self.n))
         haf = hafnian(A)
         self.assertTrue(np.allclose(haf, 0))
 
@@ -133,7 +133,7 @@ class TestLhafLoops(unittest.TestCase):
 
     def test_identity(self):
         """Check loop hafnian(I)=1"""
-        A = np.identity(self.n)
+        A = np.complex128(np.identity(self.n))
         haf = hafnian(A, loop=True)
         self.assertTrue(np.allclose(haf, 1))
 

@@ -218,7 +218,7 @@ dhaf (double *mat, int n, double *res)
 }
 
 
-telem
+double
 hafnian (double *mat, int n)
 {
     /*

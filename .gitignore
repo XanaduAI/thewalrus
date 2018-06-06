@@ -11,4 +11,8 @@ hafnian/__pycache__/*
 tests/__pycache__/*
 .coverage
 coverage_html_report
+hafnian/*.c
+hafnian/*.pyx
+hafnian/lib
+
 

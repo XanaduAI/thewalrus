@@ -17,7 +17,7 @@ import unittest
 from math import factorial as fac
 
 import numpy as np
-from hafnian._rlhafnian import hafnian
+from hafnian.lib.librhaf import haf_real as hafnian
 
 
 hyp1f1 = {
@@ -77,13 +77,6 @@ class TestRlhaf(unittest.TestCase):
     def test_ones(self):
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = np.float64(np.ones([2*self.n, 2*self.n]))
-        haf = hafnian(A)
-        expected = fac(2*self.n)/(fac(self.n)*(2**self.n))
-        self.assertTrue(np.allclose(haf, expected))
-
-    def test_integer_casting(self):
-        """Check casting to integer"""
-        A = np.int64(np.ones([2*self.n, 2*self.n]))
         haf = hafnian(A)
         expected = fac(2*self.n)/(fac(self.n)*(2**self.n))
         self.assertTrue(np.allclose(haf, expected))

@@ -35,6 +35,8 @@ dist:
 .PHONY : clean
 clean:
 	rm -rf hafnian/__pycache__
+	rm -rf hafnian/*.c
+	rm -rf hafnian/lib
 	rm -rf tests/__pycache__
 	rm -rf dist
 	rm -rf build
