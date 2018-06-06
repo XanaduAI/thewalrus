@@ -38,7 +38,7 @@ else:
 
 LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
 C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
-CFLAGS = os.environ.get('CFLAGS', cflags_default).split()
+CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
 requirements = [
     "numpy>=1.13",
