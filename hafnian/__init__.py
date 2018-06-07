@@ -50,9 +50,17 @@ import numpy as np
 
 from ._version import __version__
 from ._hafnian import hafnian, haf_complex, haf_real
-from ._permanent import perm, perm_real
+from ._permanent import perm, perm_real, perm_complex
 
-__all__ = ['hafnian', 'perm', 'haf_complex', 'haf_real', 'perm_real', 'version']
+__all__ = [
+  'hafnian',
+  'perm',
+  'haf_complex',
+  'haf_real',
+  'perm_real',
+  'perm_complex',
+  'version'
+  ]
 
 
 def version():

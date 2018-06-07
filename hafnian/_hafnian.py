@@ -43,7 +43,7 @@ def hafnian(A, loop=False, tol=1e-12):
             symmetric. Default tolerance is 1e-12.
 
     Returns:
-        np.float64 or np.complex128: the hafnian of matrix A
+        np.float64 or np.complex128: the hafnian of matrix A.
     """
     if not isinstance(A, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")

@@ -28,7 +28,7 @@ before_install:
 - |
   if [ "$WHEEL" = "0" ]; then
     sudo apt-get -qq update;
-    sudo apt-get install -y liblapacke-dev;
+    sudo apt-get install -y liblapacke-dev gfortran;
   fi
 install:
 - |

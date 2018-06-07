@@ -53,7 +53,7 @@ module perm
 
   contains
 
-  subroutine re(mat, n, nthreads, permanent)
+  subroutine re(mat, permanent)
     use vars
     use kinds
     use omp_lib
@@ -62,25 +62,31 @@ module perm
 
     real(wp), intent(in)    :: mat(:, :)
     real(wp), intent(out)   :: permanent
-    integer(ip), intent(in) :: nthreads, n
 
     ! local variables
-    real(wp)    :: permtmp, rowsumprod, tmp(1:n)
+    real(wp), dimension(:), allocatable :: tmp
+    real(wp)    :: permtmp, rowsumprod
     integer(ip) :: C, k, kg1, kg2, cntr, nmaxthreads, &
-                   j, pos, sig, sgntmp, i, ii
+                   j, pos, sig, sgntmp, i, ii, nthreads, n
 
     integer(ip), allocatable :: threadbound_low(:), threadbound_hi(:)
     real(wp), allocatable    :: tot(:), chitmp(:)
+
+    !f2py intent(in) :: mat
+    !f2py intent(out) :: permanent
+
+    nthreads = OMP_get_max_threads()
+    call omp_set_num_threads(nthreads)
+
+    nmaxthreads = nthreads
+
+    n = nint(sqrt(real(size(mat), wp)))
 
     C = 2**n-1
 
     nmaxthreads = nthreads
 
-    call OMP_set_num_threads(nthreads)
-
-    permanent = real(nmaxthreads, wp)
-
-    allocate(tot(1:nmaxthreads),threadbound_low(1:nmaxthreads),threadbound_hi(1:nmaxthreads),chitmp(1:n+1))
+    allocate(tot(1:nmaxthreads),threadbound_low(1:nmaxthreads),threadbound_hi(1:nmaxthreads),chitmp(1:n+1), tmp(1:n))
 
     do i=1,nmaxthreads
       threadbound_low(i) = int(C/nmaxthreads)*(i-1)+1
@@ -93,6 +99,7 @@ module perm
 
 !$OMP PARALLEL DO private(ii,j,k,rowsumprod,kg2,sgntmp,sig,pos,tmp,permtmp,chitmp,cntr) shared(mat,tot)
     do ii = 1,nmaxthreads
+
 
       permtmp = 0.0_wp
       tmp = 0.0_wp
@@ -154,35 +161,44 @@ module perm
 !$OMP END PARALLEL DO
 
     permanent = sum(tot)
-    deallocate(tot,threadbound_low,threadbound_hi,chitmp)
+    deallocate(tot,threadbound_low,threadbound_hi,chitmp,tmp)
   end subroutine re
 
-  subroutine comp(mat, permanent, n, nthreads)
+  subroutine comp(mat, permanent)
     use vars
     use kinds
+    use omp_lib
     implicit none
 
     complex(wp), intent(in)   :: mat(:, :)
-    integer(ip), intent(in)  :: nthreads, n
     complex(wp), intent(out) :: permanent
 
     ! local variables
-    complex(wp) :: tmp(1:n), permtmp, rowsumprod
+    complex(wp) :: permtmp, rowsumprod
     integer(ip) :: C, k, kg1, kg2, cntr, nmaxthreads, &
-                   j, pos, sig, sgntmp, i, ii
+                   j, pos, sig, sgntmp, i, ii, nthreads, n
 
     real(wp), allocatable    :: chitmp(:)
-    complex(wp), allocatable :: tot(:)
+    complex(wp), allocatable :: tot(:), tmp(:)
     integer(ip), allocatable :: threadbound_low(:), threadbound_hi(:)
 
-    call OMP_set_num_threads(nthreads)
+    !f2py intent(in) :: mat
+    !f2py intent(out) :: permanent
+
+    nthreads = OMP_get_max_threads()
+    call omp_set_num_threads(nthreads)
+
+
+    nmaxthreads = nthreads
+
+    n = nint(sqrt(real(size(mat), wp)))
 
     C = 2**n-1
 
     nmaxthreads = nthreads
 
     allocate(tot(1:nmaxthreads), threadbound_low(1:nmaxthreads), &
-      threadbound_hi(1:nmaxthreads), chitmp(1:n+1))
+      threadbound_hi(1:nmaxthreads), chitmp(1:n+1), tmp(1:n))
 
     do i=1,nmaxthreads
       threadbound_low(i) = int(C/nmaxthreads)*(i-1)+1
@@ -258,7 +274,7 @@ module perm
 !$OMP END PARALLEL DO
 
     permanent = sum(tot)
-    deallocate(tot,threadbound_low,threadbound_hi,chitmp)
+    deallocate(tot,threadbound_low,threadbound_hi,chitmp,tmp)
   end subroutine comp
 
   subroutine dec2bin (kk, nnn, mat)

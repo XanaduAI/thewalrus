@@ -16,17 +16,33 @@ Permanent Python interface
 """
 import numpy as np
 
-from .lib.libperm import perm as perm_real
+from .lib.libperm import perm
+
+perm_real = perm.re
+perm_complex = perm.comp
 
 
 def perm(A):
-    """Returns the hafnian of matrix A via the Fortran permanent library.
+    """Returns the permanent of matrix A via the Fortran permanent library.
+
+    .. note::
+
+        If the array is real valued (np.float), the result of
+        :func:`perm_real` is returned.
+
+        If the array is complex (np.complex), this function queries
+        whether the array A has non-zero imaginary part. If so, it
+        calls the :func:`perm_complex` function. Otherwise, if all elements
+        are exactly real, the :func:`perm_real` function is called.
+
+        For more direct control, you may wish to call :func:`perm_real`
+        or :func:`perm_complex` directly.
 
     Args:
-        A (array): a np.float64 square array.
+        A (array): a square array.
 
     Returns:
-        np.float64: the permanent of matrix A.
+        np.float64 or np.complex128: the permanent of matrix A.
     """
     if not isinstance(A, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")
@@ -47,4 +63,9 @@ def perm(A):
             + A[0, 2]*A[1, 0]*A[2, 1] + A[0, 0]*A[1, 2]*A[2, 1] \
             +  A[0, 1]*A[1, 0]*A[2, 2] + A[0, 0]*A[1, 1]*A[2, 2]
 
-    return perm_real(A.real, matshape, 4)
+    if A.dtype == np.complex:
+        if np.any(np.iscomplex(A)):
+            return perm_complex(A)
+        return perm_real(np.float64(A.real))
+
+    return perm_real(A)

@@ -17,7 +17,10 @@ import unittest
 import numpy as np
 
 from hafnian import perm
-from hafnian.lib.libperm import perm as perm_real
+from hafnian.lib import libperm
+
+perm_real = libperm.perm.re
+perm_complex = libperm.perm.comp
 
 
 class TestPythonPermanentWrapper(unittest.TestCase):
@@ -64,15 +67,25 @@ class TestPythonPermanentWrapper(unittest.TestCase):
         A = np.random.random([6, 6])
         A += A.T
         p = perm(A)
-        expected = perm_real(A, A.shape[0], 4)
+        expected = perm_real(A)
         self.assertEqual(p, expected)
 
         A = np.random.random([6, 6])
         A += A.T
         A = np.array(A, dtype=np.complex128)
         p = perm(A)
-        expected = perm_real(np.float64(A.real), A.shape[0], 4)
+        expected = perm_real(np.float64(A.real))
         self.assertEqual(p, expected)
+
+    def test_complex(self):
+        """Check perm(A)=perm_complex(A) for a random matrix.
+        """
+        A = np.complex128(np.random.random([6, 6]))
+        A += 1j*np.random.random([6, 6])
+        A += A.T
+        haf = perm(A)
+        expected = perm_complex(A)
+        self.assertTrue(np.allclose(haf, expected))
 
 
 if __name__ == '__main__':
