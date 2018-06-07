@@ -69,6 +69,7 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    hafnian_tutorial.ipynb
+   permanent_tutorial.ipynb
 
 .. toctree::
    :maxdepth: 2
