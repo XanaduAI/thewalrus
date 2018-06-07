@@ -15,17 +15,25 @@
 #!/usr/bin/env python3
 import sys
 import os
-from setuptools import setup, Extension
-from Cython.Distutils import build_ext
-from Cython.Build import cythonize
+
+import setuptools
 
 import numpy as np
+
+from numpy.distutils.core import setup
+from numpy.distutils.extension import Extension
+
+from Cython.Build import cythonize
 
 
 with open("hafnian/_version.py") as f:
     version = f.readlines()[-1].split()[-1].strip("\"'")
 
-# cmdclass = {'build_docs': BuildDoc}
+
+requirements = [
+    "numpy>=1.13",
+    "cython"
+]
 
 if os.name == 'nt':
     cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
@@ -40,10 +48,33 @@ LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
 C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
 CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
-requirements = [
-    "numpy>=1.13",
-    "cython"
-]
+
+extensions = cythonize([
+        Extension("libhaf",
+            sources=["hafnian/lhafnian.pyx", "src/lhafnian.c",],
+            depends=["src/lhafnian.h"],
+            include_dirs=C_INCLUDE_PATH,
+            libraries=libraries,
+            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+            extra_compile_args=CFLAGS,
+            extra_link_args=extra_link_args),
+        Extension("librhaf",
+            sources=["hafnian/rlhafnian.pyx", "src/rlhafnian.c"],
+            depends=["src/rlhafnian.h"],
+            include_dirs=C_INCLUDE_PATH,
+            libraries=libraries,
+            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+            extra_compile_args=CFLAGS,
+            extra_link_args=extra_link_args),
+        Extension("libperm",
+            sources=["src/permanent.f90"],
+            include_dirs=C_INCLUDE_PATH,
+            libraries=libraries,
+            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+            extra_compile_args=CFLAGS,
+            extra_link_args=extra_link_args)
+])
+
 
 os.environ['OPT'] = ''
 
@@ -63,25 +94,8 @@ info = {
     'provides': ["hafnian"],
     'install_requires': requirements,
     'ext_package': 'hafnian.lib',
-    'ext_modules': [
-        Extension("libhaf",
-            sources=["hafnian/lhafnian.pyx", "src/lhafnian.c",],
-            depends=["src/lhafnian.h"],
-            include_dirs=C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args),
-        Extension("librhaf",
-            sources=["hafnian/rlhafnian.pyx", "src/rlhafnian.c"],
-            depends=["src/rlhafnian.h"],
-            include_dirs=C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args)
-    ],
-    'cmdclass': {'build_ext': build_ext},
+    'ext_modules': extensions,
+    # 'cmdclass': {'build_ext': build_ext},
     'command_options': {
         'build_sphinx': {
             'version': ('setup.py', version),

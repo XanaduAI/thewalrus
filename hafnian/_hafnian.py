@@ -13,35 +13,11 @@
 # limitations under the License.
 """
 Hafnian Python interface
-========================
-
-.. currentmodule:: hafnian._hafnian
-
-This is the top level module of the Hafnian python interface,
-containing the function :func:`hafnian`. This function determines,
-based on the input matrix, whether to use the complex C hafnian
-library, or the slightly faster real C hafnian library.
-
-For more advanced usage, the functions :func:`haf_real` and
-:func:`haf_complex` are also provided.
-
-Top-level functions
--------------------
-
-.. autosummary::
-   hafnian
-   haf_complex
-   haf_real
-
-Code details
--------------
 """
 import numpy as np
 
 from .lib.libhaf import haf_complex
 from .lib.librhaf import haf_real
-
-__all__ = ['hafnian', 'haf_complex', 'haf_real']
 
 
 def hafnian(A, loop=False, tol=1e-12):

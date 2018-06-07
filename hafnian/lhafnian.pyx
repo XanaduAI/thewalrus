@@ -23,6 +23,7 @@ cdef extern from "../src/lhafnian.h":
 
 @cython.embedsignature(True)
 @cython.boundscheck(False)
+@cython.wraparound(False)
 def haf_complex(double complex[:, :] A, bint loop=False):
     """Returns the hafnian of a complex matrix A via the C hafnian library.
 

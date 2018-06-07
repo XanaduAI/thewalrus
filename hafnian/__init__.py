@@ -11,14 +11,48 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""FPMW"""
+"""
+Hafnian Python interface
+========================
+
+.. currentmodule:: hafnian
+
+This is the top level module of the Hafnian python interface,
+containing the function :func:`hafnian` and :func:`perm`.
+These wrapper functions determine,
+based on the input matrix, whether to use the complex or real
+C/Fortran library.
+
+For more advanced usage, access to the libraries directly are provided
+via the functions :func:`haf_real`, :func:`haf_complex`, and
+:func:`perm_real`.
+
+Python wrapper functions
+------------------------
+
+.. autosummary::
+   hafnian
+   perm
+
+C/Fortran interfaces
+------------------------
+
+.. autosummary::
+   haf_complex
+   haf_real
+   perm_real
+
+Code details
+-------------
+"""
 
 import numpy as np
 
 from ._version import __version__
 from ._hafnian import hafnian, haf_complex, haf_real
+from ._permanent import perm, perm_real
 
-__all__ = ['version']
+__all__ = ['hafnian', 'perm', 'haf_complex', 'haf_real', 'perm_real', 'version']
 
 
 def version():

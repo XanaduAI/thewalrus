@@ -23,6 +23,7 @@ cdef extern from "../src/rlhafnian.h":
 
 @cython.embedsignature(True)
 @cython.boundscheck(False)
+@cython.wraparound(False)
 def haf_real(double[:, :] A, bint loop=False):
     """Returns the hafnian of a real matrix A via the C hafnian library.
 
