@@ -16,9 +16,10 @@
 import numpy as np
 
 from ._version import __version__
-from .hafnian import hafnian
+from ._hafnian import hafnian, haf_complex, haf_real
 
 __all__ = ['version']
+
 
 def version():
     r"""

@@ -123,7 +123,7 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
 
         haf = hafnian(A, loop=True)
         expected = haf_complex(A, loop=True)
-        self.assertEqual(haf, expected)
+        self.assertTrue(np.allclose(haf, expected))
 
 
 if __name__ == '__main__':
