@@ -31,11 +31,13 @@ with open("hafnian/_version.py") as f:
 
 
 requirements = [
-    "numpy>=1.13",
-    "cython"
+    "numpy>=1.13"
 ]
 
-if os.name == 'nt':
+
+liblapacke = os.environ.get('PROVIDES_LAPACKE', 'lapack')
+
+if os.name == 'nt' or liblapacke == 'openblas':
     cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
     libraries = ['openblas']
     extra_link_args = ['-fopenmp', '-lopenblas']
