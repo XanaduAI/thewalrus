@@ -30,13 +30,12 @@ via the functions:
 * :func:`haf_complex` links to ``libhaf.so``
 * :func:`perm_real` links to ``libperm.so``.
 
-Summary
--------
+Python wrappers
+---------------
 
 .. autosummary::
    hafnian
    perm
-
 
 Code details
 ------------
@@ -51,10 +50,6 @@ from ._permanent import perm, perm_real, perm_complex
 __all__ = [
   'hafnian',
   'perm',
-  'haf_complex',
-  'haf_real',
-  'perm_real',
-  'perm_complex',
   'version'
   ]
 

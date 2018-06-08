@@ -25,18 +25,18 @@ perm_complex = perm.comp
 def perm(A):
     """Returns the permanent of matrix A via the Fortran permanent library.
 
-    .. note::
+    If the array is real valued (np.float), the result of
+    :func:`perm_real` is returned.
 
-        If the array is real valued (np.float), the result of
-        :func:`perm_real` is returned.
+    * If the array is complex (np.complex), this function queries
+      whether the array A has non-zero imaginary part. If so, it
+      calls the :func:`perm_complex` function.
 
-        If the array is complex (np.complex), this function queries
-        whether the array A has non-zero imaginary part. If so, it
-        calls the :func:`perm_complex` function. Otherwise, if all elements
-        are exactly real, the :func:`perm_real` function is called.
+    * Otherwise, if all elements are exactly real, the
+      :func:`perm_real` function is called.
 
-        For more direct control, you may wish to call :func:`perm_real`
-        or :func:`perm_complex` directly.
+    For more direct control, you may wish to call :func:`perm_real`
+    or :func:`perm_complex` directly.
 
     Args:
         A (array): a square array.

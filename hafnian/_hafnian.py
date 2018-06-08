@@ -23,18 +23,18 @@ from .lib.librhaf import haf_real
 def hafnian(A, loop=False, tol=1e-12):
     """Returns the hafnian of matrix A via the C hafnian library.
 
-    .. note::
+    If the array is real valued (np.float), the result of
+    :func:`haf_real` is returned.
 
-        If the array is real valued (np.float), the result of
-        :func:`haf_real` is returned.
+    * If the array is complex (np.complex), this function queries
+      whether the array A has non-zero imaginary part. If so, it
+      calls the :func:`haf_complex` function.
 
-        If the array is complex (np.complex), this function queries
-        whether the array A has non-zero imaginary part. If so, it
-        calls the :func:`haf_complex` function. Otherwise, if all elements
-        are exactly real, the :func:`haf_real` function is called.
+    * Otherwise, if all elements are exactly real, the
+      :func:`haf_real` function is called.
 
-        For more direct control, you may wish to call :func:`haf_real`
-        or :func:`haf_complex` directly.
+    For more direct control, you may wish to call :func:`haf_real`
+    or :func:`haf_complex` directly.
 
     Args:
         A (array): a square, symmetric array of even dimensions.
