@@ -34,16 +34,19 @@ class Mock(MagicMock):
 class TypeMock(type):
     pass
 
-# MOCK_MODULES = [
-#     'numpy',
-#     'numpy.dtype',
-#     'cython',
-#     'ctypes'
-#     ]
+MOCK_MODULES = [
+    'numpy',
+    'numpy.dtype',
+    'cython',
+    'hafnian.lib',
+    'hafnian.lib.libhaf',
+    'hafnian.lib.librhaf',
+    'hafnian.lib.libperm'
+    ]
 
-# mock = Mock()
-# for mod_name in MOCK_MODULES:
-#     sys.modules[mod_name] = mock
+mock = Mock()
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock
 
 # -- General configuration ------------------------------------------------
 

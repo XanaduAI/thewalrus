@@ -18,67 +18,87 @@ import os
 
 import setuptools
 
-import numpy as np
-
-from numpy.distutils.core import setup
-from numpy.distutils.extension import Extension
-
-from Cython.Build import cythonize
-
 
 with open("hafnian/_version.py") as f:
     version = f.readlines()[-1].split()[-1].strip("\"'")
 
 
 requirements = [
-    "numpy>=1.13"
+    "numpy"
 ]
 
 
-liblapacke = os.environ.get('PROVIDES_LAPACKE', 'lapack')
+setup_requirements = [
+    "numpy"
+]
 
-if os.name == 'nt' or liblapacke == 'openblas':
-    cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
-    libraries = ['openblas']
-    extra_link_args = ['-fopenmp', '-lopenblas']
+
+BUILD_EXT = True
+
+try:
+    import numpy as np
+    from numpy.distutils.core import setup
+    from numpy.distutils.extension import Extension
+except ImportError:
+    raise ImportError("ERROR: NumPy needs to be installed first. "
+                      "You can install it with pip:"
+                      "\n\npip install numpy")
+
+
+if BUILD_EXT:
+
+    USE_CYTHON = True
+    try:
+        from Cython.Build import cythonize
+        ext = 'pyx'
+    except:
+        USE_CYTHON = False
+        cythonize = lambda x: x
+        ext = 'c'
+
+    liblapacke = os.environ.get('PROVIDES_LAPACKE', 'lapack')
+
+    if os.name == 'nt' or liblapacke == 'openblas':
+        cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
+        libraries = ['openblas']
+        extra_link_args = ['-fopenmp', '-lopenblas']
+    else:
+        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
+        libraries = ['lapacke']
+        extra_link_args = ['-fopenmp', '-llapacke']
+
+    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
+    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
+
+    extensions = cythonize([
+            Extension("libhaf",
+                sources=["hafnian/lhafnian."+ext, "src/lhafnian.c",],
+                depends=["src/lhafnian.h"],
+                include_dirs=C_INCLUDE_PATH,
+                libraries=libraries,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                extra_compile_args=CFLAGS,
+                extra_link_args=extra_link_args),
+            Extension("librhaf",
+                sources=["hafnian/rlhafnian."+ext, "src/rlhafnian.c"],
+                depends=["src/rlhafnian.h"],
+                include_dirs=C_INCLUDE_PATH,
+                libraries=libraries,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                extra_compile_args=CFLAGS,
+                extra_link_args=extra_link_args),
+            Extension("libperm",
+                sources=["src/permanent.f90"],
+                include_dirs=C_INCLUDE_PATH,
+                libraries=libraries,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                extra_compile_args=CFLAGS,
+                extra_link_args=extra_link_args)
+    ])
 else:
-    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
-    libraries = ['lapacke']
-    extra_link_args = ['-fopenmp', '-llapacke']
+    extensions = []
 
-LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
-C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
-CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
-
-
-extensions = cythonize([
-        Extension("libhaf",
-            sources=["hafnian/lhafnian.pyx", "src/lhafnian.c",],
-            depends=["src/lhafnian.h"],
-            include_dirs=C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args),
-        Extension("librhaf",
-            sources=["hafnian/rlhafnian.pyx", "src/rlhafnian.c"],
-            depends=["src/rlhafnian.h"],
-            include_dirs=C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args),
-        Extension("libperm",
-            sources=["src/permanent.f90"],
-            include_dirs=C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args)
-])
-
-
-os.environ['OPT'] = ''
 
 info = {
     'name': 'Hafnian',
@@ -96,6 +116,7 @@ info = {
     'provides': ["hafnian"],
     'install_requires': requirements,
     'ext_package': 'hafnian.lib',
+    'setup_requires': setup_requirements,
     'ext_modules': extensions,
     # 'cmdclass': {'build_ext': build_ext},
     'command_options': {

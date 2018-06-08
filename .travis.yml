@@ -22,7 +22,6 @@ matrix:
     - WHEEL=1
     - PIP=pip
     - CIBW_MANYLINUX1_X86_64_IMAGE=josh146/manylinux1_openblas_x86_64
-    # - CIBW_MANYLINUX1_I686_IMAGE=josh146/manylinux1_openblas_i686
     - CIBW_ENVIRONMENT="PROVIDES_LAPACKE=openblas C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/include/openblas"
     - CIBW_BEFORE_BUILD='{pip} install numpy cython && export NUMPY_INCLUDE=$({python} -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"'
 before_install:

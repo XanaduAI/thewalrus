@@ -24,26 +24,22 @@ based on the input matrix, whether to use the complex or real
 C/Fortran library.
 
 For more advanced usage, access to the libraries directly are provided
-via the functions :func:`haf_real`, :func:`haf_complex`, and
-:func:`perm_real`.
+via the functions:
 
-Python wrapper functions
-------------------------
+* :func:`haf_real` links to ``librhaf.so``
+* :func:`haf_complex` links to ``libhaf.so``
+* :func:`perm_real` links to ``libperm.so``.
+
+Summary
+-------
 
 .. autosummary::
    hafnian
    perm
 
-C/Fortran interfaces
-------------------------
-
-.. autosummary::
-   haf_complex
-   haf_real
-   perm_real
 
 Code details
--------------
+------------
 """
 
 import numpy as np
