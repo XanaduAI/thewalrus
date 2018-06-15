@@ -19,6 +19,8 @@
 #endif
 
 __PYX_EXTERN_C void evals(double *, __pyx_t_double_complex *, int, double *, double *, int, double *);
+__PYX_EXTERN_C PY_LONG_LONG haf_int(__Pyx_memviewslice, int __pyx_skip_dispatch);
+__PYX_EXTERN_C PY_LONG_LONG solve(__Pyx_memviewslice, int, int, __Pyx_memviewslice, int, int __pyx_skip_dispatch);
 
 #endif /* !__PYX_HAVE_API__librhaf */
 

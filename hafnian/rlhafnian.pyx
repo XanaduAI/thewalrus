@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#cython: boundscheck=False, wraparound=False, embedsignature=True
 cimport cython
+from cython.parallel cimport prange
 
 import numpy as np
 cimport numpy as np
+
 from scipy.linalg.cython_lapack cimport dgees
 
 
@@ -23,10 +26,9 @@ cdef extern from "../src/rlhafnian.h":
     double hafnian_loops(double *mat, int n)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef public void evals(double *z, double complex *vals, int n,
                        double *wr, double *wi, int lwork, double *work) nogil:
+    """Provides a C interface to the SciPy dgees interface."""
 
     cdef int lda = n, ldvs = n, sdim = 0, info, i
 
@@ -37,9 +39,6 @@ cdef public void evals(double *z, double complex *vals, int n,
         vals[i] = wr[i] + 1j*wi[i]
 
 
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def haf_real(double[:, :] A, bint loop=False):
     """Returns the hafnian of a real matrix A via the C hafnian library.
 
@@ -55,3 +54,62 @@ def haf_real(double[:, :] A, bint loop=False):
     if loop:
         return hafnian_loops(&A[0,0], n)
     return hafnian(&A[0,0], n)
+
+
+cpdef public long long haf_int(long long[:, :] A):
+    """Returns the hafnian of an integer matrix A via the C hafnian library.
+
+    Modified with permission from https://github.com/eklotek/Hafnian.
+
+    Args:
+        A (array): a np.int64, square, symmetric array of even dimensions.
+
+    Returns:
+        np.int64: the hafnian of matrix A
+    """
+    cdef:
+        int n = A.shape[0]//2, j, k
+        long long[:, :] z = np.zeros([n*(2*n-1), n+1], dtype=np.int64)
+        long long[:] g = np.zeros([n+1], dtype=np.int64)
+
+    with nogil:
+        g[0] = 1
+        for j in prange(1, 2*n):
+            for k in prange(j):
+                z[j*(j-1)//2+k, 0] = A[j, k]
+
+    return solve(z, 2*n, 1, g, n)
+
+
+cpdef public long long solve(long long[:, :] b, int s, int w, long long[:] g, int n):
+    """Recursive integer hafnian solver."""
+    if s == 0:
+        return w*g[n]
+
+    cdef:
+        long long[:, :] c = np.zeros([(s-2)*(s-3)/2, n+1], dtype=np.int64)
+        long long[:] e = np.zeros([n+1], dtype=np.int64)
+        long long h
+        int u, v, j, k, i = 0
+
+    for j in range(1, s-2):
+        for k in range(j):
+            c[i, :] = b[(j+1)*(j+2)/2+k+2, :]
+            i += 1
+
+    h = solve(c, s-2, -w, g, n)
+
+    e[:] = g
+    for u in range(n):
+        for v in range(n-u):
+            # print(u, v, g[u], b[0,v])
+            e[u+v+1] += g[u]*b[0, v]
+
+    for j in prange(1, s-2, nogil=True):
+        for k in range(j):
+            for u in range(n):
+                for v in range(n-u):
+                    c[j*(j-1)/2+k, u+v+1] += b[(j+1)*(j+2)/2, u]*b[(k+1)*(k+2)/2+1, v] \
+                        + b[(k+1)*(k+2)/2, u]*b[(j+1)*(j+2)/2+1, v]
+
+    return h + solve(c, s-2, w, e, n)
