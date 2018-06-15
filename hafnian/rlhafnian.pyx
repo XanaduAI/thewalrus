@@ -15,7 +15,6 @@
 cimport cython
 from cython.parallel cimport prange
 cimport openmp
-from libc.stdlib import malloc, free
 
 import numpy as np
 cimport numpy as np
@@ -26,18 +25,6 @@ from scipy.linalg.cython_lapack cimport dgees
 cdef extern from "../src/rlhafnian.h":
     double hafnian (double mat[], int n)
     double hafnian_loops(double *mat, int n)
-
-
-cdef class Vector:
-    cdef long long *data
-    cdef public int n_ax0
-
-    def __init__(Vector self, int n_ax0):
-        self.data = <long long*> malloc (sizeof(long long) * n_ax0)
-        self.n_ax0 = n_ax0
-
-    def __dealloc__(Vector self):
-        free(self.data)
 
 
 cdef public void evals(double *z, double complex *vals, int n,
