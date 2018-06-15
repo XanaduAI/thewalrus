@@ -14,6 +14,8 @@
 #cython: boundscheck=False, wraparound=False, embedsignature=True
 cimport cython
 from cython.parallel cimport prange
+cimport openmp
+from libc.stdlib import malloc, free
 
 import numpy as np
 cimport numpy as np
@@ -24,6 +26,18 @@ from scipy.linalg.cython_lapack cimport dgees
 cdef extern from "../src/rlhafnian.h":
     double hafnian (double mat[], int n)
     double hafnian_loops(double *mat, int n)
+
+
+cdef class Vector:
+    cdef long long *data
+    cdef public int n_ax0
+
+    def __init__(Vector self, int n_ax0):
+        self.data = <long long*> malloc (sizeof(long long) * n_ax0)
+        self.n_ax0 = n_ax0
+
+    def __dealloc__(Vector self):
+        free(self.data)
 
 
 cdef public void evals(double *z, double complex *vals, int n,
@@ -52,8 +66,8 @@ def haf_real(double[:, :] A, bint loop=False):
     # Exposes a c function to python
     n = A.shape[0]
     if loop:
-        return hafnian_loops(&A[0,0], n)
-    return hafnian(&A[0,0], n)
+        return hafnian_loops(&A[0, 0], n)
+    return hafnian(&A[0, 0], n)
 
 
 cpdef public long long haf_int(long long[:, :] A):
@@ -81,7 +95,7 @@ cpdef public long long haf_int(long long[:, :] A):
     return solve(z, 2*n, 1, g, n)
 
 
-cpdef public long long solve(long long[:, :] b, int s, int w, long long[:] g, int n):
+cdef long long solve(long long[:, :] b, int s, int w, long long[:] g, int n):
     """Recursive integer hafnian solver."""
     if s == 0:
         return w*g[n]
@@ -94,7 +108,8 @@ cpdef public long long solve(long long[:, :] b, int s, int w, long long[:] g, in
 
     for j in range(1, s-2):
         for k in range(j):
-            c[i, :] = b[(j+1)*(j+2)/2+k+2, :]
+            for u in range(n+1):
+                c[i, u] = b[(j+1)*(j+2)/2+k+2, u]
             i += 1
 
     h = solve(c, s-2, -w, g, n)
@@ -102,14 +117,14 @@ cpdef public long long solve(long long[:, :] b, int s, int w, long long[:] g, in
     e[:] = g
     for u in range(n):
         for v in range(n-u):
-            # print(u, v, g[u], b[0,v])
             e[u+v+1] += g[u]*b[0, v]
 
-    for j in prange(1, s-2, nogil=True):
-        for k in range(j):
-            for u in range(n):
-                for v in range(n-u):
-                    c[j*(j-1)/2+k, u+v+1] += b[(j+1)*(j+2)/2, u]*b[(k+1)*(k+2)/2+1, v] \
-                        + b[(k+1)*(k+2)/2, u]*b[(j+1)*(j+2)/2+1, v]
+    with nogil:
+        for j in prange(1, s-2):
+            for k in range(j):
+                for u in range(n):
+                    for v in range(n-u):
+                        c[j*(j-1)/2+k, u+v+1] += b[(j+1)*(j+2)/2, u]*b[(k+1)*(k+2)/2+1, v] \
+                            + b[(k+1)*(k+2)/2, u]*b[(j+1)*(j+2)/2+1, v]
 
     return h + solve(c, s-2, w, e, n)

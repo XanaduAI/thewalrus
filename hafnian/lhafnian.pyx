@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#cython: boundscheck=False, wraparound=False, embedsignature=True
 cimport cython
 
 import numpy as np
@@ -23,10 +24,9 @@ cdef extern from "../src/lhafnian.h":
     double complex hafnian_loops(double complex *mat, int n)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef public void evals(double complex *z, double complex *vals, int n,
                        double complex *work, int lwork, double *rwork) nogil:
+    """Provides a C interface to the SciPy zgees interface."""
 
     cdef int lda = n, ldvs = 1, sdim = 0, info, j, i
 
@@ -34,9 +34,6 @@ cdef public void evals(double complex *z, double complex *vals, int n,
         NULL, &ldvs, &work[0], &lwork, &rwork[0], NULL, &info);
 
 
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def haf_complex(double complex[:, :] A, bint loop=False):
     """Returns the hafnian of a complex matrix A via the C hafnian library.
 
