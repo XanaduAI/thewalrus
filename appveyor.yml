@@ -25,9 +25,8 @@ install:
   - if "%PLATFORM%" == "x64" set PATH=%CONDAPATH%-x64\bin;%CONDAPATH%-x64\Scripts;%PATH%
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION% 
+  - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION%
   - activate python%PYTHON_VERSION%
-  - conda install -c conda-forge openblas
   - if "%PLATFORM%" == "x86" set C_INCLUDE_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\include
   - if "%PLATFORM%" == "x86" set LD_LIBRARY_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\lib
   - if "%PLATFORM%" == "x64" set C_INCLUDE_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\include

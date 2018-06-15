@@ -12,13 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 cimport cython
+
 import numpy as np
 cimport numpy as np
+from scipy.linalg.cython_lapack cimport dgees
 
 
 cdef extern from "../src/rlhafnian.h":
     double hafnian (double mat[], int n)
     double hafnian_loops(double *mat, int n)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef public void evals(double *z, double complex *vals, int n,
+                       double *wr, double *wi, int lwork, double *work) nogil:
+
+    cdef int lda = n, ldvs = n, sdim = 0, info, i
+
+    dgees('N', 'N', NULL, &n, &z[0], &lda, &sdim,
+        &wr[0], &wi[0], NULL, &ldvs, &work[0], &lwork, NULL, &info)
+
+    for i in range(n):
+        vals[i] = wr[i] + 1j*wi[i]
 
 
 @cython.embedsignature(True)

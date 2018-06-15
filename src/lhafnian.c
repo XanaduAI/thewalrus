@@ -12,34 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "lhafnian.h"
-
-
 #include <stdio.h>
-void
-evals(double complex z[], double complex vals[], int n)
-{
-    /*
-      Calculates the eigenvalues of the complex n x n matrix z
-      returns the eigenvalues in the array vals
-      For the calculation of the eigenvalues it uses lapacke
-    */
-    lapack_int info;
-
-    char jobvs = 'N';
-    char sort = 'N';
-
-    lapack_int lda = n;
-    lapack_int sdim = 0;
-    lapack_int ldvs = n;
-    info = LAPACKE_zgees(LAPACK_ROW_MAJOR, jobvs, sort,
-                         NULL, n, &(z[0]), lda,
-                         &sdim, &(vals[0]),
-                         NULL, ldvs );
-    assert(info == 0);
-}
-
-
-
 
 
 void
@@ -48,14 +21,20 @@ powtrace(double complex z[], int n, telem traces[], int l)
     /*
       given a complex matrix z of dimensions n x n
       it calculates traces[k] = tr(z^j) for 1 <= j <= l
-      It does it by first finding the eigenvalues of the matrix z
-      using the orutine evals
      */
     double complex vals[n];
     telem pvals[n];
 
-    evals(z, vals, n);
-    int i, j;
+    // work arrays
+    int lwork = 2*n;
+    double complex work[lwork];
+    double rwork[n];
+
+    if (n != 0){
+        evals(z, vals, n, work, lwork, rwork);
+    }
+
+    int i,j;
     telem sum;
     for(j = 0; j < n; j++)
     {

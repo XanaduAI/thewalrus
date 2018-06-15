@@ -24,7 +24,8 @@ with open("hafnian/_version.py") as f:
 
 
 requirements = [
-    "numpy"
+    "numpy",
+    'scipy'
 ]
 
 
@@ -56,16 +57,12 @@ if BUILD_EXT:
         cythonize = lambda x: x
         ext = 'c'
 
-    liblapacke = os.environ.get('PROVIDES_LAPACKE', 'lapack')
-
-    if os.name == 'nt' or liblapacke == 'openblas':
-        cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
-        libraries = ['openblas']
-        extra_link_args = ['-fopenmp', '-lopenblas']
+    if os.name == 'nt':
+        cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp"
+        extra_link_args = ['-fopenmp']
     else:
-        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
-        libraries = ['lapacke']
-        extra_link_args = ['-fopenmp', '-llapacke']
+        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
+        extra_link_args = ['-fopenmp']
 
     LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
     C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
@@ -76,7 +73,6 @@ if BUILD_EXT:
                 sources=["hafnian/lhafnian."+ext, "src/lhafnian.c",],
                 depends=["src/lhafnian.h"],
                 include_dirs=C_INCLUDE_PATH,
-                libraries=libraries,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args),
@@ -84,14 +80,12 @@ if BUILD_EXT:
                 sources=["hafnian/rlhafnian."+ext, "src/rlhafnian.c"],
                 depends=["src/rlhafnian.h"],
                 include_dirs=C_INCLUDE_PATH,
-                libraries=libraries,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args),
             Extension("libperm",
                 sources=["src/permanent.f90"],
                 include_dirs=C_INCLUDE_PATH,
-                libraries=libraries,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args)
@@ -101,7 +95,7 @@ else:
 
 
 info = {
-    'name': 'Hafnian',
+    'name': 'hafnian-scipy',
     'version': version,
     'maintainer': 'Xanadu Inc.',
     'maintainer_email': 'nicolas@xanadu.ai',

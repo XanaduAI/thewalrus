@@ -6,8 +6,8 @@
 
 CC=gcc
 CFLAGS=-std=c99 -O3 -Wall -I/usr/include -I. -fopenmp
-LFLAGS=-L/usr/lib -lm -llapack -llapacke  -lgfortran -lblas -fopenmp
-CFLAGS1= -std=c99 -O3 -Wall -fPIC -shared -I/usr/include -fopenmp  -llapacke -I. -o
+LFLAGS=-L/usr/lib -lm -llapack -llapacke  -lgfortran -fopenmp
+CFLAGS1= -std=c99 -O3 -Wall -fPIC -shared -I/usr/include -fopenmp -I. -o
 
 
 %.out:%.o lhafnian.o

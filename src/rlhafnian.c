@@ -13,35 +13,6 @@
 // limitations under the License.
 #include "rlhafnian.h"
 #include <stdio.h>
-void
-evals (double z[], double complex vals[], int n)
-{
-    /*
-       Calculates the eigenvalues of the real n x n matrix z
-       returns the (complex) eigenvalues in the array vals
-       For the calculation of the eigenvalues it uses lapacke
-     */
-    lapack_int info;
-
-    char jobvs = 'N';
-    char sort = 'N';
-
-    lapack_int lda = n;
-    lapack_int sdim = 0;
-    lapack_int ldvs = n;
-    double wr[n];
-    double wi[n];
-
-    info = LAPACKE_dgees (LAPACK_ROW_MAJOR, jobvs, sort,
-                          NULL, n, &(z[0]), lda,
-                          &sdim, &(wr[0]), &(wi[0]), NULL, ldvs);
-    assert (info == 0);
-    for (int i = 0; i < n; i++)
-    {
-        vals[i] = wr[i] + I * wi[i];
-    }
-
-}
 
 
 void
@@ -50,13 +21,20 @@ powtrace (double z[], int n, double traces[], int l)
     /*
        given a complex matrix z of dimensions n x n
        it calculates traces[k] = tr(z^j) for 1 <= j <= l
-       It does it by first finding the eigenvalues of the matrix z
-       using the orutine evals
      */
     double complex vals[n];
     double complex pvals[n];
 
-    evals (z, vals, n);
+    // work arrays
+    int lwork = 3*n;
+    double wr[n];
+    double wi[n];
+    double work[lwork];
+
+    if (n != 0){
+        evals(z, vals, n, wr, wi, lwork, work);
+    }
+
     int i, j;
     double complex sum;
     for (j = 0; j < n; j++)

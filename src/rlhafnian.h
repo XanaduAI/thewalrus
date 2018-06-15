@@ -16,7 +16,6 @@
 
 #include <complex.h>
 #include <assert.h>
-#include <lapacke.h>
 #include <omp.h>
 
 #include <math.h>
@@ -29,7 +28,7 @@ typedef unsigned char sint;
 
 void haf (double mat[], int n, double res[]);
 double hafnian (double *mat, int n);
-void evals (double z[], double complex vals[], int n);
+// void evals (double z[], double complex vals[], int n);
 double hafnian_loops(double *mat, int n);
 
 #endif
