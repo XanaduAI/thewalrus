@@ -59,7 +59,7 @@ if BUILD_EXT:
 
     if os.name == 'nt':
         cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp"
-        extra_link_args = ['-fopenmp']
+        extra_link_args = ['-fopenmp', "-static", "-static-libgfortran", "-static-libgcc"]
     else:
         cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp']
