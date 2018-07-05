@@ -62,11 +62,11 @@ if BUILD_EXT:
     library_default = ""
     USE_OPENMP = True
 
-    if os.name == 'nt':
+    if platform.system() == 'Windows':
         USE_OPENMP = False
         cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared"
         extra_link_args = ["-static", "-static-libgfortran", "-static-libgcc"]
-    if platform.system() == 'Darwin':
+    elif platform.system() == 'Darwin':
         USE_OPENMP = False
         cflags_default = "-std=c99 -O3 -Wall -fPIC -shared"
         extra_link_args = []
