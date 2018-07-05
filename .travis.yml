@@ -3,7 +3,7 @@ env:
   global:
     - CIBW_SKIP="cp27-* *i686"
     - CIBW_BEFORE_BUILD_LINUX='pip install numpy scipy cython && export NUMPY_INCLUDE=$(python -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"'
-    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc && pip install numpy scipy cython && export NUMPY_INCLUDE=$(python -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"'
+    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc llvm && pip install numpy scipy cython && export NUMPY_INCLUDE=$(python -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE -I/usr/local/opt/llvm/include $CFLAGS" && export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/opt/llvm/lib"'
     - CIBW_TEST_REQUIRES=scipy
     - CIBW_TEST_COMMAND="python -m unittest discover {project}/tests"
     - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
