@@ -77,6 +77,8 @@ if BUILD_EXT:
     C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
+    LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
+
     extensions = cythonize([
             Extension("libhaf",
                 sources=["hafnian/lhafnian."+ext, "src/lhafnian.c",],
