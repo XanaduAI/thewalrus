@@ -96,7 +96,7 @@ if BUILD_EXT:
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args),
             Extension("libperm",
-                sources=["src/permanent.f90"],
+                sources=["src/permanent.F90"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
