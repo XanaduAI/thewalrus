@@ -59,24 +59,22 @@ if BUILD_EXT:
         ext = 'c'
 
 
-    library_default = []
-    inc_default = []
+    library_default = ""
     if os.name == 'nt':
         cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp', "-static", "-static-libgfortran", "-static-libgcc"]
     if platform.system() == 'Darwin':
         os.environ['CC'] = "/usr/local/opt/llvm/bin/clang"
-        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
+        cflags_default = "-I/usr/local/opt/llvm/include -std=c99 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp']
-        library_default = ['/usr/local/opt/llvm/lib']
-        inc_default = ['-I/usr/local/opt/llvm/include']
+        library_default = '/usr/local/opt/llvm/lib'
     else:
         cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp']
 
-    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":") + library_default
+    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
     C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
-    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())] + inc_default
+    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
     extensions = cythonize([
             Extension("libhaf",
