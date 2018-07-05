@@ -15,6 +15,7 @@
 #!/usr/bin/env python3
 import sys
 import os
+import platform
 
 import setuptools
 
@@ -57,16 +58,24 @@ if BUILD_EXT:
         cythonize = lambda x: x
         ext = 'c'
 
+
+    library_default = []
+    inc_default = []
     if os.name == 'nt':
         cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp', "-static", "-static-libgfortran", "-static-libgcc"]
+    if platform.system() == 'Darwin':
+        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
+        extra_link_args = ['-fopenmp']
+        library_default = ['/usr/local/opt/llvm/lib']
+        inc_default = ['/usr/local/opt/llvm/include']
     else:
         cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp']
 
-    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
+    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":") + library_default
     C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
-    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
+    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())] + inc_default
 
     extensions = cythonize([
             Extension("libhaf",
