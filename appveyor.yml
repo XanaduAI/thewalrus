@@ -3,54 +3,21 @@ environment:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
       TEST_TIMEOUT: 1000
-  matrix:
-    - PYTHON_VERSION: "3.4"
-      CONDAPATH: 'C:\Miniconda34'
-    - PYTHON_VERSION: "3.5"
-      CONDAPATH: 'C:\Miniconda35'
-    - PYTHON_VERSION: "3.6"
-      CONDAPATH: 'C:\Miniconda36'
+      CIBW_BEFORE_BUILD: "set PATH=%PATH%;C:/msys64/usr/bin;C:/msys64/mingw64/bin && pip install numpy scipy cython"
+      CIBW_SKIP: "cp27-* *i686"
+      CIBW_TEST_REQUIRES: "scipy"
+      CIBW_TEST_COMMAND: "python -m unittest discover {project}/hafnian/tests"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
-platform:
-  - x64
-
 matrix:
   fast_finish: false
 
-install:
-  - if "%PLATFORM%" == "x86" set PATH=%CONDAPATH%\bin;%CONDAPATH%\Scripts;%PATH%
-  - if "%PLATFORM%" == "x64" set PATH=%CONDAPATH%-x64\bin;%CONDAPATH%-x64\Scripts;%PATH%
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION%
-  - activate python%PYTHON_VERSION%
-  - if "%PLATFORM%" == "x86" set C_INCLUDE_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\include
-  - if "%PLATFORM%" == "x86" set LD_LIBRARY_PATH=%CONDAPATH%\envs\python%PYTHON_VERSION%\Library\lib
-  - if "%PLATFORM%" == "x64" set C_INCLUDE_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\include
-  - if "%PLATFORM%" == "x64" set LD_LIBRARY_PATH=%CONDAPATH%-x64\envs\python%PYTHON_VERSION%\Library\lib
-  - if "%PLATFORM%" == "x86" ls %CONDAPATH%\envs\python%PYTHON_VERSION%
-  - if "%PLATFORM%" == "x64" ls %CONDAPATH%-x64\envs\python%PYTHON_VERSION%
-  - conda install -q --name python%PYTHON_VERSION% setuptools numpy wheel pip setuptools cython scipy
-  - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c anaconda libpython
-  - if not "%PYTHON_VERSION%" == "3.4" conda install -q --name python%PYTHON_VERSION% -c msys2 m2w64-toolchain
-  - if "%PYTHON_VERSION%" == "3.4" pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy
-  - python.exe setup.py build_ext --compiler=mingw32
-  - python.exe setup.py build
-
-build: off
-
-after_test:
-  # This step builds your wheels.
-  - python.exe setup.py bdist_wheel
+build_script:
+  - pip install cibuildwheel==0.9.2
+  - cibuildwheel --output-dir wheelhouse
 
 artifacts:
-  # bdist_wheel puts your built wheel in the dist directory
-  - path: dist\*.whl
-
-#on_success:
-#  You can use this step to upload your artifacts to a public website.
-#  See Appveyor's documentation for more details. Or you can simply
-#  access your wheels from the Appveyor "artifacts" tab for your build.
+  - path: "wheelhouse\\*.whl"
+    name: Wheels
