@@ -26,6 +26,7 @@ matrix:
         - WHEEL=1
         - PIP=pip
     - os: osx
+      language: generic
       env:
         - WHEEL=1
         - PIP=pip2
