@@ -191,9 +191,12 @@ module perm
     !f2py intent(in) :: mat
     !f2py intent(out) :: permanent
 
+#ifdef _OPENMP
     nthreads = OMP_get_max_threads()
     call omp_set_num_threads(nthreads)
-
+#else
+    nthreads = 1
+#endif
 
     nmaxthreads = nthreads
 
