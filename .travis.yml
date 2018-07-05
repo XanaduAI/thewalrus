@@ -26,10 +26,9 @@ matrix:
         - WHEEL=1
         - PIP=pip
     - os: osx
-      language: generic
       env:
         - WHEEL=1
-        - PIP=pip3
+        - PIP=pip2
 before_install:
   - |
     if [ "$WHEEL" = "0" ]; then
@@ -49,7 +48,7 @@ script:
   - if [ "$WHEEL" = "0" ]; then make coverage; fi
   - |
     if [ "$WHEEL" = "1" ]; then
-      $PIP install cibuildwheel==0.8.0
+      $PIP install cibuildwheel
       $PIP install -r requirements.txt
       cibuildwheel --output-dir wheelhouse
       $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
