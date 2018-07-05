@@ -64,10 +64,11 @@ if BUILD_EXT:
         cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp', "-static", "-static-libgfortran", "-static-libgcc"]
     if platform.system() == 'Darwin':
-        os.environ['CC'] = "/usr/local/opt/llvm/bin/clang"
-        cflags_default = "-I/usr/local/opt/llvm/include -std=c99 -O3 -Wall -fPIC -shared -fopenmp"
-        extra_link_args = ['-fopenmp']
-        library_default = '/usr/local/opt/llvm/lib'
+        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared"
+        extra_link_args = []
+        # cflags_default = "-I/usr/local/opt/llvm/include -std=c99 -O3 -Wall -fPIC -shared"
+        # os.environ['CC'] = "/usr/local/opt/llvm/bin/clang"
+        # library_default = '/usr/local/opt/llvm/lib'
     else:
         cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-fopenmp']
