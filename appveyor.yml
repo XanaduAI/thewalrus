@@ -15,7 +15,7 @@ matrix:
   fast_finish: false
 
 build_script:
-  - pip install cibuildwheel==0.9.2
+  - pip install numpy scipy cython cibuildwheel==0.9.2
   - cibuildwheel --output-dir wheelhouse
 
 artifacts:
