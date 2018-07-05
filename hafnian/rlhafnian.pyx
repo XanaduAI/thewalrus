@@ -14,7 +14,6 @@
 #cython: boundscheck=False, wraparound=False, embedsignature=True
 cimport cython
 from cython.parallel cimport prange
-cimport openmp
 
 import numpy as np
 cimport numpy as np
