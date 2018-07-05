@@ -16,7 +16,10 @@
 
 #include <complex.h>
 #include <assert.h>
-#include <omp.h>
+
+#ifdef _OPENMP
+    #include <omp.h>
+#endif
 
 #include <math.h>
 
