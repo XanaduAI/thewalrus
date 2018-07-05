@@ -1,9 +1,10 @@
 language: python
 env:
   global:
-  - CIBW_SKIP="cp27-* *i686"
-  - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
-  - secure: AlHQEqtlwvZgFrK/zcDsFNdshwZjA0+7MXz5VGLt9bOYoNjv1AadtAHJryap46feuxS2fLcvI0+JBP2sDeyB/8oUx8NSH0ubzGuPAlzylS9Z6E3ppmSGl6F6h8Ws9mSIk1UDe27tC9G2nEAHMW34DLECUUP9rgmagOjXkqwzkZF4c7ZFJ9K8kxr4ur0fNsLK3LpS/Ybu7KoAO4cy1TagKkvXczNVlnN4Kc+VfUrMJa8I26pO+W6gvZ7k6GKhOYZFSZxZfnyzkfrlWrVzuEFoZK2pr3yQwR+D6A2VDhwKE5NhZdCyRnsgNFxV8kxvLYwhVjzz2WFdVG/raLafDKzGOofwW7pW1gSdnGde6gnVOLo/M8TC+6Ef5NMEK3b88sq/kRrt6EjWExsyIRXOoazsMneB7ZRBHRMUdWWskW3+jxkphHAs4FE5EfOVRRMBuY/fqiW1+uVzHCPGcy23pQyjU18SLlrRvyDZYiNgF7I5goSgWgHGFQuYnOuknI0CPymHBeY7gLcPiz4yRf1NHBuw6ErUNBwgEEN22ThY7K0Hy4w7f61CS+Kj+01I2AmwWBO7ZagALX0aignRMm5mnDDHXN3jUWR63whp1XsyZVxKpUjb0OQAkqONVEPM3urU3REzKzdiF20TSwFZwKb8xp8/lPEM05kKe8oQ9bkY4T6pI0c=
+    - CIBW_SKIP="cp27-* *i686"
+    - CIBW_BEFORE_BUILD='pip install numpy scipy cython && export NUMPY_INCLUDE=$(python -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"'
+    - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
+    - secure: AlHQEqtlwvZgFrK/zcDsFNdshwZjA0+7MXz5VGLt9bOYoNjv1AadtAHJryap46feuxS2fLcvI0+JBP2sDeyB/8oUx8NSH0ubzGuPAlzylS9Z6E3ppmSGl6F6h8Ws9mSIk1UDe27tC9G2nEAHMW34DLECUUP9rgmagOjXkqwzkZF4c7ZFJ9K8kxr4ur0fNsLK3LpS/Ybu7KoAO4cy1TagKkvXczNVlnN4Kc+VfUrMJa8I26pO+W6gvZ7k6GKhOYZFSZxZfnyzkfrlWrVzuEFoZK2pr3yQwR+D6A2VDhwKE5NhZdCyRnsgNFxV8kxvLYwhVjzz2WFdVG/raLafDKzGOofwW7pW1gSdnGde6gnVOLo/M8TC+6Ef5NMEK3b88sq/kRrt6EjWExsyIRXOoazsMneB7ZRBHRMUdWWskW3+jxkphHAs4FE5EfOVRRMBuY/fqiW1+uVzHCPGcy23pQyjU18SLlrRvyDZYiNgF7I5goSgWgHGFQuYnOuknI0CPymHBeY7gLcPiz4yRf1NHBuw6ErUNBwgEEN22ThY7K0Hy4w7f61CS+Kj+01I2AmwWBO7ZagALX0aignRMm5mnDDHXN3jUWR63whp1XsyZVxKpUjb0OQAkqONVEPM3urU3REzKzdiF20TSwFZwKb8xp8/lPEM05kKe8oQ9bkY4T6pI0c=
 matrix:
   include:
   - python: 3.5
@@ -11,42 +12,46 @@ matrix:
     addons:
       apt:
         sources:
-        - ubuntu-toolchain-r-test
+          - ubuntu-toolchain-r-test
         packages:
-        - gcc-4.8
+          - gcc-4.8
     env: WHEEL=0
   - sudo: required
     services:
-    - docker
+      - docker
     env:
-    - WHEEL=1
-    - PIP=pip
-    - CIBW_BEFORE_BUILD='{pip} install numpy scipy cython && export NUMPY_INCLUDE=$({python} -c "import numpy; print(numpy.get_include())") && export CFLAGS="-I$NUMPY_INCLUDE $CFLAGS"'
+      - WHEEL=1
+      - PIP=pip
+  - os: osx
+    language: generic
+    env:
+      - WHEEL=1
+      - PIP=pip2
 before_install:
-- |
-  if [ "$WHEEL" = "0" ]; then
-    sudo apt-get -qq update;
-    sudo apt-get install -y gfortran;
-  fi
+  - |
+    if [ "$WHEEL" = "0" ]; then
+      sudo apt-get -qq update;
+      sudo apt-get install -y gfortran;
+    fi
 install:
-- |
-  if [ "$WHEEL" = "0" ]; then
-    pip install -r requirements.txt
-    pip install wheel coverage codecov
-    export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
-    export CFLAGS="-I$NUMPY_INCLUDE -std=c99 -O3 -Wall -fPIC -shared -fopenmp"
-    pip install -e .
-  fi
+  - |
+    if [ "$WHEEL" = "0" ]; then
+      pip install -r requirements.txt
+      pip install wheel coverage codecov
+      export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
+      export CFLAGS="-I$NUMPY_INCLUDE -std=c99 -O3 -Wall -fPIC -shared -fopenmp"
+      pip install -e .
+    fi
 script:
-- if [ "$WHEEL" = "0" ]; then make coverage; fi
-- |
-  if [ "$WHEEL" = "1" ]; then
-    $PIP install cibuildwheel==0.8.0
-    $PIP install -r requirements.txt
-    cibuildwheel --output-dir wheelhouse
-    $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
-    $PIP install wheelhouse-uploader
-    python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
-  fi
+  - if [ "$WHEEL" = "0" ]; then make coverage; fi
+  - |
+    if [ "$WHEEL" = "1" ]; then
+      $PIP install cibuildwheel==0.8.0
+      $PIP install -r requirements.txt
+      cibuildwheel --output-dir wheelhouse
+      $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
+      $PIP install wheelhouse-uploader
+      python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
+    fi
 after_success:
-- if [ "$WHEEL" = "0" ]; then make codecov; fi
+  - if [ "$WHEEL" = "0" ]; then make codecov; fi
