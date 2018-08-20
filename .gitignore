@@ -12,5 +12,10 @@ tests/__pycache__/*
 .coverage
 coverage_html_report
 hafnian/lib
-
-
+src/hafnian-cpp/Debug
+src/hafnian-cpp/Release
+src/hafnian-cpp/hafnian-cpp.*
+src/hafnian-cpp/hafnian-cpp/Debug
+src/hafnian-cpp/hafnian-cpp/Release
+src/hafnian-cpp/hafnian-cpp/*.vcxproj*
+src/hafnian-cpp/.vs
