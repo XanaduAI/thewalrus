@@ -46,7 +46,7 @@ from ._rlhafnian import hafnian as haf_real
 __all__ = ['hafnian', 'haf_complex', 'haf_real', 'version']
 
 
-def hafnian(A, loop=False, tol=1e-12):
+def hafnian(Ain, loop=False, tol=1e-12):
     """Returns the hafnian of matrix A via the C hafnian library.
 
     .. note::
@@ -55,7 +55,7 @@ def hafnian(A, loop=False, tol=1e-12):
         :func:`haf_real` is returned.
 
         If the array is complex (np.complex), this function queries
-        whether the array A has non-zero imaginary part. If so, it
+        whether the array Ain has non-zero imaginary part. If so, it
         calls the :func:`haf_complex` function. Otherwise, if all elements
         are exactly real, the :func:`haf_real` function is called.
 
@@ -63,32 +63,40 @@ def hafnian(A, loop=False, tol=1e-12):
         or :func:`haf_complex` directly.
 
     Args:
-        A (array): a square, symmetric array of even dimensions.
+        Ain (array): a square, symmetric array.
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         toA (float): the tolerance when checking that the matrix is
             symmetric. Default tolerance is 1e-12.
 
     Returns:
-        np.float64 or np.complex128: the hafnian of matrix l
+        np.float64 or np.complex128: the hafnian or loop hafnian of matrix Ain
     """
     # pylint: disable=too-many-return-statements
-    if not isinstance(A, np.ndarray):
+    if not isinstance(Ain, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")
 
-    matshape = A.shape
+    matshape = Ain.shape
 
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
-
-    if matshape[0] % 2 != 0:
-        raise ValueError("Input matrix must be of even dimensions.")
-
-    if np.isnan(A).any():
+    
+    if np.isnan(Ain).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
-    if np.linalg.norm(A-np.transpose(A)) >= tol:
+    if np.linalg.norm(Ain-np.transpose(Ain)) >= tol:
         raise ValueError("Input matrix must be symmetric.")
 
+    if matshape[0] % 2 != 0 and loop == False:
+        return 0.0
+    
+    A = Ain
+    
+    if matshape[0] %2 != 0 and loop == True:
+        A = np.pad(Ain, pad_width=((0, 1), (0, 1)), mode='constant')
+        A[-1, -1] = 1.0
+        
+    matshape = A.shape
+    
     if matshape[0] == 2:
         if loop:
             return A[0, 1] + A[0, 0]*A[1, 1]
@@ -106,6 +114,7 @@ def hafnian(A, loop=False, tol=1e-12):
 
         return A[0, 1]*A[2, 3] + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
 
+    
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
             return haf_complex(A, loop=loop)

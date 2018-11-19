@@ -21,7 +21,7 @@ Hafnian
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/hafnian
 
-The fastest exact hafnian library for real and complex matrices. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
+The fastest exact hafnian library for real and complex full rank matrices. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
 
 Features
 ========
