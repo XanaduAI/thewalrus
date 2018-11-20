@@ -79,24 +79,24 @@ def hafnian(Ain, loop=False, tol=1e-12):
 
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
-    
+
     if np.isnan(Ain).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
     if np.linalg.norm(Ain-np.transpose(Ain)) >= tol:
         raise ValueError("Input matrix must be symmetric.")
 
-    if matshape[0] % 2 != 0 and loop == False:
+    if matshape[0] % 2 != 0 and not loop:
         return 0.0
-    
+
     A = Ain
-    
-    if matshape[0] %2 != 0 and loop == True:
+
+    if matshape[0] %2 != 0 and loop:
         A = np.pad(Ain, pad_width=((0, 1), (0, 1)), mode='constant')
         A[-1, -1] = 1.0
-        
+
     matshape = A.shape
-    
+
     if matshape[0] == 2:
         if loop:
             return A[0, 1] + A[0, 0]*A[1, 1]
@@ -114,7 +114,7 @@ def hafnian(Ain, loop=False, tol=1e-12):
 
         return A[0, 1]*A[2, 3] + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
 
-    
+
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
             return haf_complex(A, loop=loop)

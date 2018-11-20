@@ -44,7 +44,7 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
     def test_odd_dim_exception(self):
         """Check exception for matrix with odd dimensions"""
         A = np.zeros([3, 3])
-        self.assertEqual(hafnian(A),0)
+        self.assertEqual(hafnian(A), 0)
 
     def test_non_symmetric_exception(self):
         """Check exception for non-symmetric matrix"""
