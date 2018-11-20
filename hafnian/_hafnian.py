@@ -45,6 +45,7 @@ def hafnian(A, loop=False, tol=1e-12):
     Returns:
         np.float64 or np.complex128: the hafnian of matrix A.
     """
+    # pylint: disable=too-many-return-statements
     if not isinstance(A, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")
 
@@ -53,14 +54,20 @@ def hafnian(A, loop=False, tol=1e-12):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
-    if matshape[0] % 2 != 0:
-        raise ValueError("Input matrix must be of even dimensions.")
-
     if np.isnan(A).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
     if np.linalg.norm(A-np.transpose(A)) >= tol:
         raise ValueError("Input matrix must be symmetric.")
+
+    if matshape[0] % 2 != 0 and not loop:
+        return 0.0
+
+    if matshape[0] %2 != 0 and loop:
+        A = np.pad(A, pad_width=((0, 1), (0, 1)), mode='constant')
+        A[-1, -1] = 1.0
+
+    matshape = A.shape
 
     if matshape[0] == 2:
         if loop:

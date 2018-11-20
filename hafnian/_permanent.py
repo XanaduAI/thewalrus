@@ -16,10 +16,10 @@ Permanent Python interface
 """
 import numpy as np
 
-from .lib.libperm import perm
+from .lib.libperm import perm as libperm
 
-perm_real = perm.re
-perm_complex = perm.comp
+perm_real = libperm.re
+perm_complex = libperm.comp
 
 
 def perm(A):

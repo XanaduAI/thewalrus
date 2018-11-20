@@ -48,10 +48,10 @@ from ._hafnian import hafnian, haf_complex, haf_real
 from ._permanent import perm, perm_real, perm_complex
 
 __all__ = [
-  'hafnian',
-  'perm',
-  'version'
-  ]
+    'hafnian',
+    'perm',
+    'version'
+]
 
 
 def version():

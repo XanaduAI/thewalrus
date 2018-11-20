@@ -43,11 +43,10 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         with self.assertRaises(ValueError):
             hafnian(A)
 
-    def test_odd_dim_exception(self):
-        """Check exception for matrix with odd dimensions"""
+    def test_odd_dim(self):
+        """Check hafnian for matrix with odd dimensions"""
         A = np.zeros([3, 3])
-        with self.assertRaises(ValueError):
-            hafnian(A)
+        self.assertEqual(hafnian(A), 0)
 
     def test_non_symmetric_exception(self):
         """Check exception for non-symmetric matrix"""
@@ -70,6 +69,14 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         self.assertEqual(haf, A[0, 1])
         haf = hafnian(A, loop=True)
         self.assertEqual(haf, A[0, 1]+A[0, 0]*A[1, 1])
+
+    def test_3x3(self):
+        """Check 3x3 hafnian"""
+        A = np.ones([3, 3])
+        haf = hafnian(A)
+        self.assertEqual(haf, 0.0)
+        haf = hafnian(A, loop=True)
+        self.assertEqual(haf, 4.0)
 
     def test_4x4(self):
         """Check 4x4 hafnian"""
