@@ -30,6 +30,5 @@ typedef unsigned char sint;
 void haf (double mat[], int n, double res[]);
 telem hafnian (double mat[], int n);
 void evals (double z[], double complex vals[], int n);
-telem hafnian_loops(telem *mat, int n);
 
 #endif
