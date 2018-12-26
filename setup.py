@@ -66,15 +66,15 @@ if BUILD_EXT:
 
     if platform.system() == 'Windows':
         USE_OPENMP = False
-        cflags_default = "-std=c++11 -static -O3 -Wall -fPIC"
+        cflags_default = "-static -O3 -Wall -fPIC"
         extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
-        cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -mmacosx-version-min=10.9"
+        cflags_default = "-O3 -Wall -fPIC -shared -mmacosx-version-min=10.9"
         extra_link_args = []
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
-        cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
+        cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-std=c++11 -fopenmp']
 
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
@@ -94,7 +94,7 @@ if BUILD_EXT:
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 language="c++",
-                extra_compile_args=CFLAGS,
+                extra_compile_args=["-std=c++11"] + CFLAGS,
                 extra_link_args=extra_link_args)
     ], compile_time_env={'OPENMP': USE_OPENMP})
 else:
