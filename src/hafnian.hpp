@@ -8,9 +8,16 @@
     #include <omp.h>
 #endif
 
-#ifdef _LAPACKE
+#ifdef LAPACKE
+    #define EIGEN_SUPERLU_SUPPORT
+    #define EIGEN_USE_BLAS
     #define EIGEN_USE_LAPACKE
+
+    #define LAPACK_COMPLEX_CUSTOM
+    #define lapack_complex_float std::complex<float>
+    #define lapack_complex_double std::complex<double>
 #endif
+
 
 #include <Eigen/Eigenvalues>
 

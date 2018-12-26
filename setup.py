@@ -80,6 +80,20 @@ if BUILD_EXT:
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
     LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
+    libraries = []
+
+    USE_LAPACK = False
+    if os.environ.get("USE_LAPACK", ""):
+        USE_LAPACK = True
+        CFLAGS += [" -llapacke -DLAPACKE=1"]
+        libraries += ["lapacke"]
+        extra_link_args[0] += " -llapacke"
+
+    if os.environ.get("USE_OPENBLAS", ""):
+        USE_LAPACK = True
+        CFLAGS += [" -lopenblas -DLAPACKE=1"]
+        libraries += ["openblas"]
+        extra_link_args[0] += " -lopenblas"
 
     extensions = cythonize([
             Extension("libperm",
@@ -93,10 +107,11 @@ if BUILD_EXT:
                 depends=["src/hafnian.hpp"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                libraries=libraries,
                 language="c++",
                 extra_compile_args=["-std=c++11"] + CFLAGS,
                 extra_link_args=extra_link_args)
-    ], compile_time_env={'OPENMP': USE_OPENMP})
+    ], compile_time_env={'_OPENMP': USE_OPENMP, 'LAPACKE': USE_LAPACK})
 else:
     extensions = []
 
