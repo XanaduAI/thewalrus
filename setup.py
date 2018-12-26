@@ -82,18 +82,18 @@ if BUILD_EXT:
     LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
 
     extensions = cythonize([
+            Extension("libperm",
+                sources=["src/permanent.F90"],
+                include_dirs=C_INCLUDE_PATH,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                extra_compile_args=CFLAGS,
+                extra_link_args=extra_link_args),
             Extension("libhaf",
                 sources=["hafnian/hafnian."+ext,],
                 depends=["src/hafnian.hpp"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 language="c++",
-                extra_compile_args=CFLAGS,
-                extra_link_args=extra_link_args),
-            Extension("libperm",
-                sources=["src/permanent.F90"],
-                include_dirs=C_INCLUDE_PATH,
-                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args)
     ], compile_time_env={'OPENMP': USE_OPENMP})
