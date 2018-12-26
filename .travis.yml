@@ -44,7 +44,7 @@ install:
       pip install -r requirements.txt
       pip install wheel coverage codecov
       export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
-      export CFLAGS="-I$NUMPY_INCLUDE -std=c99 -O3 -Wall -fPIC -shared -fopenmp"
+      export CFLAGS="-I$NUMPY_INCLUDE -std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
       pip install -e .
     fi
 script:
