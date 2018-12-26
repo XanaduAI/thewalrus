@@ -67,8 +67,8 @@ if BUILD_EXT:
         extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
-        cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared"
-        extra_link_args = ['-std=c++11']
+        cflags_default = "-std=c++11 -stdlib=libc++ -O3 -Wall -fPIC -shared"
+        extra_link_args = ['-std=c++11 -stdlib=libc++']
     else:
         cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-std=c++11 -fopenmp']
