@@ -2,26 +2,42 @@
 
 
 int main() {
-    int n = 2;
+    int n = 32;
     std::cout << n << std::endl;
-    vec_complex z(n*n, 0.0);
+    std::vector<long long int> z(n*n, 0);
 
-    z[0] = std::complex<double>(2.4324, 0.12343);
-    z[1] = std::complex<double>(-0.5435435, 0.21312321);
-    z[2] = z[1];
-    z[3] = std::complex<double>(-1.54321, -0.927345);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i < n/2) {
+                if (j < n/2) {
+                    z[i*n+j] = 0;
+                }
+                else {
+                    z[i*n+j] = 1;
+                }
+            }
+            else {
+                if (j < n/2) {
+                    z[i*n+j] = 1;
+                }
+                else {
+                    z[i*n+j] = 0;
+                }
+            }
+        }
+    }
 
-    double_complex expected = z[1];
-    double_complex haf = hafnian(z);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            std::cout << z[i*n+j] << ", ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    long long int haf = hafnian_int(z);
 
     std::cout << haf << std::endl;
-    std::cout << expected << std::endl;
-
-    expected = z[1] + z[0]*z[3];
-    haf = loop_hafnian(z);
-
-    std::cout << haf << std::endl;
-    std::cout << expected << std::endl;
 
     return 0;
 };

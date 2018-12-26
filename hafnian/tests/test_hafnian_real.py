@@ -44,7 +44,7 @@ hyp1f1 = {
     }
 
 
-class TestRlhaf(unittest.TestCase):
+class TestRealHaf(unittest.TestCase):
     """Various Hafnian consistency checks"""
 
     def setUp(self):
@@ -66,7 +66,6 @@ class TestRlhaf(unittest.TestCase):
         expected = A[0, 1]*A[2, 3] + \
             A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
         self.assertTrue(np.allclose(haf, expected))
-
 
     def test_identity(self):
         """Check hafnian(I)=0"""
@@ -93,7 +92,7 @@ class TestRlhaf(unittest.TestCase):
         self.assertTrue(np.allclose(haf, expected))
 
 
-class TestRlhafLoops(unittest.TestCase):
+class TestRealHafLoops(unittest.TestCase):
     """Various Hafnian consistency checks"""
 
     def setUp(self):

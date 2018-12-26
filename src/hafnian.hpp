@@ -291,6 +291,71 @@ T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int 
     return res;
 }
 
+long long int recursive_int(std::vector<std::vector<long long int>> &b, int s, int w, std::vector<long long int> &g, int n) {
+    // Recursive integer hafnian solver.
+    if (s == 0) {
+        return w*g[n];
+    }
+
+    std::vector<std::vector<long long int>> c((s-2)*(s-3)/2, std::vector<long long int>(n+1, 0.0));
+    long long int h;
+    int u, v, j, k, i = 0;
+
+    for (j = 1; j < s-2; j++) {
+        for (k = 0; k < j; k++) {
+            for (u = 0; u < n+1; u++) {
+                c[i][u] = b[(j+1)*(j+2)/2+k+2][u];
+            }
+            i += 1;
+        }
+    }
+
+    h = recursive_int(c, s-2, -w, g, n);
+
+    std::vector<long long int> e(n+1, 0);
+    e = g;
+
+    for (u = 0; u < n; u++) {
+        for (v = 0; v < n-u; v++) {
+            e[u+v+1] += g[u]*b[0][v];
+        }
+    }
+
+    for (j = 1; j < s-2; j++) {
+        for (k = 0; k < j; k++) {
+            for (u = 0; u < n; u++) {
+                #pragma omp parallel for
+                for (v = 0; v < n-u; v++) {
+                    c[j*(j-1)/2+k][u+v+1] += b[(j+1)*(j+2)/2][u]*b[(k+1)*(k+2)/2+1][v] + b[(k+1)*(k+2)/2][u]*b[(j+1)*(j+2)/2+1][v];
+                }
+            }
+        }
+    }
+
+    return h + recursive_int(c, s-2, w, e, n);
+}
+
+
+long long int hafnian_int(std::vector<long long int> &mat) {
+    // Returns the hafnian of an integer matrix A via the C hafnian library.
+    // Modified with permission from https://github.com/eklotek/Hafnian.
+    int n = std::sqrt(static_cast<double>(mat.size()))/2;
+
+    std::vector<std::vector<long long int>> z(n*(2*n-1), std::vector<long long int>(n+1, 0));
+    std::vector<long long int> g(n+1, 0);
+
+    g[0] = 1;
+
+    #pragma omp parallel for
+    for (int j = 1; j < 2*n; j++) {
+        for (int k = 0; k < j; k++) {
+            z[j*(j-1)/2+k][0] = mat[2*j*n + k];
+        }
+    }
+
+    return recursive_int(z, 2*n, 1, g, n);
+}
+
 
 template <typename T>
 T hafnian(std::vector<T> &mat) {

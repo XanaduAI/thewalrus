@@ -43,7 +43,7 @@ hyp1f1 = {
     }
 
 
-class TestLhaf(unittest.TestCase):
+class TestComplexHaf(unittest.TestCase):
     """Various Hafnian consistency checks"""
 
     def setUp(self):
@@ -92,7 +92,7 @@ class TestLhaf(unittest.TestCase):
         self.assertTrue(np.allclose(haf, expected))
 
 
-class TestLhafLoops(unittest.TestCase):
+class TestComplexHafLoops(unittest.TestCase):
     """Various Hafnian consistency checks"""
 
     def setUp(self):
