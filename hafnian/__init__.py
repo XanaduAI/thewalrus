@@ -43,6 +43,9 @@ Code details
 
 import numpy as np
 
+import os
+import platform
+
 from ._version import __version__
 from ._hafnian import hafnian, haf_complex, haf_real
 from ._permanent import perm, perm_real, perm_complex

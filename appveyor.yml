@@ -4,7 +4,7 @@ environment:
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
       TEST_TIMEOUT: 1000
       CIBW_BEFORE_BUILD: "pip install numpy scipy cython"
-      CIBW_SKIP: "cp27-* cp33-* cp34-* *i686"
+      CIBW_SKIP: "cp27-* cp33-* cp34-* *win32"
       CIBW_TEST_REQUIRES: "scipy"
       CIBW_TEST_COMMAND: "python -m unittest discover {project}/hafnian/tests"
       CIBW_BUILD_VERBOSITY: 3
