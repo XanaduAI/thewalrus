@@ -17,7 +17,7 @@ import unittest
 from math import factorial as fac
 
 import numpy as np
-from hafnian.lib.librhaf import haf_real as hafnian
+from hafnian.lib.libhaf import haf_real as hafnian
 
 
 hyp1f1 = {

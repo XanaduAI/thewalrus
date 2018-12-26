@@ -17,8 +17,7 @@ import unittest
 import numpy as np
 import hafnian as hf
 from hafnian import hafnian
-from hafnian.lib.libhaf import haf_complex
-from hafnian.lib.librhaf import haf_real
+from hafnian.lib.libhaf import haf_complex, haf_real
 
 
 class TestVersion(unittest.TestCase):

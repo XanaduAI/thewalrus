@@ -26,7 +26,6 @@ with open("hafnian/_version.py") as f:
 
 requirements = [
     "numpy",
-    'scipy'
 ]
 
 
@@ -56,7 +55,7 @@ if BUILD_EXT:
     except:
         USE_CYTHON = False
         cythonize = lambda x: x
-        ext = 'c'
+        ext = 'cpp'
 
 
     library_default = ""
@@ -64,35 +63,29 @@ if BUILD_EXT:
 
     if platform.system() == 'Windows':
         USE_OPENMP = False
-        cflags_default = "-std=c99 -static -O3 -Wall -fPIC -shared"
-        extra_link_args = ["-static", "-static-libgfortran", "-static-libgcc"]
+        cflags_default = "-std=c++11 -static -O3 -Wall -fPIC -shared"
+        extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
-        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared"
-        extra_link_args = []
+        cflags_default = "-std=c++11 -static -O3 -Wall -fPIC -shared"
+        extra_link_args = ['-std=c++11']
     else:
-        cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp"
-        extra_link_args = ['-fopenmp']
+        cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
+        extra_link_args = ['-std=c++11 -fopenmp']
 
     LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
-    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + ["src"]
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
     LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
 
     extensions = cythonize([
             Extension("libhaf",
-                sources=["hafnian/lhafnian."+ext, "src/lhafnian.c",],
-                depends=["src/lhafnian.h"],
+                sources=["hafnian/hafnian.pyx",],
+                depends=["src/hafnian.hpp"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-                extra_compile_args=CFLAGS,
-                extra_link_args=extra_link_args),
-            Extension("librhaf",
-                sources=["hafnian/rlhafnian."+ext, "src/rlhafnian.c"],
-                depends=["src/rlhafnian.h"],
-                include_dirs=C_INCLUDE_PATH,
-                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                language="c++",
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args),
             Extension("libperm",
@@ -107,7 +100,7 @@ else:
 
 
 info = {
-    'name': 'hafnian-scipy',
+    'name': 'hafnian',
     'version': version,
     'maintainer': 'Xanadu Inc.',
     'maintainer_email': 'nicolas@xanadu.ai',
