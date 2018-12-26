@@ -61,6 +61,9 @@ if BUILD_EXT:
     library_default = ""
     USE_OPENMP = True
 
+    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + ["src"]
+
     if platform.system() == 'Windows':
         USE_OPENMP = False
         cflags_default = "-std=c++11 -static -O3 -Wall -fPIC"
@@ -69,12 +72,11 @@ if BUILD_EXT:
         USE_OPENMP = False
         cflags_default = "-std=c++11 -stdlib=libc++ -O3 -Wall -fPIC -shared"
         extra_link_args = ['-std=c++11 -stdlib=libc++']
+        extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
         cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-std=c++11 -fopenmp']
 
-    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
-    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + ["src"]
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
     LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
