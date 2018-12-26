@@ -71,7 +71,7 @@ if BUILD_EXT:
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
         cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -mmacosx-version-min=10.9"
-        extra_link_args = ['-std=c++11']
+        extra_link_args = []
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
         cflags_default = "-std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
