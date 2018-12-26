@@ -314,7 +314,7 @@ T hafnian(std::vector<T> &mat) {
 
 template <typename T>
 T loop_hafnian(std::vector<T> &mat) {
-    int n = std::sqrt(mat.size());
+    int n = std::sqrt(static_cast<int>(mat.size()));
     assert(n % 2 == 0);
 
     Byte m = n / 2;
