@@ -81,7 +81,7 @@ if BUILD_EXT:
 
     extensions = cythonize([
             Extension("libhaf",
-                sources=["hafnian/hafnian.pyx",],
+                sources=["hafnian/hafnian."+ext,],
                 depends=["src/hafnian.hpp"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
