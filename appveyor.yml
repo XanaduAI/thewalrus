@@ -7,6 +7,7 @@ environment:
       CIBW_SKIP: "cp27-* cp33-* cp34-**i686"
       CIBW_TEST_REQUIRES: "scipy"
       CIBW_TEST_COMMAND: "python -m unittest discover {project}/hafnian/tests"
+      CIBW_BUILD_VERBOSITY: 3
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
