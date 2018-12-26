@@ -48,7 +48,7 @@ import platform
 
 
 if platform.system() == 'Windows':
-    extra_dll_dir = os.path.join(os.path.dirname(__file__), 'extra-dll')
+    extra_dll_dir = os.path.join(os.path.dirname(__file__), '.lib')
     if os.path.isdir(extra_dll_dir):
       os.environ["PATH"] += os.pathsep + extra_dll_dir
 
