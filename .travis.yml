@@ -27,6 +27,7 @@ matrix:
         - PIP=pip
         - PYTHON=python
     - os: osx
+      xcode: "10.0.0"
       language: generic
       env:
         - WHEEL=1
@@ -43,6 +44,7 @@ install:
     if [ "$WHEEL" = "0" ]; then
       pip install -r requirements.txt
       pip install wheel coverage codecov
+      export MACOSX_DEPLOYMENT_TARGET=10.7
       export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
       export CFLAGS="-I$NUMPY_INCLUDE -std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
       pip install -e .

@@ -70,7 +70,7 @@ if BUILD_EXT:
         extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
-        cflags_default = "-std=c++11 -stdlib=libc++ -O3 -Wall -fPIC -shared"
+        cflags_default = "-std=c++11 -stdlib=libc++ -O3 -Wall -fPIC -shared -mmacosx-version-min=10.7"
         extra_link_args = ['-std=c++11 -stdlib=libc++']
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
