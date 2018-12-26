@@ -1,7 +1,7 @@
 language: python
 env:
   global:
-    - CIBW_SKIP="cp27-* *i686"
+    - CIBW_SKIP="cp27-* cp34-* *i686"
     - CIBW_BEFORE_BUILD_LINUX='pip install numpy scipy cython'
     - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc && pip install numpy scipy cython'
     - CIBW_TEST_REQUIRES=scipy
@@ -44,7 +44,7 @@ install:
     if [ "$WHEEL" = "0" ]; then
       pip install -r requirements.txt
       pip install wheel coverage codecov
-      export MACOSX_DEPLOYMENT_TARGET=10.7
+      export MACOSX_DEPLOYMENT_TARGET=10.9
       export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
       export CFLAGS="-I$NUMPY_INCLUDE -std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
       pip install -e .
