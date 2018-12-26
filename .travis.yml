@@ -2,9 +2,9 @@ language: python
 env:
   global:
     - CIBW_SKIP="cp27-* cp34-* *i686"
-    - CIBW_BEFORE_BUILD_LINUX='pip install numpy scipy cython'
-    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc && pip install numpy scipy cython'
-    - CIBW_TEST_REQUIRES=scipy
+    - CIBW_BEFORE_BUILD_LINUX='pip install numpy cython'
+    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc && pip install numpy cython'
+    - CIBW_TEST_REQUIRES=numpy
     - CIBW_TEST_COMMAND="python -m unittest discover {project}/hafnian/tests"
     - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
     - secure: AlHQEqtlwvZgFrK/zcDsFNdshwZjA0+7MXz5VGLt9bOYoNjv1AadtAHJryap46feuxS2fLcvI0+JBP2sDeyB/8oUx8NSH0ubzGuPAlzylS9Z6E3ppmSGl6F6h8Ws9mSIk1UDe27tC9G2nEAHMW34DLECUUP9rgmagOjXkqwzkZF4c7ZFJ9K8kxr4ur0fNsLK3LpS/Ybu7KoAO4cy1TagKkvXczNVlnN4Kc+VfUrMJa8I26pO+W6gvZ7k6GKhOYZFSZxZfnyzkfrlWrVzuEFoZK2pr3yQwR+D6A2VDhwKE5NhZdCyRnsgNFxV8kxvLYwhVjzz2WFdVG/raLafDKzGOofwW7pW1gSdnGde6gnVOLo/M8TC+6Ef5NMEK3b88sq/kRrt6EjWExsyIRXOoazsMneB7ZRBHRMUdWWskW3+jxkphHAs4FE5EfOVRRMBuY/fqiW1+uVzHCPGcy23pQyjU18SLlrRvyDZYiNgF7I5goSgWgHGFQuYnOuknI0CPymHBeY7gLcPiz4yRf1NHBuw6ErUNBwgEEN22ThY7K0Hy4w7f61CS+Kj+01I2AmwWBO7ZagALX0aignRMm5mnDDHXN3jUWR63whp1XsyZVxKpUjb0OQAkqONVEPM3urU3REzKzdiF20TSwFZwKb8xp8/lPEM05kKe8oQ9bkY4T6pI0c=

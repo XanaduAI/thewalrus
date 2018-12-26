@@ -3,11 +3,14 @@ environment:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
       TEST_TIMEOUT: 1000
-      CIBW_BEFORE_BUILD: "pip install numpy scipy cython"
+      CIBW_BEFORE_BUILD: "pip install numpy cython"
       CIBW_SKIP: "cp27-* cp33-* cp34-* *win32"
-      CIBW_TEST_REQUIRES: "scipy"
+      CIBW_TEST_REQUIRES: "numpy"
       CIBW_TEST_COMMAND: "python -m unittest discover {project}/hafnian/tests"
       CIBW_BUILD_VERBOSITY: 3
+      WHEELHOUSE_UPLOADER_USERNAME: AKIAJOU6ECM5Q7T6UUQQ
+      WHEELHOUSE_UPLOADER_SECRET:
+        secure: ay6x72da/u/9Icggl83ZJyB5uUxJz1YFII2pZLD+bEznret6myBa/afWHXr021dh
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
@@ -19,6 +22,9 @@ build_script:
   - set PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
   - pip install numpy scipy cython cibuildwheel==0.10.0
   - cibuildwheel --output-dir wheelhouse
+  - pip install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
+  - pip install wheelhouse-uploader
+  - python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
 
 artifacts:
   - path: "wheelhouse\\*.whl"
