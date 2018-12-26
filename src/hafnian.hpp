@@ -294,7 +294,7 @@ T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int 
 
 template <typename T>
 T hafnian(std::vector<T> &mat) {
-    int n = std::sqrt(static_cast<int>(mat.size()));
+    int n = std::sqrt(static_cast<double>(mat.size()));
     assert(n % 2 == 0);
 
     Byte m = n / 2;
@@ -314,7 +314,7 @@ T hafnian(std::vector<T> &mat) {
 
 template <typename T>
 T loop_hafnian(std::vector<T> &mat) {
-    int n = std::sqrt(static_cast<int>(mat.size()));
+    int n = std::sqrt(static_cast<double>(mat.size()));
     assert(n % 2 == 0);
 
     Byte m = n / 2;
