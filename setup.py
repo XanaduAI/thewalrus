@@ -66,8 +66,8 @@ if BUILD_EXT:
 
     if platform.system() == 'Windows':
         USE_OPENMP = False
-        cflags_default = "-static -O3 -Wall -fPIC"
-        extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        cflags_default = "-shared -O3 -Wall -fPIC"
+        extra_link_args = ["-std=c++11"]
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
         cflags_default = "-O3 -Wall -fPIC -shared -mmacosx-version-min=10.9"
