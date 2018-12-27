@@ -11,19 +11,17 @@ Frontend
 Backends
 --------
 
-* The C libraries, ``libhaf.so`` for the hafnian calculation of complex matrices, and ``librhaf.so``, for the hafnian calculation of real matrices.
+* The C library, ``libhaf.so`` for the hafnian calculation of complex, real, and integer matrices.
 
 * The Fortran library, ``libperm.so`` for the permanent calculation of real matrices.
 
-If you would like to access the C  or Fortran libraries directly, download the source code and navigate to the ``src`` directory. The corresponding libraries can be installed by running
+You can also use the C++ Hafnian library directly in your C++ projects - just ensure that the ``src`` folder is in your include path, and add
 
-.. code-block:: bash
+.. code-block:: cpp
 
-  $ make library
-  $ make rlibrary
-  $ make libperm
+	#include <hafnian.hpp>
 
-See the file :download:`timing.c <../src/timing.c>` for an example of how the hafnian library can be accessed directly from C code.
+at the top of your C++ source file. See the file :download:`timing.cpp <../src/timing.cpp>`, as well as the corresponding Makefile, for an example of how the hafnian library can be accessed directly from C code.
 
 Alternatively, if you install the Hafnian package as a python wheel using pip, you can link against the static pre-built library provided.
 

@@ -13,6 +13,8 @@ Features
 
 * The algorithms in this library are what Ryser's formula is to the permanent.
 
+* (We also provide an efficient function for calculating the permanent via Ryser's formula.)
+
 Getting started
 ===============
 

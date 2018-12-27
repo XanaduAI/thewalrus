@@ -26,9 +26,10 @@ C/Fortran library.
 For more advanced usage, access to the libraries directly are provided
 via the functions:
 
-* :func:`haf_real` links to ``librhaf.so``
-* :func:`haf_complex` links to ``libhaf.so``
-* :func:`perm_real` links to ``libperm.so``.
+* :func:`haf_real` links to ``hafnian.lib.libhaf.haf_real``
+* :func:`haf_complex` links to ``hafnian.lib.libhaf.haf_complex``
+* :func:`haf_int` links to ``hafnian.lib.libhaf.haf_int``
+* :func:`perm_real` links to ``hafnian.lib.libperm``.
 
 Python wrappers
 ---------------
@@ -36,25 +37,26 @@ Python wrappers
 .. autosummary::
    hafnian
    perm
+   version
 
 Code details
 ------------
 """
-
-import numpy as np
-
+#pylint: disable=wrong-import-position
 import os
 import platform
 
+import numpy as np
 
-if platform.system() == 'Windows':
+if platform.system() == 'Windows': # pragma: no cover
     extra_dll_dir = os.path.join(os.path.dirname(__file__), '.libs')
     if os.path.isdir(extra_dll_dir):
-      os.environ["PATH"] += os.pathsep + extra_dll_dir
+        os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 from ._version import __version__
 from ._hafnian import hafnian, haf_complex, haf_real
 from ._permanent import perm, perm_real, perm_complex
+
 
 __all__ = [
     'hafnian',

@@ -30,45 +30,112 @@ Features
 
 * The algorithms in this library are what Ryser's formula is to the permanent.
 
+* (We also provide an efficient function for calculating the permanent via Ryser's formula.)
 
-Dependencies
+Installation
 ============
+
+To install the Hafnian library, simply run
+
+.. code-block:: console
+
+    $ python -m pip install hafnian
+
+Pre-built binary wheels are available for the following platforms:
+
+.. rst-class:: docstable
+
++------------+-------------+------------------+---------------+
+|            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |
++============+=============+==================+===============+
+| Python 3.5 |  ✅         |  ✅              |   ✅          |
++------------+-------------+------------------+---------------+
+| Python 3.6 |  ✅         |  ✅              |   ✅          |
++------------+-------------+------------------+---------------+
+| Python 3.7 |  ✅         |  ✅              |   ✅          |
++------------+-------------+------------------+---------------+
+
+
+Compiling from source
+=====================
 
 Hafnian depends on the following Python packages:
 
 * `Python <http://python.org/>`_ >=3.5
 * `NumPy <http://numpy.org/>`_  >=1.13.3
 
-These can be installed using pip, or, if on linux, using your package manager (i.e. ``apt`` if on a Debian-based system.)
+In addition, to compile the included Fortran and C++ extensions, the following dependencies are required:
 
-Note that the C extension may need to be compiled; you will need the following libraries:
+* A Fortran compiler, such as ``gfortran``
+* A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
+* `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
 
-* BLAS
-* LAPACKe
-* OpenMP
+On Debian-based systems, these can be installed via ``apt``:
 
-On Debian-based systems, this can be done via ``apt`` before installation:
-::
+.. code-block:: console
 
-    $ sudo apt install liblapacke-dev
+    $ sudo apt install g++ gfortran libeigen3-dev
+
+or using Homebrew on MacOS:
+
+.. code-block:: console
+
+    $ brew install gcc eigen
+
+Alternatively, you can download the Eigen headers manually:
+
+.. code-block:: console
+
+    $ mkdir ~/.local/eigen3 && cd ~/.local/eigen3
+    $ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz -O eigen3.tar.gz
+    $ tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
+    $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
+
+Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that Hafnian can find the Eigen3 header files (if not provided, Hafnian will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
+
+Once all dependencies are installed, you can compile the latest stable version of the Hafnian library as follows:
+
+.. code-block:: console
+
+    $ python -m pip install hafnian --no-binary :all:
+
+Alternatively, you can compile the latest development version by cloning the git repository, and installing using pip in development mode.
+
+.. code-block:: console
+
+    $ git clone https://github.com/XanaduAI/hafnian.git
+    $ cd hafnian && python -m pip install -e .
 
 
-Installation
-============
+OpenMP
+------
 
-Installation of Hafnian, as well as all required Python packages mentioned above, can be done using pip:
-::
+The Hafnian library uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux using the GNU g++ compiler, due to insufficient support using Windows/MSCV and MacOS/Clang.**
 
-    $ python -m pip install hafnian
+
+
+Using LAPACK, OpenBLAS, or MKL
+------------------------------
+
+If you would like to take advantage of the highly optimized matrix routines of LAPACK, OpenBLAS, or MKL, you can optionally compile the Hafnian library such that Eigen uses these frameworks as backends. As a result, all calls in the Hafnian library to Eigen functions are silently substituted with calls to LAPACK/OpenBLAS/MKL.
+
+For example, for LAPACK integration, make sure you have the ``lapacke`` C++ LAPACK bindings installed (``sudo apt install liblapacke-dev`` in Ubuntu-based Linux distributions), and then compile with the environment variable ``USE_LAPACK=1``:
+
+.. code-block:: console
+
+    $ USE_LAPACK=1 python -m pip install hafnian --no-binary :all:
+
+Alternatively, you may pass ``USE_OPENBLAS=1`` to use the OpenBLAS library.
 
 
 Software tests
 ==============
 
 To ensure that the Hafnian library is working correctly after installation, the test suite can be run by navigating to the source code folder and running
-::
 
-  make test
+.. code-block:: console
+
+    $ make test
 
 Documentation
 =============
@@ -87,11 +154,14 @@ They can be installed via a combination of ``pip`` and ``apt`` if on a Debian-ba
     $ pip3 install sphinx sphinxcontrib-bibtex nbsphinx --user
 
 To build the HTML documentation, go to the top-level directory and run the command
-::
 
-  $ make doc
+.. code-block:: console
+
+    $ make doc
 
 The documentation can then be found in the ``docs/_build/html/`` directory.
+
+
 
 Authors
 =======
