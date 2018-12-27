@@ -22,7 +22,7 @@ matrix:
 
 install:
   - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.7.zip -outfile eigen3.zip
-  - cmd: 7z x eigen3.zip -o "C:\" -y > nul
+  - cmd: 7z x eigen3.zip -o"C:\" -y > nul
 
 build_script:
   - set PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
