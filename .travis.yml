@@ -1,61 +1,61 @@
 language: python
 env:
   global:
-    - CIBW_SKIP="cp27-* cp34-* *i686"
-    - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/src && pip install numpy cython'
-    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc eigen && pip install numpy cython'
-    - CIBW_TEST_REQUIRES=numpy
-    - CIBW_TEST_COMMAND="python -m unittest discover {project}/hafnian/tests"
-    - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
-    - secure: AlHQEqtlwvZgFrK/zcDsFNdshwZjA0+7MXz5VGLt9bOYoNjv1AadtAHJryap46feuxS2fLcvI0+JBP2sDeyB/8oUx8NSH0ubzGuPAlzylS9Z6E3ppmSGl6F6h8Ws9mSIk1UDe27tC9G2nEAHMW34DLECUUP9rgmagOjXkqwzkZF4c7ZFJ9K8kxr4ur0fNsLK3LpS/Ybu7KoAO4cy1TagKkvXczNVlnN4Kc+VfUrMJa8I26pO+W6gvZ7k6GKhOYZFSZxZfnyzkfrlWrVzuEFoZK2pr3yQwR+D6A2VDhwKE5NhZdCyRnsgNFxV8kxvLYwhVjzz2WFdVG/raLafDKzGOofwW7pW1gSdnGde6gnVOLo/M8TC+6Ef5NMEK3b88sq/kRrt6EjWExsyIRXOoazsMneB7ZRBHRMUdWWskW3+jxkphHAs4FE5EfOVRRMBuY/fqiW1+uVzHCPGcy23pQyjU18SLlrRvyDZYiNgF7I5goSgWgHGFQuYnOuknI0CPymHBeY7gLcPiz4yRf1NHBuw6ErUNBwgEEN22ThY7K0Hy4w7f61CS+Kj+01I2AmwWBO7ZagALX0aignRMm5mnDDHXN3jUWR63whp1XsyZVxKpUjb0OQAkqONVEPM3urU3REzKzdiF20TSwFZwKb8xp8/lPEM05kKe8oQ9bkY4T6pI0c=
+  - CIBW_SKIP="cp27-* cp34-* *i686"
+  - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/src && pip install numpy cython'
+  - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc eigen && pip install numpy cython'
+  - CIBW_TEST_REQUIRES=numpy
+  - CIBW_TEST_COMMAND="python -m unittest discover {project}/hafnian/tests"
+  - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
+  - secure: Vn5Ye7dOZWIZS2gtrKMZxWtQy1hIiGLiHbxmsOTbc7NNuEYI4VzG1QBQNC8zCgeNU6kGURjbsNZ5YNULyoQ9/hGsNHlwTJDnZ27kt9NwcQXBXHWmk3gzBpaU+4tdKYK/NOlCfM8Fyjtz6129S6tAyYPQTK5pvYOd3IsLZxek0Gp0wlcCgTY5L2ww6CBQvznzBJFU3hNvgTNwFp0pcvJnXkkpqOGPIkLp+6ViEDbmYH/np65UJPTBAHl45XJbSeSYfRP3bzMPNXmBGzyWimd85DuG4GnYs7IisgxFFvD1+BqJ2mffJ5RUAlIMuL/s5d08bMvwVKBPju+iHCAH2GAnuL4ukNjXG0I5SkFkiyWsxDC9zVEwftsL6STU0ddG8ou7DjUOo59VzDf5kY+RIX3P4aOdbEW19g3rAq4MERyAwRI6g08mSGGjBlkcwRxTz6+sZJ3MFABOX137q9GZt2C7E8TsXlOhB5LmGa95RhoE8shQAF3sSC5cNwd7k6mYsb0TIAkgVh2A9u1cTHD3qEFZwm/Ojh8m4DsGqgaxxr1k7JRGLaOkIhn/tYt7/5F81FCd9eKUZZ29eTVSVpLhfYrbRWhz43ma8Ek67XI6a/OSIJxd53Q6LsKLPEMl7PxeZPoUN7Zwuuhoyp0z+9cO+p6X8MmGortwiIlVa9u9ipXsxu4=
 matrix:
   include:
-    - python: 3.5
-      cache: pip
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-4.8
-      env: WHEEL=0
-    - sudo: required
-      services:
-        - docker
-      env:
-        - WHEEL=1
-        - PIP=pip
-        - PYTHON=python
-    - os: osx
-      xcode: "10.0.0"
-      language: generic
-      env:
-        - WHEEL=1
-        - PIP=pip2
-        - PYTHON=python2
+  - python: 3.5
+    cache: pip
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-4.8
+    env: WHEEL=0
+  - sudo: required
+    services:
+    - docker
+    env:
+    - WHEEL=1
+    - PIP=pip
+    - PYTHON=python
+  - os: osx
+    xcode: 10.0.0
+    language: generic
+    env:
+    - WHEEL=1
+    - PIP=pip2
+    - PYTHON=python2
 before_install:
-  - |
-    if [ "$WHEEL" = "0" ]; then
-      sudo apt-get -qq update;
-      sudo apt-get install -y gfortran libeigen3-dev;
-    fi
+- |
+  if [ "$WHEEL" = "0" ]; then
+    sudo apt-get -qq update;
+    sudo apt-get install -y gfortran libeigen3-dev;
+  fi
 install:
-  - |
-    if [ "$WHEEL" = "0" ]; then
-      pip install -r requirements.txt
-      pip install wheel coverage codecov
-      pip install -e .
-    fi
+- |
+  if [ "$WHEEL" = "0" ]; then
+    pip install -r requirements.txt
+    pip install wheel coverage codecov
+    pip install -e .
+  fi
 script:
-  - if [ "$WHEEL" = "0" ]; then make coverage; fi
-  - |
-    if [ "$WHEEL" = "1" ]; then
-      $PIP install cibuildwheel==0.10.0
-      $PIP install -r requirements.txt
-      cibuildwheel --output-dir wheelhouse
-      $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
-      $PIP install wheelhouse-uploader
-      $PYTHON -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
-    fi
+- if [ "$WHEEL" = "0" ]; then make coverage; fi
+- |
+  if [ "$WHEEL" = "1" ]; then
+    $PIP install cibuildwheel==0.10.0
+    $PIP install -r requirements.txt
+    cibuildwheel --output-dir wheelhouse
+    $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
+    $PIP install wheelhouse-uploader
+    $PYTHON -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
+  fi
 after_success:
-  - if [ "$WHEEL" = "0" ]; then make codecov; fi
+- if [ "$WHEEL" = "0" ]; then make codecov; fi
