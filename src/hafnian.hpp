@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <math.h>
 #include <assert.h>
 
 #ifdef _OPENMP
@@ -21,18 +20,17 @@
 
 #include <Eigen/Eigenvalues>
 
+#include <version.hpp>
+
+namespace hafnian {
 
 typedef unsigned char Byte;
 typedef std::complex<double> double_complex;
-
 typedef std::vector<double_complex> vec_complex;
-typedef std::vector<vec_complex> mat_complex;
-
 typedef std::vector<double> vec_double;
-typedef std::vector<double> mat_double;
 
 
-vec_complex powtrace(vec_complex &z, int n, int l) {
+inline vec_complex powtrace(vec_complex &z, int n, int l) {
     // given a complex matrix z of dimensions n x n
     // it calculates traces[k] = tr(z^j) for 1 <= j <= l
     vec_complex traces(l, 0.0);
@@ -70,7 +68,7 @@ vec_complex powtrace(vec_complex &z, int n, int l) {
 };
 
 
-vec_double powtrace(vec_double &z, int n, int l) {
+inline vec_double powtrace(vec_double &z, int n, int l) {
     // given a real matrix z of dimensions n x n
     // it calculates traces[k] = tr(z^j) for 1 <= j <= l
     vec_double traces(l, 0.0);
@@ -108,7 +106,7 @@ vec_double powtrace(vec_double &z, int n, int l) {
 };
 
 
-void dec2bin(char* dst, unsigned long long int x, Byte len) {
+inline void dec2bin(char* dst, unsigned long long int x, Byte len) {
     // Convert decimal number in x to character vector dst of length len representing binary number
     char i; // this variable cannot be unsigned
     for (i = len - 1; i >= 0; --i) {
@@ -117,7 +115,7 @@ void dec2bin(char* dst, unsigned long long int x, Byte len) {
 }
 
 
-Byte find2(char* dst, Byte len, Byte* pos) {
+inline Byte find2(char* dst, Byte len, Byte* pos) {
     // Given a string of length len it finds in which positions it has a one and stores its position i,
     // as 2*i and 2*i+1 in consecutive slots of the array pos.
     // It also returns (twice) the number of ones in array dst
@@ -134,7 +132,7 @@ Byte find2(char* dst, Byte len, Byte* pos) {
 
 
 template <typename T>
-T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned long long int chunksize) {
+inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned long long int chunksize) {
     // This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the
     // Hafnian of matrix mat
 
@@ -200,7 +198,7 @@ T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned long l
 
 
 template <typename T>
-T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int n, unsigned long long int X, unsigned long long int chunksize) {
+inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int n, unsigned long long int X, unsigned long long int chunksize) {
     // This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the
     // Hafnian of matrix mat
 
@@ -298,7 +296,7 @@ T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int 
     return res;
 }
 
-long long int recursive_int(std::vector<std::vector<long long int>> &b, int s, int w, std::vector<long long int> &g, int n) {
+inline long long int recursive_int(std::vector<std::vector<long long int>> &b, int s, int w, std::vector<long long int> &g, int n) {
     // Recursive integer hafnian solver.
     if (s == 0) {
         return w*g[n];
@@ -343,7 +341,7 @@ long long int recursive_int(std::vector<std::vector<long long int>> &b, int s, i
 }
 
 
-long long int hafnian_int(std::vector<long long int> &mat) {
+inline long long int hafnian_int(std::vector<long long int> &mat) {
     // Returns the hafnian of an integer matrix A via the C hafnian library.
     // Modified with permission from https://github.com/eklotek/Hafnian.
     int n = std::sqrt(static_cast<double>(mat.size()))/2;
@@ -365,7 +363,7 @@ long long int hafnian_int(std::vector<long long int> &mat) {
 
 
 template <typename T>
-T hafnian(std::vector<T> &mat) {
+inline T hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
     assert(n % 2 == 0);
 
@@ -385,7 +383,7 @@ T hafnian(std::vector<T> &mat) {
 
 
 template <typename T>
-T loop_hafnian(std::vector<T> &mat) {
+inline T loop_hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
     assert(n % 2 == 0);
 
@@ -414,3 +412,4 @@ T loop_hafnian(std::vector<T> &mat) {
     return  haf;
 }
 
+}

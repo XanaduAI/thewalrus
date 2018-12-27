@@ -103,18 +103,18 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         A += A.T
         haf = hafnian(A)
         expected = haf_real(A)
-        self.assertEqual(haf, expected)
+        self.assertTrue(np.allclose(haf, expected))
 
         haf = hafnian(A, loop=True)
         expected = haf_real(A, loop=True)
-        self.assertEqual(haf, expected)
+        self.assertTrue(np.allclose(haf, expected))
 
         A = np.random.random([6, 6])
         A += A.T
         A = np.array(A, dtype=np.complex128)
         haf = hafnian(A)
         expected = haf_real(np.float64(A.real))
-        self.assertEqual(haf, expected)
+        self.assertTrue(np.allclose(haf, expected))
 
     def test_complex(self):
         """Check hafnian(A)=haf_complex(A) for a random
