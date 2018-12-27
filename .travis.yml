@@ -2,12 +2,15 @@ language: python
 env:
   global:
   - CIBW_SKIP="cp27-* cp34-* *i686"
-  - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/src && pip install numpy cython'
-  - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc eigen && pip install numpy cython'
+  - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
+    && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 &&
+    cp -rf Eigen {project}/src && pip install numpy cython'
+  - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc
+    eigen && pip install numpy cython'
   - CIBW_TEST_REQUIRES=numpy
   - CIBW_TEST_COMMAND="python -m unittest discover {project}/hafnian/tests"
   - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
-  - secure: Vn5Ye7dOZWIZS2gtrKMZxWtQy1hIiGLiHbxmsOTbc7NNuEYI4VzG1QBQNC8zCgeNU6kGURjbsNZ5YNULyoQ9/hGsNHlwTJDnZ27kt9NwcQXBXHWmk3gzBpaU+4tdKYK/NOlCfM8Fyjtz6129S6tAyYPQTK5pvYOd3IsLZxek0Gp0wlcCgTY5L2ww6CBQvznzBJFU3hNvgTNwFp0pcvJnXkkpqOGPIkLp+6ViEDbmYH/np65UJPTBAHl45XJbSeSYfRP3bzMPNXmBGzyWimd85DuG4GnYs7IisgxFFvD1+BqJ2mffJ5RUAlIMuL/s5d08bMvwVKBPju+iHCAH2GAnuL4ukNjXG0I5SkFkiyWsxDC9zVEwftsL6STU0ddG8ou7DjUOo59VzDf5kY+RIX3P4aOdbEW19g3rAq4MERyAwRI6g08mSGGjBlkcwRxTz6+sZJ3MFABOX137q9GZt2C7E8TsXlOhB5LmGa95RhoE8shQAF3sSC5cNwd7k6mYsb0TIAkgVh2A9u1cTHD3qEFZwm/Ojh8m4DsGqgaxxr1k7JRGLaOkIhn/tYt7/5F81FCd9eKUZZ29eTVSVpLhfYrbRWhz43ma8Ek67XI6a/OSIJxd53Q6LsKLPEMl7PxeZPoUN7Zwuuhoyp0z+9cO+p6X8MmGortwiIlVa9u9ipXsxu4=
+  - secure: lkBL0X+rNgWP54tf6W2xzdwl+XXeQCdPuCCKy1TPuJ1OJo4dIy6yMs4uapIz8s2atQ2x5SDC+tRQrQDnpLxy5rY0ikChdpkBCMoQvSJIoaaHTNK2hZjnTDtXTNjzkb6E70uWvRriVCy+B+LLjKjdtygIF0+2AE+SGNvW4fEZWP22TYv2s+tWY8GwMAYdaYb7UI3sI/0prIDTqdw/ZUiM22lJskR+BJxZGTR3gSzguE/umbK8tztLzKRUb9A5zXJWGCPY/eKgc20LzVeKCttv0fAGBGz6D/k3I2kUTj5+mBJ+vbNmfkOmgd0QyFGH6zBGLE0xl0vP9HYHhiCFFamTmbkjSLPym+MC5Up+YsMMRqWJDGA0/L3n6afbS3FUqKRb448t3eycvfPWACNpeLPXdaGLTx954O8tDQBMLAJa3dBEbJI31mN2sCVvXLj96SDBdSl/fyouClptGXKGraiqABzowAfmx6GRavCnZMoggmhYOLg5VknawDVSlnEFoGXss8tkZkjCjoj0xzW0aF100m6O7kAORWoa/YLAz2Dyvl+GgDMlsITCQuDs7JEWL0RABzpRw0li03FZd2a1FQkGPyYXROEW4n+tAwVjMAXsfeKafeAUMxzXlhjVc2g9+3rhLvIw3X0hgnr+dGxaLytMczUXwnouY1LbhOT2EWgW7+c=
 matrix:
   include:
   - python: 3.5
