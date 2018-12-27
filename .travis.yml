@@ -3,7 +3,7 @@ env:
   global:
     - CIBW_SKIP="cp27-* cp34-* *i686"
     - CIBW_BEFORE_BUILD_LINUX='pip install numpy cython'
-    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc && pip install numpy cython'
+    - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc eigen && pip install numpy cython'
     - CIBW_TEST_REQUIRES=numpy
     - CIBW_TEST_COMMAND="python -m unittest discover {project}/hafnian/tests"
     - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
@@ -37,16 +37,13 @@ before_install:
   - |
     if [ "$WHEEL" = "0" ]; then
       sudo apt-get -qq update;
-      sudo apt-get install -y gfortran;
+      sudo apt-get install -y gfortran libeigen3-dev;
     fi
 install:
   - |
     if [ "$WHEEL" = "0" ]; then
       pip install -r requirements.txt
       pip install wheel coverage codecov
-      export MACOSX_DEPLOYMENT_TARGET=10.9
-      export NUMPY_INCLUDE=$(python3 -c "import numpy; print(numpy.get_include())")
-      export CFLAGS="-I$NUMPY_INCLUDE -std=c++11 -O3 -Wall -fPIC -shared -fopenmp"
       pip install -e .
     fi
 script:

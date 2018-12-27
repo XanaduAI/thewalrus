@@ -2,6 +2,7 @@ environment:
   global:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
+      EIGEN_INCLUDE_DIR: C:\eigen-eigen-323c052e1731\
       TEST_TIMEOUT: 1000
       CIBW_BEFORE_BUILD: "pip install numpy cython"
       CIBW_SKIP: "cp27-* cp33-* cp34-* *win32"
@@ -17,6 +18,11 @@ cache:
 
 matrix:
   fast_finish: false
+
+
+install:
+  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.7.zip -outfile eigen3.zip
+  - cmd: 7z x eigen3.zip -o "C:\" -y > nul
 
 build_script:
   - set PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%

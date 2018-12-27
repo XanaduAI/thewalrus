@@ -60,9 +60,10 @@ if BUILD_EXT:
 
     library_default = ""
     USE_OPENMP = True
+    EIGEN_INCLUDE = [os.environ.get("EIGEN_INCLUDE_DIR", ""), "/usr/local/include/eigen3", "/usr/include/eigen3"]
 
     LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
-    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + ["src"]
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["src"]
 
     if platform.system() == 'Windows':
         USE_OPENMP = False
