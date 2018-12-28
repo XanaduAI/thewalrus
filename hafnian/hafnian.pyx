@@ -29,6 +29,8 @@ def haf_int(long long[:, :] A):
     """Returns the hafnian of an integer matrix A via the C hafnian library.
     Modified with permission from https://github.com/eklotek/Hafnian.
 
+    .. note:: Currently does not support calculation of the loop hafnian.
+
     Args:
         A (array): a np.int64, square, symmetric array of even dimensions.
 
@@ -74,11 +76,11 @@ def haf_real(double[:, :] A, bint loop=False):
     """Returns the hafnian of a real matrix A via the C hafnian library.
 
     Args:
-        A (array): a np.float128, square, symmetric array of even dimensions.
+        A (array): a np.float64, square, symmetric array of even dimensions.
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
 
     Returns:
-        np.float128: the hafnian of matrix A
+        np.float64: the hafnian of matrix A
     """
     cdef int i, j, n = A.shape[0]
     cdef vector[double] mat

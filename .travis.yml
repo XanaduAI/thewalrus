@@ -7,8 +7,8 @@ env:
     cp -rf Eigen {project}/src && pip install numpy cython'
   - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc
     eigen && pip install numpy cython'
-  - CIBW_TEST_REQUIRES=numpy
-  - CIBW_TEST_COMMAND="python -m unittest discover {project}/hafnian/tests"
+  - CIBW_TEST_REQUIRES="numpy pytest pytest-cov"
+  - CIBW_TEST_COMMAND="python -m pytest {project}/hafnian"
   - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
   - secure: lkBL0X+rNgWP54tf6W2xzdwl+XXeQCdPuCCKy1TPuJ1OJo4dIy6yMs4uapIz8s2atQ2x5SDC+tRQrQDnpLxy5rY0ikChdpkBCMoQvSJIoaaHTNK2hZjnTDtXTNjzkb6E70uWvRriVCy+B+LLjKjdtygIF0+2AE+SGNvW4fEZWP22TYv2s+tWY8GwMAYdaYb7UI3sI/0prIDTqdw/ZUiM22lJskR+BJxZGTR3gSzguE/umbK8tztLzKRUb9A5zXJWGCPY/eKgc20LzVeKCttv0fAGBGz6D/k3I2kUTj5+mBJ+vbNmfkOmgd0QyFGH6zBGLE0xl0vP9HYHhiCFFamTmbkjSLPym+MC5Up+YsMMRqWJDGA0/L3n6afbS3FUqKRb448t3eycvfPWACNpeLPXdaGLTx954O8tDQBMLAJa3dBEbJI31mN2sCVvXLj96SDBdSl/fyouClptGXKGraiqABzowAfmx6GRavCnZMoggmhYOLg5VknawDVSlnEFoGXss8tkZkjCjoj0xzW0aF100m6O7kAORWoa/YLAz2Dyvl+GgDMlsITCQuDs7JEWL0RABzpRw0li03FZd2a1FQkGPyYXROEW4n+tAwVjMAXsfeKafeAUMxzXlhjVc2g9+3rhLvIw3X0hgnr+dGxaLytMczUXwnouY1LbhOT2EWgW7+c=
 matrix:
@@ -46,7 +46,7 @@ install:
 - |
   if [ "$WHEEL" = "0" ]; then
     pip install -r requirements.txt
-    pip install wheel coverage codecov
+    pip install pytest pytest-cov wheel codecov
     pip install -e .
   fi
 script:

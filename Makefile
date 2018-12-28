@@ -2,9 +2,8 @@ PYTHON3 := $(shell which python3 2>/dev/null)
 COVERAGE3 := $(shell which coverage3 2>/dev/null)
 
 PYTHON := python3
-COVERAGE := coverage3
-COPTS := run
-TESTRUNNER := -m unittest discover hafnian/tests
+COVERAGE := --cov=hafnian --cov-report term-missing --cov-report=html:coverage_html_report
+TESTRUNNER := -m pytest hafnian
 
 .PHONY: help
 help:
@@ -51,6 +50,4 @@ test:
 	$(PYTHON) $(TESTRUNNER)
 
 coverage:
-	$(COVERAGE) $(COPTS) $(TESTRUNNER)
-	$(COVERAGE) report
-	$(COVERAGE) html
+	$(PYTHON) $(TESTRUNNER) $(COVERAGE)
