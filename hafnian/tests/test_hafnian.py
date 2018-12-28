@@ -17,7 +17,7 @@ import unittest
 import numpy as np
 import hafnian as hf
 from hafnian import hafnian
-from hafnian.lib.libhaf import haf_complex, haf_real
+from hafnian.lib.libhaf import haf_complex, haf_real, haf_int
 
 
 class TestVersion(unittest.TestCase):
@@ -131,6 +131,14 @@ class TestPythonInterfaceWrapper(unittest.TestCase):
         expected = haf_complex(A, loop=True)
         self.assertTrue(np.allclose(haf, expected))
 
+    def test_int(self):
+        """Check hafnian(A)=haf_int(A) for a random
+        real matrix.
+        """
+        A = np.ones([6, 6])
+        haf = hafnian(A)
+        expected = haf_int(np.int64(A))
+        self.assertTrue(np.allclose(haf, expected))
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,24 +16,32 @@ Hafnian Python interface
 """
 import numpy as np
 
-from .lib.libhaf import haf_complex, haf_real
+from .lib.libhaf import haf_complex, haf_real, haf_int
 
 
 def hafnian(A, loop=False, tol=1e-12):
     """Returns the hafnian of matrix A via the C hafnian library.
 
-    If the array is real valued (np.float), the result of
-    :func:`haf_real` is returned.
+    This function calls three separate parts of the C++ hafnian library,
+    depending on the input array type.
+
+    * If the array is real valued (np.float), the result of
+      :func:`haf_real` is returned.
+
+    * If the array is integer valued (either np.int or np.float), and
+      ``loop`` is set to ``False``, the result of :func:`haf_int` is returned.
+      If ``loop`` is ``True``, then the result of :func:`haf_real` is returned.
+      Note that :func:`haf_int` currently does not support the loop hafnian.
 
     * If the array is complex (np.complex), this function queries
       whether the array A has non-zero imaginary part. If so, it
       calls the :func:`haf_complex` function.
 
-    * Otherwise, if all elements are exactly real, the
+      Otherwise, if all elements are exactly real, the
       :func:`haf_real` function is called.
 
-    For more direct control, you may wish to call :func:`haf_real`
-    or :func:`haf_complex` directly.
+    For more direct control, you may wish to call :func:`haf_real`,
+    :func:`haf_complex`, or :func:`haf_int` directly.
 
     Args:
         A (array): a square, symmetric array of even dimensions.
@@ -56,7 +64,7 @@ def hafnian(A, loop=False, tol=1e-12):
     if np.isnan(A).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
-    if np.linalg.norm(A-np.transpose(A)) >= tol:
+    if np.linalg.norm(A-A.T) >= tol:
         raise ValueError("Input matrix must be symmetric.")
 
     if matshape[0] % 2 != 0 and not loop:
@@ -89,5 +97,8 @@ def hafnian(A, loop=False, tol=1e-12):
         if np.any(np.iscomplex(A)):
             return haf_complex(A, loop=loop)
         return haf_real(np.float64(A.real), loop=loop)
+
+    if np.all(np.mod(A, 1) == 0) and not loop:
+        return haf_int(np.int64(A))
 
     return haf_real(A, loop=loop)
