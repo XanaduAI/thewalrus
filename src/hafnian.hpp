@@ -303,14 +303,16 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
     return res;
 }
 
-inline long long int recursive_int(std::vector<long long int> &b, int s, int w, std::vector<long long int> &g, int n) {
+
+template <typename T>
+inline T recursive_chunk(std::vector<T> &b, int s, int w, std::vector<T> &g, int n) {
     // Recursive integer hafnian solver.
     if (s == 0) {
-        return w*g[n];
+        return static_cast<T>(w)*g[n];
     }
 
-    std::vector<long long int> c((s-2)*(s-3)/2*(n+1), 0.0);
-    long long int h;
+    std::vector<T> c((s-2)*(s-3)/2*(n+1), 0.0);
+    T h;
     int u, v, j, k, i = 0;
 
     for (j = 1; j < s-2; j++) {
@@ -322,9 +324,9 @@ inline long long int recursive_int(std::vector<long long int> &b, int s, int w, 
         }
     }
 
-    h = recursive_int(c, s-2, -w, g, n);
+    h = recursive_chunk(c, s-2, -w, g, n);
 
-    std::vector<long long int> e(n+1, 0);
+    std::vector<T> e(n+1, 0);
     e = g;
 
     for (u = 0; u < n; u++) {
@@ -339,17 +341,18 @@ inline long long int recursive_int(std::vector<long long int> &b, int s, int w, 
         }
     }
 
-    return h + recursive_int(c, s-2, w, e, n);
+    return h + recursive_chunk(c, s-2, w, e, n);
 }
 
 
-inline long long int hafnian_int(std::vector<long long int> &mat) {
+template <typename T>
+inline T hafnian_recursive(std::vector<T> &mat) {
     // Returns the hafnian of an integer matrix A via the C hafnian library.
     // Modified with permission from https://github.com/eklotek/Hafnian.
     int n = std::sqrt(static_cast<double>(mat.size()))/2;
 
-    std::vector<long long int> z(n*(2*n-1)*(n+1), 0);
-    std::vector<long long int> g(n+1, 0);
+    std::vector<T> z(n*(2*n-1)*(n+1), 0);
+    std::vector<T> g(n+1, 0);
 
     g[0] = 1;
 
@@ -360,7 +363,7 @@ inline long long int hafnian_int(std::vector<long long int> &mat) {
         }
     }
 
-    return recursive_int(z, 2*n, 1, g, n);
+    return recursive_chunk(z, 2*n, 1, g, n);
 }
 
 

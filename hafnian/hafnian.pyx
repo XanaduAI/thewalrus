@@ -18,7 +18,7 @@ from libcpp.vector cimport vector
 
 
 cdef extern from "../src/hafnian.hpp" namespace "hafnian":
-    long long hafnian_int(vector[long long] &mat)
+    T hafnian_recursive[T](vector[T] &mat)
     T hafnian[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
 
@@ -43,15 +43,17 @@ def haf_int(long long[:, :] A):
             mat.push_back(A[i, j])
 
     # Exposes a c function to python
-    return hafnian_int(mat)
+    return hafnian_recursive(mat)
 
 
-def haf_complex(double complex[:, :] A, bint loop=False):
+def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):
     """Returns the hafnian of a complex matrix A via the C hafnian library.
 
     Args:
         A (array): a np.complex128, square, symmetric array of even dimensions.
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
+        recursive (bool): If ``True``, the recursive algorithm is used. Note:
+            the recursive algorithm does not currently support the loop hafnian.
 
     Returns:
         np.complex128: the hafnian of matrix A
@@ -67,15 +69,20 @@ def haf_complex(double complex[:, :] A, bint loop=False):
     if loop:
         return loop_hafnian(mat)
 
+    if recursive:
+        return hafnian_recursive(mat)
+
     return hafnian(mat)
 
 
-def haf_real(double[:, :] A, bint loop=False):
+def haf_real(double[:, :] A, bint loop=False, bint recursive=False):
     """Returns the hafnian of a real matrix A via the C hafnian library.
 
     Args:
         A (array): a np.float64, square, symmetric array of even dimensions.
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
+        recursive (bool): If ``True``, the recursive algorithm is used. Note:
+            the recursive algorithm does not currently support the loop hafnian.
 
     Returns:
         np.float64: the hafnian of matrix A
@@ -90,4 +97,8 @@ def haf_real(double[:, :] A, bint loop=False):
     # Exposes a c function to python
     if loop:
         return loop_hafnian(mat)
+
+    if recursive:
+        return hafnian_recursive(mat)
+
     return hafnian(mat)

@@ -44,7 +44,6 @@ hyp1f1 = {
     }
 
 
-
 class TestComplexHaf:
     """Various Hafnian consistency checks"""
 
@@ -89,6 +88,54 @@ class TestComplexHaf:
                        np.hstack([B, O])])
         A = np.complex128(A)
         haf = hafnian(A)
+        expected = float(fac(n))
+        assert np.allclose(haf, expected)
+
+
+class TestComplexHafRecursive:
+    """Various Hafnian consistency checks"""
+
+    def test_2x2(self):
+        """Check 2x2 hafnian"""
+        A = np.complex128(np.random.random([2, 2])) + 1j*np.random.random([2, 2])
+        A = A + A.T
+        haf = hafnian(A, recursive=True)
+        assert np.allclose(haf, A[0, 1])
+
+    def test_4x4(self):
+        """Check 4x4 hafnian"""
+        A = np.complex128(np.random.random([4, 4]))
+        A += 1j*np.random.random([4, 4])
+        A += A.T
+        haf = hafnian(A, recursive=True)
+        expected = A[0, 1]*A[2, 3] + \
+            A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
+        assert np.allclose(haf, expected)
+
+    @pytest.mark.parametrize("n", [6, 8])
+    def test_identity(self, n):
+        """Check hafnian(I)=0"""
+        A = np.complex128(np.identity(n))
+        haf = hafnian(A, recursive=True)
+        assert np.allclose(haf, 0)
+
+    @pytest.mark.parametrize("n", [6, 8])
+    def test_ones(self, n):
+        """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
+        A = np.complex128(np.ones([2*n, 2*n]))
+        haf = hafnian(A, recursive=True)
+        expected = fac(2*n)/(fac(n)*(2**n))
+        assert np.allclose(haf, expected)
+
+    @pytest.mark.parametrize("n", [6, 8])
+    def test_block_ones(self, n):
+        """Check hafnian([[0, I_n], [I_n, 0]])=n!"""
+        O = np.zeros([n, n])
+        B = np.ones([n, n])
+        A = np.vstack([np.hstack([O, B]),
+                       np.hstack([B, O])])
+        A = np.complex128(A)
+        haf = hafnian(A, recursive=True)
         expected = float(fac(n))
         assert np.allclose(haf, expected)
 
