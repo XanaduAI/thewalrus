@@ -328,7 +328,6 @@ inline long long int recursive_int(std::vector<long long int> &b, int s, int w, 
     e = g;
 
     for (u = 0; u < n; u++) {
-        #pragma omp parallel for
         for (v = 0; v < n-u; v++) {
             e[u+v+1] += g[u]*b[v];
 
