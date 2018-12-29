@@ -8,7 +8,7 @@ from scipy.linalg import qr
 
 import matplotlib.pyplot as plt
 
-from hafnian.lib.librhaf import haf_int, haf_real
+from hafnian.lib.libhaf import haf_int, haf_real, haf_complex
 
 
 a0 = 100.
@@ -19,10 +19,22 @@ nreps = [(int)(a0*(r**((i)))) for i in range(n)]
 
 
 
-times = np.empty([n, 2])
+times = np.empty([n, 3])
+
 for ind, reps in enumerate(nreps):
     size = 2*(ind+1)
     print('\nTesting matrix size {}, with {} reps...'.format(size,reps))
+
+    start = time.time()
+    for i in range(reps):
+        matrix = np.random.randint(low=-1, high=2, size=[size, size])
+        A = np.complex128(np.clip(matrix+matrix.T, -1, 1))
+        res = haf_complex(A)
+
+    end = time.time()
+    print('Mean time taken (complex): ', (end - start)/reps)
+    # print('\t Haf result: ', res)
+    times[ind, 0] = (end - start)/reps
 
     start = time.time()
     for i in range(reps):
@@ -33,22 +45,28 @@ for ind, reps in enumerate(nreps):
     end = time.time()
     print('Mean time taken (real): ', (end - start)/reps)
     # print('\t Haf result: ', res)
-    times[ind, 0] = (end - start)/reps
+    times[ind, 1] = (end - start)/reps
 
     start = time.time()
     for i in range(reps):
         matrix = np.random.randint(low=-1, high=2, size=[size, size])
-        A = np.clip(matrix+matrix.T, -1, 1)
+        A = np.int64(np.clip(matrix+matrix.T, -1, 1))
         res = haf_int(A)
 
     end = time.time()
     print('Mean time taken (int): ', (end - start)/reps)
     # print('\t Haf result: ', res)
-    times[ind, 1] = (end - start)/reps
+    times[ind, 2] = (end - start)/reps
 
 
-plt.semilogy(2*np.arange(1,n+1),times[:, 0], marker='.')
-plt.semilogy(2*np.arange(1,n+1),times[:, 1], marker='.')
-plt.xlabel(r"Matrix size $n$")
-plt.ylabel(r"Time in seconds")
-plt.savefig('scipy-timing.png')
+fig, ax = plt.subplots(1, 1)
+
+ax.semilogy(2*np.arange(1,n+1),times[:, 0], marker='.', label='haf_complex')
+ax.semilogy(2*np.arange(1,n+1),times[:, 1], marker='.', label='haf_real')
+ax.semilogy(2*np.arange(1,n+1),times[:, 2], marker='.', label='haf_int')
+
+ax.set_xlabel(r"Matrix size $n$")
+ax.set_ylabel(r"Time in seconds")
+ax.legend()
+
+plt.savefig('hafnian++-timing.png')
