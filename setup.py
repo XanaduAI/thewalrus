@@ -66,11 +66,12 @@ if BUILD_EXT:
     C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["src"]
 
     if platform.system() == 'Windows':
-        cflags_default = "-static -O3 -Wall -fPIC /openmp"
-        extra_link_args = ["/openmp -std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        USE_OPENMP = False
+        cflags_default = "-static -O3 -Wall -fPIC"
+        extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
-        extra_link_args = ['-fopenmp -lomp']
+        extra_link_args = ['-fopenmp -lomp -Xpreprocessor']
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
         cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
