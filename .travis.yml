@@ -61,4 +61,4 @@ script:
     $PYTHON -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
   fi
 after_success:
-- if [ "$WHEEL" = "0" ]; then make codecov; fi
+- if [ "$WHEEL" = "0" ]; then codecov; fi

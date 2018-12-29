@@ -48,22 +48,19 @@ except ImportError:
 
 if BUILD_EXT:
 
-    USE_CYTHON = True
     try:
         from Cython.Build import cythonize
         ext = 'pyx'
     except:
-        USE_CYTHON = False
         cythonize = lambda x: x
         ext = 'cpp'
 
-
-    library_default = ""
     USE_OPENMP = True
     EIGEN_INCLUDE = [os.environ.get("EIGEN_INCLUDE_DIR", ""), "/usr/local/include/eigen3", "/usr/include/eigen3"]
+    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + EIGEN_INCLUDE + ["src"]
 
-    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
-    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["src"]
+    extra_link_args = []
 
     if platform.system() == 'Windows':
         USE_OPENMP = False
@@ -72,13 +69,11 @@ if BUILD_EXT:
     elif platform.system() == 'Darwin':
         USE_OPENMP = False
         cflags_default = "-O3 -Wall -fPIC -shared -mmacosx-version-min=10.9"
-        extra_link_args = []
-        extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
         cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args = ['-std=c++11 -fopenmp']
 
-    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
+    CFLAGS = os.environ.get('CFLAGS', cflags_default).split()
 
     LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
     libraries = []
@@ -135,7 +130,6 @@ info = {
     'ext_package': 'hafnian.lib',
     'setup_requires': setup_requirements,
     'ext_modules': extensions,
-    # 'cmdclass': {'build_ext': build_ext},
     'command_options': {
         'build_sphinx': {
             'version': ('setup.py', version),

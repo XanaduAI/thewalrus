@@ -16,8 +16,6 @@
 cimport cython
 from libcpp.vector cimport vector
 
-cimport numpy as np
-
 
 cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     long long hafnian_int(vector[long long] &mat)
