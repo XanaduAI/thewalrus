@@ -59,6 +59,8 @@ for ind, reps in enumerate(nreps):
     times[ind, 2] = (end - start)/reps
 
 
+np.save("hafnian++.npy", times)
+
 fig, ax = plt.subplots(1, 1)
 
 ax.semilogy(2*np.arange(1,n+1),times[:, 0], marker='.', label='haf_complex')
@@ -69,4 +71,4 @@ ax.set_xlabel(r"Matrix size $n$")
 ax.set_ylabel(r"Time in seconds")
 ax.legend()
 
-plt.savefig('hafnian++-timing.png')
+plt.savefig('hafnian++-lapack-timing.png')

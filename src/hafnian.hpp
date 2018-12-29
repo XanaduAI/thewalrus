@@ -50,29 +50,25 @@ inline vec_complex powtrace(vec_complex &z, int n, int l) {
     vec_complex vals(n, 0.0);
     vec_complex pvals(n, 0.0);
 
-    if (n != 0) {
-        Eigen::MatrixXcd A = Eigen::Map<Eigen::MatrixXcd, Eigen::Unaligned>(z.data(), n, n);
-        Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(A, false);
-        Eigen::MatrixXcd evals = solver.eigenvalues();
-        vals = vec_complex(evals.data(), evals.data()+evals.size());
-    }
+    Eigen::MatrixXcd A = Eigen::Map<Eigen::MatrixXcd, Eigen::Unaligned>(z.data(), n, n);
+    Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(A, false);
+    Eigen::MatrixXcd evals = solver.eigenvalues();
+    vals = vec_complex(evals.data(), evals.data()+evals.size());
 
-    int i,j;
     double_complex sum;
-    for(j = 0; j < n; j++)
-    {
+    int i, j;
+
+    for(j = 0; j < n; j++) {
         pvals[j] = vals[j];
     }
-    for(i = 0; i < l; i++)
-    {
+
+    for(i = 0; i < l; i++) {
         sum = 0.0;
-        for(j = 0; j < n; j++)
-        {
+        for(j = 0; j < n; j++) {
             sum += pvals[j];
         }
         traces[i] = sum;
-        for(j = 0; j < n; j++)
-        {
+        for(j = 0; j < n; j++) {
             pvals[j] = pvals[j] * vals[j];
         }
     }
@@ -88,29 +84,24 @@ inline vec_double powtrace(vec_double &z, int n, int l) {
     vec_complex vals(n, 0.0);
     vec_complex pvals(n, 0.0);
 
-    if (n != 0) {
-        Eigen::MatrixXd A = Eigen::Map<Eigen::MatrixXd, Eigen::Unaligned>(z.data(), n, n);
-        Eigen::ComplexEigenSolver<Eigen::MatrixXd> solver(A, false);
-        Eigen::MatrixXcd evals = solver.eigenvalues();
-        vals = vec_complex(evals.data(), evals.data()+evals.size());
-    }
+    Eigen::MatrixXd A = Eigen::Map<Eigen::MatrixXd, Eigen::Unaligned>(z.data(), n, n);
+    Eigen::EigenSolver<Eigen::MatrixXd> solver(A, false);
+    Eigen::MatrixXcd evals = solver.eigenvalues();
+    vals = vec_complex(evals.data(), evals.data()+evals.size());
 
-    int i,j;
     double_complex sum;
-    for(j = 0; j < n; j++)
-    {
+    int i, j;
+
+    for(j = 0; j < n; j++) {
         pvals[j] = vals[j];
     }
-    for(i = 0; i < l; i++)
-    {
+    for(i = 0; i < l; i++) {
         sum = 0.0;
-        for(j = 0; j < n; j++)
-        {
+        for(j = 0; j < n; j++) {
             sum += pvals[j];
         }
         traces[i] = sum.real();
-        for(j = 0; j < n; j++)
-        {
+        for(j = 0; j < n; j++) {
             pvals[j] = pvals[j] * vals[j];
         }
     }
@@ -172,13 +163,16 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
             }
         }
 
-        std::vector<T> traces = powtrace(B, sum, m);
+        std::vector<T> traces(m, 0.0);
+        if (sum != 0) {
+            traces = powtrace(B, sum, m);
+        }
 
         char cnt = 1;
         Byte cntindex = 0;
 
-        std::vector<std::vector<T>> comb(2, std::vector<T>(m+1, 0.0));
-        comb[0][0] = 1.0;
+        std::vector<T> comb(2*(m+1), 0.0);
+        comb[0] = 1.0;
 
         for (i = 1; i <= n / 2; i++) {
             factor = traces[i - 1] / (2.0 * i);
@@ -187,20 +181,20 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
             cnt = -cnt;
             cntindex = (1 + cnt) / 2;
             for (j = 0; j < n / 2 + 1; j++) {
-                comb[1 - cntindex][j] = comb[cntindex][j];
+                comb[(m+1)*(1 - cntindex)+j] = comb[(m+1)*cntindex+j];
             }
             for (j = 1; j <= (n / (2 * i)); j++) {
                 powfactor = powfactor * factor / (1.0*j);
                 for (k = i * j + 1; k <= n / 2 + 1; k++) {
-                    comb[1 - cntindex][k - 1] += comb[cntindex][k - i * j - 1] * powfactor;
+                    comb[(m+1)*(1 - cntindex) + k - 1] += comb[(m+1)*cntindex + k - i * j - 1] * powfactor;
                 }
             }
         }
         if (((sum / 2) % 2) == (n / 2 % 2)) {
-            summand = comb[1 - cntindex][n / 2];
+            summand = comb[(m+1)*(1-cntindex) + n / 2];
         }
         else {
-            summand = -comb[1 - cntindex][n / 2];
+            summand = -comb[(m+1)*(1-cntindex) + n / 2];
         }
         #pragma omp critical
         res += summand;
@@ -242,13 +236,16 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
             D1[i] = D[pos[i]];
         }
 
-        std::vector<T> traces = powtrace(B_powtrace, sum, m);
+        std::vector<T> traces(m, 0.0);
+        if (sum != 0) {
+            traces = powtrace(B, sum, m);
+        }
 
         char cnt = 1;
         Byte cntindex = 0;
 
-        std::vector<std::vector<T>> comb(2, std::vector<T>(m+1, 0.0));
-        comb[0][0] = 1.0;
+        std::vector<T> comb(2*(m+1), 0.0);
+        comb[0] = 1.0;
 
         for(i = 1; i <= n / 2; i++) {
             factor = traces[i - 1] / (2.0 * i);
@@ -277,30 +274,27 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
                 C1[i] = tmp_c1[i];
             }
 
-
             powfactor = 1.0;
 
             cnt = -cnt;
             cntindex = (1 + cnt) / 2;
             for(j = 0; j < n / 2 + 1; j++) {
-                comb[1 - cntindex][j] = comb[cntindex][j];
+                comb[(m+1)*(1-cntindex)+j] = comb[(m+1)*cntindex+j];
             }
 
             for(j = 1; j <= (n / (2 * i)); j++) {
                 powfactor = powfactor * factor / (1.0*j);
                 for(k = i * j + 1; k <= n / 2 + 1; k++) {
-                    comb[1 - cntindex][k - 1] = comb[1 - cntindex][k - 1] + comb[cntindex][k - i * j - 1] * powfactor;
+                    comb[(m+1)*(1-cntindex) + k - 1] = comb[(m+1)*(1-cntindex) + k - 1] + comb[(m+1)*cntindex + k - i * j - 1] * powfactor;
                 }
             }
         }
 
-        if(((sum / 2) % 2) == (n / 2 % 2))
-        {
-            summand = comb[1 - cntindex][n / 2];
+        if(((sum / 2) % 2) == (n / 2 % 2)) {
+            summand = comb[(m+1)*(1-cntindex) + n / 2];
         }
-        else
-        {
-            summand = -comb[1 - cntindex][n / 2];
+        else {
+            summand = -comb[(m+1)*(1-cntindex) + n / 2];
         }
         #pragma omp critical
         res += summand;
@@ -309,20 +303,20 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
     return res;
 }
 
-inline long long int recursive_int(std::vector<std::vector<long long int>> &b, int s, int w, std::vector<long long int> &g, int n) {
+inline long long int recursive_int(std::vector<long long int> &b, int s, int w, std::vector<long long int> &g, int n) {
     // Recursive integer hafnian solver.
     if (s == 0) {
         return w*g[n];
     }
 
-    std::vector<std::vector<long long int>> c((s-2)*(s-3)/2, std::vector<long long int>(n+1, 0.0));
+    std::vector<long long int> c((s-2)*(s-3)/2*(n+1), 0.0);
     long long int h;
     int u, v, j, k, i = 0;
 
     for (j = 1; j < s-2; j++) {
         for (k = 0; k < j; k++) {
             for (u = 0; u < n+1; u++) {
-                c[i][u] = b[(j+1)*(j+2)/2+k+2][u];
+                c[(n+1)*i+u] = b[(n+1)*((j+1)*(j+2)/2+k+2)+u];
             }
             i += 1;
         }
@@ -334,17 +328,13 @@ inline long long int recursive_int(std::vector<std::vector<long long int>> &b, i
     e = g;
 
     for (u = 0; u < n; u++) {
+        #pragma omp parallel for
         for (v = 0; v < n-u; v++) {
-            e[u+v+1] += g[u]*b[0][v];
-        }
-    }
+            e[u+v+1] += g[u]*b[v];
 
-    for (j = 1; j < s-2; j++) {
-        for (k = 0; k < j; k++) {
-            for (u = 0; u < n; u++) {
-                #pragma omp parallel for
-                for (v = 0; v < n-u; v++) {
-                    c[j*(j-1)/2+k][u+v+1] += b[(j+1)*(j+2)/2][u]*b[(k+1)*(k+2)/2+1][v] + b[(k+1)*(k+2)/2][u]*b[(j+1)*(j+2)/2+1][v];
+            for (j = 1; j < s-2; j++) {
+                for (k = 0; k < j; k++) {
+                    c[(n+1)*(j*(j-1)/2+k)+u+v+1] += b[(n+1)*((j+1)*(j+2)/2)+u]*b[(n+1)*((k+1)*(k+2)/2+1)+v] + b[(n+1)*(k+1)*(k+2)/2+u]*b[(n+1)*((j+1)*(j+2)/2+1)+v];
                 }
             }
         }
@@ -359,7 +349,7 @@ inline long long int hafnian_int(std::vector<long long int> &mat) {
     // Modified with permission from https://github.com/eklotek/Hafnian.
     int n = std::sqrt(static_cast<double>(mat.size()))/2;
 
-    std::vector<std::vector<long long int>> z(n*(2*n-1), std::vector<long long int>(n+1, 0));
+    std::vector<long long int> z(n*(2*n-1)*(n+1), 0);
     std::vector<long long int> g(n+1, 0);
 
     g[0] = 1;
@@ -367,7 +357,7 @@ inline long long int hafnian_int(std::vector<long long int> &mat) {
     #pragma omp parallel for
     for (int j = 1; j < 2*n; j++) {
         for (int k = 0; k < j; k++) {
-            z[j*(j-1)/2+k][0] = mat[2*j*n + k];
+            z[(n+1)*(j*(j-1)/2+k)] = mat[2*j*n + k];
         }
     }
 
