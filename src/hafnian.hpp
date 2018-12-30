@@ -305,14 +305,14 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
 
 
 template <typename T>
-inline T recursive_chunk(std::vector<T> &b, int s, int w, std::vector<T> &g, int n) {
+inline T recursive_chunk(std::vector<T> b, int s, int w, std::vector<T> g, int n) {
     // Recursive integer hafnian solver.
     if (s == 0) {
         return static_cast<T>(w)*g[n];
     }
 
     std::vector<T> c((s-2)*(s-3)/2*(n+1), 0.0);
-    T h;
+    T h, h1, h2;
     int u, v, j, k, i = 0;
 
     for (j = 1; j < s-2; j++) {
@@ -324,7 +324,8 @@ inline T recursive_chunk(std::vector<T> &b, int s, int w, std::vector<T> &g, int
         }
     }
 
-    h = recursive_chunk(c, s-2, -w, g, n);
+    #pragma omp task shared(h1)
+    h1 = recursive_chunk(c, s-2, -w, g, n);
 
     std::vector<T> e(n+1, 0);
     e = g;
@@ -341,7 +342,13 @@ inline T recursive_chunk(std::vector<T> &b, int s, int w, std::vector<T> &g, int
         }
     }
 
-    return h + recursive_chunk(c, s-2, w, e, n);
+    #pragma omp task shared(h2)
+    h2 = recursive_chunk(c, s-2, w, e, n);
+
+    #pragma omp taskwait
+    h = h1+h2;
+
+    return h;
 }
 
 
@@ -363,7 +370,13 @@ inline T hafnian_recursive(std::vector<T> &mat) {
         }
     }
 
-    return recursive_chunk(z, 2*n, 1, g, n);
+    T result;
+
+    #pragma omp parallel
+    #pragma omp single nowait
+    result = recursive_chunk(z, 2*n, 1, g, n);
+
+    return result;
 }
 
 
