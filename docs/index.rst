@@ -80,6 +80,7 @@ The hafnian library is **free** and **open source**, released under the Apache L
 
    code
    code/python
+   code/libhaf
 
 Indices and tables
 ==================

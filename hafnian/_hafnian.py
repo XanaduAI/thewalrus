@@ -19,16 +19,16 @@ import numpy as np
 from .lib.libhaf import haf_complex, haf_real, haf_int
 
 
-def hafnian(A, loop=False, tol=1e-12):
-    """Returns the hafnian of matrix A via the C hafnian library.
+def hafnian(A, loop=False, recursive=True, tol=1e-12):
+    """Returns the hafnian of matrix A via the C++ hafnian library.
 
     This function calls three separate parts of the C++ hafnian library,
     depending on the input array type.
 
-    * If the array is real valued (np.float), the result of
+    * If the array is real valued (``np.float``), the result of
       :func:`haf_real` is returned.
 
-    * If the array is integer valued (either np.int or np.float), and
+    * If the array is integer valued (either ``np.int`` or ``np.float``), and
       ``loop`` is set to ``False``, the result of :func:`haf_int` is returned.
       If ``loop`` is ``True``, then the result of :func:`haf_real` is returned.
       Note that :func:`haf_int` currently does not support the loop hafnian.
@@ -46,11 +46,13 @@ def hafnian(A, loop=False, tol=1e-12):
     Args:
         A (array): a square, symmetric array of even dimensions.
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
+        recursive (bool): If ``True``, the recursive algorithm is used. Note:
+            the recursive algorithm does not currently support the loop hafnian.
         tol (float): the tolerance when checking that the matrix is
             symmetric. Default tolerance is 1e-12.
 
     Returns:
-        np.float64 or np.complex128: the hafnian of matrix A.
+        np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
     """
     # pylint: disable=too-many-return-statements
     if not isinstance(A, np.ndarray):
@@ -95,10 +97,10 @@ def hafnian(A, loop=False, tol=1e-12):
 
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
-            return haf_complex(A, loop=loop)
-        return haf_real(np.float64(A.real), loop=loop)
+            return haf_complex(A, loop=loop, recursive=recursive)
+        return haf_real(np.float64(A.real), loop=loop, recursive=recursive)
 
     if np.all(np.mod(A, 1) == 0) and not loop:
         return haf_int(np.int64(A))
 
-    return haf_real(A, loop=loop)
+    return haf_real(A, loop=loop, recursive=recursive)

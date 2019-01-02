@@ -17,19 +17,12 @@ Hafnian Python interface
 
 .. currentmodule:: hafnian
 
-This is the top level module of the Hafnian python interface,
+This is the top level module of the Hafnian Python interface,
 containing the function :func:`hafnian` and :func:`perm`.
 These wrapper functions determine,
 based on the input matrix, whether to use the complex or real
-C/Fortran library.
+C++/Fortran library.
 
-For more advanced usage, access to the libraries directly are provided
-via the functions:
-
-* :func:`haf_real` links to ``hafnian.lib.libhaf.haf_real``
-* :func:`haf_complex` links to ``hafnian.lib.libhaf.haf_complex``
-* :func:`haf_int` links to ``hafnian.lib.libhaf.haf_int``
-* :func:`perm_real` links to ``hafnian.lib.libperm``.
 
 Python wrappers
 ---------------
@@ -38,6 +31,16 @@ Python wrappers
    hafnian
    perm
    version
+
+For more advanced usage, access to the libraries directly are provided
+via the functions:
+
+* :func:`haf_real` links to ``hafnian.lib.libhaf.haf_real``
+* :func:`haf_complex` links to ``hafnian.lib.libhaf.haf_complex``
+* :func:`haf_int` links to ``hafnian.lib.libhaf.haf_int``
+* :func:`perm_real` links to ``hafnian.lib.libperm.re``.
+* :func:`perm_complex` links to ``hafnian.lib.libperm.comp``.
+
 
 Code details
 ------------
@@ -54,7 +57,7 @@ if platform.system() == 'Windows': # pragma: no cover
         os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 from ._version import __version__
-from ._hafnian import hafnian, haf_complex, haf_real
+from ._hafnian import hafnian, haf_int, haf_complex, haf_real
 from ._permanent import perm, perm_real, perm_complex
 
 

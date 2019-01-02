@@ -13,7 +13,7 @@ from hafnian.lib.libhaf import haf_int, haf_real, haf_complex
 
 a0 = 100.
 anm1 = 2.
-n = 15
+n = 20
 r = (anm1/a0)**(1./(n-1))
 nreps = [(int)(a0*(r**((i)))) for i in range(n)]
 

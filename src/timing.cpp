@@ -13,6 +13,7 @@
 // limitations under the License.
 #include <iostream>
 #include <complex>
+#include <vector>
 #include <hafnian.hpp>
 
 
@@ -21,11 +22,11 @@ int main() {
 
     for (int m = 1; m <= nmax; m++) {
         int n = 2*m;
-        hafnian::vec_complex mat(n*n, 1.0);
+        std::vector<std::complex<double>> mat(n*n, 1.0);
 
         std::complex<double> hafval = hafnian::loop_hafnian(mat);
         std::cout << hafval << std::endl;
     }
 
-    return 0;\
+    return 0;
 };

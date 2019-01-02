@@ -13,21 +13,24 @@
             "-fPIC",
             "-shared",
             "-fopenmp",
-            "-I/home/josh/.local/lib/python3.6/site-packages/numpy/core/include"
+            "-I/home/josh/.local/lib/python3.6/site-packages/numpy/core/include",
+            " -llapacke -DLAPACKE=1"
         ],
         "extra_link_args": [
-            "-std=c++11 -fopenmp"
+            "-std=c++11 -fopenmp -llapacke"
         ],
         "include_dirs": [
             "hafnian",
             "",
             "/home/josh/.local/lib/python3.6/site-packages/numpy/core/include",
-            "/home/josh/.local/include/",
             "/usr/local/include/eigen3",
             "/usr/include/eigen3",
             "src"
         ],
         "language": "c++",
+        "libraries": [
+            "lapacke"
+        ],
         "library_dirs": [
             "/usr/lib",
             "/usr/local/lib",
@@ -2218,13 +2221,13 @@ static PyObject *__pyx_codeobj__31;
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of an integer matrix A via the C hafnian library.
+ *     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
  *     Modified with permission from https://github.com/eklotek/Hafnian.
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6libhaf_1haf_int(PyObject *__pyx_self, PyObject *__pyx_arg_A); /*proto*/
-static char __pyx_doc_6libhaf_haf_int[] = "haf_int(long long[:, :] A)\nReturns the hafnian of an integer matrix A via the C hafnian library.\n    Modified with permission from https://github.com/eklotek/Hafnian.\n\n    .. note:: Currently does not support calculation of the loop hafnian.\n\n    Args:\n        A (array): a np.int64, square, symmetric array of even dimensions.\n\n    Returns:\n        np.int64: the hafnian of matrix A\n    ";
+static char __pyx_doc_6libhaf_haf_int[] = "haf_int(long long[:, :] A)\nReturns the hafnian of an integer matrix A via the C++ hafnian library.\n    Modified with permission from https://github.com/eklotek/Hafnian.\n\n    .. note:: Currently does not support calculation of the loop hafnian.\n\n    Args:\n        A (array): a np.int64, square, symmetric array of even dimensions.\n\n    Returns:\n        np.int64: the hafnian of matrix A\n    ";
 static PyMethodDef __pyx_mdef_6libhaf_1haf_int = {"haf_int", (PyCFunction)__pyx_pw_6libhaf_1haf_int, METH_O, __pyx_doc_6libhaf_haf_int};
 static PyObject *__pyx_pw_6libhaf_1haf_int(PyObject *__pyx_self, PyObject *__pyx_arg_A) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2334,7 +2337,7 @@ static PyObject *__pyx_pf_6libhaf_haf_int(CYTHON_UNUSED PyObject *__pyx_self, __
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of an integer matrix A via the C hafnian library.
+ *     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
  *     Modified with permission from https://github.com/eklotek/Hafnian.
  */
 
@@ -2354,13 +2357,13 @@ static PyObject *__pyx_pf_6libhaf_haf_int(CYTHON_UNUSED PyObject *__pyx_self, __
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a complex matrix A via the C hafnian library.
+ *     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6libhaf_3haf_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_2haf_complex[] = "haf_complex(double complex[:, :] A, bool loop=False, bool recursive=False)\nReturns the hafnian of a complex matrix A via the C hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n\n    Returns:\n        np.complex128: the hafnian of matrix A\n    ";
+static char __pyx_doc_6libhaf_2haf_complex[] = "haf_complex(double complex[:, :] A, bool loop=False, bool recursive=False)\nReturns the hafnian of a complex matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n\n    Returns:\n        np.complex128: the hafnian of matrix A\n    ";
 static PyMethodDef __pyx_mdef_6libhaf_3haf_complex = {"haf_complex", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6libhaf_3haf_complex, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_2haf_complex};
 static PyObject *__pyx_pw_6libhaf_3haf_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2602,7 +2605,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a complex matrix A via the C hafnian library.
+ *     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
  * 
  */
 
@@ -2622,13 +2625,13 @@ static PyObject *__pyx_pf_6libhaf_2haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a real matrix A via the C hafnian library.
+ *     """Returns the hafnian of a real matrix A via the C++ hafnian library.
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6libhaf_5haf_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_4haf_real[] = "haf_real(double[:, :] A, bool loop=False, bool recursive=False)\nReturns the hafnian of a real matrix A via the C hafnian library.\n\n    Args:\n        A (array): a np.float64, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n\n    Returns:\n        np.float64: the hafnian of matrix A\n    ";
+static char __pyx_doc_6libhaf_4haf_real[] = "haf_real(double[:, :] A, bool loop=False, bool recursive=False)\nReturns the hafnian of a real matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.float64, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n\n    Returns:\n        np.float64: the hafnian of matrix A\n    ";
 static PyMethodDef __pyx_mdef_6libhaf_5haf_real = {"haf_real", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6libhaf_5haf_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_4haf_real};
 static PyObject *__pyx_pw_6libhaf_5haf_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2864,7 +2867,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_real(CYTHON_UNUSED PyObject *__pyx_self, 
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a real matrix A via the C hafnian library.
+ *     """Returns the hafnian of a real matrix A via the C++ hafnian library.
  * 
  */
 
@@ -16685,7 +16688,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of an integer matrix A via the C hafnian library.
+ *     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
  *     Modified with permission from https://github.com/eklotek/Hafnian.
  */
   __pyx_tuple__19 = PyTuple_Pack(6, __pyx_n_s_A, __pyx_n_s_A, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 26, __pyx_L1_error)
@@ -16697,7 +16700,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a complex matrix A via the C hafnian library.
+ *     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
  * 
  */
   __pyx_tuple__21 = PyTuple_Pack(7, __pyx_n_s_A, __pyx_n_s_loop, __pyx_n_s_recursive, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 49, __pyx_L1_error)
@@ -16709,7 +16712,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a real matrix A via the C hafnian library.
+ *     """Returns the hafnian of a real matrix A via the C++ hafnian library.
  * 
  */
   __pyx_tuple__23 = PyTuple_Pack(7, __pyx_n_s_A, __pyx_n_s_loop, __pyx_n_s_recursive, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 78, __pyx_L1_error)
@@ -17117,7 +17120,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of an integer matrix A via the C hafnian library.
+ *     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
  *     Modified with permission from https://github.com/eklotek/Hafnian.
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_1haf_int, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
@@ -17129,7 +17132,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a complex matrix A via the C hafnian library.
+ *     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
  * 
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_3haf_complex, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
@@ -17141,7 +17144,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=False):             # <<<<<<<<<<<<<<
- *     """Returns the hafnian of a real matrix A via the C hafnian library.
+ *     """Returns the hafnian of a real matrix A via the C++ hafnian library.
  * 
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_5haf_real, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)

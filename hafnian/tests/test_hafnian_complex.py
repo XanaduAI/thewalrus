@@ -51,7 +51,7 @@ class TestComplexHaf:
         """Check 2x2 hafnian"""
         A = np.complex128(np.random.random([2, 2])) + 1j*np.random.random([2, 2])
         A = A + A.T
-        haf = hafnian(A)
+        haf = hafnian(A, recursive=False)
         assert np.allclose(haf, A[0, 1])
 
     def test_4x4(self):
@@ -59,7 +59,7 @@ class TestComplexHaf:
         A = np.complex128(np.random.random([4, 4]))
         A += 1j*np.random.random([4, 4])
         A += A.T
-        haf = hafnian(A)
+        haf = hafnian(A, recursive=False)
         expected = A[0, 1]*A[2, 3] + \
             A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
         assert np.allclose(haf, expected)
@@ -68,14 +68,14 @@ class TestComplexHaf:
     def test_identity(self, n):
         """Check hafnian(I)=0"""
         A = np.complex128(np.identity(n))
-        haf = hafnian(A)
+        haf = hafnian(A, recursive=False)
         assert np.allclose(haf, 0)
 
     @pytest.mark.parametrize("n", [6, 8])
     def test_ones(self, n):
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = np.complex128(np.ones([2*n, 2*n]))
-        haf = hafnian(A)
+        haf = hafnian(A, recursive=False)
         expected = fac(2*n)/(fac(n)*(2**n))
         assert np.allclose(haf, expected)
 
@@ -87,7 +87,7 @@ class TestComplexHaf:
         A = np.vstack([np.hstack([O, B]),
                        np.hstack([B, O])])
         A = np.complex128(A)
-        haf = hafnian(A)
+        haf = hafnian(A, recursive=False)
         expected = float(fac(n))
         assert np.allclose(haf, expected)
 

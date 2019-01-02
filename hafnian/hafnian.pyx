@@ -24,7 +24,7 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
 
 
 def haf_int(long long[:, :] A):
-    """Returns the hafnian of an integer matrix A via the C hafnian library.
+    """Returns the hafnian of an integer matrix A via the C++ hafnian library.
     Modified with permission from https://github.com/eklotek/Hafnian.
 
     .. note:: Currently does not support calculation of the loop hafnian.
@@ -47,7 +47,7 @@ def haf_int(long long[:, :] A):
 
 
 def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):
-    """Returns the hafnian of a complex matrix A via the C hafnian library.
+    """Returns the hafnian of a complex matrix A via the C++ hafnian library.
 
     Args:
         A (array): a np.complex128, square, symmetric array of even dimensions.
@@ -76,7 +76,7 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):
 
 
 def haf_real(double[:, :] A, bint loop=False, bint recursive=False):
-    """Returns the hafnian of a real matrix A via the C hafnian library.
+    """Returns the hafnian of a real matrix A via the C++ hafnian library.
 
     Args:
         A (array): a np.float64, square, symmetric array of even dimensions.
