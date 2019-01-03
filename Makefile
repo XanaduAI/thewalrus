@@ -9,6 +9,7 @@ TESTRUNNER := -m pytest hafnian
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  install            to install Hafnian"
+	@echo "  libperm            to compile the Fortran permanent library"
 	@echo "  wheel              to build the Hafnian wheel"
 	@echo "  dist               to package the source distribution"
 	@echo "  clean              to delete all temporary, cache, and build files"
@@ -33,6 +34,7 @@ dist:
 
 .PHONY : clean
 clean:
+	make -C src clean
 	rm -rf hafnian/__pycache__
 	rm -rf hafnian/lib
 	rm -rf tests/__pycache__
@@ -51,3 +53,6 @@ test:
 
 coverage:
 	$(PYTHON) $(TESTRUNNER) $(COVERAGE)
+
+libperm:
+	make libperm -C src

@@ -14,16 +14,24 @@
 EIGEN_INCLUDE_DIR=/home/josh/.local/include/
 
 CC=g++
+FC=gfortran
+FFLAGS=-fopenmp -fPIC -O3 -Wall
 CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I. -I$(EIGEN_INCLUDE_DIR) -fopenmp
 LFLAGS=-L/usr/lib -lm -fopenmp
 
-all: timing
+all: example-f90 example-cpp
 
-timing.o:timing.cpp hafnian.hpp
-	$(CC) timing.cpp $(CFLAGS) -c
+example.o: example.cpp hafnian.hpp
+	$(CC) $^ $(CFLAGS) -c
 
-timing: timing.o
+example-cpp: example.o
 	$(CC) $^ $(LFLAGS) -o $@
 
+example-f90: example.f90 libperm
+	$(FC) $< $(FFLAGS) -I. -L. -lperm -o $@
+
+libperm: permanent.F90
+	$(FC) $^ $(FFLAGS) -shared -o $@.so
+
 clean:
-	rm -rf *~ *.out *.o *.so *.pyc
+	rm -rf *~ *.out *.o *.so *.pyc *.mod

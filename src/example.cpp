@@ -21,10 +21,13 @@ int main() {
     int nmax = 10;
 
     for (int m = 1; m <= nmax; m++) {
+    	// create a 2m*2m all ones matrix
         int n = 2*m;
         std::vector<std::complex<double>> mat(n*n, 1.0);
 
+        // calculate the hafnian
         std::complex<double> hafval = hafnian::loop_hafnian(mat);
+        // print out the result
         std::cout << hafval << std::endl;
     }
 
