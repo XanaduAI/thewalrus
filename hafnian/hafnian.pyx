@@ -25,7 +25,7 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian_kan[T](vector[T] &mat, vector[int] &nud)
 
 
-def haf_kan_real(double[:, :] A, int[:] rpt):
+def haf_kan_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
     using the Kan method. This method is more efficient for matrices with
     repeated rows and columns.
@@ -34,6 +34,8 @@ def haf_kan_real(double[:, :] A, int[:] rpt):
         A (array): a np.float64, square, :math:`N\times N` array of even dimensions.
         rpt (array): a length :math:`N` array corresponding to the number of times
             each row/column of matrix A is repeated.
+        use_eigen (bool): if True (default), the Eigen linear algebra library
+            is used for matrix multiplication.
 
     Returns:
         np.float64: the hafnian
@@ -48,10 +50,13 @@ def haf_kan_real(double[:, :] A, int[:] rpt):
             mat.push_back(A[i, j])
 
     # Exposes a c function to python
+    if use_eigen:
+        return hafnian_kan(mat, nud, True)
+
     return hafnian_kan(mat, nud)
 
 
-def haf_kan_complex(long long[:, :] A, int[:] rpt):
+def haf_kan_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
     r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
     using the Kan method. This method is more efficient for matrices with
     repeated rows and columns.
@@ -60,6 +65,8 @@ def haf_kan_complex(long long[:, :] A, int[:] rpt):
         A (array): a np.complex128, square, :math:`N\times N` array of even dimensions.
         rpt (array): a length :math:`N` array corresponding to the number of times
             each row/column of matrix A is repeated.
+        use_eigen (bool): if True (default), the Eigen linear algebra library
+            is used for matrix multiplication.
 
     Returns:
         np.complex128: the hafnian
@@ -74,6 +81,9 @@ def haf_kan_complex(long long[:, :] A, int[:] rpt):
             mat.push_back(A[i, j])
 
     # Exposes a c function to python
+    if use_eigen:
+        return hafnian_kan(mat, nud, True)
+
     return hafnian_kan(mat, nud)
 
 
