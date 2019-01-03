@@ -16,20 +16,87 @@
 #include <vector>
 #include <hafnian.hpp>
 
+#include <sys/time.h>
+typedef unsigned long long timestamp_t;
+
+static timestamp_t
+get_timestamp()
+{
+  struct timeval now;
+  gettimeofday (&now, NULL);
+  return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
+}
+
 
 int main() {
-    int nmax = 10;
+    int nmax = 12;
+    double time;
+    timestamp_t t0, t1;
 
+    t0 = get_timestamp();
     for (int m = 1; m <= nmax; m++) {
-    	// create a 2m*2m all ones matrix
+        // create a 2m*2m all ones matrix
         int n = 2*m;
-        std::vector<std::complex<double>> mat(n*n, 1.0);
+        std::vector<double> mat(n*n, 1.0);
 
         // calculate the hafnian
-        std::complex<double> hafval = hafnian::loop_hafnian(mat);
+        double hafval = hafnian::hafnian(mat);
         // print out the result
         std::cout << hafval << std::endl;
     }
+    t1 = get_timestamp();
+    time = (t1 - t0) / 1000000.0L;
+    std::cout << "Time taken (hafnian):" << time << std::endl << std::endl;
+
+
+    t0 = get_timestamp();
+    for (int m = 1; m <= nmax; m++) {
+        // create a 2m*2m all ones matrix
+        int n = 2*m;
+        std::vector<double> mat(n*n, 1.0);
+
+        // calculate the hafnian
+        double hafval = hafnian::hafnian_recursive(mat);
+        // print out the result
+        std::cout << hafval << std::endl;
+    }
+    t1 = get_timestamp();
+    time = (t1 - t0) / 1000000.0L;
+    std::cout << "Time taken (recursive):" << time << std::endl << std::endl;
+
+
+    t0 = get_timestamp();
+    for (int m = 1; m <= nmax; m++) {
+        // create a 2m*2m all ones matrix
+        int n = 2*m;
+        std::vector<double> mat(n*n, 1.0);
+        std::vector<int> nud(n, 1);
+
+        // calculate the hafnian
+        double hafval = hafnian::hafnian_kan(mat, nud);
+        // print out the result
+        std::cout << hafval << std::endl;
+    }
+    t1 = get_timestamp();
+    time = (t1 - t0) / 1000000.0L;
+    std::cout << "Time taken (Kan eigen):" << time << std::endl << std::endl;
+
+
+    t0 = get_timestamp();
+    for (int m = 1; m <= nmax; m++) {
+        // create a 2m*2m all ones matrix
+        int n = 2*m;
+        std::vector<double> mat(n*n, 1.0);
+        std::vector<int> nud(n, 1);
+
+        // calculate the hafnian
+        double hafval = hafnian::hafnian_kan(mat, nud, 0);
+        // print out the result
+        std::cout << hafval << std::endl;
+    }
+    t1 = get_timestamp();
+    time = (t1 - t0) / 1000000.0L;
+    std::cout << "Time taken (Kan):" << time << std::endl << std::endl;
 
     return 0;
 };

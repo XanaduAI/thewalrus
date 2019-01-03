@@ -16,7 +16,7 @@ EIGEN_INCLUDE_DIR=/home/josh/.local/include/
 CC=g++
 FC=gfortran
 FFLAGS=-fopenmp -fPIC -O3 -Wall
-CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I. -I$(EIGEN_INCLUDE_DIR) -fopenmp
+CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I. -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native
 LFLAGS=-L/usr/lib -lm -fopenmp
 
 all: example-f90 example-cpp

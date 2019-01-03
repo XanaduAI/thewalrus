@@ -21,6 +21,8 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian_recursive[T](vector[T] &mat)
     T hafnian[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
+    T hafnian_kan[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
+    T hafnian_kan[T](vector[T] &mat, vector[int] &nud)
 
 
 def haf_int(long long[:, :] A):

@@ -11,8 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <iomanip>
 #include <iostream>
 #include <vector>
+#include <numeric>
 #include <complex>
 #include <assert.h>
 
@@ -429,5 +431,115 @@ inline T loop_hafnian(std::vector<T> &mat) {
     haf = do_chunk_loops(mat, C, D, n, rank, chunksize);
     return  haf;
 }
+
+
+template <typename T>
+inline T hafnian_kan(std::vector<T> &mat, std::vector<int> &nud, bool use_eigen=true) {
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    assert(n % 2 == 0);
+
+    long long int p = 2;
+    T y = 0.0, q = 0.0;
+
+    if (use_eigen) {
+        namespace eg = Eigen;
+
+        eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
+
+        eg::VectorXd X = eg::VectorXd::Zero(n);
+        eg::VectorXd rows2 = eg::Map<eg::VectorXi, eg::Unaligned>(nud.data(), nud.size()).cast<double>();
+
+        int s = rows2.sum();
+        int s2 = s/2;
+        double prod_nu1 = (rows2+eg::VectorXd::Ones(n)).prod();
+
+        rows2 /= 2;
+        q = 0.5*rows2.dot(A*rows2);
+
+        for (int i=0; i < prod_nu1/2; i++) {
+            y += static_cast<double>(p)*pow(q, s2);
+            for (int j=0; j < n; j++) {
+                if (X[j] < nud[j]) {
+                    X[j] += 1;
+                    p *= -(nud[j]+1-X[j])/X[j];
+                    q -= A.col(j).dot(rows2-X);
+                    q -= 0.5*A(j, j);
+                    break;
+                }
+                else {
+                    X[j] = 0;
+                    if (nud[j] % 2 == 1) {
+                        p *= -1;
+                    }
+                    q += A.col(j).dot(rows2-X);
+                    q -= 0.5*nud[j]*A(j, j);
+                    q *= nud[j];
+                }
+            }
+        }
+        for (int i=1; i<s2; i++) {
+            y /= i+1;
+        }
+    }
+    else {
+        std::vector<int> x(n, 0.0);
+        int s = std::accumulate(nud.begin(), nud.end(), 0);
+        int s2 = s/2;
+
+        std::vector<double> nu2(n);
+        std::transform(nud.begin(), nud.end(), nu2.begin(),
+            std::bind(std::multiplies<double>(), std::placeholders::_1, 0.5));
+
+        #pragma omp parallel for shared(q)
+        for (int i=0; i<n; i++) {
+            for (int j=0; j<n; j++) {
+                q += 0.5*nu2[j]*mat[i*n+j]*nu2[i];
+            }
+        }
+
+        double prod_nu1 = 1.0;
+
+        for (auto i : nud) {
+            prod_nu1 *= i+1;
+        }
+
+        for (int i=0; i < prod_nu1/2; i++) {
+            y += static_cast<double>(p)*pow(q, s2);
+
+            for (int j=0; j < n; j++) {
+
+                if (x[j] < nud[j]) {
+                    x[j] += 1;
+                    p *= -(nud[j]+1-x[j])/x[j];
+
+                    for (int k=0; k < n; k++) {
+                        q -= mat[k*n+j]*(nu2[k]-x[k]);
+                    }
+                    q -= 0.5*mat[j*n+j];
+                    break;
+                }
+                else {
+                    x[j] = 0;
+                    if (nud[j] % 2 == 1) {
+                        p *= -1;
+                    }
+                    for (int k=0; k < n; k++) {
+                        q += (1.0*nud[j])*mat[k*n+j]*(nu2[k]-x[k]);
+                    }
+                    q -= 0.5*nud[j]*nud[j]*mat[j*n+j];
+                }
+            }
+        }
+
+        for (int i=1; i<s2; i++) {
+            y /= i+1;
+        }
+    }
+
+
+    return y;
+}
+
+
 
 }
