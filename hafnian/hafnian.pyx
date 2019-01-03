@@ -25,6 +25,58 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian_kan[T](vector[T] &mat, vector[int] &nud)
 
 
+def haf_kan_real(double[:, :] A, int[:] rpt):
+    r"""Returns the hafnian of a real matrix A via the C++ hafnian library
+    using the Kan method. This method is more efficient for matrices with
+    repeated rows and columns.
+
+    Args:
+        A (array): a np.float64, square, :math:`N\times N` array of even dimensions.
+        rpt (array): a length :math:`N` array corresponding to the number of times
+            each row/column of matrix A is repeated.
+
+    Returns:
+        np.float64: the hafnian
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[int] nud
+    cdef vector[double] mat
+
+    for i in range(n):
+        nud.push_back(rpt[i])
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    # Exposes a c function to python
+    return hafnian_kan(mat, nud)
+
+
+def haf_kan_complex(long long[:, :] A, int[:] rpt):
+    r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
+    using the Kan method. This method is more efficient for matrices with
+    repeated rows and columns.
+
+    Args:
+        A (array): a np.complex128, square, :math:`N\times N` array of even dimensions.
+        rpt (array): a length :math:`N` array corresponding to the number of times
+            each row/column of matrix A is repeated.
+
+    Returns:
+        np.complex128: the hafnian
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[int] nud
+    cdef vector[double complex] mat
+
+    for i in range(n):
+        nud.push_back(rpt[i])
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    # Exposes a c function to python
+    return hafnian_kan(mat, nud)
+
+
 def haf_int(long long[:, :] A):
     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
     Modified with permission from https://github.com/eklotek/Hafnian.
