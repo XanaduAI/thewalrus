@@ -434,9 +434,8 @@ inline T loop_hafnian(std::vector<T> &mat) {
 
 
 template <typename T>
-inline T hafnian_kan(std::vector<T> &mat, std::vector<int> &nud, bool use_eigen=true) {
+inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=true) {
     int n = std::sqrt(static_cast<double>(mat.size()));
-    assert(n % 2 == 0);
 
     long long int p = 2;
     T y = 0.0, q = 0.0;
@@ -447,33 +446,33 @@ inline T hafnian_kan(std::vector<T> &mat, std::vector<int> &nud, bool use_eigen=
         eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
 
         eg::VectorXd X = eg::VectorXd::Zero(n);
-        eg::VectorXd rows2 = eg::Map<eg::VectorXi, eg::Unaligned>(nud.data(), nud.size()).cast<double>();
+        eg::VectorXd rows2 = eg::Map<eg::VectorXi, eg::Unaligned>(rpt.data(), rpt.size()).cast<double>();
 
         int s = rows2.sum();
         int s2 = s/2;
-        double prod_nu1 = (rows2+eg::VectorXd::Ones(n)).prod();
+        int steps = (rows2+eg::VectorXd::Ones(n)).prod()/2;
 
         rows2 /= 2;
         q = 0.5*rows2.dot(A*rows2);
 
-        for (int i=0; i < prod_nu1/2; i++) {
+        for (int i=0; i < steps; i++) {
             y += static_cast<double>(p)*pow(q, s2);
             for (int j=0; j < n; j++) {
-                if (X[j] < nud[j]) {
+                if (X[j] < rpt[j]) {
                     X[j] += 1;
-                    p *= -(nud[j]+1-X[j])/X[j];
+                    p *= -(rpt[j]+1-X[j])/X[j];
                     q -= A.col(j).dot(rows2-X);
                     q -= 0.5*A(j, j);
                     break;
                 }
                 else {
                     X[j] = 0;
-                    if (nud[j] % 2 == 1) {
+                    if (rpt[j] % 2 == 1) {
                         p *= -1;
                     }
                     q += A.col(j).dot(rows2-X);
-                    q -= 0.5*nud[j]*A(j, j);
-                    q *= nud[j];
+                    q -= 0.5*rpt[j]*A(j, j);
+                    q *= rpt[j];
                 }
             }
         }
@@ -483,11 +482,11 @@ inline T hafnian_kan(std::vector<T> &mat, std::vector<int> &nud, bool use_eigen=
     }
     else {
         std::vector<int> x(n, 0.0);
-        int s = std::accumulate(nud.begin(), nud.end(), 0);
+        int s = std::accumulate(rpt.begin(), rpt.end(), 0);
         int s2 = s/2;
 
         std::vector<double> nu2(n);
-        std::transform(nud.begin(), nud.end(), nu2.begin(),
+        std::transform(rpt.begin(), rpt.end(), nu2.begin(),
             std::bind(std::multiplies<double>(), std::placeholders::_1, 0.5));
 
         #pragma omp parallel for shared(q)
@@ -497,20 +496,22 @@ inline T hafnian_kan(std::vector<T> &mat, std::vector<int> &nud, bool use_eigen=
             }
         }
 
-        double prod_nu1 = 1.0;
+        int steps = 1;
 
-        for (auto i : nud) {
-            prod_nu1 *= i+1;
+        for (auto i : rpt) {
+            steps *= i+1;
         }
 
-        for (int i=0; i < prod_nu1/2; i++) {
+        steps /= 2;
+
+        for (int i=0; i < steps; i++) {
             y += static_cast<double>(p)*pow(q, s2);
 
             for (int j=0; j < n; j++) {
 
-                if (x[j] < nud[j]) {
+                if (x[j] < rpt[j]) {
                     x[j] += 1;
-                    p *= -(nud[j]+1-x[j])/x[j];
+                    p *= -(rpt[j]+1-x[j])/x[j];
 
                     for (int k=0; k < n; k++) {
                         q -= mat[k*n+j]*(nu2[k]-x[k]);
@@ -520,13 +521,13 @@ inline T hafnian_kan(std::vector<T> &mat, std::vector<int> &nud, bool use_eigen=
                 }
                 else {
                     x[j] = 0;
-                    if (nud[j] % 2 == 1) {
+                    if (rpt[j] % 2 == 1) {
                         p *= -1;
                     }
                     for (int k=0; k < n; k++) {
-                        q += (1.0*nud[j])*mat[k*n+j]*(nu2[k]-x[k]);
+                        q += (1.0*rpt[j])*mat[k*n+j]*(nu2[k]-x[k]);
                     }
-                    q -= 0.5*nud[j]*nud[j]*mat[j*n+j];
+                    q -= 0.5*rpt[j]*rpt[j]*mat[j*n+j];
                 }
             }
         }

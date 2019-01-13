@@ -43,7 +43,6 @@ To install the Hafnian library, simply run
 
 Pre-built binary wheels are available for the following platforms:
 
-.. rst-class:: docstable
 
 +------------+-------------+------------------+---------------+
 |            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |

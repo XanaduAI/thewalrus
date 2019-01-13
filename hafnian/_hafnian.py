@@ -16,7 +16,7 @@ Hafnian Python interface
 """
 import numpy as np
 
-from .lib.libhaf import haf_complex, haf_real, haf_int
+from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
 
 
 def hafnian(A, loop=False, recursive=True, tol=1e-12):

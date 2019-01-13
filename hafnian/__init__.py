@@ -11,36 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
+r"""
 Hafnian Python interface
 ========================
 
 .. currentmodule:: hafnian
 
 This is the top level module of the Hafnian Python interface,
-containing the function :func:`hafnian` and :func:`perm`.
+containing the functions :func:`hafnian` and :func:`perm`.
 These wrapper functions determine,
 based on the input matrix, whether to use the complex or real
 C++/Fortran library.
+
+Algorithm terminology
+^^^^^^^^^^^^^^^^^^^^^
+
+Eigenvalue or loop hafnian algorithm
+    The algorithm described in
+    *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
+    `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
+    This algorithm scales like :math:`\mathcal{O}(n^3 2^{n/2})`.
+
+Recursive hafnian algorithm
+    The algorithm described in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
+    This algorithm scales like :math:`\mathcal{O}(n^4 2^{n/2})`.
+
+Repeating hafnian algorithm
+    The algorithm described in *From moments of sum to moments of product*,
+    `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
+    This method is more efficient for matrices with repeated rows and columns.
 
 
 Python wrappers
 ---------------
 
 .. autosummary::
-   hafnian
-   perm
-   version
-
-For more advanced usage, access to the libraries directly are provided
-via the functions:
-
-* :func:`haf_real` links to ``hafnian.lib.libhaf.haf_real``
-* :func:`haf_complex` links to ``hafnian.lib.libhaf.haf_complex``
-* :func:`haf_int` links to ``hafnian.lib.libhaf.haf_int``
-* :func:`perm_real` links to ``hafnian.lib.libperm.re``.
-* :func:`perm_complex` links to ``hafnian.lib.libperm.comp``.
-
+    hafnian
+    perm
+    version
 
 Code details
 ------------
@@ -57,7 +65,7 @@ if platform.system() == 'Windows': # pragma: no cover
         os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 from ._version import __version__
-from ._hafnian import hafnian, haf_int, haf_complex, haf_real
+from ._hafnian import hafnian, haf_int, haf_complex, haf_real, haf_rpt_real, haf_rpt_complex
 from ._permanent import perm, perm_real, perm_complex
 
 

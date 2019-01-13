@@ -36,8 +36,7 @@ dist:
 clean:
 	make -C src clean
 	rm -rf hafnian/__pycache__
-	rm -rf hafnian/lib
-	rm -rf tests/__pycache__
+	rm -rf hafnian/tests/__pycache__
 	rm -rf dist
 	rm -rf build
 

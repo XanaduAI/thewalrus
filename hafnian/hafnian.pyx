@@ -21,13 +21,13 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian_recursive[T](vector[T] &mat)
     T hafnian[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
-    T hafnian_kan[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
-    T hafnian_kan[T](vector[T] &mat, vector[int] &nud)
+    T hafnian_rpt[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
+    T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
 
 
-def haf_kan_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
+def haf_rpt_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
-    using the Kan method. This method is more efficient for matrices with
+    using the rpt method. This method is more efficient for matrices with
     repeated rows and columns.
 
     Args:
@@ -51,14 +51,14 @@ def haf_kan_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
 
     # Exposes a c function to python
     if use_eigen:
-        return hafnian_kan(mat, nud, True)
+        return hafnian_rpt(mat, nud, True)
 
-    return hafnian_kan(mat, nud)
+    return hafnian_rpt(mat, nud, False)
 
 
-def haf_kan_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
+def haf_rpt_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
     r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
-    using the Kan method. This method is more efficient for matrices with
+    using the rpt method. This method is more efficient for matrices with
     repeated rows and columns.
 
     Args:
@@ -82,9 +82,9 @@ def haf_kan_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
 
     # Exposes a c function to python
     if use_eigen:
-        return hafnian_kan(mat, nud, True)
+        return hafnian_rpt(mat, nud, True)
 
-    return hafnian_kan(mat, nud)
+    return hafnian_rpt(mat, nud, False)
 
 
 def haf_int(long long[:, :] A):

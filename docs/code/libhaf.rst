@@ -82,6 +82,7 @@ The following functions are intended as the main interface to the C++ Hafnian li
 :cpp:func:`hafnian_recursive`    Returns the hafnian of a matrix using the recursive algorithm described in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
 :cpp:func:`hafnian`              Returns the hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
 :cpp:func:`loop_hafnian`         Returns the loop hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
+:cpp:func:`hafnian_rpt`          Returns the hafnian of a matrix with repeated rows and columns using the algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
 =============================    ==============================================
 
 
@@ -138,6 +139,18 @@ Code details
     :param std\:\:vector<T> &mat: a flattened vector of size :math:`n^2`, representing an :math:`n\times n` row-ordered symmetric matrix.
 
 
+.. cpp:function:: template\<typename T> T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=true)
+
+    Returns the hafnian of a matrix using the algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
+
+    Note that this algorithm, while generally slower than the the above, can be more efficient
+    in the cases where the matrix has repeated rows and columns.
+
+    :tparam T: template parameter accepts any (signed) numeric type, including ``int``, ``long int``, ``long long int``, ``float``, ``double``, ``std::complex<float>``, ``std::complex<double>``, etc.
+
+    :param std\:\:vector<T> &mat: a flattened vector of size :math:`n^2`, representing an :math:`n\times n` row-ordered symmetric matrix.
+    :param std\:\:vector<int> &rpt: a vector of integers, representing the number of times eacg row/column in ``mat`` is repeated. For example, ``mat = {1}`` and ``rpt = {6}`` represents a :math:`6\times 6` matrix of all ones.
+    :param bool use_eigen: whether to use the Eigen linear algebra library to compute matrix multiplication. If ``true`` (default) then Eigen is used, if ``false`` then pure C++ loops are used.
 
 
 

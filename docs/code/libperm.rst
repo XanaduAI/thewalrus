@@ -81,4 +81,12 @@ Code details
 
     Returns the permanent of a double precision real matrix using Ryser's algorithm.
 
-    :param real(8) intent(in) mat(\:, \:): a flattened vector of size :math:`n^2`, representing an :math:`n\times n` row-ordered symmetric matrix.
+    :param real(8) mat(\:, \:): *(input)* a flattened vector of size :math:`n^2`, representing an :math:`n\times n` row-ordered symmetric matrix.
+    :param real(8) permanent: *(output)* the resulting permanent.
+
+.. cpp:function:: subroutine comp(mat, permanent)
+
+    Returns the permanent of a double precision real matrix using Ryser's algorithm.
+
+    :param complex(8) mat(\:, \:): *(input)* a flattened vector of size :math:`n^2`, representing an :math:`n\times n` row-ordered symmetric matrix.
+    :param complex(8) permanent: *(output)* the resulting permanent.

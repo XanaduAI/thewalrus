@@ -40,7 +40,6 @@ MOCK_MODULES = [
     'cython',
     'hafnian.lib',
     'hafnian.lib.libhaf',
-    'hafnian.lib.librhaf',
     'hafnian.lib.libperm'
     ]
 

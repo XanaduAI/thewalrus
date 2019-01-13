@@ -69,34 +69,34 @@ int main() {
     for (int m = 1; m <= nmax; m++) {
         // create a 2m*2m all ones matrix
         int n = 2*m;
-        std::vector<double> mat(n*n, 1.0);
-        std::vector<int> nud(n, 1);
+        std::vector<double> mat(1, 1.0);
+        std::vector<int> rpt(1, n);
 
         // calculate the hafnian
-        double hafval = hafnian::hafnian_kan(mat, nud);
+        double hafval = hafnian::hafnian_rpt(mat, rpt);
         // print out the result
         std::cout << hafval << std::endl;
     }
     t1 = get_timestamp();
     time = (t1 - t0) / 1000000.0L;
-    std::cout << "Time taken (Kan eigen):" << time << std::endl << std::endl;
+    std::cout << "Time taken (rpt eigen):" << time << std::endl << std::endl;
 
 
     t0 = get_timestamp();
     for (int m = 1; m <= nmax; m++) {
         // create a 2m*2m all ones matrix
         int n = 2*m;
-        std::vector<double> mat(n*n, 1.0);
-        std::vector<int> nud(n, 1);
+        std::vector<double> mat(1, 1.0);
+        std::vector<int> rpt(1, n);
 
         // calculate the hafnian
-        double hafval = hafnian::hafnian_kan(mat, nud, 0);
+        double hafval = hafnian::hafnian_rpt(mat, rpt, false);
         // print out the result
         std::cout << hafval << std::endl;
     }
     t1 = get_timestamp();
     time = (t1 - t0) / 1000000.0L;
-    std::cout << "Time taken (Kan):" << time << std::endl << std::endl;
+    std::cout << "Time taken (rpt):" << time << std::endl << std::endl;
 
     return 0;
 };
