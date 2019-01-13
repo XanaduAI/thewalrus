@@ -106,12 +106,22 @@ def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
     r"""Returns the hafnian of matrix A with repeated rows/columns via the C++ hafnian library.
 
     The :func:`kron_reduced` function may be used to show the resulting matrix
-    with repeated rows and columns as per `rpt`.
+    with repeated rows and columns as per ``rpt``.
 
     As a result, the following are identical:
 
     >>> hafnian_repeated(A, rpt)
     >>> hafnian(kron_reduced(A, rpt))
+
+    However, using ``hafnian_repeated`` in the case where there are a large number
+    of repeated rows and columns (:math:`\sum_{i}rpt_i \gg N`) can be
+    significantly faster.
+
+    .. note::
+
+        If :math:`rpt=(1, 1, \dots, 1)`, then
+
+        >>> hafnian_repeated(A, rpt) == hafnian(A)
 
     For more direct control, you may wish to call :func:`haf_rpt_real` or
     :func:`haf_rpt_complex` directly.
@@ -144,20 +154,23 @@ def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
     if np.linalg.norm(A-A.T) >= tol:
         raise ValueError("Input matrix must be symmetric.")
 
-    if len(rpt) != matshape:
+    if len(rpt) != len(A):
         raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")
-
-    if not np.all(np.mod(rpt, 1) == 0) or np.any(rpt <= 0):
-        raise ValueError("the rpt argument must contain positive integers.")
 
     nud = np.array(rpt, dtype=np.int32)
 
+    if not np.all(np.mod(nud, 1) == 0) or np.any(nud <= 0):
+        raise ValueError("the rpt argument must contain positive integers.")
+
+    if np.sum(nud) % 2 != 0:
+        return 0.0
+
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
-            return haf_rpt_complex(A, rpt, use_eigen=use_eigen)
-        return haf_rpt_real(np.float64(A), rpt, use_eigen=use_eigen)
+            return haf_rpt_complex(A, nud, use_eigen=use_eigen)
+        return haf_rpt_real(np.float64(A.real), nud, use_eigen=use_eigen)
 
     if np.all(np.mod(A, 1) == 0):
-        return np.int(haf_rpt_real(A, rpt, use_eigen=use_eigen))
+        return np.int(haf_rpt_real(A, nud, use_eigen=use_eigen))
 
-    return haf_rpt_real(A, rpt, use_eigen=use_eigen)
+    return haf_rpt_real(A, nud, use_eigen=use_eigen)
