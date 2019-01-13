@@ -6,7 +6,7 @@ env:
     && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 &&
     cp -rf Eigen {project}/src && pip install numpy cython'
   - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc
-    eigen libomp && pip install numpy cython && exit 0'
+    eigen libomp || true; brew install gcc eigen libomp && pip install numpy cython'
   - CIBW_TEST_REQUIRES="numpy pytest pytest-cov"
   - CIBW_TEST_COMMAND="python -m pytest {project}/hafnian"
   - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
