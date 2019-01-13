@@ -5,7 +5,7 @@ env:
   - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
     && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 &&
     cp -rf Eigen {project}/src && pip install numpy cython'
-  - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc
+  - CIBW_BEFORE_BUILD_MACOS='brew upgrade --cleanup && brew cask uninstall --force oclint && brew install gcc
     eigen libomp && pip install numpy cython'
   - CIBW_TEST_REQUIRES="numpy pytest pytest-cov"
   - CIBW_TEST_COMMAND="python -m pytest {project}/hafnian"
