@@ -436,6 +436,7 @@ inline T loop_hafnian(std::vector<T> &mat) {
 template <typename T>
 inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=true) {
     int n = std::sqrt(static_cast<double>(mat.size()));
+    assert(static_cast<int>(rpt.size()) == n);
 
     long long int p = 2;
     T y = 0.0, q = 0.0;
@@ -470,9 +471,8 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
                     if (rpt[j] % 2 == 1) {
                         p *= -1;
                     }
-                    q += A.col(j).conjugate().dot(rows2-X);
-                    q -= 0.5*rpt[j]*A(j, j);
-                    q *= rpt[j];
+                    q += static_cast<double>(rpt[j])*A.col(j).conjugate().dot(rows2-X);
+                    q -= 0.5*rpt[j]*rpt[j]*A(j, j);
                 }
             }
         }

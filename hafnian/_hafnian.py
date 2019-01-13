@@ -19,6 +19,19 @@ import numpy as np
 from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
 
 
+def kron_reduced(A, n):
+    r"""Calculates the reduced Kronecker product :math:`A^{\oplus 2}\cancel{\otimes}J`.
+
+    Args:
+        A (array): matrix of size [N, N]
+        n (Sequence): sequence of integers indicating the multi-mode photon detection event
+    Returns:
+        array: the reduced Kronecker product
+    """
+    rows = [i for sublist in [[idx]*j for idx, j in enumerate(n)] for i in sublist]
+    return np.float64(A[:, rows][rows])
+
+
 def hafnian(A, loop=False, recursive=True, tol=1e-12):
     """Returns the hafnian of matrix A via the C++ hafnian library.
 

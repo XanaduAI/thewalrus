@@ -102,6 +102,11 @@ class TestComplexHafRpt:
         expected = float(fac(n))
         assert np.allclose(haf, expected)
 
+        A = np.array([[0, 1], [1, 0]], dtype=np.complex128)
+        rpt = np.array([n, n], dtype=np.int32)
+        haf = haf_rpt_complex(A, rpt, use_eigen=eigen)
+        assert np.allclose(haf, expected)
+
     @pytest.mark.parametrize("n", [3, 5])
     def test_outer_product(self, n, eigen):
         r"""Check that hafnian(x \otimes x) = hafnian(J_2n)*prod(x)"""
@@ -168,6 +173,11 @@ class TestRealHafRpt:
         rpt = np.ones([2*n], dtype=np.int32)
         haf = haf_rpt_real(A, rpt, use_eigen=eigen)
         expected = float(fac(n))
+        assert np.allclose(haf, expected)
+
+        A = np.array([[0, 1], [1, 0]], dtype=np.float64)
+        rpt = np.array([n, n], dtype=np.int32)
+        haf = haf_rpt_real(A, rpt, use_eigen=eigen)
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [3, 5])

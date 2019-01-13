@@ -16,7 +16,7 @@ import pytest
 
 import numpy as np
 import hafnian as hf
-from hafnian import hafnian
+from hafnian import hafnian, kron_reduced
 from hafnian.lib.libhaf import haf_complex, haf_real, haf_int
 
 
@@ -146,3 +146,16 @@ def test_int():
     haf = hafnian(A)
     expected = haf_int(np.int64(A))
     assert np.allclose(haf, expected)
+
+
+@pytest.mark.parametrize("n", [6, 8])
+def test_kron_reduced(n):
+    """Check kron reduced returns correct result"""
+    res = kron_reduced(np.array([[0, 1], [1, 0]]), [n, n])
+
+    O = np.zeros([n, n])
+    B = np.ones([n, n])
+    ex = np.vstack([np.hstack([O, B]),
+                    np.hstack([B, O])])
+
+    assert np.all(res == ex)
