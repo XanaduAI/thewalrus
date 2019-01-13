@@ -35,24 +35,6 @@ def kron_reduced(A, n):
 def hafnian(A, loop=False, recursive=True, tol=1e-12):
     """Returns the hafnian of matrix A via the C++ hafnian library.
 
-    This function calls three separate parts of the C++ hafnian library,
-    depending on the input array type.
-
-    * If the array is real valued (``np.float``), the result of
-      :func:`haf_real` is returned.
-
-    * If the array is integer valued (either ``np.int`` or ``np.float``), and
-      ``loop`` is set to ``False``, the result of :func:`haf_int` is returned.
-      If ``loop`` is ``True``, then the result of :func:`haf_real` is returned.
-      Note that :func:`haf_int` currently does not support the loop hafnian.
-
-    * If the array is complex (np.complex), this function queries
-      whether the array A has non-zero imaginary part. If so, it
-      calls the :func:`haf_complex` function.
-
-      Otherwise, if all elements are exactly real, the
-      :func:`haf_real` function is called.
-
     For more direct control, you may wish to call :func:`haf_real`,
     :func:`haf_complex`, or :func:`haf_int` directly.
 
@@ -61,13 +43,14 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12):
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         recursive (bool): If ``True``, the recursive algorithm is used. Note:
             the recursive algorithm does not currently support the loop hafnian.
+            If ``loop=True``, then this keyword argument is ignored.
         tol (float): the tolerance when checking that the matrix is
             symmetric. Default tolerance is 1e-12.
 
     Returns:
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
     """
-    # pylint: disable=too-many-return-statements
+    # pylint: disable=too-many-return-statements,too-many-branches
     if not isinstance(A, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")
 
@@ -117,3 +100,64 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12):
         return haf_int(np.int64(A))
 
     return haf_real(A, loop=loop, recursive=recursive)
+
+
+def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
+    r"""Returns the hafnian of matrix A with repeated rows/columns via the C++ hafnian library.
+
+    The :func:`kron_reduced` function may be used to show the resulting matrix
+    with repeated rows and columns as per `rpt`.
+
+    As a result, the following are identical:
+
+    >>> hafnian_repeated(A, rpt)
+    >>> hafnian(kron_reduced(A, rpt))
+
+    For more direct control, you may wish to call :func:`haf_rpt_real` or
+    :func:`haf_rpt_complex` directly.
+
+    Args:
+        A (array): a square, symmetric :math:`N\times N` array.
+        rpt (Sequence): a length-:math:`N` positive integer sequence, corresponding
+            to the number of times each row/column of matrix :math:`A` is repeated.
+        use_eigen (bool): if True (default), the Eigen linear algebra library
+            is used for matrix multiplication. If the hafnian library was compiled
+            with BLAS/Lapack support, then BLAS will be used for matrix multiplication.
+        tol (float): the tolerance when checking that the matrix is
+            symmetric. Default tolerance is 1e-12.
+
+    Returns:
+        np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
+    """
+    # pylint: disable=too-many-return-statements,too-many-branches
+    if not isinstance(A, np.ndarray):
+        raise TypeError("Input matrix must be a NumPy array.")
+
+    matshape = A.shape
+
+    if matshape[0] != matshape[1]:
+        raise ValueError("Input matrix must be square.")
+
+    if np.isnan(A).any():
+        raise ValueError("Input matrix must not contain NaNs.")
+
+    if np.linalg.norm(A-A.T) >= tol:
+        raise ValueError("Input matrix must be symmetric.")
+
+    if len(rpt) != matshape:
+        raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")
+
+    if not np.all(np.mod(rpt, 1) == 0) or np.any(rpt <= 0):
+        raise ValueError("the rpt argument must contain positive integers.")
+
+    nud = np.array(rpt, dtype=np.int32)
+
+    if A.dtype == np.complex:
+        if np.any(np.iscomplex(A)):
+            return haf_rpt_complex(A, rpt, use_eigen=use_eigen)
+        return haf_rpt_real(np.float64(A), rpt, use_eigen=use_eigen)
+
+    if np.all(np.mod(A, 1) == 0):
+        return np.int(haf_rpt_real(A, rpt, use_eigen=use_eigen))
+
+    return haf_rpt_real(A, rpt, use_eigen=use_eigen)

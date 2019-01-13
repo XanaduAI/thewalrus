@@ -47,6 +47,7 @@ Python wrappers
 
 .. autosummary::
     hafnian
+    hafnian_repeated
     perm
     kron_reduced
     version
@@ -66,12 +67,13 @@ if platform.system() == 'Windows': # pragma: no cover
         os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 from ._version import __version__
-from ._hafnian import hafnian, haf_int, haf_complex, haf_real, haf_rpt_real, haf_rpt_complex, kron_reduced
+from ._hafnian import hafnian, hafnian_repeated, haf_int, haf_complex, haf_real, haf_rpt_real, haf_rpt_complex, kron_reduced
 from ._permanent import perm, perm_real, perm_complex
 
 
 __all__ = [
     'hafnian',
+    'hafnian_repeated',
     'perm',
     'kron_reduced',
     'version'

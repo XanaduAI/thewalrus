@@ -20,9 +20,10 @@
         ],
         "include_dirs": [
             "hafnian",
-            "/usr/include/eigen3",
+            "",
             "/home/josh/.pyenv/versions/3.6.0/envs/general/lib/python3.6/site-packages/numpy/core/include",
             "/usr/local/include/eigen3",
+            "/usr/include/eigen3",
             "src"
         ],
         "language": "c++",
