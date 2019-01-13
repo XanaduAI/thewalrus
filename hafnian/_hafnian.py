@@ -19,16 +19,19 @@ import numpy as np
 from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
 
 
-def kron_reduced(A, n):
+def kron_reduced(A, rpt):
     r"""Calculates the reduced Kronecker product :math:`A^{\oplus 2}\cancel{\otimes}J`.
+
+    This is equivalent to repeating the ith row/column of :math:`A`, :math:`rpt_i` times.
 
     Args:
         A (array): matrix of size [N, N]
-        n (Sequence): sequence of integers indicating the multi-mode photon detection event
+        rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
+            of A to be repeated.
     Returns:
         array: the reduced Kronecker product
     """
-    rows = [i for sublist in [[idx]*j for idx, j in enumerate(n)] for i in sublist]
+    rows = [i for sublist in [[idx]*j for idx, j in enumerate(rpt)] for i in sublist]
     return np.float64(A[:, rows][rows])
 
 
