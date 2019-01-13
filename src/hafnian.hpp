@@ -461,7 +461,7 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
                 if (X[j] < rpt[j]) {
                     X[j] += 1;
                     p *= -(rpt[j]+1-X[j])/X[j];
-                    q -= A.col(j).dot(rows2-X);
+                    q -= A.col(j).conjugate().dot(rows2-X);
                     q -= 0.5*A(j, j);
                     break;
                 }
@@ -470,7 +470,7 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
                     if (rpt[j] % 2 == 1) {
                         p *= -1;
                     }
-                    q += A.col(j).dot(rows2-X);
+                    q += A.col(j).conjugate().dot(rows2-X);
                     q -= 0.5*rpt[j]*A(j, j);
                     q *= rpt[j];
                 }
@@ -511,7 +511,7 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
 
                 if (x[j] < rpt[j]) {
                     x[j] += 1;
-                    p *= -(rpt[j]+1-x[j])/x[j];
+                    p *= -static_cast<double>(rpt[j]+1-x[j])/x[j];
 
                     for (int k=0; k < n; k++) {
                         q -= mat[k*n+j]*(nu2[k]-x[k]);
