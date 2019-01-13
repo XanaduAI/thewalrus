@@ -1,4 +1,4 @@
-# Copyright 2018 Xanadu Quantum Technologies Inc.
+# Copyright 2019 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ based on the input matrix, whether to use the complex or real
 C++/Fortran library.
 
 Algorithm terminology
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 Eigenvalue or loop hafnian algorithm
     The algorithm described in

@@ -83,7 +83,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Hafnian'
-copyright = '2018, Xanadu Quantum Technologies Inc'
+copyright = '2019, Xanadu Quantum Technologies Inc'
 author = 'Xanadu Inc.'
 
 # The version info for the project you're documenting, acts as replacement for

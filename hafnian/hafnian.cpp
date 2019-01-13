@@ -17768,7 +17768,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "hafnian/hafnian.pyx":1
- * # Copyright 2018 Xanadu Quantum Technologies Inc.             # <<<<<<<<<<<<<<
+ * # Copyright 2019 Xanadu Quantum Technologies Inc.             # <<<<<<<<<<<<<<
  * 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  */
