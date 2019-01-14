@@ -75,7 +75,7 @@ if BUILD_EXT:
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
         cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
-        extra_link_args = ['-std=c++11 -fopenmp']
+        extra_link_args = ['-fopenmp']
 
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
