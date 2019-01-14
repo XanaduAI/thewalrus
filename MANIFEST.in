@@ -2,5 +2,5 @@ include README.rst
 include docs/*
 include LICENSE
 include examples/*
-include src/*
+include src/*/*
 include octave/*
