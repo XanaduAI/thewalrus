@@ -68,14 +68,17 @@ if BUILD_EXT:
     if platform.system() == 'Windows':
         USE_OPENMP = False
         cflags_default = "-static -O3 -Wall -fPIC"
-        extra_link_args = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
-        extra_link_args = ['-fopenmp']
+        extra_link_args_CPP = ['-Xpreprocessor -fopenmp -lomp']
+        extra_link_args_F90 = ['-fopenmp']
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
     else:
         cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
-        extra_link_args = ['-fopenmp']
+        extra_link_args_CPP = ['-fopenmp']
+        extra_link_args_F90 = ['-fopenmp']
 
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
@@ -87,13 +90,13 @@ if BUILD_EXT:
         USE_LAPACK = True
         CFLAGS += [" -llapacke -DLAPACKE=1"]
         libraries += ["lapacke"]
-        extra_link_args[0] += " -llapacke"
+        extra_link_args_CPP[0] += " -llapacke"
 
     if os.environ.get("USE_OPENBLAS", ""):
         USE_LAPACK = True
         CFLAGS += [" -lopenblas -DLAPACKE=1"]
         libraries += ["openblas"]
-        extra_link_args[0] += " -lopenblas"
+        extra_link_args_CPP[0] += " -lopenblas"
 
     extensions = cythonize([
             Extension("libperm",
@@ -101,7 +104,7 @@ if BUILD_EXT:
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
-                extra_link_args=extra_link_args),
+                extra_link_args=extra_link_args_F90),
             Extension("libhaf",
                 sources=["hafnian/hafnian."+ext,],
                 depends=["src/hafnian.hpp"],
@@ -110,7 +113,7 @@ if BUILD_EXT:
                 libraries=libraries,
                 language="c++",
                 extra_compile_args=["-std=c++11"] + CFLAGS,
-                extra_link_args=extra_link_args)
+                extra_link_args=extra_link_args_CPP)
     ], compile_time_env={'_OPENMP': USE_OPENMP, 'LAPACKE': USE_LAPACK})
 else:
     extensions = []
