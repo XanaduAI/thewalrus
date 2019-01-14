@@ -65,6 +65,9 @@ if BUILD_EXT:
     LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
     C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["src"]
 
+    LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
+    libraries = []
+
     if platform.system() == 'Windows':
         USE_OPENMP = False
         cflags_default = "-static -O3 -Wall -fPIC"
@@ -72,9 +75,12 @@ if BUILD_EXT:
         extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
+        libraries += ["omp"]
         extra_link_args_CPP = ['-Xpreprocessor -fopenmp -lomp']
         extra_link_args_F90 = ['-fopenmp']
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
+        C_INCLUDE_PATH += ['/usr/local/opt/libomp/include']
+        LD_LIBRARY_PATH += ['/usr/local/opt/libomp/lib']
     else:
         cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args_CPP = ['-fopenmp']
@@ -82,8 +88,6 @@ if BUILD_EXT:
 
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
-    LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
-    libraries = []
 
     USE_LAPACK = False
     if os.environ.get("USE_LAPACK", ""):
