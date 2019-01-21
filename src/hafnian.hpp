@@ -546,5 +546,164 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
 }
 
 
+template <typename T>
+inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=true) {
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    assert(static_cast<int>(rpt.size()) == n);
+
+    long long int p = 2;
+    T y = 0.0, q = 0.0, q1 = 0.0;
+
+    if (use_eigen) {
+        namespace eg = Eigen;
+
+        eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
+        eg::Matrix<T,eg::Dynamic,1> mu = A.diagonal();
+
+        eg::VectorXd X = eg::VectorXd::Zero(n);
+        eg::VectorXd rows2 = eg::Map<eg::VectorXi, eg::Unaligned>(rpt.data(), rpt.size()).cast<double>();
+
+        int s = rows2.sum();
+        int s2 = s/2;
+        int steps = (rows2+eg::VectorXd::Ones(n)).prod()/2;
+
+        rows2 /= 2;
+        q = 0.5*rows2.dot(A*rows2);
+        q1 = rows2.dot(mu);
+
+        int s1 = std::floor(0.5*s)+1;
+        eg::Matrix<T,eg::Dynamic,1> z1 = eg::VectorXd::Ones(s1);
+        eg::Matrix<T,eg::Dynamic,1> z2 = eg::VectorXd::Ones(s1);
+
+        for (int i=0; i < steps; i++) {
+            for (int j=1; j < s1; j++) {
+                z1[j] = z1[j-1]*q/(1.0*j);
+            }
+
+            if (s % 2 == 1) {
+                z2[0] = q1;
+                for (int j=1; j < s1; j++) {
+                    z2[j] = z2[j-1]*pow(q1, 2)/(2.0*j)/(2.0*j+1);
+                }
+            }
+            else {
+                for (int j=1; j < s1; j++) {
+                    z2[j] = z2[j-1]*pow(q1, 2)/(2.0*j)/(2.0*j-1);
+                }
+            }
+
+            y += static_cast<double>(p)*z1.conjugate().dot(z2.reverse());
+
+            for (int j=0; j < n; j++) {
+                if (X[j] < rpt[j]) {
+                    X[j] += 1;
+                    p *= -(rpt[j]+1-X[j])/X[j];
+                    q -= A.col(j).conjugate().dot(rows2-X);
+                    q -= 0.5*A(j, j);
+                    q1 -= mu[j];
+                    break;
+                }
+                else {
+                    X[j] = 0;
+                    if (rpt[j] % 2 == 1) {
+                        p *= -1;
+                    }
+                    q += static_cast<double>(rpt[j])*A.col(j).conjugate().dot(rows2-X);
+                    q -= 0.5*rpt[j]*rpt[j]*A(j, j);
+                    q1 += static_cast<double>(rpt[j])*mu[j];
+                }
+            }
+        }
+    }
+    else {
+        std::vector<int> x(n, 0.0);
+        int s = std::accumulate(rpt.begin(), rpt.end(), 0);
+        int s2 = s/2;
+
+        int s1 = std::floor(0.5*s)+1;
+        std::vector<T> z1(s1, 1.0);
+        std::vector<T> z2(s1, 1.0);
+
+        // diagonal of matrix mat
+        std::vector<T> mu(n);
+        for (int i=0; i<n; i++) {
+            mu[i] = mat[i*n+i];
+        }
+
+        std::vector<double> nu2(n);
+        std::transform(rpt.begin(), rpt.end(), nu2.begin(),
+            std::bind(std::multiplies<double>(), std::placeholders::_1, 0.5));
+
+        for (int i=0; i<n; i++) {
+            q1 += nu2[i]*mu[i];
+            for (int j=0; j<n; j++) {
+                q += 0.5*nu2[j]*mat[i*n+j]*nu2[i];
+            }
+        }
+
+        int steps = 1;
+
+        for (auto i : rpt) {
+            steps *= i+1;
+        }
+
+        steps /= 2;
+
+        for (int i=0; i < steps; i++) {
+            for (int j=1; j < s1; j++) {
+                z1[j] = z1[j-1]*q/(1.0*j);
+            }
+
+            if (s % 2 == 1) {
+                z2[0] = q1;
+                for (int j=1; j < s1; j++) {
+                    z2[j] = z2[j-1]*pow(q1, 2)/(2.0*j)/(2.0*j+1);
+                }
+            }
+            else {
+                for (int j=1; j < s1; j++) {
+                    z2[j] = z2[j-1]*pow(q1, 2)/(2.0*j)/(2.0*j-1);
+                }
+            }
+
+            T z1z2prod = 0.0;
+            for (int j=0; j<s1; j++) {
+                z1z2prod += z1[j]*z2[s1-1-j];
+            }
+
+            y += static_cast<double>(p)*z1z2prod;
+
+            for (int j=0; j < n; j++) {
+
+                if (x[j] < rpt[j]) {
+                    x[j] += 1;
+                    p *= -static_cast<double>(rpt[j]+1-x[j])/x[j];
+
+                    for (int k=0; k < n; k++) {
+                        q -= mat[k*n+j]*(nu2[k]-x[k]);
+                    }
+                    q -= 0.5*mat[j*n+j];
+                    q1 -= mu[j];
+                    break;
+                }
+                else {
+                    x[j] = 0;
+                    if (rpt[j] % 2 == 1) {
+                        p *= -1;
+                    }
+                    for (int k=0; k < n; k++) {
+                        q += (1.0*rpt[j])*mat[k*n+j]*(nu2[k]-x[k]);
+                    }
+                    q -= 0.5*rpt[j]*rpt[j]*mat[j*n+j];
+                    q1 += static_cast<double>(rpt[j])*mu[j];
+                }
+            }
+        }
+    }
+
+
+    return y;
+}
+
 
 }

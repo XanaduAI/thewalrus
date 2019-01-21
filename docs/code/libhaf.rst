@@ -153,6 +153,19 @@ Code details
     :param bool use_eigen: whether to use the Eigen linear algebra library to compute matrix multiplication. If ``true`` (default) then Eigen is used, if ``false`` then pure C++ loops are used.
 
 
+.. cpp:function:: template\<typename T> T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=true)
+
+    Returns the loop hafnian of a matrix using the algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
+
+    Note that this algorithm, while generally slower than the the above, can be more efficient
+    in the cases where the matrix has repeated rows and columns.
+
+    :tparam T: template parameter accepts any (signed) numeric type, including ``int``, ``long int``, ``long long int``, ``float``, ``double``, ``std::complex<float>``, ``std::complex<double>``, etc.
+
+    :param std\:\:vector<T> &mat: a flattened vector of size :math:`n^2`, representing an :math:`n\times n` row-ordered symmetric matrix.
+    :param std\:\:vector<int> &rpt: a vector of integers, representing the number of times eacg row/column in ``mat`` is repeated. For example, ``mat = {1}`` and ``rpt = {6}`` represents a :math:`6\times 6` matrix of all ones.
+    :param bool use_eigen: whether to use the Eigen linear algebra library to compute matrix multiplication. If ``true`` (default) then Eigen is used, if ``false`` then pure C++ loops are used.
+
 
 .. cpp:function:: std::vector<std::complex<double>> powtrace(std::vector<std::complex<double>> &z, int n, int l)
 

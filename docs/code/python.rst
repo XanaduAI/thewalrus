@@ -67,22 +67,24 @@ via the functions:
     :rtype: ``np.complex128``
 
 
-.. py:function:: haf_rpt_real(A, rpt, use_eigen=True)
+.. py:function:: haf_rpt_real(A, rpt, loop=False, use_eigen=True)
 
     Returns the hafnian of a real matrix A via the C++ hafnian library
     using the algorithm described in algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__. This method is more efficient for matrices with repeated rows and columns.
 
     :param array A: a ``np.float64``, square, symmetric :math:`n\times n` array.
     :param array rpt: a ``np.int32`` length-:math:`n` array, corresponding to the number of times each row/column of matrix A is repeated.
+    :param bool loop: If ``True``, the loop hafnian is returned. Default false.
     :param bool use_eigen: If ``True``, he Eigen linear algebra library is used for matrix multiplication.
 
-.. py:function:: haf_rpt_complex(A, rpt, use_eigen=True)
+.. py:function:: haf_rpt_complex(A, rpt, loop=False, use_eigen=True)
 
     Returns the hafnian of a real matrix A via the C++ hafnian library
     using the algorithm described in algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__. This method is more efficient for matrices with repeated rows and columns.
 
     :param array A: a ``np.complex128``, square, symmetric :math:`n\times n` array.
     :param array rpt: a ``np.int32`` length-:math:`n` array, corresponding to the number of times each row/column of matrix A is repeated.
+    :param bool loop: If ``True``, the loop hafnian is returned. Default false.
     :param bool use_eigen: If ``True``, he Eigen linear algebra library is used for matrix multiplication
 
 

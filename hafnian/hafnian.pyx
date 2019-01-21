@@ -21,11 +21,15 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian_recursive[T](vector[T] &mat)
     T hafnian[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
+
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
 
+    T loop_hafnian_rpt[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
+    T loop_hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
 
-def haf_rpt_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
+
+def haf_rpt_real(double[:, :] A, int[:] rpt, bint loop=False, bint use_eigen=True):
     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
     using the rpt method. This method is more efficient for matrices with
     repeated rows and columns.
@@ -34,6 +38,7 @@ def haf_rpt_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
         A (array): a np.float64, square, :math:`N\times N` array of even dimensions.
         rpt (array): a length :math:`N` array corresponding to the number of times
             each row/column of matrix A is repeated.
+        loop (bool): If ``True``, the loop hafnian is returned. Default false.
         use_eigen (bool): if True (default), the Eigen linear algebra library
             is used for matrix multiplication.
 
@@ -50,13 +55,13 @@ def haf_rpt_real(double[:, :] A, int[:] rpt, bint use_eigen=True):
             mat.push_back(A[i, j])
 
     # Exposes a c function to python
-    if use_eigen:
-        return hafnian_rpt(mat, nud, True)
+    if loop:
+        return loop_hafnian_rpt(mat, nud, use_eigen)
 
-    return hafnian_rpt(mat, nud, False)
+    return hafnian_rpt(mat, nud, use_eigen)
 
 
-def haf_rpt_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
+def haf_rpt_complex(double complex[:, :] A, int[:] rpt, bint loop=False, bint use_eigen=True):
     r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
     using the rpt method. This method is more efficient for matrices with
     repeated rows and columns.
@@ -65,6 +70,7 @@ def haf_rpt_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
         A (array): a np.complex128, square, :math:`N\times N` array of even dimensions.
         rpt (array): a length :math:`N` array corresponding to the number of times
             each row/column of matrix A is repeated.
+        loop (bool): If ``True``, the loop hafnian is returned. Default false.
         use_eigen (bool): if True (default), the Eigen linear algebra library
             is used for matrix multiplication.
 
@@ -81,10 +87,10 @@ def haf_rpt_complex(double complex[:, :] A, int[:] rpt, bint use_eigen=True):
             mat.push_back(A[i, j])
 
     # Exposes a c function to python
-    if use_eigen:
-        return hafnian_rpt(mat, nud, True)
+    if loop:
+        return loop_hafnian_rpt(mat, nud, use_eigen)
 
-    return hafnian_rpt(mat, nud, False)
+    return hafnian_rpt(mat, nud, use_eigen)
 
 
 def haf_int(long long[:, :] A):

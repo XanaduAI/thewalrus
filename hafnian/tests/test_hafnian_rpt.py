@@ -56,6 +56,14 @@ class TestComplexHafRpt:
         haf = haf_rpt_complex(A, rpt, use_eigen=eigen)
         assert np.allclose(haf, A[0, 1])
 
+    def test_2x2_loop(self, eigen):
+        """Check 2x2 loop hafnian"""
+        A = np.complex128(np.random.random([2, 2])) + 1j*np.random.random([2, 2])
+        A = A + A.T
+        rpt = np.ones([2], dtype=np.int32)
+        haf = haf_rpt_complex(A, rpt, loop=True, use_eigen=eigen)
+        assert np.allclose(haf, A[0, 1]+A[0, 0]*A[1, 1])
+
     def test_4x4(self, eigen):
         """Check 4x4 hafnian"""
         A = np.complex128(np.random.random([4, 4]))
@@ -67,6 +75,21 @@ class TestComplexHafRpt:
             A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
         assert np.allclose(haf, expected)
 
+    def test_4x4_loop(self, eigen):
+        """Check 4x4 loop hafnian"""
+        A = np.complex128(np.random.random([4, 4]))
+        A += 1j*np.random.random([4, 4])
+        A += A.T
+        rpt = np.ones([4], dtype=np.int32)
+        haf = haf_rpt_complex(A, rpt, loop=True, use_eigen=eigen)
+        expected = A[0, 1]*A[2, 3] \
+            + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2] \
+            + A[0, 0]*A[1, 1]*A[2, 3] + A[0, 1]*A[2, 2]*A[3, 3] \
+            + A[0, 2]*A[1, 1]*A[3, 3] + A[0, 0]*A[2, 2]*A[1, 3] \
+            + A[0, 0]*A[3, 3]*A[1, 2] + A[0, 3]*A[1, 1]*A[2, 2] \
+            + A[0, 0]*A[1, 1]*A[2, 2]*A[3, 3]
+        assert np.allclose(haf, expected)
+
     @pytest.mark.parametrize("n", [6, 8])
     def test_identity(self, n, eigen):
         """Check hafnian(I)=0"""
@@ -74,6 +97,9 @@ class TestComplexHafRpt:
         rpt = np.ones([n], dtype=np.int32)
         haf = haf_rpt_complex(A, rpt, use_eigen=eigen)
         assert np.allclose(haf, 0)
+
+        haf = haf_rpt_complex(A, rpt, loop=True, use_eigen=eigen)
+        assert np.allclose(haf, 1)
 
     @pytest.mark.parametrize("n", [6, 8])
     def test_ones(self, n, eigen):
@@ -87,6 +113,15 @@ class TestComplexHafRpt:
         A = np.complex128([[1]])
         rpt = np.int32([2*n])
         haf = haf_rpt_complex(A, rpt, use_eigen=eigen)
+        assert np.allclose(haf, expected)
+
+    @pytest.mark.parametrize("n", [6, 8])
+    def test_ones_loop(self, n, eigen):
+        """Check loop hafnian(J_2n)=hyp1f1(-2n/2,1/2,-1/2)*(2n)!/(n!2^n)"""
+        A = np.complex128(np.ones([2*n, 2*n]))
+        rpt = np.ones([2*n], dtype=np.int32)
+        haf = haf_rpt_complex(A, rpt, loop=True, use_eigen=eigen)
+        expected = fac(2*n)/(fac(n)*(2**n))*hyp1f1[n]
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
@@ -130,6 +165,14 @@ class TestRealHafRpt:
         haf = haf_rpt_real(A, rpt, use_eigen=eigen)
         assert np.allclose(haf, A[0, 1])
 
+    def test_2x2_loop(self, eigen):
+        """Check 2x2 loop hafnian"""
+        A = np.float64(np.random.random([2, 2]))
+        A = A + A.T
+        rpt = np.ones([2], dtype=np.int32)
+        haf = haf_rpt_real(A, rpt, loop=True, use_eigen=eigen)
+        assert np.allclose(haf, A[0, 1]+A[0, 0]*A[1, 1])
+
     def test_4x4(self, eigen):
         """Check 4x4 hafnian"""
         A = np.float64(np.random.random([4, 4]))
@@ -138,6 +181,20 @@ class TestRealHafRpt:
         haf = haf_rpt_real(A, rpt, use_eigen=eigen)
         expected = A[0, 1]*A[2, 3] + \
             A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
+        assert np.allclose(haf, expected)
+
+    def test_4x4_loop(self, eigen):
+        """Check 4x4 loop hafnian"""
+        A = np.float64(np.random.random([4, 4]))
+        A += A.T
+        rpt = np.ones([4], dtype=np.int32)
+        haf = haf_rpt_real(A, rpt, loop=True, use_eigen=eigen)
+        expected = A[0, 1]*A[2, 3] \
+            + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2] \
+            + A[0, 0]*A[1, 1]*A[2, 3] + A[0, 1]*A[2, 2]*A[3, 3] \
+            + A[0, 2]*A[1, 1]*A[3, 3] + A[0, 0]*A[2, 2]*A[1, 3] \
+            + A[0, 0]*A[3, 3]*A[1, 2] + A[0, 3]*A[1, 1]*A[2, 2] \
+            + A[0, 0]*A[1, 1]*A[2, 2]*A[3, 3]
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
@@ -160,6 +217,15 @@ class TestRealHafRpt:
         A = np.float64([[1]])
         rpt = np.int32([2*n])
         haf = haf_rpt_real(A, rpt, use_eigen=eigen)
+        assert np.allclose(haf, expected)
+
+    @pytest.mark.parametrize("n", [6, 8])
+    def test_ones_loop(self, n, eigen):
+        """Check loop hafnian(J_2n)=hyp1f1(-2n/2,1/2,-1/2)*(2n)!/(n!2^n)"""
+        A = np.float64(np.ones([2*n, 2*n]))
+        rpt = np.ones([2*n], dtype=np.int32)
+        haf = haf_rpt_real(A, rpt, loop=True, use_eigen=eigen)
+        expected = fac(2*n)/(fac(n)*(2**n))*hyp1f1[n]
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])

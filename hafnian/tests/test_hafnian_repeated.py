@@ -80,6 +80,9 @@ def test_2x2():
     haf = hafnian_repeated(A, [1]*2)
     assert np.allclose(haf, A[0, 1])
 
+    haf = hafnian_repeated(A, [1]*2, loop=True)
+    assert np.allclose(haf, A[0, 1]+A[0, 0]*A[1, 1])
+
 
 def test_3x3():
     """Check 3x3 hafnian"""
@@ -97,6 +100,14 @@ def test_4x4():
         A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
     assert np.allclose(haf, expected)
 
+    haf = hafnian_repeated(A, [1]*4, loop=True)
+    expected = A[0, 1]*A[2, 3] \
+        + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2] \
+        + A[0, 0]*A[1, 1]*A[2, 3] + A[0, 1]*A[2, 2]*A[3, 3] \
+        + A[0, 2]*A[1, 1]*A[3, 3] + A[0, 0]*A[2, 2]*A[1, 3] \
+        + A[0, 0]*A[3, 3]*A[1, 2] + A[0, 3]*A[1, 1]*A[2, 2] \
+        + A[0, 0]*A[1, 1]*A[2, 2]*A[3, 3]
+    assert np.allclose(haf, expected)
 
 def test_real():
     """Check hafnian_repeated(A)=haf_real(A) for a random
@@ -124,15 +135,4 @@ def test_complex():
     A += A.T
     haf = hafnian_repeated(A, [1]*6)
     expected = haf_rpt_complex(np.complex128(A), np.ones([6], dtype=np.int32))
-    assert np.allclose(haf, expected)
-
-
-def test_int():
-    """Check hafnian_repeated(A)=haf_int(A) for a random
-    real matrix.
-    """
-    A = np.ones([6, 6])
-    haf = hafnian_repeated(A, [1]*6)
-    assert isinstance(haf, int)
-    expected = haf_rpt_real(np.float64(A), np.ones([6], dtype=np.int32))
     assert np.allclose(haf, expected)

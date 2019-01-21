@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-EIGEN_INCLUDE_DIR=/home/josh/.local/include/
+EIGEN_INCLUDE_DIR=/usr/include/eigen3
 
 CC=g++
 FC=gfortran

@@ -74,7 +74,7 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12):
     if matshape[0] % 2 != 0 and not loop:
         return 0.0
 
-    if matshape[0] %2 != 0 and loop:
+    if matshape[0] % 2 != 0 and loop:
         A = np.pad(A, pad_width=((0, 1), (0, 1)), mode='constant')
         A[-1, -1] = 1.0
 
@@ -108,7 +108,7 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12):
     return haf_real(A, loop=loop, recursive=recursive)
 
 
-def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
+def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
     r"""Returns the hafnian of matrix A with repeated rows/columns via the C++ hafnian library.
 
     The :func:`kron_reduced` function may be used to show the resulting matrix
@@ -136,6 +136,7 @@ def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
         A (array): a square, symmetric :math:`N\times N` array.
         rpt (Sequence): a length-:math:`N` positive integer sequence, corresponding
             to the number of times each row/column of matrix :math:`A` is repeated.
+        loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         use_eigen (bool): if True (default), the Eigen linear algebra library
             is used for matrix multiplication. If the hafnian library was compiled
             with BLAS/Lapack support, then BLAS will be used for matrix multiplication.
@@ -171,15 +172,15 @@ def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
     if np.all(nud == 0):
         return 1.0
 
-    if np.sum(nud) % 2 != 0:
+    if np.sum(nud) % 2 != 0 and not loop:
         return 0.0
 
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
-            return haf_rpt_complex(A, nud, use_eigen=use_eigen)
-        return haf_rpt_real(np.float64(A.real), nud, use_eigen=use_eigen)
+            return haf_rpt_complex(A, nud, loop=loop, use_eigen=use_eigen)
+        return haf_rpt_real(np.float64(A.real), nud, loop=loop, use_eigen=use_eigen)
 
     if np.all(np.mod(A, 1) == 0):
-        return np.int(haf_rpt_real(A, nud, use_eigen=use_eigen))
+        return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
 
-    return haf_rpt_real(A, nud, use_eigen=use_eigen)
+    return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
