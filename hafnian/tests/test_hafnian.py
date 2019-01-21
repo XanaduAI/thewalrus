@@ -60,6 +60,13 @@ def test_nan():
         hafnian(A)
 
 
+def test_empty_matrix():
+    """Check empty matrix returns 1"""
+    A = np.ndarray((0, 0))
+    res = hafnian(A)
+    assert res == 1
+
+
 def test_2x2():
     """Check 2x2 hafnian"""
     A = np.random.random([2, 2])

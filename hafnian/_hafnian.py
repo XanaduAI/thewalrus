@@ -59,6 +59,9 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12):
 
     matshape = A.shape
 
+    if matshape == (0, 0):
+        return 1
+
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
@@ -162,8 +165,11 @@ def hafnian_repeated(A, rpt, use_eigen=True, tol=1e-12):
 
     nud = np.array(rpt, dtype=np.int32)
 
-    if not np.all(np.mod(nud, 1) == 0) or np.any(nud <= 0):
-        raise ValueError("the rpt argument must contain positive integers.")
+    if not np.all(np.mod(nud, 1) == 0) or np.any(nud < 0):
+        raise ValueError("the rpt argument must contain non-negative integers.")
+
+    if np.all(nud == 0):
+        return 1.0
 
     if np.sum(nud) % 2 != 0:
         return 0.0

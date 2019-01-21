@@ -58,8 +58,6 @@ def test_rpt_length():
 def test_rpt_valid():
     """Check exception for rpt having invalid values"""
     A = np.array([[2, 1], [1, 3]])
-    with pytest.raises(ValueError):
-        hafnian_repeated(A, [1, 0])
 
     with pytest.raises(ValueError):
         hafnian_repeated(A, [1, -1])
@@ -67,6 +65,13 @@ def test_rpt_valid():
     with pytest.raises(ValueError):
         hafnian_repeated(A, [1.1, 1])
 
+def test_rpt_zero():
+    """Check 2x2 hafnian when rpt is all 0"""
+    A = np.array([[2, 1], [1, 3]])
+    rpt = [0, 0]
+
+    res = hafnian_repeated(A, rpt)
+    assert res == 1.0
 
 def test_2x2():
     """Check 2x2 hafnian"""
