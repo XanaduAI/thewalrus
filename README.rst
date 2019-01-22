@@ -87,7 +87,7 @@ Alternatively, you can download the Eigen headers manually:
 
     $ mkdir ~/.local/eigen3 && cd ~/.local/eigen3
     $ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz -O eigen3.tar.gz
-    $ tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
+    $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
     $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
 
 Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that Hafnian can find the Eigen3 header files (if not provided, Hafnian will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).

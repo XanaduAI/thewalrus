@@ -564,7 +564,6 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
         eg::VectorXd rows2 = eg::Map<eg::VectorXi, eg::Unaligned>(rpt.data(), rpt.size()).cast<double>();
 
         int s = rows2.sum();
-        int s2 = s/2;
         int steps = (rows2+eg::VectorXd::Ones(n)).prod()/2;
 
         rows2 /= 2;
@@ -572,8 +571,8 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
         q1 = rows2.dot(mu);
 
         int s1 = std::floor(0.5*s)+1;
-        eg::Matrix<T,eg::Dynamic,1> z1 = eg::VectorXd::Ones(s1);
-        eg::Matrix<T,eg::Dynamic,1> z2 = eg::VectorXd::Ones(s1);
+        eg::Matrix<T,eg::Dynamic,1> z1 = eg::VectorXd::Ones(s1).cast<T>();
+        eg::Matrix<T,eg::Dynamic,1> z2 = eg::VectorXd::Ones(s1).cast<T>();
 
         for (int i=0; i < steps; i++) {
             for (int j=1; j < s1; j++) {
@@ -618,8 +617,6 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
     else {
         std::vector<int> x(n, 0.0);
         int s = std::accumulate(rpt.begin(), rpt.end(), 0);
-        int s2 = s/2;
-
         int s1 = std::floor(0.5*s)+1;
         std::vector<T> z1(s1, 1.0);
         std::vector<T> z2(s1, 1.0);
