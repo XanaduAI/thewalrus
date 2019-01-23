@@ -32,7 +32,7 @@ def kron_reduced(A, rpt):
         array: the reduced Kronecker product
     """
     rows = [i for sublist in [[idx]*j for idx, j in enumerate(rpt)] for i in sublist]
-    return np.float64(A[:, rows][rows])
+    return A[:, rows][rows]
 
 
 def hafnian(A, loop=False, recursive=True, tol=1e-12):
