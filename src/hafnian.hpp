@@ -489,16 +489,11 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
         std::transform(rpt.begin(), rpt.end(), nu2.begin(),
             std::bind(std::multiplies<double>(), std::placeholders::_1, 0.5));
 
-        double qR = 0.0, qI = 0.0;
-
-        #pragma omp parallel for reduction(+:qR) reduction(+:qI)
         for (int i=0; i<n; i++) {
             for (int j=0; j<n; j++) {
-                qR += 0.5*nu2[j]*std::real(mat[i*n+j])*nu2[i];
-                qI += 0.5*nu2[j]*std::imag(mat[i*n+j])*nu2[i];
+                q += 0.5*nu2[j]*mat[i*n+j]*nu2[i];
             }
         }
-        q = qR+qI;
 
         int steps = 1;
 
