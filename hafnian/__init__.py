@@ -26,20 +26,23 @@ C++/Fortran library.
 Algorithm terminology
 ---------------------
 
-Eigenvalue or loop hafnian algorithm
+Eigenvalue hafnian algorithm
     The algorithm described in
     *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
     `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
-    This algorithm scales like :math:`\mathcal{O}(n^3 2^{n/2})`.
+    This algorithm scales like :math:`\mathcal{O}(n^3 2^{n/2})`, and supports caclulation of
+    the loop hafnian.
 
 Recursive hafnian algorithm
     The algorithm described in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
-    This algorithm scales like :math:`\mathcal{O}(n^4 2^{n/2})`.
+    This algorithm scales like :math:`\mathcal{O}(n^4 2^{n/2})`. This algorithm does not
+    currently support the loop hafnian.
 
 Repeating hafnian algorithm
     The algorithm described in *From moments of sum to moments of product*,
     `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
-    This method is more efficient for matrices with repeated rows and columns.
+    This method is more efficient for matrices with repeated rows and columns, and supports caclulation of
+    the loop hafnian.
 
 
 Python wrappers
@@ -48,6 +51,7 @@ Python wrappers
 .. autosummary::
     hafnian
     hafnian_repeated
+    permanent_repeated
     perm
     kron_reduced
     version
@@ -67,13 +71,16 @@ if platform.system() == 'Windows': # pragma: no cover
         os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 from ._version import __version__
-from ._hafnian import hafnian, hafnian_repeated, haf_int, haf_complex, haf_real, haf_rpt_real, haf_rpt_complex, kron_reduced
+from ._hafnian import (hafnian, hafnian_repeated, haf_int, haf_complex,
+                       haf_real, haf_rpt_real, haf_rpt_complex,
+                       kron_reduced, permanent_repeated)
 from ._permanent import perm, perm_real, perm_complex
 
 
 __all__ = [
     'hafnian',
     'hafnian_repeated',
+    'permanent_repeated',
     'perm',
     'kron_reduced',
     'version'
