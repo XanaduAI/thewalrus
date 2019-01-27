@@ -41,7 +41,7 @@ def test_3x3():
         + A[2, 0]*A[1, 1]*A[0, 2]+A[0, 1]*A[1, 0]*A[2, 2]+A[0, 0]*A[1, 2]*A[2, 1]
     assert np.allclose(p, exp)
 
-@pytest.mark.parametrize('n', [6, 8])
+@pytest.mark.parametrize('n', [6, 8, 10, 15, 20])
 def test_ones(n):
     """Check all ones matrix has perm(J_n)=n!"""
     A = np.array([[1]])

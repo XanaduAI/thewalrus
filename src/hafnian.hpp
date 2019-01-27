@@ -438,7 +438,7 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
     int n = std::sqrt(static_cast<double>(mat.size()));
     assert(static_cast<int>(rpt.size()) == n);
 
-    long long int p = 2;
+    long double p = 2;
     T y = 0.0, q = 0.0;
 
     if (use_eigen) {
@@ -452,6 +452,10 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
         int s = rows2.sum();
         int s2 = s/2;
         int steps = (rows2+eg::VectorXd::Ones(n)).prod()/2;
+
+        for (int i=1; i<s2; i++) {
+            p /= i+1;
+        }
 
         rows2 /= 2;
         q = 0.5*rows2.dot(A*rows2);
@@ -476,14 +480,15 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
                 }
             }
         }
-        for (int i=1; i<s2; i++) {
-            y /= i+1;
-        }
     }
     else {
         std::vector<int> x(n, 0.0);
         int s = std::accumulate(rpt.begin(), rpt.end(), 0);
         int s2 = s/2;
+
+        for (int i=1; i<s2; i++) {
+            p /= i+1;
+        }
 
         std::vector<double> nu2(n);
         std::transform(rpt.begin(), rpt.end(), nu2.begin(),
@@ -530,12 +535,7 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
                 }
             }
         }
-
-        for (int i=1; i<s2; i++) {
-            y /= i+1;
-        }
     }
-
 
     return y;
 }
