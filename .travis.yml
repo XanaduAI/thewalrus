@@ -4,10 +4,10 @@ env:
   - CIBW_SKIP="cp27-* cp34-* *i686"
   - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
     && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 &&
-    cp -rf Eigen {project}/src && pip install numpy cython'
+    cp -rf Eigen {project}/src && pip install numpy scipy cython'
   - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc
-    eigen libomp || true; brew install gcc eigen libomp && pip install numpy cython'
-  - CIBW_TEST_REQUIRES="numpy pytest pytest-cov"
+    eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython'
+  - CIBW_TEST_REQUIRES="numpy scipy pytest pytest-cov"
   - CIBW_TEST_COMMAND="python -m pytest {project}/hafnian"
   - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
   - secure: lkBL0X+rNgWP54tf6W2xzdwl+XXeQCdPuCCKy1TPuJ1OJo4dIy6yMs4uapIz8s2atQ2x5SDC+tRQrQDnpLxy5rY0ikChdpkBCMoQvSJIoaaHTNK2hZjnTDtXTNjzkb6E70uWvRriVCy+B+LLjKjdtygIF0+2AE+SGNvW4fEZWP22TYv2s+tWY8GwMAYdaYb7UI3sI/0prIDTqdw/ZUiM22lJskR+BJxZGTR3gSzguE/umbK8tztLzKRUb9A5zXJWGCPY/eKgc20LzVeKCttv0fAGBGz6D/k3I2kUTj5+mBJ+vbNmfkOmgd0QyFGH6zBGLE0xl0vP9HYHhiCFFamTmbkjSLPym+MC5Up+YsMMRqWJDGA0/L3n6afbS3FUqKRb448t3eycvfPWACNpeLPXdaGLTx954O8tDQBMLAJa3dBEbJI31mN2sCVvXLj96SDBdSl/fyouClptGXKGraiqABzowAfmx6GRavCnZMoggmhYOLg5VknawDVSlnEFoGXss8tkZkjCjoj0xzW0aF100m6O7kAORWoa/YLAz2Dyvl+GgDMlsITCQuDs7JEWL0RABzpRw0li03FZd2a1FQkGPyYXROEW4n+tAwVjMAXsfeKafeAUMxzXlhjVc2g9+3rhLvIw3X0hgnr+dGxaLytMczUXwnouY1LbhOT2EWgW7+c=

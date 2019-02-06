@@ -26,6 +26,7 @@ with open("hafnian/_version.py") as f:
 
 requirements = [
     "numpy",
+    "scipy"
 ]
 
 
