@@ -166,3 +166,14 @@ def test_kron_reduced(n):
                     np.hstack([B, O])])
 
     assert np.all(res == ex)
+
+@pytest.mark.parametrize("n", [6, 8])
+def test_kron_reduced_vector(n):
+    """Check kron reduced returns correct result"""
+    res = kron_reduced(np.array([0, 1]), [n, n])
+
+    O = np.zeros([n, n])
+    J = np.ones([n, n])
+    ex = np.hstack([O, J])
+
+    assert np.all(res == ex)
