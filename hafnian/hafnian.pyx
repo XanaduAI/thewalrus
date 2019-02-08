@@ -28,6 +28,9 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T loop_hafnian_rpt[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
 
+    double hafnian_recursive_quad(vector[double] &mat)
+    double complex hafnian_recursive_quad(vector[double complex] &mat)
+
 
 def haf_rpt_real(double[:, :] A, int[:] rpt, bint loop=False, bint use_eigen=True):
     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
@@ -116,7 +119,7 @@ def haf_int(long long[:, :] A):
     return hafnian_recursive(mat)
 
 
-def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):
+def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False, quad=True):
     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
 
     Args:
@@ -140,12 +143,14 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False):
         return loop_hafnian(mat)
 
     if recursive:
+        if quad:
+            return hafnian_recursive_quad(mat)
         return hafnian_recursive(mat)
 
     return hafnian(mat)
 
 
-def haf_real(double[:, :] A, bint loop=False, bint recursive=False):
+def haf_real(double[:, :] A, bint loop=False, bint recursive=False, quad=True):
     """Returns the hafnian of a real matrix A via the C++ hafnian library.
 
     Args:
@@ -169,6 +174,8 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=False):
         return loop_hafnian(mat)
 
     if recursive:
+        if quad:
+            return hafnian_recursive_quad(mat)
         return hafnian_recursive(mat)
 
     return hafnian(mat)

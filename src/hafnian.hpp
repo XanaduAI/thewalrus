@@ -382,6 +382,19 @@ inline T hafnian_recursive(std::vector<T> &mat) {
 }
 
 
+std::complex<double> hafnian_recursive_quad(std::vector<std::complex<double>> &mat) {
+    std::vector<std::complex<long double>> matq(mat.begin(), mat.end());
+    std::complex<long double> haf = hafnian_recursive(matq);
+    return static_cast<std::complex<double>>(haf);
+}
+
+double hafnian_recursive_quad(std::vector<double> &mat) {
+    std::vector<long double> matq(mat.begin(), mat.end());
+    long double haf = hafnian_recursive(matq);
+    return static_cast<double>(haf);
+}
+
+
 template <typename T>
 inline T hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));

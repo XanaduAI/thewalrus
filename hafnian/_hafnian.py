@@ -39,7 +39,7 @@ def kron_reduced(A, rpt):
     return A[:, rows][rows]
 
 
-def hafnian(A, loop=False, recursive=True, tol=1e-12):
+def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
     """Returns the hafnian of matrix A via the C++ hafnian library.
 
     For more direct control, you may wish to call :func:`haf_real`,
@@ -103,13 +103,13 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12):
 
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
-            return haf_complex(A, loop=loop, recursive=recursive)
-        return haf_real(np.float64(A.real), loop=loop, recursive=recursive)
+            return haf_complex(A, loop=loop, recursive=recursive, quad=quad)
+        return haf_real(np.float64(A.real), loop=loop, recursive=recursive, quad=quad)
 
     if np.all(np.mod(A, 1) == 0) and not loop:
         return haf_int(np.int64(A))
 
-    return haf_real(A, loop=loop, recursive=recursive)
+    return haf_real(A, loop=loop, recursive=recursive, quad=quad)
 
 
 def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
