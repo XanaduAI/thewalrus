@@ -31,6 +31,19 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
 
+    T torontonian[T](vector[T] &mat)
+
+
+def torontonian_complex(double complex[:, :] A):
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double complex] mat
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    return torontonian(mat)
+
 
 def haf_rpt_real(double[:, :] A, int[:] rpt, bint loop=False, bint use_eigen=True):
     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
