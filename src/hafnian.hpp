@@ -860,5 +860,10 @@ inline T torontonian(std::vector<T> &mat) {
     return netsum;
 }
 
+std::complex<double> torontonian_quad(std::vector<std::complex<double>> &mat) {
+    std::vector<std::complex<long double>> matq(mat.begin(), mat.end());
+    std::complex<long double> tor = torontonian(matq);
+    return static_cast<std::complex<double>>(tor);
+}
 
 }

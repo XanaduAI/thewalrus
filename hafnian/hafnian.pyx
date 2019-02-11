@@ -32,15 +32,19 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double complex hafnian_recursive_quad(vector[double complex] &mat)
 
     T torontonian[T](vector[T] &mat)
+    double complex torontonian_quad(vector[double complex] &mat)
 
 
-def torontonian_complex(double complex[:, :] A):
+def torontonian_complex(double complex[:, :] A, quad=True):
     cdef int i, j, n = A.shape[0]
     cdef vector[double complex] mat
 
     for i in range(n):
         for j in range(n):
             mat.push_back(A[i, j])
+
+    if quad:
+        return torontonian_quad(mat)
 
     return torontonian(mat)
 
