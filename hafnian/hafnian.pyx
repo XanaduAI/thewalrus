@@ -38,15 +38,19 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
 def torontonian_complex(double complex[:, :] A, quad=True):
     cdef int i, j, n = A.shape[0]
     cdef vector[double complex] mat
-
+    cdef int m = n/2
     for i in range(n):
         for j in range(n):
             mat.push_back(A[i, j])
 
-    if quad:
-        return torontonian_quad(mat)
+    cdef int sign=1
+    if m % 2 !=0:
+        sign = -1
 
-    return torontonian(mat)
+    if quad:
+        return sign*torontonian_quad(mat)
+
+    return sign*torontonian(mat)
 
 
 def haf_rpt_real(double[:, :] A, int[:] rpt, bint loop=False, bint use_eigen=True):
