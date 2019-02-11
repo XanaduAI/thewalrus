@@ -42,17 +42,17 @@
 namespace hafnian {
 
 
-
+  
 typedef struct {
   int last;
   long double p[SC_STACK];
 } sc_partials;
-
+  
 typedef unsigned char Byte;
 typedef std::complex<double> double_complex;
 typedef std::vector<double_complex> vec_complex;
 typedef std::vector<double> vec_double;
-
+  
 
 inline vec_complex powtrace(vec_complex &z, int n, int l) {
     // given a complex matrix z of dimensions n x n
@@ -757,7 +757,7 @@ char sum(char *dst, Byte m){
   return sum_tot;
 }
 
-
+  
 void sc_init(sc_partials *sum)
 {
   sum->p[sum->last = 0] = 0.0;
@@ -774,7 +774,7 @@ void sc_add(long double x, sc_partials *sum)
     x = hi;
     if (lo) sum->p[i++] = x, x = lo;
   }
-  if (i > 0 && isnan(x)) { sum->last = 0; return; }
+  if (i > 0 && std::isnan(x)) { sum->last = 0; return; }
   sum->p[ sum->last = i ] = x;
   if (i == SC_STACK - 1) sc_add(0.0, sum);
 }
@@ -796,7 +796,7 @@ long double sc_total(sc_partials *sum)
   }
   return x;
 }
-
+  
 
 template <typename T>
 inline T torontonian(std::vector<T> &mat) {
