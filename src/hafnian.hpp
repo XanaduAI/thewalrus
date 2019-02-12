@@ -831,19 +831,20 @@ inline T torontonian(std::vector<T> &mat) {
 
         // eg::Matrix<T,eg::Dynamic,eg::Dynamic> B(2*len, 2*len, 0.);
         eg::Matrix<T,eg::Dynamic,eg::Dynamic> B;
-        B.resize(2*static_cast<int>(len), 2*static_cast<int>(len));
+        int len_int = static_cast<int>(len);
+        B.resize(2*len_int, 2*len_int);
 
-        for (int i = 0; i < 2*len; i++){
-            for (int j = 0; j < 2*len; j++){
+        for (int i = 0; i < 2*len_int; i++){
+            for (int j = 0; j < 2*len_int; j++){
                 B(i, j) = -A(short_st[i], short_st[j]);
             }
         }
-        for (int i = 0; i < 2*len; i++){
+        for (int i = 0; i < 2*len_int; i++){
             B(i, i) += 1;
         }
 
         long double det = B.determinant().real();
-        if(len % 2 ==0){
+        if(len_int % 2 ==0){
             // sc_add(1.0/std::sqrt(det),&sum_s);
             netsum+=1.0/std::sqrt(det);
         }
