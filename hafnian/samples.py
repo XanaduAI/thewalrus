@@ -15,16 +15,12 @@
 Hafnian and torontonian sampling
 """
 # pylint: disable=too-many-arguments
-import random
-
 import numpy as np
+from scipy.special import factorial as fac
 
-from .quantum import Amat, Beta, Qmat, prefactor, density_matrix_element, reduced_gaussian, kron_reduced
-from .lib.libtor import torontonian_samples as libtor
-from hafnian.lib.libhaf import torontonian_complex
-import hafnian 
-
-
+from ._hafnian import hafnian, kron_reduced
+from .lib.libhaf import torontonian_complex
+from .quantum import Amat, Qmat, Xmat, reduced_gaussian
 
 
 def generate_hafnian_sample(cov, hbar=2, cutoff=6):
@@ -33,7 +29,6 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state.
-        mu (array): a length-:math:`2N` ``np.float64`` vector of means.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation (optional). This overwrites
@@ -53,30 +48,31 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
     for k in range(nmodes):
         probs1 = np.zeros([cutoff+1], dtype=np.float64)
         kk = np.arange(k+1)
-        mu_red, V_red = reduced_gaussian(mu, cov, kk)
+        _, V_red = reduced_gaussian(mu, cov, kk)
         Q = Qmat(V_red, hbar=hbar)
         A = Amat(Q, hbar=hbar, cov_is_qmat=True)
-     
+
         for i in range(cutoff):
             indices = result+[i]
             ind2 = indices+indices
-            factpref = np.prod([np.math.factorial(l) for l in indices])
 
-            probs1[i] = hafnian.hafnian(kron_reduced(A,ind2)).real/factpref
+            factpref = np.prod(fac(indices))
+            probs1[i] = hafnian(kron_reduced(A, ind2)).real/factpref
+
         probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
-        probs2 = (probs1a)/prev_prob
-        probs3 = np.maximum(probs2,np.zeros_like(probs2))
+        probs2 = probs1a/prev_prob
+        probs3 = np.maximum(probs2, np.zeros_like(probs2))
         ssum = np.sum(probs3)
+
         if ssum < 1.0:
             probs3[-1] = 1.0-ssum
         #if np.isnan(np.min(probs3)):
         #    result = -1*np.ones(nmodes, dtype=np.int16)
         #    return result.tolist()
-        
+
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
         if result[-1] == cutoff:
             return -1
-
 
         prev_prob = probs1a[result[-1]]
 
@@ -86,15 +82,12 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
     return result
 
 
-
-
 def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
     r"""Returns samples from the Hafnian of a Gaussian state.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state.
-        mu (array): a length-:math:`2N` ``np.float64`` vector of means.
         samples (int): the number of samples to return.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -110,7 +103,6 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
         raise TypeError("Covariance matrix must be a NumPy array.")
 
     matshape = cov.shape
-    N = matshape[0]
 
     if matshape[0] != matshape[1]:
         raise ValueError("Covariance matrix must be square.")
@@ -119,7 +111,7 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
         raise ValueError("Covariance matrix must not contain NaNs.")
 
     samples_array = []
-    j=0
+    j = 0
     #for _ in range(samples):
     while j < samples:
         result = generate_hafnian_sample(cov, hbar=hbar, cutoff=cutoff)
@@ -132,7 +124,7 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
 
 
 def torontonian_sample(cov, samples=1):
-    r"""Returns samples from the Torontonian of a Gaussian state 
+    r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -145,7 +137,6 @@ def torontonian_sample(cov, samples=1):
         raise TypeError("Covariance matrix must be a NumPy array.")
 
     matshape = cov.shape
-    N = matshape[0]
 
     if matshape[0] != matshape[1]:
         raise ValueError("Covariance matrix must be square.")
@@ -153,22 +144,17 @@ def torontonian_sample(cov, samples=1):
     if np.isnan(cov).any():
         raise ValueError("Covariance matrix must not contain NaNs.")
 
-
-
     samples_array = []
     for _ in range(samples):
-        seed = random.randint(0, 10**6)
         samples_array.append(generate_torontonian_sample(cov))
 
     return np.vstack(samples_array)
 
-def Xmat(nmodes):
-    X = np.block([[0*np.identity(nmodes),np.identity(nmodes)],[np.identity(nmodes),0*np.identity(nmodes)]])
-    return X
-
 
 def tor(O):
-    return torontonian_complex(O,quad=False).real
+    """Wrappper for the Torontonian function"""
+    return torontonian_complex(O, quad=False).real
+
 
 def generate_torontonian_sample(cov, hbar=2):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
@@ -182,41 +168,49 @@ def generate_torontonian_sample(cov, hbar=2):
     Returns:
         np.array[int]: samples from the Hafnian of the Gaussian state.
     """
-    result=[]
-    (n1,n2) = cov.shape
-    assert n1==n2
-    nmodes=n1//2
-    prev_prob=1.0
+    result = []
+    n1, n2 = cov.shape
+
+    if n1 != n2:
+        raise ValueError("Covariance matrix must be square.")
+
+    nmodes = n1//2
+    prev_prob = 1.0
     mu = np.zeros(n1)
+
     for k in range(nmodes):
         probs1 = np.zeros([2], dtype=np.float64)
         kk = np.arange(k+1)
-        mu_red, V_red = reduced_gaussian(mu, cov, kk)
+        _, V_red = reduced_gaussian(mu, cov, kk)
+
         Q = Qmat(V_red, hbar=hbar)
         A = Amat(Q, hbar=hbar, cov_is_qmat=True)
-
         O = Xmat(k+1) @ A
 
         indices = result+[0]
-        ind2 = indices+indices    
+        ind2 = indices+indices
 
-        probs1[0] = tor(np.complex128(kron_reduced(O,ind2))).real
+        probs1[0] = tor(np.complex128(kron_reduced(O, ind2))).real
 
         indices = result+[1]
-        ind2 = indices+indices    
-        probs1[1] = tor(np.complex128(kron_reduced(O,ind2))).real
+        ind2 = indices+indices
+        probs1[1] = tor(np.complex128(kron_reduced(O, ind2))).real
 
         probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
-        probs2=(probs1a)/prev_prob
-        probs3 = np.maximum(probs2,np.zeros_like(probs2))
+        probs2 = probs1a/prev_prob
+        probs3 = np.maximum(probs2, np.zeros_like(probs2))
+
         #ssum = np.sum(probs3)
         #if ssum < 1.0:
         #    probs3[-1] = 1.0-ssum
         #print(probs3)
-        probs3/=np.sum(probs3)
+
+        probs3 /= np.sum(probs3)
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
 
         prev_prob = probs1a[result[-1]]
-        if np.sum(result)>=30:
+
+        if np.sum(result) >= 30:
             break
+
     return result

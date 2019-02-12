@@ -69,10 +69,10 @@ def test_hafnian_samples_nans():
         hafnian_sample(np.array([[0, 5], [0, np.NaN]]), samples=20)
 
 
-def test_hafnian_samples_wronglength():
-    """test exception is raised if not a numpy array"""
-    with pytest.raises(ValueError, match="Means vector must be the same length as the covariance matrix."):
-        hafnian_sample(np.array([[0, 5], [0, 2]]), mu=np.array([5]), samples=20)
+# def test_hafnian_samples_wronglength():
+#     """test exception is raised if not a numpy array"""
+#     with pytest.raises(ValueError, match="Means vector must be the same length as the covariance matrix."):
+#         hafnian_sample(np.array([[0, 5], [0, 2]]), mu=np.array([5]), samples=20)
 
 
 def test_torontonian_samples_nonnumpy():
@@ -93,7 +93,7 @@ def test_torontonian_samples_nans():
         torontonian_sample(np.array([[0, 5], [0, np.NaN]]), samples=20)
 
 
-def test_torontonian_samples_wronglength():
-    """test exception is raised if not a numpy array"""
-    with pytest.raises(ValueError, match="Means vector must be the same length as the covariance matrix."):
-        torontonian_sample(np.array([[0, 5], [0, 2]]), mu=np.array([5]), samples=20)
+# def test_torontonian_samples_wronglength():
+#     """test exception is raised if not a numpy array"""
+#     with pytest.raises(ValueError, match="Means vector must be the same length as the covariance matrix."):
+#         torontonian_sample(np.array([[0, 5], [0, 2]]), mu=np.array([5]), samples=20)
