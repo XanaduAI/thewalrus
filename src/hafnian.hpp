@@ -42,7 +42,7 @@
 namespace hafnian {
 
 
-  /*  
+  /*
 typedef struct {
   int last;
   long double p[SC_STACK];
@@ -52,7 +52,7 @@ typedef unsigned char Byte;
 typedef std::complex<double> double_complex;
 typedef std::vector<double_complex> vec_complex;
 typedef std::vector<double> vec_double;
-  
+
 
 inline vec_complex powtrace(vec_complex &z, int n, int l) {
     // given a complex matrix z of dimensions n x n
@@ -757,7 +757,7 @@ char sum(char *dst, Byte m){
   return sum_tot;
 }
 
-  /*  
+  /*
 void sc_init(sc_partials *sum)
 {
   sum->p[sum->last = 0] = 0.0;
@@ -778,7 +778,7 @@ void sc_add(long double x, sc_partials *sum)
   sum->p[ sum->last = i ] = x;
   if (i == SC_STACK - 1) sc_add(0.0, sum);
 }
-  
+
 long double sc_total(sc_partials *sum)
 {
   for(;;) {
@@ -801,7 +801,7 @@ long double sc_total(sc_partials *sum)
 template <typename T>
 inline T torontonian(std::vector<T> &mat) {
     // Here weinput the matrix from python. The variable n is the size of the matrix
-    Byte n = std::sqrt(static_cast<double>(mat.size()));
+    int n = std::sqrt(static_cast<double>(mat.size()));
     Byte m = n/2;
     unsigned long long int x = static_cast<unsigned long long int>(pow(2,m));
 
@@ -810,7 +810,7 @@ inline T torontonian(std::vector<T> &mat) {
 
     namespace eg = Eigen;
     eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
-  
+
     for (int k = 0; k < x; k++){
         unsigned long long int xx = k;
         char dst[m];
