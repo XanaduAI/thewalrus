@@ -836,7 +836,7 @@ inline T torontonian(std::vector<T> &mat) {
 
         for (int i = 0; i < 2*len_int; i++){
             for (int j = 0; j < 2*len_int; j++){
-                B(i, j) = -A(short_st[i], short_st[j]);
+                B(i, j) = -A(static_cast<int>(short_st[i]), static_cast<int>(short_st[j]));
             }
         }
         for (int i = 0; i < 2*len_int; i++){
