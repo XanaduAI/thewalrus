@@ -810,7 +810,7 @@ inline T torontonian(std::vector<T> &mat) {
 
     namespace eg = Eigen;
     eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
-
+  
     for (int k = 0; k < x; k++){
         unsigned long long int xx = k;
         char dst[m];
