@@ -831,7 +831,7 @@ inline T torontonian(std::vector<T> &mat) {
 
         // eg::Matrix<T,eg::Dynamic,eg::Dynamic> B(2*len, 2*len, 0.);
         eg::Matrix<T,eg::Dynamic,eg::Dynamic> B;
-        B.resize(2*len, 2*len);
+        B.resize(2*static_cast<int>(len), 2*static_cast<int>(len));
 
         for (int i = 0; i < 2*len; i++){
             for (int j = 0; j < 2*len; j++){
