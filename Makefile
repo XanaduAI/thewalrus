@@ -10,6 +10,7 @@ help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  install            to install Hafnian"
 	@echo "  libperm            to compile the Fortran permanent library"
+	@echo "  libtor             to compile the Fortran torontonian library"
 	@echo "  wheel              to build the Hafnian wheel"
 	@echo "  dist               to package the source distribution"
 	@echo "  clean              to delete all temporary, cache, and build files"

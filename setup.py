@@ -111,7 +111,7 @@ if BUILD_EXT:
                 extra_compile_args=CFLAGS,
                 extra_link_args=extra_link_args_F90),
             Extension("libtor",
-                sources=["src/torontonian.F90"],
+                sources=["src/linpack_q_complex.f90", "src/torontonian.F90"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 extra_compile_args=CFLAGS,
