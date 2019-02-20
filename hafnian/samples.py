@@ -13,13 +13,33 @@
 # limitations under the License.
 """
 Hafnian and torontonian sampling
+================================
+
+.. currentmodule:: hafnian.samples
+
+This submodule provides access to algorithms to sample from the
+hafnian or the torontonian of Gaussian quantum states.
+
+
+Summary
+-------
+
+.. autosummary::
+    generate_hafnian_sample
+    hafnian_sample
+    generate_torontonian_sample
+    torontonian_sample
+
+
+Code details
+------------
 """
 # pylint: disable=too-many-arguments
 import numpy as np
 from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, kron_reduced
-from .lib.libhaf import torontonian_complex
+from ._torontonian import tor
 from .quantum import Amat, Qmat, Xmat, reduced_gaussian
 
 
@@ -149,11 +169,6 @@ def torontonian_sample(cov, samples=1):
         samples_array.append(generate_torontonian_sample(cov))
 
     return np.vstack(samples_array)
-
-
-def tor(O):
-    """Wrappper for the Torontonian function"""
-    return torontonian_complex(O, quad=False).real
 
 
 def generate_torontonian_sample(cov, hbar=2):

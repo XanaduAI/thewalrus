@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Quantum functions
-=================
+Hafnian quantum functions
+=========================
 
-For more details, see:
+.. currentmodule:: hafnian.quantum
+
+This submodule provides access to various utility functions that act on Gaussian
+quantum states.
+
+For more details on how the hafnian relates to various properties of Gaussian quantum
+states, see:
 
 * Kruse, R., Hamilton, C. S., Sansoni, L., Barkhofen, S., Silberhorn, C., & Jex, I.
   "A detailed study of Gaussian Boson Sampling." `arXiv:1801.07488. (2018).
@@ -24,6 +30,24 @@ For more details, see:
 * Hamilton, C. S., Kruse, R., Sansoni, L., Barkhofen, S., Silberhorn, C., & Jex, I.
   "Gaussian boson sampling." `Physical review letters, 119(17), 170501. (2017).
   <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.119.170501>`_
+
+
+Summary
+-------
+
+.. autosummary::
+    reduced_gaussian
+    Xmat
+    Qmat
+    Amat
+    Beta
+    prefactor
+    density_matrix_element
+    density_matrix
+
+
+Code details
+------------
 """
 # pylint: disable=too-many-arguments
 from itertools import product, count
@@ -68,7 +92,7 @@ def reduced_gaussian(mu, cov, modes):
 
 
 def Xmat(N):
-    r"""Returns the matrix :math:`X_n = \begin{bmatrix}0 & I_n\\ I_n & 0\end{bmatrix}
+    r"""Returns the matrix :math:`X_n = \begin{bmatrix}0 & I_n\\ I_n & 0\end{bmatrix}`
 
     Args:
         N (int): positive integer

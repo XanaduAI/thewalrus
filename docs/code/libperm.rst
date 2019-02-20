@@ -1,5 +1,5 @@
-Permanent Fortran interface
-===========================
+Permanent Fortran library
+=========================
 
 The Permanent Fortran interface allows calculation of the permanent of both real and complex matrices, using Ryser's algorithm.
 

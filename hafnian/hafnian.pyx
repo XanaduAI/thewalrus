@@ -167,6 +167,8 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, qu
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
         recursive (bool): If ``True``, the recursive algorithm is used. Note:
             the recursive algorithm does not currently support the loop hafnian.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
+            matrix internally for a quadruple precision hafnian computation.
 
     Returns:
         np.complex128: the hafnian of matrix A
@@ -198,6 +200,8 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
         recursive (bool): If ``True``, the recursive algorithm is used. Note:
             the recursive algorithm does not currently support the loop hafnian.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double``
+            matrix internally for a quadruple precision hafnian computation.
 
     Returns:
         np.float64: the hafnian of matrix A

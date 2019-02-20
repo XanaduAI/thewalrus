@@ -1,5 +1,5 @@
-Hafnian C++ interface
-=====================
+Hafnian C++ library
+===================
 
 The Hafnian C++ interface is provided as a header-only library, :download:`hafnian.hpp <../../src/hafnian.hpp>`, which can be included at the top of your source file:
 

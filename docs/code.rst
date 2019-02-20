@@ -6,7 +6,12 @@ The Hafnian library contains a Python frontend interface, and backend C/Fortran 
 Frontend
 ---------
 
-* The Python interface provides access to the C library hafnian algorithms, as well as the Fortran library permanent algorithms.
+* The :mod:`hafnian` Python interface provides access to various hafnian, permanent, and torontonian algorithms
+
+* The :mod:`hafnian.quantum` submodule provides access to various utility functions that act on Gaussian quantum states
+
+* The :mod:`hafnian.samples` submodule provides access to algorithms to sample from the hafnian or the torontonian of Gaussian quantum states
+
 
 Backends
 --------
@@ -14,6 +19,8 @@ Backends
 * The C library, ``libhaf.so`` for the hafnian and loop hafnian calculation of complex, real, and integer matrices.
 
 * The Fortran library, ``libperm.so`` for the permanent calculation of real and complex matrices.
+
+* The Fortran library, ``libtor.so`` for the permanent calculation of real and complex matrices.
 
 You can also use the C++ Hafnian library directly in your C++ projects - just ensure that the ``src`` folder is in your include path, and add
 

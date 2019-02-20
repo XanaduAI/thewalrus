@@ -54,8 +54,11 @@ if BUILD_EXT:
         from Cython.Build import cythonize
         ext = 'pyx'
     except:
+        def cythonize(x, compile_time_env=None):
+            return x
+
         USE_CYTHON = False
-        cythonize = lambda x: x
+        cythonize = cythonize
         ext = 'cpp'
 
 
