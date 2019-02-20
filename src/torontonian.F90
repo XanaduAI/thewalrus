@@ -137,6 +137,51 @@ module torontonian
     end subroutine tor
     !end function tor
 
+
+    subroutine det_real(matin, det_out)
+      use kinds
+      use vars
+      use omp_lib
+      use ISO_FORTRAN_ENV
+
+      implicit none
+
+      ! determinant work variables
+      real(wp)                  :: det(2), tmpdet
+      integer(kind=4)              :: info, lda, nn, job, i, j
+      integer(kind=4), allocatable :: ipvt(:)
+
+      real(wp), allocatable    :: work(:)
+      integer(ip)  :: n
+
+      real(dp), intent(in) :: matin(:, :)
+      real(wp), allocatable :: mat(:, :)
+      real(dp), intent(out) :: det_out
+
+      !f2py intent(in) :: matin
+      !f2py intent(out) :: det_out
+
+      nn = size(matin(1,:))
+      lda = nn
+
+      allocate(ipvt(1:nn), work(1:nn), mat(1:nn,1:nn))
+
+      forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
+
+     
+      call qgefa(mat, lda, nn, ipvt, info)
+      job = 10
+      call qgedi(mat, lda, nn, ipvt, det, work, job )
+      
+
+      tmpdet = det(1) * 10.0_wp**(real(det(2), wp)) 
+
+      det_out = real(tmpdet, dp)
+
+      deallocate(ipvt, work, mat)
+ 
+    end subroutine det_real
+
     subroutine dec2bin (kk, nnn, matt, summ)
         integer(ip), intent(in)  :: kk, nnn
         integer(ip), intent(out) :: matt(1:nnn)

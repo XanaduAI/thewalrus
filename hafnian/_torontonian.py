@@ -19,6 +19,7 @@ import numpy as np
 from .lib.libtor import torontonian as libtor
 
 tor_complex = libtor.tor
+det_real = libtor.det_real
 
 
 def tor(A):
@@ -41,3 +42,8 @@ def tor(A):
         raise ValueError("Input matrix must be square.")
 
     return tor_complex(A)
+
+
+def det(A):
+
+    return det_real(A)
