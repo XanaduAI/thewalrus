@@ -734,24 +734,20 @@ void find2T (char *dst, Byte len, Byte *pos, char offset)
        of the array pos.
        It also returns (twice) the number of ones in array dst
   */
-
   Byte j = offset-1;
-  for (Byte i = 0; i<len; i++)
-  //  for (Byte i = len-1; i>=0; i--)
-    {
-      if (1 == dst[i])
-    {
-      //      fprintf(stdout,"%d \n",len-i-1);
-      pos[j] = len-i-1;
-      pos[j + offset] = 2*len-i-1;
-      j--;
-    }
+
+  for (Byte i = 0; i<len; i++) {
+      if (1 == dst[i]) {
+            pos[j] = len-i-1;
+            pos[j + offset] = 2*len-i-1;
+            j--;
+        }
     }
 }
 
 char sum(char *dst, Byte m){
   char sum_tot = 0;
-  for(int i=0;i<m;i++){
+  for(int i=0;i<m;i++) {
     sum_tot += (Byte)dst[i];
   }
   return sum_tot;
@@ -777,8 +773,8 @@ inline T torontonian(std::vector<T> &mat) {
         dec2bin(dst,xx,m);
         char len = sum(dst,m);
 
-        Byte short_st[2*len];
-        find2T(dst,m,short_st,len);
+        Byte* short_st = new Byte[2*len];
+        find2T(dst, m, short_st, len);
         delete [] dst;
 
         // eg::Matrix<T,eg::Dynamic,eg::Dynamic> B(2*len, 2*len, 0.);
@@ -790,6 +786,9 @@ inline T torontonian(std::vector<T> &mat) {
                 B(i, j) = -A(short_st[i], short_st[j]);
             }
         }
+
+        delete [] short_st;
+
         for (int i = 0; i < 2*len; i++){
             B(i, i) += 1;
         }
