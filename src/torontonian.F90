@@ -86,8 +86,6 @@ module torontonian
 
         mat_dp1(:, :) = (0.0_dp, 0.0_dp)
 
-        print*, real(mat_dp1(1,1), wp)
-        print*, real(matin(1,1), wp) - real(real(matin(1,1)), dp)
 
         forall (i=1:n, j=1:n) mat(i,j) = zone*real(matin(i,j), wp) + zi*real(aimag(matin(i,j)), wp)!matdp(i,j)!(real(matdp(i,j), wp), aimag(matdp(i,j), wp))
 
@@ -98,8 +96,6 @@ module torontonian
         tmp3 = (mat(1,1) - real(tmp, wp)) - real(tmp2, wp)
         tmpqp = real(tmp, wp) + real(tmp2, wp) + real(tmp3, wp)
 
-        print*, tmp, tmp2, tmp3
-        print*, tmpqp 
 
         ell = n/2
 
