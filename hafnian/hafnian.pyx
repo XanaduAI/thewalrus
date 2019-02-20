@@ -49,7 +49,8 @@ def torontonian_complex(double complex[:, :] A, quad=True):
         for j in range(n):
             mat.push_back(A[i, j])
 
-    cdef int sign=1
+    cdef int sign = 1
+
     if m % 2 != 0:
         sign = -1
 

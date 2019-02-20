@@ -752,7 +752,7 @@ void find2T (char *dst, Byte len, Byte *pos, char offset)
 char sum(char *dst, Byte m){
   char sum_tot = 0;
   for(int i=0;i<m;i++){
-    sum_tot+=(Byte)dst[i];
+    sum_tot += (Byte)dst[i];
   }
   return sum_tot;
 }
@@ -766,41 +766,41 @@ inline T torontonian(std::vector<T> &mat) {
     unsigned long long int x = static_cast<unsigned long long int>(pow(2,m));
 
     T netsum = 0;
-    // sc_partials sum_s;
 
     namespace eg = Eigen;
     eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
 
     for (int k = 0; k < x; k++){
         unsigned long long int xx = k;
-        char dst[m];
+        char* dst = new char[m];
+
         dec2bin(dst,xx,m);
         char len = sum(dst,m);
 
         Byte short_st[2*len];
         find2T(dst,m,short_st,len);
+        delete [] dst;
 
         // eg::Matrix<T,eg::Dynamic,eg::Dynamic> B(2*len, 2*len, 0.);
         eg::Matrix<T,eg::Dynamic,eg::Dynamic> B;
-        int len_int = static_cast<int>(len);
-        B.resize(2*len_int, 2*len_int);
+        B.resize(2*len, 2*len);
 
-        for (int i = 0; i < 2*len_int; i++){
-            for (int j = 0; j < 2*len_int; j++){
-                B(i, j) = -A(static_cast<int>(short_st[i]), static_cast<int>(short_st[j]));
+        for (int i = 0; i < 2*len; i++){
+            for (int j = 0; j < 2*len; j++){
+                B(i, j) = -A(short_st[i], short_st[j]);
             }
         }
-        for (int i = 0; i < 2*len_int; i++){
+        for (int i = 0; i < 2*len; i++){
             B(i, i) += 1;
         }
 
         long double det = B.determinant().real();
 
-        if(len_int % 2 ==0){
-            netsum+=1.0/std::sqrt(det);
+        if(len % 2 ==0){
+            netsum += 1.0/std::sqrt(det);
         }
         else{
-            netsum-=1.0/std::sqrt(det);
+            netsum -= 1.0/std::sqrt(det);
         }
         // The set of integers that we will use to generate the new matrix is in the array short_st which has length 2*len
         // Then we calculate the det of the subarray
