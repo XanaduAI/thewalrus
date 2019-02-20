@@ -53,6 +53,7 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
             If ``loop=True``, then this keyword argument is ignored.
         tol (float): the tolerance when checking that the matrix is
             symmetric. Default tolerance is 1e-12.
+        quad (bool): If ``True``, the hafnian algorithm is performed with quadruple precision.
 
     Returns:
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
@@ -183,9 +184,6 @@ def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
         if np.any(np.iscomplex(A)):
             return haf_rpt_complex(A, nud, loop=loop, use_eigen=use_eigen)
         return haf_rpt_real(np.float64(A.real), nud, loop=loop, use_eigen=use_eigen)
-
-    if np.all(np.mod(A, 1) == 0):
-        return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
 
     return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
 

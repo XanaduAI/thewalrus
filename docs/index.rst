@@ -80,8 +80,18 @@ The hafnian library is **free** and **open source**, released under the Apache L
 
    code
    code/python
+   code/quantum
+   code/samples
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Hafnian libraries
+   :hidden:
+
    code/libhaf
    code/libperm
+   code/libtor
 
 
 Indices and tables

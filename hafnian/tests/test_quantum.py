@@ -200,6 +200,7 @@ def test_prefactor_with_displacement():
 
 
 def test_density_matrix_element_vacuum():
+    """Test density matrix elements for the vacuum"""
     Q = np.identity(2)
     A = np.zeros([2, 2])
     beta = np.zeros([2])
@@ -225,6 +226,7 @@ t2 = [[1,0,1],[0,0,1]], -0.004088994220552936-0.0009589367814578206j
 t3 = [[0,2,0],[0,0,0]], 0.003384487265468196-0.03127114305387707j
 t4 = [[0,2,0],[0,2,3]], -8.581668587044574e-05-6.134980446713632e-05j
 
+
 V = np.array([[0.6964938, 0.06016962, -0.01970064, 0.03794393, 0.07913992, -0.08890985],
              [0.06016962, 0.85435861, -0.01648842, 0.10493462, 0.01223525, 0.12484726],
              [-0.01970064, -0.01648842, 0.89450003, -0.13182502, 0.13529134, -0.10621978],
@@ -232,10 +234,13 @@ V = np.array([[0.6964938, 0.06016962, -0.01970064, 0.03794393, 0.07913992, -0.08
              [0.07913992, 0.01223525, 0.13529134, -0.11611807, 1.20819301, -0.0061647 ],
              [-0.08890985, 0.12484726, -0.10621978, 0.05634905, -0.0061647, 1.1636695 ]])
 
+
 mu = np.array([0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.33340778])
+
 
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_disp(t):
+    """Test density matrix elements for a state with displacement"""
     beta = Beta(mu)
     A = Amat(V)
     Q = Qmat(V)
@@ -256,6 +261,7 @@ t4 = [[0,2,0],[0,2,3]], 0
 
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_no_disp(t):
+    """Test density matrix elements for a state with no displacement"""
     beta = Beta(np.zeros([6]))
     A = Amat(V)
     Q = Qmat(V)
@@ -264,3 +270,92 @@ def test_density_matrix_element_no_disp(t):
     ex = t[1]
     res = density_matrix_element(beta, A, Q, el[0], el[1])
     assert np.allclose(ex, res)
+
+
+def test_density_matrix_vacuum():
+    """Test density matrix for a squeezed state"""
+    r = 0.43
+
+    mu = np.zeros([2])
+    V = np.identity(2)
+
+    res = density_matrix(mu, V)
+
+    expected = np.zeros([5, 5])
+    expected[0, 0] = 1
+
+    assert np.allclose(res, expected)
+
+
+def test_density_matrix_squeezed():
+    """Test density matrix for a squeezed state"""
+    r = 0.43
+
+    mu = np.zeros([2])
+    V = np.diag(np.array(np.exp([-2*r, 2*r])))
+
+    res = density_matrix(mu, V)
+
+    expected = np.array(
+        [[ 0.91417429, 0, -0.26200733, 0,  0.09196943],
+        [ 0,  0,  0, 0,  0],
+        [-0.26200733,  0,  0.07509273, 0, -0.02635894],
+        [ 0,  0,  0, 0,  0],
+        [ 0.09196943,  0, -0.02635894, 0,  0.00925248]])
+
+    assert np.allclose(res, expected)
+
+
+def test_density_matrix_displaced_squeezed():
+    """Test density matrix for a squeezed state"""
+    r = 0.43
+
+    mu = np.array([0.24, -0.2])
+    V = np.diag(np.array(np.exp([-2*r, 2*r])))
+
+    res = density_matrix(mu, V)
+
+    expected = np.array([[ 0.89054874,  0.15018085+0.05295904j, -0.23955467+0.01263025j, -0.0734589 -0.02452154j, 0.07862323-0.00868528j],
+       [ 0.15018085-0.05295904j,  0.02847564, -0.03964706+0.01637575j, -0.01384625+0.00023317j, 0.01274241-0.00614023j],
+       [-0.23955467-0.01263025j, -0.03964706-0.01637575j, 0.06461854,  0.01941242+0.00763805j, -0.02127257+0.00122123j],
+       [-0.0734589 +0.02452154j, -0.01384625-0.00023317j, 0.01941242-0.00763805j, 0.00673463, -0.00624626+0.00288134j],
+       [ 0.07862323+0.00868528j,  0.01274241+0.00614023j, -0.02127257-0.00122123j, -0.00624626-0.00288134j, 0.00702606]])
+
+    assert np.allclose(res, expected)
+
+
+def test_density_matrix_squeezed_postselect():
+    """Test density matrix for a squeezed state with postselection"""
+    r = 0.43
+
+    mu = np.zeros([4])
+    V = np.diag(np.array(np.exp([1, -2*r, 1, 2*r])))
+
+    res = density_matrix(mu, V, post_select={0: 0}, cutoff=15)[:5, :5]
+
+    expected = np.array(
+        [[ 0.91417429, 0, -0.26200733, 0,  0.09196943],
+        [ 0,  0,  0, 0,  0],
+        [-0.26200733,  0,  0.07509273, 0, -0.02635894],
+        [ 0,  0,  0, 0,  0],
+        [ 0.09196943,  0, -0.02635894, 0,  0.00925248]])
+
+    assert np.allclose(res, expected)
+
+
+def test_density_matrix_displaced_squeezed_postselect():
+    """Test density matrix for a squeezed state with postselection"""
+    r = 0.43
+
+    mu = np.array([0, 0.24, 0, -0.2])
+    V = np.diag(np.array(np.exp([1, -2*r, 1, 2*r])))
+
+    res = density_matrix(mu, V, post_select={0: 0}, cutoff=15)[:5, :5]
+
+    expected = np.array([[ 0.89054874,  0.15018085+0.05295904j, -0.23955467+0.01263025j, -0.0734589 -0.02452154j, 0.07862323-0.00868528j],
+       [ 0.15018085-0.05295904j,  0.02847564, -0.03964706+0.01637575j, -0.01384625+0.00023317j, 0.01274241-0.00614023j],
+       [-0.23955467-0.01263025j, -0.03964706-0.01637575j, 0.06461854,  0.01941242+0.00763805j, -0.02127257+0.00122123j],
+       [-0.0734589 +0.02452154j, -0.01384625-0.00023317j, 0.01941242-0.00763805j, 0.00673463, -0.00624626+0.00288134j],
+       [ 0.07862323+0.00868528j,  0.01274241+0.00614023j, -0.02127257-0.00122123j, -0.00624626-0.00288134j, 0.00702606]])
+
+    assert np.allclose(res, expected)

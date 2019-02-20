@@ -37,10 +37,13 @@ class TypeMock(type):
 MOCK_MODULES = [
     'numpy',
     'numpy.dtype',
+    'scipy',
+    'scipy.special',
     'cython',
     'hafnian.lib',
     'hafnian.lib.libhaf',
-    'hafnian.lib.libperm'
+    'hafnian.lib.libperm',
+    'hafnian.lib.libtor'
     ]
 
 mock = Mock()

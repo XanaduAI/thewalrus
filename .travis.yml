@@ -2,11 +2,12 @@ language: python
 env:
   global:
   - CIBW_SKIP="cp27-* cp34-* *i686"
-  - CIBW_BEFORE_BUILD_LINUX='curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
-    && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 &&
-    cp -rf Eigen {project}/src && pip install numpy scipy cython'
-  - CIBW_BEFORE_BUILD_MACOS='brew cask uninstall --force oclint && brew install gcc
-    eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython'
+  - CIBW_BEFORE_BUILD_LINUX='curl -sL -o {project}/src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
+    && curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
+    && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
+    && cp -rf Eigen {project}/src && pip install numpy scipy cython'
+  - CIBW_BEFORE_BUILD_MACOS='wget -O {project}/src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
+    && brew cask uninstall --force oclint && brew install gcc eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython'
   - CIBW_TEST_REQUIRES="numpy scipy pytest pytest-cov"
   - CIBW_TEST_COMMAND="python -m pytest {project}/hafnian"
   - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
@@ -45,6 +46,7 @@ before_install:
 install:
 - |
   if [ "$WHEEL" = "0" ]; then
+    curl -sL -o src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
     pip install -r requirements.txt
     pip install pytest pytest-cov wheel codecov
     pip install -e .

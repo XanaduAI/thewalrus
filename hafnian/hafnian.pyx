@@ -28,29 +28,40 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T loop_hafnian_rpt[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
 
+    T torontonian[T](vector[T] &mat)
+
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
 
-    T torontonian[T](vector[T] &mat)
     double complex torontonian_quad(vector[double complex] &mat)
+
+
+# ==============================================================================
+# Torontonian
 
 
 def torontonian_complex(double complex[:, :] A, quad=True):
     cdef int i, j, n = A.shape[0]
     cdef vector[double complex] mat
     cdef int m = n/2
+
     for i in range(n):
         for j in range(n):
             mat.push_back(A[i, j])
 
-    cdef int sign=1
-    if m % 2 !=0:
+    cdef int sign = 1
+
+    if m % 2 != 0:
         sign = -1
 
     if quad:
         return sign*torontonian_quad(mat)
 
     return sign*torontonian(mat)
+
+
+# ==============================================================================
+# Hafnian repeated
 
 
 def haf_rpt_real(double[:, :] A, int[:] rpt, bint loop=False, bint use_eigen=True):
@@ -117,6 +128,10 @@ def haf_rpt_complex(double complex[:, :] A, int[:] rpt, bint loop=False, bint us
     return hafnian_rpt(mat, nud, use_eigen)
 
 
+# ==============================================================================
+# Hafnian recursive
+
+
 def haf_int(long long[:, :] A):
     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
     Modified with permission from https://github.com/eklotek/Hafnian.
@@ -140,7 +155,11 @@ def haf_int(long long[:, :] A):
     return hafnian_recursive(mat)
 
 
-def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False, quad=True):
+# ==============================================================================
+# Hafnian recursive and powtrace
+
+
+def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, quad=True):
     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
 
     Args:
@@ -148,6 +167,8 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False, q
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
         recursive (bool): If ``True``, the recursive algorithm is used. Note:
             the recursive algorithm does not currently support the loop hafnian.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
+            matrix internally for a quadruple precision hafnian computation.
 
     Returns:
         np.complex128: the hafnian of matrix A
@@ -171,7 +192,7 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=False, q
     return hafnian(mat)
 
 
-def haf_real(double[:, :] A, bint loop=False, bint recursive=False, quad=True):
+def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):
     """Returns the hafnian of a real matrix A via the C++ hafnian library.
 
     Args:
@@ -179,6 +200,8 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=False, quad=True):
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
         recursive (bool): If ``True``, the recursive algorithm is used. Note:
             the recursive algorithm does not currently support the loop hafnian.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double``
+            matrix internally for a quadruple precision hafnian computation.
 
     Returns:
         np.float64: the hafnian of matrix A

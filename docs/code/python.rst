@@ -43,7 +43,7 @@ via the functions:
     :rtype: np.float64
 
 
-.. py:function:: haf_real(A, loop=False, recursive=False)
+.. py:function:: haf_real(A, loop=False, recursive=True, quad=True)
 
     Returns the hafnian or loop hafnian of a real symmetric matrix A by directly querying the C++ hafnian library.
 
@@ -51,11 +51,13 @@ via the functions:
     :param bool loop: If ``True``, the loop hafnian is returned. Default false.
     :param bool recursive: If ``True``, the recursive algorithm is used. Note:
         the recursive algorithm does not currently support the loop hafnian.
+    :param bool quad: If ``True``, the input matrix is cast to a ``long double complex``
+        matrix internally for a quadruple precision hafnian computation.
     :return: the hafnian of matrix A
     :rtype: ``np.float64``
 
 
-.. py:function:: haf_complex(A, loop=False, recursive=False)
+.. py:function:: haf_complex(A, loop=False, recursive=True, quad=True)
 
     Returns the hafnian or loop hafnian of a complex symmetric matrix A by directly querying the C++ hafnian library.
 
@@ -63,6 +65,8 @@ via the functions:
     :param bool loop: If ``True``, the loop hafnian is returned. Default false.
     :param bool recursive: If ``True``, the recursive algorithm is used. Note:
         the recursive algorithm does not currently support the loop hafnian.
+    :param bool quad: If ``True``, the input matrix is cast to a ``long double complex``
+        matrix internally for a quadruple precision hafnian computation.
     :return: the hafnian of matrix A
     :rtype: ``np.complex128``
 
