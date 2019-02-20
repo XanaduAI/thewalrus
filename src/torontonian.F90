@@ -82,19 +82,9 @@ module torontonian
 
         n = size(matin(1,:))
 
-        allocate(mat(1:n, 1:n), mat_dp1(1:n, 1:n),mat_dp2(1:n, 1:n), mat_dp3(1:n, 1:n))
-
-        mat_dp1(:, :) = (0.0_dp, 0.0_dp)
-
+        allocate(mat(1:n, 1:n))
 
         forall (i=1:n, j=1:n) mat(i,j) = zone*real(matin(i,j), wp) + zi*real(aimag(matin(i,j)), wp)!matdp(i,j)!(real(matdp(i,j), wp), aimag(matdp(i,j), wp))
-
-        forall (i=1:n, j=1:n) mat_dp1(i, j) = (1.0_dp, 0.0_dp)*real(matin(i,j), dp) + (0.0_dp, 1.0_dp)*real(aimag(matin(i,j)), dp)
-
-        tmp = real(mat(1,1), dp)
-        tmp2 = mat(1,1) - real(tmp, wp)
-        tmp3 = (mat(1,1) - real(tmp, wp)) - real(tmp2, wp)
-        tmpqp = real(tmp, wp) + real(tmp2, wp) + real(tmp3, wp)
 
 
         ell = n/2
