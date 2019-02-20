@@ -4,7 +4,7 @@ environment:
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
       EIGEN_INCLUDE_DIR: C:\eigen-eigen-323c052e1731\
       TEST_TIMEOUT: 1000
-      CIBW_BEFORE_BUILD: copy "C:\linpack_q_complex.f90" {project}/src && pip install numpy scipy cython
+      CIBW_BEFORE_BUILD: copy "C:\linpack_q_complex.f90" "{project}\src" && pip install numpy scipy cython
       CIBW_SKIP: "cp27-* cp33-* cp34-* *win32"
       CIBW_TEST_REQUIRES: "numpy scipy pytest pytest-cov"
       CIBW_TEST_COMMAND: "python -m pytest {project}/hafnian"
