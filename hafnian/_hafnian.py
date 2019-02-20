@@ -184,9 +184,6 @@ def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
             return haf_rpt_complex(A, nud, loop=loop, use_eigen=use_eigen)
         return haf_rpt_real(np.float64(A.real), nud, loop=loop, use_eigen=use_eigen)
 
-    if np.all(np.mod(A, 1) == 0):
-        return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
-
     return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
 
 

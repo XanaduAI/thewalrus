@@ -757,46 +757,6 @@ char sum(char *dst, Byte m){
   return sum_tot;
 }
 
-  /*
-void sc_init(sc_partials *sum)
-{
-  sum->p[sum->last = 0] = 0.0;
-}
-
-void sc_add(long double x, sc_partials *sum)
-{
-  int i=0;
-  long double y, hi, lo;
-  for(int j=0; j <= sum->last; j++) {
-    y = sum->p[j];
-    hi = x + y;
-    lo = (fabs(x) < fabs(y)) ? x - (hi - y) : y - (hi - x);
-    x = hi;
-    if (lo) sum->p[i++] = x, x = lo;
-  }
-  if (i > 0 && std::isnan(x)) { sum->last = 0; return; }
-  sum->p[ sum->last = i ] = x;
-  if (i == SC_STACK - 1) sc_add(0.0, sum);
-}
-
-long double sc_total(sc_partials *sum)
-{
-  for(;;) {
-    int n = sum->last + 1;      // number of partials
-    long double prev[SC_STACK];
-    memcpy(prev, sum->p, n * sizeof(long double));
-    sc_add(0.0, sum);           // remove partials overlap
-    if (n == sum->last + 1)
-      if (memcmp(prev, sum->p, n * sizeof(long double)) == 0) break;
-  }
-  long double x = sum->p[0], lo = sum->p[1];
-  if (sum->last > 1 && (lo < 0) == (sum->p[2] < 0)) {
-    long double hi = x + (lo *= 2);
-    if (lo == (hi - x)) x = hi; // half-way case
-  }
-  return x;
-}
-  */
 
 template <typename T>
 inline T torontonian(std::vector<T> &mat) {
@@ -815,19 +775,10 @@ inline T torontonian(std::vector<T> &mat) {
         unsigned long long int xx = k;
         char dst[m];
         dec2bin(dst,xx,m);
-        //    for(int i=0;i<m;i++){
-        //      fprintf(stdout,"%d", (int)dst[i]);
-        //    }
         char len = sum(dst,m);
-        // fprintf(stdout,"\n%d \n\n",(int)len);
 
         Byte short_st[2*len];
         find2T(dst,m,short_st,len);
-
-        //for(int i=0;i<2*len;i++){
-        //  std::cout << static_cast<int>(short_st[i]) << ",";
-        //}
-        //std::cout << std::endl;
 
         // eg::Matrix<T,eg::Dynamic,eg::Dynamic> B(2*len, 2*len, 0.);
         eg::Matrix<T,eg::Dynamic,eg::Dynamic> B;
@@ -844,20 +795,17 @@ inline T torontonian(std::vector<T> &mat) {
         }
 
         long double det = B.determinant().real();
+
         if(len_int % 2 ==0){
-            // sc_add(1.0/std::sqrt(det),&sum_s);
             netsum+=1.0/std::sqrt(det);
         }
         else{
-            // sc_add(-1.0/std::sqrt(det),&sum_s);
             netsum-=1.0/std::sqrt(det);
         }
         // The set of integers that we will use to generate the new matrix is in the array short_st which has length 2*len
         // Then we calculate the det of the subarray
         // we add it the sign (-1)^len and we are done
     }
-    // long double netsum2 = sc_total(&sum_s);
-    // std::cout << "netsum =" << netsum << " netsum2 = " << netsum2 << std::endl;
     return netsum;
 }
 
