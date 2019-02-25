@@ -23,7 +23,8 @@ module vars
 
 
     complex(wp), parameter :: zzero = (0.0_wp, 0.0_wp), zone = (1.0_wp, 0.0_wp), zi = (0.0_wp, 1.0_wp)
-
+    real(wp), parameter :: pi = 3.141592653589793238462643383279
+   
     character :: mattype*10
 
 end module vars

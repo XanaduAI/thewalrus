@@ -17,7 +17,9 @@ Hafnian Python interface
 import numpy as np
 
 from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
+from .lib.libhafnonneg import hafnian_approx 
 
+hafnonneg = hafnian_approx.hafnian_nonneg
 
 def kron_reduced(A, rpt):
     r"""Calculates the reduced Kronecker product :math:`A^{\oplus 2}\cancel{\otimes}J`.
@@ -38,6 +40,8 @@ def kron_reduced(A, rpt):
 
     return A[:, rows][rows]
 
+def hafnian_nonneg(A, N):
+    return hafnonneg(A, N)
 
 def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
     """Returns the hafnian of matrix A via the C++ hafnian library.
