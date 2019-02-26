@@ -43,7 +43,8 @@ MOCK_MODULES = [
     'hafnian.lib',
     'hafnian.lib.libhaf',
     'hafnian.lib.libperm',
-    'hafnian.lib.libtor'
+    'hafnian.lib.libtor',
+    'hafnian.lib.libhafapprox'
     ]
 
 mock = Mock()

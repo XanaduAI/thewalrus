@@ -12,8 +12,6 @@
 ! See the License for the specific language governing permissions and
 ! limitations under the License.
 
-
-
 module torontonian
     use kinds
     use vars
@@ -25,44 +23,18 @@ module torontonian
 
     contains
 
-    subroutine hello(varin, varout)
-      use kinds
-   
-      real(dp), intent(in) :: varin
-      real(wp) :: tmp
-      real(dp), intent(out) :: varout
-
-      !f2py intent(in) :: varin
-      !f2py intent(out) :: varout
-
-      print*, 'varin=', varin
-      tmp = real(varin, wp)
-      varout = tmp!real(tmp, dp)
-      print*, 'varout=', varout
- 
-      print*, "hello from Toronotnian!"
-    end subroutine hello
-
-    !function tor(mat)
     subroutine tor(matin, tor_out)
-      use kinds
-      use vars
-      use omp_lib
-      use ISO_FORTRAN_ENV
-
-      implicit none
-
-        complex(dp), intent(in) :: matin(:, :)
-        complex(wp), allocatable :: mat(:, :)
-        complex(dp), allocatable :: mat_dp1(:, :), mat_dp2(:, :), mat_dp3(:, :)
-        !complex(wp) :: tor
+        complex(dp), intent(in)  :: matin(:, :)
         complex(dp), intent(out) :: tor_out
-        real(dp) :: tmp, tmp2, tmp3
-        real(wp) :: tmpqp
 
         ! local variables
-        integer(ip) :: n, i, j, k, total, cntr, ell, ii, nthreads
-        complex(wp) :: tmpsum_complex, invdet_complex
+        complex(wp), allocatable :: mat(:, :)
+        complex(dp), allocatable :: mat_dp1(:, :), mat_dp2(:, :), mat_dp3(:, :)
+
+        real(dp)     :: tmp, tmp2, tmp3
+        real(wp)     :: tmpqp
+        integer(ip2) :: n, i, j, k, total, cntr, ell, ii, nthreads
+        complex(wp)  :: tmpsum_complex, invdet_complex
 
         ! result variables
         complex(wp), allocatable :: submat_comp(:, :)
@@ -70,15 +42,11 @@ module torontonian
         ! determinant work variables
         complex(wp)                  :: det_complex(2)
         integer(kind=4)              :: info, lda, nn, job
-        integer(kind=4), allocatable :: ipvt(:)
 
-        real(wp), allocatable    :: work(:)
-        complex(wp), allocatable :: work_complex(:)
-        integer(ip), allocatable :: bin(:), iter(:), iter2(:)
-
-
-        !f2py intent(in) :: matin
-        !f2py intent(out) :: tor_out
+        integer(kind=4), allocatable :: ip2vt(:)
+        real(wp), allocatable        :: work(:)
+        complex(wp), allocatable     :: work_complex(:)
+        integer(ip2), allocatable    :: bin(:), iter(:), iter2(:)
 
         n = size(matin(1,:))
 
@@ -94,7 +62,7 @@ module torontonian
         tmpsum_complex = zzero
 
         !$OMP PARALLEL DO shared(mat, ell, mattype) private(ii, bin, total, submat_comp, &
-        !$OMP                    cntr, k, iter, iter2, ipvt, nn, work_complex, det_complex, job, &
+        !$OMP                    cntr, k, iter, iter2, ip2vt, nn, work_complex, det_complex, job, &
         !$OMP                     invdet_complex, lda) reduction(+:tmpsum_complex)
 
         do ii=0, 2**ell-1
@@ -119,15 +87,15 @@ module torontonian
             lda = 2*total
             nn = 2*total
 
-            allocate(ipvt(1:nn), work_complex(1:nn))
+            allocate(ip2vt(1:nn), work_complex(1:nn))
 
-            call qgefa_complex(submat_comp, lda, nn, ipvt, info)
+            call qgefa_complex(submat_comp, lda, nn, ip2vt, info)
             job = 10
-            call qgedi_complex (submat_comp, lda, nn, ipvt, det_complex, work_complex, job )
+            call qgedi_complex(submat_comp, lda, nn, ip2vt, det_complex, work_complex, job )
             invdet_complex = zone/det_complex(1) * 10.0_wp**(-real(det_complex(2)))
             tmpsum_complex = tmpsum_complex + (-1.0_wp)**(ell-total)*sqrt(invdet_complex)
             !print*, tmpsum_complex
-            deallocate(iter, iter2, submat_comp, ipvt, work_complex)
+            deallocate(iter, iter2, submat_comp, ip2vt, work_complex)
         end do
         !$OMP END PARALLEL DO
 
@@ -135,60 +103,78 @@ module torontonian
         tor_out = tmpsum_complex
 
     end subroutine tor
-    !end function tor
-
 
     subroutine det_real(matin, det_out)
-      use kinds
-      use vars
-      use omp_lib
-      use ISO_FORTRAN_ENV
+        real(dp), intent(in)  :: matin(:, :)
+        real(dp), intent(out) :: det_out
 
-      implicit none
+        ! determinant work variables
+        real(wp)        :: det(2), tmpdet
+        integer(kind=4) :: info, lda, nn, job, i, j
+        integer(ip2)    :: n
 
-      ! determinant work variables
-      real(wp)                  :: det(2), tmpdet
-      integer(kind=4)              :: info, lda, nn, job, i, j
-      integer(kind=4), allocatable :: ipvt(:)
+        integer(kind=4), allocatable :: ip2vt(:)
+        real(wp), allocatable        :: work(:), mat(:, :)
 
-      real(wp), allocatable    :: work(:)
-      integer(ip)  :: n
+        nn = size(matin(1,:))
+        lda = nn
 
-      real(dp), intent(in) :: matin(:, :)
-      real(wp), allocatable :: mat(:, :)
-      real(dp), intent(out) :: det_out
+        allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
 
-      !f2py intent(in) :: matin
-      !f2py intent(out) :: det_out
+        forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
 
-      nn = size(matin(1,:))
-      lda = nn
+        call qgefa(mat, lda, nn, ip2vt, info)
 
-      allocate(ipvt(1:nn), work(1:nn), mat(1:nn,1:nn))
+        job = 10
 
-      forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
+        call qgedi(mat, lda, nn, ip2vt, det, work, job )
 
-     
-      call qgefa(mat, lda, nn, ipvt, info)
-      job = 10
-      call qgedi(mat, lda, nn, ipvt, det, work, job )
-      
+        tmpdet = det(1) * 10.0_wp**(real(det(2), wp))
 
-      tmpdet = det(1) * 10.0_wp**(real(det(2), wp)) 
+        det_out = real(tmpdet, dp)
 
-      det_out = real(tmpdet, dp)
-
-      deallocate(ipvt, work, mat)
- 
+        deallocate(ip2vt, work, mat)
     end subroutine det_real
 
+    subroutine det_complex(matin, det_out)
+        complex(dp), intent(in)  :: matin(:, :)
+        complex(dp), intent(out) :: det_out
+
+        ! determinant work variables
+        complex(wp)     :: det(2), tmpdet
+        integer(kind=4) :: info, lda, nn, job, i, j
+        integer(ip2)    :: n
+
+        integer(kind=4), allocatable :: ip2vt(:)
+        complex(wp), allocatable     :: work(:), mat(:, :)
+
+        nn = size(matin(1,:))
+        lda = nn
+
+        allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
+
+        forall (i=1:nn, j=1:nn) mat(i,j) = zone*real(matin(i,j), wp) + zi*real(aimag(matin(i,j)), wp)
+
+        call qgefa_complex(mat, lda, nn, ip2vt, info)
+
+        job = 10
+
+        call qgedi_complex(mat, lda, nn, ip2vt, det, work, job)
+
+        tmpdet = det(1) * 10.0_wp**(real(det(2), wp))
+
+        det_out = zone*real(tmpdet, wp) + zi*real(aimag(tmpdet), wp)
+
+        deallocate(ip2vt, work, mat)
+    end subroutine det_complex
+
     subroutine dec2bin (kk, nnn, matt, summ)
-        integer(ip), intent(in)  :: kk, nnn
-        integer(ip), intent(out) :: matt(1:nnn)
-        integer(ip), intent(out) :: summ
+        integer(ip2), intent(in)  :: kk, nnn
+        integer(ip2), intent(out) :: matt(1:nnn)
+        integer(ip2), intent(out) :: summ
 
         ! local variables
-        integer(ip) :: i, k
+        integer(ip2) :: i, k
 
         matt(:) = 0
 
@@ -202,9 +188,6 @@ module torontonian
         end do
 
         summ = sum(matt(1:nnn))
-
     end subroutine dec2bin
-
-
 
 end module torontonian

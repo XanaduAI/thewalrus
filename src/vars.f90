@@ -17,15 +17,21 @@ module vars
     use kinds
     implicit none
 
-    ! real(wp), dimension(:, :), allocatable    :: mat, inv_mat
-    !real(wp), dimension(:, :), allocatable    :: mat_comp_real, mat_comp_imag
-    complex(wp), dimension(:, :), allocatable :: inv_mat_comp
+    real(wp), parameter    :: pi = 3.141592653589793238462643383279
+    complex(wp), parameter :: zzero = (0.0_wp, 0.0_wp), &
+                              zone = (1.0_wp, 0.0_wp), &
+                              zi = (0.0_wp, 1.0_wp)
+
+    ! torontonian variables
+    character                :: mattype*10
+    complex(wp), allocatable :: inv_mat_comp(:, :)
 
 
-    complex(wp), parameter :: zzero = (0.0_wp, 0.0_wp), zone = (1.0_wp, 0.0_wp), zi = (0.0_wp, 1.0_wp)
-    real(wp), parameter :: pi = 3.141592653589793238462643383279
-   
-    character :: mattype*10
+    ! permanent variables
+    integer(ip)            :: nn, nni, maxthreads
+    real(wp), parameter    :: oneoverlog2 = 1.0_wp/log(2.0_wp)
+
+    namelist /input/ nni, nn, maxthreads
 
 end module vars
 

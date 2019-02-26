@@ -20,6 +20,7 @@ from .lib.libtor import torontonian as libtor
 
 tor_complex = libtor.tor
 det_real = libtor.det_real
+det_complex = libtor.det_complex
 
 
 def tor(A):
@@ -45,5 +46,23 @@ def tor(A):
 
 
 def det(A):
+    """Returns the determinant of a square matrix, calculated using quadruple precision.
+
+    .. note::
+
+        This function uses a modified version of the Fortran LINPACK_Q library
+        in order to calculate the determinant of the matrix using quadruple precision.
+
+    Args:
+        A (array): a real or complex square array.
+
+    Returns:
+        float or complex: determinant of A.
+    """
+    if A.dtype == np.complex:
+        if np.any(np.iscomplex(A)):
+            return det_complex(A)
+
+        return det_real(A.real)
 
     return det_real(A)

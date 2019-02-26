@@ -38,12 +38,12 @@ Code details
 import numpy as np
 from scipy.special import factorial as fac
 
-from ._hafnian import hafnian, kron_reduced
+from ._hafnian import hafnian, hafnian_approx, kron_reduced
 from ._torontonian import tor
 from .quantum import Amat, Qmat, Xmat, reduced_gaussian
 
 
-def generate_hafnian_sample(cov, hbar=2, cutoff=6):
+def generate_hafnian_sample(cov, hbar=2, cutoff=6, approx=False, approx_samples=1e5):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -51,10 +51,11 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
             representing an :math:`N` mode quantum state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
-        cutoff (int): the Fock basis truncation (optional). This overwrites
-            ``tol`` if used.
-        tol (float): determines dynamically the cutoff to use, by determining
-            :math:`D` such that :math:`\sum_{i=0}^D\mathfrak{P}_i > 1-\epsilon`.
+        cutoff (int): the Fock basis truncation.
+        approx (bool): if ``True``, the :func:`~.hafnian_approx` function is used
+            to approximate the hafnian. Note that this can only be used for
+            real, non-negative matrices.
+        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
 
     Returns:
         np.array[int]: samples from the Hafnian of the Gaussian state.
@@ -77,7 +78,12 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
             ind2 = indices+indices
 
             factpref = np.prod(fac(indices))
-            probs1[i] = hafnian(kron_reduced(A, ind2)).real/factpref
+            mat = kron_reduced(A, ind2)
+
+            if approx:
+                probs1[i] = hafnian_approx(mat, num_samples=approx_samples).real/factpref
+            else:
+                probs1[i] = hafnian(mat).real/factpref
 
         probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a/prev_prob
@@ -86,9 +92,6 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
 
         if ssum < 1.0:
             probs3[-1] = 1.0-ssum
-        #if np.isnan(np.min(probs3)):
-        #    result = -1*np.ones(nmodes, dtype=np.int16)
-        #    return result.tolist()
 
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
         if result[-1] == cutoff:
@@ -96,13 +99,10 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6):
 
         prev_prob = probs1a[result[-1]]
 
-#       if np.sum(result)>30:
-#           break
-#       print(k,prev_prob,np.sum(result))
     return result
 
 
-def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
+def hafnian_sample(cov, samples=1, hbar=2, cutoff=5, approx=False, approx_samples=1e5):
     r"""Returns samples from the Hafnian of a Gaussian state.
 
     Args:
@@ -111,10 +111,11 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
         samples (int): the number of samples to return.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
-        cutoff (int): the Fock basis truncation (optional). This overwrites
-            ``tol`` if used.
-        tol (float): determines dynamically the cutoff to use, by determining
-            :math:`D` such that :math:`\sum_{i=0}^D\mathfrak{P}_i > 1-\epsilon`.
+        cutoff (int): the Fock basis truncation.
+        approx (bool): if ``True``, the :func:`~.hafnian_approx` function is used
+            to approximate the hafnian. Note that this can only be used for
+            real, non-negative matrices.
+        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
 
     Returns:
         np.array[int]: samples from the Torontonian of the covariance matrix.
@@ -132,15 +133,14 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5):
 
     samples_array = []
     j = 0
-    #for _ in range(samples):
+
     while j < samples:
-        result = generate_hafnian_sample(cov, hbar=hbar, cutoff=cutoff)
+        result = generate_hafnian_sample(cov, hbar=hbar, cutoff=cutoff, approx=approx, approx_samples=approx_samples)
         if result != -1:
+            # if result == -1, then you never get anything beyond cutoff
             samples_array.append(result)
             j = j+1
-        # The if above implies that you never get see anything beyond cutoff
     return np.vstack(samples_array)
-    #return samples_array
 
 
 def torontonian_sample(cov, samples=1):
@@ -214,11 +214,6 @@ def generate_torontonian_sample(cov, hbar=2):
         probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a/prev_prob
         probs3 = np.maximum(probs2, np.zeros_like(probs2))
-
-        #ssum = np.sum(probs3)
-        #if ssum < 1.0:
-        #    probs3[-1] = 1.0-ssum
-        #print(probs3)
 
         probs3 /= np.sum(probs3)
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))

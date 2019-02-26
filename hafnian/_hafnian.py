@@ -17,9 +17,47 @@ Hafnian Python interface
 import numpy as np
 
 from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
-from .lib.libhafnonneg import hafnian_approx 
+from .lib.libhafapprox import hafnian_approx as libhafapprox
 
-hafnonneg = hafnian_approx.hafnian_nonneg
+
+hafnian_nonneg = libhafapprox.hafnian_nonneg
+
+
+def input_validation(A, tol=1e-12):
+    """Checks that the matrix A satisfies the requirements for Hafnian calculation.
+
+    These include:
+
+    * That the ``A`` is a NumPy array
+    * That ``A`` is square
+    * That ``A`` does not contain any NaNs
+    * That ``A`` is symmetric
+
+    Args:
+        A (array): a NumPy array.
+        tol (float): the tolerance when checking that the matrix is
+            symmetric. Default tolerance is 1e-12.
+
+    Returns:
+        bool: returns True if the matrix satisfies all requirements.
+    """
+
+    if not isinstance(A, np.ndarray):
+        raise TypeError("Input matrix must be a NumPy array.")
+
+    n = A.shape
+
+    if n[0] != n[1]:
+        raise ValueError("Input matrix must be square.")
+
+    if np.isnan(A).any():
+        raise ValueError("Input matrix must not contain NaNs.")
+
+    if np.linalg.norm(A-A.T) >= tol:
+        raise ValueError("Input matrix must be symmetric.")
+
+    return True
+
 
 def kron_reduced(A, rpt):
     r"""Calculates the reduced Kronecker product :math:`A^{\oplus 2}\cancel{\otimes}J`.
@@ -40,8 +78,33 @@ def kron_reduced(A, rpt):
 
     return A[:, rows][rows]
 
-def hafnian_nonneg(A, N):
-    return hafnonneg(A, N)
+
+def hafnian_approx(A, num_samples=1e5, tol=1e-12):
+    r"""Approximates the Hafnian via classical sampling methods.
+
+    Currently, this function only supports Hafnian approximations
+    of real, non-negative matrices.
+
+    Args:
+        A (array): a square, symmetric array of even dimensions.
+        num_samples (int): the number of determinant samples to perform
+            to approximate the hafnian.
+        tol (float): the tolerance when checking that the matrix is
+            symmetric. Default tolerance is 1e-12.
+
+    Returns:
+        float: the approximate hafnian of matrix A.
+    """
+    input_validation(A, tol=tol)
+
+    if np.any(np.iscomplex(A)):
+        raise ValueError("Input matrix must be real.")
+
+    if np.any(A < 0):
+        raise ValueError("Input matrix not have negative entries.")
+
+    return hafnian_nonneg(A, num_samples)
+
 
 def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
     """Returns the hafnian of matrix A via the C++ hafnian library.
@@ -63,22 +126,12 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
     """
     # pylint: disable=too-many-return-statements,too-many-branches
-    if not isinstance(A, np.ndarray):
-        raise TypeError("Input matrix must be a NumPy array.")
+    input_validation(A, tol=tol)
 
     matshape = A.shape
 
     if matshape == (0, 0):
         return 1
-
-    if matshape[0] != matshape[1]:
-        raise ValueError("Input matrix must be square.")
-
-    if np.isnan(A).any():
-        raise ValueError("Input matrix must not contain NaNs.")
-
-    if np.linalg.norm(A-A.T) >= tol:
-        raise ValueError("Input matrix must be symmetric.")
 
     if matshape[0] % 2 != 0 and not loop:
         return 0.0
@@ -156,19 +209,7 @@ def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
     """
     # pylint: disable=too-many-return-statements,too-many-branches
-    if not isinstance(A, np.ndarray):
-        raise TypeError("Input matrix must be a NumPy array.")
-
-    matshape = A.shape
-
-    if matshape[0] != matshape[1]:
-        raise ValueError("Input matrix must be square.")
-
-    if np.isnan(A).any():
-        raise ValueError("Input matrix must not contain NaNs.")
-
-    if np.linalg.norm(A-A.T) >= tol:
-        raise ValueError("Input matrix must be symmetric.")
+    input_validation(A, tol=tol)
 
     if len(rpt) != len(A):
         raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")

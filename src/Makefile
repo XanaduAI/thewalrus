@@ -36,5 +36,8 @@ libperm: permanent.F90
 libtor: linpack_q_complex.f90 torontonian.F90
 	$(FC) $^ $(FFLAGS) -shared -o $@.so
 
+libhafapprox: linpack_q_complex.f90 hafnian_approx.F90
+	$(FC) $^ $(FFLAGS) -shared -o $@.so
+
 clean:
 	rm -rf *~ *.out *.o *.so *.pyc *.mod

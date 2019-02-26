@@ -20,7 +20,8 @@ module kinds
     integer, parameter :: dp = selected_real_kind(9,99)
     integer, parameter :: qp = selected_real_kind(20, 199)
     integer, parameter :: wp = qp
-    integer, parameter :: ip = selected_int_kind(16)
+    integer, parameter :: ip = selected_int_kind(8)
+    integer, parameter :: ip2 = selected_int_kind(16)
 
     ! These empty arrays are used to initialize variables to either the min or
     ! max possible number of kind wp or integer.
