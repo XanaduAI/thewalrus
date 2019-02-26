@@ -95,6 +95,7 @@ def hafnian_approx(A, num_samples=1e5, tol=1e-12):
     Returns:
         float: the approximate hafnian of matrix A.
     """
+    A = np.round(A, np.int(np.log10(tol)))
     input_validation(A, tol=tol)
 
     if np.any(np.iscomplex(A)):

@@ -81,7 +81,7 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6, approx=False, approx_samples=
             mat = kron_reduced(A, ind2)
 
             if approx:
-                probs1[i] = hafnian_approx(mat, num_samples=approx_samples).real/factpref
+                probs1[i] = hafnian_approx(mat.real, num_samples=approx_samples)/factpref
             else:
                 probs1[i] = hafnian(mat).real/factpref
 
@@ -92,6 +92,11 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6, approx=False, approx_samples=
 
         if ssum < 1.0:
             probs3[-1] = 1.0-ssum
+
+        # The following normalization of probabilities is needed when approx=True
+        if approx == True:
+            if ssum > 1.0:
+                probs3 = probs3/ssum
 
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
         if result[-1] == cutoff:
