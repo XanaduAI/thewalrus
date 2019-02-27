@@ -35,9 +35,13 @@ module hafnian_approx
         integer(ip2) :: n, i, j, k
         real(wp)     :: det, rand1, rand2, std, mean
 
+        !f2py inent(in) :: matin, nsample
+        !f2py inent(out) :: haf
+
         std = 1.0_wp
         mean = 0.0_wp
         n = size(matin(1,:))
+
 
         allocate(mat(1:n, 1:n), matrand(1:n, 1:n), matrand1(1:n, 1:n), matrand2(1:n, 1:n), &
                  determinants(1:nsample), g(1:n, 1:n), gt(1:n, 1:n), W(1:n, 1:n))
@@ -88,10 +92,12 @@ module hafnian_approx
 
         nn = size(matin(1,:))
         lda = nn
+        det(:) = 0.0_wp
 
         allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
 
-        forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
+        !forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
+        mat(:,:) = matin(:,:)
 
         call qgefa(mat, lda, nn, ip2vt, info)
 
