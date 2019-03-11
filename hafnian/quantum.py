@@ -244,7 +244,7 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
     return haf/np.sqrt(np.prod(fac(rpt)))
 
 
-def density_matrix(mu, cov, post_select=None, cutoff=5, hbar=2):
+def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2):
     r"""Returns the density matrix of a (PNR post-selected) Gaussian state.
 
     The resulting density matrix will have shape
@@ -263,6 +263,7 @@ def density_matrix(mu, cov, post_select=None, cutoff=5, hbar=2):
         cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
         post_select (dict): dictionary containing the post-selected modes, of
             the form ``{mode: value}``.
+        normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
         cutoff (dim): the final length (i.e., Hilbert space dimension) of each
             mode in the density matrix.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
@@ -299,13 +300,13 @@ def density_matrix(mu, cov, post_select=None, cutoff=5, hbar=2):
 
         rho[sf_el] = density_matrix_element(beta, A, Q, el0, el1, include_prefactor=False)
 
-    if post_select:
+    rho *= prefactor(beta, A, Q)
+
+    if normalize:
         # construct the standard 2D density matrix, and take the trace
         new_ax = np.arange(2*M).reshape([M, 2]).T.flatten()
         tr = np.trace(rho.transpose(new_ax).reshape([cutoff**M, cutoff**M])).real
         # renormalize
         rho /= tr
-    else:
-        rho *= prefactor(beta, A, Q)
 
     return rho
