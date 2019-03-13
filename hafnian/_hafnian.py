@@ -270,19 +270,8 @@ def permanent_repeated(A, rpt):
     return hafnian_repeated(B, rpt*2, loop=False)
 
 def gradhaf(A, dA, s=np.array([None])):
-<<<<<<< HEAD
-    r""" Calculates the gradient of Hafnian of the matrix :math:`A(q)` with respect to the parameter :math:`q` at :math:`q` i.e. :math:`d Haf(A(q))` where the differential is computed with respect to 
-    :math:`q`.
-    
-    Args: 
-        A (array): The input (symmetric) matrix :math:`A` of size MxM evaluated at :math:`q`.
-        dA (array): Derivative of the input (symmetric) matrix with respect to the parameter :math:`q`.
-        s (array): Array integers of size M denoting the number of times a row/column should 
-                   be repeated. In a GBS experiment this refers to the number of photons detected 
-                   at each mode. 
-    Returns: 
-=======
-    r""" Calculates the gradient of Hafnian of the matrix :math:`A(q)` with respect to the parameter :math:`q` at
+    r"""
+    Calculates the gradient of Hafnian of the matrix :math:`A(q)` with respect to the parameter :math:`q` at
     :math:`q` i.e. :math:`d Haf(A(q))` where the differential is computed with respect to :math:`q`.
 
     Args:
