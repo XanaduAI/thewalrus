@@ -170,7 +170,7 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
     return haf_real(A, loop=loop, recursive=recursive, quad=quad)
 
 
-def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
+def hafnian_repeated(A, rpt, mu=None, loop=False, use_eigen=True, tol=1e-12):
     r"""Returns the hafnian of matrix A with repeated rows/columns via the C++ hafnian library.
 
     The :func:`kron_reduced` function may be used to show the resulting matrix
@@ -198,6 +198,9 @@ def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
         A (array): a square, symmetric :math:`N\times N` array.
         rpt (Sequence): a length-:math:`N` positive integer sequence, corresponding
             to the number of times each row/column of matrix :math:`A` is repeated.
+        mu (array): a vector of length :math:`N` representing the vector of means/displacement.
+            If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this
+            only affects the loop hafnian.
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         use_eigen (bool): if True (default), the Eigen linear algebra library
             is used for matrix multiplication. If the hafnian library was compiled
@@ -225,12 +228,18 @@ def hafnian_repeated(A, rpt, loop=False, use_eigen=True, tol=1e-12):
     if np.sum(nud) % 2 != 0 and not loop:
         return 0.0
 
-    if A.dtype == np.complex:
-        if np.any(np.iscomplex(A)):
-            return haf_rpt_complex(A, nud, loop=loop, use_eigen=use_eigen)
-        return haf_rpt_real(np.float64(A.real), nud, loop=loop, use_eigen=use_eigen)
+    if mu is None:
+        mu = A.diagonal().copy()
 
-    return haf_rpt_real(A, nud, loop=loop, use_eigen=use_eigen)
+    if len(mu) != len(A):
+        raise ValueError("Length of means vector must be the same length as the matrix A.")
+
+    if A.dtype == np.complex or mu.dtype == np.complex:
+        if np.any(np.iscomplex(A)) or np.any(np.iscomplex(mu)):
+            return haf_rpt_complex(A, nud, mu=mu, loop=loop)
+        return haf_rpt_real(np.float64(A.real), nud, mu=np.float64(mu.real), loop=loop)
+
+    return haf_rpt_real(A, nud, mu=mu, loop=loop)
 
 
 def permanent_repeated(A, rpt):
@@ -261,6 +270,7 @@ def permanent_repeated(A, rpt):
     return hafnian_repeated(B, rpt*2, loop=False)
 
 def gradhaf(A, dA, s=np.array([None])):
+<<<<<<< HEAD
     r""" Calculates the gradient of Hafnian of the matrix :math:`A(q)` with respect to the parameter :math:`q` at :math:`q` i.e. :math:`d Haf(A(q))` where the differential is computed with respect to 
     :math:`q`.
     
@@ -271,8 +281,18 @@ def gradhaf(A, dA, s=np.array([None])):
                    be repeated. In a GBS experiment this refers to the number of photons detected 
                    at each mode. 
     Returns: 
+=======
+    r""" Calculates the gradient of Hafnian of the matrix :math:`A(q)` with respect to the parameter :math:`q` at
+    :math:`q` i.e. :math:`d Haf(A(q))` where the differential is computed with respect to :math:`q`.
+
+    Args:
+        A (array): The input matrix :math:`A` of size MxM evaluated at :math:`q`.
+        dA (array): Derivative of the input matrix with respect to the parameter :math:`q`.
+        s (array): Array integers of size M denoting the number of times a row/column should
+                   be repeated. In a GBS experiment this refers to the number of photons detected
+                   at each mode.
+    Returns:
         real: derivative of :math:`Haf(A(q))` with respect to :math:`q` at :math:`q`.
-     
     """
     M = A.shape[0]
     final = 0.0
@@ -292,4 +312,3 @@ def gradhaf(A, dA, s=np.array([None])):
             final = final + tmpsum
             stmp = np.array([ii for ii in st])
     return final
-

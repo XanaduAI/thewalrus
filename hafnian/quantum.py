@@ -229,14 +229,12 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
         # gamma = X @ np.linalg.inv(Q).conj() @ beta
         gamma = beta.conj() - A @ beta
 
-        # if np.any(np.array(rpt) > 1):
-        A_rpt = kron_reduced(A, rpt)
-        np.fill_diagonal(A_rpt, kron_reduced(gamma, rpt))
-        haf = hafnian(A_rpt, loop=True)
-        # else:
-        #     A_disp = A.copy()
-        #     np.fill_diagonal(A_disp, gamma)
-        #     haf = hafnian_repeated(A_disp, rpt=rpt, loop=True)
+        if np.prod([k+1 for k in rpt])**(1/len(rpt)) < 3:
+            A_rpt = kron_reduced(A, rpt)
+            np.fill_diagonal(A_rpt, kron_reduced(gamma, rpt))
+            haf = hafnian(A_rpt, loop=True)
+        else:
+            haf = hafnian_repeated(A, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
         haf *= prefactor(beta, A, Q)
