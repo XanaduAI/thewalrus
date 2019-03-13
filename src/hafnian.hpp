@@ -577,6 +577,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu, std::vector<i
             }
         }
 
+
         T z1z2prod = 0.0;
         for (int j=0; j<s1; j++) {
             z1z2prod += z1[j]*z2[s1-1-j];
@@ -588,7 +589,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu, std::vector<i
 
             if (x[j] < rpt[j]) {
                 x[j] += 1;
-                p *= -static_cast<long double>(rpt[j]+1-x[j])/x[j];
+                p = -std::round(p*static_cast<long double>(rpt[j]+1-x[j])/x[j]);
 
                 for (int k=0; k < n; k++) {
                     q -= mat[k*n+j]*(nu2[k]-x[k]);

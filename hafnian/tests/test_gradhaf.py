@@ -30,11 +30,11 @@ def test_gradhaf_homogeneous():
     df = np.random.rand()
 
     exact_grad = factorial2(n-1)*n/2*(f)**((n/2)-1)*df
-    A = f*np.ones([n,n])
-    dA = df*np.ones([n,n])
+    A = f*np.ones([n, n])
+    dA = df*np.ones([n, n])
     num_grad = gradhaf(A, dA)
 
-    assert np.allclose(num_grad , exact_grad)
+    assert np.allclose(num_grad, exact_grad)
 
 
 def test_gradhad_2x2():
