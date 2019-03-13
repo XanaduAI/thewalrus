@@ -236,10 +236,10 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, use_eigen=True, tol=1e-12):
 
     if A.dtype == np.complex or mu.dtype == np.complex:
         if np.any(np.iscomplex(A)) or np.any(np.iscomplex(mu)):
-            return haf_rpt_complex(A, nud, mu=mu, loop=loop, use_eigen=use_eigen)
-        return haf_rpt_real(np.float64(A.real), nud, mu=np.float64(mu.real), loop=loop, use_eigen=use_eigen)
+            return haf_rpt_complex(A, nud, mu=mu, loop=loop)
+        return haf_rpt_real(np.float64(A.real), nud, mu=np.float64(mu.real), loop=loop)
 
-    return haf_rpt_real(A, nud, mu=mu, loop=loop, use_eigen=use_eigen)
+    return haf_rpt_real(A, nud, mu=mu, loop=loop)
 
 
 def permanent_repeated(A, rpt):

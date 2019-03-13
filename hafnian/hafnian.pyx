@@ -22,16 +22,19 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
 
-    T hafnian_rpt[T](vector[T] &mat, vector[int] &nud, bint use_eigen)
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
-
-    T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud, bint use_eigen)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud)
 
     T torontonian[T](vector[T] &mat)
 
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
+
+    double hafnian_rpt_quad(vector[double] &mat, vector[int] &nud)
+    double complex hafnian_rpt_quad(vector[double complex] &mat, vector[int] &nu)
+
+    double loop_hafnian_rpt_quad(vector[double] &mat, vector[double] &mu, vector[int] &nud)
+    double complex loop_hafnian_rpt_quad(vector[double complex] &mat, vector[double complex] &mu, vector[int] &nud)
 
     double complex torontonian_quad(vector[double complex] &mat)
 
@@ -41,6 +44,16 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
 
 
 def torontonian_complex(double complex[:, :] A, quad=True):
+    """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
+
+    Args:
+        A (array): a np.complex128, square, symmetric array of even dimensions.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
+            matrix internally for a quadruple precision torontonian computation.
+
+    Returns:
+        np.complex128: the torontonian of matrix A
+    """
     cdef int i, j, n = A.shape[0]
     cdef vector[double complex] mat
     cdef int m = n/2
@@ -64,7 +77,7 @@ def torontonian_complex(double complex[:, :] A, quad=True):
 # Hafnian repeated
 
 
-def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False, bint use_eigen=True):
+def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False):
     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
     using the rpt method. This method is more efficient for matrices with
     repeated rows and columns.
@@ -77,8 +90,6 @@ def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False,
             If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this
             only affects the loop hafnian.
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
-        use_eigen (bool): if True (default), the Eigen linear algebra library
-            is used for matrix multiplication.
 
     Returns:
         np.float64: the hafnian
@@ -100,12 +111,12 @@ def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False,
 
     # Exposes a c function to python
     if loop:
-        return loop_hafnian_rpt(mat, d, nud, use_eigen)
+        return loop_hafnian_rpt_quad(mat, d, nud)
 
-    return hafnian_rpt(mat, nud, use_eigen)
+    return hafnian_rpt_quad(mat, nud)
 
 
-def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=None, bint loop=False, bint use_eigen=True):
+def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=None, bint loop=False):
     r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
     using the rpt method. This method is more efficient for matrices with
     repeated rows and columns.
@@ -118,8 +129,6 @@ def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=Non
             If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this
             only affects the loop hafnian.
         loop (bool): If ``True``, the loop hafnian is returned. Default false.
-        use_eigen (bool): if True (default), the Eigen linear algebra library
-            is used for matrix multiplication.
 
     Returns:
         np.complex128: the hafnian
@@ -141,9 +150,9 @@ def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=Non
 
     # Exposes a c function to python
     if loop:
-        return loop_hafnian_rpt(mat, d, nud, use_eigen)
+        return loop_hafnian_rpt_quad(mat, d, nud)
 
-    return hafnian_rpt(mat, nud, use_eigen)
+    return hafnian_rpt_quad(mat, nud)
 
 
 # ==============================================================================
