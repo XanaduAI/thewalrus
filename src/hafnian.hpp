@@ -564,7 +564,7 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=
 
 
 template <typename T>
-inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_eigen=true) {
+inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu, std::vector<int> &rpt, bool use_eigen=true) {
     int n = std::sqrt(static_cast<double>(mat.size()));
     assert(static_cast<int>(rpt.size()) == n);
 
@@ -575,7 +575,8 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
         namespace eg = Eigen;
 
         eg::Matrix<T,eg::Dynamic,eg::Dynamic> A = eg::Map<eg::Matrix<T,eg::Dynamic,eg::Dynamic>, eg::Unaligned>(mat.data(), n, n);
-        eg::Matrix<T,eg::Dynamic,1> mu = A.diagonal();
+        eg::Matrix<T,eg::Dynamic,1> d = eg::Map<eg::Matrix<T,eg::Dynamic,1>, eg::Unaligned>(mu.data(), n, 1);
+        // eg::Matrix<T,eg::Dynamic,1> mu = A.diagonal();
 
         eg::VectorXd X = eg::VectorXd::Zero(n);
         eg::VectorXd rows2 = eg::Map<eg::VectorXi, eg::Unaligned>(rpt.data(), rpt.size()).cast<double>();
@@ -585,7 +586,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
 
         rows2 /= 2;
         q = 0.5*rows2.dot(A*rows2);
-        q1 = rows2.dot(mu);
+        q1 = rows2.dot(d);
 
         int s1 = std::floor(0.5*s)+1;
         eg::Matrix<T,eg::Dynamic,1> z1 = eg::VectorXd::Ones(s1).cast<T>();
@@ -616,7 +617,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
                     p *= -(rpt[j]+1-X[j])/X[j];
                     q -= A.col(j).conjugate().dot(rows2-X);
                     q -= 0.5*A(j, j);
-                    q1 -= mu[j];
+                    q1 -= d[j];
                     break;
                 }
                 else {
@@ -626,7 +627,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
                     }
                     q += static_cast<double>(rpt[j])*A.col(j).conjugate().dot(rows2-X);
                     q -= 0.5*rpt[j]*rpt[j]*A(j, j);
-                    q1 += static_cast<double>(rpt[j])*mu[j];
+                    q1 += static_cast<double>(rpt[j])*d[j];
                 }
             }
         }
@@ -639,10 +640,10 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt, bool use_e
         std::vector<T> z2(s1, 1.0);
 
         // diagonal of matrix mat
-        std::vector<T> mu(n);
-        for (int i=0; i<n; i++) {
-            mu[i] = mat[i*n+i];
-        }
+        // std::vector<T> mu(n);
+        // for (int i=0; i<n; i++) {
+        //     mu[i] = mat[i*n+i];
+        // }
 
         std::vector<double> nu2(n);
         std::transform(rpt.begin(), rpt.end(), nu2.begin(),
