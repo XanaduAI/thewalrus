@@ -41,6 +41,7 @@ Python wrappers
     hafnian
     hafnian_repeated
     hafnian_approx
+    gradhaf
     tor
     perm
     permanent_repeated
@@ -123,7 +124,7 @@ via the functions:
     :rtype: ``np.complex128``
 
 
-.. py:function:: haf_rpt_real(A, rpt, mu=None, loop=False, use_eigen=True)
+.. py:function:: haf_rpt_real(A, rpt, mu=None, loop=False)
 
     Returns the hafnian of a real matrix A via the C++ hafnian library
     using the algorithm described in algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__. This method is more efficient for matrices with repeated rows and columns.
@@ -132,9 +133,8 @@ via the functions:
     :param array rpt: a ``np.int32`` length-:math:`n` array, corresponding to the number of times each row/column of matrix A is repeated.
     :param array mu: a ``np.float64`` vector of length :math:`N` representing the vector of means/displacement. If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this only affects the loop hafnian.
     :param bool loop: If ``True``, the loop hafnian is returned. Default false.
-    :param bool use_eigen: If ``True``, he Eigen linear algebra library is used for matrix multiplication.
 
-.. py:function:: haf_rpt_complex(A, rpt, mu=None, loop=False, use_eigen=True)
+.. py:function:: haf_rpt_complex(A, rpt, mu=None, loop=False)
 
     Returns the hafnian of a real matrix A via the C++ hafnian library
     using the algorithm described in algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__. This method is more efficient for matrices with repeated rows and columns.
@@ -143,7 +143,6 @@ via the functions:
     :param array rpt: a ``np.int32`` length-:math:`n` array, corresponding to the number of times each row/column of matrix A is repeated.
     :param array mu: a ``np.complex128`` vector of length :math:`N` representing the vector of means/displacement. If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this only affects the loop hafnian.
     :param bool loop: If ``True``, the loop hafnian is returned. Default false.
-    :param bool use_eigen: If ``True``, he Eigen linear algebra library is used for matrix multiplication
 
 .. py:function:: hafnian_nonneg(A, nsample)
 
@@ -235,4 +234,4 @@ via the functions:
 
     :param array A: a ``np.complex``, square array.
     :returns: the permanent of matrix A.
-    :rtype: complexs
+    :rtype: complex

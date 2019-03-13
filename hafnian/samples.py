@@ -87,14 +87,14 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6, approx=False, approx_samples=
 
         probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a/prev_prob
-        probs3 = np.maximum(probs2, np.zeros_like(probs2))
+        probs3 = np.maximum(probs2, np.zeros_like(probs2)) # pylint: disable=assignment-from-no-return
         ssum = np.sum(probs3)
 
         if ssum < 1.0:
             probs3[-1] = 1.0-ssum
 
         # The following normalization of probabilities is needed when approx=True
-        if approx == True:
+        if approx:
             if ssum > 1.0:
                 probs3 = probs3/ssum
 
@@ -218,7 +218,7 @@ def generate_torontonian_sample(cov, hbar=2):
 
         probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a/prev_prob
-        probs3 = np.maximum(probs2, np.zeros_like(probs2))
+        probs3 = np.maximum(probs2, np.zeros_like(probs2)) # pylint: disable=assignment-from-no-return
 
         probs3 /= np.sum(probs3)
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))

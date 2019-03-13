@@ -15,9 +15,9 @@
 import pytest
 
 import numpy as np
-from hafnian import gradhaf
 from scipy.special import factorial2
 
+from hafnian import gradhaf
 
 
 def test_gradhaf_homogeneous():
@@ -28,21 +28,24 @@ def test_gradhaf_homogeneous():
     n = 10
     f = np.random.rand()
     df = np.random.rand()
+
     exact_grad = factorial2(n-1)*n/2*(f)**((n/2)-1)*df
     A = f*np.ones([n,n])
     dA = df*np.ones([n,n])
     num_grad = gradhaf(A, dA)
+
     assert np.allclose(num_grad , exact_grad)
-    
+
+
 def test_gradhad_2x2():
     """ Test the grad haf for a 2 x 2 matrix """
     da12 = np.random.rand()
     da11 = np.random.rand()
     da22 = np.random.rand()
+
     A = np.random.rand(2,2)
     A = A + A.T
     dA = np.array([[da11, da12], [da12,da22]])
     num_grad = gradhaf(A, dA)
-    assert num_grad == da12
 
-    
+    assert num_grad == da12

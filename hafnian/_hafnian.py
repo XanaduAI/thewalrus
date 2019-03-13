@@ -170,7 +170,7 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
     return haf_real(A, loop=loop, recursive=recursive, quad=quad)
 
 
-def hafnian_repeated(A, rpt, mu=None, loop=False, use_eigen=True, tol=1e-12):
+def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
     r"""Returns the hafnian of matrix A with repeated rows/columns via the C++ hafnian library.
 
     The :func:`kron_reduced` function may be used to show the resulting matrix
@@ -269,35 +269,43 @@ def permanent_repeated(A, rpt):
 
     return hafnian_repeated(B, rpt*2, loop=False)
 
+
 def gradhaf(A, dA, s=np.array([None])):
-    r"""
-    Calculates the gradient of Hafnian of the matrix :math:`A(q)` with respect to the parameter :math:`q` at
-    :math:`q` i.e. :math:`d Haf(A(q))` where the differential is computed with respect to :math:`q`.
+    r"""Calculate the gradient of a Hafnian.
+
+    This function calculates the gradient of a hafnian of matrix :math:`A(q)` with respect to some parameter :math:`q`,
+    evaluated at value :math:`q=q'`:
+
+    .. math:: \left.\frac{\partial}{\partial q}Haf(A(q))\right|_{q=q'}
 
     Args:
-        A (array): The input matrix :math:`A` of size MxM evaluated at :math:`q`.
+        A (array): The input matrix :math:`A` of size :math:`M\times M` evaluated at :math:`q`.
         dA (array): Derivative of the input matrix with respect to the parameter :math:`q`.
         s (array): Array integers of size M denoting the number of times a row/column should
-                   be repeated. In a GBS experiment this refers to the number of photons detected
-                   at each mode.
+            be repeated. In a GBS experiment this refers to the number of photons detected
+            at each mode.
+
     Returns:
-        real: derivative of :math:`Haf(A(q))` with respect to :math:`q` at :math:`q`.
+        float: derivative of :math:`Haf(A(q))` with respect to :math:`q` evaluated at :math:`q=q'`.
     """
     M = A.shape[0]
     final = 0.0
-    if s.any() == None:
+
+    if s.any() is None:
         st = np.ones(M, dtype=int)
     else:
         st = s
+
     for i in range(M):
         for j in range(M):
-            if i==j:
+            if i == j:
                 tmpsum = 0.0
             else:
                 stmp[i] = np.max([st[i]-1, 0])
                 stmp[j] = np.max([st[j]-1, 0])
-                tmpsum = 0.5*dA[i,j]*hafnian_repeated(A,list(stmp))
+                tmpsum = 0.5*dA[i, j]*hafnian_repeated(A, list(stmp))
 
             final = final + tmpsum
             stmp = np.array([ii for ii in st])
+
     return final

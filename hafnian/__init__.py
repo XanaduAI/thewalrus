@@ -37,6 +37,7 @@ __all__ = [
     'hafnian',
     'hafnian_repeated',
     'hafnian_approx',
+    'gradhaf',
     'tor',
     'perm',
     'permanent_repeated',
