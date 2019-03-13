@@ -265,8 +265,8 @@ def gradhaf(A, dA, s=np.array([None])):
     :math:`q`.
     
     Args: 
-        A (array): The input matrix :math:`A` of size MxM evaluated at :math:`q`.
-        dA (array): Derivative of the input matrix with respect to the parameter :math:`q`.
+        A (array): The input (symmetric) matrix :math:`A` of size MxM evaluated at :math:`q`.
+        dA (array): Derivative of the input (symmetric) matrix with respect to the parameter :math:`q`.
         s (array): Array integers of size M denoting the number of times a row/column should 
                    be repeated. In a GBS experiment this refers to the number of photons detected 
                    at each mode. 
