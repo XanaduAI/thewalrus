@@ -42,11 +42,11 @@ namespace fsum {
     for(int j=0; j <= last; j++) {
       y = sum[j];
       hi = x + y;
-      lo = (fabs(x) < fabs(y)) ? x - (hi - y) : y - (hi - x);
+      lo = (std::fabs(x) < std::fabs(y)) ? x - (hi - y) : y - (hi - x);
       x = hi;
       if (lo) sum[i++] = lo;      // save partials
     }
-    if (!i || !isfinite(x)) {sum[ last = 0 ] = x; return;}
+    if (!i || !std::isfinite(x)) {sum[ last = 0 ] = x; return;}
     sum[ last = i ] = x;
     if (i == SC_STACK - 1) {x = 0.0; goto COMPRESS_STACK;}
   }
