@@ -25,8 +25,6 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud)
 
-    T torontonian[T](vector[T] &mat)
-
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
 
@@ -36,14 +34,16 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double loop_hafnian_rpt_quad(vector[double] &mat, vector[double] &mu, vector[int] &nud)
     double complex loop_hafnian_rpt_quad(vector[double complex] &mat, vector[double complex] &mu, vector[int] &nud)
 
-    double complex torontonian_quad(vector[double complex] &mat)
+    double torontonian_quad(vector[double] &mat)
+    double torontonian_quad(vector[double complex] &mat)
+    double torontonian_fsum[T](vector[T] &mat)
 
 
 # ==============================================================================
 # Torontonian
 
 
-def torontonian_complex(double complex[:, :] A, quad=True):
+def torontonian_complex(double complex[:, :] A, fsum=False):
     """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
 
     Args:
@@ -67,10 +67,40 @@ def torontonian_complex(double complex[:, :] A, quad=True):
     if m % 2 != 0:
         sign = -1
 
-    if quad:
-        return sign*torontonian_quad(mat)
+    if fsum:
+        return sign*torontonian_fsum(mat)
 
-    return sign*torontonian(mat)
+    return sign*torontonian_quad(mat)
+
+
+def torontonian_real(double[:, :] A, fsum=False):
+    """Returns the Torontonian of a real matrix A via the C++ hafnian library.
+
+    Args:
+        A (array): a np.complex128, square, symmetric array of even dimensions.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
+            matrix internally for a quadruple precision torontonian computation.
+
+    Returns:
+        np.complex128: the torontonian of matrix A
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double] mat
+    cdef int m = n/2
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    cdef int sign = 1
+
+    if m % 2 != 0:
+        sign = -1
+
+    if fsum:
+        return sign*torontonian_fsum(mat)
+
+    return sign*torontonian_quad(mat)
 
 
 # ==============================================================================
