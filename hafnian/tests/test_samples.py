@@ -23,10 +23,10 @@ def test_single_squeezed_state_hafnian():
     n_samples = 1000
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    sigma = np.array([[np.exp(2*r), 0.        ],
-                   [0.        , np.exp(-2*r)]])
+    sigma = np.array([[np.exp(2*r), 0.],
+                      [0., np.exp(-2*r)]])
     n_cut = 10
-    samples = hafnian.samples.hafnian_sample(sigma, samples = n_samples, cutoff = n_cut)
+    samples = hafnian.samples.hafnian_sample(sigma, samples=n_samples, cutoff=n_cut)
     bins = np.arange(0, max(samples), 1)
     (freq, _) = np.histogram(samples, bins=bins)
     rel_freq = freq/n_samples
@@ -47,10 +47,9 @@ def test_single_squeezed_state_torontonian():
     n_samples = 1000
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    sigma = np.array([[np.exp(2*r), 0.        ],
-                   [0.        , np.exp(-2*r)]])
-    n_cut = 10
-    samples = hafnian.samples.torontonian_sample(sigma, samples = n_samples)
+    sigma = np.array([[np.exp(2*r), 0.],
+                      [0., np.exp(-2*r)]])
+    samples = hafnian.samples.torontonian_sample(sigma, samples=n_samples)
     samples_list = list(samples)
     rel_freq = np.array([samples_list.count(0), samples_list.count(1)])/n_samples
     x2 = np.empty([2])
@@ -75,7 +74,7 @@ def test_two_mode_squeezed_state_hafnian():
                       [s, c, 0, 0],
                       [0, 0, c, -s],
                       [0, 0, -s, c]])
-    samples = hafnian.samples.hafnian_sample(sigma, samples = n_samples, cutoff = n_cut)
+    samples = hafnian.samples.hafnian_sample(sigma, samples=n_samples, cutoff=n_cut)
     assert np.all(samples[:, 0] == samples[:, 1])
     samples1d = samples[:, 0]
     bins = np.arange(0, max(samples1d), 1)
@@ -94,7 +93,6 @@ def test_two_mode_squeezed_state_torontonian():
     probability distribution of a two mode squeezed vacuum state
     """
     n_samples = 1000
-    n_cut = 5
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
     c = np.cosh(2*r)
@@ -103,7 +101,7 @@ def test_two_mode_squeezed_state_torontonian():
                       [s, c, 0, 0],
                       [0, 0, c, -s],
                       [0, 0, -s, c]])
-    samples = hafnian.samples.torontonian_sample(sigma, samples = n_samples)
+    samples = hafnian.samples.torontonian_sample(sigma, samples=n_samples)
     assert np.all(samples[:, 0] == samples[:, 1])
     samples1d = samples[:, 0]
     bins = np.arange(0, max(samples1d), 1)
