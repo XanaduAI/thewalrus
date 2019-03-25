@@ -119,24 +119,24 @@ def test_single_squeezed_state_hafnian():
     assert np.all(np.abs(x2 - rel_freq) < rel_tol/np.sqrt(n_samples))
 
 
-def test_single_squeezed_state_torontonian():
-    """Test the sampling routines by comparing the photon number frequencies and the exact
-    probability distribution of a single mode squeezed vacuum state
-    """
-    n_samples = 1000
-    mean_n = 1.0
-    r = np.arcsinh(np.sqrt(mean_n))
-    sigma = np.array([[np.exp(2*r), 0.],
-                      [0., np.exp(-2*r)]])
-    samples = torontonian_sample(sigma, samples=n_samples)
-    samples_list = list(samples)
+# def test_single_squeezed_state_torontonian():
+#     """Test the sampling routines by comparing the photon number frequencies and the exact
+#     probability distribution of a single mode squeezed vacuum state
+#     """
+#     n_samples = 1000
+#     mean_n = 1.0
+#     r = np.arcsinh(np.sqrt(mean_n))
+#     sigma = np.array([[np.exp(2*r), 0.],
+#                       [0., np.exp(-2*r)]])
+#     samples = torontonian_sample(sigma, samples=n_samples)
+#     samples_list = list(samples)
 
-    rel_freq = np.array([samples_list.count(0), samples_list.count(1)])/n_samples
-    x2 = np.empty([2])
+#     rel_freq = np.array([samples_list.count(0), samples_list.count(1)])/n_samples
+#     x2 = np.empty([2])
 
-    x2[0] = 1.0/np.sqrt(1.0+mean_n)
-    x2[1] = 1.0 - x2[0]
-    assert np.all(np.abs(x2 - rel_freq) < rel_tol/np.sqrt(n_samples))
+#     x2[0] = 1.0/np.sqrt(1.0+mean_n)
+#     x2[1] = 1.0 - x2[0]
+#     assert np.all(np.abs(x2 - rel_freq) < rel_tol/np.sqrt(n_samples))
 
 
 def test_two_mode_squeezed_state_hafnian():
