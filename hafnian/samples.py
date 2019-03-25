@@ -48,7 +48,8 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6, approx=False, approx_samples=
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
@@ -112,7 +113,8 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5, approx=False, approx_sample
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): the number of samples to return.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -153,7 +155,8 @@ def torontonian_sample(cov, samples=1):
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
 
     Returns:
         np.array[int]: samples from the Torontonian of the covariance matrix.
@@ -181,7 +184,8 @@ def generate_torontonian_sample(cov, hbar=2):
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
@@ -214,12 +218,13 @@ def generate_torontonian_sample(cov, hbar=2):
 
         indices = result+[1]
         ind2 = indices+indices
-        probs1[1] = tor(np.complex128(kron_reduced(O, ind2))).real
+        pref = np.sqrt(np.linalg.det(Q).real)
+        probs1a = probs1/pref
 
-        probs1a = probs1/np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a/prev_prob
+        probs2[1] = 1.0-probs2[0]
+        probs1a[1] = probs2[1]*pref
         probs3 = np.maximum(probs2, np.zeros_like(probs2)) # pylint: disable=assignment-from-no-return
-
         probs3 /= np.sum(probs3)
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
 
