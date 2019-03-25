@@ -15,8 +15,10 @@
 import pytest
 
 import numpy as np
+from scipy.special import factorial as fac
+
 import hafnian as hf
-from hafnian import hafnian, kron_reduced
+from hafnian import hafnian, kron_reduced, hafnian_approx
 from hafnian.lib.libhaf import haf_complex, haf_real, haf_int
 
 
@@ -167,6 +169,7 @@ def test_kron_reduced(n):
 
     assert np.all(res == ex)
 
+
 @pytest.mark.parametrize("n", [6, 8])
 def test_kron_reduced_vector(n):
     """Check kron reduced returns correct result"""
@@ -177,3 +180,27 @@ def test_kron_reduced_vector(n):
     ex = np.hstack([O, J])
 
     assert np.all(res == ex)
+
+
+def test_approx_complex_error():
+    """Check exception raised if matrix is complex"""
+    A = 1j*np.ones([6, 6])
+    with pytest.raises(ValueError, match="Input matrix must be real"):
+        hafnian_approx(A)
+
+
+def test_approx_negative_error():
+    """Check exception raised if matrix is negative"""
+    A = np.ones([6, 6])
+    A[0, 0] = -1
+    with pytest.raises(ValueError, match="Input matrix not have negative entries"):
+        hafnian_approx(A)
+
+
+@pytest.mark.parametrize("n", [6, 8])
+def test_ones_approx(n):
+    """Check hafnian_approx(J_2n)=(2n)!/(n!2^n)"""
+    A = np.float64(np.ones([2*n, 2*n]))
+    haf = hafnian_approx(A, num_samples=1e4)
+    expected = fac(2*n)/(fac(n)*(2**n))
+    assert np.abs(haf - expected)/expected < 0.1

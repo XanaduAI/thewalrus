@@ -48,9 +48,8 @@ def generate_hafnian_sample(cov, hbar=2, cutoff=6, approx=False, approx_samples=
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state.
-            This can be obtained from the scovmavxp of the Gaussian backend of 
-            strawberryfields.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
@@ -114,7 +113,8 @@ def hafnian_sample(cov, samples=1, hbar=2, cutoff=5, approx=False, approx_sample
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state. This can be obtained from the scovmavxp of the Gaussian backend of strawberryfields.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): the number of samples to return.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -155,7 +155,8 @@ def torontonian_sample(cov, samples=1):
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state. This can be obtained from the scovmavxp of the Gaussian backend of strawberryfields.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
 
     Returns:
         np.array[int]: samples from the Torontonian of the covariance matrix.
@@ -183,7 +184,8 @@ def generate_torontonian_sample(cov, hbar=2):
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state. This can be obtained from the scovmavxp of the Gaussian backend of strawberryfields.
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
@@ -213,7 +215,7 @@ def generate_torontonian_sample(cov, hbar=2):
         ind2 = indices+indices
 
         probs1[0] = tor(np.complex128(kron_reduced(O, ind2))).real
-		
+
         indices = result+[1]
         ind2 = indices+indices
         pref = np.sqrt(np.linalg.det(Q).real)
