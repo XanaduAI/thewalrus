@@ -5,10 +5,10 @@
     "distutils": {
         "depends": [
             "src/eigenvalue_hafnian.hpp",
+            "src/fsum.hpp",
             "src/hafnian.hpp",
             "src/recursive_hafnian.hpp",
             "src/repeated_hafnian.hpp",
-            "src/shewchuck0.cpp",
             "src/stdafx.h",
             "src/torontonian.hpp"
         ],
