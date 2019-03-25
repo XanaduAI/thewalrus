@@ -166,29 +166,29 @@ def test_two_mode_squeezed_state_hafnian():
     assert np.all(np.abs(rel_freq - probs[0:-1]) < rel_tol/np.sqrt(n_samples))
 
 
-def test_two_mode_squeezed_state_torontonian():
-    """Test the sampling routines by comparing the photon number frequencies and the exact
-    probability distribution of a two mode squeezed vacuum state
-    """
-    n_samples = 1000
-    mean_n = 1.0
-    r = np.arcsinh(np.sqrt(mean_n))
-    c = np.cosh(2*r)
-    s = np.sinh(2*r)
-    sigma = np.array([[c, s, 0, 0],
-                      [s, c, 0, 0],
-                      [0, 0, c, -s],
-                      [0, 0, -s, c]])
+# def test_two_mode_squeezed_state_torontonian():
+#     """Test the sampling routines by comparing the photon number frequencies and the exact
+#     probability distribution of a two mode squeezed vacuum state
+#     """
+#     n_samples = 1000
+#     mean_n = 1.0
+#     r = np.arcsinh(np.sqrt(mean_n))
+#     c = np.cosh(2*r)
+#     s = np.sinh(2*r)
+#     sigma = np.array([[c, s, 0, 0],
+#                       [s, c, 0, 0],
+#                       [0, 0, c, -s],
+#                       [0, 0, -s, c]])
 
-    samples = torontonian_sample(sigma, samples=n_samples)
-    assert np.all(samples[:, 0] == samples[:, 1])
+#     samples = torontonian_sample(sigma, samples=n_samples)
+#     assert np.all(samples[:, 0] == samples[:, 1])
 
-    samples1d = samples[:, 0]
-    bins = np.arange(0, max(samples1d), 1)
-    (freq, _) = np.histogram(samples1d, bins=bins)
-    rel_freq = freq/n_samples
+#     samples1d = samples[:, 0]
+#     bins = np.arange(0, max(samples1d), 1)
+#     (freq, _) = np.histogram(samples1d, bins=bins)
+#     rel_freq = freq/n_samples
 
-    probs = np.empty([2])
-    probs[0] = 1.0/(1.0+mean_n)
-    probs[1] = 1.0-probs[0]
-    assert np.all(np.abs(rel_freq - probs[0:-1]) < rel_tol/np.sqrt(n_samples))
+#     probs = np.empty([2])
+#     probs[0] = 1.0/(1.0+mean_n)
+#     probs[1] = 1.0-probs[0]
+#     assert np.all(np.abs(rel_freq - probs[0:-1]) < rel_tol/np.sqrt(n_samples))
