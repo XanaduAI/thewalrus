@@ -77,7 +77,7 @@ if BUILD_EXT:
         cflags_default = "-static -O3 -Wall -fPIC"
         extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
         extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
-        extra_f90_compile_args = []
+        extra_f90_compile_args = ['-fcheck=no-bounds']
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
         libraries += ["omp"]
@@ -92,7 +92,7 @@ if BUILD_EXT:
         extra_link_args_CPP = ['-fopenmp']
 
         extra_link_args_F90 = ['-fopenmp']
-        extra_f90_compile_args = ['-fopenmp']
+        extra_f90_compile_args = ['-fopenmp', '-fcheck=no-bounds']
 
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
