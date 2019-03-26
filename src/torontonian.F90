@@ -65,7 +65,7 @@ module torontonian
         !$OMP                    cntr, k, iter, iter2, ip2vt, nn, work_complex, det_complex, job, &
         !$OMP                     invdet_complex, lda) reduction(+:tmpsum_complex)
         do ii=0, 2**ell-1
-
+            write(*,*)"line 68", ii, ell, total
             call dec2bin(ii, ell, bin, total)
             write(*,*)"line 70"
             allocate(iter(1:total), iter2(1:2*total), submat_comp(1:2*total, 1:2*total))
