@@ -75,7 +75,7 @@ if BUILD_EXT:
     if platform.system() == 'Windows':
         USE_OPENMP = False
         cflags_default = "-static -O3 -Wall -fPIC"
-        extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc", '-fcheck=no-bounds']
         extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc", '-fcheck=no-bounds']
         extra_f90_compile_args = []
     elif platform.system() == 'Darwin':
