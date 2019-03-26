@@ -61,6 +61,8 @@ module torontonian
 
         tmpsum_complex = zzero
 
+        allocate(ip2vt(1:20), work_complex(1:20))
+
         !$OMP PARALLEL DO shared(mat, ell, mattype) private(ii, bin, total, submat_comp, &
         !$OMP                    cntr, k, iter, iter2, ip2vt, nn, work_complex, det_complex, job, &
         !$OMP                     invdet_complex, lda) reduction(+:tmpsum_complex)
@@ -86,21 +88,20 @@ module torontonian
             lda = 2*total
             nn = 2*total
 
-            allocate(ip2vt(1:nn), work_complex(1:nn))
+            ! allocate(ip2vt(1:nn), work_complex(1:nn))
 
             call qgefa_complex(submat_comp, lda, nn, ip2vt, info)
 
-            deallocate(ip2vt, work_complex)
-            allocate(ip2vt(1:nn), work_complex(1:nn))
             job = 10
 
             call qgedi_complex(submat_comp, lda, nn, ip2vt, det_complex, work_complex, job )
             invdet_complex = zone/det_complex(1) * 10.0_wp**(-real(det_complex(2)))
             tmpsum_complex = tmpsum_complex + (-1.0_wp)**(ell-total)*sqrt(invdet_complex)
             !print*, tmpsum_complex
-            deallocate(iter, iter2, submat_comp, ip2vt, work_complex)
+            deallocate(iter, iter2, submat_comp)
         end do
         !$OMP END PARALLEL DO
+        deallocate(ip2vt, work_complex)
 
         !tor = (1.0_wp, 0.0_wp)!tmpsum_complex
         tor_out = tmpsum_complex
