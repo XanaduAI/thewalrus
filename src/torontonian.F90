@@ -101,7 +101,6 @@ module torontonian
             deallocate(iter, iter2, submat_comp)
         end do
         !$OMP END PARALLEL DO
-        deallocate(ip2vt, work_complex)
 
         !tor = (1.0_wp, 0.0_wp)!tmpsum_complex
         tor_out = tmpsum_complex
