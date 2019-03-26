@@ -114,6 +114,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
         Byte* pos = new Byte[n];
         dec2bin(dst, x, m);
         Byte sum = find2(dst, m, pos);
+        delete [] dst;
 
         std::vector<T> B(sum*sum, 0.0);
 
@@ -122,6 +123,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
                 B[i*sum+j] = mat[pos[i] * n + ((pos[j]) ^ 1)];
             }
         }
+        delete [] pos;
 
         std::vector<T> traces(m, 0.0);
         if (sum != 0) {
@@ -183,6 +185,7 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
         Byte* pos = new Byte[n];
         dec2bin(dst, x, m);
         Byte sum = find2(dst, m, pos);
+        delete [] dst;
 
         std::vector<T> B(sum*sum, 0.0), B_powtrace(sum*sum, 0.0);
         std::vector<T> C1(sum, 0.0), D1(sum, 0.0);
@@ -195,6 +198,7 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
             C1[i] = C[pos[i]];
             D1[i] = D[pos[i]];
         }
+        delete [] pos;
 
         std::vector<T> traces(m, 0.0);
         if (sum != 0) {
