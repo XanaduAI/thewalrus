@@ -100,12 +100,12 @@ module torontonian
             write(*,*)"line 100"
             !print*, tmpsum_complex
             deallocate(iter, iter2, submat_comp, ip2vt, work_complex)
+            write(*,*)"Line 103 after deallocate"
         end do
         !$OMP END PARALLEL DO
-        write(*,*)"line 105"
+        write(*,*)"line 106"
         !tor = (1.0_wp, 0.0_wp)!tmpsum_complex
         tor_out = tmpsum_complex
-
     end subroutine tor
 
     subroutine det_real(matin, det_out)
