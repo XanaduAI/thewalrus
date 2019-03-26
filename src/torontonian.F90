@@ -99,7 +99,16 @@ module torontonian
             tmpsum_complex = tmpsum_complex + (-1.0_wp)**(ell-total)*sqrt(invdet_complex)
             write(*,*)"line 100"
             !print*, tmpsum_complex
-            deallocate(iter, iter2, submat_comp, ip2vt, work_complex)
+            write(*,*)"deallocating iter..."
+            deallocate(iter)
+            write(*,*)"deallocating iter2..."
+            deallocate(iter2)
+            write(*,*)"deallocating submat_comp..."
+            deallocate(submat_comp)
+            write(*,*)"deallocating ip2vt..."
+            deallocate(ip2vt)
+            write(*,*)"deallocating work_complex..."
+            deallocate(work_complex)
             write(*,*)"Line 103 after deallocate"
         end do
         !$OMP END PARALLEL DO
