@@ -89,9 +89,12 @@ module torontonian
 
             allocate(ip2vt(1:nn), work_complex(1:nn))
 
-            call qgefa_complex(submat_comp, lda, nn, ip2vt, info)
+            if (nn > 0) then
+                call qgefa_complex(submat_comp, lda, nn, ip2vt, info)
+            end if
             job = 10
             call qgedi_complex(submat_comp, lda, nn, ip2vt, det_complex, work_complex, job )
+
             invdet_complex = zone/det_complex(1) * 10.0_wp**(-real(det_complex(2)))
             tmpsum_complex = tmpsum_complex + (-1.0_wp)**(ell-total)*sqrt(invdet_complex)
             !print*, tmpsum_complex
