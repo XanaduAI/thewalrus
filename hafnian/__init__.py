@@ -30,7 +30,7 @@ from ._hafnian import (hafnian, hafnian_repeated, haf_int, haf_complex,
                        haf_real, haf_rpt_real, haf_rpt_complex,
                        kron_reduced, permanent_repeated, hafnian_approx, gradhaf)
 from ._permanent import perm, perm_real, perm_complex
-from ._torontonian import tor, tor_complex#, det
+from ._torontonian import tor, tor_complex, det
 
 
 __all__ = [

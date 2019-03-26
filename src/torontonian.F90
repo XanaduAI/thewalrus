@@ -89,7 +89,11 @@ module torontonian
             allocate(ip2vt(1:nn), work_complex(1:nn))
 
             call qgefa_complex(submat_comp, lda, nn, ip2vt, info)
+
+            deallocate(ip2vt, work_complex)
+            allocate(ip2vt(1:nn), work_complex(1:nn))
             job = 10
+
             call qgedi_complex(submat_comp, lda, nn, ip2vt, det_complex, work_complex, job )
             invdet_complex = zone/det_complex(1) * 10.0_wp**(-real(det_complex(2)))
             tmpsum_complex = tmpsum_complex + (-1.0_wp)**(ell-total)*sqrt(invdet_complex)
@@ -103,69 +107,69 @@ module torontonian
 
     end subroutine tor
 
-    ! subroutine det_real(matin, det_out)
-    !     real(dp), intent(in)  :: matin(:, :)
-    !     real(dp), intent(out) :: det_out
+    subroutine det_real(matin, det_out)
+        real(dp), intent(in)  :: matin(:, :)
+        real(dp), intent(out) :: det_out
 
-    !     ! determinant work variables
-    !     real(wp)        :: det(2), tmpdet
-    !     integer(kind=4) :: info, lda, nn, job, i, j
-    !     integer(ip2)    :: n
+        ! determinant work variables
+        real(wp)        :: det(2), tmpdet
+        integer(kind=4) :: info, lda, nn, job, i, j
+        integer(ip2)    :: n
 
-    !     integer(kind=4), allocatable :: ip2vt(:)
-    !     real(wp), allocatable        :: work(:), mat(:, :)
+        integer(kind=4), allocatable :: ip2vt(:)
+        real(wp), allocatable        :: work(:), mat(:, :)
 
-    !     nn = size(matin(1,:))
-    !     lda = nn
+        nn = size(matin(1,:))
+        lda = nn
 
-    !     allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
+        allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
 
-    !     forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
+        forall (i=1:nn,j=1:nn) mat(i,j) = real(matin(i,j), wp)
 
-    !     call qgefa(mat, lda, nn, ip2vt, info)
+        call qgefa(mat, lda, nn, ip2vt, info)
 
-    !     job = 10
+        job = 10
 
-    !     call qgedi(mat, lda, nn, ip2vt, det, work, job )
+        call qgedi(mat, lda, nn, ip2vt, det, work, job )
 
-    !     tmpdet = det(1) * 10.0_wp**(real(det(2), wp))
+        tmpdet = det(1) * 10.0_wp**(real(det(2), wp))
 
-    !     det_out = real(tmpdet, dp)
+        det_out = real(tmpdet, dp)
 
-    !     deallocate(ip2vt, work, mat)
-    ! end subroutine det_real
+        deallocate(ip2vt, work, mat)
+    end subroutine det_real
 
-    ! subroutine det_complex(matin, det_out)
-    !     complex(dp), intent(in)  :: matin(:, :)
-    !     complex(dp), intent(out) :: det_out
+    subroutine det_complex(matin, det_out)
+        complex(dp), intent(in)  :: matin(:, :)
+        complex(dp), intent(out) :: det_out
 
-    !     ! determinant work variables
-    !     complex(wp)     :: det(2), tmpdet
-    !     integer(kind=4) :: info, lda, nn, job, i, j
-    !     integer(ip2)    :: n
+        ! determinant work variables
+        complex(wp)     :: det(2), tmpdet
+        integer(kind=4) :: info, lda, nn, job, i, j
+        integer(ip2)    :: n
 
-    !     integer(kind=4), allocatable :: ip2vt(:)
-    !     complex(wp), allocatable     :: work(:), mat(:, :)
+        integer(kind=4), allocatable :: ip2vt(:)
+        complex(wp), allocatable     :: work(:), mat(:, :)
 
-    !     nn = size(matin(1,:))
-    !     lda = nn
+        nn = size(matin(1,:))
+        lda = nn
 
-    !     allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
+        allocate(ip2vt(1:nn), work(1:nn), mat(1:nn,1:nn))
 
-    !     forall (i=1:nn, j=1:nn) mat(i,j) = zone*real(matin(i,j), wp) + zi*real(aimag(matin(i,j)), wp)
+        forall (i=1:nn, j=1:nn) mat(i,j) = zone*real(matin(i,j), wp) + zi*real(aimag(matin(i,j)), wp)
 
-    !     call qgefa_complex(mat, lda, nn, ip2vt, info)
+        call qgefa_complex(mat, lda, nn, ip2vt, info)
 
-    !     job = 10
+        job = 10
 
-    !     call qgedi_complex(mat, lda, nn, ip2vt, det, work, job)
+        call qgedi_complex(mat, lda, nn, ip2vt, det, work, job)
 
-    !     tmpdet = det(1) * 10.0_wp**(real(det(2), wp))
+        tmpdet = det(1) * 10.0_wp**(real(det(2), wp))
 
-    !     det_out = zone*real(tmpdet, wp) + zi*real(aimag(tmpdet), wp)
+        det_out = zone*real(tmpdet, wp) + zi*real(aimag(tmpdet), wp)
 
-    !     deallocate(ip2vt, work, mat)
-    ! end subroutine det_complex
+        deallocate(ip2vt, work, mat)
+    end subroutine det_complex
 
     subroutine dec2bin (kk, nnn, matt, summ)
         integer(ip2), intent(in)  :: kk, nnn
