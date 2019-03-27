@@ -4,7 +4,13 @@
 {
     "distutils": {
         "depends": [
-            "src/hafnian.hpp"
+            "src/eigenvalue_hafnian.hpp",
+            "src/fsum.hpp",
+            "src/hafnian.hpp",
+            "src/recursive_hafnian.hpp",
+            "src/repeated_hafnian.hpp",
+            "src/stdafx.h",
+            "src/torontonian.hpp"
         ],
         "extra_compile_args": [
             "-std=c++11",
@@ -1875,6 +1881,7 @@ static const char __pyx_k_obj[] = "obj";
 static const char __pyx_k_rpt[] = "rpt";
 static const char __pyx_k_base[] = "base";
 static const char __pyx_k_dict[] = "__dict__";
+static const char __pyx_k_fsum[] = "fsum";
 static const char __pyx_k_loop[] = "loop";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mode[] = "mode";
@@ -1936,6 +1943,7 @@ static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_haf_rpt_complex[] = "haf_rpt_complex";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
+static const char __pyx_k_torontonian_real[] = "torontonian_real";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
@@ -2006,6 +2014,7 @@ static PyObject *__pyx_n_s_flags;
 static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_fortran;
 static PyObject *__pyx_n_u_fortran;
+static PyObject *__pyx_n_s_fsum;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
 static PyObject *__pyx_n_s_haf_complex;
@@ -2068,16 +2077,18 @@ static PyObject *__pyx_kp_s_stringsource;
 static PyObject *__pyx_n_s_struct;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_torontonian_complex;
+static PyObject *__pyx_n_s_torontonian_real;
 static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
-static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_quad); /* proto */
-static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop); /* proto */
-static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop); /* proto */
-static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A); /* proto */
-static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad); /* proto */
-static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad); /* proto */
+static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_fsum); /* proto */
+static PyObject *__pyx_pf_6libhaf_2torontonian_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_fsum); /* proto */
+static PyObject *__pyx_pf_6libhaf_4haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop); /* proto */
+static PyObject *__pyx_pf_6libhaf_6haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop); /* proto */
+static PyObject *__pyx_pf_6libhaf_8haf_int(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A); /* proto */
+static PyObject *__pyx_pf_6libhaf_10haf_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad); /* proto */
+static PyObject *__pyx_pf_6libhaf_12haf_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2158,42 +2169,44 @@ static PyObject *__pyx_tuple__30;
 static PyObject *__pyx_tuple__32;
 static PyObject *__pyx_tuple__34;
 static PyObject *__pyx_tuple__36;
-static PyObject *__pyx_tuple__37;
 static PyObject *__pyx_tuple__38;
 static PyObject *__pyx_tuple__39;
 static PyObject *__pyx_tuple__40;
 static PyObject *__pyx_tuple__41;
+static PyObject *__pyx_tuple__42;
+static PyObject *__pyx_tuple__43;
 static PyObject *__pyx_codeobj__25;
 static PyObject *__pyx_codeobj__27;
 static PyObject *__pyx_codeobj__29;
 static PyObject *__pyx_codeobj__31;
 static PyObject *__pyx_codeobj__33;
 static PyObject *__pyx_codeobj__35;
-static PyObject *__pyx_codeobj__42;
+static PyObject *__pyx_codeobj__37;
+static PyObject *__pyx_codeobj__44;
 /* Late includes */
 
 /* "hafnian/hafnian.pyx":46
  * 
  * 
- * def torontonian_complex(double complex[:, :] A, quad=True):             # <<<<<<<<<<<<<<
+ * def torontonian_complex(double complex[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
  *     """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6libhaf_1torontonian_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_torontonian_complex[] = "torontonian_complex(__Pyx_memviewslice A, quad=True)\nReturns the Torontonian of a complex matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``\n            matrix internally for a quadruple precision torontonian computation.\n\n    Returns:\n        np.complex128: the torontonian of matrix A\n    ";
+static char __pyx_doc_6libhaf_torontonian_complex[] = "torontonian_complex(__Pyx_memviewslice A, fsum=False)\nReturns the Torontonian of a complex matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``\n            matrix internally for a quadruple precision torontonian computation.\n\n    Returns:\n        np.complex128: the torontonian of matrix A\n    ";
 static PyMethodDef __pyx_mdef_6libhaf_1torontonian_complex = {"torontonian_complex", (PyCFunction)__pyx_pw_6libhaf_1torontonian_complex, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_torontonian_complex};
 static PyObject *__pyx_pw_6libhaf_1torontonian_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
-  PyObject *__pyx_v_quad = 0;
+  PyObject *__pyx_v_fsum = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("torontonian_complex (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_quad,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_fsum,0};
     PyObject* values[2] = {0,0};
-    values[1] = ((PyObject *)Py_True);
+    values[1] = ((PyObject *)Py_False);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -2213,7 +2226,7 @@ static PyObject *__pyx_pw_6libhaf_1torontonian_complex(PyObject *__pyx_self, PyO
         CYTHON_FALLTHROUGH;
         case  1:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_quad);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fsum);
           if (value) { values[1] = value; kw_args--; }
         }
       }
@@ -2230,7 +2243,7 @@ static PyObject *__pyx_pw_6libhaf_1torontonian_complex(PyObject *__pyx_self, PyO
       }
     }
     __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 46, __pyx_L3_error)
-    __pyx_v_quad = values[1];
+    __pyx_v_fsum = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -2240,14 +2253,14 @@ static PyObject *__pyx_pw_6libhaf_1torontonian_complex(PyObject *__pyx_self, PyO
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_torontonian_complex(__pyx_self, __pyx_v_A, __pyx_v_quad);
+  __pyx_r = __pyx_pf_6libhaf_torontonian_complex(__pyx_self, __pyx_v_A, __pyx_v_fsum);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_quad) {
+static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_fsum) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -2265,8 +2278,7 @@ static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__
   Py_ssize_t __pyx_t_7;
   Py_ssize_t __pyx_t_8;
   int __pyx_t_9;
-  __pyx_t_double_complex __pyx_t_10;
-  PyObject *__pyx_t_11 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("torontonian_complex", 0);
 
   /* "hafnian/hafnian.pyx":57
@@ -2353,7 +2365,7 @@ static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__
  *     if m % 2 != 0:
  *         sign = -1             # <<<<<<<<<<<<<<
  * 
- *     if quad:
+ *     if fsum:
  */
     __pyx_v_sign = -1;
 
@@ -2369,63 +2381,61 @@ static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__
   /* "hafnian/hafnian.pyx":70
  *         sign = -1
  * 
- *     if quad:             # <<<<<<<<<<<<<<
- *         return sign*torontonian_quad(mat)
+ *     if fsum:             # <<<<<<<<<<<<<<
+ *         return sign*torontonian_fsum(mat)
  * 
  */
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_quad); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_fsum); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 70, __pyx_L1_error)
   if (__pyx_t_9) {
 
     /* "hafnian/hafnian.pyx":71
  * 
- *     if quad:
- *         return sign*torontonian_quad(mat)             # <<<<<<<<<<<<<<
+ *     if fsum:
+ *         return sign*torontonian_fsum(mat)             # <<<<<<<<<<<<<<
  * 
- *     return sign*torontonian(mat)
+ *     return sign*torontonian_quad(mat)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_10 = __Pyx_c_prod_double(__pyx_t_double_complex_from_parts(__pyx_v_sign, 0), hafnian::torontonian_quad(__pyx_v_mat));
-    __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_11);
-    __pyx_r = __pyx_t_11;
-    __pyx_t_11 = 0;
+    __pyx_t_10 = PyFloat_FromDouble((__pyx_v_sign * hafnian::torontonian_fsum<__pyx_t_double_complex>(__pyx_v_mat))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_r = __pyx_t_10;
+    __pyx_t_10 = 0;
     goto __pyx_L0;
 
     /* "hafnian/hafnian.pyx":70
  *         sign = -1
  * 
- *     if quad:             # <<<<<<<<<<<<<<
- *         return sign*torontonian_quad(mat)
+ *     if fsum:             # <<<<<<<<<<<<<<
+ *         return sign*torontonian_fsum(mat)
  * 
  */
   }
 
   /* "hafnian/hafnian.pyx":73
- *         return sign*torontonian_quad(mat)
+ *         return sign*torontonian_fsum(mat)
  * 
- *     return sign*torontonian(mat)             # <<<<<<<<<<<<<<
+ *     return sign*torontonian_quad(mat)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_10 = __Pyx_c_prod_double(__pyx_t_double_complex_from_parts(__pyx_v_sign, 0), hafnian::torontonian<__pyx_t_double_complex>(__pyx_v_mat));
-  __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 73, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_r = __pyx_t_11;
-  __pyx_t_11 = 0;
+  __pyx_t_10 = PyFloat_FromDouble((__pyx_v_sign * hafnian::torontonian_quad(__pyx_v_mat))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
   /* "hafnian/hafnian.pyx":46
  * 
  * 
- * def torontonian_complex(double complex[:, :] A, quad=True):             # <<<<<<<<<<<<<<
+ * def torontonian_complex(double complex[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
  *     """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
  * 
  */
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("libhaf.torontonian_complex", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -2435,7 +2445,267 @@ static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__
   return __pyx_r;
 }
 
-/* "hafnian/hafnian.pyx":80
+/* "hafnian/hafnian.pyx":76
+ * 
+ * 
+ * def torontonian_real(double[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
+ *     """Returns the Torontonian of a real matrix A via the C++ hafnian library.
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6libhaf_3torontonian_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6libhaf_2torontonian_real[] = "torontonian_real(__Pyx_memviewslice A, fsum=False)\nReturns the Torontonian of a real matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``\n            matrix internally for a quadruple precision torontonian computation.\n\n    Returns:\n        np.complex128: the torontonian of matrix A\n    ";
+static PyMethodDef __pyx_mdef_6libhaf_3torontonian_real = {"torontonian_real", (PyCFunction)__pyx_pw_6libhaf_3torontonian_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_2torontonian_real};
+static PyObject *__pyx_pw_6libhaf_3torontonian_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_v_fsum = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("torontonian_real (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_fsum,0};
+    PyObject* values[2] = {0,0};
+    values[1] = ((PyObject *)Py_False);
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_A)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fsum);
+          if (value) { values[1] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "torontonian_real") < 0)) __PYX_ERR(0, 76, __pyx_L3_error)
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 76, __pyx_L3_error)
+    __pyx_v_fsum = values[1];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("torontonian_real", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 76, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("libhaf.torontonian_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_6libhaf_2torontonian_real(__pyx_self, __pyx_v_A, __pyx_v_fsum);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6libhaf_2torontonian_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_fsum) {
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_n;
+  std::vector<double>  __pyx_v_mat;
+  int __pyx_v_m;
+  int __pyx_v_sign;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  int __pyx_t_3;
+  int __pyx_t_4;
+  int __pyx_t_5;
+  int __pyx_t_6;
+  Py_ssize_t __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
+  int __pyx_t_9;
+  PyObject *__pyx_t_10 = NULL;
+  __Pyx_RefNannySetupContext("torontonian_real", 0);
+
+  /* "hafnian/hafnian.pyx":87
+ *         np.complex128: the torontonian of matrix A
+ *     """
+ *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef vector[double] mat
+ *     cdef int m = n/2
+ */
+  __pyx_v_n = (__pyx_v_A.shape[0]);
+
+  /* "hafnian/hafnian.pyx":89
+ *     cdef int i, j, n = A.shape[0]
+ *     cdef vector[double] mat
+ *     cdef int m = n/2             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(n):
+ */
+  __pyx_v_m = __Pyx_div_long(__pyx_v_n, 2);
+
+  /* "hafnian/hafnian.pyx":91
+ *     cdef int m = n/2
+ * 
+ *     for i in range(n):             # <<<<<<<<<<<<<<
+ *         for j in range(n):
+ *             mat.push_back(A[i, j])
+ */
+  __pyx_t_1 = __pyx_v_n;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
+
+    /* "hafnian/hafnian.pyx":92
+ * 
+ *     for i in range(n):
+ *         for j in range(n):             # <<<<<<<<<<<<<<
+ *             mat.push_back(A[i, j])
+ * 
+ */
+    __pyx_t_4 = __pyx_v_n;
+    __pyx_t_5 = __pyx_t_4;
+    for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+      __pyx_v_j = __pyx_t_6;
+
+      /* "hafnian/hafnian.pyx":93
+ *     for i in range(n):
+ *         for j in range(n):
+ *             mat.push_back(A[i, j])             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int sign = 1
+ */
+      __pyx_t_7 = __pyx_v_i;
+      __pyx_t_8 = __pyx_v_j;
+      try {
+        __pyx_v_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_7 * __pyx_v_A.strides[0]) ) + __pyx_t_8 * __pyx_v_A.strides[1]) ))));
+      } catch(...) {
+        __Pyx_CppExn2PyErr();
+        __PYX_ERR(0, 93, __pyx_L1_error)
+      }
+    }
+  }
+
+  /* "hafnian/hafnian.pyx":95
+ *             mat.push_back(A[i, j])
+ * 
+ *     cdef int sign = 1             # <<<<<<<<<<<<<<
+ * 
+ *     if m % 2 != 0:
+ */
+  __pyx_v_sign = 1;
+
+  /* "hafnian/hafnian.pyx":97
+ *     cdef int sign = 1
+ * 
+ *     if m % 2 != 0:             # <<<<<<<<<<<<<<
+ *         sign = -1
+ * 
+ */
+  __pyx_t_9 = ((__Pyx_mod_long(__pyx_v_m, 2) != 0) != 0);
+  if (__pyx_t_9) {
+
+    /* "hafnian/hafnian.pyx":98
+ * 
+ *     if m % 2 != 0:
+ *         sign = -1             # <<<<<<<<<<<<<<
+ * 
+ *     if fsum:
+ */
+    __pyx_v_sign = -1;
+
+    /* "hafnian/hafnian.pyx":97
+ *     cdef int sign = 1
+ * 
+ *     if m % 2 != 0:             # <<<<<<<<<<<<<<
+ *         sign = -1
+ * 
+ */
+  }
+
+  /* "hafnian/hafnian.pyx":100
+ *         sign = -1
+ * 
+ *     if fsum:             # <<<<<<<<<<<<<<
+ *         return sign*torontonian_fsum(mat)
+ * 
+ */
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_fsum); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 100, __pyx_L1_error)
+  if (__pyx_t_9) {
+
+    /* "hafnian/hafnian.pyx":101
+ * 
+ *     if fsum:
+ *         return sign*torontonian_fsum(mat)             # <<<<<<<<<<<<<<
+ * 
+ *     return sign*torontonian_quad(mat)
+ */
+    __Pyx_XDECREF(__pyx_r);
+    __pyx_t_10 = PyFloat_FromDouble((__pyx_v_sign * hafnian::torontonian_fsum<double>(__pyx_v_mat))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 101, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_r = __pyx_t_10;
+    __pyx_t_10 = 0;
+    goto __pyx_L0;
+
+    /* "hafnian/hafnian.pyx":100
+ *         sign = -1
+ * 
+ *     if fsum:             # <<<<<<<<<<<<<<
+ *         return sign*torontonian_fsum(mat)
+ * 
+ */
+  }
+
+  /* "hafnian/hafnian.pyx":103
+ *         return sign*torontonian_fsum(mat)
+ * 
+ *     return sign*torontonian_quad(mat)             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_10 = PyFloat_FromDouble((__pyx_v_sign * hafnian::torontonian_quad(__pyx_v_mat))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
+  goto __pyx_L0;
+
+  /* "hafnian/hafnian.pyx":76
+ * 
+ * 
+ * def torontonian_real(double[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
+ *     """Returns the Torontonian of a real matrix A via the C++ hafnian library.
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_AddTraceback("libhaf.torontonian_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_A, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "hafnian/hafnian.pyx":110
  * 
  * 
  * def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
@@ -2444,10 +2714,10 @@ static PyObject *__pyx_pf_6libhaf_torontonian_complex(CYTHON_UNUSED PyObject *__
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6libhaf_3haf_rpt_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_2haf_rpt_real[] = "haf_rpt_real(__Pyx_memviewslice A, __Pyx_memviewslice rpt, __Pyx_memviewslice mu=None, bool loop=False)\nReturns the hafnian of a real matrix A via the C++ hafnian library\n    using the rpt method. This method is more efficient for matrices with\n    repeated rows and columns.\n\n    Args:\n        A (array): a np.float64, square, :math:`N\\times N` array of even dimensions.\n        rpt (array): a length :math:`N` array corresponding to the number of times\n            each row/column of matrix A is repeated.\n        mu (array): a vector of length :math:`N` representing the vector of means/displacement.\n            If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this\n            only affects the loop hafnian.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n\n    Returns:\n        np.float64: the hafnian\n    ";
-static PyMethodDef __pyx_mdef_6libhaf_3haf_rpt_real = {"haf_rpt_real", (PyCFunction)__pyx_pw_6libhaf_3haf_rpt_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_2haf_rpt_real};
-static PyObject *__pyx_pw_6libhaf_3haf_rpt_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6libhaf_5haf_rpt_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6libhaf_4haf_rpt_real[] = "haf_rpt_real(__Pyx_memviewslice A, __Pyx_memviewslice rpt, __Pyx_memviewslice mu=None, bool loop=False)\nReturns the hafnian of a real matrix A via the C++ hafnian library\n    using the rpt method. This method is more efficient for matrices with\n    repeated rows and columns.\n\n    Args:\n        A (array): a np.float64, square, :math:`N\\times N` array of even dimensions.\n        rpt (array): a length :math:`N` array corresponding to the number of times\n            each row/column of matrix A is repeated.\n        mu (array): a vector of length :math:`N` representing the vector of means/displacement.\n            If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this\n            only affects the loop hafnian.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n\n    Returns:\n        np.float64: the hafnian\n    ";
+static PyMethodDef __pyx_mdef_6libhaf_5haf_rpt_real = {"haf_rpt_real", (PyCFunction)__pyx_pw_6libhaf_5haf_rpt_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_4haf_rpt_real};
+static PyObject *__pyx_pw_6libhaf_5haf_rpt_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_rpt = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_mu = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2482,7 +2752,7 @@ static PyObject *__pyx_pw_6libhaf_3haf_rpt_real(PyObject *__pyx_self, PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_rpt)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("haf_rpt_real", 0, 2, 4, 1); __PYX_ERR(0, 80, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("haf_rpt_real", 0, 2, 4, 1); __PYX_ERR(0, 110, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -2498,7 +2768,7 @@ static PyObject *__pyx_pw_6libhaf_3haf_rpt_real(PyObject *__pyx_self, PyObject *
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_rpt_real") < 0)) __PYX_ERR(0, 80, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_rpt_real") < 0)) __PYX_ERR(0, 110, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2512,36 +2782,36 @@ static PyObject *__pyx_pw_6libhaf_3haf_rpt_real(PyObject *__pyx_self, PyObject *
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 80, __pyx_L3_error)
-    __pyx_v_rpt = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_rpt.memview)) __PYX_ERR(0, 80, __pyx_L3_error)
+    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
+    __pyx_v_rpt = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_rpt.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
     if (values[2]) {
-      __pyx_v_mu = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_mu.memview)) __PYX_ERR(0, 80, __pyx_L3_error)
+      __pyx_v_mu = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_mu.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
     } else {
       __pyx_v_mu = __pyx_k_;
       __PYX_INC_MEMVIEW(&__pyx_v_mu, 1);
     }
     if (values[3]) {
-      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L3_error)
+      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 110, __pyx_L3_error)
     } else {
       __pyx_v_loop = ((int)0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("haf_rpt_real", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 80, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("haf_rpt_real", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 110, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libhaf.haf_rpt_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_2haf_rpt_real(__pyx_self, __pyx_v_A, __pyx_v_rpt, __pyx_v_mu, __pyx_v_loop);
+  __pyx_r = __pyx_pf_6libhaf_4haf_rpt_real(__pyx_self, __pyx_v_A, __pyx_v_rpt, __pyx_v_mu, __pyx_v_loop);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop) {
+static PyObject *__pyx_pf_6libhaf_4haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -2566,7 +2836,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
   PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("haf_rpt_real", 0);
 
-  /* "hafnian/hafnian.pyx":97
+  /* "hafnian/hafnian.pyx":127
  *         np.float64: the hafnian
  *     """
  *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
@@ -2575,7 +2845,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
  */
   __pyx_v_n = (__pyx_v_A.shape[0]);
 
-  /* "hafnian/hafnian.pyx":101
+  /* "hafnian/hafnian.pyx":131
  *     cdef vector[double] mat, d
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2587,7 +2857,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "hafnian/hafnian.pyx":102
+    /* "hafnian/hafnian.pyx":132
  * 
  *     for i in range(n):
  *         nud.push_back(rpt[i])             # <<<<<<<<<<<<<<
@@ -2599,10 +2869,10 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
       __pyx_v_nud.push_back((*((int *) ( /* dim=0 */ (__pyx_v_rpt.data + __pyx_t_4 * __pyx_v_rpt.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 102, __pyx_L1_error)
+      __PYX_ERR(0, 132, __pyx_L1_error)
     }
 
-    /* "hafnian/hafnian.pyx":104
+    /* "hafnian/hafnian.pyx":134
  *         nud.push_back(rpt[i])
  * 
  *         if mu is None:             # <<<<<<<<<<<<<<
@@ -2612,7 +2882,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
     __pyx_t_5 = ((((PyObject *) __pyx_v_mu.memview) == Py_None) != 0);
     if (__pyx_t_5) {
 
-      /* "hafnian/hafnian.pyx":105
+      /* "hafnian/hafnian.pyx":135
  * 
  *         if mu is None:
  *             d.push_back(A[i, i])             # <<<<<<<<<<<<<<
@@ -2625,10 +2895,10 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
         __pyx_v_d.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_6 * __pyx_v_A.strides[0]) ) + __pyx_t_7 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 105, __pyx_L1_error)
+        __PYX_ERR(0, 135, __pyx_L1_error)
       }
 
-      /* "hafnian/hafnian.pyx":104
+      /* "hafnian/hafnian.pyx":134
  *         nud.push_back(rpt[i])
  * 
  *         if mu is None:             # <<<<<<<<<<<<<<
@@ -2638,7 +2908,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
       goto __pyx_L5;
     }
 
-    /* "hafnian/hafnian.pyx":107
+    /* "hafnian/hafnian.pyx":137
  *             d.push_back(A[i, i])
  *         else:
  *             d.push_back(mu[i])             # <<<<<<<<<<<<<<
@@ -2651,12 +2921,12 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
         __pyx_v_d.push_back((*((double *) ( /* dim=0 */ (__pyx_v_mu.data + __pyx_t_8 * __pyx_v_mu.strides[0]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 107, __pyx_L1_error)
+        __PYX_ERR(0, 137, __pyx_L1_error)
       }
     }
     __pyx_L5:;
 
-    /* "hafnian/hafnian.pyx":109
+    /* "hafnian/hafnian.pyx":139
  *             d.push_back(mu[i])
  * 
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -2668,7 +2938,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_j = __pyx_t_11;
 
-      /* "hafnian/hafnian.pyx":110
+      /* "hafnian/hafnian.pyx":140
  * 
  *         for j in range(n):
  *             mat.push_back(A[i, j])             # <<<<<<<<<<<<<<
@@ -2681,12 +2951,12 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
         __pyx_v_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_12 * __pyx_v_A.strides[0]) ) + __pyx_t_13 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 110, __pyx_L1_error)
+        __PYX_ERR(0, 140, __pyx_L1_error)
       }
     }
   }
 
-  /* "hafnian/hafnian.pyx":113
+  /* "hafnian/hafnian.pyx":143
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -2696,7 +2966,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_t_5 = (__pyx_v_loop != 0);
   if (__pyx_t_5) {
 
-    /* "hafnian/hafnian.pyx":114
+    /* "hafnian/hafnian.pyx":144
  *     # Exposes a c function to python
  *     if loop:
  *         return loop_hafnian_rpt_quad(mat, d, nud)             # <<<<<<<<<<<<<<
@@ -2704,13 +2974,13 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
  *     return hafnian_rpt_quad(mat, nud)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_14 = PyFloat_FromDouble(hafnian::loop_hafnian_rpt_quad(__pyx_v_mat, __pyx_v_d, __pyx_v_nud)); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_14 = PyFloat_FromDouble(hafnian::loop_hafnian_rpt_quad(__pyx_v_mat, __pyx_v_d, __pyx_v_nud)); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __pyx_r = __pyx_t_14;
     __pyx_t_14 = 0;
     goto __pyx_L0;
 
-    /* "hafnian/hafnian.pyx":113
+    /* "hafnian/hafnian.pyx":143
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -2719,7 +2989,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
  */
   }
 
-  /* "hafnian/hafnian.pyx":116
+  /* "hafnian/hafnian.pyx":146
  *         return loop_hafnian_rpt_quad(mat, d, nud)
  * 
  *     return hafnian_rpt_quad(mat, nud)             # <<<<<<<<<<<<<<
@@ -2727,13 +2997,13 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_14 = PyFloat_FromDouble(hafnian::hafnian_rpt_quad(__pyx_v_mat, __pyx_v_nud)); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_14 = PyFloat_FromDouble(hafnian::hafnian_rpt_quad(__pyx_v_mat, __pyx_v_nud)); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
   __pyx_r = __pyx_t_14;
   __pyx_t_14 = 0;
   goto __pyx_L0;
 
-  /* "hafnian/hafnian.pyx":80
+  /* "hafnian/hafnian.pyx":110
  * 
  * 
  * def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
@@ -2755,7 +3025,7 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
   return __pyx_r;
 }
 
-/* "hafnian/hafnian.pyx":119
+/* "hafnian/hafnian.pyx":149
  * 
  * 
  * def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
@@ -2764,10 +3034,10 @@ static PyObject *__pyx_pf_6libhaf_2haf_rpt_real(CYTHON_UNUSED PyObject *__pyx_se
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6libhaf_5haf_rpt_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_4haf_rpt_complex[] = "haf_rpt_complex(__Pyx_memviewslice A, __Pyx_memviewslice rpt, __Pyx_memviewslice mu=None, bool loop=False)\nReturns the hafnian of a complex matrix A via the C++ hafnian library\n    using the rpt method. This method is more efficient for matrices with\n    repeated rows and columns.\n\n    Args:\n        A (array): a np.complex128, square, :math:`N\\times N` array of even dimensions.\n        rpt (array): a length :math:`N` array corresponding to the number of times\n            each row/column of matrix A is repeated.\n        mu (array): a vector of length :math:`N` representing the vector of means/displacement.\n            If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this\n            only affects the loop hafnian.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n\n    Returns:\n        np.complex128: the hafnian\n    ";
-static PyMethodDef __pyx_mdef_6libhaf_5haf_rpt_complex = {"haf_rpt_complex", (PyCFunction)__pyx_pw_6libhaf_5haf_rpt_complex, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_4haf_rpt_complex};
-static PyObject *__pyx_pw_6libhaf_5haf_rpt_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6libhaf_7haf_rpt_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6libhaf_6haf_rpt_complex[] = "haf_rpt_complex(__Pyx_memviewslice A, __Pyx_memviewslice rpt, __Pyx_memviewslice mu=None, bool loop=False)\nReturns the hafnian of a complex matrix A via the C++ hafnian library\n    using the rpt method. This method is more efficient for matrices with\n    repeated rows and columns.\n\n    Args:\n        A (array): a np.complex128, square, :math:`N\\times N` array of even dimensions.\n        rpt (array): a length :math:`N` array corresponding to the number of times\n            each row/column of matrix A is repeated.\n        mu (array): a vector of length :math:`N` representing the vector of means/displacement.\n            If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this\n            only affects the loop hafnian.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n\n    Returns:\n        np.complex128: the hafnian\n    ";
+static PyMethodDef __pyx_mdef_6libhaf_7haf_rpt_complex = {"haf_rpt_complex", (PyCFunction)__pyx_pw_6libhaf_7haf_rpt_complex, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_6haf_rpt_complex};
+static PyObject *__pyx_pw_6libhaf_7haf_rpt_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_rpt = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_mu = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2802,7 +3072,7 @@ static PyObject *__pyx_pw_6libhaf_5haf_rpt_complex(PyObject *__pyx_self, PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_rpt)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("haf_rpt_complex", 0, 2, 4, 1); __PYX_ERR(0, 119, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("haf_rpt_complex", 0, 2, 4, 1); __PYX_ERR(0, 149, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -2818,7 +3088,7 @@ static PyObject *__pyx_pw_6libhaf_5haf_rpt_complex(PyObject *__pyx_self, PyObjec
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_rpt_complex") < 0)) __PYX_ERR(0, 119, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_rpt_complex") < 0)) __PYX_ERR(0, 149, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2832,36 +3102,36 @@ static PyObject *__pyx_pw_6libhaf_5haf_rpt_complex(PyObject *__pyx_self, PyObjec
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
-    __pyx_v_rpt = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_rpt.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
+    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 149, __pyx_L3_error)
+    __pyx_v_rpt = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_rpt.memview)) __PYX_ERR(0, 149, __pyx_L3_error)
     if (values[2]) {
-      __pyx_v_mu = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_mu.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
+      __pyx_v_mu = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_mu.memview)) __PYX_ERR(0, 149, __pyx_L3_error)
     } else {
       __pyx_v_mu = __pyx_k__2;
       __PYX_INC_MEMVIEW(&__pyx_v_mu, 1);
     }
     if (values[3]) {
-      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 119, __pyx_L3_error)
+      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 149, __pyx_L3_error)
     } else {
       __pyx_v_loop = ((int)0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("haf_rpt_complex", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 119, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("haf_rpt_complex", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 149, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libhaf.haf_rpt_complex", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_4haf_rpt_complex(__pyx_self, __pyx_v_A, __pyx_v_rpt, __pyx_v_mu, __pyx_v_loop);
+  __pyx_r = __pyx_pf_6libhaf_6haf_rpt_complex(__pyx_self, __pyx_v_A, __pyx_v_rpt, __pyx_v_mu, __pyx_v_loop);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop) {
+static PyObject *__pyx_pf_6libhaf_6haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_rpt, __Pyx_memviewslice __pyx_v_mu, int __pyx_v_loop) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -2887,7 +3157,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
   PyObject *__pyx_t_15 = NULL;
   __Pyx_RefNannySetupContext("haf_rpt_complex", 0);
 
-  /* "hafnian/hafnian.pyx":136
+  /* "hafnian/hafnian.pyx":166
  *         np.complex128: the hafnian
  *     """
  *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
@@ -2896,7 +3166,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
  */
   __pyx_v_n = (__pyx_v_A.shape[0]);
 
-  /* "hafnian/hafnian.pyx":140
+  /* "hafnian/hafnian.pyx":170
  *     cdef vector[double complex] mat, d
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2908,7 +3178,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "hafnian/hafnian.pyx":141
+    /* "hafnian/hafnian.pyx":171
  * 
  *     for i in range(n):
  *         nud.push_back(rpt[i])             # <<<<<<<<<<<<<<
@@ -2920,10 +3190,10 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
       __pyx_v_nud.push_back((*((int *) ( /* dim=0 */ (__pyx_v_rpt.data + __pyx_t_4 * __pyx_v_rpt.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 141, __pyx_L1_error)
+      __PYX_ERR(0, 171, __pyx_L1_error)
     }
 
-    /* "hafnian/hafnian.pyx":143
+    /* "hafnian/hafnian.pyx":173
  *         nud.push_back(rpt[i])
  * 
  *         if mu is None:             # <<<<<<<<<<<<<<
@@ -2933,7 +3203,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_5 = ((((PyObject *) __pyx_v_mu.memview) == Py_None) != 0);
     if (__pyx_t_5) {
 
-      /* "hafnian/hafnian.pyx":144
+      /* "hafnian/hafnian.pyx":174
  * 
  *         if mu is None:
  *             d.push_back(A[i, i])             # <<<<<<<<<<<<<<
@@ -2946,10 +3216,10 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
         __pyx_v_d.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_6 * __pyx_v_A.strides[0]) ) + __pyx_t_7 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 144, __pyx_L1_error)
+        __PYX_ERR(0, 174, __pyx_L1_error)
       }
 
-      /* "hafnian/hafnian.pyx":143
+      /* "hafnian/hafnian.pyx":173
  *         nud.push_back(rpt[i])
  * 
  *         if mu is None:             # <<<<<<<<<<<<<<
@@ -2959,7 +3229,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
       goto __pyx_L5;
     }
 
-    /* "hafnian/hafnian.pyx":146
+    /* "hafnian/hafnian.pyx":176
  *             d.push_back(A[i, i])
  *         else:
  *             d.push_back(mu[i])             # <<<<<<<<<<<<<<
@@ -2972,12 +3242,12 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
         __pyx_v_d.push_back((*((__pyx_t_double_complex *) ( /* dim=0 */ (__pyx_v_mu.data + __pyx_t_8 * __pyx_v_mu.strides[0]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 146, __pyx_L1_error)
+        __PYX_ERR(0, 176, __pyx_L1_error)
       }
     }
     __pyx_L5:;
 
-    /* "hafnian/hafnian.pyx":148
+    /* "hafnian/hafnian.pyx":178
  *             d.push_back(mu[i])
  * 
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -2989,7 +3259,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_j = __pyx_t_11;
 
-      /* "hafnian/hafnian.pyx":149
+      /* "hafnian/hafnian.pyx":179
  * 
  *         for j in range(n):
  *             mat.push_back(A[i, j])             # <<<<<<<<<<<<<<
@@ -3002,12 +3272,12 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
         __pyx_v_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_12 * __pyx_v_A.strides[0]) ) + __pyx_t_13 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 149, __pyx_L1_error)
+        __PYX_ERR(0, 179, __pyx_L1_error)
       }
     }
   }
 
-  /* "hafnian/hafnian.pyx":152
+  /* "hafnian/hafnian.pyx":182
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -3017,7 +3287,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
   __pyx_t_5 = (__pyx_v_loop != 0);
   if (__pyx_t_5) {
 
-    /* "hafnian/hafnian.pyx":153
+    /* "hafnian/hafnian.pyx":183
  *     # Exposes a c function to python
  *     if loop:
  *         return loop_hafnian_rpt_quad(mat, d, nud)             # <<<<<<<<<<<<<<
@@ -3026,13 +3296,13 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
  */
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_14 = hafnian::loop_hafnian_rpt_quad(__pyx_v_mat, __pyx_v_d, __pyx_v_nud);
-    __pyx_t_15 = __pyx_PyComplex_FromComplex(__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 153, __pyx_L1_error)
+    __pyx_t_15 = __pyx_PyComplex_FromComplex(__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __pyx_r = __pyx_t_15;
     __pyx_t_15 = 0;
     goto __pyx_L0;
 
-    /* "hafnian/hafnian.pyx":152
+    /* "hafnian/hafnian.pyx":182
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -3041,7 +3311,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
  */
   }
 
-  /* "hafnian/hafnian.pyx":155
+  /* "hafnian/hafnian.pyx":185
  *         return loop_hafnian_rpt_quad(mat, d, nud)
  * 
  *     return hafnian_rpt_quad(mat, nud)             # <<<<<<<<<<<<<<
@@ -3050,13 +3320,13 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_14 = hafnian::hafnian_rpt_quad(__pyx_v_mat, __pyx_v_nud);
-  __pyx_t_15 = __pyx_PyComplex_FromComplex(__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __pyx_t_15 = __pyx_PyComplex_FromComplex(__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_15);
   __pyx_r = __pyx_t_15;
   __pyx_t_15 = 0;
   goto __pyx_L0;
 
-  /* "hafnian/hafnian.pyx":119
+  /* "hafnian/hafnian.pyx":149
  * 
  * 
  * def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
@@ -3078,7 +3348,7 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "hafnian/hafnian.pyx":162
+/* "hafnian/hafnian.pyx":192
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
@@ -3087,16 +3357,16 @@ static PyObject *__pyx_pf_6libhaf_4haf_rpt_complex(CYTHON_UNUSED PyObject *__pyx
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6libhaf_7haf_int(PyObject *__pyx_self, PyObject *__pyx_arg_A); /*proto*/
-static char __pyx_doc_6libhaf_6haf_int[] = "haf_int(__Pyx_memviewslice A)\nReturns the hafnian of an integer matrix A via the C++ hafnian library.\n    Modified with permission from https://github.com/eklotek/Hafnian.\n\n    .. note:: Currently does not support calculation of the loop hafnian.\n\n    Args:\n        A (array): a np.int64, square, symmetric array of even dimensions.\n\n    Returns:\n        np.int64: the hafnian of matrix A\n    ";
-static PyMethodDef __pyx_mdef_6libhaf_7haf_int = {"haf_int", (PyCFunction)__pyx_pw_6libhaf_7haf_int, METH_O, __pyx_doc_6libhaf_6haf_int};
-static PyObject *__pyx_pw_6libhaf_7haf_int(PyObject *__pyx_self, PyObject *__pyx_arg_A) {
+static PyObject *__pyx_pw_6libhaf_9haf_int(PyObject *__pyx_self, PyObject *__pyx_arg_A); /*proto*/
+static char __pyx_doc_6libhaf_8haf_int[] = "haf_int(__Pyx_memviewslice A)\nReturns the hafnian of an integer matrix A via the C++ hafnian library.\n    Modified with permission from https://github.com/eklotek/Hafnian.\n\n    .. note:: Currently does not support calculation of the loop hafnian.\n\n    Args:\n        A (array): a np.int64, square, symmetric array of even dimensions.\n\n    Returns:\n        np.int64: the hafnian of matrix A\n    ";
+static PyMethodDef __pyx_mdef_6libhaf_9haf_int = {"haf_int", (PyCFunction)__pyx_pw_6libhaf_9haf_int, METH_O, __pyx_doc_6libhaf_8haf_int};
+static PyObject *__pyx_pw_6libhaf_9haf_int(PyObject *__pyx_self, PyObject *__pyx_arg_A) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("haf_int (wrapper)", 0);
   assert(__pyx_arg_A); {
-    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_PY_LONG_LONG(__pyx_arg_A, PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_PY_LONG_LONG(__pyx_arg_A, PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 192, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3104,14 +3374,14 @@ static PyObject *__pyx_pw_6libhaf_7haf_int(PyObject *__pyx_self, PyObject *__pyx
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_6haf_int(__pyx_self, __pyx_v_A);
+  __pyx_r = __pyx_pf_6libhaf_8haf_int(__pyx_self, __pyx_v_A);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A) {
+static PyObject *__pyx_pf_6libhaf_8haf_int(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -3129,7 +3399,7 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("haf_int", 0);
 
-  /* "hafnian/hafnian.pyx":174
+  /* "hafnian/hafnian.pyx":204
  *         np.int64: the hafnian of matrix A
  *     """
  *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
@@ -3138,7 +3408,7 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
  */
   __pyx_v_n = (__pyx_v_A.shape[0]);
 
-  /* "hafnian/hafnian.pyx":177
+  /* "hafnian/hafnian.pyx":207
  *     cdef vector[long long] mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -3150,7 +3420,7 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "hafnian/hafnian.pyx":178
+    /* "hafnian/hafnian.pyx":208
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -3162,7 +3432,7 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "hafnian/hafnian.pyx":179
+      /* "hafnian/hafnian.pyx":209
  *     for i in range(n):
  *         for j in range(n):
  *             mat.push_back(A[i, j])             # <<<<<<<<<<<<<<
@@ -3175,12 +3445,12 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
         __pyx_v_mat.push_back((*((PY_LONG_LONG *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_7 * __pyx_v_A.strides[0]) ) + __pyx_t_8 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 179, __pyx_L1_error)
+        __PYX_ERR(0, 209, __pyx_L1_error)
       }
     }
   }
 
-  /* "hafnian/hafnian.pyx":182
+  /* "hafnian/hafnian.pyx":212
  * 
  *     # Exposes a c function to python
  *     return hafnian_recursive(mat)             # <<<<<<<<<<<<<<
@@ -3188,13 +3458,13 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_9 = __Pyx_PyInt_From_PY_LONG_LONG(hafnian::hafnian_recursive<PY_LONG_LONG>(__pyx_v_mat)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_From_PY_LONG_LONG(hafnian::hafnian_recursive<PY_LONG_LONG>(__pyx_v_mat)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __pyx_r = __pyx_t_9;
   __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "hafnian/hafnian.pyx":162
+  /* "hafnian/hafnian.pyx":192
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
@@ -3214,7 +3484,7 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
   return __pyx_r;
 }
 
-/* "hafnian/hafnian.pyx":189
+/* "hafnian/hafnian.pyx":219
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
@@ -3223,10 +3493,10 @@ static PyObject *__pyx_pf_6libhaf_6haf_int(CYTHON_UNUSED PyObject *__pyx_self, _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6libhaf_9haf_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_8haf_complex[] = "haf_complex(__Pyx_memviewslice A, bool loop=False, bool recursive=True, quad=True)\nReturns the hafnian of a complex matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``\n            matrix internally for a quadruple precision hafnian computation.\n\n    Returns:\n        np.complex128: the hafnian of matrix A\n    ";
-static PyMethodDef __pyx_mdef_6libhaf_9haf_complex = {"haf_complex", (PyCFunction)__pyx_pw_6libhaf_9haf_complex, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_8haf_complex};
-static PyObject *__pyx_pw_6libhaf_9haf_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6libhaf_11haf_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6libhaf_10haf_complex[] = "haf_complex(__Pyx_memviewslice A, bool loop=False, bool recursive=True, quad=True)\nReturns the hafnian of a complex matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.complex128, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``\n            matrix internally for a quadruple precision hafnian computation.\n\n    Returns:\n        np.complex128: the hafnian of matrix A\n    ";
+static PyMethodDef __pyx_mdef_6libhaf_11haf_complex = {"haf_complex", (PyCFunction)__pyx_pw_6libhaf_11haf_complex, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_10haf_complex};
+static PyObject *__pyx_pw_6libhaf_11haf_complex(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_loop;
   int __pyx_v_recursive;
@@ -3278,7 +3548,7 @@ static PyObject *__pyx_pw_6libhaf_9haf_complex(PyObject *__pyx_self, PyObject *_
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_complex") < 0)) __PYX_ERR(0, 189, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_complex") < 0)) __PYX_ERR(0, 219, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3293,14 +3563,14 @@ static PyObject *__pyx_pw_6libhaf_9haf_complex(PyObject *__pyx_self, PyObject *_
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 189, __pyx_L3_error)
+    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 219, __pyx_L3_error)
     if (values[1]) {
-      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 189, __pyx_L3_error)
+      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L3_error)
     } else {
       __pyx_v_loop = ((int)0);
     }
     if (values[2]) {
-      __pyx_v_recursive = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_recursive == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 189, __pyx_L3_error)
+      __pyx_v_recursive = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_recursive == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L3_error)
     } else {
       __pyx_v_recursive = ((int)1);
     }
@@ -3308,20 +3578,20 @@ static PyObject *__pyx_pw_6libhaf_9haf_complex(PyObject *__pyx_self, PyObject *_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("haf_complex", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 189, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("haf_complex", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 219, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libhaf.haf_complex", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_8haf_complex(__pyx_self, __pyx_v_A, __pyx_v_loop, __pyx_v_recursive, __pyx_v_quad);
+  __pyx_r = __pyx_pf_6libhaf_10haf_complex(__pyx_self, __pyx_v_A, __pyx_v_loop, __pyx_v_recursive, __pyx_v_quad);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad) {
+static PyObject *__pyx_pf_6libhaf_10haf_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -3341,7 +3611,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
   PyObject *__pyx_t_11 = NULL;
   __Pyx_RefNannySetupContext("haf_complex", 0);
 
-  /* "hafnian/hafnian.pyx":203
+  /* "hafnian/hafnian.pyx":233
  *         np.complex128: the hafnian of matrix A
  *     """
  *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
@@ -3350,7 +3620,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
   __pyx_v_n = (__pyx_v_A.shape[0]);
 
-  /* "hafnian/hafnian.pyx":206
+  /* "hafnian/hafnian.pyx":236
  *     cdef vector[double complex] mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -3362,7 +3632,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "hafnian/hafnian.pyx":207
+    /* "hafnian/hafnian.pyx":237
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -3374,7 +3644,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "hafnian/hafnian.pyx":208
+      /* "hafnian/hafnian.pyx":238
  *     for i in range(n):
  *         for j in range(n):
  *             mat.push_back(A[i, j])             # <<<<<<<<<<<<<<
@@ -3387,12 +3657,12 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
         __pyx_v_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_7 * __pyx_v_A.strides[0]) ) + __pyx_t_8 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 208, __pyx_L1_error)
+        __PYX_ERR(0, 238, __pyx_L1_error)
       }
     }
   }
 
-  /* "hafnian/hafnian.pyx":211
+  /* "hafnian/hafnian.pyx":241
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -3402,7 +3672,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
   __pyx_t_9 = (__pyx_v_loop != 0);
   if (__pyx_t_9) {
 
-    /* "hafnian/hafnian.pyx":212
+    /* "hafnian/hafnian.pyx":242
  *     # Exposes a c function to python
  *     if loop:
  *         return loop_hafnian(mat)             # <<<<<<<<<<<<<<
@@ -3411,13 +3681,13 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_10 = hafnian::loop_hafnian<__pyx_t_double_complex>(__pyx_v_mat);
-    __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 212, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_r = __pyx_t_11;
     __pyx_t_11 = 0;
     goto __pyx_L0;
 
-    /* "hafnian/hafnian.pyx":211
+    /* "hafnian/hafnian.pyx":241
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -3426,7 +3696,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
   }
 
-  /* "hafnian/hafnian.pyx":214
+  /* "hafnian/hafnian.pyx":244
  *         return loop_hafnian(mat)
  * 
  *     if recursive:             # <<<<<<<<<<<<<<
@@ -3436,17 +3706,17 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
   __pyx_t_9 = (__pyx_v_recursive != 0);
   if (__pyx_t_9) {
 
-    /* "hafnian/hafnian.pyx":215
+    /* "hafnian/hafnian.pyx":245
  * 
  *     if recursive:
  *         if quad:             # <<<<<<<<<<<<<<
  *             return hafnian_recursive_quad(mat)
  *         return hafnian_recursive(mat)
  */
-    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_quad); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 215, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_quad); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
     if (__pyx_t_9) {
 
-      /* "hafnian/hafnian.pyx":216
+      /* "hafnian/hafnian.pyx":246
  *     if recursive:
  *         if quad:
  *             return hafnian_recursive_quad(mat)             # <<<<<<<<<<<<<<
@@ -3455,13 +3725,13 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
       __Pyx_XDECREF(__pyx_r);
       __pyx_t_10 = hafnian::hafnian_recursive_quad(__pyx_v_mat);
-      __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 216, __pyx_L1_error)
+      __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 246, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_r = __pyx_t_11;
       __pyx_t_11 = 0;
       goto __pyx_L0;
 
-      /* "hafnian/hafnian.pyx":215
+      /* "hafnian/hafnian.pyx":245
  * 
  *     if recursive:
  *         if quad:             # <<<<<<<<<<<<<<
@@ -3470,7 +3740,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
     }
 
-    /* "hafnian/hafnian.pyx":217
+    /* "hafnian/hafnian.pyx":247
  *         if quad:
  *             return hafnian_recursive_quad(mat)
  *         return hafnian_recursive(mat)             # <<<<<<<<<<<<<<
@@ -3479,13 +3749,13 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_10 = hafnian::hafnian_recursive<__pyx_t_double_complex>(__pyx_v_mat);
-    __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 217, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 247, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_r = __pyx_t_11;
     __pyx_t_11 = 0;
     goto __pyx_L0;
 
-    /* "hafnian/hafnian.pyx":214
+    /* "hafnian/hafnian.pyx":244
  *         return loop_hafnian(mat)
  * 
  *     if recursive:             # <<<<<<<<<<<<<<
@@ -3494,7 +3764,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
   }
 
-  /* "hafnian/hafnian.pyx":219
+  /* "hafnian/hafnian.pyx":249
  *         return hafnian_recursive(mat)
  * 
  *     return hafnian(mat)             # <<<<<<<<<<<<<<
@@ -3503,13 +3773,13 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_10 = hafnian::hafnian<__pyx_t_double_complex>(__pyx_v_mat);
-  __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_11 = __pyx_PyComplex_FromComplex(__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __pyx_r = __pyx_t_11;
   __pyx_t_11 = 0;
   goto __pyx_L0;
 
-  /* "hafnian/hafnian.pyx":189
+  /* "hafnian/hafnian.pyx":219
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
@@ -3529,7 +3799,7 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
   return __pyx_r;
 }
 
-/* "hafnian/hafnian.pyx":222
+/* "hafnian/hafnian.pyx":252
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
@@ -3538,10 +3808,10 @@ static PyObject *__pyx_pf_6libhaf_8haf_complex(CYTHON_UNUSED PyObject *__pyx_sel
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6libhaf_11haf_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_10haf_real[] = "haf_real(__Pyx_memviewslice A, bool loop=False, bool recursive=True, quad=True)\nReturns the hafnian of a real matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.float64, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double``\n            matrix internally for a quadruple precision hafnian computation.\n\n    Returns:\n        np.float64: the hafnian of matrix A\n    ";
-static PyMethodDef __pyx_mdef_6libhaf_11haf_real = {"haf_real", (PyCFunction)__pyx_pw_6libhaf_11haf_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_10haf_real};
-static PyObject *__pyx_pw_6libhaf_11haf_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6libhaf_13haf_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6libhaf_12haf_real[] = "haf_real(__Pyx_memviewslice A, bool loop=False, bool recursive=True, quad=True)\nReturns the hafnian of a real matrix A via the C++ hafnian library.\n\n    Args:\n        A (array): a np.float64, square, symmetric array of even dimensions.\n        loop (bool): If ``True``, the loop hafnian is returned. Default false.\n        recursive (bool): If ``True``, the recursive algorithm is used. Note:\n            the recursive algorithm does not currently support the loop hafnian.\n        quad (bool): If ``True``, the input matrix is cast to a ``long double``\n            matrix internally for a quadruple precision hafnian computation.\n\n    Returns:\n        np.float64: the hafnian of matrix A\n    ";
+static PyMethodDef __pyx_mdef_6libhaf_13haf_real = {"haf_real", (PyCFunction)__pyx_pw_6libhaf_13haf_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_12haf_real};
+static PyObject *__pyx_pw_6libhaf_13haf_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_loop;
   int __pyx_v_recursive;
@@ -3593,7 +3863,7 @@ static PyObject *__pyx_pw_6libhaf_11haf_real(PyObject *__pyx_self, PyObject *__p
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_real") < 0)) __PYX_ERR(0, 222, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "haf_real") < 0)) __PYX_ERR(0, 252, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3608,14 +3878,14 @@ static PyObject *__pyx_pw_6libhaf_11haf_real(PyObject *__pyx_self, PyObject *__p
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 222, __pyx_L3_error)
+    __pyx_v_A = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_A.memview)) __PYX_ERR(0, 252, __pyx_L3_error)
     if (values[1]) {
-      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 222, __pyx_L3_error)
+      __pyx_v_loop = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 252, __pyx_L3_error)
     } else {
       __pyx_v_loop = ((int)0);
     }
     if (values[2]) {
-      __pyx_v_recursive = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_recursive == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 222, __pyx_L3_error)
+      __pyx_v_recursive = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_recursive == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 252, __pyx_L3_error)
     } else {
       __pyx_v_recursive = ((int)1);
     }
@@ -3623,20 +3893,20 @@ static PyObject *__pyx_pw_6libhaf_11haf_real(PyObject *__pyx_self, PyObject *__p
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("haf_real", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 222, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("haf_real", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 252, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libhaf.haf_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_10haf_real(__pyx_self, __pyx_v_A, __pyx_v_loop, __pyx_v_recursive, __pyx_v_quad);
+  __pyx_r = __pyx_pf_6libhaf_12haf_real(__pyx_self, __pyx_v_A, __pyx_v_loop, __pyx_v_recursive, __pyx_v_quad);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad) {
+static PyObject *__pyx_pf_6libhaf_12haf_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -3655,7 +3925,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("haf_real", 0);
 
-  /* "hafnian/hafnian.pyx":236
+  /* "hafnian/hafnian.pyx":266
  *         np.float64: the hafnian of matrix A
  *     """
  *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
@@ -3664,7 +3934,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  */
   __pyx_v_n = (__pyx_v_A.shape[0]);
 
-  /* "hafnian/hafnian.pyx":239
+  /* "hafnian/hafnian.pyx":269
  *     cdef vector[double] mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -3676,7 +3946,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "hafnian/hafnian.pyx":240
+    /* "hafnian/hafnian.pyx":270
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -3688,7 +3958,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "hafnian/hafnian.pyx":241
+      /* "hafnian/hafnian.pyx":271
  *     for i in range(n):
  *         for j in range(n):
  *             mat.push_back(A[i, j])             # <<<<<<<<<<<<<<
@@ -3701,12 +3971,12 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
         __pyx_v_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_7 * __pyx_v_A.strides[0]) ) + __pyx_t_8 * __pyx_v_A.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 241, __pyx_L1_error)
+        __PYX_ERR(0, 271, __pyx_L1_error)
       }
     }
   }
 
-  /* "hafnian/hafnian.pyx":244
+  /* "hafnian/hafnian.pyx":274
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -3716,7 +3986,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
   __pyx_t_9 = (__pyx_v_loop != 0);
   if (__pyx_t_9) {
 
-    /* "hafnian/hafnian.pyx":245
+    /* "hafnian/hafnian.pyx":275
  *     # Exposes a c function to python
  *     if loop:
  *         return loop_hafnian(mat)             # <<<<<<<<<<<<<<
@@ -3724,13 +3994,13 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  *     if recursive:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_10 = PyFloat_FromDouble(hafnian::loop_hafnian<double>(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_10 = PyFloat_FromDouble(hafnian::loop_hafnian<double>(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 275, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __pyx_r = __pyx_t_10;
     __pyx_t_10 = 0;
     goto __pyx_L0;
 
-    /* "hafnian/hafnian.pyx":244
+    /* "hafnian/hafnian.pyx":274
  * 
  *     # Exposes a c function to python
  *     if loop:             # <<<<<<<<<<<<<<
@@ -3739,7 +4009,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  */
   }
 
-  /* "hafnian/hafnian.pyx":247
+  /* "hafnian/hafnian.pyx":277
  *         return loop_hafnian(mat)
  * 
  *     if recursive:             # <<<<<<<<<<<<<<
@@ -3749,17 +4019,17 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
   __pyx_t_9 = (__pyx_v_recursive != 0);
   if (__pyx_t_9) {
 
-    /* "hafnian/hafnian.pyx":248
+    /* "hafnian/hafnian.pyx":278
  * 
  *     if recursive:
  *         if quad:             # <<<<<<<<<<<<<<
  *             return hafnian_recursive_quad(mat)
  *         return hafnian_recursive(mat)
  */
-    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_quad); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_quad); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 278, __pyx_L1_error)
     if (__pyx_t_9) {
 
-      /* "hafnian/hafnian.pyx":249
+      /* "hafnian/hafnian.pyx":279
  *     if recursive:
  *         if quad:
  *             return hafnian_recursive_quad(mat)             # <<<<<<<<<<<<<<
@@ -3767,13 +4037,13 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  * 
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_10 = PyFloat_FromDouble(hafnian::hafnian_recursive_quad(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 249, __pyx_L1_error)
+      __pyx_t_10 = PyFloat_FromDouble(hafnian::hafnian_recursive_quad(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 279, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_r = __pyx_t_10;
       __pyx_t_10 = 0;
       goto __pyx_L0;
 
-      /* "hafnian/hafnian.pyx":248
+      /* "hafnian/hafnian.pyx":278
  * 
  *     if recursive:
  *         if quad:             # <<<<<<<<<<<<<<
@@ -3782,7 +4052,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  */
     }
 
-    /* "hafnian/hafnian.pyx":250
+    /* "hafnian/hafnian.pyx":280
  *         if quad:
  *             return hafnian_recursive_quad(mat)
  *         return hafnian_recursive(mat)             # <<<<<<<<<<<<<<
@@ -3790,13 +4060,13 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  *     return hafnian(mat)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_10 = PyFloat_FromDouble(hafnian::hafnian_recursive<double>(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __pyx_t_10 = PyFloat_FromDouble(hafnian::hafnian_recursive<double>(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 280, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __pyx_r = __pyx_t_10;
     __pyx_t_10 = 0;
     goto __pyx_L0;
 
-    /* "hafnian/hafnian.pyx":247
+    /* "hafnian/hafnian.pyx":277
  *         return loop_hafnian(mat)
  * 
  *     if recursive:             # <<<<<<<<<<<<<<
@@ -3805,19 +4075,19 @@ static PyObject *__pyx_pf_6libhaf_10haf_real(CYTHON_UNUSED PyObject *__pyx_self,
  */
   }
 
-  /* "hafnian/hafnian.pyx":252
+  /* "hafnian/hafnian.pyx":282
  *         return hafnian_recursive(mat)
  * 
  *     return hafnian(mat)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_10 = PyFloat_FromDouble(hafnian::hafnian<double>(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_10 = PyFloat_FromDouble(hafnian::hafnian<double>(__pyx_v_mat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __pyx_r = __pyx_t_10;
   __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "hafnian/hafnian.pyx":222
+  /* "hafnian/hafnian.pyx":252
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
@@ -17503,6 +17773,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {&__pyx_n_s_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 0, 1, 1},
   {&__pyx_n_u_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 0, 1},
+  {&__pyx_n_s_fsum, __pyx_k_fsum, sizeof(__pyx_k_fsum), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
   {&__pyx_n_s_haf_complex, __pyx_k_haf_complex, sizeof(__pyx_k_haf_complex), 0, 0, 1, 1},
@@ -17565,6 +17836,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_struct, __pyx_k_struct, sizeof(__pyx_k_struct), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_torontonian_complex, __pyx_k_torontonian_complex, sizeof(__pyx_k_torontonian_complex), 0, 0, 1, 1},
+  {&__pyx_n_s_torontonian_real, __pyx_k_torontonian_real, sizeof(__pyx_k_torontonian_real), 0, 0, 1, 1},
   {&__pyx_kp_s_unable_to_allocate_array_data, __pyx_k_unable_to_allocate_array_data, sizeof(__pyx_k_unable_to_allocate_array_data), 0, 0, 1, 0},
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
@@ -17817,74 +18089,86 @@ static int __Pyx_InitCachedConstants(void) {
   /* "hafnian/hafnian.pyx":46
  * 
  * 
- * def torontonian_complex(double complex[:, :] A, quad=True):             # <<<<<<<<<<<<<<
+ * def torontonian_complex(double complex[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
  *     """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
  * 
  */
-  __pyx_tuple__24 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_quad, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat, __pyx_n_s_m, __pyx_n_s_sign); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_tuple__24 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_fsum, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat, __pyx_n_s_m, __pyx_n_s_sign); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
   __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_torontonian_complex, 46, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 46, __pyx_L1_error)
 
-  /* "hafnian/hafnian.pyx":80
+  /* "hafnian/hafnian.pyx":76
+ * 
+ * 
+ * def torontonian_real(double[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
+ *     """Returns the Torontonian of a real matrix A via the C++ hafnian library.
+ * 
+ */
+  __pyx_tuple__26 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_fsum, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat, __pyx_n_s_m, __pyx_n_s_sign); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_torontonian_real, 76, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 76, __pyx_L1_error)
+
+  /* "hafnian/hafnian.pyx":110
  * 
  * 
  * def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
  *     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
  *     using the rpt method. This method is more efficient for matrices with
  */
-  __pyx_tuple__26 = PyTuple_Pack(10, __pyx_n_s_A, __pyx_n_s_rpt, __pyx_n_s_mu, __pyx_n_s_loop, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_nud, __pyx_n_s_mat, __pyx_n_s_d); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 80, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_rpt_real, 80, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_tuple__28 = PyTuple_Pack(10, __pyx_n_s_A, __pyx_n_s_rpt, __pyx_n_s_mu, __pyx_n_s_loop, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_nud, __pyx_n_s_mat, __pyx_n_s_d); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__28);
+  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_rpt_real, 110, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 110, __pyx_L1_error)
 
-  /* "hafnian/hafnian.pyx":119
+  /* "hafnian/hafnian.pyx":149
  * 
  * 
  * def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
  *     r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
  *     using the rpt method. This method is more efficient for matrices with
  */
-  __pyx_tuple__28 = PyTuple_Pack(10, __pyx_n_s_A, __pyx_n_s_rpt, __pyx_n_s_mu, __pyx_n_s_loop, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_nud, __pyx_n_s_mat, __pyx_n_s_d); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__28);
-  __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_rpt_complex, 119, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_tuple__30 = PyTuple_Pack(10, __pyx_n_s_A, __pyx_n_s_rpt, __pyx_n_s_mu, __pyx_n_s_loop, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_nud, __pyx_n_s_mat, __pyx_n_s_d); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__30);
+  __Pyx_GIVEREF(__pyx_tuple__30);
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_rpt_complex, 149, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 149, __pyx_L1_error)
 
-  /* "hafnian/hafnian.pyx":162
+  /* "hafnian/hafnian.pyx":192
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
  *     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
  *     Modified with permission from https://github.com/eklotek/Hafnian.
  */
-  __pyx_tuple__30 = PyTuple_Pack(6, __pyx_n_s_A, __pyx_n_s_A, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 162, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__30);
-  __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_int, 162, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(6, __pyx_n_s_A, __pyx_n_s_A, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__32);
+  __Pyx_GIVEREF(__pyx_tuple__32);
+  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_int, 192, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 192, __pyx_L1_error)
 
-  /* "hafnian/hafnian.pyx":189
+  /* "hafnian/hafnian.pyx":219
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
  *     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
  * 
  */
-  __pyx_tuple__32 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_loop, __pyx_n_s_recursive, __pyx_n_s_quad, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 189, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__32);
-  __Pyx_GIVEREF(__pyx_tuple__32);
-  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(4, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_complex, 189, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_tuple__34 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_loop, __pyx_n_s_recursive, __pyx_n_s_quad, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__34);
+  __Pyx_GIVEREF(__pyx_tuple__34);
+  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(4, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_complex, 219, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 219, __pyx_L1_error)
 
-  /* "hafnian/hafnian.pyx":222
+  /* "hafnian/hafnian.pyx":252
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
  *     """Returns the hafnian of a real matrix A via the C++ hafnian library.
  * 
  */
-  __pyx_tuple__34 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_loop, __pyx_n_s_recursive, __pyx_n_s_quad, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 222, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__34);
-  __Pyx_GIVEREF(__pyx_tuple__34);
-  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(4, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_real, 222, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_tuple__36 = PyTuple_Pack(8, __pyx_n_s_A, __pyx_n_s_loop, __pyx_n_s_recursive, __pyx_n_s_quad, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_mat); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__36);
+  __Pyx_GIVEREF(__pyx_tuple__36);
+  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(4, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_haf_real, 252, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 252, __pyx_L1_error)
 
   /* "View.MemoryView":285
  *         return self.name
@@ -17893,9 +18177,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__36 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(1, 285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__36);
-  __Pyx_GIVEREF(__pyx_tuple__36);
+  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(1, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__38);
+  __Pyx_GIVEREF(__pyx_tuple__38);
 
   /* "View.MemoryView":286
  * 
@@ -17904,9 +18188,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(1, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__37);
-  __Pyx_GIVEREF(__pyx_tuple__37);
+  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__39);
+  __Pyx_GIVEREF(__pyx_tuple__39);
 
   /* "View.MemoryView":287
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -17915,9 +18199,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(1, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__38);
-  __Pyx_GIVEREF(__pyx_tuple__38);
+  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__40);
+  __Pyx_GIVEREF(__pyx_tuple__40);
 
   /* "View.MemoryView":290
  * 
@@ -17926,9 +18210,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(1, 290, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__39);
-  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(1, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__41);
+  __Pyx_GIVEREF(__pyx_tuple__41);
 
   /* "View.MemoryView":291
  * 
@@ -17937,19 +18221,19 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(1, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__40);
-  __Pyx_GIVEREF(__pyx_tuple__40);
+  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__42);
+  __Pyx_GIVEREF(__pyx_tuple__42);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     if __pyx_checksum != 0xb068931:
  *         from pickle import PickleError as __pyx_PickleError
  */
-  __pyx_tuple__41 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__41);
-  __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__43 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__43);
+  __Pyx_GIVEREF(__pyx_tuple__43);
+  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -18262,7 +18546,7 @@ if (!__Pyx_RefNanny) {
   /* "hafnian/hafnian.pyx":46
  * 
  * 
- * def torontonian_complex(double complex[:, :] A, quad=True):             # <<<<<<<<<<<<<<
+ * def torontonian_complex(double complex[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
  *     """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
  * 
  */
@@ -18271,72 +18555,84 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_torontonian_complex, __pyx_t_1) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "hafnian/hafnian.pyx":80
+  /* "hafnian/hafnian.pyx":76
+ * 
+ * 
+ * def torontonian_real(double[:, :] A, fsum=False):             # <<<<<<<<<<<<<<
+ *     """Returns the Torontonian of a real matrix A via the C++ hafnian library.
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_3torontonian_real, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_torontonian_real, __pyx_t_1) < 0) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "hafnian/hafnian.pyx":110
  * 
  * 
  * def haf_rpt_real(double[:, :] A, int[:] rpt, double[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
  *     r"""Returns the hafnian of a real matrix A via the C++ hafnian library
  *     using the rpt method. This method is more efficient for matrices with
  */
-  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 110, __pyx_L1_error)
   __pyx_k_ = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_3haf_rpt_real, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_5haf_rpt_real, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_rpt_real, __pyx_t_1) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_rpt_real, __pyx_t_1) < 0) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "hafnian/hafnian.pyx":119
+  /* "hafnian/hafnian.pyx":149
  * 
  * 
  * def haf_rpt_complex(double complex[:, :] A, int[:] rpt, double complex[:] mu=None, bint loop=False):             # <<<<<<<<<<<<<<
  *     r"""Returns the hafnian of a complex matrix A via the C++ hafnian library
  *     using the rpt method. This method is more efficient for matrices with
  */
-  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 149, __pyx_L1_error)
   __pyx_k__2 = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_5haf_rpt_complex, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_7haf_rpt_complex, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_rpt_complex, __pyx_t_1) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_rpt_complex, __pyx_t_1) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "hafnian/hafnian.pyx":162
+  /* "hafnian/hafnian.pyx":192
  * 
  * 
  * def haf_int(long long[:, :] A):             # <<<<<<<<<<<<<<
  *     """Returns the hafnian of an integer matrix A via the C++ hafnian library.
  *     Modified with permission from https://github.com/eklotek/Hafnian.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_7haf_int, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_9haf_int, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_int, __pyx_t_1) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_int, __pyx_t_1) < 0) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "hafnian/hafnian.pyx":189
+  /* "hafnian/hafnian.pyx":219
  * 
  * 
  * def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
  *     """Returns the hafnian of a complex matrix A via the C++ hafnian library.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_9haf_complex, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_11haf_complex, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_complex, __pyx_t_1) < 0) __PYX_ERR(0, 189, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_complex, __pyx_t_1) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "hafnian/hafnian.pyx":222
+  /* "hafnian/hafnian.pyx":252
  * 
  * 
  * def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):             # <<<<<<<<<<<<<<
  *     """Returns the hafnian of a real matrix A via the C++ hafnian library.
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_11haf_real, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_13haf_real, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_real, __pyx_t_1) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_haf_real, __pyx_t_1) < 0) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "hafnian/hafnian.pyx":1
@@ -18369,7 +18665,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__36, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 285, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__38, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_1);
@@ -18383,7 +18679,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__37, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_1);
@@ -18397,7 +18693,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__38, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_1);
@@ -18411,7 +18707,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 290, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_1);
@@ -18425,7 +18721,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__42, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
