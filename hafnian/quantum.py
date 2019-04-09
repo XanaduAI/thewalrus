@@ -54,6 +54,7 @@ from itertools import product, count
 
 import numpy as np
 from scipy.special import factorial as fac
+from scipy.optimize import root_scalar
 
 from ._hafnian import hafnian_repeated, hafnian, kron_reduced
 
@@ -78,7 +79,8 @@ def reduced_gaussian(mu, cov, modes):
         modes = [modes]
 
     if np.any(np.array(modes) > N):
-        raise ValueError("Provided mode is larger than the number of subsystems.")
+        raise ValueError(
+            "Provided mode is larger than the number of subsystems.")
 
     if len(modes) == N:
         # reduced state is full state
@@ -131,7 +133,8 @@ def Qmat(cov, hbar=2):
 
     # calculate the covariance matrix sigma_Q appearing in the Q function:
     # Q(alpha) = exp[-(alpha-beta).sigma_Q^{-1}.(alpha-beta)/2]/|sigma_Q|
-    Q = np.block([[aidaj, aiaj.conj()], [aiaj, aidaj.conj()]]) + np.identity(2*N)
+    Q = np.block([[aidaj, aiaj.conj()], [aiaj, aidaj.conj()]]) + \
+                 np.identity(2*N)
     return Q
 
 
@@ -286,8 +289,9 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         el = []
 
         counter = count(0)
-        modes = (np.arange(2*N)%N).tolist()
-        el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
+        modes = (np.arange(2*N) % N).tolist()
+        el = [post_select[i]
+            if i in post_select else idx[next(counter)] for i in modes]
 
         el = np.array(el).reshape(2, -1)
         el0 = el[0].tolist()
@@ -296,15 +300,76 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_idx = np.array(idx).reshape(2, -1)
         sf_el = tuple(sf_idx[::-1].T.flatten())
 
-        rho[sf_el] = density_matrix_element(beta, A, Q, el0, el1, include_prefactor=False)
+        rho[sf_el] = density_matrix_element(
+            beta, A, Q, el0, el1, include_prefactor=False)
 
     rho *= prefactor(beta, A, Q)
 
     if normalize:
         # construct the standard 2D density matrix, and take the trace
         new_ax = np.arange(2*M).reshape([M, 2]).T.flatten()
-        tr = np.trace(rho.transpose(new_ax).reshape([cutoff**M, cutoff**M])).real
+        tr = np.trace(rho.transpose(new_ax).reshape(
+            [cutoff**M, cutoff**M])).real
         # renormalize
         rho /= tr
 
     return rho
+
+
+def find_scaling_adjacency_matrix(A, n_mean):
+    r""" Returns the scaling parameter by which the adjacency matrix A
+    should be rescaled so that the Gaussian state that endodes it has 
+    a total mean photon number n_mean.
+
+    Args:
+        A (array): Adjacency matrix 
+        n_mean (float): Mean photon number of the Gaussian state
+
+    Returns:
+        float: Scaling parameter
+    """
+    eps = 1e-10
+    ls = np.linalg.svd(A, compute_uv=False)
+    max_sv = ls[0]
+    a_lim = 0.0
+    b_lim = 1.0/(eps+max_sv)
+    x_init = 0.5*b_lim
+    assert 1000*eps < max_sv
+
+    def mean_photon_number(x, vals):
+        r""" Returns the mean number of photons in the Gaussian state that
+        encodes the adjacency matrix x*A where vals are the singular values of A
+
+        Args:
+            x (float): Scaling parameter
+            vals (array): Singular values of the matrix A
+
+        Returns:
+            n_mean: Mean photon number in the Gaussian state
+        """
+        vals2 = (x*vals)**2
+        n = np.sum(vals2/(1.0-vals2))
+        return n
+
+    def grad_mean_photon_number(x, vals):
+        r""" Returns the gradient od the mean number of photons in the Gaussian state that
+        encodes the adjacency matrix x*A with respect to x. 
+        vals are the singular values of A
+
+        Args:
+            x (float): Scaling parameter
+            vals (array): Singular values of the matrix A
+
+        Returns:
+            d_n_mean: Derivative of the mean photon number in the Gaussian state
+                with respect to x
+        """
+        vals1 = (vals*x)
+        dn = (2.0/x)*np.sum((vals1/(1-vals1**2))**2)    
+        return dn
+
+    f = lambda x: mean_photon_number(x, ls) - n_mean
+    df = lambda x: grad_photon_number(x, ls)
+    res = root_scalar(f, fprime = df, x0 = x_init, bracket = (a_lim, b_lim))
+    assert res.converged
+    return res.root
