@@ -223,7 +223,7 @@ def generate_torontonian_sample(cov, hbar=2):
 
         probs2 = probs1a/prev_prob
         probs2[1] = 1.0-probs2[0]
-        probs1a[1] = probs2[1]*pref
+        probs1a[1] = probs2[1]*prev_prob
         probs3 = np.maximum(probs2, np.zeros_like(probs2)) # pylint: disable=assignment-from-no-return
         probs3 /= np.sum(probs3)
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
