@@ -16,7 +16,8 @@ import pytest
 
 import numpy as np
 from hafnian.quantum import (reduced_gaussian, Xmat, Qmat, Amat, Beta,
-                             prefactor, density_matrix_element, density_matrix)
+                             prefactor, density_matrix_element, density_matrix,
+                             find_scaling_adjacency_matrix)
 
 
 def TMS_cov(r, phi):
@@ -352,10 +353,26 @@ def test_density_matrix_displaced_squeezed_postselect():
 
     res = density_matrix(mu, V, post_select={0: 0}, cutoff=20, normalize=True)[:5, :5]
 
+    #fmt:off
     expected = np.array([[ 0.89054874,  0.15018085+0.05295904j, -0.23955467+0.01263025j, -0.0734589 -0.02452154j, 0.07862323-0.00868528j],
        [ 0.15018085-0.05295904j,  0.02847564, -0.03964706+0.01637575j, -0.01384625+0.00023317j, 0.01274241-0.00614023j],
        [-0.23955467-0.01263025j, -0.03964706-0.01637575j, 0.06461854,  0.01941242+0.00763805j, -0.02127257+0.00122123j],
        [-0.0734589 +0.02452154j, -0.01384625-0.00023317j, 0.01941242-0.00763805j, 0.00673463, -0.00624626+0.00288134j],
        [ 0.07862323+0.00868528j,  0.01274241+0.00614023j, -0.02127257-0.00122123j, -0.00624626-0.00288134j, 0.00702606]])
+    #fmt:on
 
     assert np.allclose(res, expected)
+
+
+def test_find_scaling_adjacency_matrix():
+    """Test the find_scaling_adjacency matrix for a the one mode case"""
+    r = 0.75 + 0.9j
+    rabs = np.abs(r)
+    n_mean = 10.0
+    A = r * np.identity(1)
+    sc_exact = np.sqrt(n_mean / (1.0 + n_mean)) / rabs
+    sc_num = find_scaling_adjacency_matrix(A, n_mean)
+    assert np.allclose(sc_exact, sc_num)
+
+
+

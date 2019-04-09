@@ -72,21 +72,20 @@ def reduced_gaussian(mu, cov, modes):
         tuple (means, cov): where means is an array containing the vector of means,
         and cov is a square array containing the covariance matrix.
     """
-    N = len(mu)//2
+    N = len(mu) // 2
 
     # reduce rho down to specified subsystems
     if isinstance(modes, int):
         modes = [modes]
 
     if np.any(np.array(modes) > N):
-        raise ValueError(
-            "Provided mode is larger than the number of subsystems.")
+        raise ValueError("Provided mode is larger than the number of subsystems.")
 
     if len(modes) == N:
         # reduced state is full state
         return mu, cov
 
-    ind = np.concatenate([np.array(modes), np.array(modes)+N])
+    ind = np.concatenate([np.array(modes), np.array(modes) + N])
     rows = ind.reshape(-1, 1)
     cols = ind.reshape(1, -1)
 
@@ -120,21 +119,20 @@ def Qmat(cov, hbar=2):
         array: the :math:`Q` matrix.
     """
     # number of modes
-    N = len(cov)//2
+    N = len(cov) // 2
     I = np.identity(N)
 
-    x = cov[:N, :N]*2/hbar
-    xp = cov[:N, N:]*2/hbar
-    p = cov[N:, N:]*2/hbar
+    x = cov[:N, :N] * 2 / hbar
+    xp = cov[:N, N:] * 2 / hbar
+    p = cov[N:, N:] * 2 / hbar
     # the (Hermitian) matrix elements <a_i^\dagger a_j>
-    aidaj = (x+p+1j*(xp-xp.T)-2*I)/4
+    aidaj = (x + p + 1j * (xp - xp.T) - 2 * I) / 4
     # the (symmetric) matrix elements <a_i a_j>
-    aiaj = (x-p+1j*(xp+xp.T))/4
+    aiaj = (x - p + 1j * (xp + xp.T)) / 4
 
     # calculate the covariance matrix sigma_Q appearing in the Q function:
     # Q(alpha) = exp[-(alpha-beta).sigma_Q^{-1}.(alpha-beta)/2]/|sigma_Q|
-    Q = np.block([[aidaj, aiaj.conj()], [aiaj, aidaj.conj()]]) + \
-                 np.identity(2*N)
+    Q = np.block([[aidaj, aiaj.conj()], [aiaj, aidaj.conj()]]) + np.identity(2 * N)
     return Q
 
 
@@ -151,7 +149,7 @@ def Amat(cov, hbar=2, cov_is_qmat=False):
         array: the :math:`A` matrix.
     """
     # number of modes
-    N = len(cov)//2
+    N = len(cov) // 2
     X = Xmat(N)
 
     # inverse Q matrix
@@ -163,7 +161,7 @@ def Amat(cov, hbar=2, cov_is_qmat=False):
     Qinv = np.linalg.inv(Q)
 
     # calculate Hamilton's A matrix: A = X.(I-Q^{-1})*
-    A = X @ (np.identity(2*N)-Qinv).conj()
+    A = X @ (np.identity(2 * N) - Qinv).conj()
     return A
 
 
@@ -179,9 +177,9 @@ def Beta(mu, hbar=2):
         array: the expectation values
         :math:`[\langle a_1\rangle, \langle a_2\rangle,\dots,\langle a_N\rangle, \langle a^\dagger_1\rangle, \dots, \langle a^\dagger_N\rangle]`
     """
-    N = len(mu)//2
+    N = len(mu) // 2
     # mean displacement of each mode
-    alpha = (mu[:N] + 1j*mu[N:])/np.sqrt(2*hbar)
+    alpha = (mu[:N] + 1j * mu[N:]) / np.sqrt(2 * hbar)
     # the expectation values (<a_1>, <a_2>,...,<a_N>, <a^\dagger_1>, ..., <a^\dagger_N>)
     return np.concatenate([alpha, alpha.conj()])
 
@@ -202,7 +200,7 @@ def prefactor(beta, A, Q):
     sqrt_Qdet = np.sqrt(np.linalg.det(Q))
     # Qinv = np.linalg.inv(Q)
     # return np.exp(-0.5*beta @ Qinv @ beta.conj())/sqrt_Qdet
-    return np.exp(-0.5*(beta.conj() @ beta - beta @ A @ beta))/sqrt_Qdet
+    return np.exp(-0.5 * (beta.conj() @ beta - beta @ A @ beta)) / sqrt_Qdet
 
 
 def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
@@ -222,7 +220,7 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
     Returns:
         complex: the density matrix element
     """
-    rpt = i+j
+    rpt = i + j
 
     if np.linalg.norm(beta) < tol:
         # no displacement
@@ -232,7 +230,7 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
         # gamma = X @ np.linalg.inv(Q).conj() @ beta
         gamma = beta.conj() - A @ beta
 
-        if np.prod([k+1 for k in rpt])**(1/len(rpt)) < 3:
+        if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
             A_rpt = kron_reduced(A, rpt)
             np.fill_diagonal(A_rpt, kron_reduced(gamma, rpt))
             haf = hafnian(A_rpt, loop=True)
@@ -242,7 +240,7 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
     if include_prefactor:
         haf *= prefactor(beta, A, Q)
 
-    return haf/np.sqrt(np.prod(fac(rpt)))
+    return haf / np.sqrt(np.prod(fac(rpt)))
 
 
 def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2):
@@ -276,22 +274,21 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     if post_select is None:
         post_select = {}
 
-    N = len(mu)//2
-    M = N-len(post_select)
+    N = len(mu) // 2
+    M = N - len(post_select)
 
     beta = Beta(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     Q = Qmat(cov, hbar=hbar)
 
-    rho = np.zeros([cutoff]*(2*M), dtype=np.complex128)
+    rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
 
-    for idx in product(range(cutoff), repeat=2*M):
+    for idx in product(range(cutoff), repeat=2 * M):
         el = []
 
         counter = count(0)
-        modes = (np.arange(2*N) % N).tolist()
-        el = [post_select[i]
-            if i in post_select else idx[next(counter)] for i in modes]
+        modes = (np.arange(2 * N) % N).tolist()
+        el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
 
         el = np.array(el).reshape(2, -1)
         el0 = el[0].tolist()
@@ -301,15 +298,15 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_el = tuple(sf_idx[::-1].T.flatten())
 
         rho[sf_el] = density_matrix_element(
-            beta, A, Q, el0, el1, include_prefactor=False)
+            beta, A, Q, el0, el1, include_prefactor=False
+        )
 
     rho *= prefactor(beta, A, Q)
 
     if normalize:
         # construct the standard 2D density matrix, and take the trace
-        new_ax = np.arange(2*M).reshape([M, 2]).T.flatten()
-        tr = np.trace(rho.transpose(new_ax).reshape(
-            [cutoff**M, cutoff**M])).real
+        new_ax = np.arange(2 * M).reshape([M, 2]).T.flatten()
+        tr = np.trace(rho.transpose(new_ax).reshape([cutoff ** M, cutoff ** M])).real
         # renormalize
         rho /= tr
 
@@ -332,9 +329,9 @@ def find_scaling_adjacency_matrix(A, n_mean):
     ls = np.linalg.svd(A, compute_uv=False)
     max_sv = ls[0]
     a_lim = 0.0
-    b_lim = 1.0/(eps+max_sv)
-    x_init = 0.5*b_lim
-    assert 1000*eps < max_sv
+    b_lim = 1.0 / (eps + max_sv)
+    x_init = 0.5 * b_lim
+    assert 1000 * eps < max_sv
 
     def mean_photon_number(x, vals):
         r""" Returns the mean number of photons in the Gaussian state that
@@ -347,8 +344,8 @@ def find_scaling_adjacency_matrix(A, n_mean):
         Returns:
             n_mean: Mean photon number in the Gaussian state
         """
-        vals2 = (x*vals)**2
-        n = np.sum(vals2/(1.0-vals2))
+        vals2 = (x * vals) ** 2
+        n = np.sum(vals2 / (1.0 - vals2))
         return n
 
     def grad_mean_photon_number(x, vals):
@@ -364,12 +361,12 @@ def find_scaling_adjacency_matrix(A, n_mean):
             d_n_mean: Derivative of the mean photon number in the Gaussian state
                 with respect to x
         """
-        vals1 = (vals*x)
-        dn = (2.0/x)*np.sum((vals1/(1-vals1**2))**2)    
+        vals1 = vals * x
+        dn = (2.0 / x) * np.sum((vals1 / (1 - vals1 ** 2)) ** 2)
         return dn
 
     f = lambda x: mean_photon_number(x, ls) - n_mean
     df = lambda x: grad_photon_number(x, ls)
-    res = root_scalar(f, fprime = df, x0 = x_init, bracket = (a_lim, b_lim))
+    res = root_scalar(f, fprime=df, x0=x_init, bracket=(a_lim, b_lim))
     assert res.converged
     return res.root
