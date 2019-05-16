@@ -1,4 +1,4 @@
-// Copyright 2018 Xanadu Quantum Technologies Inc.
+// Copyright 2019 Xanadu Quantum Technologies Inc.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,14 +21,16 @@
 
 #include <math.h>
 
+
 typedef double complex telem;
 typedef unsigned char sint;
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void haf (double mat[], int n, double res[]);
-telem hafnian (double mat[], int n);
-void evals (double z[], double complex vals[], int n);
+void haf (telem mat[], int n, double res[]);
+telem hafnian (telem mat[], int n);
+void evals (double complex z[], double complex vals[], int n);
+telem hafnian_loops(telem *mat, int n);
 
 #endif

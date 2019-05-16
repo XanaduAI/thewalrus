@@ -1,4 +1,4 @@
-// Copyright 2018 Xanadu Quantum Technologies Inc.
+// Copyright 2019 Xanadu Quantum Technologies Inc.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,33 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <stdio.h>
-#include "lhafnian.h"
+#ifndef _HAFNIAN_
+#define _HAFNIAN_
 
+#include <complex.h>
+#include <assert.h>
+#include <lapacke.h>
+#include <omp.h>
 
+#include <math.h>
 
-int main (){
-  int nmax = 10;
-  int m, n;
-  for (m = 1; m <= nmax; m++)
-    {
-      n = 2 * m;
-      double complex mat[n * n];
-      
-      int i, j;
-      for (i = 0; i < n; i++)
-	{
-	  for (j = 0; j < n; j++)
-	    {
-	      mat[n * i + j] = 1.0;
-	    }
-	}
+typedef double complex telem;
+typedef unsigned char sint;
 
-      double complex hafval = hafnian_loops (mat, n);
-  
-  
-      printf ("%d %lf %lf\n", n, creal (hafval), cimag (hafval) );
-      
-    }
-  return 0;
-}
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
+void haf (double mat[], int n, double res[]);
+telem hafnian (double mat[], int n);
+void evals (double z[], double complex vals[], int n);
+
+#endif

@@ -2,3 +2,5 @@ sphinxcontrib-bibtex
 sphinx>=1.4
 ipykernel
 nbsphinx
+cython>=0.20
+numpy>=1.9

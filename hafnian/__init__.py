@@ -1,4 +1,4 @@
-# Copyright 2018 Xanadu Quantum Technologies Inc.
+# Copyright 2019 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,117 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+r"""
+.. Hafnian Python interface
 """
-Hafnian Python interface
-========================
-
-This is the top level module of the Hafnian python interface,
-containing the function :func:`hafnian`. This function determines,
-based on the input matrix, whether to use the complex C hafnian
-library, or the slightly faster real C hafnian library.
-
-For more advanced usage, the functions :func:`haf_real` and
-:func:`haf_complex` are also provided.
-
-Top-level functions
--------------------
-
-.. autosummary::
-   hafnian
-   haf_complex
-   haf_real
-   version
-
-Code details
--------------
-"""
+#pylint: disable=wrong-import-position
+import os
+import platform
 
 import numpy as np
 
+if platform.system() == 'Windows': # pragma: no cover
+    extra_dll_dir = os.path.join(os.path.dirname(__file__), '.libs')
+    if os.path.isdir(extra_dll_dir):
+        os.environ["PATH"] += os.pathsep + extra_dll_dir
+
 from ._version import __version__
-from ._lhafnian import hafnian as haf_complex
-from ._rlhafnian import hafnian as haf_real
+from ._hafnian import (hafnian, hafnian_repeated, haf_int, haf_complex,
+                       haf_real, haf_rpt_real, haf_rpt_complex,
+                       kron_reduced, permanent_repeated)
+from ._permanent import perm, perm_real, perm_complex
+from ._torontonian import tor, tor_complex, det
 
 
-__all__ = ['hafnian', 'haf_complex', 'haf_real', 'version']
-
-
-def hafnian(Ain, loop=False, tol=1e-12):
-    """Returns the hafnian of matrix A via the C hafnian library.
-
-    .. note::
-
-        If the array is real valued (np.float), the result of
-        :func:`haf_real` is returned.
-
-        If the array is complex (np.complex), this function queries
-        whether the array Ain has non-zero imaginary part. If so, it
-        calls the :func:`haf_complex` function. Otherwise, if all elements
-        are exactly real, the :func:`haf_real` function is called.
-
-        For more direct control, you may wish to call :func:`haf_real`
-        or :func:`haf_complex` directly.
-
-    Args:
-        Ain (array): a square, symmetric array.
-        loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
-        toA (float): the tolerance when checking that the matrix is
-            symmetric. Default tolerance is 1e-12.
-
-    Returns:
-        np.float64 or np.complex128: the hafnian or loop hafnian of matrix Ain
-    """
-    # pylint: disable=too-many-return-statements
-    if not isinstance(Ain, np.ndarray):
-        raise TypeError("Input matrix must be a NumPy array.")
-
-    matshape = Ain.shape
-
-    if matshape[0] != matshape[1]:
-        raise ValueError("Input matrix must be square.")
-
-    if np.isnan(Ain).any():
-        raise ValueError("Input matrix must not contain NaNs.")
-
-    if np.linalg.norm(Ain-np.transpose(Ain)) >= tol:
-        raise ValueError("Input matrix must be symmetric.")
-
-    if matshape[0] % 2 != 0 and not loop:
-        return 0.0
-
-    A = Ain
-
-    if matshape[0] %2 != 0 and loop:
-        A = np.pad(Ain, pad_width=((0, 1), (0, 1)), mode='constant')
-        A[-1, -1] = 1.0
-
-    matshape = A.shape
-
-    if matshape[0] == 2:
-        if loop:
-            return A[0, 1] + A[0, 0]*A[1, 1]
-        return A[0][1]
-
-    if matshape[0] == 4:
-        if loop:
-            result = A[0, 1]*A[2, 3] \
-                + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2] \
-                + A[0, 0]*A[1, 1]*A[2, 3] + A[0, 1]*A[2, 2]*A[3, 3] \
-                + A[0, 2]*A[1, 1]*A[3, 3] + A[0, 0]*A[2, 2]*A[1, 3] \
-                + A[0, 0]*A[3, 3]*A[1, 2] + A[0, 3]*A[1, 1]*A[2, 2] \
-                + A[0, 0]*A[1, 1]*A[2, 2]*A[3, 3]
-            return result
-
-        return A[0, 1]*A[2, 3] + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
-
-
-    if A.dtype == np.complex:
-        if np.any(np.iscomplex(A)):
-            return haf_complex(A, loop=loop)
-
-        return haf_real(np.float64(A.real), loop=loop)
-
-    return haf_real(A, loop=loop)
+__all__ = [
+    'hafnian',
+    'hafnian_repeated',
+    'tor',
+    'perm',
+    'permanent_repeated',
+    'det',
+    'kron_reduced',
+    'version'
+]
 
 
 def version():

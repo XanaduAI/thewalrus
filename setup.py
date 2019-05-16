@@ -1,4 +1,4 @@
-# Copyright 2018 Xanadu Quantum Technologies Inc.
+# Copyright 2019 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,56 +15,137 @@
 #!/usr/bin/env python3
 import sys
 import os
-from setuptools import setup, Extension
-from distutils.command.build_ext import build_ext
+import platform
 
-
-class build_ext(build_ext):
-    def build_extension(self, ext):
-        self._ctypes = isinstance(ext, CTypes)
-        return super().build_extension(ext)
-
-    def get_export_symbols(self, ext):
-        if self._ctypes:
-            return ext.export_symbols
-        return super().get_export_symbols(ext)
-
-    def get_ext_filename(self, ext_name):
-        if self._ctypes:
-            return ext_name + '.so'
-        return super().get_ext_filename(ext_name)
-
-
-class CTypes(Extension):
-    pass
+import setuptools
 
 
 with open("hafnian/_version.py") as f:
-	version = f.readlines()[-1].split()[-1].strip("\"'")
+    version = f.readlines()[-1].split()[-1].strip("\"'")
 
-# cmdclass = {'build_docs': BuildDoc}
-
-if os.name == 'nt':
-    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -lopenblas"
-    libraries = ['openblas']
-    extra_link_args = ['-fopenmp', '-lopenblas']
-else:
-    cflags_default = "-std=c99 -O3 -Wall -fPIC -shared -fopenmp -llapacke"
-    libraries = ['lapacke']
-    extra_link_args = ['-fopenmp', '-llapacke']
-
-LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', "").split(":")
-C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":")
-CFLAGS = os.environ.get('CFLAGS', cflags_default).split()
 
 requirements = [
-    "numpy>=1.13"
+    "numpy",
+    "scipy>=1.2.1"
 ]
 
-os.environ['OPT'] = ''
+
+setup_requirements = [
+    "numpy"
+]
+
+
+BUILD_EXT = True
+
+try:
+    import numpy as np
+    from numpy.distutils.core import setup
+    from numpy.distutils.extension import Extension
+except ImportError:
+    raise ImportError("ERROR: NumPy needs to be installed first. "
+                      "You can install it with pip:"
+                      "\n\npip install numpy")
+
+
+if BUILD_EXT:
+
+    USE_CYTHON = True
+    try:
+        from Cython.Build import cythonize
+        ext = 'pyx'
+    except:
+        def cythonize(x, compile_time_env=None):
+            return x
+
+        USE_CYTHON = False
+        cythonize = cythonize
+        ext = 'cpp'
+
+
+    library_default = ""
+    USE_OPENMP = True
+    EIGEN_INCLUDE = [os.environ.get("EIGEN_INCLUDE_DIR", ""), "/usr/local/include/eigen3", "/usr/include/eigen3"]
+
+    LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["src"]
+
+    LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
+    libraries = []
+
+    if platform.system() == 'Windows':
+        USE_OPENMP = False
+        cflags_default = "-static -O3 -Wall -fPIC"
+        extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        extra_f90_compile_args = []
+    elif platform.system() == 'Darwin':
+        cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
+        libraries += ["omp"]
+        extra_link_args_CPP = ['-Xpreprocessor -fopenmp -lomp']
+        extra_link_args_F90 = ['-fopenmp']
+        extra_f90_compile_args = ['-fopenmp']
+        extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
+        C_INCLUDE_PATH += ['/usr/local/opt/libomp/include']
+        LD_LIBRARY_PATH += ['/usr/local/opt/libomp/lib']
+    else:
+        cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
+        extra_link_args_CPP = ['-fopenmp']
+
+        extra_link_args_F90 = ['-fopenmp']
+        extra_f90_compile_args = ['-fopenmp']
+
+    CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
+
+    USE_LAPACK = False
+    if os.environ.get("USE_LAPACK", ""):
+        USE_LAPACK = True
+        CFLAGS += [" -llapacke -DLAPACKE=1"]
+        libraries += ["lapacke"]
+        extra_link_args_CPP[0] += " -llapacke"
+
+    if os.environ.get("USE_OPENBLAS", ""):
+        USE_LAPACK = True
+        CFLAGS += [" -lopenblas -DLAPACKE=1"]
+        libraries += ["openblas"]
+        extra_link_args_CPP[0] += " -lopenblas"
+
+    extensions = cythonize([
+            Extension("libperm",
+                sources=["src/kinds.f90", "src/vars.f90", "src/permanent.F90"],
+                include_dirs=C_INCLUDE_PATH,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                extra_compile_args=CFLAGS,
+                extra_f90_compile_args=extra_f90_compile_args,
+                extra_link_args=extra_link_args_F90),
+            Extension("libtor",
+                sources=["src/kinds.f90", "src/vars.f90", "src/linpack_q_complex.f90", "src/torontonian.F90"],
+                include_dirs=C_INCLUDE_PATH,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                extra_compile_args=CFLAGS,
+                extra_f90_compile_args=extra_f90_compile_args,
+                extra_link_args=extra_link_args_F90),
+            Extension("libhaf",
+                sources=["hafnian/hafnian."+ext,],
+                depends=["src/hafnian.hpp",
+                         "src/eigenvalue_hafnian.hpp",
+                         "src/recursive_hafnian.hpp",
+                         "src/repeated_hafnian.hpp",
+                         "src/torontonian.hpp",
+                         "src/stdafx.h",
+                         "src/fsum.hpp"],
+                include_dirs=C_INCLUDE_PATH,
+                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
+                libraries=libraries,
+                language="c++",
+                extra_compile_args=["-std=c++11"] + CFLAGS,
+                extra_link_args=extra_link_args_CPP)
+    ], compile_time_env={'_OPENMP': USE_OPENMP, 'LAPACKE': USE_LAPACK})
+else:
+    extensions = []
+
 
 info = {
-    'name': 'Hafnian',
+    'name': 'hafnian',
     'version': version,
     'maintainer': 'Xanadu Inc.',
     'maintainer_email': 'nicolas@xanadu.ai',
@@ -72,37 +153,16 @@ info = {
     'license': 'Apache License 2.0',
     'packages': [
                     'hafnian',
-                    'hafnian/tests'
+                    'hafnian.tests'
                 ],
-    # 'package_data': {'hafnian': ['backends/data/*']},
-    # 'include_package_data': True,
     'description': 'Open source library for hafnian calculation',
     'long_description': open('README.rst').read(),
     'provides': ["hafnian"],
     'install_requires': requirements,
-    # 'extras_require': extra_requirements,
     'ext_package': 'hafnian.lib',
-    'ext_modules': [
-        CTypes("lhafnian",
-            sources=["src/lhafnian.c",],
-            depends=["src/lhafnian.h"],
-            include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args
-            ),
-        CTypes("rlhafnian",
-            sources=["src/rlhafnian.c"],
-            depends=["src/rlhafnian.h"],
-            include_dirs=['/usr/local/include', '/usr/include', './src'] + C_INCLUDE_PATH,
-            libraries=libraries,
-            library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-            extra_compile_args=CFLAGS,
-            extra_link_args=extra_link_args
-            )
-    ],
-    'cmdclass': {'build_ext': build_ext},
+    'setup_requires': setup_requirements,
+    'ext_modules': extensions,
+    # 'cmdclass': {'build_ext': build_ext},
     'command_options': {
         'build_sphinx': {
             'version': ('setup.py', version),
@@ -110,7 +170,7 @@ info = {
 }
 
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",

@@ -1,0 +1,111 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2.1
+jobs:
+  tests:
+    docker:
+      - image: circleci/python:3.6.8-stretch
+    working_directory: ~/tests
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            sudo apt-get -qq update;
+            sudo apt-get install -y gcc gfortran libeigen3-dev;
+            curl -sL -o src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install pytest pytest-cov wheel codecov
+            pip install -e .
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            make coverage
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
+  linux-wheels:
+    working_directory: ~/linux-wheels
+    docker:
+      - image: circleci/python:3.6.8-stretch
+    environment:
+      CIBW_SKIP: "cp27-* cp34-* *i686"
+      CIBW_BEFORE_BUILD_LINUX: curl -sL -o {project}/src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90 && curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/src && pip install numpy scipy cython
+      CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
+      CIBW_TEST_COMMAND: python -m pytest {project}/hafnian
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build the Linux wheels.
+          command: |
+            pip install --user cibuildwheel==0.10.2
+            python -m cibuildwheel --output-dir wheelhouse
+      - run:
+          name: Upload Linux wheels.
+          filters:
+            branches:
+              only: master
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              echo "Uploading wheels..."
+              pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+              python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
+            else
+              echo "Not on master, not deploying."
+            fi
+      - store_artifacts:
+          path: wheelhouse/
+
+  osx-wheels:
+    working_directory: ~/osx-wheels
+    macos:
+      xcode: "10.0.0"
+    environment:
+      CIBW_SKIP: "cp27-* cp34-* *i686"
+      CIBW_BEFORE_BUILD_MACOS: wget -O {project}/src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90 && brew cask uninstall --force oclint && brew install gcc eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython
+      CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
+      CIBW_TEST_COMMAND: python -m pytest {project}/hafnian
+    steps:
+      - checkout
+      - run:
+          name: Build the OS X wheels.
+          command: |
+            pip install --user cibuildwheel
+            cibuildwheel --output-dir wheelhouse
+      - run:
+          name: Upload OS X wheels.
+          filters:
+            branches:
+              only: master
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              echo "Uploading wheels..."
+              pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+              python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
+            else
+              echo "Not on master, not deploying."
+            fi
+      - store_artifacts:
+          path: wheelhouse/
+
+workflows:
+  version: 2
+  all-tests:
+    jobs:
+      - linux-wheels

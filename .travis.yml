@@ -1,9 +1,17 @@
 language: python
 env:
   global:
-  - CIBW_SKIP="cp27-*"
+  - CIBW_SKIP="cp27-* cp34-* *i686"
+  - CIBW_BEFORE_BUILD_LINUX='curl -sL -o {project}/src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
+    && curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
+    && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
+    && cp -rf Eigen {project}/src && pip install numpy scipy cython'
+  - CIBW_BEFORE_BUILD_MACOS='wget -O {project}/src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
+    && brew cask uninstall --force oclint && brew install gcc eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython'
+  - CIBW_TEST_REQUIRES="numpy scipy pytest pytest-cov"
+  - CIBW_TEST_COMMAND="python -m pytest {project}/hafnian"
   - WHEELHOUSE_UPLOADER_USERNAME=AKIAJOU6ECM5Q7T6UUQQ
-  - secure: AlHQEqtlwvZgFrK/zcDsFNdshwZjA0+7MXz5VGLt9bOYoNjv1AadtAHJryap46feuxS2fLcvI0+JBP2sDeyB/8oUx8NSH0ubzGuPAlzylS9Z6E3ppmSGl6F6h8Ws9mSIk1UDe27tC9G2nEAHMW34DLECUUP9rgmagOjXkqwzkZF4c7ZFJ9K8kxr4ur0fNsLK3LpS/Ybu7KoAO4cy1TagKkvXczNVlnN4Kc+VfUrMJa8I26pO+W6gvZ7k6GKhOYZFSZxZfnyzkfrlWrVzuEFoZK2pr3yQwR+D6A2VDhwKE5NhZdCyRnsgNFxV8kxvLYwhVjzz2WFdVG/raLafDKzGOofwW7pW1gSdnGde6gnVOLo/M8TC+6Ef5NMEK3b88sq/kRrt6EjWExsyIRXOoazsMneB7ZRBHRMUdWWskW3+jxkphHAs4FE5EfOVRRMBuY/fqiW1+uVzHCPGcy23pQyjU18SLlrRvyDZYiNgF7I5goSgWgHGFQuYnOuknI0CPymHBeY7gLcPiz4yRf1NHBuw6ErUNBwgEEN22ThY7K0Hy4w7f61CS+Kj+01I2AmwWBO7ZagALX0aignRMm5mnDDHXN3jUWR63whp1XsyZVxKpUjb0OQAkqONVEPM3urU3REzKzdiF20TSwFZwKb8xp8/lPEM05kKe8oQ9bkY4T6pI0c=
+  - secure: lkBL0X+rNgWP54tf6W2xzdwl+XXeQCdPuCCKy1TPuJ1OJo4dIy6yMs4uapIz8s2atQ2x5SDC+tRQrQDnpLxy5rY0ikChdpkBCMoQvSJIoaaHTNK2hZjnTDtXTNjzkb6E70uWvRriVCy+B+LLjKjdtygIF0+2AE+SGNvW4fEZWP22TYv2s+tWY8GwMAYdaYb7UI3sI/0prIDTqdw/ZUiM22lJskR+BJxZGTR3gSzguE/umbK8tztLzKRUb9A5zXJWGCPY/eKgc20LzVeKCttv0fAGBGz6D/k3I2kUTj5+mBJ+vbNmfkOmgd0QyFGH6zBGLE0xl0vP9HYHhiCFFamTmbkjSLPym+MC5Up+YsMMRqWJDGA0/L3n6afbS3FUqKRb448t3eycvfPWACNpeLPXdaGLTx954O8tDQBMLAJa3dBEbJI31mN2sCVvXLj96SDBdSl/fyouClptGXKGraiqABzowAfmx6GRavCnZMoggmhYOLg5VknawDVSlnEFoGXss8tkZkjCjoj0xzW0aF100m6O7kAORWoa/YLAz2Dyvl+GgDMlsITCQuDs7JEWL0RABzpRw0li03FZd2a1FQkGPyYXROEW4n+tAwVjMAXsfeKafeAUMxzXlhjVc2g9+3rhLvIw3X0hgnr+dGxaLytMczUXwnouY1LbhOT2EWgW7+c=
 matrix:
   include:
   - python: 3.5
@@ -21,30 +29,38 @@ matrix:
     env:
     - WHEEL=1
     - PIP=pip
-    - CIBW_MANYLINUX1_X86_64_IMAGE=josh146/manylinux1_lapack_3.4.2_x86_64:firstcommit
-    - CIBW_MANYLINUX1_I686_IMAGE=josh146/manylinux1_lapack_3.4.2_i686:firstcommit
+    - PYTHON=python
+  - os: osx
+    xcode: 10.0.0
+    language: generic
+    env:
+    - WHEEL=1
+    - PIP=pip2
+    - PYTHON=python2
 before_install:
 - |
   if [ "$WHEEL" = "0" ]; then
     sudo apt-get -qq update;
-    sudo apt-get install -y liblapacke-dev;
+    sudo apt-get install -y gfortran libeigen3-dev;
   fi
 install:
 - |
   if [ "$WHEEL" = "0" ]; then
+    curl -sL -o src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
     pip install -r requirements.txt
-    pip install wheel coverage codecov
+    pip install pytest pytest-cov wheel codecov
     pip install -e .
   fi
 script:
 - if [ "$WHEEL" = "0" ]; then make coverage; fi
 - |
   if [ "$WHEEL" = "1" ]; then
-    $PIP install cibuildwheel==0.8.0
+    $PIP install cibuildwheel==0.10.2
+    $PIP install -r requirements.txt
     cibuildwheel --output-dir wheelhouse
     $PIP install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
     $PIP install wheelhouse-uploader
-    python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
+    $PYTHON -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
   fi
 after_success:
-- if [ "$WHEEL" = "0" ]; then make codecov; fi
+- if [ "$WHEEL" = "0" ]; then codecov; fi

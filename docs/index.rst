@@ -9,9 +9,11 @@ The fastest exact hafnian library.
 Features
 ========
 
-* Provides the fastest calculation of the hafnian and loop hafnian.
+* The fastest calculation of the hafnian, loop hafnian, permanent, and torontonian,
+  of general and certain structured matrices.
 
-* The algorithms in this library are what Ryser's formula is to the permanent.
+* An easy to use interface to use the loop hafnian to calculate Fock matrix
+  elements of Gaussian states via the included quantum module.
 
 Getting started
 ===============
@@ -69,6 +71,7 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    hafnian_tutorial.ipynb
+   permanent_tutorial.ipynb
 
 .. toctree::
    :maxdepth: 2
@@ -77,6 +80,18 @@ The hafnian library is **free** and **open source**, released under the Apache L
 
    code
    code/python
+   code/quantum
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Hafnian libraries
+   :hidden:
+
+   code/libhaf
+   code/libperm
+   code/libtor
+
 
 Indices and tables
 ==================
