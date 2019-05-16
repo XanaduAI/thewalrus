@@ -9,11 +9,11 @@ The fastest exact hafnian library.
 Features
 ========
 
-* Provides the fastest calculation of the hafnian and loop hafnian.
+* The fastest calculation of the hafnian, loop hafnian, permanent, and torontonian,
+  of general and certain structured matrices.
 
-* The algorithms in this library are what Ryser's formula is to the permanent.
-
-* (We also provide an efficient function for calculating the permanent via Ryser's formula.)
+* An easy to use interface to use the loop hafnian to calculate Fock matrix
+  elements of Gaussian states via the included quantum module.
 
 Getting started
 ===============
