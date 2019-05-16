@@ -36,7 +36,16 @@ class TypeMock(type):
 
 MOCK_MODULES = [
     'numpy',
-    'ctypes'
+    'numpy.dtype',
+    'scipy',
+    'scipy.special',
+    'scipy.optimize',
+    'cython',
+    'hafnian.lib',
+    'hafnian.lib.libhaf',
+    'hafnian.lib.libperm',
+    'hafnian.lib.libtor',
+    'hafnian.lib.libhafapprox'
     ]
 
 mock = Mock()
@@ -63,7 +72,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
     'edit_on_github',
-    'nbsphinx'
+    'nbsphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -79,7 +88,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Hafnian'
-copyright = '2018, Xanadu Quantum Technologies Inc'
+copyright = '2019, Xanadu Quantum Technologies Inc'
 author = 'Xanadu Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -115,11 +124,11 @@ exclude_patterns = ['_build']
 #default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-#add_function_parentheses = True
+add_function_parentheses = True
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.

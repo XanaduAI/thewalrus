@@ -13,6 +13,8 @@ Features
 
 * The algorithms in this library are what Ryser's formula is to the permanent.
 
+* (We also provide an efficient function for calculating the permanent via Ryser's formula.)
+
 Getting started
 ===============
 
@@ -69,6 +71,7 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    hafnian_tutorial.ipynb
+   permanent_tutorial.ipynb
 
 .. toctree::
    :maxdepth: 2
@@ -77,6 +80,18 @@ The hafnian library is **free** and **open source**, released under the Apache L
 
    code
    code/python
+   code/quantum
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Hafnian libraries
+   :hidden:
+
+   code/libhaf
+   code/libperm
+   code/libtor
+
 
 Indices and tables
 ==================

@@ -2,14 +2,15 @@ PYTHON3 := $(shell which python3 2>/dev/null)
 COVERAGE3 := $(shell which coverage3 2>/dev/null)
 
 PYTHON := python3
-COVERAGE := coverage3
-COPTS := run
-TESTRUNNER := -m unittest discover hafnian/tests
+COVERAGE := --cov=hafnian --cov-report term-missing --cov-report=html:coverage_html_report
+TESTRUNNER := -m pytest hafnian
 
 .PHONY: help
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  install            to install Hafnian"
+	@echo "  libperm            to compile the Fortran permanent library"
+	@echo "  libtor             to compile the Fortran torontonian library"
 	@echo "  wheel              to build the Hafnian wheel"
 	@echo "  dist               to package the source distribution"
 	@echo "  clean              to delete all temporary, cache, and build files"
@@ -34,8 +35,9 @@ dist:
 
 .PHONY : clean
 clean:
+	make -C src clean
 	rm -rf hafnian/__pycache__
-	rm -rf tests/__pycache__
+	rm -rf hafnian/tests/__pycache__
 	rm -rf dist
 	rm -rf build
 
@@ -50,6 +52,7 @@ test:
 	$(PYTHON) $(TESTRUNNER)
 
 coverage:
-	$(COVERAGE) $(COPTS) $(TESTRUNNER)
-	$(COVERAGE) report
-	$(COVERAGE) html
+	$(PYTHON) $(TESTRUNNER) $(COVERAGE)
+
+libperm:
+	make libperm -C src

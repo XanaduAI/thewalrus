@@ -1,7 +1,7 @@
 # .coveragerc to control coverage.py
 [run]
 source = hafnian
-omit= hafnian/tests/__init__.py
+omit = hafnian/tests/*
 
 [report]
 # Regexes for lines to exclude from consideration

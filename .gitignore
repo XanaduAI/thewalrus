@@ -6,9 +6,13 @@ dist
 hafnian.egg-info
 .idea
 examples/*ipynp*
+.eggs/*
 *.egg-info*
 hafnian/__pycache__/*
 tests/__pycache__/*
 .coverage
 coverage_html_report
+hafnian/lib
+src/*.o
+src/timing
 
