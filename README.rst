@@ -1,40 +1,27 @@
 Hafnian
 #######
 
-.. image:: https://img.shields.io/travis/XanaduAI/hafnian/master.svg?style=for-the-badge
-    :alt: Travis
-    :target: https://travis-ci.org/XanaduAI/hafnian
+.. image:: https://circleci.com/gh/XanaduAI/hafnianplus.svg?style=svg&circle-token=e34895951dd90ef61a72c1928b4db7ba1e856f48
+    :alt: CircleCI
+    :target: https://circleci.com/gh/XanaduAI/hafnianplus
 
 .. image:: https://ci.appveyor.com/api/projects/status/6wt68c81f8ly583s/branch/master?svg=true
     :alt: Appveyor
     :target: https://ci.appveyor.com/project/josh146/hafnianplus/branch/master
 
-.. image:: https://img.shields.io/codecov/c/github/xanaduai/hafnian/master.svg?style=for-the-badge
-    :alt: Codecov coverage
-    :target: https://codecov.io/gh/XanaduAI/hafnian
 
-.. image:: https://img.shields.io/codacy/grade/df94d22534cf4c05b1bddcf697011a82.svg?style=for-the-badge
-    :alt: Codacy grade
-    :target: https://app.codacy.com/app/XanaduAI/hafnian?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/hafnian&utm_campaign=badger
-
-.. image:: https://img.shields.io/readthedocs/hafnian.svg?style=for-the-badge
-    :alt: Read the Docs
-    :target: https://hafnian.readthedocs.io
-
-.. image:: https://img.shields.io/pypi/pyversions/hafnian.svg?style=for-the-badge
-    :alt: PyPI - Python Version
-    :target: https://pypi.org/project/hafnian
-
-The fastest exact hafnian library for real and complex matrices. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
+The fastest exact hafnian library. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
 
 Features
 ========
 
-* The fastest calculation of the hafnian, loop hafnian, permanent, and torontonian,
-  of general and certain structured matrices.
+* The fastest calculation of the hafnians, loop hafnians, and torontonians of general and certain structured matrices.
 
-* An easy to use interface to use the loop hafnian to calculate Fock matrix
-  elements of Gaussian states via the included quantum module.
+* An easy to use interface to use the loop hafnian for quantum state calculations
+
+* State of the art algorithms to sample from hafnian and torontonians of graphs.
+
+* Efficient classical methods for approximating the hafnian of non-negative matrices.
 
 Installation
 ============
@@ -51,7 +38,7 @@ Pre-built binary wheels are available for the following platforms:
 | Python 3.7 |  ✅         |  ✅              |   ✅          |
 +------------+-------------+------------------+---------------+
 
-These can be installed using ``pip``:
+To install, simply run
 
 .. code-block:: bash
 
@@ -69,7 +56,6 @@ Hafnian depends on the following Python packages:
 In addition, to compile the included Fortran and C++ extensions, the following dependencies are required:
 
 * A Fortran compiler, such as ``gfortran``
-* The LINPACK_Q quadruple precision linear algebra library
 * A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
 * `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
 
@@ -78,14 +64,12 @@ On Debian-based systems, these can be installed via ``apt`` and ``curl``:
 .. code-block:: console
 
     $ sudo apt install g++ gfortran libeigen3-dev
-    $ curl -sL -o src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
 
 or using Homebrew on MacOS:
 
 .. code-block:: console
 
     $ brew install gcc eigen
-    $ curl -sL -o src/linpack_q_complex.f90 https://raw.githubusercontent.com/josh146/linpack_q_complex/master/linpack_q_complex.f90
 
 Alternatively, you can download the Eigen headers manually:
 
@@ -142,6 +126,32 @@ To ensure that the Hafnian library is working correctly after installation, the 
 
     $ make test
 
+To run the low-level C++ test suite, `Googletest <https://github.com/google/googletest>`_
+will need to be installed. In Ubuntu-based distributions, this can be done as follows:
+
+.. code-block:: console
+
+    sudo apt-get install cmake libgtest-dev
+    cd /usr/src/googletest/googletest
+    sudo cmake
+    sudo make
+    sudo cp libgtest* /usr/lib/
+    sudo mkdir /usr/local/lib/googletest
+    sudo ln -s /usr/lib/libgtest.a /usr/local/lib/googletest/libgtest.a
+    sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/googletest/libgtest_main.a
+
+Alternatively, the latest Googletest release can be installed from source:
+
+.. code-block:: console
+
+    sudo apt install cmake
+    wget -qO - https://github.com/google/googletest/archive/release-1.8.1.tar.gz | tar -xz
+    cmake -D CMAKE_INSTALL_PREFIX:PATH=$HOME/googletest -D CMAKE_BUILD_TYPE=Release googletest-release-1.8.1
+    make install
+
+If installing Googletest from source, make sure that the included headers and
+libraries are available on your include/library paths.
+
 Documentation
 =============
 
@@ -151,12 +161,15 @@ The Hafnian+ documentation is currently not hosted online. To build it locally, 
 * `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >=0.3.6
 * `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_
 * `Pandoc <https://pandoc.org/>`_
+* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >=4.12.0
+* `exhale <https://exhale.readthedocs.io/en/latest/>`_
+* `Doxygen <http://www.doxygen.nl/>`_
 
 They can be installed via a combination of ``pip`` and ``apt`` if on a Debian-based system:
 ::
 
-    $ sudo apt install pandoc
-    $ pip3 install sphinx sphinxcontrib-bibtex nbsphinx --user
+    $ sudo apt install pandoc doxygen
+    $ pip3 install sphinx sphinxcontrib-bibtex nbsphinx breathe exhale
 
 To build the HTML documentation, go to the top-level directory and run the command
 

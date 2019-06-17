@@ -15,4 +15,7 @@ coverage_html_report
 hafnian/lib
 src/*.o
 src/timing
-
+src/tests/*.o
+src/tests/cpptests
+docs/doxyoutput/*
+docs/hafnian_cpp_api/*

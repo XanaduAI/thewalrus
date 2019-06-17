@@ -49,14 +49,14 @@ def input_validation(A, tol=1e-12):
     if np.isnan(A).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
-    if np.linalg.norm(A-A.T) >= tol:
+    if np.linalg.norm(A - A.T) >= tol:
         raise ValueError("Input matrix must be symmetric.")
 
     return True
 
 
-def kron_reduced(A, rpt):
-    r"""Calculates the reduced Kronecker product :math:`A^{\oplus 2}\cancel{\otimes}J`.
+def reduction(A, rpt):
+    r"""Calculates the reduction of an array by a vector of indices.
 
     This is equivalent to repeating the ith row/column of :math:`A`, :math:`rpt_i` times.
 
@@ -65,9 +65,9 @@ def kron_reduced(A, rpt):
         rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
             of A to be repeated.
     Returns:
-        array: the reduced Kronecker product
+        array: the reduction of A by the index vector rpt
     """
-    rows = [i for sublist in [[idx]*j for idx, j in enumerate(rpt)] for i in sublist]
+    rows = [i for sublist in [[idx] * j for idx, j in enumerate(rpt)] for i in sublist]
 
     if A.ndim == 1:
         return A[rows]
@@ -75,8 +75,8 @@ def kron_reduced(A, rpt):
     return A[:, rows][rows]
 
 
-def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
-    """Returns the hafnian of matrix A via the C++ hafnian library.
+def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True, approx=False, num_samples=1000): # pylint: disable=too-many-arguments
+    """Returns the hafnian of a matrix.
 
     For more direct control, you may wish to call :func:`haf_real`,
     :func:`haf_complex`, or :func:`haf_int` directly.
@@ -90,6 +90,10 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
         tol (float): the tolerance when checking that the matrix is
             symmetric. Default tolerance is 1e-12.
         quad (bool): If ``True``, the hafnian algorithm is performed with quadruple precision.
+        approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note that
+            the approximation algorithm can only be applied to matrices ``A`` that only have non-negative entries.
+        num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples`` iterations
+            for estimation of the hafnian of the non-negative matrix ``A``.
 
     Returns:
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
@@ -106,49 +110,77 @@ def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True):
         return 0.0
 
     if matshape[0] % 2 != 0 and loop:
-        A = np.pad(A, pad_width=((0, 1), (0, 1)), mode='constant')
+        A = np.pad(A, pad_width=((0, 1), (0, 1)), mode="constant")
         A[-1, -1] = 1.0
 
     matshape = A.shape
 
     if matshape[0] == 2:
         if loop:
-            return A[0, 1] + A[0, 0]*A[1, 1]
+            return A[0, 1] + A[0, 0] * A[1, 1]
         return A[0][1]
 
     if matshape[0] == 4:
         if loop:
-            result = A[0, 1]*A[2, 3] \
-                + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2] \
-                + A[0, 0]*A[1, 1]*A[2, 3] + A[0, 1]*A[2, 2]*A[3, 3] \
-                + A[0, 2]*A[1, 1]*A[3, 3] + A[0, 0]*A[2, 2]*A[1, 3] \
-                + A[0, 0]*A[3, 3]*A[1, 2] + A[0, 3]*A[1, 1]*A[2, 2] \
-                + A[0, 0]*A[1, 1]*A[2, 2]*A[3, 3]
+            result = (
+                A[0, 1] * A[2, 3]
+                + A[0, 2] * A[1, 3]
+                + A[0, 3] * A[1, 2]
+                + A[0, 0] * A[1, 1] * A[2, 3]
+                + A[0, 1] * A[2, 2] * A[3, 3]
+                + A[0, 2] * A[1, 1] * A[3, 3]
+                + A[0, 0] * A[2, 2] * A[1, 3]
+                + A[0, 0] * A[3, 3] * A[1, 2]
+                + A[0, 3] * A[1, 1] * A[2, 2]
+                + A[0, 0] * A[1, 1] * A[2, 2] * A[3, 3]
+            )
             return result
 
-        return A[0, 1]*A[2, 3] + A[0, 2]*A[1, 3] + A[0, 3]*A[1, 2]
+        return A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2]
+
+    if approx:
+        if np.any(np.iscomplex(A)):
+            raise ValueError("Input matrix must be real")
+
+        if np.any(A < 0):
+            raise ValueError("Input matrix must not have negative entries")
 
     if A.dtype == np.complex:
+        # array data is complex type
         if np.any(np.iscomplex(A)):
+            # array values contain non-zero imaginary parts
             return haf_complex(A, loop=loop, recursive=recursive, quad=quad)
+
+        # all array values have zero imaginary parts
         return haf_real(np.float64(A.real), loop=loop, recursive=recursive, quad=quad)
 
-    if np.all(np.mod(A, 1) == 0) and not loop:
+    if np.issubdtype(A.dtype, np.integer) and not loop:
+        # array data is an integer type, and the user is not
+        # requesting the loop hafnian
         return haf_int(np.int64(A))
 
-    return haf_real(A, loop=loop, recursive=recursive, quad=quad)
+    if np.issubdtype(A.dtype, np.integer) and loop:
+        # array data is an integer type, and the user is
+        # requesting the loop hafnian. Currently no
+        # integer function for loop hafnians, have to instead
+        # convert to float and use haf_real
+        A = np.float64(A)
+
+    return haf_real(
+        A, loop=loop, recursive=recursive, quad=quad, approx=approx, nsamples=num_samples
+    )
 
 
 def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
-    r"""Returns the hafnian of matrix A with repeated rows/columns via the C++ hafnian library.
+    r"""Returns the hafnian of matrix with repeated rows/columns.
 
-    The :func:`kron_reduced` function may be used to show the resulting matrix
+    The :func:`reduction` function may be used to show the resulting matrix
     with repeated rows and columns as per ``rpt``.
 
     As a result, the following are identical:
 
     >>> hafnian_repeated(A, rpt)
-    >>> hafnian(kron_reduced(A, rpt))
+    >>> hafnian(reduction(A, rpt))
 
     However, using ``hafnian_repeated`` in the case where there are a large number
     of repeated rows and columns (:math:`\sum_{i}rpt_i \gg N`) can be
@@ -204,36 +236,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
         raise ValueError("Length of means vector must be the same length as the matrix A.")
 
     if A.dtype == np.complex or mu.dtype == np.complex:
-        if np.any(np.iscomplex(A)) or np.any(np.iscomplex(mu)):
-            return haf_rpt_complex(A, nud, mu=mu, loop=loop)
-        return haf_rpt_real(np.float64(A.real), nud, mu=np.float64(mu.real), loop=loop)
+        return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
-
-
-def permanent_repeated(A, rpt):
-    r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
-    of :math:`A` is repeated :math:`rpt_i` times.
-
-    This function constructs the matrix
-
-    .. math:: B = \begin{bmatrix} 0 & A\\ A^T & 0 \end{bmatrix},
-
-    and then calculates :math:`perm(A)=haf(B)`, by calling
-
-    >>> hafnian_repeated(B, rpt*2, loop=False)
-
-    Args:
-        A (array): matrix of size [N, N]
-        rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
-            of A to be repeated.
-
-    Returns:
-        np.int64 or np.float64 or np.complex128: the permanent of matrix A.
-    """
-    n = A.shape[0]
-    O = np.zeros([n, n])
-    B = np.vstack([np.hstack([O, A]),
-                   np.hstack([A.T, O])])
-
-    return hafnian_repeated(B, rpt*2, loop=False)

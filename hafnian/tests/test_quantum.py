@@ -61,10 +61,7 @@ def test_reduced_gaussian(n):
     assert np.all(
         res[1]
         == np.array(
-            [
-                [(N + 1) * n, (N + 1) * n + m],
-                [(N + 1) * n + N * m, (N + 1) * n + N * m + m],
-            ]
+            [[(N + 1) * n, (N + 1) * n + m], [(N + 1) * n + N * m, (N + 1) * n + N * m + m]]
         )
     )
 
@@ -93,9 +90,7 @@ def test_reduced_gaussian_exceptions():
     mu = np.array([0, 0, 0, 0])
     cov = np.identity(4)
 
-    with pytest.raises(
-        ValueError, match="Provided mode is larger than the number of subsystems."
-    ):
+    with pytest.raises(ValueError, match="Provided mode is larger than the number of subsystems."):
         reduced_gaussian(mu, cov, [0, 5])
 
 
@@ -264,9 +259,7 @@ V = np.array(
 )
 
 
-mu = np.array(
-    [0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.33340778]
-)
+mu = np.array([0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.33340778])
 
 
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
@@ -349,7 +342,7 @@ def test_density_matrix_displaced_squeezed():
 
     res = density_matrix(mu, V)
 
-    #fmt: off
+    # fmt: off
     expected = np.array(
         [[0.89054874, 0.15018085 + 0.05295904j, -0.23955467 + 0.01263025j, -0.0734589 - 0.02452154j, 0.07862323 - 0.00868528j],
          [0.15018085 - 0.05295904j, 0.02847564, -0.03964706 + 0.01637575j, -0.01384625 + 0.00023317j, 0.01274241 - 0.00614023j],
@@ -357,7 +350,7 @@ def test_density_matrix_displaced_squeezed():
          [-0.0734589 + 0.02452154j, -0.01384625 - 0.00023317j, 0.01941242 - 0.00763805j, 0.00673463, -0.00624626 + 0.00288134j],
          [0.07862323 + 0.00868528j, 0.01274241 + 0.00614023j, -0.02127257 - 0.00122123j, -0.00624626 - 0.00288134j, 0.00702606]]
     )
-    #fmt:on
+    # fmt:on
 
     assert np.allclose(res, expected)
 
