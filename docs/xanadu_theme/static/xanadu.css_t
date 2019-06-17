@@ -124,7 +124,7 @@ div.related {
 }
 
 p {
-  padding: 0;
+  padding: 10px 0 0 0;
   font-family: inherit;
   font-size: inherit;
   color: #333;
@@ -326,7 +326,7 @@ div.sphinxsidebar h4 {
 
 div.sphinxsidebar p {
   padding: 0px 21px;
-  color: #666;
+  color: #2c96cc;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: bold;
@@ -338,7 +338,7 @@ div.sphinxsidebar p {
 .sidebar-toc {
   font-size: 15px;
   position: absolute;
-  background-color: #333;
+  background-color: #efefef;
   width: 300px;
 }
 
@@ -351,7 +351,7 @@ div.sphinxsidebar .sidebar-toc ul {
 div.sphinxsidebar .sidebar-toc a {
   font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
   /*color: #444;*/
-  color: #ddd;
+  color: #4a4a4a;
   text-decoration: none;
 }
 
@@ -394,7 +394,7 @@ div.sphinxsidebar .sidebar-toc a {
 }
 
 .sidebar-toc ul li.toctree-l2 {
-  background-color: #494949;
+  background-color: #fcfcfc;
 }
 
 .sidebar-toc ul li.toctree-l3 a {

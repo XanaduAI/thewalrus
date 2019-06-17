@@ -17,7 +17,7 @@ Matrices and vectors
 
 In this section we introduce the notation that is used in the rest of the documentation.
 
-We deal with so-called bivectors in which the second half of their components is the complex conjugate of the first half. Thus if :math:`\mathbf{u} = (u_1,\ldots u_\ell) \in \mathbb{C}^{\ell}` then :math:`\vec{\alpha} = (\mathbf{u},\mathbf{u}^*) = (u_1,\ldots,u_\ell,u_1^*,\ldots,u_\ell^*)` is a bivector. We use uppercase letters for (multi)sets such as :math:`S = \{1,1,2}\`.
+We deal with so-called bivectors in which the second half of their components is the complex conjugate of the first half. Thus if :math:`\mathbf{u} = (u_1,\ldots u_\ell) \in \mathbb{C}^{\ell}` then :math:`\vec{\alpha} = (\mathbf{u},\mathbf{u}^*) = (u_1,\ldots,u_\ell,u_1^*,\ldots,u_\ell^*)` is a bivector. We use uppercase letters for (multi)sets such as :math:`S = \{1,1,2\}`.
 
 Following standard Python and C convention, we index starting from zero, thus the first :math:`\ell` natural numbers are :math:`[\ell]:=\{0,1,\ldots,\ell-1\}`.
 We define the :math:`\text{diag}` function as follows: When acting on a vector :math:`\mathbf{u}` it returns a square diagonal matrix :math:`\mathbf{u}`. When acting on a square matrix it returns a vector with its diagonal entries.
