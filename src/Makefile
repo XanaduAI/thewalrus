@@ -33,8 +33,5 @@ example-f90: example.f90 libperm
 libperm: permanent.F90
 	$(FC) $^ $(FFLAGS) -shared -o $@.so
 
-libtor: linpack_q_complex.f90 torontonian.F90
-	$(FC) $^ $(FFLAGS) -shared -o $@.so
-
 clean:
 	rm -rf *~ *.out *.o *.so *.pyc *.mod

@@ -9,11 +9,13 @@ The fastest exact hafnian library.
 Features
 ========
 
-* The fastest calculation of the hafnian, loop hafnian, permanent, and torontonian,
-  of general and certain structured matrices.
+* The fastest calculation of the hafnians, loop hafnians, and torontonians of general and certain structured matrices.
 
-* An easy to use interface to use the loop hafnian to calculate Fock matrix
-  elements of Gaussian states via the included quantum module.
+* An easy to use interface to use the loop hafnian for quantum state calculations
+
+* State of the art algorithms to sample from hafnian and torontonians of graphs. 
+
+* Efficient classical methods for approximating the hafnian of non-negative matrices.
 
 Getting started
 ===============
@@ -62,7 +64,11 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    hafnian
+   loop_hafnian
    algorithms
+   gbs
+   gbs_sampling
+   notation
    references
 
 .. toctree::
@@ -70,8 +76,10 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :caption: Tutorials
    :hidden:
 
+   basics.ipynb
    hafnian_tutorial.ipynb
    permanent_tutorial.ipynb
+   gaussian_states.ipynb
 
 .. toctree::
    :maxdepth: 2
@@ -79,18 +87,18 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    code
-   code/python
+   code/hafnian
    code/quantum
-
+   code/samples
+   code/reference
 
 .. toctree::
    :maxdepth: 2
-   :caption: Hafnian libraries
+   :caption: Low-level libraries
    :hidden:
 
    code/libhaf
    code/libperm
-   code/libtor
 
 
 Indices and tables

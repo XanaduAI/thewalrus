@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Hafnian quantum functions
-=========================
+Quantum algorithms
+==================
 
 .. currentmodule:: hafnian.quantum
 
@@ -56,7 +56,7 @@ import numpy as np
 from scipy.special import factorial as fac
 from scipy.optimize import root_scalar
 
-from ._hafnian import hafnian_repeated, hafnian, kron_reduced
+from ._hafnian import hafnian_repeated, hafnian, reduction
 
 
 def reduced_gaussian(mu, cov, modes):
@@ -256,8 +256,8 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
         gamma = beta.conj() - A @ beta
 
         if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
-            A_rpt = kron_reduced(A, rpt)
-            np.fill_diagonal(A_rpt, kron_reduced(gamma, rpt))
+            A_rpt = reduction(A, rpt)
+            np.fill_diagonal(A_rpt, reduction(gamma, rpt))
             haf = hafnian(A_rpt, loop=True)
         else:
             haf = hafnian_repeated(A, rpt, mu=gamma, loop=True)
@@ -322,9 +322,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_idx = np.array(idx).reshape(2, -1)
         sf_el = tuple(sf_idx[::-1].T.flatten())
 
-        rho[sf_el] = density_matrix_element(
-            beta, A, Q, el0, el1, include_prefactor=False
-        )
+        rho[sf_el] = density_matrix_element(beta, A, Q, el0, el1, include_prefactor=False)
 
     rho *= prefactor(beta, A, Q)
 
@@ -356,9 +354,9 @@ def find_scaling_adjacency_matrix(A, n_mean):
     a_lim = 0.0
     b_lim = 1.0 / (eps + max_sv)
     x_init = 0.5 * b_lim
+
     if 1000 * eps >= max_sv:
         raise ValueError("The singular values of the matrix A are too small.")
-
 
     def mean_photon_number(x, vals):
         r""" Returns the mean number of photons in the Gaussian state that

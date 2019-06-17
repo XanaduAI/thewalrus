@@ -18,8 +18,8 @@ from libcpp.vector cimport vector
 
 
 cdef extern from "../src/hafnian.hpp" namespace "hafnian":
-    T hafnian_recursive[T](vector[T] &mat)
     T hafnian[T](vector[T] &mat)
+    T hafnian_recursive[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
 
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
@@ -34,8 +34,10 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double loop_hafnian_rpt_quad(vector[double] &mat, vector[double] &mu, vector[int] &nud)
     double complex loop_hafnian_rpt_quad(vector[double complex] &mat, vector[double complex] &mu, vector[int] &nud)
 
+    double hafnian_approx(vector[double] &mat, int &nsamples)
+
     double torontonian_quad(vector[double] &mat)
-    double torontonian_quad(vector[double complex] &mat)
+    double complex torontonian_quad(vector[double complex] &mat)
     double torontonian_fsum[T](vector[T] &mat)
 
 
@@ -46,10 +48,17 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
 def torontonian_complex(double complex[:, :] A, fsum=False):
     """Returns the Torontonian of a complex matrix A via the C++ hafnian library.
 
+    The input matrix is cast to a ``long double complex``
+    matrix internally for a quadruple precision torontonian computation.
+
+    However, if ``fsum=True``, no casting takes place, as the Shewchuk algorithm
+    only support double precision.
+
     Args:
         A (array): a np.complex128, square, symmetric array of even dimensions.
-        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
-            matrix internally for a quadruple precision torontonian computation.
+        fsum (bool): if ``True``, the `Shewchuk algorithm <https://github.com/achan001/fsum>_
+            for more accurate summation is performed. This can significantly increase
+            the accuracy of the computation.
 
     Returns:
         np.complex128: the torontonian of matrix A
@@ -62,27 +71,29 @@ def torontonian_complex(double complex[:, :] A, fsum=False):
         for j in range(n):
             mat.push_back(A[i, j])
 
-    cdef int sign = 1
-
-    if m % 2 != 0:
-        sign = -1
-
     if fsum:
-        return sign*torontonian_fsum(mat)
+        return torontonian_fsum(mat)
 
-    return sign*torontonian_quad(mat)
+    return torontonian_quad(mat)
 
 
 def torontonian_real(double[:, :] A, fsum=False):
     """Returns the Torontonian of a real matrix A via the C++ hafnian library.
 
+    The input matrix is cast to a ``long double``
+    matrix internally for a quadruple precision torontonian computation.
+
+    However, if ``fsum=True``, no casting takes place, as the Shewchuk algorithm
+    only support double precision.
+
     Args:
-        A (array): a np.complex128, square, symmetric array of even dimensions.
-        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
-            matrix internally for a quadruple precision torontonian computation.
+        A (array): a np.float64, square, symmetric array of even dimensions.
+        fsum (bool): if ``True``, the `Shewchuk algorithm <https://github.com/achan001/fsum>_
+            for more accurate summation is performed. This can significantly increase
+            the accuracy of the computation.
 
     Returns:
-        np.complex128: the torontonian of matrix A
+        np.float64: the torontonian of matrix A
     """
     cdef int i, j, n = A.shape[0]
     cdef vector[double] mat
@@ -92,15 +103,11 @@ def torontonian_real(double[:, :] A, fsum=False):
         for j in range(n):
             mat.push_back(A[i, j])
 
-    cdef int sign = 1
-
-    if m % 2 != 0:
-        sign = -1
 
     if fsum:
-        return sign*torontonian_fsum(mat)
+        return torontonian_fsum(mat)
 
-    return sign*torontonian_quad(mat)
+    return torontonian_quad(mat)
 
 
 # ==============================================================================
@@ -249,7 +256,7 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, qu
     return hafnian(mat)
 
 
-def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):
+def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True, bint approx=False, nsamples=1000):
     """Returns the hafnian of a real matrix A via the C++ hafnian library.
 
     Args:
@@ -259,6 +266,10 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):
             the recursive algorithm does not currently support the loop hafnian.
         quad (bool): If ``True``, the input matrix is cast to a ``long double``
             matrix internally for a quadruple precision hafnian computation.
+        approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note that
+            the approximation algorithm can only be applied to matrices ``A`` that only have non-negative entries.
+        num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples`` iterations 
+        	for estimation of the hafnian of the non-negative matrix ``A``.
 
     Returns:
         np.float64: the hafnian of matrix A
@@ -273,6 +284,9 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True):
     # Exposes a c function to python
     if loop:
         return loop_hafnian(mat)
+
+    if approx:
+        return hafnian_approx(mat, nsamples)
 
     if recursive:
         if quad:

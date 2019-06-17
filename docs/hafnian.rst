@@ -1,6 +1,6 @@
 .. role:: raw-latex(raw)
    :format: latex
-   
+
 .. role:: html(raw)
    :format: html
 
@@ -8,17 +8,34 @@
 
 
 The hafnian
-======================
+===========
+.. sectionauthor:: Nicolás Quesada <nicolas@xanadu.ai>
 
-.. sectionauthor:: Nicolas Quesada <nicolas@xanadu.ai>
 
-The hafnian of an :math:`n \times n` symmetric matrix :math:`\mathbf{A} =\mathbf{A}^T` is defined as
-		   
+The hafnian
+***********
+
+The hafnian of an :math:`n \times n`, symmetric matrix :math:`\mathbf{A} =\mathbf{A}^T` is defined as :cite:`barvinok2016combinatorics` 
+
 .. math::
    \label{eq:hafA}
-   \haf(\mathbf{A}) = \sum_{M \in \text{PMP}(n)} \prod_{\scriptscriptstyle (i, j) \in M} A_{i, j}
+   \haf(\mathbf{A}) = \sum_{M \in \text{PMP}(n)} \prod_{\scriptscriptstyle (i, j) \in M} A_{i, j},
 
-where :math:`PMP(n)` stands for the set of perfect matching permutations of :math:`n` (even) objects.
+where :math:`\text{PMP}(n)` stands for the set of perfect matching permutations of :math:`n` (even) objects, i.e., permutations :math:`\sigma:[n]\rightarrow [n]` such that :math:`\forall i:\sigma(2i-1)<\sigma(2i)` and :math:`\forall i:\sigma(2i-1)<\sigma(2i+1)`.
+
+
+It was so named by Eduardo R. Caianiello :cite:`caianiello1953quantum` "to mark the fruitful period of stay in Copenhagen (*Hafnia* in Latin)." :cite:`termini2006imagination`
+
+
+The set PMP(:math:`n`) used to define the hafnian contains
+
+.. math::
+   \label{eq:haf1}
+   |\text{PMP}(n)|=(n-1)!! = 1 \times 3 \times 5 \times \ldots \times (n -1),
+
+elements and thus as defined it takes :math:`(n-1)!!` additions of products of :math:`n/2` numbers to calculate the hafnian of an :math:`n \times n` matrix.
+Note that the diagonal elements of the matrix :math:`\mathbf{A}` do not appear in the calculation of the hafnian and are (conventionally) taken to be zero.
+
 For :math:`n=4` the set of perfect matchings is
 
 .. math::
@@ -32,63 +49,135 @@ and the hafnian of a :math:`4 \times 4` matrix :math:`\mathbf{B}` is
    \haf(\mathbf{B}) = B_{0,1} B_{2,3}+B_{0,2}B_{1,3}+B_{0,3} B_{1,2}.
 
 
-More generally, the set PMP(:math:`n`) contains
+The hafnian of an odd sized matrix is defined to be zero; if :math:`\mathbf{A}=\mathbf{A}^T` is :math:`M` dimensional and :math:`M` is odd then :math:`\haf(\mathbf{A}) = 0`. Note that, for convenience, we define the hafnian of an empty matrix, i.e., a matrix of dimension zero by zero, to be 1.
+
+The hafnian is a homogeneous function of degree :math:`n/2` in the matrix entries of an :math:`n \times n` matrix :math:`\mathbf{A}`. This implies that
 
 .. math::
-   \label{eq:haf1}
-   |\text{PMP}(n)|=(n -1)!! = 1 \times 3 \times 5 \times \ldots \times (n -1)
+   \haf(\mu \mathbf{A}) = \mu ^{n/2} \haf(\mathbf{A}),
 
-elements and thus as defined it takes :math:`(n-1)!!` additions of products of :math:`n/2` numbers to calculate the hafnian of :math:`\mathbf{A}`.
-Note that the diagonal elements of the matrix :math:`\mathbf{A}` do not appear in the calculation of the hafnian and are (conventionally) taken to be zero. 
-
-
-We will also be interested in a generalization of the hafnian function where we will consider graphs that have loops, henceforth referred to as lhaf (loop hafnian). The weight associated with said loops will be allocated in the diagonal elements of the adjacency matrix :math:`\mathbf{A}` (which were previously ignored in the definition of the hafnian). To account for the possibility of loops we generalize the set of perfect matching permutations PMP to the single-pair matchings (SPM). This is simply the set of perfect matchings of a complete graph with loops. Thus we define
+where :math:`\mu` is a scalar. More generally, if :math:`\mathbf{W} = \text{diag}(w_0,\ldots,w_{n-1})`, then it holds that :cite:`banchi2019molecular`
 
 .. math::
-   
-   \lhaf(\mathbf{A}) = \sum_{M \in \text{SPM}(n)} \prod_{\scriptscriptstyle (i,j) \in M} A_{i,j}.
+   \haf( \mathbf{W} \mathbf{A} \mathbf{W} ) = \left(\prod_{i=0}^{n-1} w_i\right) \haf(\mathbf{A}).
 
-Considering again a graph with 4 vertices we get a total of 10 SPMs:
-   
+The definition used to introduce the hafnian is rather algebraic and brings little intuition.
+To gain more insight in the next section we introduce some graph theory language and use it to present a more intuitive vision of what the hafnian "counts".
+
+
+
+
+Basics of graphs
+****************
+
+A graph is an ordered pair :math:`G=(V,E)` where :math:`V` is the set of vertices, and :math:`E` is the set of edges linking the vertices of the graph, i.e., if :math:`e \in  E` then :math:`e=(i,j)` where :math:`i,j \in  V`.
+In this section we consider graphs without loops (we relax this in the next section), thus we do not allow for edges :math:`e = (i,i)` connecting a given vertex to itself. 
+A 6 vertex graph is shown here
+
+.. image:: _static/graph.svg
+    :align: center
+    :width: 25%
+    :target: javascript:void(0);
+
+the vertices are labelled :math:`V = \{1,2,3,4,5,6 \}` and the edges are :math:`E=\{(1,1),(1,4),(2,4),(2,5),(3,4),(3,5),(3,6),(5,5) \}`.
+
+A matching :math:`M` is a subset of the edges in which no two edges share a vertex. An example of matching is :math:`M=(1,4)(3,6)` represented by the blue lines in the following figure
+
+.. image:: _static/matching.svg
+    :align: center
+    :width: 25%
+    :target: javascript:void(0);
+
+In the figure above we know we have a matching because none of the highlighted edges shares a vertex.
+
+A perfect matching is a matching which matches all the vertices of the graph, such as for example :math:`M=(1,4)(2,5)(3,6)`, which is represented again by the blue lines in the following figure
+
+.. image:: _static/pm.svg
+    :align: center
+    :width: 25%
+    :target: javascript:void(0);
+
+The blue lines represent a *perfect* matching because, they are a matching, i.e., the edges do no overlap on any vertex *and* all the vertices are covered by one and only edge.
+
+A complete graph is a graph where every vertex is connected to every other vertex.
+For loopless graphs having :math:`n` vertices, the number of perfect matchings is precisely :cite:`barvinok2016combinatorics`
+
 .. math::
-      
-   \text{SPM}(4)=\big\{ &(0,1)(2,3),\ (0,2)(1,3), \ (0,3),(1,2), \ (0,0)(1,1)(2,3),\ (0,1)(2,2)(3,3),
-   \\&  (0,2)(1,1)(3,3), \ (0,0)(2,2)(1,3), \ (0,0)(3,3)(1,2),\ (0,3)(1,1)(2,2),  \ (0,0)(1,1)(2,2)(3,3) \big\}. 
+   |\text{PMP}(n)|=(n-1)!! = 1 \times 3 \times  \ldots \times (n-1).
 
-   
-and the the lhaf of a :math:`4 \times 4` matrix :math:`\mathbf{B}` is
+where we use :math:`\text{PMP}(n)` to indicate the set of perfect matchings of introduced in the previous section, and the notation :math:`|V|` to indicate the number of elements in the set :math:`V`. Note that this number is nonzero only for even :math:`n`, since for odd :math:`n` there will always be one unmatched vertex.
 
-.. math::
+In the following figure we illustrate the 3 perfect matchings of a complete graph with 4 vertices
 
-   \lhaf(\mathbf{B}) =& B_{0,1} B_{2,3}+B_{0,2}B_{1,3}+B_{0,3} B_{1,2}\\
-   &+ B_{0,0} B_{1,1} B_{2,3}+B_{0,1} B_{2,2} B_{3,3}+B_{0,2}B_{1,1}B_{3,3}\nonumber\\
-   &+ B_{0,0} B_{2,2} B_{1,3}+B_{0,0}B_{3,3}B_{1,2}+B_{0,3} B_{1,1} B_{2,2}\nonumber\\
-   &+ B_{0,0} B_{1,1} B_{2,2} B_{3,3}. \nonumber
+.. image:: _static/pmp4.svg
+    :align: center
+    :width: 50%
+    :target: javascript:void(0);
 
-More generally for a graph with :math:`n` vertices (:math:`n` even) the number of SPMs is
 
-.. math::
-   
-   |\text{SPM}(n)| = (n-1)!! \  _1F_1\left(-\frac{n}{2};\frac{1}{2};-\frac{1}{2}\right)
+Perfect matchings and hafnians
+*******************************
 
-where :math:`_1F_1\left(a;b;z\right)` is the Kummer confluent hypergeometric function. Note that :math:`_1F_1\left(-\frac{n}{2};\frac{1}{2};-\frac{1}{2}\right)` scales superpolynomially in :math:`n`
-
-Finally, let us comment on the scaling properties of the :math:`\haf` and :math:`\lhaf`.
-Unlike the hafnian the function loop hafnian is not homogeneous in its matrix entries, i.e.
+An important question concerning a given graph :math:`G=(V,E)` is the number of perfect matchings it has. One possible way to answer this question is to iterate over the perfect matchings of a complete graph and at each step check if the given perfect matching of the complete graph is also a perfect matching of the given graph. A simple way to automatize this process is by constructing the adjacency matrix of the graph. The adjacency matrix :math:`\mathbf{A}` of a graph :math:`G=(V,E)` is a 0-1 matrix that has :math:`\mathbf{A}_{i,j} = \mathbf{A}_{j,i}=1` if, and only if, :math:`(i,j) \in E` and 0 otherwise. For the example graph in the previous section, the adjacency matrix is
 
 .. math::
-   
-   \haf(\mu \mathbf{A}) &= \mu ^{n/2} \haf(\mathbf{A}) \text{  but},\\
-   \lhaf(\mu \mathbf{A}) &\neq \mu ^{n/2} \lhaf(\mathbf{A}).
+   \mathbf{A}' = \begin{bmatrix}
+      0 & 0 & 0 & 1 & 0 & 0 \\
+      0 & 0 & 0 & 1 & 1 & 0 \\
+      0 & 0 & 0 & 1 & 1 & 1 \\
+      1 & 1 & 1 & 0 & 0 & 0 \\
+      0 & 1 & 1 & 0 & 0 & 0 \\
+      0 & 0 & 1 & 0 & 0 & 0
+   \end{bmatrix}.
 
-where :math:`n` is the size of the matrix :math:`\mathbf{A}` and :math:`\mu \geq 0`. However if we split the matrix :math:`\mathbf{A}`  in terms of its diagonal :math:`\mathbf{A}_{\text{diag}}` part and its offdiagonal part :math:`\mathbf{A}_{\text{off-diag}}`
+The number of perfect matchings of a (loopless) graph is simply given by the hafnian of its adjacency matrix
 
 .. math::
-   
-   \mathbf{A} = \mathbf{A}_{\text{diag}}+\mathbf{A}_{\text{off-diag}}
+   \text{haf}(\mathbf{A}) =  \sum_{M \in
+     \text{PMP}(n)} \prod_{\scriptscriptstyle (i,j) \in  M} {A}_{i,j}.
 
-then it holds that
-   
+For the graph in the previous section we can easily confirm that the perfect matching we found is the only perfect matching since
+
 .. math::
-   
-   \lhaf(\sqrt{\mu} \mathbf{A}_{\text{diag}}+ \mu \mathbf{A}_{\text{off-diag}}) = \mu^{n/2} \lhaf(\mathbf{A}_{\text{diag}}+ \mathbf{A}_{\text{off-diag}}) =\mu^{n/2} \lhaf(\mathbf{A}).
+   \text{haf}(\mathbf{A}')  = 1.
+
+The definition of the hafnian immediately generalizes to weighted graphs, where we assign a real or complex number to the entries of the symmetric matrix :math:`\mathbf{A}`.
+
+
+Special values of the hafnian
+*****************************
+
+Here we list some special values of the hafnian for certain special matrices.
+
+* If the matrix :math:`\mathbf{A}` has the following block form
+
+.. math::
+   \mathbf{A}_{\text{block}} = \left[\begin{array}{c|c}
+      0 & \mathbf{C} \\
+      \hline
+      \mathbf{C}^T & 0 \\
+      \end{array}\right]
+
+then it holds that :math:`\text{haf}\left(  \mathbf{A}_{\text{block}}  \right) = \text{per}(\mathbf{C})` where :math:`\text{per}` is the permanent matrix function defined as :cite:`barvinok2016combinatorics`
+
+.. math::
+   \text{per}(\mathbf{C})=\sum_{\sigma\in S_n}\prod_{i=1}^n C_{i,\sigma(i)}.
+
+The sum here extends over all elements :math:`\sigma` of the symmetric group :math:`S_n`.
+
+
+* If :math:`\mathbf{A}_{\text{rank-one}} = \mathbf{e} \mathbf{e}^T` is a rank one matrix of size :math:`n` then
+
+.. math::
+   \text{haf}\left( \mathbf{A}_{\text{rank-one}} \right) = (n-1)!! \prod_{i=1}^{n-1} e_i
+
+In particular, the hafnian of the all ones matrix is precisely :math:`(n-1)!!`.
+
+
+
+* If :math:`\mathbf{A}_{\text{direct sum}} = \mathbf{A}_1 \oplus \mathbf{A}_2` is a block diagonal matrix then
+
+.. math::
+   \text{haf}\left(\mathbf{A}_{\text{direct sum}}\right) = \text{haf}\left( \mathbf{A}_1 \oplus \mathbf{A}_2 \right) = \text{haf}\left( \mathbf{A}_1 \right) \text{haf}\left( \mathbf{A}_2 \right)
+
+This identity simply expresses the fact that the number of perfect matchings of a graph that is made of two disjoint subgraphs is simply the product of the number of perfect matchings of the two disjoint subgraphs.

@@ -77,7 +77,7 @@ if BUILD_EXT:
         cflags_default = "-static -O3 -Wall -fPIC"
         extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
         extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
-        extra_f90_compile_args = []
+        extra_f90_compile_args = [] #['-fopenmp']
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
         libraries += ["omp"]
@@ -117,19 +117,13 @@ if BUILD_EXT:
                 extra_compile_args=CFLAGS,
                 extra_f90_compile_args=extra_f90_compile_args,
                 extra_link_args=extra_link_args_F90),
-            Extension("libtor",
-                sources=["src/kinds.f90", "src/vars.f90", "src/linpack_q_complex.f90", "src/torontonian.F90"],
-                include_dirs=C_INCLUDE_PATH,
-                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-                extra_compile_args=CFLAGS,
-                extra_f90_compile_args=extra_f90_compile_args,
-                extra_link_args=extra_link_args_F90),
             Extension("libhaf",
                 sources=["hafnian/hafnian."+ext,],
                 depends=["src/hafnian.hpp",
                          "src/eigenvalue_hafnian.hpp",
                          "src/recursive_hafnian.hpp",
                          "src/repeated_hafnian.hpp",
+                         "src/hafnian_approx.hpp",
                          "src/torontonian.hpp",
                          "src/stdafx.h",
                          "src/fsum.hpp"],
@@ -161,12 +155,7 @@ info = {
     'install_requires': requirements,
     'ext_package': 'hafnian.lib',
     'setup_requires': setup_requirements,
-    'ext_modules': extensions,
-    # 'cmdclass': {'build_ext': build_ext},
-    'command_options': {
-        'build_sphinx': {
-            'version': ('setup.py', version),
-            'release': ('setup.py', version)}}
+    'ext_modules': extensions
 }
 
 classifiers = [

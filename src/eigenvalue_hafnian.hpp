@@ -11,26 +11,41 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * @file
+ * Contains functions for computing the hafnian using the algorithm described in
+ * *A faster hafnian formula for complex matrices and its benchmarking
+ * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498)
+ */
 #pragma once
 #include <stdafx.h>
 
 #ifdef LAPACKE
-    #define EIGEN_SUPERLU_SUPPORT
-    #define EIGEN_USE_BLAS
-    #define EIGEN_USE_LAPACKE
+#define EIGEN_SUPERLU_SUPPORT
+#define EIGEN_USE_BLAS
+#define EIGEN_USE_LAPACKE
 
-    #define LAPACK_COMPLEX_CUSTOM
-    #define lapack_complex_float std::complex<float>
-    #define lapack_complex_double std::complex<double>
+#define LAPACK_COMPLEX_CUSTOM
+#define lapack_complex_float std::complex<float>
+#define lapack_complex_double std::complex<double>
 #endif
 
 #include <Eigen/Eigenvalues>
 
 namespace hafnian {
 
+/**
+ * Given a complex matrix \f$z\f$ of dimensions \f$n\times n\f$, it calculates
+ * \f$Tr(z^j)~\forall~1\leq j\leq l\f$.
+ *
+ * @param z a flattened complex vector of size \f$n^2\f$, representing an
+ *       \f$n\times n\f$ row-ordered matrix.
+ * @param n size of the matrix `z`.
+ * @param l maximum matrix power when calculating the power trace.
+ * @return a vector containing the power traces of matrix `z` to power
+ *       \f$1\leq j \leq l\f$.
+ */
 inline vec_complex powtrace(vec_complex &z, int n, int l) {
-    // given a complex matrix z of dimensions n x n
-    // it calculates traces[k] = tr(z^j) for 1 <= j <= l
     vec_complex traces(l, 0.0);
     vec_complex vals(n, 0.0);
     vec_complex pvals(n, 0.0);
@@ -38,22 +53,22 @@ inline vec_complex powtrace(vec_complex &z, int n, int l) {
     Eigen::MatrixXcd A = Eigen::Map<Eigen::MatrixXcd, Eigen::Unaligned>(z.data(), n, n);
     Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(A, false);
     Eigen::MatrixXcd evals = solver.eigenvalues();
-    vals = vec_complex(evals.data(), evals.data()+evals.size());
+    vals = vec_complex(evals.data(), evals.data() + evals.size());
 
     double_complex sum;
     int i, j;
 
-    for(j = 0; j < n; j++) {
+    for (j = 0; j < n; j++) {
         pvals[j] = vals[j];
     }
 
-    for(i = 0; i < l; i++) {
+    for (i = 0; i < l; i++) {
         sum = 0.0;
-        for(j = 0; j < n; j++) {
+        for (j = 0; j < n; j++) {
             sum += pvals[j];
         }
         traces[i] = sum;
-        for(j = 0; j < n; j++) {
+        for (j = 0; j < n; j++) {
             pvals[j] = pvals[j] * vals[j];
         }
     }
@@ -61,10 +76,18 @@ inline vec_complex powtrace(vec_complex &z, int n, int l) {
     return traces;
 };
 
-
+/**
+* Given a real matrix \f$z\f$ of dimensions \f$n\times n\f$, it calculates
+* \f$Tr(z^j)~\forall~1\leq j\leq l\f$.
+*
+* @param z a flattened complex vector of size \f$n^2\f$, representing an
+*       \f$n\times n\f$ row-ordered matrix.
+* @param n size of the matrix `z`.
+* @param l maximum matrix power when calculating the power trace.
+* @return a vector containing the power traces of matrix `z` to power
+*       \f$1\leq j \leq l\f$.
+*/
 inline vec_double powtrace(vec_double &z, int n, int l) {
-    // given a real matrix z of dimensions n x n
-    // it calculates traces[k] = tr(z^j) for 1 <= j <= l
     vec_double traces(l, 0.0);
     vec_complex vals(n, 0.0);
     vec_complex pvals(n, 0.0);
@@ -72,21 +95,21 @@ inline vec_double powtrace(vec_double &z, int n, int l) {
     Eigen::MatrixXd A = Eigen::Map<Eigen::MatrixXd, Eigen::Unaligned>(z.data(), n, n);
     Eigen::EigenSolver<Eigen::MatrixXd> solver(A, false);
     Eigen::MatrixXcd evals = solver.eigenvalues();
-    vals = vec_complex(evals.data(), evals.data()+evals.size());
+    vals = vec_complex(evals.data(), evals.data() + evals.size());
 
     double_complex sum;
     int i, j;
 
-    for(j = 0; j < n; j++) {
+    for (j = 0; j < n; j++) {
         pvals[j] = vals[j];
     }
-    for(i = 0; i < l; i++) {
+    for (i = 0; i < l; i++) {
         sum = 0.0;
-        for(j = 0; j < n; j++) {
+        for (j = 0; j < n; j++) {
             sum += pvals[j];
         }
         traces[i] = sum.real();
-        for(j = 0; j < n; j++) {
+        for (j = 0; j < n; j++) {
             pvals[j] = pvals[j] * vals[j];
         }
     }
@@ -95,6 +118,21 @@ inline vec_double powtrace(vec_double &z, int n, int l) {
 };
 
 
+
+/**
+ * Calculates the partial sum \f$X,X+1,\dots,X+\text{chunksize}\f$ using
+ * the Cygan and Pilipczuk formula for the hafnian of matrix `mat`.
+ *
+ * Note that if `X=0` and `chunksize=pow(2.0, n/2)`, then the full hafnian is calculated.
+ *
+ * This function uses OpenMP (if available) to parallelize the reduction.
+ *
+ * @param mat vector representing the flattened matrix
+ * @param n size of the matrix
+ * @param X initial index of the partial sum
+ * @param chunksize length of the partial sum
+ * @return the partial sum for hafnian
+ */
 template <typename T>
 inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned long long int chunksize) {
     // This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the
@@ -116,11 +154,11 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
         Byte sum = find2(dst, m, pos);
         delete [] dst;
 
-        std::vector<T> B(sum*sum, 0.0);
+        std::vector<T> B(sum * sum, 0.0);
 
         for (i = 0; i < sum; i++) {
             for (j = 0; j < sum; j++) {
-                B[i*sum+j] = mat[pos[i] * n + ((pos[j]) ^ 1)];
+                B[i * sum + j] = mat[pos[i] * n + ((pos[j]) ^ 1)];
             }
         }
         delete [] pos;
@@ -133,7 +171,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
         char cnt = 1;
         Byte cntindex = 0;
 
-        std::vector<T> comb(2*(m+1), 0.0);
+        std::vector<T> comb(2 * (m + 1), 0.0);
         comb[0] = 1.0;
 
         for (i = 1; i <= n / 2; i++) {
@@ -143,20 +181,20 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
             cnt = -cnt;
             cntindex = (1 + cnt) / 2;
             for (j = 0; j < n / 2 + 1; j++) {
-                comb[(m+1)*(1 - cntindex)+j] = comb[(m+1)*cntindex+j];
+                comb[(m + 1) * (1 - cntindex) + j] = comb[(m + 1) * cntindex + j];
             }
             for (j = 1; j <= (n / (2 * i)); j++) {
-                powfactor = powfactor * factor / (1.0*j);
+                powfactor = powfactor * factor / (1.0 * j);
                 for (k = i * j + 1; k <= n / 2 + 1; k++) {
-                    comb[(m+1)*(1 - cntindex) + k - 1] += comb[(m+1)*cntindex + k - i * j - 1] * powfactor;
+                    comb[(m + 1) * (1 - cntindex) + k - 1] += comb[(m + 1) * cntindex + k - i * j - 1] * powfactor;
                 }
             }
         }
         if (((sum / 2) % 2) == (n / 2 % 2)) {
-            summand = comb[(m+1)*(1-cntindex) + n / 2];
+            summand = comb[(m + 1) * (1 - cntindex) + n / 2];
         }
         else {
-            summand = -comb[(m+1)*(1-cntindex) + n / 2];
+            summand = -comb[(m + 1) * (1 - cntindex) + n / 2];
         }
         #pragma omp critical
         res += summand;
@@ -165,16 +203,31 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
     return res;
 }
 
-
+/**
+ * Calculates the partial sum \f$X,X+1,\dots,X+\text{chunksize}\f$ using
+ * the Cygan and Pilipczuk formula for the loop hafnian of matrix `mat`.
+ *
+ * Note that if `X=0` and `chunksize=pow(2.0, n/2)`, then the full loop hafnian is calculated.
+ *
+ * This function uses OpenMP (if available) to parallelize the reduction.
+ *
+ * @param mat vector representing the flattened matrix
+ * @param C contains the diagonal elements of matrix ``z``
+ * @param D the diagonal elements of matrix ``z``, with every consecutive pair
+ *      swapped (i.e., ``C[0]==D[1]``, ``C[1]==D[0]``, ``C[2]==D[3]``,
+ *      ``C[3]==D[2]``, etc.).
+ * @param n size of the matrix
+ * @param X initial index of the partial sum
+ * @param chunksize length of the partial sum
+ * @return the partial sum for the loop hafnian
+ */
 template <typename T>
 inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int n, unsigned long long int X, unsigned long long int chunksize) {
-    // This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the
-    // Hafnian of matrix mat
 
     T res = 0.0;
 
     #pragma omp parallel for
-    for(unsigned long long int x = X * chunksize; x < (X + 1)*chunksize; x++) {
+    for (unsigned long long int x = X * chunksize; x < (X + 1)*chunksize; x++) {
         T summand = 0.0;
 
         Byte m = n / 2;
@@ -187,11 +240,11 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
         Byte sum = find2(dst, m, pos);
         delete [] dst;
 
-        std::vector<T> B(sum*sum, 0.0), B_powtrace(sum*sum, 0.0);
+        std::vector<T> B(sum * sum, 0.0), B_powtrace(sum * sum, 0.0);
         std::vector<T> C1(sum, 0.0), D1(sum, 0.0);
 
-        for(i = 0; i < sum; i++) {
-            for(j = 0; j < sum; j++) {
+        for (i = 0; i < sum; i++) {
+            for (j = 0; j < sum; j++) {
                 B[i * sum + j] = mat[pos[i] * n + ((pos[j]) ^ 1)];
                 B_powtrace[i * sum + j] = mat[pos[i] * n + ((pos[j]) ^ 1)];
             }
@@ -208,33 +261,33 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
         char cnt = 1;
         Byte cntindex = 0;
 
-        std::vector<T> comb(2*(m+1), 0.0);
+        std::vector<T> comb(2 * (m + 1), 0.0);
         comb[0] = 1.0;
 
-        for(i = 1; i <= n / 2; i++) {
+        for (i = 1; i <= n / 2; i++) {
             factor = traces[i - 1] / (2.0 * i);
             T tmpn = 0.0;
 
-            for(int i = 0; i < sum; i++) {
+            for (int i = 0; i < sum; i++) {
                 tmpn += C1[i] * D1[i];
             }
 
-            factor += 0.5*tmpn;
+            factor += 0.5 * tmpn;
             std::vector<T> tmp_c1(sum, 0.0);
 
             T tmp = 0.0;
 
-            for(int i = 0; i < sum; i++) {
+            for (int i = 0; i < sum; i++) {
                 tmp = 0.0;
 
-                for(int j = 0; j < sum; j++) {
+                for (int j = 0; j < sum; j++) {
                     tmp += C1[j] * B[j * sum + i];
                 }
 
                 tmp_c1[i] = tmp;
             }
 
-            for(int i = 0; i < sum; i++) {
+            for (int i = 0; i < sum; i++) {
                 C1[i] = tmp_c1[i];
             }
 
@@ -242,23 +295,23 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
 
             cnt = -cnt;
             cntindex = (1 + cnt) / 2;
-            for(j = 0; j < n / 2 + 1; j++) {
-                comb[(m+1)*(1-cntindex)+j] = comb[(m+1)*cntindex+j];
+            for (j = 0; j < n / 2 + 1; j++) {
+                comb[(m + 1) * (1 - cntindex) + j] = comb[(m + 1) * cntindex + j];
             }
 
-            for(j = 1; j <= (n / (2 * i)); j++) {
-                powfactor = powfactor * factor / (1.0*j);
-                for(k = i * j + 1; k <= n / 2 + 1; k++) {
-                    comb[(m+1)*(1-cntindex) + k - 1] = comb[(m+1)*(1-cntindex) + k - 1] + comb[(m+1)*cntindex + k - i * j - 1] * powfactor;
+            for (j = 1; j <= (n / (2 * i)); j++) {
+                powfactor = powfactor * factor / (1.0 * j);
+                for (k = i * j + 1; k <= n / 2 + 1; k++) {
+                    comb[(m + 1) * (1 - cntindex) + k - 1] = comb[(m + 1) * (1 - cntindex) + k - 1] + comb[(m + 1) * cntindex + k - i * j - 1] * powfactor;
                 }
             }
         }
 
-        if(((sum / 2) % 2) == (n / 2 % 2)) {
-            summand = comb[(m+1)*(1-cntindex) + n / 2];
+        if (((sum / 2) % 2) == (n / 2 % 2)) {
+            summand = comb[(m + 1) * (1 - cntindex) + n / 2];
         }
         else {
-            summand = -comb[(m+1)*(1-cntindex) + n / 2];
+            summand = -comb[(m + 1) * (1 - cntindex) + n / 2];
         }
         #pragma omp critical
         res += summand;
@@ -267,6 +320,16 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
     return res;
 }
 
+
+/**
+* Returns the hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
 template <typename T>
 inline T hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -287,6 +350,15 @@ inline T hafnian(std::vector<T> &mat) {
 }
 
 
+/**
+* Returns the loop hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
 template <typename T>
 inline T loop_hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -303,11 +375,11 @@ inline T loop_hafnian(std::vector<T> &mat) {
     unsigned long long int chunksize = pow1;
     unsigned long long int rank = 0;
 
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         D[i] = mat[i * n + i];
     }
 
-    for(int i = 0; i < n; i += 2) {
+    for (int i = 0; i < n; i += 2) {
         C[i] = D[i + 1];
         C[i + 1] = D[i];
     }
@@ -315,6 +387,142 @@ inline T loop_hafnian(std::vector<T> &mat) {
     T haf;
     haf = do_chunk_loops(mat, C, D, n, rank, chunksize);
     return  haf;
+}
+
+
+/**
+* Returns the hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function hafnian() for Python
+* integration. It accepts and returns complex double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
+std::complex<double> hafnian_eigen(std::vector<std::complex<double>> &mat) {
+    std::vector<std::complex<double>> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    std::complex<double> haf;
+
+    if (n == 0)
+        haf = std::complex<double>(1.0, 0.0);
+    else if (n % 2 != 0)
+        haf = std::complex<double>(0.0, 0.0);
+    else
+        haf = hafnian(matq);
+
+    return haf;
+}
+
+
+/**
+* Returns the hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function hafnian() for Python
+* integration. It accepts and returns double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
+double hafnian_eigen(std::vector<double> &mat) {
+    std::vector<double> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    double haf;
+
+    if (n == 0)
+        haf = 1.0;
+    else if (n % 2 != 0)
+        haf = 0.0;
+    else
+        haf = static_cast<double>(hafnian(matq));
+
+    return haf;
+}
+
+
+/**
+* Returns the loop hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function hafnian::loop_hafnian() for Python
+* integration. It accepts and returns complex double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return loop hafnian of the input matrix
+*/
+std::complex<double> loop_hafnian_eigen(std::vector<std::complex<double>> &mat) {
+    std::vector<std::complex<double>> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    std::complex<double> haf;
+    std::vector<std::complex<double>> matq2((n + 1) * (n + 1), std::complex<double>(0.0, 0.0));
+
+    if (n == 0)
+        haf = std::complex<double>(1.0, 0.0);
+    else if (n % 2 != 0) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matq2[i * (n + 1) + j] = matq[i * n + j];
+            }
+        }
+        matq2[(n + 1) * (n + 1) - 1] = std::complex<double>(1.0, 0.0);
+
+
+        haf = loop_hafnian(matq2);
+    }
+    else
+        haf = loop_hafnian(matq);
+
+    return haf;
+}
+
+
+/**
+* Returns the loop hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function loop_hafnian() for Python
+* integration. It accepts and returns double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return loop hafnian of the input matrix
+*/
+double loop_hafnian_eigen(std::vector<double> &mat) {
+    std::vector<double> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    double haf;
+    std::vector<double> matq2((n + 1) * (n + 1), 0.0);
+
+    if (n == 0)
+        haf = 1.0;
+    else if (n % 2 != 0) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matq2[i * (n + 1) + j] = mat[i * n + j];
+            }
+        }
+        matq2[(n + 1) * (n + 1) - 1] = 1.0;
+
+
+        haf = loop_hafnian(matq2);
+    }
+    else
+        haf = static_cast<double>(loop_hafnian(matq));
+
+    return haf;
 }
 
 }

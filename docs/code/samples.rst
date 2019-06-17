@@ -1,0 +1,2 @@
+.. automodule:: hafnian.samples
+    :members:

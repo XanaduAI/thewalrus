@@ -13,6 +13,16 @@
 ! limitations under the License.
 
 module perm
+    ! Module to compute the permanent of a matrix based on Ryser's formula with Gray code implementation.
+    ! Subroutines 're' and 'comp' are respectively for real and complex matrices. 
+    ! The algorithm has the complexity n*2^n with Gray code implementation. We
+    ! use OpenMP parallelization to take advantage of share memory parallelism. When
+    ! implemented in double precision, numerical errors become as large as 100% for a
+    ! 30x30 matrix. This stems from summation of ~2^30 double precision numbers. In
+    ! order to avoid this, we have also implemented the algorithm in quad precision
+    ! which can be availed by changing wp = qp from wp = dp in kinds.f90 and compiling
+    ! the program again. 
+
     use kinds
     use vars
     use omp_lib
@@ -20,21 +30,28 @@ module perm
 
     contains
 
-    subroutine re(mat, permanent)
-        real(dp), intent(in)    :: mat(:, :)
-        real(dp), intent(out)   :: permanent
+    subroutine re(matin, permanent_out)
+        ! Computing permanent of a real matrix
+        real(dp), intent(in)    :: matin(:, :)
+        real(dp), intent(out)   :: permanent_out
+
+        real(wp), allocatable    :: mat(:, :)
+        real(wp)   :: permanent
 
         ! local variables
-        real(dp), dimension(:), allocatable :: tmp
-        real(dp)    :: permtmp, rowsumprod
-        integer(ip) :: C, k, kg1, kg2, cntr, nmaxthreads, &
-                                     j, pos, sig, sgntmp, i, ii, nthreads, n
+        real(wp), dimension(:), allocatable :: tmp
+        real(wp)    :: permtmp, rowsumprod
+        integer(ip2) :: C, k, kg1, kg2, cntr, &
+                                     j, pos, sig, sgntmp, i, n
 
-        integer(ip), allocatable :: threadbound_low(:), threadbound_hi(:)
-        real(dp), allocatable    :: tot(:), chitmp(:)
+        integer(ip) :: nmaxthreads, nthreads, ii
 
-        !f2py intent(in) :: mat
-        !f2py intent(out) :: permanent
+        integer(ip2), allocatable :: threadbound_low(:), threadbound_hi(:)
+        real(wp), allocatable    :: tot(:)
+        real(dp), allocatable    :: chitmp(:)
+
+        !f2py intent(in) :: matin
+        !f2py intent(out) :: permanent_out
 
 #ifdef _OPENMP
         nthreads = OMP_get_max_threads()
@@ -43,13 +60,17 @@ module perm
         nthreads = 1
 #endif
 
+        n = nint(sqrt(real(size(matin), wp)))
+        allocate(mat(1:n, 1:n))
+
+        mat = real(matin, wp)
         nmaxthreads = nthreads
 
-        n = nint(sqrt(real(size(mat), dp)))
 
         C = 2**n-1
 
         nmaxthreads = nthreads
+
 
         allocate(tot(1:nmaxthreads),threadbound_low(1:nmaxthreads),threadbound_hi(1:nmaxthreads),chitmp(1:n+1), tmp(1:n))
 
@@ -60,22 +81,23 @@ module perm
             threadbound_hi(nmaxthreads) =  C
 
 
-        tot=0.0_dp
+        tot=0.0_wp
 
 !$OMP PARALLEL DO private(ii,j,k,rowsumprod,kg2,sgntmp,sig,pos,tmp,permtmp,chitmp,cntr) shared(mat,tot)
         do ii = 1,nmaxthreads
 
 
-            permtmp = 0.0_dp
-            tmp = 0.0_dp
+            permtmp = 0.0_wp
+            tmp = 0.0_wp
             chitmp = 0
             cntr = 0
             kg1 = 0
+
             do k = threadbound_low(ii), threadbound_hi(ii)
-                rowsumprod = 1.0_dp
-                kg2 = igray(k, 1)
-                sgntmp = kg2-igray(k-1, 1)
-                sig = sign(1, sgntmp)! sgntmp/abs(sgntmp)
+                rowsumprod = 1.0_wp
+                kg2 = igray(k, 1_ip2)
+                sgntmp = kg2-igray(k-1_ip2, 1_ip2)
+                sig = sign(1_ip2, sgntmp)! sgntmp/abs(sgntmp)
                 pos = 0
 
                 do while(ibits(sgntmp, pos, 1) < 1)
@@ -126,24 +148,34 @@ module perm
 !$OMP END PARALLEL DO
 
         permanent = sum(tot)
+        permanent_out = real(permanent, dp)
+
         deallocate(tot,threadbound_low,threadbound_hi,chitmp,tmp)
     end subroutine re
 
-    subroutine comp(mat, permanent)
-        complex(dp), intent(in)   :: mat(:, :)
-        complex(dp), intent(out) :: permanent
+    subroutine comp(matin, permanent_out)
+        ! Computing permanent of a complex matrix
+        complex(dp), intent(in)   :: matin(:, :)
+        complex(dp), intent(out) :: permanent_out  
+
+        complex(wp), allocatable :: mat(:, :)
+        complex(wp) :: permanent
 
         ! local variables
-        complex(dp) :: permtmp, rowsumprod
-        integer(ip) :: C, k, kg1, kg2, cntr, nmaxthreads, &
-                                     j, pos, sig, sgntmp, i, ii, nthreads, n
+        complex(wp) :: permtmp, rowsumprod
+        integer(ip2) :: C, k, kg1, kg2, cntr, &
+                                     j, pos, sig, sgntmp, i, n
+
+        integer(ip) :: nmaxthreads, nthreads, ii
+
+        integer(ip2), allocatable :: threadbound_low(:), threadbound_hi(:)
+
 
         real(dp), allocatable    :: chitmp(:)
-        complex(dp), allocatable :: tot(:), tmp(:)
-        integer(ip), allocatable :: threadbound_low(:), threadbound_hi(:)
+        complex(wp), allocatable :: tot(:), tmp(:)
 
         !f2py intent(in) :: mat
-        !f2py intent(out) :: permanent
+        !f2py intent(out) :: permanent_out
 
 #ifdef _OPENMP
         nthreads = OMP_get_max_threads()
@@ -152,9 +184,12 @@ module perm
         nthreads = 1
 #endif
 
-        nmaxthreads = nthreads
+        n = nint(sqrt(real(size(matin), wp)))
+        allocate(mat(1:n, 1:n))
 
-        n = nint(sqrt(real(size(mat), dp)))
+        mat = real(matin, wp) + zi*real(aimag(matin), wp)
+
+        nmaxthreads = nthreads
 
         C = 2**n-1
 
@@ -182,9 +217,9 @@ module perm
             do k=threadbound_low(ii), threadbound_hi(ii)
 
                 rowsumprod = zone
-                kg2 = igray(k, 1)
-                sgntmp = kg2-igray(k-1, 1)
-                sig = sign(1, sgntmp)! sgntmp/abs(sgntmp)
+                kg2 = igray(k, 1_ip2)
+                sgntmp = kg2-igray(k-1_ip2, 1_ip2)
+                sig = sign(1_ip2, sgntmp)! sgntmp/abs(sgntmp)
                 pos = 0
 
                 do while(ibits(sgntmp, pos, 1) < 1)
@@ -237,15 +272,17 @@ module perm
 !$OMP END PARALLEL DO
 
         permanent = sum(tot)
+        permanent_out = real(permanent, dp) + (0.0_dp, 1.0_dp)*real(aimag(permanent), dp)
+
         deallocate(tot,threadbound_low,threadbound_hi,chitmp,tmp)
     end subroutine comp
 
     subroutine dec2bin (kk, nnn, mat)
-        integer(ip), intent(in) :: kk, nnn
+        integer(ip2), intent(in) :: kk, nnn
         real(dp), intent(out)   :: mat(1:nnn+1)
 
         ! local variables
-        integer(ip) :: i, k
+        integer(ip2) :: i, k
 
         mat(:) = 0.0_dp
 
@@ -254,7 +291,7 @@ module perm
 
         do while (k > 0 .and. i>0)
             mat(i) = mod(k, 2)
-            k = k/2 !floor(real(k, dp)/2.0_dp)
+            k = k/2 !floor(real(k, wp)/2.0_wp)
             i = i-1
         end do
 
@@ -263,11 +300,11 @@ module perm
 
 
     function igray(n,is)
-        integer(ip), intent(in) :: n, is
-        integer(ip) :: igray
+        integer(ip2), intent(in) :: n, is
+        integer(ip2) :: igray
 
         ! local variables
-        integer(ip) :: idiv,ish
+        integer(ip2) :: idiv,ish
 
         if (is >= 0) then
                 igray = ieor(n,n/2)

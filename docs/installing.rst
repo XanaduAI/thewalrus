@@ -4,5 +4,5 @@ Installation and Downloads
 #################################
 
 .. include:: ../README.rst
-   :start-line: 41
-   :end-line: 168
+   :start-line: 23
+   :end-line: 186

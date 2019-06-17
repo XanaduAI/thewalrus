@@ -19,7 +19,7 @@ module kinds
     integer, parameter :: sp = selected_real_kind(5,30)
     integer, parameter :: dp = selected_real_kind(9,99)
     integer, parameter :: qp = selected_real_kind(20, 199)
-    integer, parameter :: wp = qp
+    integer, parameter :: wp = dp
     integer, parameter :: ip = selected_int_kind(8)
     integer, parameter :: ip2 = selected_int_kind(16)
 

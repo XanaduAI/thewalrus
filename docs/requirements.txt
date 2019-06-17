@@ -4,3 +4,5 @@ ipykernel
 nbsphinx
 cython>=0.20
 numpy>=1.9
+breathe==4.12.0
+exhale

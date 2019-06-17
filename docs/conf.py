@@ -73,7 +73,33 @@ extensions = [
     'sphinxcontrib.bibtex',
     'edit_on_github',
     'nbsphinx',
+    'breathe',
+    'exhale'
 ]
+
+# Setup the breathe extension
+breathe_projects = {
+    "Hafnian C++": "./doxyoutput/xml"
+}
+
+breathe_default_project = "Hafnian C++"
+breathe_domain_by_extension = {"hpp" : "cpp"}
+
+# Setup the exhale extension
+exhale_args = {
+    # These arguments are required
+    "containmentFolder":     "./hafnian_cpp_api",
+    "rootFileName":          "library_root.rst",
+    "rootFileTitle":         "C++ Library API",
+    "doxygenStripFromPath":  "..",
+    # Suggested optional arguments
+    "createTreeView":        True,
+    # TIP: if using the sphinx-bootstrap-theme, you need
+    # "treeViewIsBootstrap": True,
+    "exhaleExecutesDoxygen": True,
+    "exhaleDoxygenStdin":    "INPUT = ../src/stdafx.h ../src/hafnian.hpp ../src/version.hpp ../src/eigenvalue_hafnian.hpp ../src/hafnian_approx.hpp ../src/recursive_hafnian.hpp ../src/repeated_hafnian.hpp  ../src/torontonian.hpp",
+    # "exhaleUseDoxyfile": True
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates', 'xanadu_theme']

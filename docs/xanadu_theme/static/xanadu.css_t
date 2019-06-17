@@ -10,6 +10,8 @@ body {
   font-size: 15px;
   color: #333;
   line-height: 1.4;
+  width: 100%;
+  min-height: calc(100vh - 90px);
 }
 
 .css-transitions-only-after-page-load * {
@@ -38,6 +40,8 @@ body {
   background-color: #fff;
   max-width: 900px;
   float: left;
+  width: 100%;
+  min-height: calc(100vh - 90px);
 }
 
 a.headerlink {
@@ -81,6 +85,7 @@ h1 {
   width: calc(100% + 90px);
   /*border-bottom: 3px solid #D8E4EF;*/
   /*border-bottom: 3px solid #eee;*/
+  word-wrap: anywhere;
 }
 
 h2 {
@@ -332,8 +337,9 @@ div.sphinxsidebar p {
 
 .sidebar-toc {
   font-size: 15px;
-  /*position: absolute;*/
+  position: absolute;
   background-color: #333;
+  width: 300px;
 }
 
 div.sphinxsidebar .sidebar-toc ul {
@@ -905,10 +911,14 @@ div.topic.contents {
 div.topic.contents > ul {
     padding-left: 20px;
     padding-left: 20px;
-    max-height: 100px;
+    /*max-height: 100px;*/
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+}
+
+div.topic.contents > ul > li {
+    margin-bottom: 10px;
 }
 
 /* -- admonitions ----------------------------------------------------------- */
@@ -1006,7 +1016,6 @@ div.topic.contents > ul {
 
 .admonition.tip {
   padding: 5px 0 0 24px;
-  margin-top: -24px;
   background-color: #F9F9F9;
   border-top: 0px solid #EAEAEA;
   border-left-color: #119A68;
@@ -1029,6 +1038,13 @@ div.body p.centered {
 div.seealso {
   background-color: #ffc;
   border: 1px solid #ff6;
+}
+
+.admonition.see {
+  font-style: italic;
+  margin: -15px 0px 10px 0px;
+  padding: 5px;
+  border-color: #ddd white white white;
 }
 
 div.admonition tt.xref, div.admonition a tt {

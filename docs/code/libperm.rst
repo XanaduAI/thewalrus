@@ -1,3 +1,5 @@
+.. _perm_f90:
+
 Permanent Fortran library
 =========================
 
@@ -19,7 +21,7 @@ This will generate the shared library ``src/libperm.so``, as well as the Fortran
 Example
 -------
 
-For instance, consider the following example :download:`example.f90 <../../src/example.f90>`, which calculates the permanent of several all ones matrices:
+For instance, consider the following example ``example.f90``, which calculates the permanent of several all ones matrices:
 
 .. code-block:: cpp
 
