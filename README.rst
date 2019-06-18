@@ -9,6 +9,21 @@ Hafnian
     :alt: Appveyor
     :target: https://ci.appveyor.com/project/josh146/hafnianplus/branch/master
 
+.. image:: https://img.shields.io/codecov/c/github/xanaduai/hafnian/master.svg?style=flat
+    :alt: Codecov coverage
+    :target: https://codecov.io/gh/XanaduAI/hafnian
+
+.. image:: https://img.shields.io/codacy/grade/df94d22534cf4c05b1bddcf697011a82.svg?style=flat
+    :alt: Codacy grade
+    :target: https://app.codacy.com/app/XanaduAI/hafnian?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/hafnian&utm_campaign=badger
+
+.. image:: https://img.shields.io/readthedocs/hafnian.svg?style=flat
+    :alt: Read the Docs
+    :target: https://hafnian.readthedocs.io
+
+.. image:: https://img.shields.io/pypi/pyversions/hafnian.svg?style=flat
+    :alt: PyPI - Python Version
+    :target: https://pypi.org/project/hafnian
 
 The fastest exact hafnian library. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
 
@@ -185,6 +200,8 @@ Authors
 =======
 
 Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
+
+All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/hafnian/blob/master/.github/ACKNOWLEDGMENTS.md.md>`_.
 
 If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
 
