@@ -54,7 +54,6 @@ Python wrappers
 .. autosummary::
     hafnian
     hafnian_repeated
-    gradhaf
     tor
     perm
     permanent_repeated
