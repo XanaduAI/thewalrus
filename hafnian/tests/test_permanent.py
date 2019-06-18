@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for the Python pnian wrapper function"""
+"""Tests for the Python permanent wrapper function"""
+# pylint: disable=no-self-use,redefined-outer-name
 import pytest
 
 import numpy as np
@@ -64,7 +65,7 @@ class TestPermanentWrapper:
         )
         assert p == expected
 
-    @pytest.mark.parametrize('dtype', [np.float64])
+    @pytest.mark.parametrize("dtype", [np.float64])
     def test_real(self, random_matrix):
         """Check permanent(A)=perm_real(A) for a random
         real matrix.
@@ -80,7 +81,7 @@ class TestPermanentWrapper:
         expected = perm_real(np.float64(A.real))
         assert p == expected
 
-    @pytest.mark.parametrize('dtype', [np.complex128])
+    @pytest.mark.parametrize("dtype", [np.complex128])
     def test_complex(self, random_matrix):
         """Check perm(A)=perm_complex(A) for a random matrix.
         """
@@ -89,7 +90,7 @@ class TestPermanentWrapper:
         expected = perm_complex(A)
         assert np.allclose(p, expected)
 
-    @pytest.mark.parametrize('dtype', [np.float64])
+    @pytest.mark.parametrize("dtype", [np.float64])
     def test_complex_no_imag(self, random_matrix):
         """Check perm(A)=perm_real(A) for a complex random matrix
         with zero imaginary parts.

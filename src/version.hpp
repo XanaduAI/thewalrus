@@ -24,10 +24,10 @@
 #define HAFNIAN_VERSION_MINOR 6
 
 /// The patch number
-#define HAFNIAN_VERSION_PATCH 0
+#define HAFNIAN_VERSION_PATCH 1
 
 /// The complete version number
 #define HAFNIAN_VERSION_CODE (HAFNIAN_VERSION_MAJOR * 10000 + HAFNIAN_VERSION_MINOR * 100 + HAFNIAN_VERSION_PATCH)
 
 /// Version number as string
-#define HAFNIAN_VERSION_STRING "0.6.0"
+#define HAFNIAN_VERSION_STRING "0.6.1"

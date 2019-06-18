@@ -32,22 +32,53 @@ states, see:
   <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.119.170501>`_
 
 
-Summary
--------
+Fock states
+-----------
 
 .. autosummary::
-    reduced_gaussian
-    Xmat
-    Qmat
-    Amat
-    Beta
-    prefactor
+
+    pure_state_amplitude
+    state_vector
     density_matrix_element
     density_matrix
 
+Details
+^^^^^^^
 
-Code details
-------------
+.. autofunction::
+    pure_state_amplitude
+
+.. autofunction::
+    state_vector
+
+.. autofunction::
+    density_matrix_element
+
+.. autofunction::
+    density_matrix
+
+
+Utility functions
+-----------------
+
+.. autosummary::
+
+    reduced_gaussian
+    Xmat
+    Sympmat
+    Qmat
+    Covmat
+    Amat
+    Beta
+    Means
+    prefactor
+    find_scaling_adjacency_matrix
+    gen_Qmat_from_graph
+    is_valid_cov
+    is_pure_cov
+
+Details
+^^^^^^^
 """
 # pylint: disable=too-many-arguments
 from itertools import product, count
@@ -107,6 +138,21 @@ def Xmat(N):
     return X
 
 
+def Sympmat(N):
+    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
+
+    Args:
+        N (int): positive integer
+
+    Returns:
+        array: :math:`2N\times 2N` array
+    """
+    I = np.identity(N)
+    O = np.zeros_like(I)
+    S = np.block([[O, I], [-I, O]])
+    return S
+
+
 def Qmat(cov, hbar=2):
     r"""Returns the :math:`Q` matrix of the Gaussian state.
 
@@ -162,7 +208,7 @@ def Covmat(Q, hbar=2):
 
 
 def Amat(cov, hbar=2, cov_is_qmat=False):
-    r"""Returns the :math:`A` matrix of the Gaussian state.
+    r"""Returns the :math:`A` matrix of the Gaussian state whose hafnian gives the photon number probabilities.
 
     Args:
         cov (array): :math:`2N\times 2N` covariance matrix
@@ -209,47 +255,71 @@ def Beta(mu, hbar=2):
     return np.concatenate([alpha, alpha.conj()])
 
 
-def prefactor(beta, A, Q):
+def Means(beta, hbar=2):
+    r"""Returns the vector of real quadrature displacements.
+
+    Args:
+        beta (array): length-:math:`2N` means bivector
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+
+    Returns:
+        array: the quadrature expectation values
+        :math:`[\langle q_1\rangle, \langle q_2\rangle,\dots,\langle q_N\rangle, \langle p_1\rangle, \dots, \langle p_N\rangle]`
+    """
+
+    N = len(beta) // 2
+    alpha = beta[0:N]
+    return np.sqrt(2 * hbar) * np.concatenate([alpha.real, alpha.imag])
+
+
+def prefactor(mu, cov, hbar=2):
     r"""Returns the prefactor.
 
     .. math:: prefactor = \frac{e^{-\beta Q^{-1}\beta^*/2}}{n_1!\cdots n_m! \sqrt{|Q|}}
 
     Args:
-        beta (array): length-:math:`2N` vector of displacements :math:`[\alpha,\alpha^*]`
-        A (array): length-:math:`2N` :math:`A` matrix
-        Q (array): length-:math:`2N` :math:`Q` matrix
+        mu (array): length-:math:`2N` vector of mean values :math:`[\alpha,\alpha^*]`
+        cov (array): length-:math:`2N` `xp`-covariance matrix
 
     Returns:
         float: the prefactor
     """
-    sqrt_Qdet = np.sqrt(np.linalg.det(Q))
-    # Qinv = np.linalg.inv(Q)
-    # return np.exp(-0.5*beta @ Qinv @ beta.conj())/sqrt_Qdet
-    return np.exp(-0.5 * (beta.conj() @ beta - beta @ A @ beta)) / sqrt_Qdet
+    Q = Qmat(cov, hbar=hbar)
+    beta = Beta(mu, hbar=hbar)
+    Qinv = np.linalg.inv(Q)
+    return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
 
 
-def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
+def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hbar=2):
     r"""Returns the :math:`\langle i | \rho | j \rangle` element of the density matrix
-    of a Gaussian state defined by the :math:`A` and :math:`Q` matrices.
+    of a Gaussian state defined by covariance matrix cov.
 
     Args:
-        beta (array): length-:math:`2N` displacement and conjugate displacement vector
-        A (array): length-:math:`2N` :math:`A` matrix
-        Q (array): length-:math:`2N` :math:`Q` matrix
+        mu (array): length-:math:`2N` quadrature displacement vector
+        cov (array): length-:math:`2N` covariance matrix
         i (list): list of density matrix rows
         j (list): list of density matrix columns
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
         complex: the density matrix element
     """
     rpt = i + j
 
+    beta = Beta(mu, hbar=hbar)
+    A = Amat(cov, hbar=hbar)
     if np.linalg.norm(beta) < tol:
         # no displacement
-        haf = hafnian_repeated(A, rpt=rpt)
+        if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
+            A_rpt = reduction(A, rpt)
+            haf = hafnian(A_rpt)
+        else:
+            haf = hafnian_repeated(A, rpt)
     else:
         # replace the diagonal of A with gamma
         # gamma = X @ np.linalg.inv(Q).conj() @ beta
@@ -263,9 +333,130 @@ def density_matrix_element(beta, A, Q, i, j, include_prefactor=True, tol=1e-10):
             haf = hafnian_repeated(A, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        haf *= prefactor(beta, A, Q)
+        haf *= prefactor(mu, cov, hbar=2)
 
     return haf / np.sqrt(np.prod(fac(rpt)))
+
+
+def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
+    r"""Returns the :math:`\langle i | \psi ` element of the state ket
+    of a Gaussian state defined by covariance matrix cov.
+    To verify if the given covariance matrix corresponds to a pure stat
+
+    Args:
+        mu (array): length-:math:`2N` quadrature displacement vector
+        cov (array): length-:math:`2N` covariance matrix
+        i (list): list of amplitude elements
+        include_prefactor (bool): if ``True``, the prefactor is automatically calculated
+            used to scale the result.
+        tol (float): tolerance for determining if displacement is negligible
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        check_purity (bool): if ``True``, the purity of the Gaussian state is checked
+            before calculating the state vector.
+
+    Returns:
+        complex: the pure state amplitude
+    """
+    if check_purity:
+        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+            raise ValueError("The covariance matrix does not correspond to a pure state")
+
+    rpt = i
+    beta = Beta(mu, hbar=hbar)
+    Q = Qmat(cov, hbar=hbar)
+    A = Amat(cov, hbar=hbar)
+    (n, _) = cov.shape
+    N = n // 2
+    B = A[0:N, 0:N]
+    alpha = beta[0:N]
+
+    if np.linalg.norm(alpha) < tol:
+        # no displacement
+        if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
+            B_rpt = reduction(B, rpt)
+            haf = hafnian(B_rpt)
+        else:
+            haf = hafnian_repeated(B, rpt)
+    else:
+        # replace the diagonal of A with gamma
+        # gamma = X @ np.linalg.inv(Q).conj() @ beta
+        zeta = alpha - B @ (alpha.conj())
+
+        if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
+            B_rpt = reduction(B, rpt)
+            np.fill_diagonal(B_rpt, reduction(zeta, rpt))
+            haf = hafnian(B_rpt, loop=True)
+        else:
+            haf = hafnian_repeated(B, rpt, mu=zeta, loop=True)
+
+    if include_prefactor:
+        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
+        haf *= pref
+
+    return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
+
+
+def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity=True):
+    r"""Returns the state vector of a (PNR post-selected) Gaussian state.
+
+    The resulting density matrix will have shape
+
+    .. math:: \underbrace{D\times D \times \cdots \times D}_M
+
+    where :math:`D` is the Fock space cutoff, and :math:`M` is the
+    number of *non* post-selected modes, i.e. ``M = len(mu)//2 - len(post_select)``.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
+        post_select (dict): dictionary containing the post-selected modes, of
+            the form ``{mode: value}``.
+        normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
+        cutoff (dim): the final length (i.e., Hilbert space dimension) of each
+            mode in the density matrix.
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        check_purity (bool): if ``True``, the purity of the Gaussian state is checked
+            before calculating the state vector.
+
+    Returns:
+        np.array[complex]: the state vector of the Gaussian state
+    """
+    if check_purity:
+        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+            raise ValueError("The covariance matrix does not correspond to a pure state")
+
+    if post_select is None:
+        post_select = {}
+
+    beta = Beta(mu, hbar=hbar)
+    A = Amat(cov, hbar=hbar)
+
+    (n, _) = cov.shape
+    N = n // 2
+
+    B = A[0:N, 0:N]
+    alpha = beta[0:N]
+    M = N - len(post_select)
+    psi = np.zeros([cutoff] * (M), dtype=np.complex128)
+
+    for idx in product(range(cutoff), repeat=M):
+        el = []
+
+        counter = count(0)
+        modes = (np.arange(N)).tolist()
+        el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
+        psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
+
+    pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
+    psi = psi * pref
+
+    if normalize:
+        norm = np.sqrt(np.sum(np.abs(psi) ** 2))
+        psi = psi / norm
+
+    return psi
 
 
 def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2):
@@ -302,10 +493,6 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     N = len(mu) // 2
     M = N - len(post_select)
 
-    beta = Beta(mu, hbar=hbar)
-    A = Amat(cov, hbar=hbar)
-    Q = Qmat(cov, hbar=hbar)
-
     rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
 
     for idx in product(range(cutoff), repeat=2 * M):
@@ -322,9 +509,9 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_idx = np.array(idx).reshape(2, -1)
         sf_el = tuple(sf_idx[::-1].T.flatten())
 
-        rho[sf_el] = density_matrix_element(beta, A, Q, el0, el1, include_prefactor=False)
+        rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
 
-    rho *= prefactor(beta, A, Q)
+    rho *= prefactor(mu, cov, hbar=hbar)
 
     if normalize:
         # construct the standard 2D density matrix, and take the trace
@@ -399,10 +586,10 @@ def find_scaling_adjacency_matrix(A, n_mean):
 
 def gen_Qmat_from_graph(A, n_mean):
     r""" Returns the Qmat xp-covariance matrix associated to a graph with
-    adjacency matrix A and with mean photon number n_mean
+    adjacency matrix :math:`A` and with mean photon number :math:`n_{mean}`.
 
     Args:
-        A (array): a :math:`N\times N` ``np.float64`` (symmetric) adjacency matrix matrix
+        A (array): a :math:`N\times N` ``np.float64`` (symmetric) adjacency matrix
         n_mean (float): mean photon number of the Gaussian state
 
     Returns:
@@ -420,3 +607,55 @@ def gen_Qmat_from_graph(A, n_mean):
     X = Xmat(n)
     Q = np.linalg.inv(I - X @ A)
     return Q
+
+
+def is_valid_cov(cov, hbar=2, sigdigits=6):
+    r""" Checks if the covariance matrix is a valid quantum covariance matrix.
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+
+    Returns:
+        (boolean): whether the given covariance matrix is a valid covariance matrix
+    """
+    (n, m) = cov.shape
+    if n != m:
+        # raise ValueError("The input matrix must be square")
+        return False
+
+    if np.linalg.norm(cov - np.transpose(cov)) >= 10 ** (-sigdigits):
+        # raise ValueError("The input matrix is not symmetric")
+        return False
+
+    if n % 2 != 0:
+        # raise ValueError("The input matrix is of even dimension")
+        return False
+
+    nmodes = n // 2
+    vals = np.round(np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes)), sigdigits)
+
+    if np.all(vals >= 0):
+        # raise ValueError("The input matrix violates the uncertainty relation")
+        return True
+
+    return False
+
+
+def is_pure_cov(cov, hbar=2, sigdigits=6):
+    r""" Checks if the covariance matrix is a valid quantum covariance matrix
+    that corresponds to a quantum pure state
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+
+    Returns:
+        (boolean): whether the given covariance matrix corresponds to a pure state
+    """
+    if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
+        purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
+        if np.allclose(purity, 1.0):
+            return True
+
+    return False

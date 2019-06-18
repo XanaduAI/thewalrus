@@ -99,9 +99,7 @@ In the case where the Gaussian state :math:`\varrho = |\psi \rangle \langle \psi
 factorizes into a product of two amplitudes. In Ref. :cite:`quesada2019franck` it was shown that the Fock **amplitude** of a gaussian state is also given by a loop hafnian. Then, for pure states the matrix :math:`\mathbf{\bar{A}} = \mathbf{\bar{B}} \oplus \mathbf{\bar{B}}^*`.
 
 
-.. tip::
 
-   * To obtain the matrix element of gaussian state with Husimi covariance matrix :math:`\Sigma` and vector of means :math:`\vec \beta` use the function :func:`hafnian.quantum.density_matrix_element`.
 
 
 
@@ -166,4 +164,29 @@ Finally, note that for :math:`\mathbf{V}` to be a valid **quantum** covariance m
 
 .. tip::
 
-   * To interconvert between the complex covariance matrix :math:`\sigma` and the quadrature covariance matrix :math:`V` use the functions :func:`hafnian.quantum.Qmat` and :func:`hafnian.quantum.Covmat`
+   * To interconvert between the complex covariance matrix :math:`\sigma` and the quadrature covariance matrix :math:`\mathbf{V}` use the functions :func:`hafnian.quantum.Qmat` and :func:`hafnian.quantum.Covmat`
+
+.. tip::
+
+   * To verify if a given quadrature covariance matrix is a valid quantum covariance matrix use the function :func:`hafnian.quantum.is_valid_cov`
+
+.. tip::
+
+   * To verify if a given quadrature covariance matrix is a valid quantum covariance matrix and corresponds to a pure state use the function :func:`hafnian.quantum.is_pure_cov`
+
+.. tip::
+
+   * To obtain the matrix element of gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`hafnian.quantum.density_matrix_element`.
+
+.. tip::
+
+   * To obtain the Fock space density matrix of gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`hafnian.quantum.density_matrix`.
+
+.. tip::
+
+   * To obtain the overlap of a *pure* gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` and a given Fock state :math:`\langle \mathbf{n}|` use the function :func:`hafnian.quantum.pure_state_amplitude`.
+
+.. tip::
+
+   * To obtain the Fock space state vector (ket) of a pure gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`hafnian.quantum.state_vector`.
+

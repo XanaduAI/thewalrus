@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the Python reference hafnian functions"""
+# pylint: disable=redefined-outer-name
 import pytest
 import numpy as np
 
 
 @pytest.fixture(params=[np.complex128, np.float64, np.int64])
 def dtype(request):
+    """Fixture that iterates through all numpy types"""
     return request.param
 
 

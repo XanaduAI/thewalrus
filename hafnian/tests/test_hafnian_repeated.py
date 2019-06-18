@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the lhaf Python function, which calls lhafnian.so"""
+# pylint: disable=no-self-use,redefined-outer-name
 from math import factorial as fac
 
 import pytest

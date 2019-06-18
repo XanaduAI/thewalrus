@@ -75,7 +75,9 @@ def reduction(A, rpt):
     return A[:, rows][rows]
 
 
-def hafnian(A, loop=False, recursive=True, tol=1e-12, quad=True, approx=False, num_samples=1000): # pylint: disable=too-many-arguments
+def hafnian(
+    A, loop=False, recursive=True, tol=1e-12, quad=True, approx=False, num_samples=1000
+):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
 
     For more direct control, you may wish to call :func:`haf_real`,
