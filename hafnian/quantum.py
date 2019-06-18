@@ -279,7 +279,6 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
     rpt = i + j
 
     beta = Beta(mu, hbar=hbar)
-    Q = Qmat(cov, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     if np.linalg.norm(beta) < tol:
         # no displacement
@@ -306,9 +305,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
     return haf / np.sqrt(np.prod(fac(rpt)))
 
 
-def pure_state_amplitude(
-    mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True
-):
+def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
     r"""Returns the :math:`\langle i | \psi ` element of the state ket
     of a Gaussian state defined by covariance matrix cov.
     To verify if the given covariance matrix corresponds to a pure stat
@@ -325,16 +322,14 @@ def pure_state_amplitude(
         complex: the pure state amplitude
     """
     if check_purity:
-        if not (is_pure_cov(cov, hbar=2, sigdigits=6)):
-            raise ValueError(
-                "The covariance matrix does not correspond to a pure state"
-            )
+        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+            raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
     beta = Beta(mu, hbar=hbar)
     Q = Qmat(cov, hbar=hbar)
     A = Amat(cov, hbar=hbar)
-    (n, m) = cov.shape
+    (n, _) = cov.shape
     N = n // 2
     B = A[0:N, 0:N]
     alpha = beta[0:N]
@@ -358,14 +353,13 @@ def pure_state_amplitude(
             haf = hafnian_repeated(B, rpt, mu=zeta, loop=True)
 
     if include_prefactor:
-        pref = np.exp(
-            -0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj())
-        )
+        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
         haf *= pref
 
     return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
 
-def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity = True):
+
+def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity=True):
     r"""Returns the state vector of a (PNR post-selected) Gaussian state.
 
     The resulting density matrix will have shape
@@ -390,42 +384,37 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         np.array[complex]: the state vector of the Gaussian state
     """
     if check_purity:
-        if not (is_pure_cov(cov, hbar=2, sigdigits=6)):
-            raise ValueError(
-                "The covariance matrix does not correspond to a pure state"
-            )
-
+        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+            raise ValueError("The covariance matrix does not correspond to a pure state")
 
     if post_select is None:
         post_select = {}
     beta = Beta(mu, hbar=hbar)
-    Q = Qmat(cov, hbar=hbar)
     A = Amat(cov, hbar=hbar)
-    (n, m) = cov.shape
+    (n, _) = cov.shape
     N = n // 2
     B = A[0:N, 0:N]
     alpha = beta[0:N]
     M = N - len(post_select)
     psi = np.zeros([cutoff] * (M), dtype=np.complex128)
-    for idx in product(range(cutoff), repeat= M):
+    for idx in product(range(cutoff), repeat=M):
         el = []
 
         counter = count(0)
         modes = (np.arange(N)).tolist()
         el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
         psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
-        #rho[idx] = density_matrix_element(
+        # rho[idx] = density_matrix_element(
         #    mu, cov, el0, el1, include_prefactor=False, hbar=hbar
-        #)
-    pref = np.exp(
-            -0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj())
-        )
-    psi = psi*pref
+        # )
+    pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
+    psi = psi * pref
     if normalize:
-        norm = np.sqrt(np.sum(np.abs(psi)**2))
-        psi = psi/norm
+        norm = np.sqrt(np.sum(np.abs(psi) ** 2))
+        psi = psi / norm
 
     return psi
+
 
 def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2):
     r"""Returns the density matrix of a (PNR post-selected) Gaussian state.
@@ -461,9 +450,6 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     N = len(mu) // 2
     M = N - len(post_select)
 
-    beta = Beta(mu, hbar=hbar)
-    Q = Qmat(cov, hbar=hbar)
-
     rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
 
     for idx in product(range(cutoff), repeat=2 * M):
@@ -480,9 +466,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_idx = np.array(idx).reshape(2, -1)
         sf_el = tuple(sf_idx[::-1].T.flatten())
 
-        rho[sf_el] = density_matrix_element(
-            mu, cov, el0, el1, include_prefactor=False, hbar=hbar
-        )
+        rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
 
     rho *= prefactor(mu, cov, hbar=hbar)
 
@@ -583,6 +567,15 @@ def gen_Qmat_from_graph(A, n_mean):
 
 
 def is_valid_cov(cov, hbar=2, sigdigits=6):
+    r""" Checks if the covariance matrix is a valid quantum covariance matrix
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+
+    Returns:
+        (boolen): whether the given covariance matrix is a valid covariance matrix
+    """
     (n, m) = cov.shape
     if n != m:
         # raise ValueError("The input matrix must be square")
@@ -602,6 +595,16 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
 
 
 def is_pure_cov(cov, hbar=2, sigdigits=6):
+    r""" Checks if the covariance matrix is a valid quantum covariance matrix
+    that corresponds to a quantum pure state
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+
+    Returns:
+        (boolen): whether the given covariance matrix corresponds to a pure state
+    """
     if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
         purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
         if np.allclose(purity, 1.0):  # , atol = 10**(-sigdigits)):
