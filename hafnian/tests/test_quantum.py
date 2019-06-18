@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the hafnian quantum functions"""
-#pylint: disable=no-self-use,redefined-outer-name
+# pylint: disable=no-self-use,redefined-outer-name
 import pytest
 
 import numpy as np
@@ -35,6 +35,10 @@ from hafnian.quantum import (
     pure_state_amplitude,
     state_vector,
 )
+
+
+# make tests deterministic
+np.random.seed(42)
 
 
 def TMS_cov(r, phi):
@@ -455,6 +459,41 @@ def test_is_valid_cov():
     hbar = 2
     val = is_valid_cov(V, hbar=hbar)
     assert val
+
+
+def test_is_valid_cov_non_square():
+    """ Test False if matrix is not square"""
+    hbar = 2
+    V = np.ones([3, 4])
+    val = is_valid_cov(V, hbar=hbar)
+    assert not val
+
+
+def test_is_valid_cov_non_symmetric():
+    """ Test False if matrix is not symmetric"""
+    hbar = 2
+    V = np.zeros([4, 4])
+    V[0, 1] = 1
+    val = is_valid_cov(V, hbar=hbar)
+    assert not val
+
+
+def test_is_valid_cov_not_even_dimension():
+    """ Test False if matrix does not have even dimensions"""
+    hbar = 2
+    V = np.zeros([5, 5])
+    val = is_valid_cov(V, hbar=hbar)
+    assert not val
+
+
+def test_is_valid_cov_too_certain():
+    """ Test False if matrix does not satisfy the Heisenberg
+    uncertainty relation"""
+    hbar = 2
+    V = np.random.random([4, 4])
+    V += V.T
+    val = is_valid_cov(V, hbar=hbar)
+    assert not val
 
 
 def test_is_pure_cov():

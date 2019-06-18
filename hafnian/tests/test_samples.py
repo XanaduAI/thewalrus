@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the hafnian sampling functions"""
-#pylint: disable=no-self-use,redefined-outer-name
+# pylint: disable=no-self-use,redefined-outer-name
 import pytest
 
 import numpy as np
 from scipy.stats import nbinom
 
-from hafnian.samples import (
-    hafnian_sample_state,
-    hafnian_sample_graph,
-    torontonian_sample_state,
-)
+from hafnian.samples import hafnian_sample_state, hafnian_sample_graph, torontonian_sample_state
 from hafnian.quantum import gen_Qmat_from_graph
 
 np.random.seed(20)
