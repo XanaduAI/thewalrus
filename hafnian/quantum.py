@@ -574,7 +574,7 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (boolen): whether the given covariance matrix is a valid covariance matrix
+        (boolean): whether the given covariance matrix is a valid covariance matrix
     """
     (n, m) = cov.shape
     if n != m:
@@ -603,7 +603,7 @@ def is_pure_cov(cov, hbar=2, sigdigits=6):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (boolen): whether the given covariance matrix corresponds to a pure state
+        (boolean): whether the given covariance matrix corresponds to a pure state
     """
     if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
         purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
