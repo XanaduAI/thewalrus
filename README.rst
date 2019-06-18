@@ -201,7 +201,7 @@ Authors
 
 Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
 
-All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/hafnian/blob/master/.github/ACKNOWLEDGMENTS.md.md>`_.
+All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/hafnian/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
 If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
 
