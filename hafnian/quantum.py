@@ -32,22 +32,53 @@ states, see:
   <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.119.170501>`_
 
 
-Summary
--------
+Fock states
+-----------
 
 .. autosummary::
-    reduced_gaussian
-    Xmat
-    Qmat
-    Amat
-    Beta
-    prefactor
+
+    pure_state_amplitude
+    state_vector
     density_matrix_element
     density_matrix
 
+Details
+^^^^^^^
 
-Code details
-------------
+.. autofunction::
+    pure_state_amplitude
+
+.. autofunction::
+    state_vector
+
+.. autofunction::
+    density_matrix_element
+
+.. autofunction::
+    density_matrix
+
+
+Utility functions
+-----------------
+
+.. autosummary::
+
+    reduced_gaussian
+    Xmat
+    Sympmat
+    Qmat
+    Covmat
+    Amat
+    Beta
+    Means
+    prefactor
+    find_scaling_adjacency_matrix
+    gen_Qmat_from_graph
+    is_valid_cov
+    is_pure_cov
+
+Details
+^^^^^^^
 """
 # pylint: disable=too-many-arguments
 from itertools import product, count
@@ -108,7 +139,7 @@ def Xmat(N):
 
 
 def Sympmat(N):
-    r"""Returns the matrix :math:`X_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
+    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
 
     Args:
         N (int): positive integer
@@ -272,6 +303,8 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
         complex: the density matrix element
@@ -317,6 +350,10 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        check_purity (bool): if ``True``, the purity of the Gaussian state is checked
+            before calculating the state vector.
 
     Returns:
         complex: the pure state amplitude
@@ -333,6 +370,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
     N = n // 2
     B = A[0:N, 0:N]
     alpha = beta[0:N]
+
     if np.linalg.norm(alpha) < tol:
         # no displacement
         if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
@@ -379,6 +417,8 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
             mode in the density matrix.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
+        check_purity (bool): if ``True``, the purity of the Gaussian state is checked
+            before calculating the state vector.
 
     Returns:
         np.array[complex]: the state vector of the Gaussian state
@@ -389,14 +429,18 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
 
     if post_select is None:
         post_select = {}
+
     beta = Beta(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
+
     (n, _) = cov.shape
     N = n // 2
+
     B = A[0:N, 0:N]
     alpha = beta[0:N]
     M = N - len(post_select)
     psi = np.zeros([cutoff] * (M), dtype=np.complex128)
+
     for idx in product(range(cutoff), repeat=M):
         el = []
 
@@ -404,11 +448,10 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         modes = (np.arange(N)).tolist()
         el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
         psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
-        # rho[idx] = density_matrix_element(
-        #    mu, cov, el0, el1, include_prefactor=False, hbar=hbar
-        # )
+
     pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
     psi = psi * pref
+
     if normalize:
         norm = np.sqrt(np.sum(np.abs(psi) ** 2))
         psi = psi / norm
@@ -543,10 +586,10 @@ def find_scaling_adjacency_matrix(A, n_mean):
 
 def gen_Qmat_from_graph(A, n_mean):
     r""" Returns the Qmat xp-covariance matrix associated to a graph with
-    adjacency matrix A and with mean photon number n_mean
+    adjacency matrix :math:`A` and with mean photon number :math:`n_{mean}`.
 
     Args:
-        A (array): a :math:`N\times N` ``np.float64`` (symmetric) adjacency matrix matrix
+        A (array): a :math:`N\times N` ``np.float64`` (symmetric) adjacency matrix
         n_mean (float): mean photon number of the Gaussian state
 
     Returns:
@@ -567,7 +610,7 @@ def gen_Qmat_from_graph(A, n_mean):
 
 
 def is_valid_cov(cov, hbar=2, sigdigits=6):
-    r""" Checks if the covariance matrix is a valid quantum covariance matrix
+    r""" Checks if the covariance matrix is a valid quantum covariance matrix.
 
     Args:
         cov (array): a covariance matrix
@@ -580,17 +623,22 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
     if n != m:
         # raise ValueError("The input matrix must be square")
         return False
+
     if np.linalg.norm(cov - np.transpose(cov)) >= 10 ** (-sigdigits):
         # raise ValueError("The input matrix is not symmetric")
         return False
+
     if n % 2 != 0:
         # raise ValueError("The input matrix is of even dimension")
         return False
+
     nmodes = n // 2
     vals = np.round(np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes)), sigdigits)
+
     if np.all(vals >= 0):
         # raise ValueError("The input matrix violates the uncertainty relation")
         return True
+
     return False
 
 
@@ -607,6 +655,7 @@ def is_pure_cov(cov, hbar=2, sigdigits=6):
     """
     if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
         purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
-        if np.allclose(purity, 1.0):  # , atol = 10**(-sigdigits)):
+        if np.allclose(purity, 1.0):
             return True
+
     return False

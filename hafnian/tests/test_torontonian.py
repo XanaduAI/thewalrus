@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the Torontonian"""
-import pytest
+#pylint: disable=no-self-use,redefined-outer-name
 import numpy as np
 from hafnian import tor
 
@@ -25,12 +25,11 @@ def test_torontonian_tmsv():
 
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    Omat = np.tanh(r) * np.array(
-        [[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
-    )
+    Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
 
     tor_val = tor(Omat)
     assert np.abs(tor_val.real - 1.0) < abs_tol
+
 
 def test_torontonian_tmsv_complex_zero_imag_part():
     """Calculates the torontonian of a two-mode squeezed vacuum
@@ -38,12 +37,11 @@ def test_torontonian_tmsv_complex_zero_imag_part():
 
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    Omat = np.tanh(r) * np.array(
-        [[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
-    )
+    Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
     Omat = np.complex128(Omat)
     tor_val = tor(Omat)
     assert np.abs(tor_val.real - 1.0) < abs_tol
+
 
 def test_torontonian_tmsv_complex():
     """Calculates the torontonian of a two-mode squeezed vacuum

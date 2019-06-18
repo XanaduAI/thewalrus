@@ -201,7 +201,6 @@ def _hafnian_sample(args):
             samples_array.append(result)
             j = j + 1
 
-
     return np.vstack(samples_array)
 
 
@@ -250,7 +249,7 @@ def hafnian_sample_state(
     )
 
     result = np.vstack(pool.map(_hafnian_sample, params))
-    pool.close() # no more tasks
+    pool.close()  # no more tasks
     pool.join()  # wrap up current tasks
 
     return result
@@ -436,7 +435,7 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, pool=False):
     params.append([cov, samples - localsamps * (nprocs - 1), hbar, max_photons])
 
     result = np.vstack(pool.map(_torontonian_sample, params))
-    pool.close() # no more tasks
+    pool.close()  # no more tasks
     pool.join()  # wrap up current tasks
 
     return result

@@ -12,19 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the hafnian sampling functions"""
-import multiprocessing
+#pylint: disable=no-self-use,redefined-outer-name
 import pytest
 
 import numpy as np
 from scipy.stats import nbinom
 
 from hafnian.samples import (
-    generate_hafnian_sample,
     hafnian_sample_state,
     hafnian_sample_graph,
-    generate_torontonian_sample,
     torontonian_sample_state,
-    torontonian_sample_graph,
 )
 from hafnian.quantum import gen_Qmat_from_graph
 

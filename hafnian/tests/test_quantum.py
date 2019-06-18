@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the hafnian quantum functions"""
+#pylint: disable=no-self-use,redefined-outer-name
 import pytest
 
 import numpy as np
@@ -67,10 +68,7 @@ def test_reduced_gaussian(n):
     assert np.all(
         res[1]
         == np.array(
-            [
-                [(N + 1) * n, (N + 1) * n + m],
-                [(N + 1) * n + N * m, (N + 1) * n + N * m + m],
-            ]
+            [[(N + 1) * n, (N + 1) * n + m], [(N + 1) * n + N * m, (N + 1) * n + N * m + m]]
         )
     )
 
@@ -99,9 +97,7 @@ def test_reduced_gaussian_exceptions():
     mu = np.array([0, 0, 0, 0])
     cov = np.identity(4)
 
-    with pytest.raises(
-        ValueError, match="Provided mode is larger than the number of subsystems."
-    ):
+    with pytest.raises(ValueError, match="Provided mode is larger than the number of subsystems."):
         reduced_gaussian(mu, cov, [0, 5])
 
 
@@ -243,7 +239,6 @@ def test_prefactor_with_displacement():
 def test_density_matrix_element_vacuum():
     """Test density matrix elements for the vacuum"""
     Q = np.identity(2)
-    A = np.zeros([2, 2])
     beta = np.zeros([2])
 
     el = [[0], [0]]
@@ -284,22 +279,18 @@ V = np.array(
 )
 
 
-mu = np.array(
-    [0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.33340778]
-)
+mu = np.array([0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.33340778])
 
 
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_disp(t):
     """Test density matrix elements for a state with displacement"""
     beta = Beta(mu)
-    A = Amat(V)
     Q = Qmat(V)
 
     el = t[0]
     ex = t[1]
     res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
-    #    res = density_matrix_element(beta, A, Q, el[0], el[1])
     assert np.allclose(ex, res)
 
 
@@ -315,20 +306,16 @@ t4 = [[0, 2, 0], [0, 2, 3]], 0
 def test_density_matrix_element_no_disp(t):
     """Test density matrix elements for a state with no displacement"""
     beta = Beta(np.zeros([6]))
-    A = Amat(V)
     Q = Qmat(V)
 
     el = t[0]
     ex = t[1]
     res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
-    #    res = density_matrix_element(beta, A, Q, el[0], el[1])
     assert np.allclose(ex, res)
 
 
 def test_density_matrix_vacuum():
-    """Test density matrix for a squeezed state"""
-    r = 0.43
-
+    """Test density matrix for a vacuum state"""
     mu = np.zeros([2])
     V = np.identity(2)
 
@@ -416,11 +403,11 @@ def test_density_matrix_displaced_squeezed_postselect():
     res = density_matrix(mu, V, post_select={0: 0}, cutoff=20, normalize=True)[:5, :5]
 
     # fmt:off
-    expected = np.array([[ 0.89054874,  0.15018085+0.05295904j, -0.23955467+0.01263025j, -0.0734589 -0.02452154j, 0.07862323-0.00868528j],
-       [ 0.15018085-0.05295904j,  0.02847564, -0.03964706+0.01637575j, -0.01384625+0.00023317j, 0.01274241-0.00614023j],
-       [-0.23955467-0.01263025j, -0.03964706-0.01637575j, 0.06461854,  0.01941242+0.00763805j, -0.02127257+0.00122123j],
+    expected = np.array([[0.89054874, 0.15018085+0.05295904j, -0.23955467+0.01263025j, -0.0734589 -0.02452154j, 0.07862323-0.00868528j],
+       [0.15018085-0.05295904j, 0.02847564, -0.03964706+0.01637575j, -0.01384625+0.00023317j, 0.01274241-0.00614023j],
+       [-0.23955467-0.01263025j, -0.03964706-0.01637575j, 0.06461854, 0.01941242+0.00763805j, -0.02127257+0.00122123j],
        [-0.0734589 +0.02452154j, -0.01384625-0.00023317j, 0.01941242-0.00763805j, 0.00673463, -0.00624626+0.00288134j],
-       [ 0.07862323+0.00868528j,  0.01274241+0.00614023j, -0.02127257-0.00122123j, -0.00624626-0.00288134j, 0.00702606]])
+       [0.07862323+0.00868528j, 0.01274241+0.00614023j, -0.02127257-0.00122123j, -0.00624626-0.00288134j, 0.00702606]])
     # fmt:on
 
     assert np.allclose(res, expected)
@@ -483,7 +470,7 @@ def test_is_valid_cov_thermal(nbar):
     hbar = 2
     dim = 10
     cov = (2 * nbar + 1) * np.identity(dim)
-    val = is_valid_cov(V, hbar=hbar)
+    val = is_valid_cov(cov, hbar=hbar)
     assert val
 
 
@@ -495,9 +482,9 @@ def test_is_pure_cov_thermal(nbar):
     cov = (2 * nbar + 1) * np.identity(dim)
     val = is_pure_cov(cov, hbar=hbar)
     if nbar == 0:
-        assert val == True
+        assert val
     else:
-        assert val == False
+        assert not val
 
 
 @pytest.mark.parametrize("i", [0, 1, 2, 3, 4])
@@ -512,11 +499,7 @@ def test_pure_state_amplitude_two_mode_squezed(i, j):
     if i != j:
         exact = 0.0
     else:
-        exact = (
-            np.exp(-1j * i * phase)
-            * (nbar / (1.0 + nbar)) ** (i / 2)
-            / np.sqrt(1.0 + nbar)
-        )
+        exact = np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar)
     num = pure_state_amplitude(mu, cov, [i, j])
     assert np.allclose(exact, num)
 
@@ -528,9 +511,7 @@ def test_pure_state_amplitude_coherent(i):
     mu = np.array([1.0, 2.0])
     beta = Beta(mu)
     alpha = beta[0]
-    exact = (
-        np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))
-    )
+    exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))
     num = pure_state_amplitude(mu, cov, [i])
     assert np.allclose(exact, num)
 
@@ -564,14 +545,16 @@ def test_state_vector_two_mode_squeezed():
     r = np.arcsinh(np.sqrt(nbar))
     cov = TMS_cov(r, phase)
     mu = np.zeros([4], dtype=np.complex)
-    exact = np.array([(
-            np.exp(-1j * i * phase)
-            * (nbar / (1.0 + nbar)) ** (i / 2)
-            / np.sqrt(1.0 + nbar)
-        ) for i in range(cutoff)])
-    psi = state_vector(mu, cov, cutoff = cutoff)
+    exact = np.array(
+        [
+            (np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
+            for i in range(cutoff)
+        ]
+    )
+    psi = state_vector(mu, cov, cutoff=cutoff)
     expected = np.diag(exact)
     assert np.allclose(psi, expected)
+
 
 def test_state_vector_two_mode_squeezed_post():
     """ Tests state_vector for a two mode squeezed vacuum state """
@@ -581,18 +564,19 @@ def test_state_vector_two_mode_squeezed_post():
     r = np.arcsinh(np.sqrt(nbar))
     cov = TMS_cov(r, phase)
     mu = np.zeros([4], dtype=np.complex)
-    exact = np.diag(np.array([(
-            np.exp(-1j * i * phase)
-            * (nbar / (1.0 + nbar)) ** (i / 2)
-            / np.sqrt(1.0 + nbar)
-        ) for i in range(cutoff)]))
+    exact = np.diag(
+        np.array(
+            [
+                (np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
+                for i in range(cutoff)
+            ]
+        )
+    )
     val = 2
-    post_select={0: val}
-    psi = state_vector(mu, cov, cutoff = cutoff, post_select=post_select)
+    post_select = {0: val}
+    psi = state_vector(mu, cov, cutoff=cutoff, post_select=post_select)
     expected = exact[val]
     assert np.allclose(psi, expected)
-
-
 
 
 def test_state_vector_coherent():
@@ -602,11 +586,15 @@ def test_state_vector_coherent():
     mu = np.array([1.0, 2.0])
     beta = Beta(mu)
     alpha = beta[0]
-    exact = np.array([(
-        np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))
-    ) for i in range(cutoff)])
-    num = state_vector(mu, cov, cutoff = cutoff)
+    exact = np.array(
+        [
+            (np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i)))
+            for i in range(cutoff)
+        ]
+    )
+    num = state_vector(mu, cov, cutoff=cutoff)
     assert np.allclose(exact, num)
+
 
 def test_state_vector_two_mode_squeezed_post_normalize():
     """ Tests state_vector for a two mode squeezed vacuum state """
@@ -616,14 +604,17 @@ def test_state_vector_two_mode_squeezed_post_normalize():
     r = np.arcsinh(np.sqrt(nbar))
     cov = TMS_cov(r, phase)
     mu = np.zeros([4], dtype=np.complex)
-    exact = np.diag(np.array([(
-            np.exp(-1j * i * phase)
-            * (nbar / (1.0 + nbar)) ** (i / 2)
-            / np.sqrt(1.0 + nbar)
-        ) for i in range(cutoff)]))
+    exact = np.diag(
+        np.array(
+            [
+                (np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
+                for i in range(cutoff)
+            ]
+        )
+    )
     val = 2
-    post_select={0: val}
-    psi = state_vector(mu, cov, cutoff = cutoff, post_select=post_select, normalize = True)
+    post_select = {0: val}
+    psi = state_vector(mu, cov, cutoff=cutoff, post_select=post_select, normalize=True)
     expected = exact[val]
-    expected = expected/np.linalg.norm(expected)
+    expected = expected / np.linalg.norm(expected)
     assert np.allclose(psi, expected)

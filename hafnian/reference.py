@@ -64,7 +64,7 @@ MAXSIZE = 1000
 Tee = tee([], 1)[0].__class__
 
 
-class LimitedSizeDict(OrderedDict): #pragma: no cover
+class LimitedSizeDict(OrderedDict):  # pragma: no cover
     r"""Defines a limited sized dictionary.
     Used to limit the cache size.
     """
