@@ -34,6 +34,7 @@ from hafnian.quantum import (
     is_pure_cov,
     pure_state_amplitude,
     state_vector,
+    is_classical_cov,
 )
 
 
@@ -657,3 +658,19 @@ def test_state_vector_two_mode_squeezed_post_normalize():
     expected = exact[val]
     expected = expected / np.linalg.norm(expected)
     assert np.allclose(psi, expected)
+
+
+def test_is_classical_cov_squeezed():
+    """ Tests that a squeezed state is not classical"""
+    nbar = 1.0
+    phase = np.pi / 8
+    r = np.arcsinh(np.sqrt(nbar))
+    cov = TMS_cov(r, phase)
+    assert not is_classical_cov(cov)
+
+
+@pytest.mark.parametrize("nbar", [0.0, 1.0, 2.0, 3.0, 4.0])
+def test_is_classical_cov_thermal(nbar):
+    """ Tests that a thermal state is classical"""
+    cov = (2 * nbar + 1) * np.identity(2)
+    assert is_classical_cov(cov)

@@ -659,3 +659,22 @@ def is_pure_cov(cov, hbar=2, sigdigits=6):
             return True
 
     return False
+
+
+def is_classical_cov(cov, hbar=2, sigdigits=6):
+    r""" Checks if the covariance matrix can be efficiently sampled from
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+
+    Returns:
+        (boolean): whether the given covariance matrix corresponds to a pure state
+    """
+
+    if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
+        (n, _) = cov.shape
+        vals = np.linalg.eigvalsh(cov - 0.5 * hbar * np.identity(n))
+        if np.all(vals >= 0):
+            return True
+    return False
