@@ -28,6 +28,7 @@ Hafnian sampling
     generate_hafnian_sample
     hafnian_sample_state
     hafnian_sample_graph
+    hafnian_sample_classical_state
 
 
 Torontonian sampling
@@ -37,7 +38,7 @@ Torontonian sampling
     generate_torontonian_sample
     torontonian_sample_state
     torontonian_sample_graph
-
+    torontonian_sample_classical_state
 
 Code details
 ------------
@@ -476,8 +477,8 @@ def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): number of samples to generate
-        mean (array): (default zero) vector of means of the gaussian state
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        mean (array): vector of means of the gaussian state
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
 

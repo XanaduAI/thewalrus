@@ -76,6 +76,7 @@ Utility functions
     gen_Qmat_from_graph
     is_valid_cov
     is_pure_cov
+    is_classical_cov
 
 Details
 ^^^^^^^
@@ -158,7 +159,7 @@ def Qmat(cov, hbar=2):
 
     Args:
         cov (array): :math:`2N\times 2N` covariance matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -188,7 +189,7 @@ def Covmat(Q, hbar=2):
 
     Args:
         Q (array): :math:`2N\times 2N` Q matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -212,7 +213,7 @@ def Amat(cov, hbar=2, cov_is_qmat=False):
 
     Args:
         cov (array): :math:`2N\times 2N` covariance matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cov_is_qmat (bool): if ``True``, it is assumed that ``cov`` is in fact the Q matrix.
 
@@ -241,7 +242,7 @@ def Beta(mu, hbar=2):
 
     Args:
         mu (array): length-:math:`2N` means vector
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -260,7 +261,7 @@ def Means(beta, hbar=2):
 
     Args:
         beta (array): length-:math:`2N` means bivector
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -303,7 +304,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -350,7 +351,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         check_purity (bool): if ``True``, the purity of the Gaussian state is checked
             before calculating the state vector.
@@ -415,7 +416,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
         cutoff (dim): the final length (i.e., Hilbert space dimension) of each
             mode in the density matrix.
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         check_purity (bool): if ``True``, the purity of the Gaussian state is checked
             before calculating the state vector.
@@ -481,7 +482,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
         cutoff (dim): the final length (i.e., Hilbert space dimension) of each
             mode in the density matrix.
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
