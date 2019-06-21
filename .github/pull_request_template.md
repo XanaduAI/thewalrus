@@ -1,9 +1,5 @@
 ### Pull request template
 
-Make sure you are up to date on the
-[Hafnian workflow](https://github.com/XanaduAI/hafnianplus/wiki/Hafnian-GitHub-Flow)
-before submitting the pull request.
-
 When ready to submit, delete everything above the dashed line and fill in the pull
 request template.
 
