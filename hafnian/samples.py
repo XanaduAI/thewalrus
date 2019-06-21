@@ -468,7 +468,7 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
 
 
-def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigits=6):
+def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
     r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
 
     Args:
@@ -484,7 +484,7 @@ def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigits=6)
     Returns:
         np.array[int]: photon number samples from the Gaussian state with covariance cov and vector means mean.
     """
-    if not is_classical_cov(cov, hbar=hbar, sigdigits=sigdigits):
+    if not is_classical_cov(cov, hbar=hbar, atol=atol):
         raise ValueError("Not a classical covariance matrix")
 
     (n, _) = cov.shape
@@ -501,7 +501,7 @@ def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigits=6)
     return samples
 
 
-def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigits=6):
+def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
     r""" Returns threshold samples from a Gaussian state that has a positive P function
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -517,7 +517,5 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigit
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
     return np.where(
-        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, sigdigits=sigdigits) > 0,
-        1,
-        0,
+        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
     )

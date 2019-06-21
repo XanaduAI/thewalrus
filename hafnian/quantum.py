@@ -359,7 +359,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         complex: the pure state amplitude
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
@@ -424,7 +424,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         np.array[complex]: the state vector of the Gaussian state
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     if post_select is None:
@@ -609,7 +609,7 @@ def gen_Qmat_from_graph(A, n_mean):
     return Q
 
 
-def is_valid_cov(cov, hbar=2, sigdigits=6):
+def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix.
 
     Args:
@@ -617,24 +617,22 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (boolean): whether the given covariance matrix is a valid covariance matrix
+        (bool): whether the given covariance matrix is a valid covariance matrix
     """
     (n, m) = cov.shape
     if n != m:
         # raise ValueError("The input matrix must be square")
         return False
-
-    if np.linalg.norm(cov - np.transpose(cov)) >= 10 ** (-sigdigits):
+    if not np.allclose(cov, np.transpose(cov), rtol=rtol, atol=atol):
         # raise ValueError("The input matrix is not symmetric")
         return False
-
     if n % 2 != 0:
         # raise ValueError("The input matrix is of even dimension")
         return False
 
     nmodes = n // 2
-    vals = np.round(np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes)), sigdigits)
-
+    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes))
+    vals[np.abs(vals) < atol] = 0.0
     if np.all(vals >= 0):
         # raise ValueError("The input matrix violates the uncertainty relation")
         return True
@@ -642,7 +640,7 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
     return False
 
 
-def is_pure_cov(cov, hbar=2, sigdigits=6):
+def is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix
     that corresponds to a quantum pure state
 
@@ -651,17 +649,17 @@ def is_pure_cov(cov, hbar=2, sigdigits=6):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (boolean): whether the given covariance matrix corresponds to a pure state
+        (bool): whether the given covariance matrix corresponds to a pure state
     """
-    if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
+    if is_valid_cov(cov, hbar=hbar, rtol=rtol, atol=atol):
         purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
-        if np.allclose(purity, 1.0):
+        if np.allclose(purity, 1.0, rtol=rtol, atol=atol):
             return True
 
     return False
 
 
-def is_classical_cov(cov, hbar=2, sigdigits=6):
+def is_classical_cov(cov, hbar=2, atol=1e-08):
     r""" Checks if the covariance matrix can be efficiently sampled.
 
     Args:
@@ -672,9 +670,11 @@ def is_classical_cov(cov, hbar=2, sigdigits=6):
         (bool): whether the given covariance matrix corresponds to a pure state
     """
 
-    if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
+    if is_valid_cov(cov, hbar=hbar, atol=atol):
         (n, _) = cov.shape
         vals = np.linalg.eigvalsh(cov - 0.5 * hbar * np.identity(n))
+        vals[np.abs(vals) < atol] = 0.0
+
         if np.all(vals >= 0):
             return True
     return False
