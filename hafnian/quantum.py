@@ -76,6 +76,7 @@ Utility functions
     gen_Qmat_from_graph
     is_valid_cov
     is_pure_cov
+    is_classical_cov
 
 Details
 ^^^^^^^
@@ -158,7 +159,7 @@ def Qmat(cov, hbar=2):
 
     Args:
         cov (array): :math:`2N\times 2N` covariance matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -188,7 +189,7 @@ def Covmat(Q, hbar=2):
 
     Args:
         Q (array): :math:`2N\times 2N` Q matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -212,7 +213,7 @@ def Amat(cov, hbar=2, cov_is_qmat=False):
 
     Args:
         cov (array): :math:`2N\times 2N` covariance matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cov_is_qmat (bool): if ``True``, it is assumed that ``cov`` is in fact the Q matrix.
 
@@ -241,7 +242,7 @@ def Beta(mu, hbar=2):
 
     Args:
         mu (array): length-:math:`2N` means vector
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -260,7 +261,7 @@ def Means(beta, hbar=2):
 
     Args:
         beta (array): length-:math:`2N` means bivector
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -303,7 +304,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -350,7 +351,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         include_prefactor (bool): if ``True``, the prefactor is automatically calculated
             used to scale the result.
         tol (float): tolerance for determining if displacement is negligible
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         check_purity (bool): if ``True``, the purity of the Gaussian state is checked
             before calculating the state vector.
@@ -359,7 +360,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         complex: the pure state amplitude
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
@@ -415,7 +416,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
         cutoff (dim): the final length (i.e., Hilbert space dimension) of each
             mode in the density matrix.
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         check_purity (bool): if ``True``, the purity of the Gaussian state is checked
             before calculating the state vector.
@@ -424,7 +425,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         np.array[complex]: the state vector of the Gaussian state
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, sigdigits=6):
+        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     if post_select is None:
@@ -481,7 +482,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
         cutoff (dim): the final length (i.e., Hilbert space dimension) of each
             mode in the density matrix.
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
@@ -609,7 +610,7 @@ def gen_Qmat_from_graph(A, n_mean):
     return Q
 
 
-def is_valid_cov(cov, hbar=2, sigdigits=6):
+def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix.
 
     Args:
@@ -617,24 +618,22 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (boolean): whether the given covariance matrix is a valid covariance matrix
+        (bool): whether the given covariance matrix is a valid covariance matrix
     """
     (n, m) = cov.shape
     if n != m:
         # raise ValueError("The input matrix must be square")
         return False
-
-    if np.linalg.norm(cov - np.transpose(cov)) >= 10 ** (-sigdigits):
+    if not np.allclose(cov, np.transpose(cov), rtol=rtol, atol=atol):
         # raise ValueError("The input matrix is not symmetric")
         return False
-
     if n % 2 != 0:
         # raise ValueError("The input matrix is of even dimension")
         return False
 
     nmodes = n // 2
-    vals = np.round(np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes)), sigdigits)
-
+    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes))
+    vals[np.abs(vals) < atol] = 0.0
     if np.all(vals >= 0):
         # raise ValueError("The input matrix violates the uncertainty relation")
         return True
@@ -642,7 +641,7 @@ def is_valid_cov(cov, hbar=2, sigdigits=6):
     return False
 
 
-def is_pure_cov(cov, hbar=2, sigdigits=6):
+def is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix
     that corresponds to a quantum pure state
 
@@ -651,11 +650,32 @@ def is_pure_cov(cov, hbar=2, sigdigits=6):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (boolean): whether the given covariance matrix corresponds to a pure state
+        (bool): whether the given covariance matrix corresponds to a pure state
     """
-    if is_valid_cov(cov, hbar=hbar, sigdigits=sigdigits):
+    if is_valid_cov(cov, hbar=hbar, rtol=rtol, atol=atol):
         purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
-        if np.allclose(purity, 1.0):
+        if np.allclose(purity, 1.0, rtol=rtol, atol=atol):
             return True
 
+    return False
+
+
+def is_classical_cov(cov, hbar=2, atol=1e-08):
+    r""" Checks if the covariance matrix can be efficiently sampled.
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+
+    Returns:
+        (bool): whether the given covariance matrix corresponds to a pure state
+    """
+
+    if is_valid_cov(cov, hbar=hbar, atol=atol):
+        (n, _) = cov.shape
+        vals = np.linalg.eigvalsh(cov - 0.5 * hbar * np.identity(n))
+        vals[np.abs(vals) < atol] = 0.0
+
+        if np.all(vals >= 0):
+            return True
     return False

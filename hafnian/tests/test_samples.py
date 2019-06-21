@@ -18,7 +18,13 @@ import pytest
 import numpy as np
 from scipy.stats import nbinom
 
-from hafnian.samples import hafnian_sample_state, hafnian_sample_graph, torontonian_sample_state
+from hafnian.samples import (
+    hafnian_sample_state,
+    hafnian_sample_graph,
+    torontonian_sample_state,
+    hafnian_sample_classical_state,
+    torontonian_sample_classical_state,
+)
 from hafnian.quantum import gen_Qmat_from_graph
 
 np.random.seed(20)
@@ -195,16 +201,36 @@ class TestHafnianSampling:
 
         assert np.abs(prob0 - prob0_estimate) < delta
 
-    def test_multimode_vacuum_state_hafnian(self):
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
+    def test_multimode_vacuum_state_hafnian(self, sample_func):
         """Test the sampling routines by checking the samples for pure vacuum
+        using the sampler for classical states
         """
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
         zeros = np.zeros(n_modes, dtype=np.int)
-        samples = hafnian_sample_state(sigma, samples=n_samples)
+        samples = sample_func(
+            sigma, samples=n_samples
+        )  # hafnian_sample_classical_state(sigma, samples=n_samples)
         for i in range(n_samples):
             assert np.all(samples[i] == zeros)
+
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
+    def test_thermal_state_hafnian(self, sample_func):
+        """Test the sampling routines by checking the samples for a single mode
+        thermal state
+        """
+        n_samples = 10000
+        mean_n = 0.5
+        sigma = (2 * mean_n + 1) * np.identity(2)
+        samples = sample_func(sigma, samples=n_samples)
+        bins = np.arange(0, max(samples), 1)
+        (freq, _) = np.histogram(samples, bins=bins)
+        rel_freq = freq / n_samples
+
+        probs = (1.0 / (1.0 + mean_n)) * (mean_n / (1.0 + mean_n)) ** bins[0:-1]
+        assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
 
 class TestTorontonianSampling:
@@ -267,13 +293,36 @@ class TestTorontonianSampling:
         probs[1] = 1.0 - probs[0]
         assert np.all(np.abs(rel_freq - probs[0:-1]) < rel_tol / np.sqrt(n_samples))
 
-    def test_multimode_vacuum_state_torontonian(self):
+    @pytest.mark.parametrize(
+        "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
+    )
+    def test_multimode_vacuum_state_torontonian(self, sample_func):
         """Test the sampling routines by checking the samples for pure vacuum
         """
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
         zeros = np.zeros(n_modes, dtype=np.int)
-        samples = torontonian_sample_state(sigma, samples=n_samples)
+        samples = sample_func(sigma, samples=n_samples)
         for i in range(n_samples):
             assert np.all(samples[i] == zeros)
+
+    @pytest.mark.parametrize(
+        "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
+    )
+    def test_thermal_state_torontonian(self, sample_func):
+        """Test the sampling routines by checking the samples for a single mode
+        thermal state
+        """
+        n_samples = 10000
+        mean_n = 0.5
+        sigma = (2 * mean_n + 1) * np.identity(2)
+        samples = sample_func(sigma, samples=n_samples)
+        bins = np.array([0, 1, 2])
+        (freq, _) = np.histogram(samples, bins=bins)
+        rel_freq = freq / n_samples
+
+        probs = np.zeros([2])
+        probs[0] = 1.0 / (1.0 + mean_n)
+        probs[1] = 1 - probs[0]
+        assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))

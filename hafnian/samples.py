@@ -28,6 +28,7 @@ Hafnian sampling
     generate_hafnian_sample
     hafnian_sample_state
     hafnian_sample_graph
+    hafnian_sample_classical_state
 
 
 Torontonian sampling
@@ -37,7 +38,7 @@ Torontonian sampling
     generate_torontonian_sample
     torontonian_sample_state
     torontonian_sample_graph
-
+    torontonian_sample_classical_state
 
 Code details
 ------------
@@ -51,7 +52,15 @@ from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, reduction
 from ._torontonian import tor
-from .quantum import Amat, Qmat, Xmat, reduced_gaussian, Covmat, gen_Qmat_from_graph
+from .quantum import (
+    Amat,
+    Qmat,
+    Xmat,
+    reduced_gaussian,
+    Covmat,
+    gen_Qmat_from_graph,
+    is_classical_cov,
+)
 
 
 # ===============================================================================================
@@ -458,3 +467,56 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q)
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
+
+
+def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
+    r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
+
+    Args:
+        cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+        samples (int): number of samples to generate
+        mean (array): vector of means of the gaussian state
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
+
+    Returns:
+        np.array[int]: photon number samples from the Gaussian state with covariance cov and vector means mean.
+    """
+    if not is_classical_cov(cov, hbar=hbar, atol=atol):
+        raise ValueError("Not a classical covariance matrix")
+
+    (n, _) = cov.shape
+    if mean is None:
+        mean = np.zeros([n])
+    else:
+        if mean.shape != (n,):
+            raise ValueError("mean and cov do not have compatible shapes")
+
+    R = np.random.multivariate_normal(mean, cov - 0.5 * hbar * np.identity(n), samples)
+    N = n // 2
+    alpha = (1.0 / np.sqrt(2 * hbar)) * (R[:, 0:N] + 1j * R[:, N : 2 * N])
+    samples = np.random.poisson(np.abs(alpha) ** 2)
+    return samples
+
+
+def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
+    r""" Returns threshold samples from a Gaussian state that has a positive P function
+    Args:
+        cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+        samples (int): number of samples to generate
+        mean (array): vector of means of the Gaussian state
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
+
+    Returns:
+        np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
+    """
+    return np.where(
+        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
+    )
