@@ -469,7 +469,8 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
 
 
 def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigits=6):
-    r""" Returns samples from a Gaussian state that has a positive P function
+    r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
+
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
@@ -479,17 +480,20 @@ def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigits=6)
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
+
     Returns:
         np.array[int]: photon number samples from the Gaussian state with covariance cov and vector means mean.
     """
     if not is_classical_cov(cov, hbar=hbar, sigdigits=sigdigits):
         raise ValueError("Not a classical covariance matrix")
+
     (n, _) = cov.shape
     if mean is None:
         mean = np.zeros([n])
     else:
         if mean.shape != (n,):
             raise ValueError("mean and cov do not have compatible shapes")
+
     R = np.random.multivariate_normal(mean, cov - 0.5 * hbar * np.identity(n), samples)
     N = n // 2
     alpha = (1.0 / np.sqrt(2 * hbar)) * (R[:, 0:N] + 1j * R[:, N : 2 * N])
@@ -504,10 +508,11 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, sigdigit
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): number of samples to generate
-        mean (array): (default zero) vector of means of the gaussian state
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+        mean (array): vector of means of the Gaussian state
+        hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
+
     Returns:
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
