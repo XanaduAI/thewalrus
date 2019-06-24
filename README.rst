@@ -203,9 +203,9 @@ Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
 
 All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/hafnian/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
-If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
+If you are doing research using Hafnian, please cite `our paper <https://dl.acm.org/citation.cfm?id=3325111>`_:
 
- Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer *arXiv*, 2018. arxiv:1805.12498
+ Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on a supercomputer, Journal of Experimental Algorithmics (JEA) 24 (1), 11 (2019)
 
 
 Support
