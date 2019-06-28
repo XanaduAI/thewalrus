@@ -110,13 +110,6 @@ if BUILD_EXT:
         extra_link_args_CPP[0] += " -lopenblas"
 
     extensions = cythonize([
-            Extension("libperm",
-                sources=["src/kinds.f90", "src/vars.f90", "src/permanent.F90"],
-                include_dirs=C_INCLUDE_PATH,
-                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-                extra_compile_args=CFLAGS,
-                extra_f90_compile_args=extra_f90_compile_args,
-                extra_link_args=extra_link_args_F90),
             Extension("libhaf",
                 sources=["hafnian/hafnian."+ext,],
                 depends=["src/hafnian.hpp",
@@ -125,6 +118,7 @@ if BUILD_EXT:
                          "src/repeated_hafnian.hpp",
                          "src/hafnian_approx.hpp",
                          "src/torontonian.hpp",
+                         "src/permanent.hpp",
                          "src/stdafx.h",
                          "src/fsum.hpp"],
                 include_dirs=C_INCLUDE_PATH,

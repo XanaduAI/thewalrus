@@ -81,11 +81,13 @@ from ._hafnian import (
     haf_rpt_real,
     haf_rpt_complex,
     reduction,
+    perm_complex,
+    perm_real,
 )
 
 from ._torontonian import tor
 
-from ._permanent import perm, perm_real, perm_complex, permanent_repeated
+from ._permanent import perm, permanent_repeated
 
 __all__ = [
     "hafnian",

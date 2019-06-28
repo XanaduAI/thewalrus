@@ -16,7 +16,7 @@ Hafnian Python interface
 """
 import numpy as np
 
-from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
+from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex, perm_complex, perm_real
 
 
 def input_validation(A, tol=1e-12):
