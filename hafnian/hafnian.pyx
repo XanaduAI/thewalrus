@@ -21,9 +21,16 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     T hafnian[T](vector[T] &mat)
     T hafnian_recursive[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
+    T permanent[T](vector[T] &mat)
 
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud)
+
+    double permanent_quad(vector[double] &mat)
+    double complex permanent_quad(vector[double complex] &mat)
+    double perm_fsum[T](vector[T] &mat)
+    double permanent_fsum(vector[double] &mat)
+
 
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
@@ -39,6 +46,8 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double torontonian_quad(vector[double] &mat)
     double complex torontonian_quad(vector[double complex] &mat)
     double torontonian_fsum[T](vector[T] &mat)
+
+    vector[double complex] batchhafnian_all(vector[double] &mat, vector[double] &d, int &resolution)
 
 
 # ==============================================================================
@@ -294,3 +303,83 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True, bi
         return hafnian_recursive(mat)
 
     return hafnian(mat)
+
+
+
+# ==============================================================================
+# Permanent
+
+
+def perm_complex(double complex[:, :] A, quad=True):
+    """Returns the hafnian of a complex matrix A via the C++ hafnian library.
+
+    Args:
+        A (array): a np.float, square array
+        quad (bool): If ``True``, the input matrix is cast to a ``long double complex``
+            matrix internally for a quadruple precision hafnian computation.
+
+    Returns:
+        np.complex128: the hafnian of matrix A
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double complex] mat
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    # Exposes a c function to python
+    if quad:
+        return permanent_quad(mat)
+
+    return permanent(mat)
+
+
+def perm_real(double [:, :] A, quad=True, fsum=False):
+    """Returns the hafnian of a real matrix A via the C++ hafnian library.
+
+    Args:
+        A (array): a np.float64, square array
+        quad (bool): If ``True``, the input matrix is cast to a ``long double``
+            matrix internally for a quadruple precision hafnian computation.
+        fsum (bool): If ``True``, ``fsum`` method is used for summation.
+
+
+    Returns:
+        np.float64: the hafnian of matrix A
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double] mat
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+		
+    if fsum:
+        return permanent_fsum(mat)
+
+    # Exposes a c function to python
+    if quad:
+        return permanent_quad(mat)
+
+    return permanent(mat)
+
+
+
+# ==============================================================================
+# Batch hafnian
+
+def batchhafnian(double[:, :] A, double[:] d, int resolution):
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double] mat, d_mat
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+
+    for i in range(n):
+        d_mat.push_back(d[i])
+
+    return batchhafnian_all(mat, d_mat, resolution)
+

@@ -16,7 +16,16 @@ Hafnian Python interface
 """
 import numpy as np
 
-from .lib.libhaf import haf_complex, haf_real, haf_int, haf_rpt_real, haf_rpt_complex
+from .lib.libhaf import (
+    haf_complex,
+    haf_real,
+    haf_int,
+    haf_rpt_real,
+    haf_rpt_complex,
+    perm_complex,
+    perm_real,
+    batchhafnian,
+)
 
 
 def input_validation(A, tol=1e-12):
@@ -241,3 +250,44 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
+
+
+def gradhaf(A, dA, s=np.array([None])):
+    r"""Calculate the gradient of a Hafnian.
+
+    This function calculates the gradient of a hafnian of matrix :math:`A(q)` with respect to some parameter :math:`q`,
+    evaluated at value :math:`q=q'`:
+
+    .. math:: \left.\frac{\partial}{\partial q}Haf(A(q))\right|_{q=q'}
+
+    Args:
+        A (array): The input matrix :math:`A` of size :math:`M\times M` evaluated at :math:`q`.
+        dA (array): Derivative of the input matrix with respect to the parameter :math:`q`.
+        s (array): Array integers of size M denoting the number of times a row/column should
+            be repeated. In a GBS experiment this refers to the number of photons detected
+            at each mode.
+
+    Returns:
+        float: derivative of :math:`Haf(A(q))` with respect to :math:`q` evaluated at :math:`q=q'`.
+    """
+    M = A.shape[0]
+    final = 0.0
+
+    if s.any() is None:
+        st = np.ones(M, dtype=int)
+    else:
+        st = s
+
+    for i in range(M):
+        for j in range(M):
+            if i == j:
+                tmpsum = 0.0
+            else:
+                stmp[i] = np.max([st[i] - 1, 0])
+                stmp[j] = np.max([st[j] - 1, 0])
+                tmpsum = 0.5 * dA[i, j] * hafnian_repeated(A, list(stmp))
+
+            final = final + tmpsum
+            stmp = np.array([ii for ii in st])
+
+    return final
