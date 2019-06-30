@@ -13,7 +13,7 @@ Features
 
 * An easy to use interface to use the loop hafnian for quantum state calculations
 
-* State of the art algorithms to sample from hafnian and torontonians of graphs. 
+* State of the art algorithms to sample from hafnian and torontonians of graphs.
 
 * Efficient classical methods for approximating the hafnian of non-negative matrices.
 
@@ -98,7 +98,6 @@ The hafnian library is **free** and **open source**, released under the Apache L
    :hidden:
 
    code/libhaf
-   code/libperm
 
 
 Indices and tables

@@ -40,7 +40,7 @@ before_install:
 - |
   if [ "$WHEEL" = "0" ]; then
     sudo apt-get -qq update;
-    sudo apt-get install -y gfortran libeigen3-dev;
+    sudo apt-get install -y libeigen3-dev;
   fi
 install:
 - |
