@@ -340,7 +340,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
 
 
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
-    r"""Returns the :math:`\langle i | \psi ` element of the state ket
+    r"""Returns the :math:`\langle i | \psi\rangle` element of the state ket
     of a Gaussian state defined by covariance matrix cov.
     To verify if the given covariance matrix corresponds to a pure stat
 

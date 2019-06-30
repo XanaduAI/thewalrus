@@ -18,9 +18,7 @@ Python interface
 Low-level libraries
 -------------------
 
-* A :ref:`C++ library <hafnian_cpp>` containing various parallelized algorithms for computing the hafnian, loop hafnian, and Torontonian calculation of complex, real, and integer matrices.
-
-* A :ref:`Fortran library <perm_f90>` for the permanent calculation of real and complex matrices.
+The low-level Hafnian :ref:`C++ library <hafnian_cpp>` is a header-only library containing various parallelized algorithms for computing the hafnian, loop hafnian, permanent, and Torontonian calculation of complex, real, and integer matrices. This library is used under-the-hood by the Python :mod:`hafnian` module.
 
 You can also use the C++ Hafnian library directly in your C++ projects - just ensure that the ``src`` folder is in your include path, and add
 

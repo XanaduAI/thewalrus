@@ -11,8 +11,6 @@ The Hafnian C++ interface is provided as a header-only library, :download:`hafni
 
 The following templated functions are then available for use within the ``hafnian`` namespace.
 
-.. note:: The Hafnian C++ interface only provides functions for calculating the hafnian and torontonian. For calculating the permanent via Ryser's algorithm, either use the :mod:`Python interface <hafnian>`, or the Fortran interface.
-
 Example
 -------
 
