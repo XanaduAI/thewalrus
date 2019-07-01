@@ -178,7 +178,6 @@ inline T permanent(std::vector<T> &mat) {
         tot[ii] = permtmp;
     }
 
-    //return static_cast<T>(tot[0]);
     return static_cast<T>(std::accumulate(tot.begin(), tot.end(), static_cast<T>(0)));
 }
 
@@ -276,8 +275,6 @@ inline double perm_fsum(std::vector<T> &mat) {
        tot[ii] = permtmp;
     }
 
-    //return static_cast<T>(tot[0]);
-    //return static_cast<T>(permtmp);
     return static_cast<T>(std::accumulate(tot.begin(), tot.end(), static_cast<T>(0)));
 }
 
@@ -329,8 +326,6 @@ std::complex<double> permanent_quad(std::vector<std::complex<double>> &mat) {
 double permanent_quad(std::vector<double> &mat) {
     std::vector<qp> matq(mat.begin(), mat.end());
     qp perm = permanent(matq);
-    //std::vector<qp> matq(mat.begin(), mat.end());
-    //qp perm = permanent(matq);
     return static_cast<double>(perm);
 }
 
