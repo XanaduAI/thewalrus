@@ -53,12 +53,12 @@ Auxiliary functions
 Details
 ^^^^^^^
 """
+import functools
+
 # pylint: disable=too-many-arguments
 from collections import OrderedDict
-import functools
 from itertools import tee
 from types import GeneratorType
-
 
 MAXSIZE = 1000
 Tee = tee([], 1)[0].__class__

@@ -22,10 +22,10 @@ typedef long long int llint;
 //typedef long double qp;
 
 #if (defined(__GNUC__) || defined(__GNUG__)) && !(defined(__clang__) || defined(__INTEL_COMPILER))
-typedef __float128 qp;
-//#include <quadmath.h>
+	typedef __float128 qp;
+	//#include <quadmath.h>
 #else
-typedef long double qp;
+	typedef long double qp;
 #endif
 
 /**
@@ -178,7 +178,6 @@ inline T permanent(std::vector<T> &mat) {
         tot[ii] = permtmp;
     }
 
-    //return static_cast<T>(tot[0]);
     return static_cast<T>(std::accumulate(tot.begin(), tot.end(), static_cast<T>(0)));
 }
 
@@ -273,11 +272,8 @@ inline double perm_fsum(std::vector<T> &mat) {
                 permtmp -= rowsumprod;
 
         }
-        tot[ii] = permtmp;
+       tot[ii] = permtmp;
     }
-
-    //return static_cast<T>(tot[0]);
-    //return static_cast<T>(permtmp);
     return static_cast<T>(std::accumulate(tot.begin(), tot.end(), static_cast<T>(0)));
 }
 
@@ -329,8 +325,6 @@ std::complex<double> permanent_quad(std::vector<std::complex<double>> &mat) {
 double permanent_quad(std::vector<double> &mat) {
     std::vector<qp> matq(mat.begin(), mat.end());
     qp perm = permanent(matq);
-    //std::vector<qp> matq(mat.begin(), mat.end());
-    //qp perm = permanent(matq);
     return static_cast<double>(perm);
 }
 

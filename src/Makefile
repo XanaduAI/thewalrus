@@ -14,8 +14,6 @@
 EIGEN_INCLUDE_DIR=/usr/include/eigen3
 
 CC=g++
-FC=gfortran
-FFLAGS=-fopenmp -fPIC -O3 -Wall
 CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I. -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native
 LFLAGS=-L/usr/lib -lm -fopenmp
 
@@ -26,12 +24,6 @@ example.o: example.cpp hafnian.hpp
 
 example-cpp: example.o
 	$(CC) $^ $(LFLAGS) -o $@
-
-example-f90: example.f90 libperm
-	$(FC) $< $(FFLAGS) -I. -L. -lperm -o $@
-
-libperm: permanent.F90
-	$(FC) $^ $(FFLAGS) -shared -o $@.so
 
 clean:
 	rm -rf *~ *.out *.o *.so *.pyc *.mod

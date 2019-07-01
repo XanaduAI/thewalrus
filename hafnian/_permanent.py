@@ -16,9 +16,8 @@ Permanent Python interface
 """
 import numpy as np
 
-from .lib.libhaf import perm_complex, perm_real
-
 from ._hafnian import hafnian_repeated
+from .lib.libhaf import perm_complex, perm_real
 
 
 def perm(A, quad=True, fsum=False):
@@ -30,9 +29,11 @@ def perm(A, quad=True, fsum=False):
 
     Args:
         A (array): a square array.
-        quad (bool): quad (bool): If ``True``, the input matrix is cast to a ``long double``
+        quad (bool): If ``True``, the input matrix is cast to a ``long double``
             matrix internally for a quadruple precision hafnian computation.
-        fsum (bool): If ``True``, ``fsum`` method is used for summation.
+        fsum (bool): Whether to use the ``fsum`` method for higher accuracy summation.
+            Note that if ``fsum`` is true, double precision will be used, and the
+            ``quad`` keyword argument will be ignored.
 
     Returns:
         np.float64 or np.complex128: the permanent of matrix A.

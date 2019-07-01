@@ -31,7 +31,6 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double perm_fsum[T](vector[T] &mat)
     double permanent_fsum(vector[double] &mat)
 
-
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
 
@@ -365,7 +364,6 @@ def perm_real(double [:, :] A, quad=True, fsum=False):
     return permanent(mat)
 
 
-
 # ==============================================================================
 # Batch hafnian
 
@@ -382,4 +380,3 @@ def batchhafnian(double[:, :] A, double[:] d, int resolution):
         d_mat.push_back(d[i])
 
     return batchhafnian_all(mat, d_mat, resolution)
-

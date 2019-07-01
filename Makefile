@@ -2,7 +2,7 @@ PYTHON3 := $(shell which python3 2>/dev/null)
 COVERAGE3 := $(shell which coverage3 2>/dev/null)
 
 PYTHON := python3
-COVERAGE := --cov=hafnian --cov-report term-missing --cov-report=html:coverage_html_report
+COVERAGE := --cov=hafnian --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
 TESTRUNNER := -m pytest hafnian
 
 .PHONY: help

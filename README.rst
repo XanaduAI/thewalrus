@@ -68,9 +68,8 @@ Hafnian depends on the following Python packages:
 * `Python <http://python.org/>`_ >=3.5
 * `NumPy <http://numpy.org/>`_  >=1.13.3
 
-In addition, to compile the included Fortran and C++ extensions, the following dependencies are required:
+In addition, to compile the C++ extension, the following dependencies are required:
 
-* A Fortran compiler, such as ``gfortran``
 * A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
 * `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
 
@@ -78,7 +77,7 @@ On Debian-based systems, these can be installed via ``apt`` and ``curl``:
 
 .. code-block:: console
 
-    $ sudo apt install g++ gfortran libeigen3-dev
+    $ sudo apt install g++ libeigen3-dev
 
 or using Homebrew on MacOS:
 

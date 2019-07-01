@@ -66,30 +66,31 @@ import platform
 
 import numpy as np
 
+
 if platform.system() == "Windows":  # pragma: no cover
     extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
     if os.path.isdir(extra_dll_dir):
         os.environ["PATH"] += os.pathsep + extra_dll_dir
 
-from ._version import __version__
+
 from ._hafnian import (
+    haf_complex,
+    haf_int,
+    haf_real,
+    haf_rpt_complex,
+    haf_rpt_real,
     hafnian,
     hafnian_repeated,
-    haf_int,
-    haf_complex,
-    haf_real,
-    haf_rpt_real,
-    haf_rpt_complex,
     reduction,
     gradhaf,
     perm_complex,
     perm_real,
     batchhafnian,
 )
-
+from ._permanent import perm, perm_complex, perm_real, permanent_repeated
 from ._torontonian import tor
+from ._version import __version__
 
-from ._permanent import perm, permanent_repeated
 
 __all__ = [
     "hafnian",

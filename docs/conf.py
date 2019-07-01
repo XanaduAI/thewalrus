@@ -42,10 +42,7 @@ MOCK_MODULES = [
     'scipy.optimize',
     'cython',
     'hafnian.lib',
-    'hafnian.lib.libhaf',
-    'hafnian.lib.libperm',
-    'hafnian.lib.libtor',
-    'hafnian.lib.libhafapprox'
+    'hafnian.lib.libhaf'
     ]
 
 mock = Mock()
@@ -97,7 +94,7 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../src/stdafx.h ../src/hafnian.hpp ../src/version.hpp ../src/eigenvalue_hafnian.hpp ../src/hafnian_approx.hpp ../src/recursive_hafnian.hpp ../src/repeated_hafnian.hpp  ../src/torontonian.hpp",
+    "exhaleDoxygenStdin":    "INPUT = ../src/stdafx.h ../src/hafnian.hpp ../src/version.hpp ../src/eigenvalue_hafnian.hpp ../src/hafnian_approx.hpp ../src/recursive_hafnian.hpp ../src/repeated_hafnian.hpp  ../src/torontonian.hpp ../src/permanent.hpp",
     # "exhaleUseDoxyfile": True
 }
 
