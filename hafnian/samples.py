@@ -54,14 +54,13 @@ from ._hafnian import hafnian, reduction
 from ._torontonian import tor
 from .quantum import (
     Amat,
+    Covmat,
     Qmat,
     Xmat,
-    reduced_gaussian,
-    Covmat,
     gen_Qmat_from_graph,
     is_classical_cov,
+    reduced_gaussian,
 )
-
 
 # ===============================================================================================
 # Hafnian sampling
@@ -503,7 +502,8 @@ def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
 
 
 def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
-    r""" Returns threshold samples from a Gaussian state that has a positive P function
+    r""" Returns threshold samples from a Gaussian state that has a positive P function.
+
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained

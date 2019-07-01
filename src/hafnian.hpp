@@ -18,6 +18,7 @@
 #include <repeated_hafnian.hpp>
 #include <hafnian_approx.hpp>
 #include <torontonian.hpp>
+#include <permanent.hpp>
 
 /**
  * @namespace hafnian

@@ -16,14 +16,11 @@ Permanent Python interface
 """
 import numpy as np
 
-from .lib.libperm import perm as libperm
 from ._hafnian import hafnian_repeated
-
-perm_real = libperm.re
-perm_complex = libperm.comp
+from .lib.libhaf import perm_complex, perm_real
 
 
-def perm(A):
+def perm(A, quad=True, fsum=False):
     """Returns the permanent of a matrix via the
     `Ryser formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_.
 
@@ -32,6 +29,11 @@ def perm(A):
 
     Args:
         A (array): a square array.
+        quad (bool): If ``True``, the input matrix is cast to a ``long double``
+            matrix internally for a quadruple precision hafnian computation.
+        fsum (bool): Whether to use the ``fsum`` method for higher accuracy summation.
+            Note that if ``fsum`` is true, double precision will be used, and the
+            ``quad`` keyword argument will be ignored.
 
     Returns:
         np.float64 or np.complex128: the permanent of matrix A.
@@ -63,10 +65,10 @@ def perm(A):
 
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
-            return perm_complex(A)
-        return perm_real(np.float64(A.real))
+            return perm_complex(A, quad=quad)
+        return perm_real(np.float64(A.real), quad=quad, fsum=fsum)
 
-    return perm_real(A)
+    return perm_real(A, quad=quad, fsum=fsum)
 
 
 def permanent_repeated(A, rpt):

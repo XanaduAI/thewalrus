@@ -76,23 +76,16 @@ if BUILD_EXT:
         USE_OPENMP = False
         cflags_default = "-static -O3 -Wall -fPIC"
         extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
-        extra_link_args_F90 = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
-        extra_f90_compile_args = [] #['-fopenmp']
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
         libraries += ["omp"]
         extra_link_args_CPP = ['-Xpreprocessor -fopenmp -lomp']
-        extra_link_args_F90 = ['-fopenmp']
-        extra_f90_compile_args = ['-fopenmp']
         extra_include = ['/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/']
         C_INCLUDE_PATH += ['/usr/local/opt/libomp/include']
         LD_LIBRARY_PATH += ['/usr/local/opt/libomp/lib']
     else:
         cflags_default = "-O3 -Wall -fPIC -shared -fopenmp"
         extra_link_args_CPP = ['-fopenmp']
-
-        extra_link_args_F90 = ['-fopenmp']
-        extra_f90_compile_args = ['-fopenmp']
 
     CFLAGS = os.environ.get('CFLAGS', cflags_default).split() + ['-I{}'.format(np.get_include())]
 
@@ -110,13 +103,6 @@ if BUILD_EXT:
         extra_link_args_CPP[0] += " -lopenblas"
 
     extensions = cythonize([
-            Extension("libperm",
-                sources=["src/kinds.f90", "src/vars.f90", "src/permanent.F90"],
-                include_dirs=C_INCLUDE_PATH,
-                library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
-                extra_compile_args=CFLAGS,
-                extra_f90_compile_args=extra_f90_compile_args,
-                extra_link_args=extra_link_args_F90),
             Extension("libhaf",
                 sources=["hafnian/hafnian."+ext,],
                 depends=["src/hafnian.hpp",
@@ -125,6 +111,7 @@ if BUILD_EXT:
                          "src/repeated_hafnian.hpp",
                          "src/hafnian_approx.hpp",
                          "src/torontonian.hpp",
+                         "src/permanent.hpp",
                          "src/stdafx.h",
                          "src/fsum.hpp"],
                 include_dirs=C_INCLUDE_PATH,
