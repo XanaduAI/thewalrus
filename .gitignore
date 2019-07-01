@@ -19,3 +19,5 @@ src/tests/*.o
 src/tests/cpptests
 docs/doxyoutput/*
 docs/hafnian_cpp_api/*
+docs/.ipynb_checkpoints/*
+coverage.xml

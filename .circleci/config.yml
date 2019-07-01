@@ -139,7 +139,6 @@ workflows:
   version: 2
   all-tests:
     jobs:
-      - pythoncoverage
       - cpptests
       - linux-wheels
       - osx-wheels
