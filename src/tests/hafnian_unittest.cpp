@@ -21,9 +21,8 @@
 const double tol = 1.0e-10f;
 const double tol2 = 1.0e-7f;
 
+
 namespace permanent {
-
-
 TEST(PermanentRealFsum, CompleteGraph) {
     std::vector<double> mat2(4, 1.0);
     std::vector<double> mat3(9, 1.0);
@@ -44,14 +43,14 @@ TEST(PermanentFsum, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             double randnum = distribution(generator);
-            mat[i*3+j] = randnum;
+            mat[i * 3 + j] = randnum;
         }
     }
 
-    double expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                      + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
+    double expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] + mat[2] * mat[3] * mat[7]
+                      + mat[0] * mat[5] * mat[7] + mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
 
     EXPECT_NEAR(expected, hafnian::permanent_fsum(mat), tol);
 
@@ -77,14 +76,14 @@ TEST(PermanentReal, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             double randnum = distribution(generator);
-            mat[i*3+j] = randnum;
+            mat[i * 3 + j] = randnum;
         }
     }
 
-    double expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                      + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
+    double expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] + mat[2] * mat[3] * mat[7]
+                      + mat[0] * mat[5] * mat[7] + mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
 
     EXPECT_NEAR(expected, hafnian::permanent_quad(mat), tol);
 
@@ -100,111 +99,15 @@ TEST(PermanentComplex, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat[i*3+j] = std::complex<double>(randnum1, randnum2);
+            mat[i * 3 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
-    std::complex<double> expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                                    + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
-
-    std::complex<double> perm = hafnian::permanent_quad(mat);
-
-    EXPECT_NEAR(std::real(expected), std::real(perm), tol);
-    EXPECT_NEAR(std::imag(expected), std::imag(perm), tol);
-
-}
-
-}
-
-namespace permanent {
-TEST(PermanentRealFsum, CompleteGraph) {
-    std::vector<double> mat2(4, 1.0);
-    std::vector<double> mat3(9, 1.0);
-    std::vector<double> mat4(16, 1.0);
-
-    EXPECT_NEAR(2, hafnian::permanent_fsum(mat2), tol);
-    EXPECT_NEAR(6, hafnian::permanent_fsum(mat3), tol);
-    EXPECT_NEAR(24, hafnian::permanent_fsum(mat4), tol);
-
-}
-
-
-TEST(PermanentFsum, Random) {
-    std::vector<double> mat(9, 1.0);
-
-    std::default_random_engine generator;
-    generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
-
-    for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
-            double randnum = distribution(generator);
-            mat[i*3+j] = randnum;
-        }
-    }
-
-    double expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                      + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
-
-    EXPECT_NEAR(expected, hafnian::permanent_fsum(mat), tol);
-
-}
-
-TEST(PermanentReal, CompleteGraph) {
-    std::vector<double> mat2(4, 1.0);
-    std::vector<double> mat3(9, 1.0);
-    std::vector<double> mat4(16, 1.0);
-
-    EXPECT_NEAR(2, hafnian::permanent_quad(mat2), tol);
-    EXPECT_NEAR(6, hafnian::permanent_quad(mat3), tol);
-    EXPECT_NEAR(24, hafnian::permanent_quad(mat4), tol);
-
-}
-
-
-TEST(PermanentReal, Random) {
-    std::vector<double> mat(9, 1.0);
-
-    std::default_random_engine generator;
-    generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
-
-    for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
-            double randnum = distribution(generator);
-            mat[i*3+j] = randnum;
-        }
-    }
-
-    double expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                      + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
-
-    EXPECT_NEAR(expected, hafnian::permanent_quad(mat), tol);
-
-}
-
-
-
-TEST(PermanentComplex, Random) {
-    std::vector<std::complex<double>> mat(9, 1.0);
-
-    std::default_random_engine generator;
-    generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
-
-    for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
-            double randnum1 = distribution(generator);
-            double randnum2 = distribution(generator);
-            mat[i*3+j] = std::complex<double>(randnum1, randnum2);
-        }
-    }
-
-    std::complex<double> expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                                    + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
+    std::complex<double> expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] + mat[2] * mat[3] * mat[7]
+                                    + mat[0] * mat[5] * mat[7] + mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
 
     std::complex<double> perm = hafnian::permanent_quad(mat);
 
@@ -238,13 +141,13 @@ TEST(HafianRecursiveDouble, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum = distribution(generator);
-            mat[i*4+j] = randnum;
+            mat[i * 4 + j] = randnum;
         }
     }
 
-    double expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    double expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     EXPECT_NEAR(expected, hafnian::hafnian_recursive_quad(mat), tol);
 }
@@ -319,14 +222,14 @@ TEST(HafianRecursiveDoubleComplex, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
-    std::complex<double> expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    std::complex<double> expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     std::complex<double> haf = hafnian::hafnian_recursive_quad(mat);
 
@@ -393,13 +296,13 @@ TEST(HafianEigenDouble, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum = distribution(generator);
-            mat[i*4+j] = randnum;
+            mat[i * 4 + j] = randnum;
         }
     }
 
-    double expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    double expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     EXPECT_NEAR(expected, hafnian::hafnian_eigen(mat), tol);
 }
@@ -474,14 +377,14 @@ TEST(HafianEigenDoubleComplex, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
-    std::complex<double> expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    std::complex<double> expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     std::complex<double> haf = hafnian::hafnian_eigen(mat);
 
@@ -550,8 +453,8 @@ TEST(HafnianApproxNonngeative, Random) {
     }
 
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat4[i*n+j] = x4[i]*x4[j];
+        for (int j = 0; j < n; j++) {
+            mat4[i * n + j] = x4[i] * x4[j];
         }
     }
 
@@ -565,8 +468,8 @@ TEST(HafnianApproxNonngeative, Random) {
     }
 
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat6[i*n+j] = x6[i]*x6[j];
+        for (int j = 0; j < n; j++) {
+            mat6[i * n + j] = x6[i] * x6[j];
         }
     }
 
@@ -579,8 +482,8 @@ TEST(HafnianApproxNonngeative, Random) {
     }
 
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat8[i*n+j] = x8[i]*x8[j];
+        for (int j = 0; j < n; j++) {
+            mat8[i * n + j] = x8[i] * x8[j];
         }
     }
 
@@ -592,9 +495,9 @@ TEST(HafnianApproxNonngeative, Random) {
     double haf6 = hafnian::hafnian_approx(mat6, nsamples);
     double haf8 = hafnian::hafnian_approx(mat8, nsamples);
 
-    EXPECT_NEAR(expected4, haf4, haf4/15.0);
-    EXPECT_NEAR(expected6, haf6, haf6/15.0);
-    EXPECT_NEAR(expected8, haf8, haf8/15.0);
+    EXPECT_NEAR(expected4, haf4, haf4 / 15.0);
+    EXPECT_NEAR(expected6, haf6, haf6 / 15.0);
+    EXPECT_NEAR(expected8, haf8, haf8 / 15.0);
 
 }
 
@@ -629,16 +532,16 @@ TEST(HafnianRepeatedDouble, AllOneRpt) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum = distribution(generator);
-            mat2rand[i*2+j] = randnum;
+            mat2rand[i * 2 + j] = randnum;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum = distribution(generator);
-            mat4rand[i*4+j] = randnum;
+            mat4rand[i * 4 + j] = randnum;
         }
     }
 
@@ -647,7 +550,7 @@ TEST(HafnianRepeatedDouble, AllOneRpt) {
     double expected2rand = mat2rand[1];
 
     double expected4 = 3;
-    double expected4rand = mat4rand[1]*mat4rand[11] + mat4rand[2]*mat4rand[7] + mat4rand[3]*mat4rand[6];;
+    double expected4rand = mat4rand[1] * mat4rand[11] + mat4rand[2] * mat4rand[7] + mat4rand[3] * mat4rand[6];;
 
     double haf2 = hafnian::hafnian_rpt_quad(mat2, rpt2);
     double haf2rand = hafnian::hafnian_rpt_quad(mat2rand, rpt2);
@@ -691,18 +594,18 @@ TEST(HafnianRepeatedComplex, AllOneRpt) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat2rand[i*2+j] = std::complex<double>(randnum1, randnum2);
+            mat2rand[i * 2 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat4rand[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat4rand[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
@@ -714,7 +617,7 @@ TEST(HafnianRepeatedComplex, AllOneRpt) {
 
     double expected4_re = 3;
     double expected4_im = 0;
-    std::complex<double> expected4rand = mat4rand[1]*mat4rand[11] + mat4rand[2]*mat4rand[7] + mat4rand[3]*mat4rand[6];;
+    std::complex<double> expected4rand = mat4rand[1] * mat4rand[11] + mat4rand[2] * mat4rand[7] + mat4rand[3] * mat4rand[6];;
     double expected4rand_re = std::real(expected4rand);
     double expected4rand_im = std::imag(expected4rand);
 
@@ -774,16 +677,16 @@ TEST(LoopHafnianEigenDouble, EvenRandom) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
-            mat2[i*2+j] = randnum1;
+            mat2[i * 2 + j] = randnum1;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
-            mat4[i*4+j] = randnum1;
+            mat4[i * 4 + j] = randnum1;
         }
     }
 
@@ -791,11 +694,11 @@ TEST(LoopHafnianEigenDouble, EvenRandom) {
     double haf4 = hafnian::loop_hafnian_eigen(mat4);
 
     double expected2 = mat2[1] + mat2[0] * mat2[3];
-    double expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                       mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                       mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                       mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                       mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    double expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                       mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                       mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                       mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                       mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(expected2, haf2, tol);
     EXPECT_NEAR(expected4, haf4, tol);
@@ -841,18 +744,18 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat2[i*2+j] = std::complex<double>(randnum1, randnum2);
+            mat2[i * 2 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat4[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat4[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
@@ -860,11 +763,11 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
     std::complex<double> haf4 = hafnian::loop_hafnian_eigen(mat4);
 
     std::complex<double> expected2 = mat2[1] + mat2[0] * mat2[3];
-    std::complex<double> expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                                     mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                                     mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                                     mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                                     mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    std::complex<double> expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                                     mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                                     mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                                     mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                                     mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(std::real(expected2), std::real(haf2), tol);
     EXPECT_NEAR(std::imag(expected2), std::imag(haf2), tol);
@@ -923,10 +826,10 @@ TEST(LoopHafnianRepeatedDouble, EvenOnes) {
     std::vector<int> rpt6(6, 1);
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
 
     for (int i = 0; i < 6; i++)
-        mu6[i] = mat6[i*6+i];
+        mu6[i] = mat6[i * 6 + i];
 
     double haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
     double haf6 = hafnian::loop_hafnian_rpt_quad(mat6, mu6, rpt6);
@@ -956,34 +859,34 @@ TEST(LoopHafnianRepeatedDouble, EvenRandom) {
 
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
-            mat2[i*2+j] = randnum1;
+            mat2[i * 2 + j] = randnum1;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
-            mat4[i*4+j] = randnum1;
+            mat4[i * 4 + j] = randnum1;
         }
     }
 
     for (int i = 0; i < 2; i++)
-        mu2[i] = mat2[i*2+i];
+        mu2[i] = mat2[i * 2 + i];
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
 
     double haf2 = hafnian::loop_hafnian_rpt_quad(mat2, mu2, rpt2);
     double haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
 
     double expected2 = mat2[1] + mat2[0] * mat2[3];
-    double expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                       mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                       mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                       mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                       mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    double expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                       mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                       mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                       mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                       mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(expected2, haf2, tol);
     EXPECT_NEAR(expected4, haf4, tol);
@@ -1002,10 +905,10 @@ TEST(LoopHafnianRepeatedDouble, Odd) {
     std::vector<int> rpt5(5, 1);
 
     for (int i = 0; i < 3; i++)
-        mu3[i] = mat3[i*3+i];
+        mu3[i] = mat3[i * 3 + i];
 
     for (int i = 0; i < 5; i++)
-        mu5[i] = mat5[i*5+i];
+        mu5[i] = mat5[i * 5 + i];
 
     double haf3 = hafnian::loop_hafnian_rpt_quad(mat3, mu3, rpt3);
     double haf5 = hafnian::loop_hafnian_rpt_quad(mat5, mu5, rpt5);
@@ -1053,13 +956,13 @@ TEST(LoopHafnianRepeatedComplex, EvenOnes) {
     std::vector<int> rpt6(6, 1);
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
     std::complex<double> haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
     EXPECT_NEAR(10, std::real(haf4), tol);
     EXPECT_NEAR(0, std::imag(haf4), tol);
 
     for (int i = 0; i < 6; i++)
-        mu6[i] = mat6[i*6+i];
+        mu6[i] = mat6[i * 6 + i];
 
     std::complex<double> haf6 = hafnian::loop_hafnian_rpt_quad(mat6, mu6, rpt6);
 
@@ -1087,36 +990,36 @@ TEST(LoopHafnianRepeatedComplex, EvenRandom) {
 
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat2[i*2+j] = std::complex<double>(randnum1, randnum2);
+            mat2[i * 2 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat4[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat4[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 2; i++)
-        mu2[i] = mat2[i*2+i];
+        mu2[i] = mat2[i * 2 + i];
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
 
     std::complex<double> haf2 = hafnian::loop_hafnian_rpt_quad(mat2, mu2, rpt2);
     std::complex<double> haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
 
     std::complex<double> expected2 = mat2[1] + mat2[0] * mat2[3];
-    std::complex<double> expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                                     mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                                     mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                                     mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                                     mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    std::complex<double> expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                                     mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                                     mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                                     mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                                     mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(std::real(expected2), std::real(haf2), tol);
     EXPECT_NEAR(std::imag(expected2), std::imag(haf2), tol);
@@ -1138,10 +1041,10 @@ TEST(LoopHafnianRepeatedComplex, Odd) {
     std::vector<int> rpt5(5, 1);
 
     for (int i = 0; i < 3; i++)
-        mu3[i] = mat3[i*3+i];
+        mu3[i] = mat3[i * 3 + i];
 
     for (int i = 0; i < 5; i++)
-        mu5[i] = mat5[i*5+i];
+        mu5[i] = mat5[i * 5 + i];
 
     std::complex<double> haf3 = hafnian::loop_hafnian_rpt_quad(mat3, mu3, rpt3);
     std::complex<double> haf5 = hafnian::loop_hafnian_rpt_quad(mat5, mu5, rpt5);
@@ -1167,16 +1070,16 @@ TEST(TorontonianDouble, TMSV) {
     double r = asinh(std::sqrt(mean_n));
 
     int n = 4;
-    for(int i = 0; i < n; i++)
-        mat4[i*n+n-i-1] = tanh(r)*1.0;
+    for (int i = 0; i < n; i++)
+        mat4[i * n + n - i - 1] = tanh(r) * 1.0;
 
     n = 8;
-    for(int i = 0; i < n; i++)
-        mat8[i*n+n-i-1] = tanh(r)*1.0;
+    for (int i = 0; i < n; i++)
+        mat8[i * n + n - i - 1] = tanh(r) * 1.0;
 
     n = 16;
-    for(int i = 0; i < n; i++)
-        mat16[i*n+n-i-1] = tanh(r)*1.0;
+    for (int i = 0; i < n; i++)
+        mat16[i * n + n - i - 1] = tanh(r) * 1.0;
 
     double tor4 = hafnian::torontonian_quad(mat4);
     double tor8 = hafnian::torontonian_quad(mat8);
@@ -1192,7 +1095,7 @@ TEST(TorontonianDouble, TMSV) {
 TEST(TorontonianDouble, Vacuum) {
     int n_modes = 5;
 
-    std::vector<double> mat(2*n_modes*2*n_modes, 0.0);
+    std::vector<double> mat(2 * n_modes * 2 * n_modes, 0.0);
 
     double tor_val = hafnian::torontonian_quad(mat);
 
@@ -1202,11 +1105,11 @@ TEST(TorontonianDouble, Vacuum) {
 TEST(TorontonianDouble, Analytical) {
     int n = 1;
     double nbar = 0.25;
-    std::vector<double> mat1(2*n*2*n, 0.0);
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat1[i*2*n+j] = nbar/(static_cast<double>(n)*(1.0+nbar));
-            mat1[(i+n)*2*n+(j+n)] = nbar/(static_cast<double>(n)*(1.0+nbar));
+    std::vector<double> mat1(2 * n * 2 * n, 0.0);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            mat1[i * 2 * n + j] = nbar / (static_cast<double>(n) * (1.0 + nbar));
+            mat1[(i + n) * 2 * n + (j + n)] = nbar / (static_cast<double>(n) * (1.0 + nbar));
         }
     }
 
@@ -1216,11 +1119,11 @@ TEST(TorontonianDouble, Analytical) {
 
     n = 2;
     nbar = 0.25;
-    std::vector<double> mat2(2*n*2*n, 0.0);
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat2[i*2*n+j] = nbar/(static_cast<double>(n)*(1.0+nbar));
-            mat2[(i+n)*2*n+(j+n)] = nbar/(static_cast<double>(n)*(1.0+nbar));
+    std::vector<double> mat2(2 * n * 2 * n, 0.0);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            mat2[i * 2 * n + j] = nbar / (static_cast<double>(n) * (1.0 + nbar));
+            mat2[(i + n) * 2 * n + (j + n)] = nbar / (static_cast<double>(n) * (1.0 + nbar));
         }
     }
 
