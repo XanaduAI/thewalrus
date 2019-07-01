@@ -82,13 +82,13 @@ Details
 ^^^^^^^
 """
 # pylint: disable=too-many-arguments
-from itertools import product, count
+from itertools import count, product
 
 import numpy as np
-from scipy.special import factorial as fac
 from scipy.optimize import root_scalar
+from scipy.special import factorial as fac
 
-from ._hafnian import hafnian_repeated, hafnian, reduction
+from ._hafnian import hafnian, hafnian_repeated, reduction
 
 
 def reduced_gaussian(mu, cov, modes):

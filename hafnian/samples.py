@@ -54,14 +54,13 @@ from ._hafnian import hafnian, reduction
 from ._torontonian import tor
 from .quantum import (
     Amat,
+    Covmat,
     Qmat,
     Xmat,
-    reduced_gaussian,
-    Covmat,
     gen_Qmat_from_graph,
     is_classical_cov,
+    reduced_gaussian,
 )
-
 
 # ===============================================================================================
 # Hafnian sampling

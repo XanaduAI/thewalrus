@@ -16,8 +16,8 @@ Torontonian Python interface
 """
 import numpy as np
 
-from .lib.libhaf import torontonian_real as tor_real
 from .lib.libhaf import torontonian_complex as tor_complex
+from .lib.libhaf import torontonian_real as tor_real
 
 
 def tor(A, fsum=False):

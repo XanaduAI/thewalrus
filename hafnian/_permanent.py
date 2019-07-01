@@ -16,9 +16,8 @@ Permanent Python interface
 """
 import numpy as np
 
-from .lib.libhaf import perm_complex, perm_real
-
 from ._hafnian import hafnian_repeated
+from .lib.libhaf import perm_complex, perm_real
 
 
 def perm(A, quad=True, fsum=False):
