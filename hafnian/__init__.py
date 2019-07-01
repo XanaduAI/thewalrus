@@ -83,8 +83,6 @@ from ._hafnian import (
     hafnian_repeated,
     reduction,
     gradhaf,
-    perm_complex,
-    perm_real,
     batchhafnian,
 )
 from ._permanent import perm, perm_complex, perm_real, permanent_repeated
