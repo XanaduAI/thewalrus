@@ -48,59 +48,13 @@ namespace hafnian {
  *
  */
 template <typename T>
-inline std::vector<T> mode_elem(std::vector<T> &mat, std::vector<T> &d, int &resolution) {
-    int dim = std::sqrt(static_cast<double>(mat.size()));
+inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
+    int dim = std::sqrt(static_cast<double>(R_mat.size()));
 
     namespace eg = Eigen;
 
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> M = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(mat.data(), dim, dim);
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> U, dim_eye, U1, U2, U3, tmp1, tmp2, tmp, tmp1_inv, tmp2_inv, R, y;
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> d_eg, tmpy;
-
-    d_eg.resize(dim, 1);
-    U.resize(dim, dim);
-    U1.resize(dim, dim);
-    U2.resize(dim, dim);
-    U3.resize(dim, dim);
-    dim_eye.resize(dim, dim);
-
-    U.setIdentity(dim, dim);
-    dim_eye.setIdentity(dim, dim);
-
-    for(int i = 0; i < dim/2; i++) {
-        U(i, i) = std::complex<double>(0, -1);
-        U(i+dim/2, i) = std::complex<double>(1, 0);
-        U(i, i+dim/2) = std::complex<double>(0, 1);
-    }
-
-
-
-    for (int i = 0; i < dim; i++)
-        d_eg(i, 0) = d[i];
-
-    U = U/(static_cast<T>(std::sqrt(2)));
-
-
-    U3 = U.transpose();
-    U1 = U3.conjugate();
-    U2 = U.conjugate();
-
-    tmp1 = dim_eye + 2*M;
-    tmp1_inv = tmp1.inverse();
-
-    tmp2 = dim_eye - 2*M;
-    tmp2_inv = tmp2.inverse();
-
-    //R=U1*(eye(dim)-2*M)*inv(eye(dim)+2*M)*U2;
-    tmp = tmp1_inv * U2;
-    tmp = tmp2 * tmp;
-    R = U1 * tmp;
-
-    //y = 2*U3*inv(eye(dim)-2*M)*d;
-    tmpy = tmp2_inv * d_eg;
-    y = (U3 * tmpy);
-    y = 2 * y;
-
+    eg::Matrix<T, eg::Dynamic, eg::Dynamic> R = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(R_mat.data(), dim, dim);
+    eg::Matrix<T, eg::Dynamic, eg::Dynamic> y = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(y_mat.data(), dim, dim);
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
@@ -186,11 +140,11 @@ inline std::vector<T> mode_elem(std::vector<T> &mat, std::vector<T> &d, int &res
  * @param resolution highest number of photons to be resolved.
  *
  */
-std::vector<std::complex<double>> batchhafnian_all(std::vector<double> &mat, std::vector<double> &d, int &resolution) {
-    std::vector<std::complex<double>> matq(mat.begin(), mat.end());
-    std::vector<std::complex<double>> dq(d.begin(), d.end());
+std::vector<std::complex<double>> hermite_multidimensional_all(std::vector<double> &R_mat, std::vector<double> &y_mat, int &resolution) {
+    std::vector<std::complex<double>> R_matq(R_mat.begin(), R_mat.end());
+    std::vector<std::complex<double>> y_matq(y_mat.begin(), y_mat.end());
 
-    return mode_elem(matq, dq, resolution);
+    return hermite_multidimensional(R_matq, y_matq, resolution);
 }
 
 

@@ -1140,8 +1140,8 @@ TEST(TorontonianDouble, Analytical) {
 
 namespace batchhafnian {
 TEST(BatchHafnian, CompleteGraph) {
-    std::vector<std::complex<double>> mat4{0.920381,  -0.072714,  -1.141482,   0.166058, -0.072714,   2.456324,   0.337705,   0.988284, -1.141482,   0.337705,   2.509430,   0.072714, 0.166058,   0.988284,   0.072714,   0.664800};
-    std::vector<std::complex<double>> d4{1.00000,  0.38730, 0.25000,  -1.54919};
+    std::vector<std::complex<double>> mat4{std::complex<double>(-0.28264629150778969, 0.39867701584672210), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(-0.22959477315790058, 0.00000000000000008), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(0.38245649793510783, -0.41413300040003126), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.13684045954832844, 0.00000000000000006), std::complex<double>(-0.22959477315790058, -0.00000000000000008), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.28264629150778969, -0.39867701584672210), std::complex<double>(-0.06086128222348247, 0.12220227033305252), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.13684045954832844, -0.00000000000000006), std::complex<double>(-0.06086128222348247, +0.12220227033305252), std::complex<double>(0.38245649793510783, 0.41413300040003126)};
+    std::vector<std::complex<double>> d4{std::complex<double>(0.66917130190858, -1.52776303400764), std::complex<double>(-2.95847055822102, -1.29582519437023), std::complex<double>(0.66917130190858, 1.52776303400764), std::complex<double>(-2.95847055822102, 1.29582519437023)};
     std::vector<std::complex<double>> out(256, 0.0);
     std::vector<double> expected_re{1.00000000e+00, -1.64614736e+00,  1.94351456e+00, -1.44618627e+00,
                                     4.35642368e-01, -1.32047906e+00,  2.23766490e+00, -1.86917564e+00,
@@ -1273,7 +1273,7 @@ TEST(BatchHafnian, CompleteGraph) {
                                     9.62872951e-01, -2.53217806e+00,  3.10967275e+00, -1.42559575e-14};
     int res = 4;
 
-    out = hafnian::mode_elem(mat4, d4, res);
+    out = hafnian::hermite_multidimensional(mat4, d4, res);
 
     for (int i = 0; i < 256; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
