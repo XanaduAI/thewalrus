@@ -1272,8 +1272,9 @@ TEST(BatchHafnian, CompleteGraph) {
                                     2.91297712e-01, -6.63359067e-01, -1.47024726e-02,  2.58202829e+00,
                                     9.62872951e-01, -2.53217806e+00,  3.10967275e+00, -1.42559575e-14};
     int res = 4;
+    int renorm = 0;
 
-    out = hafnian::hermite_multidimensional(mat4, d4, res);
+    out = hafnian::hermite_multidimensional(mat4, d4, res, renorm);
 
     for (int i = 0; i < 256; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);

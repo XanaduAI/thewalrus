@@ -35,11 +35,30 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
+ullint factorial(int n)
+{
+    if(n > 1)
+        return n * factorial(n - 1);
+    else
+        return 1;
+}
+
+
+double renorm_factor(std::vector<int> &pos){
+	long double factor = 1;	
+    int dim = pos.size();
+
+	for (int i = 0; i < dim; i++)
+		factor *= factorial(pos[i]) ;
+	
+	return static_cast<double>(std::sqrt(factor));
+}
+
 namespace hafnian {
 
 /**
- * Returns photon numbemr statistics of a Gaussian state for a given covariance matrix `mat`.
- * Based in the MATLAB code available at: https://github.com/clementsw/gaussian-optics
+ * Returns photon number statistics of a Gaussian state for a given covariance matrix `mat`.
+ * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
  *
  * @param mat a flattened vector of size \f$2n^2\f$, representing an
  *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
@@ -48,7 +67,7 @@ namespace hafnian {
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
+inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution, int &renorm) {
     int dim = std::sqrt(static_cast<double>(R_mat.size()));
 
     namespace eg = Eigen;
@@ -117,6 +136,10 @@ inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vecto
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
                 H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*static_cast<T>(R(k,ii))*H[prevCoordinate];
+				
+				if (renorm) {
+					H[nextCoordinate] = H[nextCoordinate]/renorm_factor(nextPos);
+				}
             }
         }
 
@@ -140,11 +163,11 @@ inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vecto
  * @param resolution highest number of photons to be resolved.
  *
  */
-std::vector<std::complex<double>> hermite_multidimensional_all(std::vector<double> &R_mat, std::vector<double> &y_mat, int &resolution) {
+std::vector<std::complex<double>> hermite_multidimensional_all(std::vector<double> &R_mat, std::vector<double> &y_mat, int &resolution, int &renorm) {
     std::vector<std::complex<double>> R_matq(R_mat.begin(), R_mat.end());
     std::vector<std::complex<double>> y_matq(y_mat.begin(), y_mat.end());
 
-    return hermite_multidimensional(R_matq, y_matq, resolution);
+    return hermite_multidimensional(R_matq, y_matq, resolution, renorm);
 }
 
 
