@@ -82,7 +82,6 @@ from ._hafnian import (
     hafnian,
     hafnian_repeated,
     reduction,
-    gradhaf,
     batchhafnian,
     hermite_multidimensional,
 )
@@ -94,7 +93,6 @@ from ._version import __version__
 __all__ = [
     "hafnian",
     "hafnian_repeated",
-    "gradhaf",
     "tor",
     "perm",
     "permanent_repeated",

@@ -35,24 +35,16 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
-ullint factorial(int n)
+long double factorial(int nn)
 {
+    long double n = static_cast<long double>(nn);
+
     if(n > 1)
         return n * factorial(n - 1);
     else
         return 1;
 }
 
-
-double renorm_factor(std::vector<int> &pos){
-	long double factor = 1;	
-    int dim = pos.size();
-
-	for (int i = 0; i < dim; i++)
-		factor *= factorial(pos[i]) ;
-	
-	return static_cast<double>(std::sqrt(factor));
-}
 
 namespace hafnian {
 
@@ -77,13 +69,19 @@ inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vecto
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
+    std::vector<double> ren_factor(Hdim, 0);
 
     H[0] = 1;
+    ren_factor[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
     std::vector<int> ek(dim, 0);
+    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
+
+    for (int i = 0; i <=resolution; i++)
+        factors[i] = std::sqrt(static_cast<double>(factorial(i)));
 
 
     for (ullint jj = 0; jj < Hdim-1; jj++) {
@@ -136,15 +134,23 @@ inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vecto
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
                 H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*static_cast<T>(R(k,ii))*H[prevCoordinate];
-				
-				if (renorm) {
-					H[nextCoordinate] = H[nextCoordinate]/renorm_factor(nextPos);
-				}
+
             }
         }
 
+        // Computation of the renormalization factor
+        double tmp = 1;
+        for (int ii = 0; ii < dim; ii++)
+            tmp *= factors[nextPos[ii]];
+
+        ren_factor[nextCoordinate] = tmp;
+
     }
 
+    if (renorm) {
+        for (ullint jj = 0; jj < Hdim; jj++)
+            H[jj] = H[jj]/ren_factor[jj];
+    }
 
     return H;
 
