@@ -63,9 +63,7 @@ def test_torontonian_tmsv():
 
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    Omat = np.tanh(r) * np.array(
-        [[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
-    )
+    Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
 
     tor_val = tor(Omat)
     assert np.allclose(tor_val.real, 1.0)
@@ -77,9 +75,7 @@ def test_torontonian_tmsv_complex_zero_imag_part():
 
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    Omat = np.tanh(r) * np.array(
-        [[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
-    )
+    Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
     Omat = np.complex128(Omat)
     tor_val = tor(Omat)
     assert np.allclose(tor_val.real, 1.0)

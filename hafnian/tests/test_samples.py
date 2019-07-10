@@ -83,9 +83,7 @@ class TestHafnianSampling:
 
     def test_hafnian_sample_states_nans(self):
         """test exception is raised if not a numpy array"""
-        with pytest.raises(
-            ValueError, match="Covariance matrix must not contain NaNs."
-        ):
+        with pytest.raises(ValueError, match="Covariance matrix must not contain NaNs."):
             hafnian_sample_state(np.array([[0, 5], [0, np.NaN]]), samples=20)
 
     def test_single_squeezed_state_hafnian(self):
@@ -104,19 +102,14 @@ class TestHafnianSampling:
         rel_freq = freq / n_samples
         nm = max(samples) // 2
 
-        x = nbinom.pmf(
-            np.arange(0, nm, 1), 0.5, np.tanh(np.arcsinh(np.sqrt(mean_n))) ** 2
-        )
+        x = nbinom.pmf(np.arange(0, nm, 1), 0.5, np.tanh(np.arcsinh(np.sqrt(mean_n))) ** 2)
         x2 = np.zeros(2 * len(x))
         x2[::2] = x
         rel_freq = freq[0:-1] / n_samples
         x2 = x2[0 : len(rel_freq)]
 
         assert np.allclose(
-            rel_freq,
-            x2,
-            atol=rel_tol / np.sqrt(n_samples),
-            rtol=rel_tol / np.sqrt(n_samples),
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
         )
 
     def test_two_mode_squeezed_state_hafnian(self):
@@ -166,12 +159,7 @@ class TestHafnianSampling:
         nr_samples = 10
 
         samples = hafnian_sample_graph(
-            A,
-            n_mean,
-            cutoff=5,
-            approx=True,
-            approx_samples=approx_samples,
-            samples=nr_samples,
+            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples
         )
 
         test_passed = True
@@ -200,12 +188,7 @@ class TestHafnianSampling:
 
         nr_samples = 100
         samples = hafnian_sample_graph(
-            A,
-            n_mean,
-            cutoff=5,
-            approx=True,
-            approx_samples=approx_samples,
-            samples=nr_samples,
+            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples
         )
         nr_zeros = 0
 
@@ -220,9 +203,7 @@ class TestHafnianSampling:
 
         assert np.abs(prob0 - prob0_estimate) < delta
 
-    @pytest.mark.parametrize(
-        "sample_func", [hafnian_sample_state, hafnian_sample_classical_state]
-    )
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
     def test_multimode_vacuum_state_hafnian(self, sample_func):
         """Test the sampling routines by checking the samples for pure vacuum
         using the sampler for classical states
@@ -237,9 +218,7 @@ class TestHafnianSampling:
         for i in range(n_samples):
             assert np.all(samples[i] == zeros)
 
-    @pytest.mark.parametrize(
-        "sample_func", [hafnian_sample_state, hafnian_sample_classical_state]
-    )
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
     def test_thermal_state_hafnian(self, sample_func):
         """Test the sampling routines by checking the samples for a single mode
         thermal state
@@ -271,9 +250,7 @@ class TestTorontonianSampling:
 
     def test_torontonian_samples_nans(self):
         """test exception is raised if not a numpy array"""
-        with pytest.raises(
-            ValueError, match="Covariance matrix must not contain NaNs."
-        ):
+        with pytest.raises(ValueError, match="Covariance matrix must not contain NaNs."):
             torontonian_sample_state(np.array([[0, 5], [0, np.NaN]]), samples=20)
 
     def test_single_squeezed_state_torontonian(self):
@@ -293,10 +270,7 @@ class TestTorontonianSampling:
         x2[0] = 1.0 / np.sqrt(1.0 + mean_n)
         x2[1] = 1.0 - x2[0]
         assert np.allclose(
-            rel_freq,
-            x2,
-            atol=rel_tol / np.sqrt(n_samples),
-            rtol=rel_tol / np.sqrt(n_samples),
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
         )
 
     def test_two_mode_squeezed_state_torontonian(self):
