@@ -19,7 +19,8 @@ import numpy as np
 from scipy.special import poch, factorial
 from hafnian import tor
 
-def gen_omats(l,nbar):
+
+def gen_omats(l, nbar):
     r"""Generates the matrix O that enters inside the Torontonian for an l mode system
     in which the first mode is prepared in a thermal state with mean photon number nbar
     and the rest in vacuum and are later sent into a Fourier interferometer, i.e. one described 
@@ -31,8 +32,8 @@ def gen_omats(l,nbar):
     Returns:
         array: An O matrix whose Torontonian can be calculated analytically.
     """
-    A = (nbar/(l*(1.0+nbar)))*np.ones([l,l])
-    O = np.block([[A,0*A],[0*A,A]])
+    A = (nbar / (l * (1.0 + nbar))) * np.ones([l, l])
+    O = np.block([[A, 0 * A], [0 * A, A]])
     return O
 
 
@@ -47,13 +48,14 @@ def torontonian_analytical(l, nbar):
 
 
     """
-    if np.allclose(l,nbar,atol=1e-14,rtol=0.0):
+    if np.allclose(l, nbar, atol=1e-14, rtol=0.0):
         return 1.0
-    beta = -(nbar/(l*(1 + nbar)))
-    pref = (factorial(l)/beta)
-    p1 = pref*l/poch(1/beta,l+2)
-    p2 = pref*beta/poch(2+1/beta,l)
-    return (p1+p2)*(-1)**l
+    beta = -(nbar / (l * (1 + nbar)))
+    pref = factorial(l) / beta
+    p1 = pref * l / poch(1 / beta, l + 2)
+    p2 = pref * beta / poch(2 + 1 / beta, l)
+    return (p1 + p2) * (-1) ** l
+
 
 def test_torontonian_tmsv():
     """Calculates the torontonian of a two-mode squeezed vacuum
@@ -61,7 +63,9 @@ def test_torontonian_tmsv():
 
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
+    Omat = np.tanh(r) * np.array(
+        [[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
+    )
 
     tor_val = tor(Omat)
     assert np.allclose(tor_val.real, 1.0)
@@ -73,7 +77,9 @@ def test_torontonian_tmsv_complex_zero_imag_part():
 
     mean_n = 1.0
     r = np.arcsinh(np.sqrt(mean_n))
-    Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
+    Omat = np.tanh(r) * np.array(
+        [[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]]
+    )
     Omat = np.complex128(Omat)
     tor_val = tor(Omat)
     assert np.allclose(tor_val.real, 1.0)
@@ -103,8 +109,8 @@ def test_torontonian_vacuum():
     assert np.allclose(tor_val.real, 0.0)
 
 
-@pytest.mark.parametrize("l", [1,2,3,4,5])
-@pytest.mark.parametrize("nbar", np.arange(0.25,3,0.25))
+@pytest.mark.parametrize("l", [1, 2, 3, 4, 5])
+@pytest.mark.parametrize("nbar", np.arange(0.25, 3, 0.25))
 def test_torontononian_analytical_mats(l, nbar):
     """Checks the correct value of the torontonian for the analytical family described by gen_omats"""
     np.allclose(torontonian_analytical(l, nbar), tor(gen_omats(l, nbar)))
