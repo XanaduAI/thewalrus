@@ -16,8 +16,6 @@
 import numpy as np
 from hafnian import tor
 
-abs_tol = 1.0e-8
-
 
 def test_torontonian_tmsv():
     """Calculates the torontonian of a two-mode squeezed vacuum
@@ -28,7 +26,7 @@ def test_torontonian_tmsv():
     Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
 
     tor_val = tor(Omat)
-    assert np.abs(tor_val.real - 1.0) < abs_tol
+    assert np.allclose(tor_val.real, 1.0)
 
 
 def test_torontonian_tmsv_complex_zero_imag_part():
@@ -40,7 +38,7 @@ def test_torontonian_tmsv_complex_zero_imag_part():
     Omat = np.tanh(r) * np.array([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
     Omat = np.complex128(Omat)
     tor_val = tor(Omat)
-    assert np.abs(tor_val.real - 1.0) < abs_tol
+    assert np.allclose(tor_val.real, 1.0)
 
 
 def test_torontonian_tmsv_complex():
@@ -55,7 +53,7 @@ def test_torontonian_tmsv_complex():
         [[0, 0, 0, phase], [0, 0, phase, 0], [0, phasec, 0, 0], [phasec, 0, 0, 0]]
     )
     tor_val = tor(Omat)
-    assert np.abs(tor_val.real - 1.0) < abs_tol
+    assert np.allclose(tor_val.real, 1.0)
 
 
 def test_torontonian_vacuum():
@@ -64,4 +62,4 @@ def test_torontonian_vacuum():
     n_modes = 5
     Omat = np.zeros([2 * n_modes, 2 * n_modes])
     tor_val = tor(Omat)
-    assert np.abs(tor_val.real - 0.0) < abs_tol
+    assert np.allclose(tor_val.real, 0.0)
