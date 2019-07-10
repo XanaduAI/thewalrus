@@ -97,7 +97,7 @@ class TestHafnianSampling:
 
         n_cut = 10
         samples = hafnian_sample_state(sigma, samples=n_samples, cutoff=n_cut)
-        bins = np.arange(0, max(samples), 1)
+        bins = np.arange(0, max(samples) + 1, 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
         nm = max(samples) // 2
@@ -128,7 +128,8 @@ class TestHafnianSampling:
         assert np.all(samples[:, 0] == samples[:, 1])
 
         samples1d = samples[:, 0]
-        bins = np.arange(0, max(samples1d), 1)
+        bins = np.arange(0, max(samples1d) + 1, 1)
+
         (freq, _) = np.histogram(samples1d, bins=bins)
         rel_freq = freq / n_samples
 
@@ -137,7 +138,9 @@ class TestHafnianSampling:
             probs[0:-1]
         )  # Coarse grain all the probabilities past the threshold
 
-        assert np.allclose(rel_freq, probs, atol=0.0, rtol=rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, probs, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_hafnian_sample_graph(self):
         """Test hafnian sampling from a graph"""
