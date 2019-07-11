@@ -1,13 +1,13 @@
 Hafnian
 #######
-
-.. image:: https://circleci.com/gh/XanaduAI/hafnianplus.svg?style=svg&circle-token=e34895951dd90ef61a72c1928b4db7ba1e856f48
+    
+.. image:: https://circleci.com/gh/XanaduAI/hafnian/tree/master.svg?style=svg&circle-token=209b57390082a2b2fe2cdc9ee49a301ddc29ca5b
     :alt: CircleCI
-    :target: https://circleci.com/gh/XanaduAI/hafnianplus
+    :target: https://circleci.com/gh/XanaduAI/hafnian/tree/master
 
-.. image:: https://ci.appveyor.com/api/projects/status/6wt68c81f8ly583s/branch/master?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/9udscqldo1xd25yk/branch/master?svg=true
     :alt: Appveyor
-    :target: https://ci.appveyor.com/project/josh146/hafnianplus/branch/master
+    :target: https://ci.appveyor.com/project/josh146/hafnian/branch/master
 
 .. image:: https://img.shields.io/codecov/c/github/xanaduai/hafnian/master.svg?style=flat
     :alt: Codecov coverage
