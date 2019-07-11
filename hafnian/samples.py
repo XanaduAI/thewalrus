@@ -60,6 +60,7 @@ from .quantum import (
     gen_Qmat_from_graph,
     is_classical_cov,
     reduced_gaussian,
+    density_matrix_element,
 )
 
 # ===============================================================================================
@@ -68,7 +69,7 @@ from .quantum import (
 
 
 def generate_hafnian_sample(
-    cov, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
+    cov, mu=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
 ):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
@@ -91,14 +92,16 @@ def generate_hafnian_sample(
     result = []
     prev_prob = 1.0
     nmodes = N
-    mu = np.zeros(2 * N)
-
+    if mu is None:
+        local_mu = np.zeros(2 * N)
+    else:
+        local_mu = mu
     A = Amat(Qmat(cov), hbar=hbar)
 
     for k in range(nmodes):
         probs1 = np.zeros([cutoff + 1], dtype=np.float64)
         kk = np.arange(k + 1)
-        _, V_red = reduced_gaussian(mu, cov, kk)
+        mu_red, V_red = reduced_gaussian(local_mu, cov, kk)
         Q = Qmat(V_red, hbar=hbar)
         A = Amat(Q, hbar=hbar, cov_is_qmat=True)
 
@@ -114,8 +117,11 @@ def generate_hafnian_sample(
                     hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
                 )
             else:
-                probs1[i] = hafnian(mat).real / factpref
-
+                if mu is None:
+                    probs1[i] = hafnian(mat).real / factpref
+                else:
+                    tmp = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar)
+                    probs1[i] =  np.sqrt(np.linalg.det(Q).real)*tmp.real
         probs1a = probs1 / np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a / prev_prob
         probs3 = np.maximum(
