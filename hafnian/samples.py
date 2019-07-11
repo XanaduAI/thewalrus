@@ -69,7 +69,7 @@ from .quantum import (
 
 
 def generate_hafnian_sample(
-    cov, mu=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
+    cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
 ):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
@@ -77,6 +77,8 @@ def generate_hafnian_sample(
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+        mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+            state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
@@ -92,10 +94,10 @@ def generate_hafnian_sample(
     result = []
     prev_prob = 1.0
     nmodes = N
-    if mu is None:
+    if mean is None:
         local_mu = np.zeros(2 * N)
     else:
-        local_mu = mu
+        local_mu = mean
     A = Amat(Qmat(cov), hbar=hbar)
 
     for k in range(nmodes):
@@ -117,12 +119,13 @@ def generate_hafnian_sample(
                     hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
                 )
             else:
-                probs1[i] = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar).real
+                probs1[i] = density_matrix_element(
+                    mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar
+                ).real
 
         if approx:
-            probs1 = probs1/np.sqrt(np.linalg.det(Q).real)
+            probs1 = probs1 / np.sqrt(np.linalg.det(Q).real)
 
-        #probs1a = probs1
         probs2 = probs1 / prev_prob
         probs3 = np.maximum(
             probs2, np.zeros_like(probs2)
@@ -164,6 +167,9 @@ def _hafnian_sample(args):
             samples (int)
                 the number of samples to return.
 
+            mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+                state.
+
             hbar (float)
                 the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`.
 
@@ -183,7 +189,7 @@ def _hafnian_sample(args):
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
-    cov, samples, hbar, cutoff, max_photons, approx, approx_samples = args
+    cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples = args
 
     if not isinstance(cov, np.ndarray):
         raise TypeError("Covariance matrix must be a NumPy array.")
@@ -202,6 +208,7 @@ def _hafnian_sample(args):
     while j < samples:
         result = generate_hafnian_sample(
             cov,
+            mean=mean,
             hbar=hbar,
             cutoff=cutoff,
             max_photons=max_photons,
@@ -218,7 +225,15 @@ def _hafnian_sample(args):
 
 
 def hafnian_sample_state(
-    cov, samples, hbar=2, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, pool=False
+    cov,
+    samples,
+    mean=None,
+    hbar=2,
+    cutoff=5,
+    max_photons=30,
+    approx=False,
+    approx_samples=1e5,
+    pool=False,
 ):
     r"""Returns samples from the Hafnian of a Gaussian state.
 
@@ -227,6 +242,8 @@ def hafnian_sample_state(
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): the number of samples to return.
+        mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+                state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
@@ -241,7 +258,7 @@ def hafnian_sample_state(
         np.array[int]: photon number samples from the Gaussian state
     """
     if not pool:
-        params = [cov, samples, hbar, cutoff, max_photons, approx, approx_samples]
+        params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
         return _hafnian_sample(params)
 
     pool = Pool()
@@ -293,6 +310,7 @@ def hafnian_sample_graph(
     return hafnian_sample_state(
         cov,
         samples,
+        mean=None,
         hbar=2,
         cutoff=cutoff,
         max_photons=max_photons,
@@ -473,7 +491,7 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
 
 
-def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
+def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08, cutoff=None):
     r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
 
     Args:
