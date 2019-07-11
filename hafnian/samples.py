@@ -118,17 +118,21 @@ def generate_hafnian_sample(
                 )
             else:
                 if mu is None:
-                    probs1[i] = hafnian(mat).real / factpref
+                    probs1[i] = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar).real
+                    #probs1[i] =  np.sqrt(np.linalg.det(Q).real)*tmp.real
+                    #probs1[i] = hafnian(mat).real / factpref
                 else:
-                    tmp = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar)
-                    probs1[i] =  np.sqrt(np.linalg.det(Q).real)*tmp.real
+                    probs1[i] = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar).real
+                    #probs1[i] =  *tmp.real
+        if not approx:
+            probs1 = np.sqrt(np.linalg.det(Q).real)*probs1
+
         probs1a = probs1 / np.sqrt(np.linalg.det(Q).real)
         probs2 = probs1a / prev_prob
         probs3 = np.maximum(
             probs2, np.zeros_like(probs2)
         )  # pylint: disable=assignment-from-no-return
         ssum = np.sum(probs3)
-
         if ssum < 1.0:
             probs3[-1] = 1.0 - ssum
 
