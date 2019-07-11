@@ -102,33 +102,28 @@ def generate_hafnian_sample(
         probs1 = np.zeros([cutoff + 1], dtype=np.float64)
         kk = np.arange(k + 1)
         mu_red, V_red = reduced_gaussian(local_mu, cov, kk)
-        Q = Qmat(V_red, hbar=hbar)
-        A = Amat(Q, hbar=hbar, cov_is_qmat=True)
+
+        if approx:
+            Q = Qmat(V_red, hbar=hbar)
+            A = Amat(Q, hbar=hbar, cov_is_qmat=True)
 
         for i in range(cutoff):
             indices = result + [i]
             ind2 = indices + indices
-
-            factpref = np.prod(fac(indices))
-            mat = reduction(A, ind2)
-
             if approx:
+                factpref = np.prod(fac(indices))
+                mat = reduction(A, ind2)
                 probs1[i] = (
                     hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
                 )
             else:
-                if mu is None:
-                    probs1[i] = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar).real
-                    #probs1[i] =  np.sqrt(np.linalg.det(Q).real)*tmp.real
-                    #probs1[i] = hafnian(mat).real / factpref
-                else:
-                    probs1[i] = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar).real
-                    #probs1[i] =  *tmp.real
-        if not approx:
-            probs1 = np.sqrt(np.linalg.det(Q).real)*probs1
+                probs1[i] = density_matrix_element(mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar).real
 
-        probs1a = probs1 / np.sqrt(np.linalg.det(Q).real)
-        probs2 = probs1a / prev_prob
+        if approx:
+            probs1 = probs1/np.sqrt(np.linalg.det(Q).real)
+
+        #probs1a = probs1
+        probs2 = probs1 / prev_prob
         probs3 = np.maximum(
             probs2, np.zeros_like(probs2)
         )  # pylint: disable=assignment-from-no-return
@@ -146,7 +141,7 @@ def generate_hafnian_sample(
             return -1
         if sum(result) > max_photons:
             return -1
-        prev_prob = probs1a[result[-1]]
+        prev_prob = probs1[result[-1]]
 
     return result
 
