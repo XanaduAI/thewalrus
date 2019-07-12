@@ -2049,7 +2049,6 @@ static const char __pyx_k_resolution[] = "resolution";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_haf_complex[] = "haf_complex";
-static const char __pyx_k_batchhafnian[] = "batchhafnian";
 static const char __pyx_k_haf_rpt_real[] = "haf_rpt_real";
 static const char __pyx_k_perm_complex[] = "perm_complex";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
@@ -2074,6 +2073,7 @@ static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>"
 static const char __pyx_k_MemoryView_of_r_at_0x_x[] = "<MemoryView of %r at 0x%x>";
 static const char __pyx_k_contiguous_and_indirect[] = "<contiguous and indirect>";
 static const char __pyx_k_Cannot_index_with_type_s[] = "Cannot index with type '%s'";
+static const char __pyx_k_hermite_multidimensional[] = "hermite_multidimensional";
 static const char __pyx_k_Invalid_shape_in_axis_d_d[] = "Invalid shape in axis %d: %d.";
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
@@ -2119,7 +2119,6 @@ static PyObject *__pyx_n_s_View_MemoryView;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_approx;
 static PyObject *__pyx_n_s_base;
-static PyObject *__pyx_n_s_batchhafnian;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
 static PyObject *__pyx_n_s_class;
@@ -2145,6 +2144,7 @@ static PyObject *__pyx_n_s_haf_real;
 static PyObject *__pyx_n_s_haf_rpt_complex;
 static PyObject *__pyx_n_s_haf_rpt_real;
 static PyObject *__pyx_kp_s_hafnian_hafnian_pyx;
+static PyObject *__pyx_n_s_hermite_multidimensional;
 static PyObject *__pyx_n_s_i;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
@@ -2219,7 +2219,7 @@ static PyObject *__pyx_pf_6libhaf_10haf_complex(CYTHON_UNUSED PyObject *__pyx_se
 static PyObject *__pyx_pf_6libhaf_12haf_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad, int __pyx_v_approx, PyObject *__pyx_v_nsamples); /* proto */
 static PyObject *__pyx_pf_6libhaf_14perm_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_quad); /* proto */
 static PyObject *__pyx_pf_6libhaf_16perm_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_quad, PyObject *__pyx_v_fsum); /* proto */
-static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_d, int __pyx_v_resolution, PyObject *__pyx_v_ren); /* proto */
+static PyObject *__pyx_pf_6libhaf_18hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_d, int __pyx_v_resolution, PyObject *__pyx_v_ren); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -4709,23 +4709,23 @@ static PyObject *__pyx_pf_6libhaf_16perm_real(CYTHON_UNUSED PyObject *__pyx_self
 /* "hafnian/hafnian.pyx":370
  * # Batch hafnian
  * 
- * def batchhafnian(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
  *     cdef int i, j, n = A.shape[0]
  *     cdef vector[double complex] R_mat, y_mat
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6libhaf_19batchhafnian(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6libhaf_18batchhafnian[] = "batchhafnian(double complex[:, :] A, double complex[:] d, int resolution, ren=False)";
-static PyMethodDef __pyx_mdef_6libhaf_19batchhafnian = {"batchhafnian", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6libhaf_19batchhafnian, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_18batchhafnian};
-static PyObject *__pyx_pw_6libhaf_19batchhafnian(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6libhaf_19hermite_multidimensional(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6libhaf_18hermite_multidimensional[] = "hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False)";
+static PyMethodDef __pyx_mdef_6libhaf_19hermite_multidimensional = {"hermite_multidimensional", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6libhaf_19hermite_multidimensional, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6libhaf_18hermite_multidimensional};
+static PyObject *__pyx_pw_6libhaf_19hermite_multidimensional(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_A = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_d = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_resolution;
   PyObject *__pyx_v_ren = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("batchhafnian (wrapper)", 0);
+  __Pyx_RefNannySetupContext("hermite_multidimensional (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_d,&__pyx_n_s_resolution,&__pyx_n_s_ren,0};
     PyObject* values[4] = {0,0,0,0};
@@ -4754,13 +4754,13 @@ static PyObject *__pyx_pw_6libhaf_19batchhafnian(PyObject *__pyx_self, PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_d)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("batchhafnian", 0, 3, 4, 1); __PYX_ERR(0, 370, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 0, 3, 4, 1); __PYX_ERR(0, 370, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_resolution)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("batchhafnian", 0, 3, 4, 2); __PYX_ERR(0, 370, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 0, 3, 4, 2); __PYX_ERR(0, 370, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -4770,7 +4770,7 @@ static PyObject *__pyx_pw_6libhaf_19batchhafnian(PyObject *__pyx_self, PyObject 
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "batchhafnian") < 0)) __PYX_ERR(0, 370, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "hermite_multidimensional") < 0)) __PYX_ERR(0, 370, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4790,20 +4790,20 @@ static PyObject *__pyx_pw_6libhaf_19batchhafnian(PyObject *__pyx_self, PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("batchhafnian", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 370, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 370, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("libhaf.batchhafnian", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("libhaf.hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6libhaf_18batchhafnian(__pyx_self, __pyx_v_A, __pyx_v_d, __pyx_v_resolution, __pyx_v_ren);
+  __pyx_r = __pyx_pf_6libhaf_18hermite_multidimensional(__pyx_self, __pyx_v_A, __pyx_v_d, __pyx_v_resolution, __pyx_v_ren);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_d, int __pyx_v_resolution, PyObject *__pyx_v_ren) {
+static PyObject *__pyx_pf_6libhaf_18hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, __Pyx_memviewslice __pyx_v_d, int __pyx_v_resolution, PyObject *__pyx_v_ren) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
@@ -4823,11 +4823,11 @@ static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_s
   Py_ssize_t __pyx_t_9;
   Py_ssize_t __pyx_t_10;
   PyObject *__pyx_t_11 = NULL;
-  __Pyx_RefNannySetupContext("batchhafnian", 0);
+  __Pyx_RefNannySetupContext("hermite_multidimensional", 0);
 
   /* "hafnian/hafnian.pyx":371
  * 
- * def batchhafnian(double complex[:, :] A, double complex[:] d, int resolution, ren=False):
+ * def hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False):
  *     cdef int i, j, n = A.shape[0]             # <<<<<<<<<<<<<<
  *     cdef vector[double complex] R_mat, y_mat
  * 
@@ -4930,7 +4930,7 @@ static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_s
  *     for i in range(n):
  *         y_mat.push_back(d[i])             # <<<<<<<<<<<<<<
  * 
- *     return hermite_multidimensional(R_mat, y_mat, resolution, renorm)
+ *     return hermite_multidimensional_cpp(R_mat, y_mat, resolution, renorm)
  */
     __pyx_t_10 = __pyx_v_i;
     try {
@@ -4944,10 +4944,10 @@ static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_s
   /* "hafnian/hafnian.pyx":387
  *         y_mat.push_back(d[i])
  * 
- *     return hermite_multidimensional(R_mat, y_mat, resolution, renorm)             # <<<<<<<<<<<<<<
+ *     return hermite_multidimensional_cpp(R_mat, y_mat, resolution, renorm)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_11 = __pyx_convert_vector_to_py___pyx_t_double_complex(hafnian::hermite_multidimensional(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_resolution, __pyx_v_renorm)); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 387, __pyx_L1_error)
+  __pyx_t_11 = __pyx_convert_vector_to_py___pyx_t_double_complex(hafnian::hermite_multidimensional_cpp(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_resolution, __pyx_v_renorm)); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __pyx_r = __pyx_t_11;
   __pyx_t_11 = 0;
@@ -4956,7 +4956,7 @@ static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_s
   /* "hafnian/hafnian.pyx":370
  * # Batch hafnian
  * 
- * def batchhafnian(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
  *     cdef int i, j, n = A.shape[0]
  *     cdef vector[double complex] R_mat, y_mat
  */
@@ -4964,7 +4964,7 @@ static PyObject *__pyx_pf_6libhaf_18batchhafnian(CYTHON_UNUSED PyObject *__pyx_s
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_AddTraceback("libhaf.batchhafnian", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("libhaf.hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_A, 1);
@@ -18557,7 +18557,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_approx, __pyx_k_approx, sizeof(__pyx_k_approx), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
-  {&__pyx_n_s_batchhafnian, __pyx_k_batchhafnian, sizeof(__pyx_k_batchhafnian), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
@@ -18583,6 +18582,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_haf_rpt_complex, __pyx_k_haf_rpt_complex, sizeof(__pyx_k_haf_rpt_complex), 0, 0, 1, 1},
   {&__pyx_n_s_haf_rpt_real, __pyx_k_haf_rpt_real, sizeof(__pyx_k_haf_rpt_real), 0, 0, 1, 1},
   {&__pyx_kp_s_hafnian_hafnian_pyx, __pyx_k_hafnian_hafnian_pyx, sizeof(__pyx_k_hafnian_hafnian_pyx), 0, 0, 1, 0},
+  {&__pyx_n_s_hermite_multidimensional, __pyx_k_hermite_multidimensional, sizeof(__pyx_k_hermite_multidimensional), 0, 0, 1, 1},
   {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
@@ -18971,14 +18971,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "hafnian/hafnian.pyx":370
  * # Batch hafnian
  * 
- * def batchhafnian(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
  *     cdef int i, j, n = A.shape[0]
  *     cdef vector[double complex] R_mat, y_mat
  */
   __pyx_tuple__39 = PyTuple_Pack(10, __pyx_n_s_A, __pyx_n_s_d, __pyx_n_s_resolution, __pyx_n_s_ren, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_renorm); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_batchhafnian, 370, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 370, __pyx_L1_error)
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_hafnian_hafnian_pyx, __pyx_n_s_hermite_multidimensional, 370, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 370, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -19497,13 +19497,13 @@ if (!__Pyx_RefNanny) {
   /* "hafnian/hafnian.pyx":370
  * # Batch hafnian
  * 
- * def batchhafnian(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False):             # <<<<<<<<<<<<<<
  *     cdef int i, j, n = A.shape[0]
  *     cdef vector[double complex] R_mat, y_mat
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_19batchhafnian, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6libhaf_19hermite_multidimensional, NULL, __pyx_n_s_libhaf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_batchhafnian, __pyx_t_1) < 0) __PYX_ERR(0, 370, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "hafnian/hafnian.pyx":1
