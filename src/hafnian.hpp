@@ -19,7 +19,7 @@
 #include <hafnian_approx.hpp>
 #include <torontonian.hpp>
 #include <permanent.hpp>
-#include <batchhafnian.hpp>
+#include <hermite_multidimensional.hpp>
 
 /**
  * @namespace hafnian

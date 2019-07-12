@@ -112,7 +112,7 @@ if BUILD_EXT:
                          "src/hafnian_approx.hpp",
                          "src/torontonian.hpp",
                          "src/permanent.hpp",
-                         "src/batchhafnian.hpp",
+                         "src/hermite_multidimensional.hpp",
                          "src/stdafx.h",
                          "src/fsum.hpp"],
                 include_dirs=C_INCLUDE_PATH,
