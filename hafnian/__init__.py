@@ -82,12 +82,11 @@ from ._hafnian import (
     hafnian,
     hafnian_repeated,
     reduction,
-    batchhafnian,
-    hermite_multidimensional,
 )
 from ._permanent import perm, perm_complex, perm_real, permanent_repeated
 from ._torontonian import tor
 from ._version import __version__
+from ._hermite_multidimensional import density_matrix, hermite_multidimensional
 
 
 __all__ = [

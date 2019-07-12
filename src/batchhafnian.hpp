@@ -103,7 +103,7 @@ namespace hafnian {
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution, int &renorm) {
+inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution, int &renorm) {
     int dim = std::sqrt(static_cast<double>(R_mat.size()));
 
     namespace eg = Eigen;
@@ -206,7 +206,7 @@ std::vector<std::complex<double>> hermite_multidimensional_all(std::vector<doubl
     std::vector<std::complex<double>> R_matq(R_mat.begin(), R_mat.end());
     std::vector<std::complex<double>> y_matq(y_mat.begin(), y_mat.end());
 
-    return hermite_multidimensional(R_matq, y_matq, resolution, renorm);
+    return hermite_multidimensional_cpp(R_matq, y_matq, resolution, renorm);
 }
 
 

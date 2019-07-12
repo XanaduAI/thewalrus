@@ -1274,7 +1274,7 @@ TEST(BatchHafnian, CompleteGraph) {
     int res = 4;
     int renorm = 0;
 
-    out = hafnian::hermite_multidimensional(mat4, d4, res, renorm);
+    out = hafnian::hermite_multidimensional_cpp(mat4, d4, res, renorm);
 
     for (int i = 0; i < 256; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
@@ -1301,7 +1301,7 @@ TEST(BatchHafnian, UnitRenormalization) {
     for (int i = 0; i < res; i++)
         expected_re[i*res+i] = pow(0.5, static_cast<double>(i)/2.0);
 
-    out = hafnian::hermite_multidimensional(B, d, res, renorm);
+    out = hafnian::hermite_multidimensional_cpp(B, d, res, renorm);
 
     for (int i = 0; i < res*res; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
