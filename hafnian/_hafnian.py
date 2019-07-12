@@ -19,7 +19,7 @@ import numpy as np
 from .lib.libhaf import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
 
 
-def input_validation(A, tol=1e-12):
+def input_validation(A, tol=1e-12, check_symmetry = True):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
 
     These include:
@@ -49,8 +49,9 @@ def input_validation(A, tol=1e-12):
     if np.isnan(A).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
-    if np.linalg.norm(A - A.T) >= tol:
-        raise ValueError("Input matrix must be symmetric.")
+    if check_symmetry:
+        if np.linalg.norm(A - A.T) >= tol:
+            raise ValueError("Input matrix must be symmetric.")
 
     return True
 
