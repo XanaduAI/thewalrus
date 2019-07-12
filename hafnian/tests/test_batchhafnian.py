@@ -15,10 +15,10 @@
 import pytest
 
 import numpy as np
-from hafnian import batchhafnian, hermite_multidimensional
+from hafnian import hermite_multidimensional, density_matrix
 
 
-def test_batchhafnian():
+def test_hermite_multidimensional():
     """ This tests the batchhafnian wrapper function to compute photon number statistics for a given gaussian state.
 	"""
 
@@ -294,12 +294,12 @@ def test_batchhafnian():
         ]
     )
 
-    hafs = hermite_multidimensional(mat, d, 4, renorm=False)
+    hafs = density_matrix(mat, d, 4, renorm=False)
 
     assert np.allclose(hafs, expected)
 
 
-def test_batchhafnian_renorm():
+def test_hermite_multidimensional_renorm():
     """ This tests the renomalized batchhafnian wrapper function to compute photon number statistics for a given gaussian state.
 	"""
 
@@ -313,7 +313,7 @@ def test_batchhafnian_renorm():
 
     expected = np.diag(0.5 ** (np.arange(0, res) / 2))
 
-    array = batchhafnian(-B, d, res, ren=True)
+    array = hermite_multidimensional(-B, d, res, renorm=True)
 
     tensor = np.reshape(array, shape)
 
