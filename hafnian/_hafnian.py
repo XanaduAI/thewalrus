@@ -245,8 +245,8 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
 
 
 def hermite_multidimensional(A, d, resolution, renorm=False):
-    r"""Returns photon number statistics of a Gaussian state for a given covariance matrix `A`. 
-    
+    r"""Returns photon number statistics of a Gaussian state for a given covariance matrix `A`.
+
 
     Args:
         A (array): a square, symmetric :math:`N\times N` array.
