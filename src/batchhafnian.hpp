@@ -35,15 +35,59 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
-long double factorial(int nn)
+std::vector<int> find_rep(int val, int base, int n) {
+    std::vector<int> x(n, 0);
+    int local_val = val;
+
+    x[0] = 1;
+
+    for (int i = 1; i < n; i++)
+        x[i] = x[i-1]*base;
+
+    std::vector<int> digits(n, 0);
+
+    for (int i = 0; i < n; i++) {
+        digits[i] = local_val/x[n-i-1];
+        local_val = local_val - digits[i] * x[n-i-1];
+    }
+
+    return digits;
+
+}
+
+
+long double sqrtfactorial(int nn)
 {
     long double n = static_cast<long double>(nn);
 
     if(n > 1)
-        return n * factorial(n - 1);
+        return std::sqrt(n) * sqrtfactorial(n - 1);
     else
         return 1;
 }
+
+template <typename T>
+inline std::vector<T> renormalization(std::vector<T> tn, int nmodes, int res) {
+    std::vector<long double> invsqfacts(res, 0);
+    std::vector<int> digits(nmodes, 0);
+
+    ullint Hdim = pow(res, nmodes);
+
+    for (int i = 0; i < res; i++)
+        invsqfacts[i] = sqrtfactorial(i);
+
+    for (ullint i = 0; i < Hdim; i++) {
+        digits = find_rep(i, res, nmodes);
+        long double pref = 1;
+        for (int j = 0; j < nmodes; j++)
+            pref *= 1.0L/invsqfacts[digits[j]];
+        tn[i] = tn[i]*static_cast<double>(pref);
+    }
+
+    return tn;
+
+}
+
 
 
 namespace hafnian {
@@ -79,9 +123,6 @@ inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vecto
     std::vector<int> ek(dim, 0);
     std::vector<double> factors(resolution+1, 0);
     int jump = 0;
-
-    for (int i = 0; i <=resolution; i++)
-        factors[i] = std::sqrt(static_cast<double>(factorial(i)));
 
 
     for (ullint jj = 0; jj < Hdim-1; jj++) {
@@ -138,18 +179,10 @@ inline std::vector<T> hermite_multidimensional(std::vector<T> &R_mat, std::vecto
             }
         }
 
-        // Computation of the renormalization factor
-        double tmp = 1;
-        for (int ii = 0; ii < dim; ii++)
-            tmp *= factors[nextPos[ii]];
-
-        ren_factor[nextCoordinate] = tmp;
-
     }
 
     if (renorm) {
-        for (ullint jj = 0; jj < Hdim; jj++)
-            H[jj] = H[jj]/ren_factor[jj];
+        H = renormalization(H, dim, resolution);
     }
 
     return H;

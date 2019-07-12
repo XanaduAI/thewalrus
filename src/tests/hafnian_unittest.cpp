@@ -1282,4 +1282,32 @@ TEST(BatchHafnian, CompleteGraph) {
     }
 
 }
+
+
+
+TEST(BatchHafnian, UnitRenormalization) {
+    std::vector<std::complex<double>> B = {std::complex<double>(0, 0), std::complex<double>(-0.70710678, 0), std::complex<double>(-0.70710678, 0), std::complex<double>(0, 0)};
+    std::vector<std::complex<double>> d(4, std::complex<double>(0.0, 0.0));
+
+    int res = 10;
+
+    std::vector<double> expected_re(res*res, 0);
+    std::vector<double> expected_im(res*res, 0);
+
+    std::vector<std::complex<double>> out(res*res, 0.0);
+
+    int renorm = 1;
+
+    for (int i = 0; i < res; i++)
+        expected_re[i*res+i] = pow(0.5, static_cast<double>(i)/2.0);
+
+    out = hafnian::hermite_multidimensional(B, d, res, renorm);
+
+    for (int i = 0; i < res*res; i++) {
+        EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
+        EXPECT_NEAR(expected_im[i], std::imag(out[i]), tol2);
+    }
+
+}
+
 }

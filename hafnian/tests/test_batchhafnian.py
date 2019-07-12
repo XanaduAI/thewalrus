@@ -297,3 +297,24 @@ def test_batchhafnian():
     hafs = hermite_multidimensional(mat, d, 4, renorm=False)
 
     assert np.allclose(hafs, expected)
+
+
+def test_batchhafnian_renorm():
+    """ This tests the renomalized batchhafnian wrapper function to compute photon number statistics for a given gaussian state.
+	"""
+
+    B = np.sqrt(0.5) * np.array([[0, 1], [1, 0]]) + 0 * 1j
+    res = 10
+    n_modes, _ = B.shape
+
+    d = np.zeros(n_modes, dtype=complex)
+
+    shape = res * np.ones(n_modes, dtype=int)
+
+    expected = np.diag(0.5 ** (np.arange(0, res) / 2))
+
+    array = batchhafnian(-B, d, res, ren=True)
+
+    tensor = np.reshape(array, shape)
+
+    assert np.allclose(tensor, expected)
