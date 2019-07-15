@@ -372,8 +372,7 @@ def test_coherent_squeezed():
          [0.07862323 + 0.00868528j, 0.01274241 + 0.00614023j, -0.02127257 - 0.00122123j, -0.00624626 - 0.00288134j, 0.00702606]]
     )
     # fmt:on
-    print(res.real)
-    print(expected)
+
     assert np.allclose(res, expected)
 
 

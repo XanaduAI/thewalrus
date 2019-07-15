@@ -89,7 +89,7 @@ from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
-from ._hermite_multidimensional import hafnian_batched
+from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
 
 np.set_printoptions(linewidth=200)
 
@@ -315,7 +315,6 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         complex: the density matrix element
     """
     rpt = i + j
-    print("from density_matrix_element",cov.shape)
     beta = Beta(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     if np.linalg.norm(beta) < tol:
@@ -329,8 +328,6 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         # replace the diagonal of A with gamma
         # gamma = X @ np.linalg.inv(Q).conj() @ beta
         gamma = beta.conj() - A @ beta
-        print(A)
-        print(gamma)
         if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
             A_rpt = reduction(A, rpt)
             np.fill_diagonal(A_rpt, reduction(gamma, rpt))
@@ -373,40 +370,53 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         np.array[complex]: the density matrix of the Gaussian state
     """
     N = len(mu) // 2
+    pref = prefactor(mu, cov, hbar=hbar)
+
+    if post_select is None:
+        print("hello")
+
+        A = Amat(cov, hbar=hbar)
+        if np.allclose(mu, np.zeros_like(mu)):
+            return pref*hermite_multidimensional(-A, cutoff, renorm = True)
+        try:
+            y = np.linalg.inv(A)@np.linalg.inv(Qmat(cov))@Beta(mu, hbar = hbar)
+            return pref*hermite_multidimensional(-A, cutoff, y=-y, renorm = True)
+        except np.linalg.LinAlgError:
+            pass
+        post_select = {}
     if post_select is None:
         #A, beta = argument(cov/hbar, mu/np.sqrt(hbar))
-        beta = Beta(mu, hbar=hbar)
+        #beta = Beta(mu, hbar=hbar)
         #print(beta.shape)
-        A = Amat(cov, hbar=hbar)
-        gamma = beta.conj() - A @ beta
-        print(A)
-        print(gamma)
+        #A = Amat(cov, hbar=hbar)
+        #gamma = beta.conj() - A @ beta
+        #print(A)
+        #print(gamma)
         #Q = Qmat(cov)
         #gamma = np.conj(np.linalg.inv(Q)) @ beta
         #print(gamma)
-        rho = hafnian_batched(A, cutoff, mu = gamma, renorm=True)
-        post_select = {}
-    else:
-        M = N - len(post_select)
-        rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
+        #rho = hafnian_batched(A, cutoff, mu = gamma, renorm=True)
 
-        for idx in product(range(cutoff), repeat=2 * M):
-            el = []
+    M = N - len(post_select)
+    rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
 
-            counter = count(0)
-            modes = (np.arange(2 * N) % N).tolist()
-            el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
+    for idx in product(range(cutoff), repeat=2 * M):
+        el = []
 
-            el = np.array(el).reshape(2, -1)
-            el0 = el[0].tolist()
-            el1 = el[1].tolist()
+        counter = count(0)
+        modes = (np.arange(2 * N) % N).tolist()
+        el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
 
-            sf_idx = np.array(idx).reshape(2, -1)
-            sf_el = tuple(sf_idx[::-1].T.flatten())
+        el = np.array(el).reshape(2, -1)
+        el0 = el[0].tolist()
+        el1 = el[1].tolist()
 
-            rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
+        sf_idx = np.array(idx).reshape(2, -1)
+        sf_el = tuple(sf_idx[::-1].T.flatten())
 
-    rho *= prefactor(mu, cov, hbar=hbar)
+        rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
+
+    rho *= pref
 
     if normalize:
         # construct the standard 2D density matrix, and take the trace

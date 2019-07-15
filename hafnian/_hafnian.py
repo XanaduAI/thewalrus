@@ -19,7 +19,7 @@ import numpy as np
 from .lib.libhaf import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
 
 
-def input_validation(A, tol=1e-12, check_symmetry = True):
+def input_validation(A, tol=1e-12, check_symmetry=True):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
 
     These include:
@@ -245,6 +245,3 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
-
-
-
