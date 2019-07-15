@@ -22,7 +22,7 @@ from ._hafnian import input_validation
 
 
 def return_prod(C, index):
-    """ Given a square array C_{i,j} and an array or list of indices index = [i_1,i_2,i_3,...,i_n] it returns :math:`prod_{k=1}^n C_{1,i_1}`.
+    """ Given an array C_{i,j} and an array or list of indices index = [i_1,i_2,i_3,...,i_n] it returns :math:`prod_{k=1}^n C_{1,i_1}`.
     Args:
         C (array): An array
         index (array): A set of indices

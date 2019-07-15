@@ -91,7 +91,6 @@ from scipy.special import factorial as fac
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
 
-np.set_printoptions(linewidth=200)
 
 
 def reduced_gaussian(mu, cov, modes):
