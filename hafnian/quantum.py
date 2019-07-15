@@ -89,6 +89,10 @@ from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
+from ._hermite_multidimensional import hafnian_batched
+
+np.set_printoptions(linewidth=200)
+
 
 
 def reduced_gaussian(mu, cov, modes):
@@ -311,7 +315,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         complex: the density matrix element
     """
     rpt = i + j
-
+    print("from density_matrix_element",cov.shape)
     beta = Beta(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     if np.linalg.norm(beta) < tol:
@@ -325,7 +329,8 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         # replace the diagonal of A with gamma
         # gamma = X @ np.linalg.inv(Q).conj() @ beta
         gamma = beta.conj() - A @ beta
-
+        print(A)
+        print(gamma)
         if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
             A_rpt = reduction(A, rpt)
             np.fill_diagonal(A_rpt, reduction(gamma, rpt))
@@ -338,6 +343,79 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
 
     return haf / np.sqrt(np.prod(fac(rpt)))
 
+
+def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2):
+    r"""Returns the density matrix of a (PNR post-selected) Gaussian state.
+
+    The resulting density matrix will have shape
+
+    .. math:: \underbrace{D\times D \times \cdots \times D}_{2M}
+
+    where :math:`D` is the Fock space cutoff, and :math:`M` is the
+    number of *non* post-selected modes, i.e. ``M = len(mu)//2 - len(post_select)``.
+
+    Note that we use the Strawberry Fields convention for indexing the density
+    matrix; the first two dimensions correspond to subsystem 1, the second two
+    dimensions correspond to subsystem 2, etc.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
+        post_select (dict): dictionary containing the post-selected modes, of
+            the form ``{mode: value}``.
+        normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
+        cutoff (dim): the final length (i.e., Hilbert space dimension) of each
+            mode in the density matrix.
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+
+    Returns:
+        np.array[complex]: the density matrix of the Gaussian state
+    """
+    N = len(mu) // 2
+    if post_select is None:
+        #A, beta = argument(cov/hbar, mu/np.sqrt(hbar))
+        beta = Beta(mu, hbar=hbar)
+        #print(beta.shape)
+        A = Amat(cov, hbar=hbar)
+        gamma = beta.conj() - A @ beta
+        print(A)
+        print(gamma)
+        #Q = Qmat(cov)
+        #gamma = np.conj(np.linalg.inv(Q)) @ beta
+        #print(gamma)
+        rho = hafnian_batched(A, cutoff, mu = gamma, renorm=True)
+        post_select = {}
+    else:
+        M = N - len(post_select)
+        rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
+
+        for idx in product(range(cutoff), repeat=2 * M):
+            el = []
+
+            counter = count(0)
+            modes = (np.arange(2 * N) % N).tolist()
+            el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
+
+            el = np.array(el).reshape(2, -1)
+            el0 = el[0].tolist()
+            el1 = el[1].tolist()
+
+            sf_idx = np.array(idx).reshape(2, -1)
+            sf_el = tuple(sf_idx[::-1].T.flatten())
+
+            rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
+
+    rho *= prefactor(mu, cov, hbar=hbar)
+
+    if normalize:
+        # construct the standard 2D density matrix, and take the trace
+        new_ax = np.arange(2 * M).reshape([M, 2]).T.flatten()
+        tr = np.trace(rho.transpose(new_ax).reshape([cutoff ** M, cutoff ** M])).real
+        # renormalize
+        rho /= tr
+
+    return rho
 
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
     r"""Returns the :math:`\langle i | \psi\rangle` element of the state ket
@@ -428,30 +506,34 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
-    if post_select is None:
-        post_select = {}
+
 
     beta = Beta(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
+    Q = Qmat(cov, hbar=hbar)
 
     (n, _) = cov.shape
     N = n // 2
 
     B = A[0:N, 0:N]
     alpha = beta[0:N]
-    M = N - len(post_select)
-    psi = np.zeros([cutoff] * (M), dtype=np.complex128)
-
-    for idx in product(range(cutoff), repeat=M):
-        el = []
-
-        counter = count(0)
-        modes = (np.arange(N)).tolist()
-        el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
-        psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
-
     pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
-    psi = psi * pref
+
+    if post_select is None:
+        psi =  pref*hafnian_batched(B, cutoff, mu = alpha, renorm=True)/np.sqrt(np.sqrt(np.linalg.det(Q).real))
+    else:
+        M = N - len(post_select)
+        psi = np.zeros([cutoff] * (M), dtype=np.complex128)
+
+        for idx in product(range(cutoff), repeat=M):
+            el = []
+
+            counter = count(0)
+            modes = (np.arange(N)).tolist()
+            el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
+            psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
+
+        psi = psi * pref
 
     if normalize:
         norm = np.sqrt(np.sum(np.abs(psi) ** 2))
@@ -460,68 +542,6 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     return psi
 
 
-def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2):
-    r"""Returns the density matrix of a (PNR post-selected) Gaussian state.
-
-    The resulting density matrix will have shape
-
-    .. math:: \underbrace{D\times D \times \cdots \times D}_{2M}
-
-    where :math:`D` is the Fock space cutoff, and :math:`M` is the
-    number of *non* post-selected modes, i.e. ``M = len(mu)//2 - len(post_select)``.
-
-    Note that we use the Strawberry Fields convention for indexing the density
-    matrix; the first two dimensions correspond to subsystem 1, the second two
-    dimensions correspond to subsystem 2, etc.
-
-    Args:
-        mu (array): length-:math:`2N` means vector in xp-ordering
-        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
-        post_select (dict): dictionary containing the post-selected modes, of
-            the form ``{mode: value}``.
-        normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
-        cutoff (dim): the final length (i.e., Hilbert space dimension) of each
-            mode in the density matrix.
-        hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
-
-    Returns:
-        np.array[complex]: the density matrix of the Gaussian state
-    """
-    if post_select is None:
-        post_select = {}
-
-    N = len(mu) // 2
-    M = N - len(post_select)
-
-    rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
-
-    for idx in product(range(cutoff), repeat=2 * M):
-        el = []
-
-        counter = count(0)
-        modes = (np.arange(2 * N) % N).tolist()
-        el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
-
-        el = np.array(el).reshape(2, -1)
-        el0 = el[0].tolist()
-        el1 = el[1].tolist()
-
-        sf_idx = np.array(idx).reshape(2, -1)
-        sf_el = tuple(sf_idx[::-1].T.flatten())
-
-        rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
-
-    rho *= prefactor(mu, cov, hbar=hbar)
-
-    if normalize:
-        # construct the standard 2D density matrix, and take the trace
-        new_ax = np.arange(2 * M).reshape([M, 2]).T.flatten()
-        tr = np.trace(rho.transpose(new_ax).reshape([cutoff ** M, cutoff ** M])).real
-        # renormalize
-        rho /= tr
-
-    return rho
 
 
 def find_scaling_adjacency_matrix(A, n_mean):

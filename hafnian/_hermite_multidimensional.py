@@ -15,12 +15,23 @@
 Hafnian Python interface
 """
 import numpy as np
+from itertools import product
 
 from .lib.libhaf import hermite_multidimensional as hm
 from ._hafnian import input_validation
 
+def return_prod(prim, index):
+    return np.prod([prim[mode,val] for mode,val in enumerate(index)])
 
-def density_matrix(A, d, resolution, renorm=False):
+def expansion_coeff(alpha, resolution):
+    vals = np.empty([resolution], dtype = type(alpha))
+    vals[0] = 1.0
+    for i in range(1,resolution):
+        vals[i] = vals[i-1]*alpha/np.sqrt(i)
+    return vals
+
+
+def density_matrix(A, d, resolution, renorm=True):
     r"""Returns photon number statistics of a Gaussian state for a given covariance matrix `A`.
 
 
@@ -141,10 +152,25 @@ def hafnian_batched(A, resolution, mu=None, tol=1e-12, renorm=False, make_tensor
     """
     # pylint: disable=too-many-return-statements,too-many-branches
     input_validation(A, tol=tol)
-
+    n, _ = A.shape
     if mu is not None:
         y = -mu
     else:
         y = None
-    return hermite_multidimensional(-A, resolution, y=y, renorm=renorm, make_tensor=make_tensor)
-    # Note the minus signs in the arguments. Those are intentional
+    if not np.allclose(A, np.zeros([n,n])):
+        return hermite_multidimensional(-A, resolution, y=y, renorm=renorm, make_tensor=make_tensor)
+        # Note the minus signs in the arguments. Those are intentional
+    else:
+        if mu is None:
+            tensor = np.zeros([esolution**n],dtype=complex)
+            tensor[0] = 1.0
+        else:
+            vecs = [expansion_coeff(alpha, resolution) for alpha in mu]
+            index = resolution*np.ones([n],dtype = int)
+            tensor = np.empty(index, dtype = complex)
+            prim = np.array([expansion_coeff(alpha,resolution) for alpha in mu])
+            for i in product(range(resolution),repeat=n):
+                tensor[i] = return_prod(prim,i)
+        if make_tensor:
+            return tensor
+        return tensor.flatten()
