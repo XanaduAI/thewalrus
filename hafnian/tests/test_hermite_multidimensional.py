@@ -66,7 +66,7 @@ def test_hafnian_batched():
     n_modes = 4
     A = np.random.rand(n_modes, n_modes) + 1j * np.random.rand(n_modes, n_modes)
     A += A.T
-    n_photon = 10
+    n_photon = 5
     v1 = np.array([hafnian_repeated(A, q) for q in product(np.arange(n_photon), repeat=n_modes)])
     assert np.allclose(hafnian_batched(A, n_photon, make_tensor=False), v1)
 
@@ -79,7 +79,7 @@ def test_hafnian_batched_loops():
     A = np.random.rand(n_modes, n_modes) + 1j * np.random.rand(n_modes, n_modes)
     A += A.T
     mu = np.random.rand(n_modes) + 1j * np.random.rand(n_modes)
-    n_photon = 10
+    n_photon = 5
     v1 = np.array(
         [
             hafnian_repeated(A, q, mu=mu, loop=True)
@@ -87,5 +87,40 @@ def test_hafnian_batched_loops():
         ]
     )
     expected = hafnian_batched(A, n_photon, mu=mu, make_tensor=False)
+
+    assert np.allclose(expected, v1)
+
+
+def test_hafnian_batched_loops_no_edges():
+    """Test hafnian_batched with loops against hafnian_repeated with loops for a random symmetric matrix
+    and a random vector of loops
+    """
+    n_modes = 4
+    A = np.zeros([n_modes, n_modes], dtype=complex)
+    mu = np.random.rand(n_modes) + 1j * np.random.rand(n_modes)
+    n_photon = 5
+    v1 = np.array(
+        [
+            hafnian_repeated(A, q, mu=mu, loop=True)
+            for q in product(np.arange(n_photon), repeat=n_modes)
+        ]
+    )
+    expected = hafnian_batched(A, n_photon, mu=mu, make_tensor=False)
+
+    assert np.allclose(expected, v1)
+
+
+def test_hafnian_batched_zero_loops_no_edges():
+    """Test hafnian_batched with loops against hafnian_repeated with loops for a the zero matrix
+    and a loops 
+    """
+    n_modes = 4
+    A = np.zeros([n_modes, n_modes], dtype=complex)
+    mu = np.zeros([n_modes], dtype=complex)
+    n_photon = 5
+    v1 = np.array(
+        [hafnian_repeated(A, q, loop=True) for q in product(np.arange(n_photon), repeat=n_modes)]
+    )
+    expected = hafnian_batched(A, n_photon, make_tensor=False)
 
     assert np.allclose(expected, v1)

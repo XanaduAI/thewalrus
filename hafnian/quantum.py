@@ -94,7 +94,6 @@ from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
 np.set_printoptions(linewidth=200)
 
 
-
 def reduced_gaussian(mu, cov, modes):
     r""" Returns the vector of means and the covariance matrix of the specified modes.
 
@@ -359,7 +358,9 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         mu (array): length-:math:`2N` means vector in xp-ordering
         cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
         post_select (dict): dictionary containing the post-selected modes, of
-            the form ``{mode: value}``.
+            the form ``{mode: value}``. If post_select is None the whole non post-selected density matrix
+            is calculated directly using (multidimensional) Hermite polynomials, which is significantly faster
+            than calculating one hafnian at a time.
         normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
         cutoff (dim): the final length (i.e., Hilbert space dimension) of each
             mode in the density matrix.
@@ -373,29 +374,15 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     pref = prefactor(mu, cov, hbar=hbar)
 
     if post_select is None:
-        print("hello")
-
         A = Amat(cov, hbar=hbar)
         if np.allclose(mu, np.zeros_like(mu)):
-            return pref*hermite_multidimensional(-A, cutoff, renorm = True)
+            return pref * hermite_multidimensional(-A, cutoff, renorm=True)
         try:
-            y = np.linalg.inv(A)@np.linalg.inv(Qmat(cov))@Beta(mu, hbar = hbar)
-            return pref*hermite_multidimensional(-A, cutoff, y=-y, renorm = True)
+            y = np.linalg.inv(A) @ np.linalg.inv(Qmat(cov)) @ Beta(mu, hbar=hbar)
+            return pref * hermite_multidimensional(-A, cutoff, y=-y, renorm=True)
         except np.linalg.LinAlgError:
             pass
         post_select = {}
-    if post_select is None:
-        #A, beta = argument(cov/hbar, mu/np.sqrt(hbar))
-        #beta = Beta(mu, hbar=hbar)
-        #print(beta.shape)
-        #A = Amat(cov, hbar=hbar)
-        #gamma = beta.conj() - A @ beta
-        #print(A)
-        #print(gamma)
-        #Q = Qmat(cov)
-        #gamma = np.conj(np.linalg.inv(Q)) @ beta
-        #print(gamma)
-        #rho = hafnian_batched(A, cutoff, mu = gamma, renorm=True)
 
     M = N - len(post_select)
     rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
@@ -426,6 +413,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         rho /= tr
 
     return rho
+
 
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
     r"""Returns the :math:`\langle i | \psi\rangle` element of the state ket
@@ -516,8 +504,6 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
-
-
     beta = Beta(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     Q = Qmat(cov, hbar=hbar)
@@ -530,7 +516,11 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
 
     if post_select is None:
-        psi =  pref*hafnian_batched(B, cutoff, mu = alpha, renorm=True)/np.sqrt(np.sqrt(np.linalg.det(Q).real))
+        psi = (
+            pref
+            * hafnian_batched(B, cutoff, mu=alpha, renorm=True)
+            / np.sqrt(np.sqrt(np.linalg.det(Q).real))
+        )
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
@@ -541,7 +531,9 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
             counter = count(0)
             modes = (np.arange(N)).tolist()
             el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
-            psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
+            psi[idx] = pure_state_amplitude(
+                mu, cov, el, check_purity=False, include_prefactor=False
+            )
 
         psi = psi * pref
 
@@ -550,8 +542,6 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         psi = psi / norm
 
     return psi
-
-
 
 
 def find_scaling_adjacency_matrix(A, n_mean):
