@@ -66,6 +66,17 @@ long double sqrtfactorial(int nn)
         return 1;
 }
 
+/**
+ * Renormalizes and unnormalized photon number statistics of a Gaussian state.
+ * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
+ *
+ * @param tn unnormalized flattened vector of size \f$res**nmodes$ representing unnormalized photon number statistics
+ *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
+ * @param nmodes number of modes
+ * @param res highest number of photons to be resolved.
+ *
+ * $return Renormalized photon number statistics
+ */
 template <typename T>
 inline std::vector<T> renormalization(std::vector<T> tn, int nmodes, int res) {
     std::vector<long double> invsqfacts(res, 0);
@@ -189,25 +200,6 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
 
 }
 
-
-
-/**
- * A wrapper around the templated function hafnian::mode_elem. Returns photon number
- * statistics of a Gaussian state for a given covariance matrix `mat`. Based in the
- * MATLAB code available at: https://github.com/clementsw/gaussian-optics
- *
- * @param mat a flattened vector of size \f$2n^2\f$, representing an
- *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
- * @param d a flattened vector of size \f$2n\f$, representing the first order moments.
- * @param resolution highest number of photons to be resolved.
- *
- */
-std::vector<std::complex<double>> hermite_multidimensional_all(std::vector<double> &R_mat, std::vector<double> &y_mat, int &resolution, int &renorm) {
-    std::vector<std::complex<double>> R_matq(R_mat.begin(), R_mat.end());
-    std::vector<std::complex<double>> y_matq(y_mat.begin(), y_mat.end());
-
-    return hermite_multidimensional_cpp(R_matq, y_matq, resolution, renorm);
-}
 
 
 }

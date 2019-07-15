@@ -66,13 +66,6 @@ import platform
 
 import numpy as np
 
-
-if platform.system() == "Windows":  # pragma: no cover
-    extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
-    if os.path.isdir(extra_dll_dir):
-        os.environ["PATH"] += os.pathsep + extra_dll_dir
-
-
 from ._hafnian import (
     haf_complex,
     haf_int,
@@ -83,10 +76,15 @@ from ._hafnian import (
     hafnian_repeated,
     reduction,
 )
+from ._hermite_multidimensional import density_matrix, hafnian_batched, hermite_multidimensional
 from ._permanent import perm, perm_complex, perm_real, permanent_repeated
 from ._torontonian import tor
 from ._version import __version__
-from ._hermite_multidimensional import density_matrix, hermite_multidimensional, hafnian_batched
+
+if platform.system() == "Windows":  # pragma: no cover
+    extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
+    if os.path.isdir(extra_dll_dir):
+        os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 
 __all__ = [
