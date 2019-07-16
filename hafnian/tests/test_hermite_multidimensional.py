@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the batch hafnian wrapper function"""
-# pylint: disable=no-self-use,redefined-outer-name
-from itertools import product
+# pylint: disable=no-self-use,redefined-outer-name,unused-import
 import pytest
+
+from itertools import product
 import numpy as np
 
 from scipy.special import eval_hermitenorm, eval_hermite
@@ -27,7 +28,6 @@ def test_hermite_multidimensional_renorm():
 	"""
     B = np.sqrt(0.5) * np.array([[0, 1], [1, 0]]) + 0 * 1j
     res = 10
-    n_modes, _ = B.shape
     expected = np.diag(0.5 ** (np.arange(0, res) / 2))
     array = hermite_multidimensional(-B, res, renorm=True)
 
