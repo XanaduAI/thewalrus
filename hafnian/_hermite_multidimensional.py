@@ -35,7 +35,8 @@ def return_prod(C, index):
 
 def expansion_coeff(alpha, resolution, renorm=True):
     """
-    Returns the (quasi) geometric series as a vector with components alpha^i/sqrt(i!) for 0 <= i < resolution.
+    Returns the (quasi) geometric series as a vector with components :math:`alpha^i/sqrt(i!)` for :math:`0 \leq i < resolution`.
+    
     If renorm is false it omits the division by factorials
     Args:
         alpha (complex): Ratio of the geometric series
