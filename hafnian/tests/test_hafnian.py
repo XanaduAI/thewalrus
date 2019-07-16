@@ -27,8 +27,8 @@ from hafnian.lib.libhaf import haf_complex, haf_real, haf_int
 T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
 
 
-class TestKroneckerReduce:
-    """Tests for the kronecker reduce function"""
+class TestReduction:
+    """Tests for the reduction function"""
 
     @pytest.mark.parametrize("n", [6, 8])
     def test_reduction(self, n):

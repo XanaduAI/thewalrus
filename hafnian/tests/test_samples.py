@@ -97,7 +97,7 @@ class TestHafnianSampling:
 
         n_cut = 10
         samples = hafnian_sample_state(sigma, samples=n_samples, cutoff=n_cut)
-        bins = np.arange(0, max(samples), 1)
+        bins = np.arange(0, max(samples) + 1, 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
         nm = max(samples) // 2
@@ -108,7 +108,9 @@ class TestHafnianSampling:
         rel_freq = freq[0:-1] / n_samples
         x2 = x2[0 : len(rel_freq)]
 
-        assert np.all(np.abs(x2 - rel_freq) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_two_mode_squeezed_state_hafnian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -126,16 +128,19 @@ class TestHafnianSampling:
         assert np.all(samples[:, 0] == samples[:, 1])
 
         samples1d = samples[:, 0]
-        bins = np.arange(0, max(samples1d), 1)
+        bins = np.arange(0, max(samples1d) + 1, 1)
+
         (freq, _) = np.histogram(samples1d, bins=bins)
         rel_freq = freq / n_samples
 
         probs = (1.0 / (1.0 + mean_n)) * (mean_n / (1.0 + mean_n)) ** bins[0:-1]
         probs[-1] = 1.0 - np.sum(
             probs[0:-1]
-        )  # Coarse grain all the probabilities past the threhold
+        )  # Coarse grain all the probabilities past the threshold
 
-        assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, probs, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_hafnian_sample_graph(self):
         """Test hafnian sampling from a graph"""
@@ -267,7 +272,9 @@ class TestTorontonianSampling:
 
         x2[0] = 1.0 / np.sqrt(1.0 + mean_n)
         x2[1] = 1.0 - x2[0]
-        assert np.all(np.abs(x2 - rel_freq) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_two_mode_squeezed_state_torontonian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -291,7 +298,12 @@ class TestTorontonianSampling:
         probs = np.empty([2])
         probs[0] = 1.0 / (1.0 + mean_n)
         probs[1] = 1.0 - probs[0]
-        assert np.all(np.abs(rel_freq - probs[0:-1]) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq,
+            probs[0:-1],
+            atol=rel_tol / np.sqrt(n_samples),
+            rtol=rel_tol / np.sqrt(n_samples),
+        )
 
     @pytest.mark.parametrize(
         "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
