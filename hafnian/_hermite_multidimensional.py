@@ -41,7 +41,7 @@ def expansion_coeff(alpha, resolution, renorm=True):
     Args:
         alpha (complex): Ratio of the geometric series
         resoluton (int): Cutoff of the geometric series
-        renor (bool): Decides whether to normalize by the factorials
+        renorm (bool): Decides whether to normalize by the factorials
     Returns:
         array: The power series
     """
