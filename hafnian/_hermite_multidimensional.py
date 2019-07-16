@@ -22,7 +22,7 @@ from ._hafnian import input_validation
 
 
 def return_prod(C, index):
-    """Given an array :math:`C_{i,j}` and an array or list of indices :math:`index = [i_1,i_2,i_3,\dots,i_n] `, returns :math:`prod_{k=1}^n C_{1,i_1}`.
+    r"""Given an array :math:`C_{i,j}` and an array or list of indices :math:`index = [i_1,i_2,i_3,\dots,i_n] `, returns :math:`prod_{k=1}^n C_{1,i_1}`.
 
     Args:
         C (array): An array
@@ -35,8 +35,7 @@ def return_prod(C, index):
 
 
 def expansion_coeff(alpha, resolution, renorm=True):
-    """
-    Returns the (quasi) geometric series as a vector with components :math:`alpha^i/sqrt(i!)` for :math:`0 \leq i < resolution`.
+    r"""Returns the (quasi) geometric series as a vector with components :math:`alpha^i/sqrt(i!)` for :math:`0 \leq i < resolution`.
 
     If renorm is false it omits the division by factorials
 
@@ -60,8 +59,7 @@ def expansion_coeff(alpha, resolution, renorm=True):
 
 
 def hermite_multidimensional(R, resolution, y=None, renorm=False, make_tensor=True):
-    r"""
-    Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`. 
+    r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
     Here :math:`R` is an :math:n \times n: square matrix,
     :math:`y` is an :math:`n` dimensional vector. The polynomials are parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})
@@ -80,7 +78,7 @@ def hermite_multidimensional(R, resolution, y=None, renorm=False, make_tensor=Tr
     Returns:
         (array): The multidimensional Hermite polynomials.
     """
-    input_validation(R, check_symmetry=False)
+    input_validation(R)
     n, _ = R.shape
     if y is None:
         y = np.zeros([n], dtype=complex)
@@ -115,7 +113,7 @@ def hafnian_batched(A, resolution, mu=None, tol=1e-12, renorm=False, make_tensor
     Returns:
         (array): The values of the hafnians.
     """
-    # pylint: disable=too-many-return-statements,too-many-branches
+    # pylint: disable=too-many-return-statements,too-many-branches,too-many-arguments
     input_validation(A, tol=tol)
     n, _ = A.shape
     if not np.allclose(A, np.zeros([n, n])):

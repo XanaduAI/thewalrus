@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the batch hafnian wrapper function"""
-import pytest
-
-import numpy as np
+# pylint: disable=no-self-use,redefined-outer-name
 from itertools import product
+import pytest
+import numpy as np
 
 from scipy.special import eval_hermitenorm, eval_hermite
 
@@ -28,7 +28,6 @@ def test_hermite_multidimensional_renorm():
     B = np.sqrt(0.5) * np.array([[0, 1], [1, 0]]) + 0 * 1j
     res = 10
     n_modes, _ = B.shape
-    shape = res * np.ones(n_modes, dtype=int)
     expected = np.diag(0.5 ** (np.arange(0, res) / 2))
     array = hermite_multidimensional(-B, res, renorm=True)
 
@@ -112,11 +111,10 @@ def test_hafnian_batched_loops_no_edges():
 
 def test_hafnian_batched_zero_loops_no_edges():
     """Test hafnian_batched with loops against hafnian_repeated with loops for a the zero matrix
-    and a loops 
+    and a loops
     """
     n_modes = 4
     A = np.zeros([n_modes, n_modes], dtype=complex)
-    mu = np.zeros([n_modes], dtype=complex)
     n_photon = 5
     v1 = np.array(
         [hafnian_repeated(A, q, loop=True) for q in product(np.arange(n_photon), repeat=n_modes)]
