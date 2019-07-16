@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the batch hafnian wrapper function"""
-# pylint: disable=no-self-use,redefined-outer-name,unused-import
-import pytest
-
+# pylint: disable=no-self-use,redefined-outer-name
 from itertools import product
+
 import numpy as np
 
 from scipy.special import eval_hermitenorm, eval_hermite
