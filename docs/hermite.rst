@@ -3,7 +3,7 @@
 
 .. role:: html(raw)
    :format: html
-.. _gbs:
+.. _hermite:
 
 
 Multidimensional Hermite polynomials
