@@ -259,8 +259,6 @@ class TestHafnianSampling:
 
         A = np.triu(A)
         A = A + np.transpose(A)
-        for i in range(n):
-            A[i, i] = 0
         n_mean = 1.0
         Q = gen_Qmat_from_graph(A, n_mean)
         prob0 = np.abs(1 / (np.sqrt(np.linalg.det(Q))))
