@@ -353,7 +353,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     matrix; the first two dimensions correspond to subsystem 1, the second two
     dimensions correspond to subsystem 2, etc.
     If post_select is None then the density matrix elements are calculated using
-    the multidimensional Hermite polynomials which provide a significantly faster 
+    the multidimensional Hermite polynomials which provide a significantly faster
     evaluation.
 
     Args:
