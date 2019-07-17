@@ -4,18 +4,20 @@ Hafnian
 :Release: |release|
 :Date: |today|
 
-The fastest exact hafnian library.
+The fastest hafnian library.
 
 Features
 ========
 
 * The fastest calculation of the hafnians, loop hafnians, and torontonians of general and certain structured matrices.
 
-* An easy to use interface to use the loop hafnian for quantum state calculations
+* An easy to use interface to use the loop hafnian for Gaussian quantum state calculations
 
-* State of the art algorithms to sample from hafnian and torontonians of graphs.
+* State of the art algorithms to sample from (loop)hafnian and torontonians of graphs.
 
 * Efficient classical methods for approximating the hafnian of non-negative matrices.
+
+* Easy to use implementations of the multidimensional Hermite polynomials, which can also be used to calculate hafnians of all reductions of a given matrix.
 
 Getting started
 ===============
@@ -66,6 +68,7 @@ The hafnian library is **free** and **open source**, released under the Apache L
    hafnian
    loop_hafnian
    algorithms
+   hermite
    gbs
    gbs_sampling
    notation

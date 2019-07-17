@@ -100,14 +100,14 @@ def hafnian_batched(A, resolution, mu=None, tol=1e-12, renorm=False, make_tensor
     r"""Returns the haf(reduction(A, k)) where k is a vector of (non-negative) integers with the same dimensions as the square matrix A
     :math:`k = (k_0,k_1,\ldots,k_{n-1})` and where :math:`0 \leq k_j < \text{resolution}`.
 
-    If mu is not None the it instead calculates :math:`lhaf(fill_diagonal(reduction(A, k),reduction(mu, k)))`, this calculation can only be performed if
-    the matrix A has an inverse.
+    If mu is not None then it instead calculates lhaf(fill_diagonal(reduction(A, k),reduction(mu, k))),
+    this calculation can only be performed if the matrix A has an inverse.
 
     Args:
         R (array): Square matrix parametrizing
         resolution (int): Maximum size of the subindices in the Hermite polynomial
         y (array): Vector for the argument of the Hermite polynomial
-        renorm (bool): If True returns :math:`haf(reduction(A, k))/\prod(\prod_i k_i!)` or :math:`lhaf(fill_diagonal(reduction(A, k),reduction(mu, k)))` is mu is not None
+        renorm (bool): If True returns :math:`haf(reduction(A, k))/\prod(\prod_i k_i!)` or lhaf(fill_diagonal(reduction(A, k),reduction(mu, k))) is mu is not None
         make_tensor: If False returns a flattened one dimensional array instead of a tensor with the values of the polynomial
 
     Returns:
@@ -129,7 +129,7 @@ def hafnian_batched(A, resolution, mu=None, tol=1e-12, renorm=False, make_tensor
         return hermite_multidimensional(
             -A, resolution, y=-yi, renorm=renorm, make_tensor=make_tensor
         )
-    # Note the minus signs in the arguments. Those are intentional
+    # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
 
     if mu is None:
         tensor = np.zeros([resolution ** n], dtype=complex)

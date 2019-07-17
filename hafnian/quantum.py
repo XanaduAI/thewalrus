@@ -352,6 +352,9 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     Note that we use the Strawberry Fields convention for indexing the density
     matrix; the first two dimensions correspond to subsystem 1, the second two
     dimensions correspond to subsystem 2, etc.
+    If post_select is None then the density matrix elements are calculated using
+    the multidimensional Hermite polynomials which provide a significantly faster 
+    evaluation.
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering
@@ -417,7 +420,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
     r"""Returns the :math:`\langle i | \psi\rangle` element of the state ket
     of a Gaussian state defined by covariance matrix cov.
-    To verify if the given covariance matrix corresponds to a pure stat
+
 
     Args:
         mu (array): length-:math:`2N` quadrature displacement vector
@@ -482,6 +485,11 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
 
     where :math:`D` is the Fock space cutoff, and :math:`M` is the
     number of *non* post-selected modes, i.e. ``M = len(mu)//2 - len(post_select)``.
+
+    If post_select is None then the density matrix elements are calculated using
+    the multidimensional Hermite polynomials which provide a significantly faster
+    evaluation.
+
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering

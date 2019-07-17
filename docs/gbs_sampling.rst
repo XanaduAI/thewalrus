@@ -57,7 +57,7 @@ where :math:`p(N_{k-1}=n_{k-1},\ldots,N_0=n_0)` has already been calculated from
 
 .. tip::
 
-   * To generate samples from a gaussian state speficied by a quadrature covariance matrix use :func:`hafnian.samples.generate_hafnian_sample`.
+   * To generate samples from a gaussian state specified by a quadrature covariance matrix use :func:`hafnian.samples.generate_hafnian_sample`.
 
 
 Threshold detection samples
@@ -66,4 +66,15 @@ Note the arguments presented in the previous section can also be generalized to 
 
 .. tip::
 
-   * To generate samples from a gaussian state speficied by a quadrature covariance matrix use :func:`hafnian.samples.generate_torontonian_sample`.
+   * To generate threshold samples from a gaussian state specified by a quadrature covariance matrix use :func:`hafnian.samples.generate_torontonian_sample`.
+
+
+Sampling of classical states
+****************************
+
+In the previous section it was mentioned that states whose covariance matrix satisfies :math:`\mathbf{V} \geq \mathbb{I}` are termed classical. These designation is due to the fact that for these states it is possible to obtain a polynomial (cubic) time algorithm to generate photon number or threshold samples :cite:`rahimi2015can`.
+
+.. tip::
+
+   * To generate photon number or threshold samples from a classical gaussian state specified by a quadrature covariance matrix use :func:`hafnian.samples.hafnian_sample_classical_state` or :func:`torontonian_sample_classical_state`.
+

@@ -27,6 +27,11 @@ which states that a bipartite graph with two parts having :math:`n/2` elements c
 It should be noted that improving over Ryser's algorithm is a well-known open problem: e.g. Knuth :cite:`TAOCP` asks for an arithmetic circuit for the permanent with less than :math:`2^n` operations. Also note that since the exact calculation of the permanent of :math:`(0,1)` matrices is in the \#P complete class :cite:`valiant1979complexity` the above identity shows that deciding if the hafnian of a complex matrix is larger than a given value is also in the \#P complete class.
 
 
+.. tip::
+
+   Permanents can be calculated directly using Ryser's algorithm via :func:`hafnian.perm`.
+
+
 Finally, note that the approximate methods developed for counting perfect matchings are aimed at (weighted-)graphs with real or positive entries  :cite:`2016arXiv160107518B,10.1007/3-540-36494-3_38`. Of particular note is the approximate algorithm introduced by Barvinok for matrices with non-negative entries :cite:`barvinok1999polynomial` further analyzed in Ref. :cite:`rudelson2016hafnians`.
 
 
@@ -140,11 +145,34 @@ Compare this with Björklund's algorithm, which requires :math:`O\left((A n)^3 \
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.hafnian_repeated`. The vector :math:`\mathbf{m}` is passed in the variable ``rpt``. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`mathbf{u}` and the option ``loops=True``.
+   *Implemented as* :func:`hafnian.hafnian_repeated`. The vector :math:`\mathbf{m}` is passed in the variable ``rpt``. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`\mathbf{u}` and the option ``loops=True``.
+
+Batched algorithm
+-----------------
+Using the Hermite polynomials and their connection to the matrix elements of Gaussian states and hafnians discussed in the next section one can calculate the hafnians of all the reduction of a given matrix :math:`\mathbf{A}` up to a given cutoff. The reduction of matrix :math:`\mathbf{B}` is precisely the matrix :math:`\mathbf{B}_{\mathbf{m}}` obtained by repeating (or removing) the :math:`i^{\text{th}}` row and column :math:`m_i` times. Thus given a cutoff :math:`m_{\max}` one can use the batched algorithm to calculate
+
+.. math::
+	\text{haf}\left( \mathbf{B}_\mathbf{m} \right)
+
+for all :math:`0\leq m_i < m_{\max}`, thus this function returns a tensor with :math:`n^{m_{\max}}` components.
+
+One can also use this function to calculate the same loop hafnians that Kan's algorithm returns
+
+.. math::
+	\text{lhaf}\left( \text{vid}(\mathbf{B}_\mathbf{m},\mathbf{u}_\mathbf{m}) \right)
+
+if provided also with a vector :math:`\mathbf{u}`. Note that this parameter is optional.
+
+Internally, these hafnians are calculated by using the recursion relation of the multidimensional Hermite polynomials discussed in the next section.
+
+.. tip::
+
+   *Implemented as* :func:`hafnian.hafnian_batched`. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`\mathbf{u}`.
+
 
 
 Approximate algorithm
--------------------------
+---------------------
 In 1999 Barvinok :cite:`barvinok1999polynomial` provided a surprisingly simple algorithm to approximate the hafnian of a symmetric matrix with positive entries. Let the matrix have entries :math:`A_{i,j}` and define the antisymmetric stochastic matrix with entries that distribute according to :math:`W_{i,j} = -W_{i,j}   \sim \mathcal{N}(0,A_{i,j})`, where :math:`\mathcal{N}(\mu,\sigma^2)` is the normal distribution with mean :math:`\mu` and variance :math:`\sigma^2`. The following now holds:
 
 .. math::
