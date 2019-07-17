@@ -16,9 +16,9 @@ EIGEN_INCLUDE_DIR=/usr/include/eigen3
 #C_LIBRARY_PATH = /opt/local/lib/libomp/
 #LD_LIBRARY_PATH = /opt/local/lib/libomp/
 CC=g++
-CFLAGS=-std=c++11 -O3 -g -Wall -fPIC -I/usr/include \
+CFLAGS=-std=c++11 -O3 -g -Wall -fopenmp -fPIC -I/usr/include \
 	-I.. -I$(EIGEN_INCLUDE_DIR) -I$(GOOGLETEST_DIR)/include \
-	-march=native
+	-march=native 
 LFLAGS=-fopenmp -lomp -L$(GOOGLETEST_DIR)/lib -lgtest
 
 all: test
