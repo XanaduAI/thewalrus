@@ -56,7 +56,8 @@ The hafnian is a homogeneous function of degree :math:`n/2` in the matrix entrie
 .. math::
    \haf(\mu \mathbf{A}) = \mu ^{n/2} \haf(\mathbf{A}),
 
-where :math:`\mu` is a scalar. More generally, if :math:`\mathbf{W} = \text{diag}(w_0,\ldots,w_{n-1})`, then it holds that :cite:`banchi2019molecular`
+where :math:`\mu` is a scalar. More generally, if :math:`\mathbf{W} = \text{diag}(w_0,\ldots,w_{n-1})`, then it holds that ( see proposition 4.2.3 of :cite:`barvinok2016combinatorics`)
+
 
 .. math::
    \haf( \mathbf{W} \mathbf{A} \mathbf{W} ) = \left(\prod_{i=0}^{n-1} w_i\right) \haf(\mathbf{A}).
