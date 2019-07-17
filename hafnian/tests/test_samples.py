@@ -144,7 +144,7 @@ class TestHafnianSampling:
         mean_n = 0.5
         samples = hafnian_sample_graph(A, mean_n, samples=n_samples)
         approx_mean_n = np.sum(samples) / n_samples
-        assert np.allclose(mean_n, approx_mean_n, rtol=1e-1)
+        assert np.allclose(mean_n, approx_mean_n, rtol=2e-1)
 
     def test_single_pm_graphs(self):
         """Tests that the number of photons is the same for modes i and n-i
