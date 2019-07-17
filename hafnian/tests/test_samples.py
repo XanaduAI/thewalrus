@@ -25,9 +25,9 @@ from hafnian.samples import (
     hafnian_sample_classical_state,
     torontonian_sample_classical_state,
 )
-from hafnian.quantum import gen_Qmat_from_graph
+from hafnian.quantum import gen_Qmat_from_graph, density_matrix_element
 
-np.random.seed(20)
+np.random.seed(137)
 
 rel_tol = 3.0
 abs_tol = 1.0e-10
@@ -97,7 +97,7 @@ class TestHafnianSampling:
 
         n_cut = 10
         samples = hafnian_sample_state(sigma, samples=n_samples, cutoff=n_cut)
-        bins = np.arange(0, max(samples), 1)
+        bins = np.arange(0, max(samples) + 1, 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
         nm = max(samples) // 2
@@ -108,7 +108,9 @@ class TestHafnianSampling:
         rel_freq = freq[0:-1] / n_samples
         x2 = x2[0 : len(rel_freq)]
 
-        assert np.all(np.abs(x2 - rel_freq) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_two_mode_squeezed_state_hafnian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -126,16 +128,95 @@ class TestHafnianSampling:
         assert np.all(samples[:, 0] == samples[:, 1])
 
         samples1d = samples[:, 0]
-        bins = np.arange(0, max(samples1d), 1)
+        bins = np.arange(0, max(samples1d) + 1, 1)
+
         (freq, _) = np.histogram(samples1d, bins=bins)
         rel_freq = freq / n_samples
 
         probs = (1.0 / (1.0 + mean_n)) * (mean_n / (1.0 + mean_n)) ** bins[0:-1]
         probs[-1] = 1.0 - np.sum(
             probs[0:-1]
-        )  # Coarse grain all the probabilities past the threhold
+        )  # Coarse grain all the probabilities past the threshold
 
-        assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, probs, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
+
+    def test_displaced_two_mode_squeezed_state_hafnian(self):
+        """Test the sampling routines by comparing the photon number frequencies and the exact
+        probability distribution of a displaced two mode squeezed vacuum state
+        """
+        n_samples = 1000
+        n_cut = 10
+        mean_n = 1
+        r = np.arcsinh(np.sqrt(mean_n))
+        c = np.cosh(2 * r)
+        s = np.sinh(2 * r)
+        sigma = np.array([[c, s, 0, 0], [s, c, 0, 0], [0, 0, c, -s], [0, 0, -s, c]])
+        mean = 2 * np.array([0.1, 0.25, 0.1, 0.25])
+        samples = hafnian_sample_state(sigma, samples=n_samples, mean=mean, cutoff=n_cut)
+
+        probs = np.real_if_close(
+            np.array(
+                [
+                    [density_matrix_element(mean, sigma, [i, j], [i, j]) for i in range(n_cut)]
+                    for j in range(n_cut)
+                ]
+            )
+        )
+        freq, _, _ = np.histogram2d(samples[:, 1], samples[:, 0], bins=np.arange(0, n_cut + 1))
+        rel_freq = freq / n_samples
+
+        assert np.allclose(
+            rel_freq, probs, rtol=rel_tol / np.sqrt(n_samples), atol=rel_tol / np.sqrt(n_samples)
+        )
+
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
+    def test_displaced_single_mode_state_hafnian(self, sample_func):
+        """Test the sampling routines by comparing the photon number frequencies and the exact
+        probability distribution of a single mode coherent state
+        """
+        n_samples = 1000
+        n_cut = 6
+        sigma = np.identity(2)
+        mean = 10 * np.array([0.1, 0.25])
+
+        samples = sample_func(sigma, samples=n_samples, mean=mean, cutoff=n_cut)
+
+        probs = np.real_if_close(
+            np.array([density_matrix_element(mean, sigma, [i], [i]) for i in range(n_cut)])
+        )
+        freq, _ = np.histogram(samples[:, 0], bins=np.arange(0, n_cut + 1))
+        rel_freq = freq / n_samples
+        assert np.allclose(
+            rel_freq, probs, rtol=rel_tol / np.sqrt(n_samples), atol=rel_tol / np.sqrt(n_samples)
+        )
+
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
+    def test_displaced_two_mode_state_hafnian(self, sample_func):
+        """Test the sampling routines by comparing the photon number frequencies and the exact
+        probability distribution of a two mode coherent state
+        """
+        n_samples = 1000
+        n_cut = 6
+        sigma = np.identity(4)
+        mean = 5 * np.array([0.1, 0.25, 0.1, 0.25])
+        samples = sample_func(sigma, samples=n_samples, mean=mean, cutoff=n_cut)
+        # samples = hafnian_sample_classical_state(sigma, mean = mean, samples = n_samples)
+        probs = np.real_if_close(
+            np.array(
+                [
+                    [density_matrix_element(mean, sigma, [i, j], [i, j]) for i in range(n_cut)]
+                    for j in range(n_cut)
+                ]
+            )
+        )
+        freq, _, _ = np.histogram2d(samples[:, 1], samples[:, 0], bins=np.arange(0, n_cut + 1))
+        rel_freq = freq / n_samples
+
+        assert np.allclose(
+            rel_freq, probs, rtol=rel_tol / np.sqrt(n_samples), atol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_hafnian_sample_graph(self):
         """Test hafnian sampling from a graph"""
@@ -267,7 +348,9 @@ class TestTorontonianSampling:
 
         x2[0] = 1.0 / np.sqrt(1.0 + mean_n)
         x2[1] = 1.0 - x2[0]
-        assert np.all(np.abs(x2 - rel_freq) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
 
     def test_two_mode_squeezed_state_torontonian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -291,7 +374,12 @@ class TestTorontonianSampling:
         probs = np.empty([2])
         probs[0] = 1.0 / (1.0 + mean_n)
         probs[1] = 1.0 - probs[0]
-        assert np.all(np.abs(rel_freq - probs[0:-1]) < rel_tol / np.sqrt(n_samples))
+        assert np.allclose(
+            rel_freq,
+            probs[0:-1],
+            atol=rel_tol / np.sqrt(n_samples),
+            rtol=rel_tol / np.sqrt(n_samples),
+        )
 
     @pytest.mark.parametrize(
         "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
