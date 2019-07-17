@@ -67,10 +67,10 @@ from .quantum import (
 # Hafnian sampling
 # ===============================================================================================
 
-
+# pylint: disable=too-many-branches
 def generate_hafnian_sample(
     cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
-):
+): # pylint: disable=too-many-branches
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -490,8 +490,8 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
     cov = Covmat(Q)
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
 
-
-def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08, cutoff=None):
+# pylint: disable=unused-argument
+def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08, cutoff=None): # add cutoff for consistency pylint: disable=unused-argument
     r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
 
     Args:
