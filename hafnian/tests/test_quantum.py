@@ -354,8 +354,8 @@ def test_density_matrix_squeezed():
     assert np.allclose(res, expected)
 
 
-def test_density_matrix_displaced_squeezed():
-    """Test density matrix for a squeezed state"""
+def test_coherent_squeezed():
+    """Test density matrix for a squeezed displaced state"""
     r = 0.43
 
     mu = np.array([0.24, -0.2])

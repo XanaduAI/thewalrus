@@ -19,6 +19,8 @@
 #include <math.h>
 
 const double tol = 1.0e-10f;
+const double tol2 = 1.0e-7f;
+
 
 namespace permanent {
 TEST(PermanentRealFsum, CompleteGraph) {
@@ -41,14 +43,14 @@ TEST(PermanentFsum, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             double randnum = distribution(generator);
-            mat[i*3+j] = randnum;
+            mat[i * 3 + j] = randnum;
         }
     }
 
-    double expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                      + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
+    double expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] + mat[2] * mat[3] * mat[7]
+                      + mat[0] * mat[5] * mat[7] + mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
 
     EXPECT_NEAR(expected, hafnian::permanent_fsum(mat), tol);
 
@@ -74,14 +76,14 @@ TEST(PermanentReal, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             double randnum = distribution(generator);
-            mat[i*3+j] = randnum;
+            mat[i * 3 + j] = randnum;
         }
     }
 
-    double expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                      + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
+    double expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] + mat[2] * mat[3] * mat[7]
+                      + mat[0] * mat[5] * mat[7] + mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
 
     EXPECT_NEAR(expected, hafnian::permanent_quad(mat), tol);
 
@@ -97,15 +99,15 @@ TEST(PermanentComplex, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat[i*3+j] = std::complex<double>(randnum1, randnum2);
+            mat[i * 3 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
-    std::complex<double> expected = mat[2]*mat[4]*mat[6] + mat[1]*mat[5]*mat[6] + mat[2]*mat[3]*mat[7]
-                                    + mat[0]*mat[5]*mat[7] + mat[1]*mat[3]*mat[8] + mat[0]*mat[4]*mat[8];
+    std::complex<double> expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] + mat[2] * mat[3] * mat[7]
+                                    + mat[0] * mat[5] * mat[7] + mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
 
     std::complex<double> perm = hafnian::permanent_quad(mat);
 
@@ -139,13 +141,13 @@ TEST(HafianRecursiveDouble, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum = distribution(generator);
-            mat[i*4+j] = randnum;
+            mat[i * 4 + j] = randnum;
         }
     }
 
-    double expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    double expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     EXPECT_NEAR(expected, hafnian::hafnian_recursive_quad(mat), tol);
 }
@@ -220,14 +222,14 @@ TEST(HafianRecursiveDoubleComplex, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
-    std::complex<double> expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    std::complex<double> expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     std::complex<double> haf = hafnian::hafnian_recursive_quad(mat);
 
@@ -294,13 +296,13 @@ TEST(HafianEigenDouble, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum = distribution(generator);
-            mat[i*4+j] = randnum;
+            mat[i * 4 + j] = randnum;
         }
     }
 
-    double expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    double expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     EXPECT_NEAR(expected, hafnian::hafnian_eigen(mat), tol);
 }
@@ -375,14 +377,14 @@ TEST(HafianEigenDoubleComplex, Random) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
-    std::complex<double> expected = mat[1]*mat[11] + mat[2]*mat[7] + mat[3]*mat[6];
+    std::complex<double> expected = mat[1] * mat[11] + mat[2] * mat[7] + mat[3] * mat[6];
 
     std::complex<double> haf = hafnian::hafnian_eigen(mat);
 
@@ -451,8 +453,8 @@ TEST(HafnianApproxNonngeative, Random) {
     }
 
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat4[i*n+j] = x4[i]*x4[j];
+        for (int j = 0; j < n; j++) {
+            mat4[i * n + j] = x4[i] * x4[j];
         }
     }
 
@@ -466,8 +468,8 @@ TEST(HafnianApproxNonngeative, Random) {
     }
 
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat6[i*n+j] = x6[i]*x6[j];
+        for (int j = 0; j < n; j++) {
+            mat6[i * n + j] = x6[i] * x6[j];
         }
     }
 
@@ -480,8 +482,8 @@ TEST(HafnianApproxNonngeative, Random) {
     }
 
     for (int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat8[i*n+j] = x8[i]*x8[j];
+        for (int j = 0; j < n; j++) {
+            mat8[i * n + j] = x8[i] * x8[j];
         }
     }
 
@@ -493,9 +495,9 @@ TEST(HafnianApproxNonngeative, Random) {
     double haf6 = hafnian::hafnian_approx(mat6, nsamples);
     double haf8 = hafnian::hafnian_approx(mat8, nsamples);
 
-    EXPECT_NEAR(expected4, haf4, haf4/15.0);
-    EXPECT_NEAR(expected6, haf6, haf6/15.0);
-    EXPECT_NEAR(expected8, haf8, haf8/15.0);
+    EXPECT_NEAR(expected4, haf4, haf4 / 15.0);
+    EXPECT_NEAR(expected6, haf6, haf6 / 15.0);
+    EXPECT_NEAR(expected8, haf8, haf8 / 15.0);
 
 }
 
@@ -530,16 +532,16 @@ TEST(HafnianRepeatedDouble, AllOneRpt) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum = distribution(generator);
-            mat2rand[i*2+j] = randnum;
+            mat2rand[i * 2 + j] = randnum;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum = distribution(generator);
-            mat4rand[i*4+j] = randnum;
+            mat4rand[i * 4 + j] = randnum;
         }
     }
 
@@ -548,7 +550,7 @@ TEST(HafnianRepeatedDouble, AllOneRpt) {
     double expected2rand = mat2rand[1];
 
     double expected4 = 3;
-    double expected4rand = mat4rand[1]*mat4rand[11] + mat4rand[2]*mat4rand[7] + mat4rand[3]*mat4rand[6];;
+    double expected4rand = mat4rand[1] * mat4rand[11] + mat4rand[2] * mat4rand[7] + mat4rand[3] * mat4rand[6];;
 
     double haf2 = hafnian::hafnian_rpt_quad(mat2, rpt2);
     double haf2rand = hafnian::hafnian_rpt_quad(mat2rand, rpt2);
@@ -592,18 +594,18 @@ TEST(HafnianRepeatedComplex, AllOneRpt) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat2rand[i*2+j] = std::complex<double>(randnum1, randnum2);
+            mat2rand[i * 2 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat4rand[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat4rand[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
@@ -615,7 +617,7 @@ TEST(HafnianRepeatedComplex, AllOneRpt) {
 
     double expected4_re = 3;
     double expected4_im = 0;
-    std::complex<double> expected4rand = mat4rand[1]*mat4rand[11] + mat4rand[2]*mat4rand[7] + mat4rand[3]*mat4rand[6];;
+    std::complex<double> expected4rand = mat4rand[1] * mat4rand[11] + mat4rand[2] * mat4rand[7] + mat4rand[3] * mat4rand[6];;
     double expected4rand_re = std::real(expected4rand);
     double expected4rand_im = std::imag(expected4rand);
 
@@ -675,16 +677,16 @@ TEST(LoopHafnianEigenDouble, EvenRandom) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
-            mat2[i*2+j] = randnum1;
+            mat2[i * 2 + j] = randnum1;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
-            mat4[i*4+j] = randnum1;
+            mat4[i * 4 + j] = randnum1;
         }
     }
 
@@ -692,11 +694,11 @@ TEST(LoopHafnianEigenDouble, EvenRandom) {
     double haf4 = hafnian::loop_hafnian_eigen(mat4);
 
     double expected2 = mat2[1] + mat2[0] * mat2[3];
-    double expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                       mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                       mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                       mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                       mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    double expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                       mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                       mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                       mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                       mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(expected2, haf2, tol);
     EXPECT_NEAR(expected4, haf4, tol);
@@ -742,18 +744,18 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
     std::normal_distribution<double> distribution(1.0, 0.0);
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat2[i*2+j] = std::complex<double>(randnum1, randnum2);
+            mat2[i * 2 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat4[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat4[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
@@ -761,11 +763,11 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
     std::complex<double> haf4 = hafnian::loop_hafnian_eigen(mat4);
 
     std::complex<double> expected2 = mat2[1] + mat2[0] * mat2[3];
-    std::complex<double> expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                                     mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                                     mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                                     mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                                     mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    std::complex<double> expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                                     mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                                     mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                                     mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                                     mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(std::real(expected2), std::real(haf2), tol);
     EXPECT_NEAR(std::imag(expected2), std::imag(haf2), tol);
@@ -824,10 +826,10 @@ TEST(LoopHafnianRepeatedDouble, EvenOnes) {
     std::vector<int> rpt6(6, 1);
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
 
     for (int i = 0; i < 6; i++)
-        mu6[i] = mat6[i*6+i];
+        mu6[i] = mat6[i * 6 + i];
 
     double haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
     double haf6 = hafnian::loop_hafnian_rpt_quad(mat6, mu6, rpt6);
@@ -857,34 +859,34 @@ TEST(LoopHafnianRepeatedDouble, EvenRandom) {
 
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
-            mat2[i*2+j] = randnum1;
+            mat2[i * 2 + j] = randnum1;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
-            mat4[i*4+j] = randnum1;
+            mat4[i * 4 + j] = randnum1;
         }
     }
 
     for (int i = 0; i < 2; i++)
-        mu2[i] = mat2[i*2+i];
+        mu2[i] = mat2[i * 2 + i];
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
 
     double haf2 = hafnian::loop_hafnian_rpt_quad(mat2, mu2, rpt2);
     double haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
 
     double expected2 = mat2[1] + mat2[0] * mat2[3];
-    double expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                       mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                       mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                       mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                       mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    double expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                       mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                       mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                       mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                       mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(expected2, haf2, tol);
     EXPECT_NEAR(expected4, haf4, tol);
@@ -903,10 +905,10 @@ TEST(LoopHafnianRepeatedDouble, Odd) {
     std::vector<int> rpt5(5, 1);
 
     for (int i = 0; i < 3; i++)
-        mu3[i] = mat3[i*3+i];
+        mu3[i] = mat3[i * 3 + i];
 
     for (int i = 0; i < 5; i++)
-        mu5[i] = mat5[i*5+i];
+        mu5[i] = mat5[i * 5 + i];
 
     double haf3 = hafnian::loop_hafnian_rpt_quad(mat3, mu3, rpt3);
     double haf5 = hafnian::loop_hafnian_rpt_quad(mat5, mu5, rpt5);
@@ -954,13 +956,13 @@ TEST(LoopHafnianRepeatedComplex, EvenOnes) {
     std::vector<int> rpt6(6, 1);
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
     std::complex<double> haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
     EXPECT_NEAR(10, std::real(haf4), tol);
     EXPECT_NEAR(0, std::imag(haf4), tol);
 
     for (int i = 0; i < 6; i++)
-        mu6[i] = mat6[i*6+i];
+        mu6[i] = mat6[i * 6 + i];
 
     std::complex<double> haf6 = hafnian::loop_hafnian_rpt_quad(mat6, mu6, rpt6);
 
@@ -988,36 +990,36 @@ TEST(LoopHafnianRepeatedComplex, EvenRandom) {
 
 
     for (int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
+        for (int j = 0; j < 2; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat2[i*2+j] = std::complex<double>(randnum1, randnum2);
+            mat2[i * 2 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+        for (int j = 0; j < 4; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
-            mat4[i*4+j] = std::complex<double>(randnum1, randnum2);
+            mat4[i * 4 + j] = std::complex<double>(randnum1, randnum2);
         }
     }
 
     for (int i = 0; i < 2; i++)
-        mu2[i] = mat2[i*2+i];
+        mu2[i] = mat2[i * 2 + i];
 
     for (int i = 0; i < 4; i++)
-        mu4[i] = mat4[i*4+i];
+        mu4[i] = mat4[i * 4 + i];
 
     std::complex<double> haf2 = hafnian::loop_hafnian_rpt_quad(mat2, mu2, rpt2);
     std::complex<double> haf4 = hafnian::loop_hafnian_rpt_quad(mat4, mu4, rpt4);
 
     std::complex<double> expected2 = mat2[1] + mat2[0] * mat2[3];
-    std::complex<double> expected4 = mat4[1]*mat4[11] + mat4[2]*mat4[7] + mat4[3]*mat4[6] +
-                                     mat4[0]*mat4[5]*mat4[11] + mat4[1]*mat4[10]*mat4[15] +
-                                     mat4[2]*mat4[5]*mat4[15] + mat4[0]*mat4[10]*mat4[7] +
-                                     mat4[0]*mat4[15]*mat4[6] + mat4[3]*mat4[5]*mat4[10] +
-                                     mat4[0]*mat4[5]*mat4[10]*mat4[15];
+    std::complex<double> expected4 = mat4[1] * mat4[11] + mat4[2] * mat4[7] + mat4[3] * mat4[6] +
+                                     mat4[0] * mat4[5] * mat4[11] + mat4[1] * mat4[10] * mat4[15] +
+                                     mat4[2] * mat4[5] * mat4[15] + mat4[0] * mat4[10] * mat4[7] +
+                                     mat4[0] * mat4[15] * mat4[6] + mat4[3] * mat4[5] * mat4[10] +
+                                     mat4[0] * mat4[5] * mat4[10] * mat4[15];
 
     EXPECT_NEAR(std::real(expected2), std::real(haf2), tol);
     EXPECT_NEAR(std::imag(expected2), std::imag(haf2), tol);
@@ -1039,10 +1041,10 @@ TEST(LoopHafnianRepeatedComplex, Odd) {
     std::vector<int> rpt5(5, 1);
 
     for (int i = 0; i < 3; i++)
-        mu3[i] = mat3[i*3+i];
+        mu3[i] = mat3[i * 3 + i];
 
     for (int i = 0; i < 5; i++)
-        mu5[i] = mat5[i*5+i];
+        mu5[i] = mat5[i * 5 + i];
 
     std::complex<double> haf3 = hafnian::loop_hafnian_rpt_quad(mat3, mu3, rpt3);
     std::complex<double> haf5 = hafnian::loop_hafnian_rpt_quad(mat5, mu5, rpt5);
@@ -1068,16 +1070,16 @@ TEST(TorontonianDouble, TMSV) {
     double r = asinh(std::sqrt(mean_n));
 
     int n = 4;
-    for(int i = 0; i < n; i++)
-        mat4[i*n+n-i-1] = tanh(r)*1.0;
+    for (int i = 0; i < n; i++)
+        mat4[i * n + n - i - 1] = tanh(r) * 1.0;
 
     n = 8;
-    for(int i = 0; i < n; i++)
-        mat8[i*n+n-i-1] = tanh(r)*1.0;
+    for (int i = 0; i < n; i++)
+        mat8[i * n + n - i - 1] = tanh(r) * 1.0;
 
     n = 16;
-    for(int i = 0; i < n; i++)
-        mat16[i*n+n-i-1] = tanh(r)*1.0;
+    for (int i = 0; i < n; i++)
+        mat16[i * n + n - i - 1] = tanh(r) * 1.0;
 
     double tor4 = hafnian::torontonian_quad(mat4);
     double tor8 = hafnian::torontonian_quad(mat8);
@@ -1093,7 +1095,7 @@ TEST(TorontonianDouble, TMSV) {
 TEST(TorontonianDouble, Vacuum) {
     int n_modes = 5;
 
-    std::vector<double> mat(2*n_modes*2*n_modes, 0.0);
+    std::vector<double> mat(2 * n_modes * 2 * n_modes, 0.0);
 
     double tor_val = hafnian::torontonian_quad(mat);
 
@@ -1103,11 +1105,11 @@ TEST(TorontonianDouble, Vacuum) {
 TEST(TorontonianDouble, Analytical) {
     int n = 1;
     double nbar = 0.25;
-    std::vector<double> mat1(2*n*2*n, 0.0);
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat1[i*2*n+j] = nbar/(static_cast<double>(n)*(1.0+nbar));
-            mat1[(i+n)*2*n+(j+n)] = nbar/(static_cast<double>(n)*(1.0+nbar));
+    std::vector<double> mat1(2 * n * 2 * n, 0.0);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            mat1[i * 2 * n + j] = nbar / (static_cast<double>(n) * (1.0 + nbar));
+            mat1[(i + n) * 2 * n + (j + n)] = nbar / (static_cast<double>(n) * (1.0 + nbar));
         }
     }
 
@@ -1117,11 +1119,11 @@ TEST(TorontonianDouble, Analytical) {
 
     n = 2;
     nbar = 0.25;
-    std::vector<double> mat2(2*n*2*n, 0.0);
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j++) {
-            mat2[i*2*n+j] = nbar/(static_cast<double>(n)*(1.0+nbar));
-            mat2[(i+n)*2*n+(j+n)] = nbar/(static_cast<double>(n)*(1.0+nbar));
+    std::vector<double> mat2(2 * n * 2 * n, 0.0);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            mat2[i * 2 * n + j] = nbar / (static_cast<double>(n) * (1.0 + nbar));
+            mat2[(i + n) * 2 * n + (j + n)] = nbar / (static_cast<double>(n) * (1.0 + nbar));
         }
     }
 
@@ -1135,3 +1137,177 @@ TEST(TorontonianDouble, Analytical) {
 
 }
 
+
+namespace batchhafnian {
+TEST(BatchHafnian, CompleteGraph) {
+    std::vector<std::complex<double>> mat4{std::complex<double>(-0.28264629150778969, 0.39867701584672210), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(-0.22959477315790058, 0.00000000000000008), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(0.38245649793510783, -0.41413300040003126), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.13684045954832844, 0.00000000000000006), std::complex<double>(-0.22959477315790058, -0.00000000000000008), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.28264629150778969, -0.39867701584672210), std::complex<double>(-0.06086128222348247, 0.12220227033305252), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.13684045954832844, -0.00000000000000006), std::complex<double>(-0.06086128222348247, +0.12220227033305252), std::complex<double>(0.38245649793510783, 0.41413300040003126)};
+    std::vector<std::complex<double>> d4{std::complex<double>(0.66917130190858, -1.52776303400764), std::complex<double>(-2.95847055822102, -1.29582519437023), std::complex<double>(0.66917130190858, 1.52776303400764), std::complex<double>(-2.95847055822102, 1.29582519437023)};
+    std::vector<std::complex<double>> out(256, 0.0);
+    std::vector<double> expected_re{1.00000000e+00, -1.64614736e+00,  1.94351456e+00, -1.44618627e+00,
+                                    4.35642368e-01, -1.32047906e+00,  2.23766490e+00, -1.86917564e+00,
+                                    -6.76966967e-01,  5.73670333e-01, -7.33188149e-02, -1.21997190e-01,
+                                    2.32161778e-01, -5.57198229e-01,  1.18563164e+00, -1.79235874e+00,
+                                    -1.64614736e+00,  3.23047167e+00, -4.65694018e+00,  4.44401287e+00,
+                                    -4.63159381e-02,  1.31073870e+00, -3.22177207e+00,  3.63237405e+00,
+                                    1.23991893e+00, -1.44213928e+00,  8.01092161e-01,  2.28567603e-01,
+                                    -6.99231782e-01,  1.51022665e+00, -2.91603997e+00,  4.30125549e+00,
+                                    1.94351456e+00, -4.65694018e+00,  8.15053238e+00, -9.76981613e+00,
+                                    -7.95376620e-01, -3.06685257e-01,  2.99900529e+00, -5.19576276e+00,
+                                    -1.40243198e+00,  2.03208134e+00, -1.62929470e+00, -2.50514870e-01,
+                                    1.12880996e+00, -2.69285454e+00,  5.33966585e+00, -8.00210813e+00,
+                                    -1.44618627e+00,  4.44401287e+00, -9.76981613e+00,  1.52284285e+01,
+                                    1.11641813e+00, -8.67834158e-01, -1.21356826e+00,  4.85970544e+00,
+                                    4.82389499e-01, -9.16927653e-01,  9.19681681e-01,  5.20655922e-01,
+                                    -8.34195372e-01,  2.92229672e+00, -6.78809904e+00,  1.10996783e+01,
+                                    4.35642368e-01, -4.63159381e-02, -7.95376620e-01,  1.11641813e+00,
+                                    1.56877658e+00, -2.31606077e+00,  2.25637651e+00, -1.05357461e+00,
+                                    4.79157988e-01, -1.44851326e+00,  2.00611116e+00, -5.18263640e-01,
+                                    -6.15836536e-01,  5.36430564e-01, -2.88165936e-01,  4.59048908e-01,
+                                    -1.32047906e+00,  1.31073870e+00, -3.06685257e-01, -8.67834158e-01,
+                                    -2.31606077e+00,  4.15988484e+00, -5.13015068e+00,  3.41102851e+00,
+                                    1.55349628e-01,  1.12665346e+00, -2.55195698e+00,  1.37496136e+00,
+                                    5.89607772e-01, -4.94801663e-01, -7.51210237e-02,  5.26517347e-01,
+                                    2.23766490e+00, -3.22177207e+00,  2.99900529e+00, -1.21356826e+00,
+                                    2.25637651e+00, -5.13015068e+00,  8.00781690e+00, -7.39736288e+00,
+                                    -1.05510937e+00,  1.44993971e-01,  1.83226945e+00, -2.23251713e+00,
+                                    2.06934935e-01, -6.05111407e-01,  1.55663126e+00, -2.69619939e+00,
+                                    -1.86917564e+00,  3.63237405e+00, -5.19576276e+00,  4.85970544e+00,
+                                    -1.05357461e+00,  3.41102851e+00, -7.39736288e+00,  1.03896013e+01,
+                                    6.44552723e-01, -6.96168471e-01, -2.62839607e-01,  1.95309353e+00,
+                                    -1.42746493e+00,  2.66108892e+00, -4.01938103e+00,  4.99610368e+00,
+                                    -6.76966967e-01,  1.23991893e+00, -1.40243198e+00,  4.82389499e-01,
+                                    4.79157988e-01,  1.55349628e-01, -1.05510937e+00,  6.44552723e-01,
+                                    2.08027043e+00, -2.71815189e+00,  2.08749438e+00, -3.59011119e-01,
+                                    2.39920807e-01, -1.06932525e+00,  1.14339407e+00,  9.25081052e-01,
+                                    5.73670333e-01, -1.44213928e+00,  2.03208134e+00, -9.16927653e-01,
+                                    -1.44851326e+00,  1.12665346e+00,  1.44993971e-01, -6.96168471e-01,
+                                    -2.71815189e+00,  4.45234470e+00, -4.61154260e+00,  1.74127108e+00,
+                                    6.25361244e-01,  3.75915531e-01, -1.21876790e+00, -5.13059479e-01,
+                                    -7.33188149e-02,  8.01092161e-01, -1.62929470e+00,  9.19681681e-01,
+                                    2.00611116e+00, -2.55195698e+00,  1.83226945e+00, -2.62839607e-01,
+                                    2.08749438e+00, -4.61154260e+00,  6.55944518e+00, -4.66420500e+00,
+                                    -1.28536521e+00,  7.81945188e-01,  5.63969365e-01, -7.03167365e-01,
+                                    -1.21997190e-01,  2.28567603e-01, -2.50514870e-01,  5.20655922e-01,
+                                    -5.18263640e-01,  1.37496136e+00, -2.23251713e+00,  1.95309353e+00,
+                                    -3.59011119e-01,  1.74127108e+00, -4.66420500e+00,  7.36229153e+00,
+                                    1.42777111e-02, -3.18771206e-01, -5.24341968e-02,  1.68507163e+00,
+                                    2.32161778e-01, -6.99231782e-01,  1.12880996e+00, -8.34195372e-01,
+                                    -6.15836536e-01,  5.89607772e-01,  2.06934935e-01, -1.42746493e+00,
+                                    2.39920807e-01,  6.25361244e-01, -1.28536521e+00,  1.42777111e-02,
+                                    2.99123653e+00, -3.75195474e+00,  2.82213119e+00, -7.81358057e-01,
+                                    -5.57198229e-01,  1.51022665e+00, -2.69285454e+00,  2.92229672e+00,
+                                    5.36430564e-01, -4.94801663e-01, -6.05111407e-01,  2.66108892e+00,
+                                    -1.06932525e+00,  3.75915531e-01,  7.81945188e-01, -3.18771206e-01,
+                                    -3.75195474e+00,  6.10393167e+00, -6.48641622e+00,  3.30150978e+00,
+                                    1.18563164e+00, -2.91603997e+00,  5.33966585e+00, -6.78809904e+00,
+                                    -2.88165936e-01, -7.51210237e-02,  1.55663126e+00, -4.01938103e+00,
+                                    1.14339407e+00, -1.21876790e+00,  5.63969365e-01, -5.24341968e-02,
+                                    2.82213119e+00, -6.48641622e+00,  9.98950443e+00, -9.09570553e+00,
+                                    -1.79235874e+00,  4.30125549e+00, -8.00210813e+00,  1.10996783e+01,
+                                    4.59048908e-01,  5.26517347e-01, -2.69619939e+00,  4.99610368e+00,
+                                    9.25081052e-01, -5.13059479e-01, -7.03167365e-01,  1.68507163e+00,
+                                    -7.81358057e-01,  3.30150978e+00, -9.09570553e+00,  1.56159162e+01};
+    std::vector<double> expected_im{0.00000000e+00, -6.19540212e-01,  1.62557597e+00, -2.04268077e+00,
+                                    -1.07209959e+00,  1.37273368e+00, -1.04855753e+00,  2.44875659e-01,
+                                    -5.35426993e-01,  1.06382831e+00, -1.13167436e+00, -5.50895821e-02,
+                                    2.33832577e-01, -3.78336056e-01,  7.66353380e-01, -1.42492084e+00,
+                                    6.19540212e-01, -8.32667268e-17, -1.64140851e+00,  3.13391670e+00,
+                                    1.93588686e+00, -3.06589811e+00,  3.30672773e+00, -1.86213343e+00,
+                                    3.61695050e-01, -1.18989013e+00,  1.65240909e+00, -7.67200444e-02,
+                                    -5.09572526e-02,  1.60560058e-01, -6.31216079e-01,  1.58488036e+00,
+                                    -1.62557597e+00,  1.64140851e+00, -2.00406005e-15, -2.89715424e+00,
+                                    -2.45819767e+00,  4.73270217e+00, -6.50126689e+00,  5.38692527e+00,
+                                    1.31935650e-01,  6.45842049e-01, -1.46639188e+00,  1.74105305e-01,
+                                    -7.03114482e-01,  9.82371295e-01, -7.30475300e-01, -4.69877164e-01,
+                                    2.04268077e+00, -3.13391670e+00,  2.89715424e+00, -9.52005210e-15,
+                                    1.83179431e+00, -4.41516458e+00,  7.85181522e+00, -9.37606710e+00,
+                                    -2.10974632e-01,  5.27110853e-02,  3.02027970e-01,  3.02537735e-01,
+                                    1.73508640e+00, -2.84340169e+00,  3.30111115e+00, -2.05599107e+00,
+                                    1.07209959e+00, -1.93588686e+00,  2.45819767e+00, -1.83179431e+00,
+                                    -5.55111512e-17, -9.23929364e-01,  2.07252046e+00, -1.72348979e+00,
+                                    -1.45132762e+00,  1.63837310e+00, -9.25631147e-01, -8.65199492e-02,
+                                    -1.80257925e-02, -4.95003549e-03,  7.10339932e-01, -2.21351707e+00,
+                                    -1.37273368e+00,  3.06589811e+00, -4.73270217e+00,  4.41516458e+00,
+                                    9.23929364e-01, -6.97358837e-16, -1.96212896e+00,  2.69923158e+00,
+                                    2.26051161e+00, -3.21251263e+00,  2.71847065e+00, -3.91405380e-01,
+                                    -4.80113320e-01,  7.08913327e-01, -1.77090980e+00,  4.06599993e+00,
+                                    1.04855753e+00, -3.30672773e+00,  6.50126689e+00, -7.85181522e+00,
+                                    -2.07252046e+00,  1.96212896e+00, -2.15452656e-15, -2.46721598e+00,
+                                    -2.22778040e+00,  3.99810349e+00, -4.56372028e+00,  1.81520753e+00,
+                                    8.17667372e-01, -1.51861788e+00,  3.08750334e+00, -5.85075242e+00,
+                                    -2.44875659e-01,  1.86213343e+00, -5.38692527e+00,  9.37606710e+00,
+                                    1.72348979e+00, -2.69923158e+00,  2.46721598e+00, -8.65973959e-15,
+                                    7.76349098e-01, -2.07828888e+00,  3.67741704e+00, -3.39674623e+00,
+                                    1.67268754e-03,  1.05174705e+00, -3.26705990e+00,  6.24576761e+00,
+                                    5.35426993e-01, -3.61695050e-01, -1.31935650e-01,  2.10974632e-01,
+                                    1.45132762e+00, -2.26051161e+00,  2.22778040e+00, -7.76349098e-01,
+                                    -4.49459509e-16, -1.15371273e+00,  2.14384564e+00, -7.75127965e-01,
+                                    -1.69420825e+00,  1.75565162e+00, -7.87144208e-01, -2.91297712e-01,
+                                    -1.06382831e+00,  1.18989013e+00, -6.45842049e-01, -5.27110853e-02,
+                                    -1.63837310e+00,  3.21251263e+00, -3.99810349e+00,  2.07828888e+00,
+                                    1.15371273e+00, -2.03309591e-15, -1.93589426e+00,  1.65877008e+00,
+                                    2.16797656e+00, -2.87072370e+00,  1.92413422e+00,  6.63359067e-01,
+                                    1.13167436e+00, -1.65240909e+00,  1.46639188e+00, -3.02027970e-01,
+                                    9.25631147e-01, -2.71847065e+00,  4.56372028e+00, -3.67741704e+00,
+                                    -2.14384564e+00,  1.93589426e+00, -3.84414722e-15, -1.84525302e+00,
+                                    -1.51949589e+00,  2.78597545e+00, -2.83838661e+00,  1.47024726e-02,
+                                    5.50895821e-02,  7.67200444e-02, -1.74105305e-01, -3.02537735e-01,
+                                    8.65199492e-02,  3.91405380e-01, -1.81520753e+00,  3.39674623e+00,
+                                    7.75127965e-01, -1.65877008e+00,  1.84525302e+00, -8.71004657e-15,
+                                    5.32280868e-02, -7.29284151e-01,  2.11417457e+00, -2.58202829e+00,
+                                    -2.33832577e-01,  5.09572526e-02,  7.03114482e-01, -1.73508640e+00,
+                                    1.80257925e-02,  4.80113320e-01, -8.17667372e-01, -1.67268754e-03,
+                                    1.69420825e+00, -2.16797656e+00,  1.51949589e+00, -5.32280868e-02,
+                                    -1.26663794e-15, -1.59424776e+00,  2.80268987e+00, -9.62872951e-01,
+                                    3.78336056e-01, -1.60560058e-01, -9.82371295e-01,  2.84340169e+00,
+                                    4.95003549e-03, -7.08913327e-01,  1.51861788e+00, -1.05174705e+00,
+                                    -1.75565162e+00,  2.87072370e+00, -2.78597545e+00,  7.29284151e-01,
+                                    1.59424776e+00, -3.49720253e-15, -2.61480295e+00,  2.53217806e+00,
+                                    -7.66353380e-01,  6.31216079e-01,  7.30475300e-01, -3.30111115e+00,
+                                    -7.10339932e-01,  1.77090980e+00, -3.08750334e+00,  3.26705990e+00,
+                                    7.87144208e-01, -1.92413422e+00,  2.83838661e+00, -2.11417457e+00,
+                                    -2.80268987e+00,  2.61480295e+00, -6.24500451e-15, -3.10967275e+00,
+                                    1.42492084e+00, -1.58488036e+00,  4.69877164e-01,  2.05599107e+00,
+                                    2.21351707e+00, -4.06599993e+00,  5.85075242e+00, -6.24576761e+00,
+                                    2.91297712e-01, -6.63359067e-01, -1.47024726e-02,  2.58202829e+00,
+                                    9.62872951e-01, -2.53217806e+00,  3.10967275e+00, -1.42559575e-14};
+    int res = 4;
+    int renorm = 0;
+
+    out = hafnian::hermite_multidimensional_cpp(mat4, d4, res, renorm);
+
+    for (int i = 0; i < 256; i++) {
+        EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
+        EXPECT_NEAR(expected_im[i], std::imag(out[i]), tol2);
+    }
+
+}
+
+
+
+TEST(BatchHafnian, UnitRenormalization) {
+    std::vector<std::complex<double>> B = {std::complex<double>(0, 0), std::complex<double>(-0.70710678, 0), std::complex<double>(-0.70710678, 0), std::complex<double>(0, 0)};
+    std::vector<std::complex<double>> d(4, std::complex<double>(0.0, 0.0));
+
+    int res = 10;
+
+    std::vector<double> expected_re(res*res, 0);
+    std::vector<double> expected_im(res*res, 0);
+
+    std::vector<std::complex<double>> out(res*res, 0.0);
+
+    int renorm = 1;
+
+    for (int i = 0; i < res; i++)
+        expected_re[i*res+i] = pow(0.5, static_cast<double>(i)/2.0);
+
+    out = hafnian::hermite_multidimensional_cpp(B, d, res, renorm);
+
+    for (int i = 0; i < res*res; i++) {
+        EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
+        EXPECT_NEAR(expected_im[i], std::imag(out[i]), tol2);
+    }
+
+}
+
+}

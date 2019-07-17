@@ -46,6 +46,8 @@ cdef extern from "../src/hafnian.hpp" namespace "hafnian":
     double complex torontonian_quad(vector[double complex] &mat)
     double torontonian_fsum[T](vector[T] &mat)
 
+    vector[double complex] hermite_multidimensional_cpp(vector[double complex] &mat, vector[double complex] &d, int &resolution, bint &renorm)
+
 
 # ==============================================================================
 # Torontonian
@@ -361,3 +363,25 @@ def perm_real(double [:, :] A, quad=True, fsum=False):
 
     return permanent(mat)
 
+
+# ==============================================================================
+# Batch hafnian
+
+def hermite_multidimensional(double complex[:, :] A, double complex[:] d, int resolution, ren=False):
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double complex] R_mat, y_mat
+	
+    cdef int renorm = 0
+
+    if ren:
+        renorm = 1
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(A[i, j])
+
+
+    for i in range(n):
+        y_mat.push_back(d[i])
+
+    return hermite_multidimensional_cpp(R_mat, y_mat, resolution, renorm)

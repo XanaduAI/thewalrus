@@ -22,10 +22,10 @@ typedef long long int llint;
 //typedef long double qp;
 
 #if (defined(__GNUC__) || defined(__GNUG__)) && !(defined(__clang__) || defined(__INTEL_COMPILER))
-	typedef __float128 qp;
-	//#include <quadmath.h>
+typedef __float128 qp;
+//#include <quadmath.h>
 #else
-	typedef long double qp;
+typedef long double qp;
 #endif
 
 /**
@@ -210,7 +210,7 @@ inline double perm_fsum(std::vector<T> &mat) {
 #endif
 
     std::vector<T> tot(nthreads, static_cast<T>(0));
-   
+
     std::vector<llint> threadbound_low(nthreads);
     std::vector<llint> threadbound_hi(nthreads);
 
@@ -224,7 +224,7 @@ inline double perm_fsum(std::vector<T> &mat) {
     #pragma omp parallel for shared(tot)
     for (int ii = 0; ii < nthreads; ii++) {
 
-    	fsum::sc_partials permtmp; // = 0;
+        fsum::sc_partials permtmp; // = 0;
 
         int cntr = 0;
         std::vector<int> chitmp(n, 0);
@@ -272,9 +272,8 @@ inline double perm_fsum(std::vector<T> &mat) {
                 permtmp -= rowsumprod;
 
         }
-       tot[ii] = permtmp;
+        tot[ii] = permtmp;
     }
-
     return static_cast<T>(std::accumulate(tot.begin(), tot.end(), static_cast<T>(0)));
 }
 

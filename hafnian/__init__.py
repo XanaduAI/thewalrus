@@ -54,24 +54,20 @@ Python wrappers
 .. autosummary::
     hafnian
     hafnian_repeated
+    hafnian_batched
+    hermite_multidimensional
     tor
     perm
     permanent_repeated
     reduction
     version
+
 """
 # pylint: disable=wrong-import-position
 import os
 import platform
 
 import numpy as np
-
-
-if platform.system() == "Windows":  # pragma: no cover
-    extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
-    if os.path.isdir(extra_dll_dir):
-        os.environ["PATH"] += os.pathsep + extra_dll_dir
-
 
 from ._hafnian import (
     haf_complex,
@@ -83,9 +79,15 @@ from ._hafnian import (
     hafnian_repeated,
     reduction,
 )
+from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional
 from ._permanent import perm, perm_complex, perm_real, permanent_repeated
 from ._torontonian import tor
 from ._version import __version__
+
+if platform.system() == "Windows":  # pragma: no cover
+    extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
+    if os.path.isdir(extra_dll_dir):
+        os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 
 __all__ = [
@@ -95,6 +97,8 @@ __all__ = [
     "perm",
     "permanent_repeated",
     "reduction",
+    "hafnian_batched",
+    "hermite_multidimensional",
     "version",
 ]
 

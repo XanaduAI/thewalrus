@@ -30,7 +30,7 @@ def test_rank_one(n):
     A = np.outer(x, x)
     exact = factorial2(n - 1) * np.prod(x)
     approx = haf_real(A, approx=True, nsamples=10000)
-    assert np.allclose(approx, exact, rtol=1e-1, atol=0)
+    assert np.allclose(approx, exact, rtol=2e-1, atol=0)
 
 
 def test_approx_complex_error():

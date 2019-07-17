@@ -174,7 +174,10 @@ def hafnian(
 
 
 def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
-    r"""Returns the hafnian of matrix with repeated rows/columns.
+    r"""
+    THIS NEEDS TO BE WRITTEN
+
+    Returns the hafnian of matrix with repeated rows/columns.
 
     The :func:`reduction` function may be used to show the resulting matrix
     with repeated rows and columns as per ``rpt``.
