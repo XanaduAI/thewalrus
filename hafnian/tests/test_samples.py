@@ -27,7 +27,7 @@ from hafnian.samples import (
 )
 from hafnian.quantum import gen_Qmat_from_graph
 
-np.random.seed(20)
+np.random.seed(137)
 
 rel_tol = 3.0
 abs_tol = 1.0e-10
