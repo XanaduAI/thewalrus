@@ -47,6 +47,9 @@ Approximate hafnian algorithm
     matrices with non-negative elements. This is done by sampling determinants;
     the larger the number of samples taken, the higher the accuracy.
 
+Batched hafnian algorithm
+    TODO
+
 
 Python wrappers
 ---------------
@@ -55,10 +58,10 @@ Python wrappers
     hafnian
     hafnian_repeated
     hafnian_batched
-    hermite_multidimensional
     tor
     perm
     permanent_repeated
+    hermite_multidimensional
     reduction
     version
 
@@ -68,6 +71,11 @@ import os
 import platform
 
 import numpy as np
+
+if platform.system() == "Windows":  # pragma: no cover
+    extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
+    if os.path.isdir(extra_dll_dir):
+        os.environ["PATH"] += os.pathsep + extra_dll_dir
 
 from ._hafnian import (
     haf_complex,
@@ -84,20 +92,15 @@ from ._permanent import perm, perm_complex, perm_real, permanent_repeated
 from ._torontonian import tor
 from ._version import __version__
 
-if platform.system() == "Windows":  # pragma: no cover
-    extra_dll_dir = os.path.join(os.path.dirname(__file__), ".libs")
-    if os.path.isdir(extra_dll_dir):
-        os.environ["PATH"] += os.pathsep + extra_dll_dir
-
 
 __all__ = [
     "hafnian",
     "hafnian_repeated",
+    "hafnian_batched",
     "tor",
     "perm",
     "permanent_repeated",
     "reduction",
-    "hafnian_batched",
     "hermite_multidimensional",
     "version",
 ]
