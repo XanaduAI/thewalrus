@@ -413,3 +413,19 @@ class TestTorontonianSampling:
         probs[0] = 1.0 / (1.0 + mean_n)
         probs[1] = 1 - probs[0]
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
+
+
+def test_seed():
+    """Tests that seed method does reset the random number generators"""
+    n_samples = 10
+    mean_n = 1.0
+    r = np.arcsinh(np.sqrt(mean_n))
+    V = np.array([[np.exp(2 * r), 0.0], [0.0, np.exp(-2 * r)]])
+    seed(137)
+    first_sample = hafnian_sample_state(V, n_samples)
+    second_sample = hafnian_sample_state(V, n_samples)
+    seed(137)
+    first_sample_p = hafnian_sample_state(V, n_samples)
+    second_sample_p = hafnian_sample_state(V, n_samples)
+    assert np.array_equal(first_sample, first_sample_p)
+    assert np.array_equal(second_sample, second_sample_p)
