@@ -24,10 +24,11 @@ from hafnian.samples import (
     torontonian_sample_state,
     hafnian_sample_classical_state,
     torontonian_sample_classical_state,
+    seed,
 )
 from hafnian.quantum import gen_Qmat_from_graph, density_matrix_element
 
-np.random.seed(137)
+seed(137)
 
 rel_tol = 3.0
 abs_tol = 1.0e-10
