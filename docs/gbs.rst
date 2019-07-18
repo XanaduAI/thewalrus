@@ -57,7 +57,7 @@ where :math:`\Gamma` is hermitian and positive definite, while :math:`C` is symm
 Gaussian states in the quadrature basis
 ***************************************
 
-Historically, Gaussian states are parametrized not in terms of the covariance matrix :math:`\sigma` of the complex amplitudes :math:`\alpha_j` but rather in terms of its quadrature components, the canonical positions :math:`q_j` and canonical momenta :math:`p_j` as follows
+Historically, Gaussian states are parametrized not in terms of the covariance matrix :math:`\sigma` of the complex amplitudes :math:`\alpha_j`, but rather in terms of its quadrature components, the canonical positions :math:`q_j` and canonical momenta :math:`p_j`,
 
 .. math::
 	\alpha_j = \frac{1}{\sqrt{2 \hbar}} \left( q_j+ i p_j \right),

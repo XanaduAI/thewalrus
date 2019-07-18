@@ -13,7 +13,7 @@ Features
 
 * An easy to use interface to use the loop hafnian for Gaussian quantum state calculations
 
-* State of the art algorithms to sample from (loop)hafnian and torontonians of graphs.
+* State of the art algorithms to sample from (loop) hafnian and torontonians of graphs.
 
 * Efficient classical methods for approximating the hafnian of non-negative matrices.
 

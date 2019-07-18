@@ -59,7 +59,7 @@ where :math:`p(N_{k-1}=n_{k-1},\ldots,N_0=n_0)` has already been calculated from
 
    * To generate samples from a gaussian state specified by a quadrature covariance matrix use :func:`hafnian.samples.generate_hafnian_sample`.
 
-Note that the above algorithm can also be generalized to states with finite means for which one only needs to provide the mean with the optional argument ``mean``.
+      Note that the above algorithm can also be generalized to states with finite means for which one only needs to provide the mean with the optional argument ``mean``.
 
 
 Threshold detection samples
