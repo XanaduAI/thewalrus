@@ -48,8 +48,9 @@ Approximate hafnian algorithm
     the larger the number of samples taken, the higher the accuracy.
 
 Batched hafnian algorithm
-    TODO
-
+    An algorithm that allows to calculate the hafnians of all the reduction of
+    a given matrix up to the cutoff (resolution) provided. This algorithm uses
+    internaly the multidimensional Hermite polynomials.
 
 Python wrappers
 ---------------
