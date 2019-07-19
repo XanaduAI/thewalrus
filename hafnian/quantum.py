@@ -31,6 +31,14 @@ states, see:
   "Gaussian boson sampling." `Physical review letters, 119(17), 170501. (2017).
   <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.119.170501>`_
 
+* Quesada, N. 
+  "Franck-Condon factors by counting perfect matchings of graphs with loops."
+  `Journal of Chemical Physics 150, 164113 (2019). 10.1063/1.5086387>`_ 
+
+* Quesada, N., Helt, L. G., Izaac, J., Arrazola, J. M., Shahrokhshahi, R., Myers, C. R., & Sabapathy, K. K. 
+  "Simulating realistic non-Gaussian state preparation."
+  `arXiv:1905.07011. (2019). <https://arxiv.org/abs/1905.07011>`
+
 
 Fock states
 -----------
