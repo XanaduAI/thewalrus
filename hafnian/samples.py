@@ -549,11 +549,12 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
 
 
 def seed(seed_val=None):
-    r""" Seeds the random number generator. It provides a wrapper
-    for numpy.random.seed()
+    r""" Seeds the random number generator used in the sampling algorithms.
+    
+    This function is a wrapper around ``numpy.random.seed()``. By setting the seed
+    to a specific integer, the sampling algorithms will exhibit deterministic behaviour.
 
     Args:
         seed_val (int): Seed for RandomState. Must be convertible to 32 bit unsigned integers.
-
     """
     np.random.seed(seed_val)
