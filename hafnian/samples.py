@@ -550,7 +550,7 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
 
 def seed(seed_val=None):
     r""" Seeds the random number generator used in the sampling algorithms.
-    
+
     This function is a wrapper around ``numpy.random.seed()``. By setting the seed
     to a specific integer, the sampling algorithms will exhibit deterministic behaviour.
 
