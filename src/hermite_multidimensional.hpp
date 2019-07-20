@@ -28,12 +28,12 @@ typedef unsigned long long int ullint;
 
 
 /**
- * TODO
+ * Returns the index of the one dimensional flattened vector corresponding to the multidimensional tensor
  *
  * @param pos
  * @param resolution
  *
- * @return
+ * @return index on flattened vector
  */
 ullint vec2index(std::vector<int> &pos, int resolution) {
     int dim = pos.size();
@@ -49,13 +49,13 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 }
 
 /**
- * TODO
+ * Returns the indices of the tensor that corresponds to a given element
  *
  * @param val
  * @param base
  * @param n
  *
- * @return
+ * @return tensor index
  */
 std::vector<int> find_rep(int val, int base, int n) {
     std::vector<int> x(n, 0);
@@ -78,15 +78,11 @@ std::vector<int> find_rep(int val, int base, int n) {
 
 
 /**
- * Renormalizes an unnormalized photon number statistics of a Gaussian state.
- * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
+ * Returns the sqrt of the factorial of an integer.
  *
- * @param tn unnormalized flattened vector of size \f$res**nmodes$ representing unnormalized photon number statistics
- *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
- * @param nmodes number of modes
- * @param res highest number of photons to be resolved.
+ * @param nn input integer
  *
- * @return Renormalized photon number statistics
+ * @return Square root of the factorial of \f$n\f$.
  */
 long double sqrtfactorial(int nn)
 {
