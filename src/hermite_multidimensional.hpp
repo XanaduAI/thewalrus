@@ -49,7 +49,7 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 }
 
 /**
- * Returns the indices of the tensor that corresponds to a given element
+ * Returns the indices of the tensor corresponding to a given element
  *
  * @param val
  * @param base
