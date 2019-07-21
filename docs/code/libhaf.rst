@@ -77,17 +77,18 @@ The following functions are intended as the main interface to the C++ Hafnian li
 
 .. rst-class:: longtable docutils
 
-======================================    ==============================================
-:cpp:func:`hafnian::hafnian_recursive`    Returns the hafnian of a matrix using the recursive algorithm described in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
-:cpp:func:`hafnian::hafnian`              Returns the hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
-:cpp:func:`hafnian::loop_hafnian`         Returns the loop hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
-:cpp:func:`hafnian::hafnian_rpt`          Returns the hafnian of a matrix with repeated rows and columns using the algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
-:cpp:func:`hafnian::hafnian_approx`       Returns the approximate hafnian of a matrix with non-negative entries by sampling over determinants. The higher the number of samples, the better the accuracy.
-:cpp:func:`hafnian::torontonian`          Returns the Torontonian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
-:cpp:func:`hafnian::torontonian_fsum`     Returns the torontonian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__, with increased accuracy via the ``fsum`` summation algorithm.
-:cpp:func:`hafnian::permanent`            Returns the permanent of a matrix using Ryser's algorithm with Gray code ordering.
-:cpp:func:`hafnian::perm_fsum`            Returns the permanent of a matrix using Ryser's algorithm with Gray code ordering, with increased accuracy via the ``fsum`` summation algorithm.
-======================================    ==============================================
+=================================================            ==============================================
+:cpp:func:`hafnian::hafnian_recursive`                       Returns the hafnian of a matrix using the recursive algorithm described in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
+:cpp:func:`hafnian::hafnian`                                 Returns the hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
+:cpp:func:`hafnian::loop_hafnian`                            Returns the loop hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
+:cpp:func:`hafnian::hafnian_rpt`                             Returns the hafnian of a matrix with repeated rows and columns using the algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
+:cpp:func:`hafnian::hafnian_approx`                          Returns the approximate hafnian of a matrix with non-negative entries by sampling over determinants. The higher the number of samples, the better the accuracy.
+:cpp:func:`hafnian::torontonian`                             Returns the Torontonian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
+:cpp:func:`hafnian::torontonian_fsum`                        Returns the torontonian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__, with increased accuracy via the ``fsum`` summation algorithm.
+:cpp:func:`hafnian::permanent`                               Returns the permanent of a matrix using Ryser's algorithm with Gray code ordering.
+:cpp:func:`hafnian::perm_fsum`                               Returns the permanent of a matrix using Ryser's algorithm with Gray code ordering, with increased accuracy via the ``fsum`` summation algorithm.
+:cpp:func:`hafnian::hermite_multidimensional_cpp`            Returns photon number statistics of a Gaussian state for a given covariance matrix as described in *Multidimensional Hermite polynomials and photon distribution for polymode mixed light* `arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`__.
+=================================================            ==============================================
 
 
 API

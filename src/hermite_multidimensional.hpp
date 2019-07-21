@@ -12,6 +12,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * @file
+ * Contains functions for calculating the multidimensional
+ * Hermite polynomials, used for computation of batched hafnians.
+ */
 
 #pragma once
 #include <stdafx.h>
@@ -22,6 +27,14 @@
 typedef unsigned long long int ullint;
 
 
+/**
+ * Returns the index of the one dimensional flattened vector corresponding to the multidimensional tensor
+ *
+ * @param pos
+ * @param resolution
+ *
+ * @return index on flattened vector
+ */
 ullint vec2index(std::vector<int> &pos, int resolution) {
     int dim = pos.size();
     ullint nextCoordinate = 0;
@@ -35,6 +48,15 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
+/**
+ * Returns the indices of the tensor corresponding to a given element
+ *
+ * @param val
+ * @param base
+ * @param n
+ *
+ * @return tensor index
+ */
 std::vector<int> find_rep(int val, int base, int n) {
     std::vector<int> x(n, 0);
     int local_val = val;
@@ -52,10 +74,16 @@ std::vector<int> find_rep(int val, int base, int n) {
     }
 
     return digits;
-
 }
 
 
+/**
+ * Returns the sqrt of the factorial of an integer.
+ *
+ * @param nn input integer
+ *
+ * @return Square root of the factorial of \f$n\f$.
+ */
 long double sqrtfactorial(int nn)
 {
     long double n = static_cast<long double>(nn);
@@ -66,8 +94,9 @@ long double sqrtfactorial(int nn)
         return 1;
 }
 
+
 /**
- * Renormalizes and unnormalized photon number statistics of a Gaussian state.
+ * Renormalizes an unnormalized photon number statistics of a Gaussian state.
  * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
  *
  * @param tn unnormalized flattened vector of size \f$res**nmodes$ representing unnormalized photon number statistics
@@ -75,7 +104,7 @@ long double sqrtfactorial(int nn)
  * @param nmodes number of modes
  * @param res highest number of photons to be resolved.
  *
- * $return Renormalized photon number statistics
+ * @return Renormalized photon number statistics
  */
 template <typename T>
 inline std::vector<T> renormalization(std::vector<T> tn, int nmodes, int res) {
@@ -105,7 +134,11 @@ namespace hafnian {
 
 /**
  * Returns photon number statistics of a Gaussian state for a given covariance matrix `mat`.
- * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
+ * as described in *Multidimensional Hermite polynomials and photon distribution for polymode mixed light*
+ * [arxiv:9308033](https://arxiv.org/abs/hep-th/9308033).
+ *
+ * This implementation is based on the MATLAB code available at
+ * https://github.com/clementsw/gaussian-optics
  *
  * @param mat a flattened vector of size \f$2n^2\f$, representing an
  *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
