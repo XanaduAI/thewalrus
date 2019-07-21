@@ -48,9 +48,11 @@ Approximate hafnian algorithm
     the larger the number of samples taken, the higher the accuracy.
 
 Batched hafnian algorithm
-    An algorithm that allows to calculate the hafnians of all the reduction of
-    a given matrix up to the cutoff (resolution) provided. This algorithm uses
-    internaly the multidimensional Hermite polynomials.
+    An algorithm that allows the calculation of hafnians of all reductions of
+    a given matrix up to the cutoff (resolution) provided. Internally, this algorithm
+    makes use of the multidimensional Hermite polynomials as per
+    *Multidimensional Hermite polynomials and photon distribution for polymode mixed light*
+`arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`__.
 
 Python wrappers
 ---------------
