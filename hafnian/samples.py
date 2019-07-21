@@ -70,7 +70,7 @@ from .quantum import (
 # pylint: disable=too-many-branches
 def generate_hafnian_sample(
     cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
-): # pylint: disable=too-many-branches
+):  # pylint: disable=too-many-branches
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -490,8 +490,11 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
     cov = Covmat(Q)
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
 
+
 # pylint: disable=unused-argument
-def hafnian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08, cutoff=None): # add cutoff for consistency pylint: disable=unused-argument
+def hafnian_sample_classical_state(
+    cov, samples, mean=None, hbar=2, atol=1e-08, cutoff=None
+):  # add cutoff for consistency pylint: disable=unused-argument
     r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
 
     Args:
@@ -543,3 +546,15 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
     return np.where(
         hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
     )
+
+
+def seed(seed_val=None):
+    r""" Seeds the random number generator used in the sampling algorithms.
+
+    This function is a wrapper around ``numpy.random.seed()``. By setting the seed
+    to a specific integer, the sampling algorithms will exhibit deterministic behaviour.
+
+    Args:
+        seed_val (int): Seed for RandomState. Must be convertible to 32 bit unsigned integers.
+    """
+    np.random.seed(seed_val)
