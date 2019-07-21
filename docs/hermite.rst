@@ -21,7 +21,7 @@ Given two complex vectors :math:`\alpha,\beta \in \mathbb{C}^\ell` and a symmetr
 .. math::
     G_B(\alpha,\beta) = \exp\left( \alpha \mathbf{B} \beta^T - \tfrac{1}{2}\beta \mathbf{B} \beta^T\right) = \sum_{\mathbf{m} \geq \mathbf{0}} \prod_{i=1}^{\ell} \frac{\beta_i^{n_i}}{n_i} H_{\mathbf{m}}^{(\mathbf{B})}(\alpha),
 
-where the notation :math:`\mathbf{m} \geq 0` is used to indicate that the sum goes over all vectors  in :math:` \mathbb{N}^{\ell}_0` (the set of vectors of nonnegative integers of size :math:`\ell`). This generating function provides an implicit definition of the multidimensional Hermite polynomials.
+where the notation :math:`\mathbf{m} \geq \mathbf{0}` is used to indicate that the sum goes over all vectors  in :math:` \mathbb{N}^{\ell}_0` (the set of vectors of nonnegative integers of size :math:`\ell`). This generating function provides an implicit definition of the multidimensional Hermite polynomials.
 It is also straightforward to verify that :math:`H_{\mathbf{0}}^{(\mathbf{B})}(\alpha) = 1`.
 
 In the one dimensional case, :math:`\ell=1`, one can compare the generating function above with the ones for the "probabilists' Hermite polynomials" :math:`He_n(x)` and "physicists' Hermite polynomials" :math:`H_n(x)` to find
