@@ -33,11 +33,10 @@ states, see:
 
 * Quesada, N.
   "Franck-Condon factors by counting perfect matchings of graphs with loops."
-  `Journal of Chemical Physics 150, 164113 (2019). 10.1063/1.5086387>`_
+  `Journal of Chemical Physics 150, 164113 (2019). <https://aip.scitation.org/doi/10.1063/1.5086387>`_
 
 * Quesada, N., Helt, L. G., Izaac, J., Arrazola, J. M., Shahrokhshahi, R., Myers, C. R., & Sabapathy, K. K.
-  "Simulating realistic non-Gaussian state preparation."
-  `arXiv:1905.07011. (2019). <https://arxiv.org/abs/1905.07011>`
+  "Simulating realistic non-Gaussian state preparation." `arXiv:1905.07011. (2019). <https://arxiv.org/abs/1905.07011>`_
 
 
 Fock states
