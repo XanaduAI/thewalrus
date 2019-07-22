@@ -52,7 +52,7 @@ Batched hafnian algorithm
     a given matrix up to the cutoff (resolution) provided. Internally, this algorithm
     makes use of the multidimensional Hermite polynomials as per
     *Multidimensional Hermite polynomials and photon distribution for polymode mixed light*
-`arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`__.
+    `arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`__.
 
 Python wrappers
 ---------------
