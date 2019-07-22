@@ -149,12 +149,12 @@ Compare this with Björklund's algorithm, which requires :math:`O\left((A n)^3 \
 
 Batched algorithm
 -----------------
-Using the Hermite polynomials, and their connection to the matrix elements of Gaussian states and hafnians discussed in the next section, one can calculate the hafnians of all reductions of a matrix :math:`\mathbf{A}` up to a given cutoff. The reduction of matrix :math:`\mathbf{B}` is precisely the matrix :math:`\mathbf{B}_{\mathbf{m}}` obtained by repeating (or removing) the :math:`i^{\text{th}}` row and column :math:`m_i` times. Thus given a cutoff :math:`m_{\max}`, one can use the batched algorithm to calculate
+Using the multidimensional Hermite polynomials, and their connection to the matrix elements of Gaussian states and hafnians discussed in the next section, one can calculate the hafnians of all reductions of a matrix :math:`\mathbf{B} \in \mathbb{C}^{n \times n}` up to a given cutoff. The reduction of matrix :math:`\mathbf{B}` is precisely the matrix :math:`\mathbf{B}_{\mathbf{m}}` obtained by repeating (or removing) the :math:`i^{\text{th}}` row and column :math:`m_i` times. Thus given a cutoff :math:`m_{\max}`, one can use the batched algorithm to calculate
 
 .. math::
 	\text{haf}\left( \mathbf{B}_\mathbf{m} \right)
 
-for all :math:`0\leq m_i < m_{\max}`, thus this function returns a tensor with :math:`n^{m_{\max}}` components.
+for all :math:`0\leq m_i < m_{\max}`, thus this function returns a tensor with :math:`(m_{\max})^n` components.
 
 One can also use this function to calculate the same loop hafnians that Kan's algorithm returns
 
