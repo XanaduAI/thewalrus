@@ -171,7 +171,7 @@ def partitions(s, singles=True, pairs=True):
 def T(n):
     r"""Returns the :math:`n` th telephone number.
 
-    They satisfy the recursion relation :math:`T(n) = T(n-1)+(n-1)T(n-1)` and
+    They satisfy the recursion relation :math:`T(n) = T(n-1)+(n-1)T(n-2)` and
     :math:`T(0)=T(1)=1`.
 
     See https://oeis.org/A000085 for more details.
