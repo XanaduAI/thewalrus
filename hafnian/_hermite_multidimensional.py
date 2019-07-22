@@ -132,7 +132,7 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
         cutoff (int): maximum size of the subindices in the Hermite polynomial
         mu (array): a vector of length :math:`N` representing the vector of means/displacement
         renorm (bool): If ``True``, the returned hafnians are *normalized*, that is,
-            :math:`haf(reduction(A, k))/\prod(\prod_i k_i!)`
+            :math:`haf(reduction(A, k))/\prod_i k_i!`
             (or :math:`lhaf(fill\_diagonal(reduction(A, k),reduction(mu, k)))` if
             ``mu`` is not None)
         make_tensor: If ``False``, returns a flattened one dimensional array instead
