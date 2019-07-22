@@ -165,10 +165,10 @@ def Sympmat(N):
 
 
 def Qmat(cov, hbar=2):
-    r"""Returns the :math:`Q` matrix of the Gaussian state.
+    r"""Returns the :math:`Q` Husimi matrix of the Gaussian state.
 
     Args:
-        cov (array): :math:`2N\times 2N` covariance matrix
+        cov (array): :math:`2N\times 2N xp-` Wigner covariance matrix
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
@@ -194,11 +194,11 @@ def Qmat(cov, hbar=2):
 
 
 def Covmat(Q, hbar=2):
-    r"""Returns the covariance matrix in the :math:`xp`-ordering of the Gaussian state.
+    r"""Returns the Wigner covariance matrix in the :math:`xp`-ordering of the Gaussian state.
     This is the inverse function of Qmat.
 
     Args:
-        Q (array): :math:`2N\times 2N` Q matrix
+        Q (array): :math:`2N\times 2N` Husimi Q matrix
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
