@@ -33,11 +33,10 @@ states, see:
 
 * Quesada, N.
   "Franck-Condon factors by counting perfect matchings of graphs with loops."
-  `Journal of Chemical Physics 150, 164113 (2019). 10.1063/1.5086387>`_
+  `Journal of Chemical Physics 150, 164113 (2019). <https://aip.scitation.org/doi/10.1063/1.5086387>`_
 
 * Quesada, N., Helt, L. G., Izaac, J., Arrazola, J. M., Shahrokhshahi, R., Myers, C. R., & Sabapathy, K. K.
-  "Simulating realistic non-Gaussian state preparation."
-  `arXiv:1905.07011. (2019). <https://arxiv.org/abs/1905.07011>`
+  "Simulating realistic non-Gaussian state preparation." `arXiv:1905.07011. (2019). <https://arxiv.org/abs/1905.07011>`_
 
 
 Fock states
@@ -165,10 +164,10 @@ def Sympmat(N):
 
 
 def Qmat(cov, hbar=2):
-    r"""Returns the :math:`Q` matrix of the Gaussian state.
+    r"""Returns the :math:`Q` Husimi matrix of the Gaussian state.
 
     Args:
-        cov (array): :math:`2N\times 2N` covariance matrix
+        cov (array): :math:`2N\times 2N xp-` Wigner covariance matrix
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
@@ -194,11 +193,11 @@ def Qmat(cov, hbar=2):
 
 
 def Covmat(Q, hbar=2):
-    r"""Returns the covariance matrix in the :math:`xp`-ordering of the Gaussian state.
+    r"""Returns the Wigner covariance matrix in the :math:`xp`-ordering of the Gaussian state.
     This is the inverse function of Qmat.
 
     Args:
-        Q (array): :math:`2N\times 2N` Q matrix
+        Q (array): :math:`2N\times 2N` Husimi Q matrix
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 

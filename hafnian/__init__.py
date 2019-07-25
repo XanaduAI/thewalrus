@@ -27,8 +27,8 @@ Algorithm terminology
 Eigenvalue hafnian algorithm
     The algorithm described in
     *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
-    `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
-    This algorithm scales like :math:`\mathcal{O}(n^3 2^{n/2})`, and supports caclulation of
+    :cite:`bjorklund2018faster`.
+    This algorithm scales like :math:`\mathcal{O}(n^3 2^{n/2})`, and supports calculation of
     the loop hafnian.
 
 Recursive hafnian algorithm
@@ -37,13 +37,14 @@ Recursive hafnian algorithm
     currently support the loop hafnian.
 
 Repeating hafnian algorithm
-    The algorithm described in *From moments of sum to moments of product*,
-    `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
+    The algorithm described in *From moments of sum to moments of product*, :cite:`kan2008moments`.
     This method is more efficient for matrices with repeated rows and columns, and supports caclulation of
     the loop hafnian.
 
 Approximate hafnian algorithm
-    An algorithm that allows us to efficiently approximate the hafnian of
+    The algorithm described in *Polynomial time algorithms to approximate permanents and mixed discriminants
+    within a simply exponential factor*, :cite:`barvinok1999polynomial`.
+    This algorithm allows us to efficiently approximate the hafnian of
     matrices with non-negative elements. This is done by sampling determinants;
     the larger the number of samples taken, the higher the accuracy.
 
@@ -52,7 +53,7 @@ Batched hafnian algorithm
     a given matrix up to the cutoff (resolution) provided. Internally, this algorithm
     makes use of the multidimensional Hermite polynomials as per
     *Multidimensional Hermite polynomials and photon distribution for polymode mixed light*
-`arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`__.
+    :cite:`dodonov1994multidimensional`.
 
 Python wrappers
 ---------------

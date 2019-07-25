@@ -44,11 +44,11 @@ The variables :math:`(\alpha_0,\ldots,\alpha_{\ell-1})` are said to be complex n
 
 where :math:`{Z} = \left( \begin{smallmatrix} \mathbb{I} & 0\\ 0& -\mathbb{I} \end{smallmatrix} \right)`. The covariance matrix :math:`\sigma` is customarily parametrized in the following block form :cite:`picinbono1996second`
 
-.. math:: \sigma = \left(\begin{array}{c|c}
+.. math:: \sigma = \left[\begin{array}{c|c}
 	\Gamma & C \\
 	\hline
 	C^* & \Gamma^*
-	\end{array} \right),
+	\end{array} \right],
 
 where :math:`\Gamma` is hermitian and positive definite, while :math:`C` is symmetric.
 
