@@ -8,7 +8,7 @@ from scipy.linalg import qr
 
 import matplotlib.pyplot as plt
 
-from hafnian.lib.libhaf import haf_int, haf_real, haf_complex
+from thewalrus.libwalrus import haf_int, haf_real, haf_complex
 
 
 a0 = 100.

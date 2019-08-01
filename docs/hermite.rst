@@ -31,7 +31,7 @@ In the one dimensional case, :math:`\ell=1`, one can compare the generating func
     H_n(x) = H_{n}^{([2])}(x).
 
 .. tip::
-   The multidimensional Hermite polynomials are *Implemented as* :func:`hafnian.hermite_multidimensional`.
+   The multidimensional Hermite polynomials are *Implemented as* :func:`thewalrus.hermite_multidimensional`.
 
 
 Recursion relation

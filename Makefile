@@ -2,15 +2,15 @@ PYTHON3 := $(shell which python3 2>/dev/null)
 COVERAGE3 := $(shell which coverage3 2>/dev/null)
 
 PYTHON := python3
-COVERAGE := --cov=hafnian --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
-TESTRUNNER := -m pytest hafnian
+COVERAGE := --cov=thewalrus --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
+TESTRUNNER := -m pytest thewalrus
 
 .PHONY: help
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
-	@echo "  install            to install Hafnian"
+	@echo "  install            to install The Walrus"
 	@echo "  libperm            to compile the Fortran permanent library"
-	@echo "  wheel              to build the Hafnian wheel"
+	@echo "  wheel              to build the The Walrus wheel"
 	@echo "  dist               to package the source distribution"
 	@echo "  clean              to delete all temporary, cache, and build files"
 	@echo "  clean-docs         to delete all built documentation"
@@ -21,7 +21,7 @@ help:
 .PHONY: install
 install:
 ifndef PYTHON3
-	@echo "To install Hafnian you need to have Python 3 installed"
+	@echo "To install The Walrus you need to have Python 3 installed"
 endif
 	$(PYTHON) setup.py install
 
@@ -35,9 +35,9 @@ dist:
 
 .PHONY : clean
 clean:
-	make -C src clean
-	rm -rf hafnian/__pycache__
-	rm -rf hafnian/tests/__pycache__
+	make -C include clean
+	rm -rf thewalrus/__pycache__
+	rm -rf thewalrus/tests/__pycache__
 	rm -rf dist
 	rm -rf build
 
@@ -46,21 +46,18 @@ doc:
 
 .PHONY : clean-docs
 clean-docs:
-	rm -rf docs/hafnian_cpp_api
+	rm -rf docs/libwalrus_cpp_api
 	make -C docs clean
 
 test-cpp:
-	make -C src/tests clean
+	make -C tests clean
 	echo "Going to compile C++ tests"
-	make -C src/tests
+	make -C tests cpptests
 	echo "Compilation done for C++ tests"
-	make -C src/tests runtest
+	make -C tests
 
 test:
 	$(PYTHON) $(TESTRUNNER)
 
 coverage:
 	$(PYTHON) $(TESTRUNNER) $(COVERAGE)
-
-libperm:
-	make libperm -C src

@@ -1,7 +1,7 @@
 # .coveragerc to control coverage.py
 [run]
-source = hafnian
-omit = hafnian/tests/*
+source = thewalrus
+omit = thewalrus/tests/*
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -30,9 +30,9 @@ exclude_lines =
     raise IndexError
     raise FileNotFoundError
     raise NotADirectoryError
-    return __version__ 
-    if len(lst) != self._num_modes: 
-    elif max(lst) >= self._trunc: 
+    return __version__
+    if len(lst) != self._num_modes:
+    elif max(lst) >= self._trunc:
     except NotImplementedError as err
 
     # Don't complain if non-runnable code isn't run:
