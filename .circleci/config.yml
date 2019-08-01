@@ -29,12 +29,12 @@ jobs:
       - run:
           name: Build unit tests
           command: |
-            cd include/tests
+            cd tests
             GOOGLETEST_DIR=/root/googletest make cpptests
       - run:
           name: Run unit tests
           command: |
-            cd include/tests && ./cpptests
+            cd tests && ./cpptests
 
   pythoncoverage:
     docker:
