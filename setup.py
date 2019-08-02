@@ -131,7 +131,7 @@ info = {
     'version': version,
     'maintainer': 'Xanadu Inc.',
     'maintainer_email': 'nicolas@xanadu.ai',
-    'url': 'http://xanadu.ai',
+    'url': 'https://github.com/XanaduAI/thewalrus',
     'license': 'Apache License 2.0',
     'packages': [
                     'thewalrus',
