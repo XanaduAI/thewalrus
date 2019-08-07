@@ -35,7 +35,7 @@ dist:
 
 .PHONY : clean
 clean:
-	make -C include clean
+	make -C examples clean
 	rm -rf thewalrus/__pycache__
 	rm -rf thewalrus/tests/__pycache__
 	rm -rf dist

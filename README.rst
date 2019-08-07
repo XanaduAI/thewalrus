@@ -17,15 +17,15 @@ The Walrus
     :alt: Codacy grade
     :target: https://app.codacy.com/app/XanaduAI/thewalrus?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/thewalrus&utm_campaign=badger
 
-.. image:: https://img.shields.io/readthedocs/thewalrus.svg?style=flat
+.. image:: https://img.shields.io/readthedocs/the-walrus.svg?style=flat
     :alt: Read the Docs
-    :target: https://thewalrus.readthedocs.io
+    :target: https://the-walrus.readthedocs.io
 
 .. image:: https://img.shields.io/pypi/pyversions/thewalrus.svg?style=flat
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/thewalrus
 
-The fastest exact hafnian library. For more information, please see the `documentation <https://thewalrus.readthedocs.io>`_.
+The fastest exact hafnian library. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
 
 Features
 ========
@@ -169,7 +169,7 @@ libraries are available on your include/library paths.
 Documentation
 =============
 
-The Walrus documentation is available online on `Read the Docs <https://thewalrus.readthedocs.io>`_.
+The Walrus documentation is available online on `Read the Docs <https://the-walrus.readthedocs.io>`_.
 
 To build it locally, you need to have the following packages installed:
 
