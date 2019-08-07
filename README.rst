@@ -1,31 +1,31 @@
-Hafnian
-#######
-    
-.. image:: https://circleci.com/gh/XanaduAI/hafnian/tree/master.svg?style=svg&circle-token=209b57390082a2b2fe2cdc9ee49a301ddc29ca5b
+The Walrus
+##########
+
+.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg&circle-token=209b57390082a2b2fe2cdc9ee49a301ddc29ca5b
     :alt: CircleCI
-    :target: https://circleci.com/gh/XanaduAI/hafnian/tree/master
+    :target: https://circleci.com/gh/XanaduAI/thewalrus/tree/master
 
 .. image:: https://ci.appveyor.com/api/projects/status/9udscqldo1xd25yk/branch/master?svg=true
     :alt: Appveyor
-    :target: https://ci.appveyor.com/project/josh146/hafnian/branch/master
+    :target: https://ci.appveyor.com/project/josh146/thewalrus/branch/master
 
-.. image:: https://img.shields.io/codecov/c/github/xanaduai/hafnian/master.svg?style=flat
+.. image:: https://img.shields.io/codecov/c/github/xanaduai/thewalrus/master.svg?style=flat
     :alt: Codecov coverage
-    :target: https://codecov.io/gh/XanaduAI/hafnian
+    :target: https://codecov.io/gh/XanaduAI/thewalrus
 
 .. image:: https://img.shields.io/codacy/grade/df94d22534cf4c05b1bddcf697011a82.svg?style=flat
     :alt: Codacy grade
-    :target: https://app.codacy.com/app/XanaduAI/hafnian?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/hafnian&utm_campaign=badger
+    :target: https://app.codacy.com/app/XanaduAI/thewalrus?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/thewalrus&utm_campaign=badger
 
-.. image:: https://img.shields.io/readthedocs/hafnian.svg?style=flat
+.. image:: https://img.shields.io/readthedocs/thewalrus.svg?style=flat
     :alt: Read the Docs
-    :target: https://hafnian.readthedocs.io
+    :target: https://thewalrus.readthedocs.io
 
-.. image:: https://img.shields.io/pypi/pyversions/hafnian.svg?style=flat
+.. image:: https://img.shields.io/pypi/pyversions/thewalrus.svg?style=flat
     :alt: PyPI - Python Version
-    :target: https://pypi.org/project/hafnian
+    :target: https://pypi.org/project/thewalrus
 
-The fastest exact hafnian library. For more information, please see the `documentation <https://hafnian.readthedocs.io>`_.
+The fastest exact hafnian library. For more information, please see the `documentation <https://thewalrus.readthedocs.io>`_.
 
 Features
 ========
@@ -57,13 +57,13 @@ To install, simply run
 
 .. code-block:: bash
 
-    pip install hafnian
+    pip install thewalrus
 
 
 Compiling from source
 =====================
 
-Hafnian depends on the following Python packages:
+The Walrus depends on the following Python packages:
 
 * `Python <http://python.org/>`_ >=3.5
 * `NumPy <http://numpy.org/>`_  >=1.13.3
@@ -94,39 +94,39 @@ Alternatively, you can download the Eigen headers manually:
     $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
     $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
 
-Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that Hafnian can find the Eigen3 header files (if not provided, Hafnian will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
+Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
 
-Once all dependencies are installed, you can compile the latest stable version of the Hafnian library as follows:
+Once all dependencies are installed, you can compile the latest stable version of the The Walrus library as follows:
 
 .. code-block:: console
 
-    $ python -m pip install hafnian --no-binary :all:
+    $ python -m pip install thewalrus --no-binary :all:
 
 Alternatively, you can compile the latest development version by cloning the git repository, and installing using pip in development mode.
 
 .. code-block:: console
 
-    $ git clone https://github.com/XanaduAI/hafnian.git
-    $ cd hafnian && python -m pip install -e .
+    $ git clone https://github.com/XanaduAI/thewalrus.git
+    $ cd thewalrus && python -m pip install -e .
 
 
 OpenMP
 ------
 
-The Hafnian library uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux using the GNU g++ compiler, due to insufficient support using Windows/MSCV and MacOS/Clang.**
+``libwalrus`` uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux using the GNU g++ compiler, due to insufficient support using Windows/MSCV and MacOS/Clang.**
 
 
 
 Using LAPACK, OpenBLAS, or MKL
 ------------------------------
 
-If you would like to take advantage of the highly optimized matrix routines of LAPACK, OpenBLAS, or MKL, you can optionally compile the Hafnian library such that Eigen uses these frameworks as backends. As a result, all calls in the Hafnian library to Eigen functions are silently substituted with calls to LAPACK/OpenBLAS/MKL.
+If you would like to take advantage of the highly optimized matrix routines of LAPACK, OpenBLAS, or MKL, you can optionally compile the ``libwalrus`` such that Eigen uses these frameworks as backends. As a result, all calls in the ``libwalrus`` library to Eigen functions are silently substituted with calls to LAPACK/OpenBLAS/MKL.
 
 For example, for LAPACK integration, make sure you have the ``lapacke`` C++ LAPACK bindings installed (``sudo apt install liblapacke-dev`` in Ubuntu-based Linux distributions), and then compile with the environment variable ``USE_LAPACK=1``:
 
 .. code-block:: console
 
-    $ USE_LAPACK=1 python -m pip install hafnian --no-binary :all:
+    $ USE_LAPACK=1 python -m pip install thewalrus --no-binary :all:
 
 Alternatively, you may pass ``USE_OPENBLAS=1`` to use the OpenBLAS library.
 
@@ -134,7 +134,7 @@ Alternatively, you may pass ``USE_OPENBLAS=1`` to use the OpenBLAS library.
 Software tests
 ==============
 
-To ensure that the Hafnian library is working correctly after installation, the test suite can be run by navigating to the source code folder and running
+To ensure that The Walrus library is working correctly after installation, the test suite can be run by navigating to the source code folder and running
 
 .. code-block:: console
 
@@ -169,7 +169,9 @@ libraries are available on your include/library paths.
 Documentation
 =============
 
-The Hafnian+ documentation is currently not hosted online. To build it locally, you need to have the following packages installed:
+The Walrus documentation is available online on `Read the Docs <https://thewalrus.readthedocs.io>`_.
+
+To build it locally, you need to have the following packages installed:
 
 * `Sphinx <http://sphinx-doc.org/>`_ >=1.5
 * `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >=0.3.6
@@ -200,9 +202,9 @@ Authors
 
 Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
 
-All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/hafnian/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
+All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
-If you are doing research using Hafnian, please cite `our paper <https://dl.acm.org/citation.cfm?id=3325111>`_:
+If you are doing research using The Walrus, please cite `our paper <https://dl.acm.org/citation.cfm?id=3325111>`_:
 
  Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on a supercomputer, Journal of Experimental Algorithmics (JEA) 24 (1), 11 (2019)
 
@@ -210,8 +212,8 @@ If you are doing research using Hafnian, please cite `our paper <https://dl.acm.
 Support
 =======
 
-- **Source Code:** https://github.com/XanaduAI/hafnian
-- **Issue Tracker:** https://github.com/XanaduAI/hafnian/issues
+- **Source Code:** https://github.com/XanaduAI/thewalrus
+- **Issue Tracker:** https://github.com/XanaduAI/thewalrus/issues
 
 If you are having issues, please let us know by posting the issue on our Github issue tracker.
 
@@ -219,4 +221,4 @@ If you are having issues, please let us know by posting the issue on our Github 
 License
 =======
 
-Hafnian is **free** and **open source**, released under the Apache License, Version 2.0.
+The Walrus is **free** and **open source**, released under the Apache License, Version 2.0.

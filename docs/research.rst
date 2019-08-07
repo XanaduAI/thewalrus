@@ -4,18 +4,18 @@ Research and contribution
 Research
 ---------------
 
-If you are doing research using the Hafnian library please reference this page and our `our paper <https://arxiv.org/abs/1805.12498>`_.
+If you are doing research using The Walrus please reference this page and our `our paper <https://arxiv.org/abs/1805.12498>`_.
 
-We are always open for collaboration, and can be contacted at research@xanadu.ai. 
+We are always open for collaboration, and can be contacted at research@xanadu.ai.
 
 Contribution
 -------------
 
 If you would like to get involved with the Machine Learning Toolbox, or you would like to contribute, simply fork our Github repository, and make a descriptive pull request.
 
-- **Source Code:** https://github.com/XanaduAI/hafnian
-- **Issue Tracker:** https://github.com/XanaduAI/hafnian/issues
-   
+- **Source Code:** https://github.com/XanaduAI/thewalrus
+- **Issue Tracker:** https://github.com/XanaduAI/thewalrus/issues
+
 
 Support
 --------

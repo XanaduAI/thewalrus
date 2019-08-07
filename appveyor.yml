@@ -7,7 +7,7 @@ environment:
       CIBW_BEFORE_BUILD: pip install numpy scipy cython
       CIBW_SKIP: "cp27-* cp33-* cp34-* *win32"
       CIBW_TEST_REQUIRES: "numpy scipy pytest pytest-cov"
-      CIBW_TEST_COMMAND: "python -m pytest {project}/hafnian"
+      CIBW_TEST_COMMAND: "python -m pytest {project}/thewalrus"
       CIBW_BUILD_VERBOSITY: 3
       WHEELHOUSE_UPLOADER_USERNAME: AKIAJOU6ECM5Q7T6UUQQ
       WHEELHOUSE_UPLOADER_SECRET:

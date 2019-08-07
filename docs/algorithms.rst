@@ -29,7 +29,7 @@ It should be noted that improving over Ryser's algorithm is a well-known open pr
 
 .. tip::
 
-   Permanents can be calculated directly using Ryser's algorithm via :func:`hafnian.perm`.
+   Permanents can be calculated directly using Ryser's algorithm via :func:`thewalrus.perm`.
 
 
 Finally, note that the approximate methods developed for counting perfect matchings are aimed at (weighted-)graphs with real or positive entries  :cite:`2016arXiv160107518B,10.1007/3-540-36494-3_38`. Of particular note is the approximate algorithm introduced by Barvinok for matrices with non-negative entries :cite:`barvinok1999polynomial` further analyzed in Ref. :cite:`rudelson2016hafnians`.
@@ -44,7 +44,7 @@ We provide a reference implementation of the hafnian and loop hafnian that itera
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.reference.hafnian`. The optional argument ``loops=True`` can be used to calculate loop hafnians.
+   *Implemented as* :func:`thewalrus.reference.hafnian`. The optional argument ``loops=True`` can be used to calculate loop hafnians.
 
 
 
@@ -76,7 +76,7 @@ Unfortunately, there is no known generalization of this algorithm to loop hafnia
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.hafnian`. This is the default algorithm for calculating hafnians.
+   *Implemented as* :func:`thewalrus.hafnian`. This is the default algorithm for calculating hafnians.
 
 
 
@@ -123,7 +123,7 @@ where :math:`\mathbf{v} = \text{diag}(\mathbf{C})` and we used the reduction ope
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.hafnian` with the argument ``recursive=False``.
+   *Implemented as* :func:`thewalrus.hafnian` with the argument ``recursive=False``.
    The loop hafnian calculation can be done by setting the option ``loops=True``.
 
 Repeated-moment algorithm
@@ -145,7 +145,7 @@ Compare this with Björklund's algorithm, which requires :math:`O\left((A n)^3 \
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.hafnian_repeated`. The vector :math:`\mathbf{m}` is passed in the variable ``rpt``. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`\mathbf{u}` and the option ``loops=True``.
+   *Implemented as* :func:`thewalrus.hafnian_repeated`. The vector :math:`\mathbf{m}` is passed in the variable ``rpt``. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`\mathbf{u}` and the option ``loops=True``.
 
 Batched algorithm
 -----------------
@@ -167,7 +167,7 @@ Internally, these hafnians are calculated by using the recursion relation of the
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.hafnian_batched`. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`\mathbf{u}`.
+   *Implemented as* :func:`thewalrus.hafnian_batched`. The loop hafnian calculation can be done by passing the variable ``mu`` with the values of the vector :math:`\mathbf{u}`.
 
 
 
@@ -182,4 +182,4 @@ where :math:`\mathbb{E}` denotes the usual statistical expectation value, and :m
 
 .. tip::
 
-   *Implemented as* :func:`hafnian.hafnian_approx`. Note that one needs to pass the number of samples used to estimate the expectation value in the formula above; this is specified with the argument ``num_samples``.
+   *Implemented as* :func:`thewalrus.hafnian` with ``approx=True``. Note that one needs to pass the number of samples used to estimate the expectation value in the formula above; this is specified with the argument ``num_samples``.

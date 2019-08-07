@@ -72,7 +72,7 @@ One can also define the reduction operation on vectors. For instance if :math:`\
 
 .. tip::
 
-   * The reduction operation is implemented as :func:`hafnian.reduction`.
+   * The reduction operation is implemented as :func:`thewalrus.reduction`.
 
 
 Reduction on block matrices

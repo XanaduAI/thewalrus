@@ -1,5 +1,5 @@
-Hafnian
-################################
+The Walrus
+##########
 
 :Release: |release|
 :Date: |today|
@@ -22,17 +22,17 @@ Features
 Getting started
 ===============
 
-To get the Hafnian package installed and running on your system, begin at the :ref:`download and installation guide <installation>`. Then, familiarise yourself with some :ref:`background information on the Hafnian <hafnian>` and :ref:`the computational algorithm <algorithms>`.
+To get the The Walrus installed and running on your system, begin at the :ref:`download and installation guide <installation>`. Then, familiarise yourself with some :ref:`background information on the Hafnian <hafnian>` and :ref:`the computational algorithm <algorithms>`.
 
-For getting started with using the Hafnian library in your own code, have a look at the `Python tutorial <hafnian_tutorial.ipynb>`_.
+For getting started with using the The Walrus in your own code, have a look at the `Python tutorial <hafnian_tutorial.ipynb>`_.
 
 Finally, detailed documentation on the code and API is provided.
 
 Support
 =======
 
-- **Source Code:** https://github.com/XanaduAI/hafnian
-- **Issue Tracker:** https://github.com/XanaduAI/hafnian/issues
+- **Source Code:** https://github.com/XanaduAI/thewalrus
+- **Issue Tracker:** https://github.com/XanaduAI/thewalrus/issues
 
 If you are having issues, please let us know, either by email or by posting the issue on our Github issue tracker.
 
@@ -41,7 +41,7 @@ Authors
 
 Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
 
-If you are doing research using Hafnian, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
+If you are doing research using The Walrus, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
 
   Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer *arXiv*, 2018. arxiv:1805.12498
 
@@ -49,7 +49,7 @@ If you are doing research using Hafnian, please cite `our paper <https://arxiv.o
 License
 =======
 
-The hafnian library is **free** and **open source**, released under the Apache License, Version 2.0.
+The Walrus library is **free** and **open source**, released under the Apache License, Version 2.0.
 
 .. toctree::
    :maxdepth: 2
@@ -86,21 +86,21 @@ The hafnian library is **free** and **open source**, released under the Apache L
 
 .. toctree::
    :maxdepth: 2
-   :caption: Hafnian API
+   :caption: The Walrus API
    :hidden:
 
    code
-   code/hafnian
+   code/thewalrus
    code/quantum
    code/samples
    code/reference
 
 .. toctree::
    :maxdepth: 2
-   :caption: Low-level libraries
+   :caption: libwalrus
    :hidden:
 
-   code/libhaf
+   code/libwalrus
 
 
 Indices and tables

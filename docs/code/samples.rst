@@ -1,2 +1,2 @@
-.. automodule:: hafnian.samples
+.. automodule:: thewalrus.samples
     :members:

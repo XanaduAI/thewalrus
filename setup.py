@@ -20,7 +20,7 @@ import platform
 import setuptools
 
 
-with open("hafnian/_version.py") as f:
+with open("thewalrus/_version.py") as f:
     version = f.readlines()[-1].split()[-1].strip("\"'")
 
 
@@ -67,7 +67,7 @@ if BUILD_EXT:
     EIGEN_INCLUDE = [os.environ.get("EIGEN_INCLUDE_DIR", ""), "/usr/local/include/eigen3", "/usr/include/eigen3"]
 
     LD_LIBRARY_PATH = os.environ.get('LD_LIBRARY_PATH', library_default).split(":")
-    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["src"]
+    C_INCLUDE_PATH = os.environ.get('C_INCLUDE_PATH', "").split(":") + [np.get_include()]  + EIGEN_INCLUDE + ["include"]
 
     LD_LIBRARY_PATH = [i for i in LD_LIBRARY_PATH if i]
     libraries = []
@@ -103,18 +103,18 @@ if BUILD_EXT:
         extra_link_args_CPP[0] += " -lopenblas"
 
     extensions = cythonize([
-            Extension("libhaf",
-                sources=["hafnian/hafnian."+ext,],
-                depends=["src/hafnian.hpp",
-                         "src/eigenvalue_hafnian.hpp",
-                         "src/recursive_hafnian.hpp",
-                         "src/repeated_hafnian.hpp",
-                         "src/hafnian_approx.hpp",
-                         "src/torontonian.hpp",
-                         "src/permanent.hpp",
-                         "src/hermite_multidimensional.hpp",
-                         "src/stdafx.h",
-                         "src/fsum.hpp"],
+            Extension("libwalrus",
+                sources=["thewalrus/libwalrus."+ext,],
+                depends=["include/libwalrus.hpp",
+                         "include/eigenvalue_hafnian.hpp",
+                         "include/recursive_hafnian.hpp",
+                         "include/repeated_hafnian.hpp",
+                         "include/hafnian_approx.hpp",
+                         "include/torontonian.hpp",
+                         "include/permanent.hpp",
+                         "include/hermite_multidimensional.hpp",
+                         "include/stdafx.h",
+                         "include/fsum.hpp"],
                 include_dirs=C_INCLUDE_PATH,
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 libraries=libraries,
@@ -127,23 +127,23 @@ else:
 
 
 info = {
-    'name': 'hafnian',
+    'name': 'thewalrus',
     'version': version,
     'maintainer': 'Xanadu Inc.',
     'maintainer_email': 'nicolas@xanadu.ai',
-    'url': 'http://xanadu.ai',
+    'url': 'https://github.com/XanaduAI/thewalrus',
     'license': 'Apache License 2.0',
     'packages': [
-                    'hafnian',
-                    'hafnian.tests'
+                    'thewalrus',
+                    'thewalrus.tests'
                 ],
     'description': 'Open source library for hafnian calculation',
     'long_description': open('README.rst').read(),
-    'provides': ["hafnian"],
+    'provides': ["thewalrus"],
     'install_requires': requirements,
-    'ext_package': 'hafnian.lib',
     'setup_requires': setup_requirements,
-    'ext_modules': extensions
+    'ext_modules': extensions,
+    'ext_package': 'thewalrus'
 }
 
 classifiers = [

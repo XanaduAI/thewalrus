@@ -15,7 +15,7 @@
 import time
 
 import numpy as np
-from hafnian import haf_real
+from thewalrus import haf_real
 
 header = ["Size", "Time(complex128)", "Result(complex128)"]
 

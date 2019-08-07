@@ -29,12 +29,12 @@ jobs:
       - run:
           name: Build unit tests
           command: |
-            cd src/tests
+            cd tests
             GOOGLETEST_DIR=/root/googletest make cpptests
       - run:
           name: Run unit tests
           command: |
-            cd src/tests && ./cpptests
+            cd tests && ./cpptests
 
   pythoncoverage:
     docker:
@@ -75,9 +75,9 @@ jobs:
       - image: circleci/python:3.6.8-stretch
     environment:
       CIBW_SKIP: "cp27-* cp34-* *i686"
-      CIBW_BEFORE_BUILD_LINUX: curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/src && pip install numpy scipy cython
+      CIBW_BEFORE_BUILD_LINUX: curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/include && pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
-      CIBW_TEST_COMMAND: python -m pytest {project}/hafnian
+      CIBW_TEST_COMMAND: python -m pytest {project}/thewalrus
     steps:
       - checkout
       - setup_remote_docker
@@ -110,7 +110,7 @@ jobs:
       CIBW_SKIP: "cp27-* cp34-* *i686"
       CIBW_BEFORE_BUILD_MACOS: brew cask uninstall --force oclint && brew install gcc eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
-      CIBW_TEST_COMMAND: python -m pytest {project}/hafnian
+      CIBW_TEST_COMMAND: python -m pytest {project}/thewalrus
     steps:
       - checkout
       - run:
