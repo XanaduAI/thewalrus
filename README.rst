@@ -7,7 +7,7 @@ The Walrus
 
 .. image:: https://ci.appveyor.com/api/projects/status/9udscqldo1xd25yk/branch/master?svg=true
     :alt: Appveyor
-    :target: https://ci.appveyor.com/project/josh146/thewalrus/branch/master
+    :target: https://ci.appveyor.com/project/josh146/hafnian/branch/master
 
 .. image:: https://img.shields.io/codecov/c/github/xanaduai/thewalrus/master.svg?style=flat
     :alt: Codecov coverage
