@@ -74,7 +74,7 @@ polynomials [@dodonov1994]. Calculating the probabilities
 of a GBS experiment in terms of multidimensional Hermite polynomials is often suboptimal since they have worse space and time scaling than the corresponding calculation in terms of hafnians.
 
 
-In The Walrus, we provide a highly efficient implementation of the best known algorithms for hafnians,
+In The Walrus, we provide a highly optimized implementation of the best known algorithms for hafnians,
 loop hafnians, Hermite polynomials, and torontonians of generic real and complex matrices. We also implement
 algorithms that specialize to certain matrices with structure, for example having repeated rows and
 columns [@kan2008] or non-negative entries [@barvinok1999]. For increased efficiency, these
@@ -87,7 +87,7 @@ Python package manager `pip` for Windows, MacOS, and Linux users.
 We also provide implementations of multidimensional Hermite polynomials, that are, to the best of our
 knowledge, the first ones implemented in a fast open source library.
 With this underlying machinery we also
-provide two extra Python-only modules. The first one, *quantum*, allows one to calculate in an efficient manner the
+provide two extra Python-only modules. The first one, *quantum*, allows one to calculate in a straightforward manner the
 probabilities or probability amplitudes of Gaussian states in the particle representation. The second
 one, *samples*, allows one to generate GBS samples. This module implements state-of-the-art algorithms that
 have been recently developed [@quesada2019c]. Of course, given the promise that GBS should be a hard
