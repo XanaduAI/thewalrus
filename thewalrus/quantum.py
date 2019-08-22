@@ -84,6 +84,9 @@ Utility functions
     is_valid_cov
     is_pure_cov
     is_classical_cov
+    total_photon_num_dist_pure_state
+    gen_single_mode_dist
+    gen_multi_mode_dist
 
 Details
 ^^^^^^^
@@ -94,10 +97,10 @@ from itertools import count, product
 import numpy as np
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
+from scipy.stats import nbinom
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
-
 
 
 def reduced_gaussian(mu, cov, modes):
@@ -713,3 +716,69 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
         if np.all(vals >= 0):
             return True
     return False
+
+
+def gen_single_mode_dist(s, nmax=50, N=1):
+    """Generate the photon number distribution of N identical single mode squeezed states with squeezing parameter s up to cutoff nmax
+    Args:
+        s (float): squeezing paramer
+        nmax (int): Fock cutoff
+        N (float): Number of squeezed state(s).
+    Returns:
+        (array): Photon number distribution
+    """
+    r = 0.5 * N
+    q = 1.0 - np.tanh(s) ** 2
+    N = nmax // 2
+    ps = nbinom.pmf(np.arange(N), p=q, n=r)
+    ps_tot = np.zeros(nmax)
+
+    if nmax % 2 == 0:
+        ps_tot[0::2] = ps
+    else:
+        # This is a bit hacky.
+        ps_tot[0:-1][0::2] = ps
+
+    return ps_tot
+
+
+def gen_multi_mode_dist(s, nmax=50, padding_factor=2):
+    """Generates the total photon number distirbution of len(s) single mode squeezed states with squeezing parameter s[i] up to cutoff
+    nmax.
+    Args:
+        s (array): array of squeezing parameters
+        nmax (int): Fock cutoff
+    Returns:
+        (array): Total photon number distribution
+    """
+    scale = padding_factor
+    nmax_sc = scale * nmax
+    ps = np.zeros(nmax_sc)
+    ps[0] = 1.0
+    for s_val in s:
+        ps = np.convolve(ps, gen_single_mode_dist(s_val, nmax_sc))[0:nmax_sc]
+    return ps
+
+
+def total_photon_num_dist_pure_state(cov, nmax=50, hbar=2, tol=1e-8, padding_factor=2):
+    r""" Calculates the total photon number distribution of the pure state
+    with zero mean and covariance matrix cov
+
+    Args:
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
+        nmax (int): Fock cutoff
+        tol (float): tolerance for determining if displacement is negligible
+        hbar (float): the value of :math:`\hbar` in the commutation
+        padding_factor (int): Expanded size of the photon distribution to avoid accumulation of errors
+    Returns:
+        (array): Total photon number distribution
+    """
+    if is_pure_cov(cov):
+        A = Amat(cov, hbar=hbar)
+        (n, _) = A.shape
+        N = n // 2
+        B = A[0:N, 0:N]
+        rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
+        return gen_multi_mode_dist(rs, nmax=nmax, padding_factor=padding_factor)[0:nmax]
+    else:
+        raise ValueError("The Gaussian state is not pure")
