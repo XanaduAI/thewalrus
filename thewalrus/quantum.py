@@ -760,7 +760,7 @@ def gen_multi_mode_dist(s, nmax=50, padding_factor=2):
     return ps
 
 
-def total_photon_num_dist_pure_state(cov, nmax=50, hbar=2, tol=1e-8, padding_factor=2):
+def total_photon_num_dist_pure_state(cov, nmax=50, hbar=2, padding_factor=2):
     r""" Calculates the total photon number distribution of the pure state
     with zero mean and covariance matrix cov
 
@@ -780,5 +780,4 @@ def total_photon_num_dist_pure_state(cov, nmax=50, hbar=2, tol=1e-8, padding_fac
         B = A[0:N, 0:N]
         rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
         return gen_multi_mode_dist(rs, nmax=nmax, padding_factor=padding_factor)[0:nmax]
-    else:
-        raise ValueError("The Gaussian state is not pure")
+    raise ValueError("The Gaussian state is not pure")
