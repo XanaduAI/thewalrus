@@ -719,11 +719,13 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
 
 
 def gen_single_mode_dist(s, nmax=50, N=1):
-    """Generate the photon number distribution of N identical single mode squeezed states with squeezing parameter s up to cutoff nmax
+    """Generate the photon number distribution of :math:`N` identical single mode squeezed states.
+    
     Args:
-        s (float): squeezing paramer
+        s (float): squeezing parameter
         nmax (int): Fock cutoff
-        N (float): Number of squeezed state(s).
+        N (float): number of squeezed state(s)
+
     Returns:
         (array): Photon number distribution
     """
@@ -743,13 +745,14 @@ def gen_single_mode_dist(s, nmax=50, N=1):
 
 
 def gen_multi_mode_dist(s, nmax=50, padding_factor=2):
-    """Generates the total photon number distirbution of len(s) single mode squeezed states with squeezing parameter s[i] up to cutoff
+    """Generates the total photon number distribution of single mode squeezed states with different squeezing values.
+
     nmax.
     Args:
         s (array): array of squeezing parameters
         nmax (int): Fock cutoff
     Returns:
-        (array): Total photon number distribution
+        (array[int]): total photon number distribution
     """
     scale = padding_factor
     nmax_sc = scale * nmax
@@ -761,15 +764,16 @@ def gen_multi_mode_dist(s, nmax=50, padding_factor=2):
 
 
 def total_photon_num_dist_pure_state(cov, nmax=50, hbar=2, padding_factor=2):
-    r""" Calculates the total photon number distribution of the pure state
-    with zero mean and covariance matrix cov
+    r""" Calculates the total photon number distribution of a pure state
+    with zero mean.
 
     Args:
         cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
         nmax (int): Fock cutoff
         tol (float): tolerance for determining if displacement is negligible
         hbar (float): the value of :math:`\hbar` in the commutation
-        padding_factor (int): Expanded size of the photon distribution to avoid accumulation of errors
+        padding_factor (int): expanded size of the photon distribution to avoid accumulation of errors
+
     Returns:
         (array): Total photon number distribution
     """
