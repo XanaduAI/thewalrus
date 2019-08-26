@@ -35,6 +35,8 @@ from thewalrus.quantum import (
     pure_state_amplitude,
     state_vector,
     is_classical_cov,
+    total_photon_num_dist_pure_state,
+    gen_single_mode_dist,
 )
 
 
@@ -674,3 +676,16 @@ def test_is_classical_cov_thermal(nbar):
     """ Tests that a thermal state is classical"""
     cov = (2 * nbar + 1) * np.identity(2)
     assert is_classical_cov(cov)
+
+@pytest.mark.parametrize("cutoff", [50, 51, 52, 53])
+def test_total_photon_num_dist_pure_state(cutoff):
+    """ Test the correct photon number distribution is obtained for n modes
+    with nmean number of photons up to Fock cutoff nmax"""
+    n = 3
+    nmean = 1.0
+    cutoff = 50
+    rs = np.arcsinh(np.sqrt(nmean)) * np.ones([n])
+    cov = np.diag(np.concatenate([np.exp(2 * rs), np.exp(-2 * rs)]))
+    p1 = total_photon_num_dist_pure_state(cov, cutoff=cutoff)
+    p2 = gen_single_mode_dist(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
+    assert np.allclose(p1, p2)
