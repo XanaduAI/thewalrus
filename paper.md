@@ -72,7 +72,7 @@ more than zero particles -- so-called threshold detectors -- then the probabilit
 a matrix function that acts as a generating function for the hafnian [@quesada2018]. One can also show that the probabilities
 of a Gaussian state probed in the number basis are related to multidimensional Hermite
 polynomials [@dodonov1994]. Calculating the probabilities
-of a GBS experiment in terms of multidimensional Hermite polynomials is often suboptimal since they have worse space and time scaling than the corresponding calculation in terms of hafnians.
+of a GBS experiment in terms of multidimensional Hermite polynomials [@kok2001] is often suboptimal since they have worse space and time scaling than the corresponding calculation in terms of hafnians.
 
 
 In The Walrus, we provide a highly optimized implementation of the best known algorithms for hafnians,
