@@ -40,6 +40,7 @@ MOCK_MODULES = [
     'scipy',
     'scipy.special',
     'scipy.optimize',
+    'scipy.stats',
     'cython',
     'thewalrus.libwalrus'
     ]
