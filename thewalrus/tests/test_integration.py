@@ -13,13 +13,10 @@
 # limitations under the License.
 """Tests for The Walrus quantum functions"""
 # pylint: disable=no-self-use,redefined-outer-name
-import pytest
 
 import numpy as np
 from thewalrus.quantum import (
-    density_matrix_element,
     density_matrix,
-    pure_state_amplitude,
     state_vector,
 )
 
