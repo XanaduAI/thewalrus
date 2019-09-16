@@ -372,7 +372,11 @@ def test_coherent_squeezed():
          [0.07862323 + 0.00868528j, 0.01274241 + 0.00614023j, -0.02127257 - 0.00122123j, -0.00624626 - 0.00288134j, 0.00702606]]
     )
     # fmt:on
+    np.set_printoptions(linewidth=200)
 
+    print("\n")
+    print(np.round(res,4))
+    print(np.round(expected,4))
     assert np.allclose(res, expected)
 
 
@@ -529,7 +533,7 @@ def test_is_pure_cov_thermal(nbar):
 
 @pytest.mark.parametrize("i", [0, 1, 2, 3, 4])
 @pytest.mark.parametrize("j", [0, 1, 2, 3, 4])
-def test_pure_state_amplitude_two_mode_squezed(i, j):
+def test_pure_state_amplitude_two_mode_squeezed(i, j):
     """ Tests pure state amplitude for a two mode squeezed vacuum state """
     nbar = 1.0
     phase = np.pi / 8
@@ -539,8 +543,9 @@ def test_pure_state_amplitude_two_mode_squezed(i, j):
     if i != j:
         exact = 0.0
     else:
-        exact = np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar)
+        exact = np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar)
     num = pure_state_amplitude(mu, cov, [i, j])
+
     assert np.allclose(exact, num)
 
 
@@ -587,7 +592,7 @@ def test_state_vector_two_mode_squeezed():
     mu = np.zeros([4], dtype=np.complex)
     exact = np.array(
         [
-            (np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
+            (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
             for i in range(cutoff)
         ]
     )
@@ -607,7 +612,7 @@ def test_state_vector_two_mode_squeezed_post():
     exact = np.diag(
         np.array(
             [
-                (np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
+                (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
                 for i in range(cutoff)
             ]
         )
@@ -647,7 +652,7 @@ def test_state_vector_two_mode_squeezed_post_normalize():
     exact = np.diag(
         np.array(
             [
-                (np.exp(-1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
+                (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
                 for i in range(cutoff)
             ]
         )

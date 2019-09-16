@@ -331,7 +331,6 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
             haf = hafnian_repeated(A, rpt)
     else:
         # replace the diagonal of A with gamma
-        # gamma = X @ np.linalg.inv(Q).conj() @ beta
         gamma = beta.conj() - A @ beta
         if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
             A_rpt = reduction(A, rpt)
@@ -383,11 +382,12 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     pref = prefactor(mu, cov, hbar=hbar)
 
     if post_select is None:
-        A = Amat(cov, hbar=hbar)
+        A = Amat(cov, hbar=hbar).conj()
         if np.allclose(mu, np.zeros_like(mu)):
             return pref * hermite_multidimensional(-A, cutoff, renorm=True)
         try:
-            y = np.linalg.inv(A) @ np.linalg.inv(Qmat(cov)) @ Beta(mu, hbar=hbar)
+            beta = Beta(mu)
+            y = np.linalg.inv(A) @ (beta - A @ beta.conj())
             return pref * hermite_multidimensional(-A, cutoff, y=-y, renorm=True)
         except np.linalg.LinAlgError:
             pass
@@ -454,7 +454,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
     A = Amat(cov, hbar=hbar)
     (n, _) = cov.shape
     N = n // 2
-    B = A[0:N, 0:N]
+    B = A[0:N, 0:N].conj()
     alpha = beta[0:N]
 
     if np.linalg.norm(alpha) < tol:
@@ -465,19 +465,16 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         else:
             haf = hafnian_repeated(B, rpt)
     else:
-        # replace the diagonal of A with gamma
-        # gamma = X @ np.linalg.inv(Q).conj() @ beta
-        zeta = alpha - B @ (alpha.conj())
-
+        gamma = alpha - B @ np.conj(alpha)
         if np.prod([k + 1 for k in rpt]) ** (1 / len(rpt)) < 3:
             B_rpt = reduction(B, rpt)
-            np.fill_diagonal(B_rpt, reduction(zeta, rpt))
+            np.fill_diagonal(B_rpt, reduction(gamma, rpt))
             haf = hafnian(B_rpt, loop=True)
         else:
-            haf = hafnian_repeated(B, rpt, mu=zeta, loop=True)
+            haf = hafnian_repeated(B, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
+        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha))
         haf *= pref
 
     return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
@@ -527,12 +524,13 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
 
     B = A[0:N, 0:N]
     alpha = beta[0:N]
-    pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
-
+    gamma = np.conj(alpha) - B @ alpha
+    pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha))
     if post_select is None:
+
         psi = (
             pref
-            * hafnian_batched(B, cutoff, mu=alpha, renorm=True)
+            * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True)
             / np.sqrt(np.sqrt(np.linalg.det(Q).real))
         )
     else:
