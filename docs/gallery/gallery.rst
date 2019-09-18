@@ -36,14 +36,28 @@ If you develop a new circuit and measurement scheme to prepare a nongaussian sta
    :align: middle
    :target: photon_added.html
 
+.. _Cat: cat.html
+.. |cat| image:: cat.svg
+   :width: 260px
+   :align: middle
+   :target: cat.html
+
+.. _FourCat: fourcat.html
+.. |four_cat| image:: four_cat.svg
+   :width: 260px
+   :align: middle
+   :target: four_cat.html
+
 .. rst-class:: gallery-table
 
+
+
 +-------------------------------+-------------------------------+------------------------------+
-| |fock|                        | |kitten|                      |   |cubic|                    |
+| |fock|                        | |kitten|                      | |cubic|                      |
 |                               |                               |                              |
-| Fock states                   | Kitten states                 |   Cubic phase states         |
+| Fock states                   | Kitten states                 | Cubic phase states           |
 +-------------------------------+-------------------------------+------------------------------+
-| |photon_added|                |                               |                              |
+| |photon_added|                | |cat|                         | |four_cat|                   |
 |                               |                               |                              |
-| Photon added states           |                               |                              |
+| Photon added states           | Cat states                    | Four-headed cat states       |
 +-------------------------------+-------------------------------+------------------------------+
