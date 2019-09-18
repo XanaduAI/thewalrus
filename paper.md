@@ -72,7 +72,7 @@ more than zero particles -- so-called threshold detectors -- then the probabilit
 a matrix function that acts as a generating function for the hafnian [@quesada2018]. One can also show that the probabilities
 of a Gaussian state probed in the number basis are related to multidimensional Hermite
 polynomials [@dodonov1994]. Calculating the probabilities
-of a GBS experiment in terms of multidimensional Hermite polynomials is often suboptimal since they have worse space and time scaling than the corresponding calculation in terms of hafnians.
+of a GBS experiment in terms of multidimensional Hermite polynomials [@kok2001] is often suboptimal since they have worse space and time scaling than the corresponding calculation in terms of hafnians.
 
 
 In The Walrus, we provide a highly optimized implementation of the best known algorithms for hafnians,
@@ -96,11 +96,11 @@ problem for classical computers, the complexity of the algorithm we provide for 
 complexity of the hafnian, still exponential in the size of the number of particles generated.
 
 Our package has already been used in several research efforts to understand how to generate resource
-states for universal quantum computing [@quesada2019a], study the dynamics of vibrational quanta in
+states for universal quantum computing [@quesada2019a; @valson2019franck], study the dynamics of vibrational quanta in
 molecules [@quesada2019], and develop the applications of GBS to molecular docking [@banchi2019],
 graph theory [@schuld2019], and point processes [@jahangiri2019]. More importantly, it has been
 useful in delineating when quantum computation can be simulated by classical computing resources and
-when it cannot [@gupt2018; @quesada2019c; @killoran2019].
+when it cannot [@gupt2018; @quesada2019c; @wu2019speedup; @killoran2019].
 
 # Acknowledgements
 
