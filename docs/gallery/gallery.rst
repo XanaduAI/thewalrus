@@ -4,7 +4,7 @@ Nongaussian states gallery
 ##########################
 
 
-Here you can find a curated list of circuits and measurements to prepare nongaussian states of interest in quantum optics, information, metrology and computing. 
+Here you can find a curated list of gaussian circuits and photon-number-resolved measurements to prepare nongaussian states of interest in quantum optics, information, metrology and computing.
 
 
 If you develop a new circuit and measurement scheme to prepare a nongaussian state add it to the gallery!
@@ -18,11 +18,11 @@ If you develop a new circuit and measurement scheme to prepare a nongaussian sta
    :align: middle
    :target: fock.html
 
-.. _Cat: cat.html
-.. |cat| image:: cat.svg
+.. _Kitten: kitten.html
+.. |kitten| image:: kitten.svg
    :width: 260px
    :align: middle
-   :target: cat.html
+   :target: kitten.html
 
 .. _Cubic: cubic.html
 .. |cubic| image:: cubic.svg
@@ -36,9 +36,10 @@ If you develop a new circuit and measurement scheme to prepare a nongaussian sta
    :align: middle
    :target: photon_added.html
 
+.. rst-class:: gallery-table
 
 +-------------------------------+-------------------------------+------------------------------+
-| |fock|                        | |cat|                         |   |cubic|                    |
+| |fock|                        | |kitten|                      |   |cubic|                    |
 |                               |                               |                              |
 | Fock states                   | Kitten states                 |   Cubic phase states         |
 +-------------------------------+-------------------------------+------------------------------+
