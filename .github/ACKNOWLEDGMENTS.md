@@ -23,3 +23,5 @@
 * [Nathan Killoran](https://github.com/co9olguy) (Xanadu) - :godmode: dynamic programmer
 
 * [Thomas Loke](https://github.com/ThomasLoke) (DownUnder GeoSolutions) - 💻 C++ master
+
+* [Luke Helt](https://github.com/heltluke/) (Xanadu) - Matplotlib master
