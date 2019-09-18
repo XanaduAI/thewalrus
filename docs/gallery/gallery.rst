@@ -4,10 +4,10 @@ Nongaussian states gallery
 ##########################
 
 
-Here you can find a curated list of circuits and measurements to prepare nongaussian states of interest in quantum optics, information, metrology and metrology. 
+Here you can find a curated list of circuits and measurements to prepare nongaussian states of interest in quantum optics, information, metrology and computing. 
 
 
-If you develop a new circuit and measurement scheme to prepare a new nongaussian state add it to the gallery!
+If you develop a new circuit and measurement scheme to prepare a nongaussian state add it to the gallery!
 
 
 .. Copy the template below in order to create a link to your notebook, and a thumbnail.
