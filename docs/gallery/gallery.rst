@@ -30,10 +30,19 @@ If you develop a new circuit and measurement scheme to prepare a new nongaussian
    :align: middle
    :target: cubic.html
 
+.. _Added: photon_added.html
+.. |photon_added| image:: photon_added.svg
+   :width: 260px
+   :align: middle
+   :target: photon_added.html
+
 
 +-------------------------------+-------------------------------+------------------------------+
 | |fock|                        | |cat|                         |   |cubic|                    |
 |                               |                               |                              |
-| Heralded Fock states          | Kitten states                 |   Cubic phase states         |
+| Fock states                   | Kitten states                 |   Cubic phase states         |
 +-------------------------------+-------------------------------+------------------------------+
-
+| |photon_added|                |                               |                              |
+|                               |                               |                              |
+| Photon added states           |                               |                              |
++-------------------------------+-------------------------------+------------------------------+
