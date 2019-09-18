@@ -82,7 +82,13 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    basics.ipynb
    hafnian_tutorial.ipynb
    permanent_tutorial.ipynb
-   gaussian_states.ipynb
+
+.. toctree::
+   :maxdepth: 2
+   :caption: The Walrus Gallery
+   :hidden:
+
+   gallery/gallery
 
 .. toctree::
    :maxdepth: 2
