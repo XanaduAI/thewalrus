@@ -24,4 +24,6 @@
 
 * [Thomas Loke](https://github.com/ThomasLoke) (DownUnder GeoSolutions) - 💻 C++ master
 
-* [Luke Helt](https://github.com/heltluke/) (Xanadu) - Matplotlib master
+* [Luke Helt](https://github.com/heltluke/) (Xanadu) - :bar_chart: Matplotlib master
+
+* [Guillaume Thekkadath](https://www2.physics.ox.ac.uk/contacts/people/thekkadath) (University of Oxford) - :smiley_cat: Master cat herder
