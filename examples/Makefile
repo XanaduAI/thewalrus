@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-EIGEN_INCLUDE_DIR=/usr/include/eigen3
+EIGEN_INCLUDE_DIR?=/usr/include/eigen3
 
 CC=g++
 CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I../include -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native
 LFLAGS=-L/usr/lib -lm -fopenmp
 
-all: example-f90 example-cpp
+all: example-cpp
 
-example.o: example.cpp libwalrus.hpp
+example.o: example.cpp
 	$(CC) $^ $(CFLAGS) -c
 
 example-cpp: example.o
