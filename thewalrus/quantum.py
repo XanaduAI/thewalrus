@@ -24,19 +24,20 @@ For more details on how the hafnian relates to various properties of Gaussian qu
 states, see:
 
 * Kruse, R., Hamilton, C. S., Sansoni, L., Barkhofen, S., Silberhorn, C., & Jex, I.
-  "A detailed study of Gaussian Boson Sampling." `arXiv:1801.07488. (2018).
-  <https://arxiv.org/abs/1801.07488>`_
+  "Detailed study of Gaussian boson sampling." `Physical Review A 100, 032326 (2019)
+  <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.032326>`_
 
 * Hamilton, C. S., Kruse, R., Sansoni, L., Barkhofen, S., Silberhorn, C., & Jex, I.
-  "Gaussian boson sampling." `Physical review letters, 119(17), 170501. (2017).
+  "Gaussian boson sampling." `Physical Review Letters, 119(17), 170501 (2017)
   <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.119.170501>`_
 
 * Quesada, N.
   "Franck-Condon factors by counting perfect matchings of graphs with loops."
-  `Journal of Chemical Physics 150, 164113 (2019). <https://aip.scitation.org/doi/10.1063/1.5086387>`_
+  `Journal of Chemical Physics 150, 164113 (2019) <https://aip.scitation.org/doi/10.1063/1.5086387>`_
 
 * Quesada, N., Helt, L. G., Izaac, J., Arrazola, J. M., Shahrokhshahi, R., Myers, C. R., & Sabapathy, K. K.
-  "Simulating realistic non-Gaussian state preparation." `arXiv:1905.07011. (2019). <https://arxiv.org/abs/1905.07011>`_
+  "Simulating realistic non-Gaussian state preparation." `Phys. Rev. A 100, 022341 (2019)
+ <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.022341>`_
 
 
 Fock states
