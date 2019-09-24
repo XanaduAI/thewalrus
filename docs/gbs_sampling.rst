@@ -57,7 +57,7 @@ where :math:`p(N_{k-1}=n_{k-1},\ldots,N_0=n_0)` has already been calculated from
 
 .. tip::
 
-   * To generate samples from a gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.generate_hafnian_sample`.
+   To generate samples from a gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.generate_hafnian_sample`.
 
       Note that the above algorithm can also be generalized to states with finite means for which one only needs to provide the mean with the optional argument ``mean``.
 
@@ -68,15 +68,15 @@ Note the arguments presented in the previous section can also be generalized to 
 
 .. tip::
 
-   * To generate threshold samples from a gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.generate_torontonian_sample`.
+   To generate threshold samples from a gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.generate_torontonian_sample`.
 
 
 Sampling of classical states
 ****************************
 
-In the previous section it was mentioned that states whose covariance matrix satisfies :math:`\mathbf{V} \geq \mathbb{I}` are termed classical. These designation is due to the fact that for these states it is possible to obtain a polynomial (cubic) time algorithm to generate photon number or threshold samples :cite:`rahimi2015can`.
+In the previous section it was mentioned that states whose covariance matrix satisfies :math:`\mathbf{V} \geq \frac{\hbar}{2}\mathbb{I}` are termed classical. These designation is due to the fact that for these states it is possible to obtain a polynomial (cubic) time algorithm to generate photon number or threshold samples :cite:`rahimi2015can`.
 
 .. tip::
 
-   * To generate photon number or threshold samples from a classical gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.hafnian_sample_classical_state` or :func:`thewalrus.samples.torontonian_sample_classical_state`.
+   To generate photon number or threshold samples from a classical gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.hafnian_sample_classical_state` or :func:`thewalrus.samples.torontonian_sample_classical_state`.
 

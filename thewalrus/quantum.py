@@ -36,8 +36,8 @@ states, see:
   `Journal of Chemical Physics 150, 164113 (2019) <https://aip.scitation.org/doi/10.1063/1.5086387>`_
 
 * Quesada, N., Helt, L. G., Izaac, J., Arrazola, J. M., Shahrokhshahi, R., Myers, C. R., & Sabapathy, K. K.
-  "Simulating realistic non-Gaussian state preparation." `Phys. Rev. A 100, 022341 (2019)
- <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.022341>`_
+  "Simulating realistic non-Gaussian state preparation." `Physical Review A 100, 022341 (2019)
+  <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.022341>`_
 
 
 Fock states
@@ -704,7 +704,7 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
         hbar (float): value of hbar in the uncertainty relation
 
     Returns:
-        (bool): whether the given covariance matrix corresponds to a pure state
+        (bool): whether the given covariance matrix corresponds to a classical state
     """
 
     if is_valid_cov(cov, hbar=hbar, atol=atol):

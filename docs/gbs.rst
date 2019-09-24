@@ -82,14 +82,14 @@ Similarly the complex normal covariance matrix :math:`\sigma` of the variables :
 
 .. tip::
 
-   * To inter convert between the complex covariance matrix :math:`\sigma` and the quadrature covariance matrix :math:`\mathbf{V}` use the functions :func:`thewalrus.quantum.Qmat` and :func:`thewalrus.quantum.Covmat`
+   To convert between the complex covariance matrix :math:`\sigma` and the quadrature covariance matrix :math:`\mathbf{V}` use the functions :func:`thewalrus.quantum.Qmat` and :func:`thewalrus.quantum.Covmat`
 
 
 An important property of Gaussian states is that reduced (or marginal) states of a global Gaussian state are also Gaussian. This implies that the reduced covariance matrix of a subsystem of a Gaussian state together with a reduced vector of means fully characterize a reduced Gaussian state. The reduced covariance matrix for modes :math:`S = i_1,\ldots,i_n` is obtained from the covariance matrix of the global state :math:`sigma` or :math:`\mathbf{V}` by keeping the columns and rows  :math:`i_1,\ldots,i_n` and :math:`i_1+\ell,\ldots,i_n+\ell` of the original covariance matrix :math:`\sigma`. Similarly one obtains the vector of means by keeping only entries :math:`i_1,\ldots,i_n` and :math:`i_1+\ell,\ldots,i_n+\ell` of the original vector of means :math:`\vec \beta` or :math:`\mathbf{\bar{r}}`. Using the :ref:`notation <notation>` previously introduced, one can succinctly write the covariance matrix of modes :math:`S=i_1,\ldots,i_m` as :math:`\sigma_{(S)}` or :math:`\mathbf{V}_{(S)}` , and similarly the vector of means as :math:`\vec{\beta}_{(S)}` or :math:`\mathbf{\bar{r}}_{(S)}`.
 
 .. tip::
 
-   * To obtain the reduced covariance matrix and vector of means for a certain subset of the modes use :func:`thewalrus.quantum.reduced_gaussian`.
+   To obtain the reduced covariance matrix and vector of means for a certain subset of the modes use :func:`thewalrus.quantum.reduced_gaussian`.
 
 
 Note that for :math:`\mathbf{V}` to be a valid **quantum** covariance matrix it needs to be symmetric and satisfy the uncertainty relation
@@ -100,13 +100,13 @@ Note that for :math:`\mathbf{V}` to be a valid **quantum** covariance matrix it 
 
 .. tip::
 
-   * To verify if a given quadrature covariance matrix is a valid quantum covariance matrix use the function :func:`thewalrus.quantum.is_valid_cov`
+   To verify if a given quadrature covariance matrix is a valid quantum covariance matrix use the function :func:`thewalrus.quantum.is_valid_cov`
 
-A Gaussian state is pure :math:`\varrho = \ket{\psi} \bra{\psi}` if and only if :math:`\text{det}(\mathbf{V}/\tfrac{\hbar}{2}) = 1`.
+A Gaussian state is pure :math:`\varrho = \ket{\psi} \bra{\psi}` if and only if :math:`\text{det}\left( \tfrac{2}{\hbar} \mathbf{V} \right) = 1`.
 
 .. tip::
 
-   * To verify if a given quadrature covariance matrix is a valid quantum covariance matrix and corresponds to a pure state use the function :func:`thewalrus.quantum.is_pure_cov`
+   To verify if a given quadrature covariance matrix is a valid quantum covariance matrix and corresponds to a pure state use the function :func:`thewalrus.quantum.is_pure_cov`
 
 Finally, there is a special subset of Gaussian states called **classical** whose covariance matrix satisfies
 
@@ -117,7 +117,7 @@ This terminology is explained in the next section when sampling is discussed.
 
 .. tip::
 
-   * To verify if a given quadrature covariance matrix is a valid quantum covariance matrix and corresponds to a classical state use the function :func:`thewalrus.quantum.is_classical_cov`
+   To verify if a given quadrature covariance matrix is a valid quantum covariance matrix and corresponds to a classical state use the function :func:`thewalrus.quantum.is_classical_cov`
 
 
 
@@ -154,11 +154,11 @@ Note that one can also obtain the probability of detecting a certain photon numb
 
 .. tip::
 
-   * To obtain the matrix element of gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`thewalrus.quantum.density_matrix_element`.
+   To obtain the matrix element of gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`thewalrus.quantum.density_matrix_element`.
 
 .. tip::
 
-   * To obtain the Fock space density matrix of gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`thewalrus.quantum.density_matrix`.
+   To obtain the Fock space density matrix of gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`thewalrus.quantum.density_matrix`.
 
 
 In the case where the Gaussian state :math:`\varrho = |\psi \rangle \langle \psi|` is pure then the matrix element
@@ -171,11 +171,11 @@ factorizes into a product of two amplitudes. In Ref. :cite:`quesada2019franck` i
 
 .. tip::
 
-   * To obtain the overlap of a *pure* gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` and a given Fock state :math:`\langle \mathbf{n}|` use the function :func:`thewalrus.quantum.pure_state_amplitude`.
+   To obtain the overlap of a *pure* gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` and a given Fock state :math:`\langle \mathbf{n}|` use the function :func:`thewalrus.quantum.pure_state_amplitude`.
 
 .. tip::
 
-   * To obtain the Fock space state vector (ket) of a pure gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`thewalrus.quantum.state_vector`.
+   To obtain the Fock space state vector (ket) of a pure gaussian state with quadrature covariance matrix :math:`\mathbf{V}` and vector of means :math:`\mathbf{r}` use the function :func:`thewalrus.quantum.state_vector`.
 
 
 
@@ -204,7 +204,7 @@ The torontonian can be thought of as a generating function for hafnians (cf. the
 
 .. tip::
 
-   * The torontonian is implemented as :func:`thewalrus.tor`.
+   The torontonian is implemented as :func:`thewalrus.tor`.
 
 
 
