@@ -83,7 +83,7 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True):
         cutoff (int): maximum size of the subindices in the Hermite polynomial
         y (array): vector argument of the Hermite polynomial
         renorm (bool): If ``True``, normalizes the returned multidimensional Hermite
-            polynomials such that :math:`H_k^{(R)}(y)/\prod(\prod_i k_i!)`
+            polynomials such that :math:`H_k^{(R)}(y)/\prod_i k_i!`
         make_tensor: If ``False``, returns a flattened one dimensional array
             containing the values of the polynomial
 
