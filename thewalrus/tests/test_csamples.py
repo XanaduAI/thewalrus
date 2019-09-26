@@ -14,7 +14,7 @@
 r"""Tests for the classical sampling functions"""
 
 import numpy as np
-from csamples import (
+from thewalrus.csamples import (
     rescale_adjacency_matrix_thermal,
     generate_thermal_samples,
 )
