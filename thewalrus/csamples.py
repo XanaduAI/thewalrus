@@ -17,7 +17,7 @@ Classical Sampling Algorithms
 
 .. currentmodule:: thewalrus.csamples
 
-This submodule provides access to classical sampling algorithms. 
+This submodule provides access to classical sampling algorithms.
 
 Summary
 -------
@@ -25,10 +25,11 @@ Summary
     rescale_adjacency_matrix_thermal
     rescale_adjacency_matrix
     generate_thermal_samples
-    
+
 Code details
 ------------
 """
+# pylint: disable=too-many-arguments
 
 import numpy as np
 from scipy.optimize import root_scalar
@@ -79,7 +80,6 @@ def rescale_adjacency_matrix(
 
     if check_positivity is True:
         assert np.all(ls >= 0)
-        
 
     max_sv = ls[-1]
     a_lim = 0.0
@@ -140,4 +140,3 @@ def generate_thermal_samples(ls, O, num_samples=1):
         )
         for _ in range(num_samples)
     ]
-

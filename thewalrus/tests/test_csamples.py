@@ -13,9 +13,7 @@
 # limitations under the License.
 r"""Tests for the classical sampling functions"""
 
-import pytest
 import numpy as np
-from scipy.special import factorial2
 from csamples import (
     rescale_adjacency_matrix_thermal,
     generate_thermal_samples,
@@ -39,7 +37,7 @@ def test_rescaling_thermal():
     n = 10
     A = generate_positive_definite_matrix(n)
     n_mean = 1.0
-    ls, O = rescale_adjacency_matrix_thermal(A, n_mean)
+    ls, _ = rescale_adjacency_matrix_thermal(A, n_mean)
     assert np.allclose(n_mean, np.sum(ls / (1 - ls)))
 
 def test_mean_thermal():
