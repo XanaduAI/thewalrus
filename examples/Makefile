@@ -14,7 +14,7 @@
 EIGEN_INCLUDE_DIR?=/usr/include/eigen3
 
 CC=g++
-CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I../include -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native
+CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I../include -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native 
 LFLAGS=-L/usr/lib -lm -fopenmp
 
 all: example-cpp
@@ -22,8 +22,21 @@ all: example-cpp
 example.o: example.cpp
 	$(CC) $^ $(CFLAGS) -c
 
+example28.o: example28.cpp
+	$(CC) $^ $(CFLAGS) -c
+
+haf_example.o: haf_example.cpp
+	$(CC) $^ $(CFLAGS) -c
+
 example-cpp: example.o
 	$(CC) $^ $(LFLAGS) -o $@
+
+haf_example-cpp: haf_example.o
+	$(CC) $^ $(LFLAGS) -o $@
+
+example28-cpp: example28.o
+	$(CC) $^ $(LFLAGS) -o $@
+
 
 clean:
 	rm -rf *~ *.out *.o *.so *.pyc *.mod

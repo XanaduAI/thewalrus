@@ -19,7 +19,7 @@
  */
 #pragma once
 #include <stdafx.h>
-
+#include <iostream>
 #ifdef LAPACKE
 #define EIGEN_SUPERLU_SUPPORT
 #define EIGEN_USE_BLAS
@@ -54,7 +54,11 @@ inline vec_complex powtrace(vec_complex &z, int n, int l) {
     Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(A, false);
     Eigen::MatrixXcd evals = solver.eigenvalues();
     vals = vec_complex(evals.data(), evals.data() + evals.size());
-
+    std::cout<<"hello";
+    for(int i=0;i<l;i++){
+      std::cout<<vals[i];
+    }
+    
     double_complex sum;
     int i, j;
 
@@ -137,12 +141,13 @@ template <typename T>
 inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned long long int chunksize) {
     // This function calculates adds parts X to X+chunksize of Cygan and Pilipczuk formula for the
     // Hafnian of matrix mat
-
     T res = 0.0;
 
     #pragma omp parallel for
     for (unsigned long long int x = X; x < X + chunksize; x++) {
+
         T summand = 0.0;
+
 
         Byte m = n / 2;
         int i, j, k;
@@ -198,6 +203,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
         }
         #pragma omp critical
         res += summand;
+
     }
 
     return res;
@@ -225,7 +231,7 @@ template <typename T>
 inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &D, int n, unsigned long long int X, unsigned long long int chunksize) {
 
     T res = 0.0;
-
+    
     #pragma omp parallel for
     for (unsigned long long int x = X * chunksize; x < (X + 1)*chunksize; x++) {
         T summand = 0.0;
@@ -334,13 +340,12 @@ template <typename T>
 inline T hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
     assert(n % 2 == 0);
-
+    std::cout<<"hello from hafnian";
     Byte m = n / 2;
     Byte mm = m / 2;
     unsigned long long int pow1 = ((unsigned long long int)pow(2.0, (double)m));
     unsigned long long int workers = ((unsigned long long int)pow(2.0, (double)mm));
     workers = std::min(workers, pow1);
-
     unsigned long long int chunksize = pow1;
     unsigned long long int rank = 0;
 
@@ -374,7 +379,6 @@ inline T loop_hafnian(std::vector<T> &mat) {
 
     unsigned long long int chunksize = pow1;
     unsigned long long int rank = 0;
-
     for (int i = 0; i < n; i++) {
         D[i] = mat[i * n + i];
     }
@@ -383,7 +387,7 @@ inline T loop_hafnian(std::vector<T> &mat) {
         C[i] = D[i + 1];
         C[i + 1] = D[i];
     }
-
+    std::cout<<"hello from loop_hafnian";
     T haf;
     haf = do_chunk_loops(mat, C, D, n, rank, chunksize);
     return  haf;

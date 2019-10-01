@@ -1,5 +1,5 @@
 ---
-title: 'The Walrus: the fastest calculation of hafnians, Hermite polynomials and Gaussian boson sampling'
+title: 'The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling'
 tags:
   - Python
   - quantum computing
@@ -18,7 +18,7 @@ authors:
 affiliations:
  - name: Xanadu, Toronto, Canada
    index: 1
-date: 3 August 2019
+date: 1 October 2019
 bibliography: paper.bib
 ---
 

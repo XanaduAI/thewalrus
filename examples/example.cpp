@@ -18,17 +18,17 @@
 
 
 int main() {
-    int nmax = 10;
+    int nmax = 20;
 
-    for (int m = 1; m <= nmax; m++) {
+    for (int m = 10; m <= nmax; m++) {
         // create a 2m*2m all ones matrix
         int n = 2 * m;
         std::vector<std::complex<double>> mat(n * n, 1.0);
 
         // calculate the hafnian
-        std::complex<double> hafval = libwalrus::loop_hafnian(mat);
+        std::complex<double> hafval = libwalrus::hafnian(mat);
         // print out the result
-        std::cout << hafval << std::endl;
+        std::cout << n << " " << hafval << std::endl;
     }
 
     return 0;

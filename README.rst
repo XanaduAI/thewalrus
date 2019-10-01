@@ -25,16 +25,16 @@ The Walrus
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/thewalrus
 
-The fastest exact hafnian library. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
+A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
 
 Features
 ========
 
-* The fastest calculation of the hafnians, loop hafnians, and torontonians of general and certain structured matrices.
+* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices.
 
-* An easy to use interface to use the loop hafnian for quantum state calculations
+* An easy to use interface to use the loop hafnian for Gaussian quantum state calculations.
 
-* State of the art algorithms to sample from hafnian and torontonians of graphs.
+* Sampling algorithms for hafnian and torontonians of graphs.
 
 * Efficient classical methods for approximating the hafnian of non-negative matrices.
 
