@@ -4,16 +4,16 @@ The Walrus
 :Release: |release|
 :Date: |today|
 
-The fastest hafnian library.
+A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling.
 
 Features
 ========
 
-* The fastest calculation of the hafnians, loop hafnians, and torontonians of general and certain structured matrices.
+* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices.
 
-* An easy to use interface to use the loop hafnian for Gaussian quantum state calculations
+* An easy to use interface to use the loop hafnian for Gaussian quantum state calculations.
 
-* State of the art algorithms to sample from (loop) hafnian and torontonians of graphs.
+* Sampling algorithms for hafnian and torontonians of graphs.
 
 * Efficient classical methods for approximating the hafnian of non-negative matrices.
 
