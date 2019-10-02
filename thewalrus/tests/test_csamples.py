@@ -65,3 +65,5 @@ def test_dist_thermal():
     rel_freq = freq / n_samples
     expected = (1 / (1 + n_mean)) * (n_mean / (1 + n_mean)) ** (np.arange(len(rel_freq)))
     assert np.allclose(rel_freq, expected, atol=10 / np.sqrt(n_samples))
+
+def test_multimode_thermal()

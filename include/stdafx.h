@@ -30,6 +30,13 @@ typedef std::complex<double> double_complex;
 typedef std::vector<double_complex> vec_complex;
 typedef std::vector<double> vec_double;
 
+#if (defined(__GNUC__) || defined(__GNUG__)) && !(defined(__clang__) || defined(__INTEL_COMPILER))
+typedef __float128 qp;
+//#include <quadmath.h>
+#else
+typedef long double qp;
+#endif
+
 /**
  * Convert decimal number `x` to character vector `dst` of length `len`
  * representing a binary number

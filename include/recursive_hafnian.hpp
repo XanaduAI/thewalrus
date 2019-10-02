@@ -194,9 +194,9 @@ std::complex<double> hafnian_recursive_quad(std::vector<std::complex<double>> &m
  * @return the hafnian
  */
 double hafnian_recursive_quad(std::vector<double> &mat) {
-    std::vector<long double> matq(mat.begin(), mat.end());
+    std::vector<qp> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
-    long double haf;
+    qp haf;
 
     if (n == 0)
         haf = 1.0;
