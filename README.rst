@@ -198,7 +198,12 @@ To build the HTML documentation, go to the top-level directory and run the comma
 
 The documentation can then be found in the ``docs/_build/html/`` directory.
 
+Contributing to The Walrus
+==========================
 
+We welcome contributions - simply fork The Walrus repository, and then make a pull request containing your contribution. All contributors to The Walrus will be listed as authors on the releases.
+
+We also encourage bug reports, suggestions for new features and enhancements, and even links to projects, applications or scientific publications that use The Walrus.
 
 Authors
 =======
