@@ -4,9 +4,9 @@
 
 * Adds classical sampling of permanents of positive definite matrices in `csamples`.
 
-### Improvements
-
 * The Walrus gallery with examples of nongaussian state preparations that can be studied using the functions from the `quantum` module. [#55](https://github.com/XanaduAI/thewalrus/pull/55)
+
+### Improvements
 
 * Updates the bibliography of the documentation with recently published articles. [#51](https://github.com/XanaduAI/thewalrus/pull/51)
 
