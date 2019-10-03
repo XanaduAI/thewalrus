@@ -6,7 +6,7 @@
 
 ### Improvements
 
-* The Walrus gallery with examples of nongaussian state preparations that can be studied using the functions from the `quantum` module. [#55](https://github.com/XanaduAI/thewalrus/pull/55)
+* The Walrus gallery with examples of non-Gaussian state preparations that can be studied using the functions from the `quantum` module. [#55](https://github.com/XanaduAI/thewalrus/pull/55)
 
 * Updates the bibliography of the documentation with recently published articles. [#51](https://github.com/XanaduAI/thewalrus/pull/51)
 
