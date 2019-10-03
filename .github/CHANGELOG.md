@@ -2,7 +2,7 @@
 
 ### New features
 
-* Adds classical sampling of permanents of positive definite matrices in `csamples`.
+* Adds classical sampling of permanents of positive definite matrices in `csamples`. [#61](https://github.com/XanaduAI/thewalrus/pull/61)
 
 ### Improvements
 
