@@ -1,14 +1,28 @@
-# Version 0.8.0-dev
+# Version 0.8.0
 
 ### New features
 
+* Adds classical sampling of permanents of positive definite matrices in `csamples`. [#61](https://github.com/XanaduAI/thewalrus/pull/61)
+
+* The Walrus gallery with examples of nongaussian state preparations that can be studied using the functions from the `quantum` module. [#55](https://github.com/XanaduAI/thewalrus/pull/55)
+
 ### Improvements
+
+* Updates the bibliography of the documentation with recently published articles. [#51](https://github.com/XanaduAI/thewalrus/pull/51)
 
 ### Bug fixes
 
-### Contributors
+* Important bugfix in `quantum`. This bug was detected by running the tests in `test_integration`. [#48](https://github.com/XanaduAI/thewalrus/pull/48)
 
+* Corrects the Makefile so that it uses the environment variable pointing to Eigen (if available). [#58](https://github.com/XanaduAI/thewalrus/pull/58)
+
+* Removes any reference to Fortran in the Makefile. [#58](https://github.com/XanaduAI/thewalrus/pull/58)
+
+### Contributors
 This release contains contributions from (in alphabetical order):
+
+Luke Helt, Josh Izaac, Soran Jahangiri, Nicolas Quesada, Guillaume Thekkadath
+
 
 ---
 
