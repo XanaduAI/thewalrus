@@ -74,7 +74,7 @@ def test_dist_thermal():
 @pytest.mark.parametrize("nmodes", [3, 4, 5, 6])
 def test_number_moments_multimode_thermal(nmodes):
     r"""Test the correct values of the photon number means and covariances"""
-    assert nmodes > 1
+    # This test requires nmodes > 1
     n_samples = 100000
     n_mean = 3.0
     A = generate_positive_definite_matrix(nmodes)
