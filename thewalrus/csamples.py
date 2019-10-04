@@ -134,7 +134,7 @@ def generate_thermal_samples(ls, O, num_samples=1):
     return [
         np.random.poisson(
             np.abs(
-                O @ (np.random.normal(0, np.sqrt(rs))) + 1j * np.random.normal(0, np.sqrt(rs))
+                O @ (np.random.normal(0, np.sqrt(rs)) + 1j * np.random.normal(0, np.sqrt(rs)))
             )
             ** 2
         )

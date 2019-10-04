@@ -1,10 +1,10 @@
 .. _gallery:
 
-Nongaussian states gallery
+Non-Gaussian states gallery
 ##########################
 
 
-Here you can find a curated list of Gaussian circuits and photon-number-resolved measurements to prepare nongaussian states of interest in quantum optics, information, metrology and computing.
+Here you can find a curated list of Gaussian circuits and photon-number-resolved measurements to prepare non-Gaussian states of interest in quantum optics, information, metrology and computing.
 
 
 If you develop a new circuit and measurement scheme to prepare a nongaussian state, add it to the gallery!
