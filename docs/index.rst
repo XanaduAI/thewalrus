@@ -58,6 +58,7 @@ The Walrus library is **free** and **open source**, released under the Apache Li
 
    installing
    research
+   quick_guide
 
 
 .. toctree::
