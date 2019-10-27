@@ -173,7 +173,7 @@ Internally, these hafnians are calculated by using the recursion relation of the
 
 Approximate algorithm
 ---------------------
-In 1999 Barvinok :cite:`barvinok1999polynomial` provided a surprisingly simple algorithm to approximate the hafnian of a symmetric matrix with positive entries. Let the matrix have entries :math:`A_{i,j}` and define the antisymmetric stochastic matrix with entries that distribute according to :math:`W_{i,j} = -W_{i,j}   \sim \mathcal{N}(0,A_{i,j})`, where :math:`\mathcal{N}(\mu,\sigma^2)` is the normal distribution with mean :math:`\mu` and variance :math:`\sigma^2`. The following now holds:
+In 1999 Barvinok :cite:`barvinok1999polynomial` provided a surprisingly simple algorithm to approximate the hafnian of a symmetric matrix with non-negative entries. Let the matrix have entries :math:`A_{i,j}` and define the antisymmetric stochastic matrix with entries that distribute according to :math:`W_{i,j} = -W_{i,j}   \sim \mathcal{N}(0,A_{i,j})`, where :math:`\mathcal{N}(\mu,\sigma^2)` is the normal distribution with mean :math:`\mu` and variance :math:`\sigma^2`. The following now holds:
 
 .. math::
 	\text{haf}(\mathbf{A}) = \mathbb{E} \left( \text{det}(\mathbf{W}) \right)
