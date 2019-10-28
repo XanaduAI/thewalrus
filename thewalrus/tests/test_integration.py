@@ -15,10 +15,7 @@
 # pylint: disable=no-self-use,redefined-outer-name
 
 import numpy as np
-from thewalrus.quantum import (
-    density_matrix,
-    state_vector,
-)
+from thewalrus.quantum import density_matrix, state_vector
 
 
 def test_cubic_phase():
@@ -45,7 +42,7 @@ def test_cubic_phase():
     psi = state_vector(mu, cov, post_select={0: m1, 1: m2}, cutoff=cutoff, hbar=2)
     psi_c = state_vector(mu, cov, cutoff=cutoff, hbar=2)[m1, m2, :]
     rho = density_matrix(mu, cov, post_select={0: m1, 1: m2}, cutoff=cutoff, hbar=2)
-    rho_c = density_matrix(mu, cov, cutoff=cutoff, hbar=2)[m1, m2, :, m1, m2, :]
+    rho_c = density_matrix(mu, cov, cutoff=cutoff, hbar=2)[m1, m1, m2, m2, :, :]
     assert np.allclose(np.outer(psi, psi.conj()), rho)
     assert np.allclose(np.outer(psi_c, psi_c.conj()), rho)
     assert np.allclose(rho_c, rho)

@@ -93,7 +93,7 @@ Details
 ^^^^^^^
 """
 # pylint: disable=too-many-arguments
-from itertools import count, product
+from itertools import count, product, chain
 
 import numpy as np
 from scipy.optimize import root_scalar
@@ -387,12 +387,17 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
 
     if post_select is None:
         A = Amat(cov, hbar=hbar).conj()
+        sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
+
         if np.allclose(mu, np.zeros_like(mu)):
-            return pref * hermite_multidimensional(-A, cutoff, renorm=True)
+            tensor = pref * hermite_multidimensional(-A, cutoff, renorm=True)
+            return tensor.transpose(sf_order)
         try:
             beta = Beta(mu)
             y = np.linalg.inv(A) @ (beta - A @ beta.conj())
-            return pref * hermite_multidimensional(-A, cutoff, y=-y, renorm=True)
+            tensor = pref * hermite_multidimensional(-A, cutoff, y=-y, renorm=True)
+            return tensor.transpose(sf_order)
+
         except np.linalg.LinAlgError:
             pass
         post_select = {}
