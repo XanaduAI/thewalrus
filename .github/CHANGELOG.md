@@ -1,18 +1,3 @@
-# Version 0.10.0-dev
-
-### New features
-
-### Improvements
-
-### Bug fixes
-
-### Contributors
-
-This release contains contributions from (in alphabetical order):
-
-
----
-
 # Version 0.9.0
 
 ### New features
@@ -20,7 +5,7 @@ This release contains contributions from (in alphabetical order):
 
 ### Improvements
 
-* Adds a quick guide section in the documentation. [#75](https://github.com/XanaduAI/thewalrus/pull/75)
+* Adds a quick reference section in the documentation. [#75](https://github.com/XanaduAI/thewalrus/pull/75)
 
 
 ### Bug fixes
