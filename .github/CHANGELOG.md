@@ -20,7 +20,7 @@ This release contains contributions from (in alphabetical order):
 
 ### Improvements
 
-* Adds a quick guide section in the documentation. [#75](https://github.com/XanaduAI/thewalrus/pull/75)
+* Adds a quick reference section in the documentation. [#75](https://github.com/XanaduAI/thewalrus/pull/75)
 
 
 ### Bug fixes
