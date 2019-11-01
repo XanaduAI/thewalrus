@@ -23,9 +23,9 @@ from thewalrus import symplectic
 
 
 # make test deterministic
-np.random.seed(42)
+np.random.seed(137)
 
-
+# pylint: disable=too-few-public-methods
 class TestVacuum:
     """Tests for the vacuum_state function"""
 
@@ -175,7 +175,7 @@ class TestInterferometer:
     def rotation(self, tol):
         """Test that a rotation returns the correct symplectic for an abritrary angle"""
         theta = 0.98
-        U = symplectic.beam_splitter(theta, phi)
+        U = symplectic.rotation(theta)
         S = symplectic.interferometer(U)
         expected = np.block([[U.real, -U.imag], [U.imag, U.real]])
         np.allclose(S, expected, atol=tol, rtol=0)
@@ -455,7 +455,7 @@ class TestMeanPhotonNumber:
 
         assert np.allclose(mean_photon, mean_ex, atol=tol, rtol=0)
         assert np.allclose(var, var_ex, atol=tol, rtol=0)
-
+# pylint: disable=too-few-public-methods
 class TestVectorExpansion:
     """Tests for expanding a displacement operation into a phase-space displacement vector"""
 
