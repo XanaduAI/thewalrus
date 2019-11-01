@@ -17,6 +17,22 @@ import pytest
 import numpy as np
 
 
+# defaults
+TOL = 1e-3
+
+
+@pytest.fixture(scope="session")
+def tol():
+    """Numerical tolerance for equality tests."""
+    return TOL
+
+
+@pytest.fixture(params=[0.5, 1, 2])
+def hbar(request):
+    """The value of hbar to use in tests"""
+    return request.param
+
+
 @pytest.fixture(params=[np.complex128, np.float64, np.int64])
 def dtype(request):
     """Fixture that iterates through all numpy types"""
@@ -40,3 +56,4 @@ def random_matrix(dtype):
         return dtype(A)
 
     return _wrapper
+
