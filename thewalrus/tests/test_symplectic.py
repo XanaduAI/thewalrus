@@ -172,7 +172,7 @@ class TestInterferometer:
         np.allclose(S, expected, atol=tol, rtol=0)
 
 
-    def rotation(self, tol):
+    def test_rotation(self, tol):
         """Test that a rotation returns the correct symplectic for an abritrary angle"""
         theta = 0.98
         U = symplectic.rotation(theta)
@@ -459,7 +459,7 @@ class TestMeanPhotonNumber:
 class TestVectorExpansion:
     """Tests for expanding a displacement operation into a phase-space displacement vector"""
 
-    def text_expand_one(self, hbar, tol):
+    def test_expand_one(self, hbar, tol):
         """Test that displacement vectors are created correctly"""
         alpha = 1.4 + 3.7 * 1j
         mode = 4
