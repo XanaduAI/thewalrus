@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Symplectic
-==========
+Symplectic Operations
+=====================
 
 **Module name:** :mod:`thewalrus.symplectic`
 
@@ -76,7 +76,7 @@ def expand(S, modes, N):
 
 
 def expand_vector(alpha, mode, N, hbar=2.0):
-    """Returns the phase-space displacement vector associated to a displacement in mode by amount alpha in a total of N modes.
+    """Returns the phase-space displacement vector associated to a displacement.
 
     Args:
         alpha (complex): complex displacement
