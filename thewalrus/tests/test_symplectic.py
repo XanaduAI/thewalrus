@@ -21,20 +21,6 @@ from scipy.linalg import block_diag
 from thewalrus import symplectic
 
 
-# defaults
-TOL = 1e-3
-
-
-@pytest.fixture(scope="session")
-def tol():
-    """Numerical tolerance for equality tests."""
-    return TOL
-
-
-@pytest.fixture(params=[0.5, 1, 2])
-def hbar(request):
-    """The value of hbar to use in tests"""
-    return request.param
 
 # make test deterministic
 np.random.seed(42)
