@@ -74,11 +74,23 @@ def expand(S, modes, N):
 
     return S2
 
+
 def expand_vector(alpha, mode, N, hbar=2.0):
-    r = np.zeros(2*N)
-    r[mode] = np.sqrt(2*hbar)*alpha.real
-    r[N+mode] = np.sqrt(2*hbar)*alpha.imag
+    """Returns the phase-space displacement vector associated to a displacement in mode by amount alpha in a total of N modes.
+
+    Args:
+        alpha (complex): complex displacement
+        mode (int): mode index
+        N (int): number of modes
+
+    Returns:
+        array: phase-space displacement vector of size 2*N
+    """
+    r = np.zeros(2 * N)
+    r[mode] = np.sqrt(2 * hbar) * alpha.real
+    r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
+
 
 def reduced_state(mu, cov, modes):
     r""" Returns the vector of means and the covariance matrix of the specified modes.
@@ -189,7 +201,7 @@ def interferometer(U):
 
     return S
 
-
+# pylint: disable=too-many-arguments
 def loss(mu, cov, T, mode, nbar=0, hbar=2):
     r"""Loss channel acting on a Gaussian state.
 
@@ -265,5 +277,5 @@ def rotation(theta):
     Returns:
         array: rotation matrix by angle theta
     """
-    V = np.identity(1)*np.exp(1j*theta)
+    V = np.identity(1) * np.exp(1j * theta)
     return V
