@@ -1,4 +1,4 @@
-# Version 0.9.0-dev
+# Version 0.10.0-dev
 
 ### New features
 
@@ -9,6 +9,29 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+
+---
+
+# Version 0.9.0
+
+### New features
+* Adds a symplectic module `symplectic` which allows easy access to symplectic transformations and covariance matrices of Gaussian states. [#78](https://github.com/XanaduAI/thewalrus/pull/78)
+
+### Improvements
+
+* Adds a quick guide section in the documentation. [#75](https://github.com/XanaduAI/thewalrus/pull/75)
+
+
+### Bug fixes
+
+* Solves issue [#70](https://github.com/XanaduAI/thewalrus/issues/70) related to the index ordering in `thewalrus.quantum.density_matrix`.
+
+### Contributors
+This release contains contributions from (in alphabetical order):
+
+Josh Izaac, Nicolas Quesada
+
 
 ---
 
