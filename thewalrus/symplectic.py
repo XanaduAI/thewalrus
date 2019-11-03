@@ -26,6 +26,7 @@ Auxiliary functions
 
 .. autosummary::
     expand
+    expand_vector
     reduced_state
 
 Gaussian states

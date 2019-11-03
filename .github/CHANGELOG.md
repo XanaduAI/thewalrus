@@ -1,3 +1,16 @@
+# Version 0.10.0-dev
+
+### New features
+
+### Improvements
+
+### Bug fixes
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+
 # Version 0.9.0
 
 ### New features
@@ -7,12 +20,12 @@
 
 * Adds a quick reference section in the documentation. [#75](https://github.com/XanaduAI/thewalrus/pull/75)
 
-
 ### Bug fixes
 
 * Solves issue [#70](https://github.com/XanaduAI/thewalrus/issues/70) related to the index ordering in `thewalrus.quantum.density_matrix`.
 
 ### Contributors
+
 This release contains contributions from (in alphabetical order):
 
 Josh Izaac, Nicolas Quesada
