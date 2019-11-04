@@ -176,7 +176,6 @@ class TestInterferometer:
         """Test that a rotation returns the correct symplectic for an abritrary angle"""
         theta = 0.98
         S = symplectic.rotation(theta)
-        #S = symplectic.interferometer(U)
         expected = np.block([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
         np.allclose(S, expected, atol=tol, rtol=0)
 
