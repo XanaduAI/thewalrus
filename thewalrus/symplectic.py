@@ -279,4 +279,4 @@ def rotation(theta):
         array: rotation matrix by angle theta
     """
     V = np.identity(1) * np.exp(1j * theta)
-    return V
+    return interferometer(V)
