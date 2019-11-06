@@ -121,7 +121,7 @@ def test_hong_ou_mandel_interference(cutoff, tol):
             if indj == [0, 0] and indi == [0, 0]:
                 assert np.allclose(T[tuple(indj + indi)], 1.0)
                 # Checking that the vacuum-vacuum amplitude is 1
-    assert np.allclose(mat[1 : 1 + nmodes, 1 : 1 + nmodes], U)
+    assert np.allclose(mat[1 : 1 + nmodes, 1 : 1 + nmodes], U, atol=tol, rtol=0)
 
 
 @pytest.mark.parametrize("cutoff", [2])
@@ -144,4 +144,4 @@ def test_single_excitation_manifold_unitary(cutoff, tol):
     for i, indi in enumerate(items):
         for j, indj in enumerate(items):
             mat[i, j] = T[tuple(indi + indj)]
-    np.allclose(U, mat[1 : 1 + nmodes, 1 : 1 + nmodes])
+    np.allclose(U, mat[1 : 1 + nmodes, 1 : 1 + nmodes], atol=tol, rtol=0)

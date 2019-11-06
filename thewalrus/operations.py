@@ -22,6 +22,22 @@ Operations
 Functions to construct the Fock representation of a Gaussian operation
 represented as Symplectic matrix and complex displacements.
 
+
+Contains some Gaussian operations and auxiliary functions.
+
+Auxiliary functions
+-------------------
+
+.. autosummary::
+    n_two_mode_squeezed_vac
+    choi_expand
+    renormalizer
+
+Operations
+---------------
+
+.. autosummary::
+    fock_tensor
 """
 
 from itertools import product
