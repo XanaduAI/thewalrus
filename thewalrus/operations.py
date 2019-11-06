@@ -102,7 +102,7 @@ def renormalizer(tensor, R, l, cutoff):
         for p2 in product(list(range(cutoff)), repeat=l):
             p = tuple(p1 + p2)
             scaled_tensor[p] = (
-                tensor[p] * np.prod([R[i] for i in p2]) / np.sqrt(np.prod(factorial(p)))
+                tensor[p] * np.prod([R[i] for i in p2])
             )
     return scaled_tensor
 
@@ -137,5 +137,6 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
 
     l = len(alpha)
     # B, zeta, R, T = local_matelem(S, alpha, cutoff)
-    tensor = hafnian_batched(B, cutoff, mu=zeta)  # This is the heavy computational part
+    tensor = hafnian_batched(B, cutoff, mu=zeta, renorm = True)  # This is the heavy computational part
     return renormalizer(T * tensor, R, l, cutoff)
+
