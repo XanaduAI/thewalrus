@@ -26,6 +26,7 @@ np.random.seed(137)
 
 @pytest.mark.parametrize("cutoff", [4, 5, 6, 7])
 def test_single_mode_identity(cutoff, tol):
+    """Tests the correct construction of the single mode identity operation"""
     nmodes = 1
     S = np.identity(2 * nmodes)
     alphas = np.zeros([nmodes])
@@ -36,6 +37,7 @@ def test_single_mode_identity(cutoff, tol):
 
 @pytest.mark.parametrize("cutoff", [7])
 def test_single_mode_rotation(cutoff, tol):
+    """Tests the correct construction of the single mode rotation operation"""
     nmodes = 1
     theta = 2 * np.pi * np.random.rand()
     S = rotation(theta)
@@ -47,6 +49,7 @@ def test_single_mode_rotation(cutoff, tol):
 
 @pytest.mark.parametrize("cutoff", [5])
 def test_single_mode_displacement(cutoff, tol):
+    """Tests the correct construction of the single mode displacement operation"""
     nmodes = 1
     alphas = (0.3 + 0.5 * 1j) * np.ones([nmodes])
     S = np.identity(2 * nmodes)
@@ -61,6 +64,7 @@ def test_single_mode_displacement(cutoff, tol):
 
 @pytest.mark.parametrize("cutoff", [5])
 def test_single_mode_squeezing(cutoff, tol):
+    """Tests the correct construction of the single mode squeezing operation"""
     nmodes = 1
     r = 1.0
     S = squeezing(r, 0.0)
@@ -76,6 +80,7 @@ def test_single_mode_squeezing(cutoff, tol):
 
 @pytest.mark.parametrize("cutoff", [5])
 def test_single_mode_displacement_squeezing(cutoff, tol):
+    """Tests the correct construction of the single mode squeezing operation followed by the single mode displacement operation"""
     nmodes = 1
     r = 1.0
     S = squeezing(r, 0.0)
@@ -91,6 +96,7 @@ def test_single_mode_displacement_squeezing(cutoff, tol):
 
 @pytest.mark.parametrize("cutoff", [5])
 def test_hong_ou_mandel_interference(cutoff, tol):
+    """Tests the the properties of a 50-50 beamsplitter"""
     nmodes = 2
     U = np.sqrt(0.5) * np.array([[1, 1j], [1j, 1]])
     alphas = np.zeros([nmodes])
@@ -120,6 +126,7 @@ def test_hong_ou_mandel_interference(cutoff, tol):
 
 @pytest.mark.parametrize("cutoff", [2])
 def test_single_excitation_manifold_unitary(cutoff, tol):
+    """Tests the the properties of a 3 mode interferometer"""
     nmodes = 3
     U = np.array(
         [
