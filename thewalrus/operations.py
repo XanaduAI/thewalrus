@@ -42,7 +42,6 @@ Operations
 
 from itertools import product
 import numpy as np
-from scipy.special import factorial
 from thewalrus import hafnian_batched
 from thewalrus.symplectic import two_mode_squeezing, expand
 from thewalrus.quantum import Amat
@@ -101,9 +100,7 @@ def renormalizer(tensor, R, l, cutoff):
     for p1 in product(list(range(cutoff)), repeat=l):
         for p2 in product(list(range(cutoff)), repeat=l):
             p = tuple(p1 + p2)
-            scaled_tensor[p] = (
-                tensor[p] * np.prod([R[i] for i in p2])
-            )
+            scaled_tensor[p] = tensor[p] * np.prod([R[i] for i in p2])
     return scaled_tensor
 
 
@@ -137,6 +134,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
 
     l = len(alpha)
     # B, zeta, R, T = local_matelem(S, alpha, cutoff)
-    tensor = hafnian_batched(B, cutoff, mu=zeta, renorm = True)  # This is the heavy computational part
+    tensor = hafnian_batched(
+        B, cutoff, mu=zeta, renorm=True
+    )  # This is the heavy computational part
     return renormalizer(T * tensor, R, l, cutoff)
-
