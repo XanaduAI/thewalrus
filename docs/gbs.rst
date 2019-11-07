@@ -182,7 +182,7 @@ factorizes into a product of two amplitudes. In Ref. :cite:`quesada2019franck` i
 
 Gaussian states and threshold detection
 ***************************************
-In the last section we sketched how to obtain the probability that a certain photon-number outcome is obtained when a Gaussian state is measured with photon-number detectors. In this section we show how to obtain the analogous probability for for the case of threshold detectors. These binary outcome detectors can only distinguish between the the vacuum state and occupied states, and thus for a single mode they are described by the POVM elements
+In the last section we sketched how to obtain the probability that a certain photon-number outcome is obtained when a Gaussian state is measured with photon-number detectors. In this section we show how to obtain the analogous probability for the case of threshold detectors. These binary outcome detectors can only distinguish between the the vacuum state and occupied states, and thus for a single mode they are described by the POVM elements
 
 .. math::
 	\hat{\Pi}_0^{(i)} = \ket{0_i} \bra{0_i} \text{ and } \hat{\Pi}_1^{(i)} = 1_i - \hat{\Pi}_0^{(i)},
