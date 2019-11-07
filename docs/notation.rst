@@ -109,7 +109,7 @@ Similarly to block matrices, one can also define a reduction operator for bivect
 The reduction operation in terms of sets
 ****************************************
 
-A different way of specifying how many times a given row and column must me repeated is by giving a set in which we simply list the columns to be repeated. Thus for example the reduction index vector :math:`\mathbf{n} = (1,3,0,2)` can alternatively be given as the (multiset)set :math:`S=\{0,1,1,1,3,3 \}` where the element 0 appears once to indicate the first row and column is repeated once, the index 1 appears three times to indicate that this row and column are repeated three times, etcetera.
+A different way of specifying how many times a given row and column must me repeated is by giving a set in which we simply list the columns to be repeated. Thus for example the reduction index vector :math:`\mathbf{n} = (1,3,0,2)` can alternatively be given as the multiset :math:`S=\{0,1,1,1,3,3 \}` where the element 0 appears once to indicate the first row and column is repeated once, the index 1 appears three times to indicate that this row and column are repeated three times, etcetera.
 
 Similarly for matrices of even size for which the following partition makes sense
 
