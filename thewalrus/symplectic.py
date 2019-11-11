@@ -280,3 +280,17 @@ def rotation(theta):
     """
     V = np.identity(1) * np.exp(1j * theta)
     return interferometer(V)
+
+def sympmat(nmodes):
+    """Symplectic matrix of n modes
+
+    Args:
+        nmodes (int): number of modes
+
+    Returns:
+        array: symplectic matrix of size 2*nmodes times 2*nmodes
+    """
+    idm = np.identity(nmodes)
+    zeros = np.zeros([nmodes, nmodes])
+    Omega = np.block([[zeros, idm],[-idm, zeros]])
+    return Omega

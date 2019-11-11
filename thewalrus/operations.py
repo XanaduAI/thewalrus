@@ -43,7 +43,7 @@ Operations
 from itertools import product
 import numpy as np
 from thewalrus import hafnian_batched
-from thewalrus.symplectic import two_mode_squeezing, expand
+from thewalrus.symplectic import two_mode_squeezing, expand, sympmat
 from thewalrus.quantum import Amat
 
 # There are probably a million ways in which to do this in a better way
@@ -57,13 +57,11 @@ def n_two_mode_squeezed_vac(n, r=np.arcsinh(1.0)):
     Returns:
         (array): the symplectic matrix
     """
-    S2 = two_mode_squeezing(r, 0)
-    Snet = np.identity(4 * n)
-    for i in range(n):
-        S2e = expand(S2, [i, i + n], 2 * n)
-        Snet = Snet @ S2e
+    ch = np.cosh(r)*np.identity(n)
+    sh = np.sinh(r)*np.identity(n)
+    zh = np.zeros([n,n])
+    Snet = np.block([[ch,sh,zh,zh],[sh,ch,zh,zh],[zh,zh,ch,-sh],[zh,zh,-sh,ch]])
     return Snet
-
 
 def choi_expand(S, r=np.arcsinh(1.0)):
     r"""
@@ -96,7 +94,7 @@ def renormalizer(tensor, R, l, cutoff):
         (array): The renormalized tensor
     """
     scaled_tensor = np.empty_like(tensor)
-    # Note that the following loops are probably very inefficient.
+    # Note that the following loops are very inefficient and should be implemented in a better way.
     for p1 in product(list(range(cutoff)), repeat=l):
         for p2 in product(list(range(cutoff)), repeat=l):
             p = tuple(p1 + p2)
@@ -112,6 +110,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     Args:
         S (array): symplectic matrix
         alpha (array): complex vector of displacements
+        r (float): squeezing parameter used for the Choi expansion
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """

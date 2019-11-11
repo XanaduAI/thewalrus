@@ -98,7 +98,7 @@ def test_single_mode_displacement_squeezing(tol):
     S = squeezing(r, 0.0)
     alphas = (0.5 + 0.4 * 1j) * np.ones([nmodes])
     # This data is obtained by using qutip
-    # np.array((displace(40,alpha)*squeeze(40,r)).data.todense())[0:10,0:10]
+    # np.array((displace(40,alpha)*squeeze(40,r)).data.todense())[0:5,0:5]
     expected = np.array(
         [
             [0.6263739 + 0.09615331j, -0.22788717 + 0.13121343j, 0.36548296 - 0.0200537j, -0.20708137 + 0.14004403j, 0.25645667 - 0.06275564j],
@@ -112,9 +112,9 @@ def test_single_mode_displacement_squeezing(tol):
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("cutoff", [5])
-def test_hong_ou_mandel_interference(cutoff, tol):
-    """Tests the the properties of a 50-50 beamsplitter"""
+def test_hong_ou_mandel_interference(tol):
+    """Tests the properties of a 50-50 beamsplitter"""
+    cutoff = 5
     nmodes = 2
     U = np.sqrt(0.5) * np.array([[1, 1j], [1j, 1]])
     alphas = np.zeros([nmodes])
@@ -142,9 +142,10 @@ def test_hong_ou_mandel_interference(cutoff, tol):
     assert np.allclose(mat[1 : 1 + nmodes, 1 : 1 + nmodes], U, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("cutoff", [2])
-def test_single_excitation_manifold_unitary(cutoff, tol):
-    """Tests the the properties of a 3 mode interferometer"""
+
+def test_single_excitation_manifold_unitary(tol):
+    """Tests the properties of a 3 mode interferometer"""
+    cutoff = 5
     nmodes = 3
     U = np.array(
         [
