@@ -43,7 +43,7 @@ Operations
 from itertools import product
 import numpy as np
 from thewalrus import hafnian_batched
-from thewalrus.symplectic import two_mode_squeezing, expand, sympmat
+from thewalrus.symplectic import two_mode_squeezing, expand
 from thewalrus.quantum import Amat
 
 # There are probably a million ways in which to do this in a better way
@@ -93,13 +93,13 @@ def renormalizer(tensor, R, l, cutoff):
     Return:
         (array): The renormalized tensor
     """
-    scaled_tensor = np.empty_like(tensor)
+    #scaled_tensor = np.empty_like(tensor)
     # Note that the following loops are very inefficient and should be implemented in a better way.
     for p1 in product(list(range(cutoff)), repeat=l):
         for p2 in product(list(range(cutoff)), repeat=l):
             p = tuple(p1 + p2)
-            scaled_tensor[p] = tensor[p] * np.prod([R[i] for i in p2])
-    return scaled_tensor
+            tensor[p] = tensor[p] * np.prod([R[i] for i in p2])
+    return tensor
 
 
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
