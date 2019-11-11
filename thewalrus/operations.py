@@ -82,33 +82,6 @@ def choi_expand(S, r=np.arcsinh(1.0)):
     return expand(S, list(range(nmodes)), n) @ n_two_mode_squeezed_vac(nmodes, r)
 
 
-def renormalizer(tensor, R, l, cutoff):
-    r"""
-    Returns a renomarlized tensor
-
-    Args:
-        tensor (array): Original (unnormarlized) tensor
-        R (array): Normalization factors
-        l (int): Number of modes
-        cutoff (int): Fock space cutoff
-    Return:
-        (array): The renormalized tensor
-    """
-    # scaled_tensor = np.empty_like(tensor)
-    # Note that the following loops are very inefficient and should be implemented in a better way.
-    vals = list(range(l))
-    vals2 = list(range(l,2*l))
-    tensor_view = tensor.transpose(vals2+vals)
-    for p2 in product(list(range(cutoff)), repeat=l):
-        #p2 = tuple(p2)
-        tensor_view[p2] = tensor_view[p2] * np.prod([R[i] for i in p2])
-    return tensor
-    #for p1 in product(list(range(cutoff)), repeat=l):
-    #    for p2 in product(list(range(cutoff)), repeat=l):
-    #        p = tuple(p1 + p2)
-    #        tensor[p] = tensor[p] * np.prod([R[i] for i in p2])
-    #return tensor
-
 
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     r"""
