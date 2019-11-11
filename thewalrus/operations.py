@@ -96,11 +96,18 @@ def renormalizer(tensor, R, l, cutoff):
     """
     # scaled_tensor = np.empty_like(tensor)
     # Note that the following loops are very inefficient and should be implemented in a better way.
-    for p1 in product(list(range(cutoff)), repeat=l):
-        for p2 in product(list(range(cutoff)), repeat=l):
-            p = tuple(p1 + p2)
-            tensor[p] = tensor[p] * np.prod([R[i] for i in p2])
+    vals = list(range(l))
+    vals2 = list(range(l,2*l))
+    tensor_view = tensor.transpose(vals2+vals)
+    for p2 in product(list(range(cutoff)), repeat=l):
+        #p2 = tuple(p2)
+        tensor_view[p2] = tensor_view[p2] * np.prod([R[i] for i in p2])
     return tensor
+    #for p1 in product(list(range(cutoff)), repeat=l):
+    #    for p2 in product(list(range(cutoff)), repeat=l):
+    #        p = tuple(p1 + p2)
+    #        tensor[p] = tensor[p] * np.prod([R[i] for i in p2])
+    #return tensor
 
 
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
@@ -131,7 +138,14 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     lt = np.arctanh(np.linalg.svd(B, compute_uv=False))
     T = np.exp(pref_exp) / (np.sqrt(np.prod(np.cosh(lt))))
 
-    tensor = hafnian_batched(
+    tensor = T*hafnian_batched(
         B, cutoff, mu=zeta, renorm=True
     )  # This is the heavy computational part
-    return renormalizer(T * tensor, R, l, cutoff)
+    vals = list(range(l))
+    vals2 = list(range(l,2*l))
+    tensor_view = tensor.transpose(vals2+vals)
+    for p2 in product(list(range(cutoff)), repeat=l):
+        #p2 = tuple(p2)
+        tensor_view[p2] = tensor_view[p2] * np.prod([R[i] for i in p2])
+    return tensor
+    #return renormalizer(tensor, R, l, cutoff)
