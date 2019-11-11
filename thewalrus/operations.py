@@ -132,7 +132,6 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     T = np.exp(pref) / (np.sqrt(np.prod(np.cosh(lt))))
 
     l = len(alpha)
-    # B, zeta, R, T = local_matelem(S, alpha, cutoff)
     tensor = hafnian_batched(
         B, cutoff, mu=zeta, renorm=True
     )  # This is the heavy computational part
