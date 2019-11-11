@@ -57,11 +57,12 @@ def n_two_mode_squeezed_vac(n, r=np.arcsinh(1.0)):
     Returns:
         (array): the symplectic matrix
     """
-    ch = np.cosh(r)*np.identity(n)
-    sh = np.sinh(r)*np.identity(n)
-    zh = np.zeros([n,n])
-    Snet = np.block([[ch,sh,zh,zh],[sh,ch,zh,zh],[zh,zh,ch,-sh],[zh,zh,-sh,ch]])
+    ch = np.cosh(r) * np.identity(n)
+    sh = np.sinh(r) * np.identity(n)
+    zh = np.zeros([n, n])
+    Snet = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
     return Snet
+
 
 def choi_expand(S, r=np.arcsinh(1.0)):
     r"""
@@ -93,7 +94,7 @@ def renormalizer(tensor, R, l, cutoff):
     Return:
         (array): The renormalized tensor
     """
-    #scaled_tensor = np.empty_like(tensor)
+    # scaled_tensor = np.empty_like(tensor)
     # Note that the following loops are very inefficient and should be implemented in a better way.
     for p1 in product(list(range(cutoff)), repeat=l):
         for p2 in product(list(range(cutoff)), repeat=l):
@@ -114,8 +115,6 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """
-    n, _ = S.shape
-
     S_exp = choi_expand(S, r)
     cov = S_exp @ S_exp.T
     A = Amat(cov)
@@ -123,15 +122,15 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     N = n // 2
     # B = -A[0:N,0:N].conj()
     B = A[0:N, 0:N].conj()
-    alphat = np.array(list(alpha) + list(np.zeros_like(alpha)))
+    l = len(alpha)
+    alphat = np.array(list(alpha) + ([0] * l))
     zeta = alphat - B @ alphat.conj()
-    pref = -0.5 * alphat.conj() @ zeta
+    pref_exp = -0.5 * alphat.conj() @ zeta
     R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
     # pylint: disable=assignment-from-no-return
     lt = np.arctanh(np.linalg.svd(B, compute_uv=False))
-    T = np.exp(pref) / (np.sqrt(np.prod(np.cosh(lt))))
+    T = np.exp(pref_exp) / (np.sqrt(np.prod(np.cosh(lt))))
 
-    l = len(alpha)
     tensor = hafnian_batched(
         B, cutoff, mu=zeta, renorm=True
     )  # This is the heavy computational part
