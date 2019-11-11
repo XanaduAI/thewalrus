@@ -20,7 +20,7 @@ Operations
 .. currentmodule:: thewalrus.operations
 
 Functions to construct the Fock representation of a Gaussian operation
-represented as Symplectic matrix and complex displacements.
+represented as a Symplectic matrix and complex displacements.
 
 
 Contains some Gaussian operations and auxiliary functions.
@@ -31,7 +31,6 @@ Auxiliary functions
 .. autosummary::
     n_two_mode_squeezed_vac
     choi_expand
-    renormalizer
 
 Operations
 ---------------
@@ -46,7 +45,7 @@ from thewalrus import hafnian_batched
 from thewalrus.symplectic import expand
 from thewalrus.quantum import Amat
 
-# There are probably a million ways in which to do this in a better way
+
 def n_two_mode_squeezed_vac(n, r=np.arcsinh(1.0)):
     r"""
     Returns the symplectic matrix associated with two mode squeezing operations by amount r between modes i and i+n for 0<=i<n
@@ -82,15 +81,14 @@ def choi_expand(S, r=np.arcsinh(1.0)):
     return expand(S, list(range(nmodes)), n) @ n_two_mode_squeezed_vac(nmodes, r)
 
 
-
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     r"""
-    Calculated the Fock representation of Gaussian unitary specified by the
-    unitary matrices U and Up, the squeezing parameters ls and displacements alpha
-    for l modes up to cutoff
+    Calculates the Fock representation of a Gaussian unitary represented by symplectic matrix S
+    and displacements alpha up to cutoff
     Args:
         S (array): symplectic matrix
         alpha (array): complex vector of displacements
+        cutoff (int): cutoff in Fock space
         r (float): squeezing parameter used for the Choi expansion
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
@@ -100,7 +98,6 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     A = Amat(cov)
     n, _ = A.shape
     N = n // 2
-    # B = -A[0:N,0:N].conj()
     B = A[0:N, 0:N].conj()
     l = len(alpha)
     alphat = np.array(list(alpha) + ([0] * l))
@@ -111,14 +108,13 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     lt = np.arctanh(np.linalg.svd(B, compute_uv=False))
     T = np.exp(pref_exp) / (np.sqrt(np.prod(np.cosh(lt))))
 
-    tensor = T*hafnian_batched(
+    tensor = T * hafnian_batched(
         B, cutoff, mu=zeta, renorm=True
     )  # This is the heavy computational part
     vals = list(range(l))
-    vals2 = list(range(l,2*l))
-    tensor_view = tensor.transpose(vals2+vals)
-    for p2 in product(list(range(cutoff)), repeat=l):
-        #p2 = tuple(p2)
-        tensor_view[p2] = tensor_view[p2] * np.prod([R[i] for i in p2])
+    vals2 = list(range(l, 2 * l))
+    tensor_view = tensor.transpose(vals2 + vals)
+    # There is probably a better way to do the following rescaling, but this is already "good"
+    for p in product(list(range(cutoff)), repeat=l):
+        tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
     return tensor
-    #return renormalizer(tensor, R, l, cutoff)
