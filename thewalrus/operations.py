@@ -43,7 +43,7 @@ Operations
 from itertools import product
 import numpy as np
 from thewalrus import hafnian_batched
-from thewalrus.symplectic import two_mode_squeezing, expand
+from thewalrus.symplectic import expand
 from thewalrus.quantum import Amat
 
 # There are probably a million ways in which to do this in a better way

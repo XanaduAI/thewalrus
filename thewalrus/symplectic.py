@@ -202,6 +202,7 @@ def interferometer(U):
 
     return S
 
+
 # pylint: disable=too-many-arguments
 def loss(mu, cov, T, mode, nbar=0, hbar=2):
     r"""Loss channel acting on a Gaussian state.
@@ -281,6 +282,7 @@ def rotation(theta):
     V = np.identity(1) * np.exp(1j * theta)
     return interferometer(V)
 
+
 def sympmat(nmodes):
     """Symplectic matrix of n modes
 
@@ -292,5 +294,5 @@ def sympmat(nmodes):
     """
     idm = np.identity(nmodes)
     zeros = np.zeros([nmodes, nmodes])
-    Omega = np.block([[zeros, idm],[-idm, zeros]])
+    Omega = np.block([[zeros, idm], [-idm, zeros]])
     return Omega
