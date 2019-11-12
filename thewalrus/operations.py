@@ -74,6 +74,7 @@ def choi_expand(S, r=np.arcsinh(1.0)):
     return expand(S, list(range(nmodes)), n) @ Schoi
 
 
+# pylint: disable=too-many-arguments
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, rtol=1e-05, atol=1e-08):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
@@ -96,7 +97,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, rtol
     """
     # Check the matrix is symplectic
     if check_symplectic:
-        if not is_symplectic(S, rtol=1e-05, atol=1e-08):
+        if not is_symplectic(S, rtol=rtol, atol=atol):
             raise ValueError("The matrix S is not symplectic")
 
     # And that S and alpha have compatible dimensions
@@ -130,9 +131,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, rtol
     T = np.exp(pref_exp) / (np.sqrt(np.prod(np.cosh(lt))))
 
     # Now we use hafnian_batched to get the hafnians of all possible reductions
-    tensor = T * hafnian_batched(
-        B, cutoff, mu=zeta, renorm=True
-    )
+    tensor = T * hafnian_batched(B, cutoff, mu=zeta, renorm=True)
 
     # Finally, we need to renormalize the tensor because we used TMSV to move the input
     # Fock state to the end using auxiliary modes, cf. Fig. 40 and Eq. 60 of the paper

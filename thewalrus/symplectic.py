@@ -53,6 +53,7 @@ Code details
 import numpy as np
 from thewalrus.quantum import Sympmat
 
+
 def expand(S, modes, N):
     r"""Expands a Symplectic matrix S to act on the entire subsystem.
 
@@ -292,16 +293,16 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     Returns:
         (bool): whether the given matrix is symplectic
     """
-    n,m = S.shape
+    n, m = S.shape
     if n != m:
         return False
-    if n%2 != 0:
+    if n % 2 != 0:
         return False
-    nmodes = n//2
+    nmodes = n // 2
 
     Omega = Sympmat(nmodes)
 
-    if np.allclose(S.T @ Omega @ S, Omega):
+    if np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol):
         return True
 
     return False

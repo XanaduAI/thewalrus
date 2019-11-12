@@ -602,7 +602,7 @@ class TestIntegration:
         assert np.allclose(mu, mu_init, atol=tol, rtol=0)
         assert np.allclose(cov, cov_init, atol=tol, rtol=0)
 
-def test_is_symplectic(tol):
+def test_is_symplectic():
     """ Tests that the matrices generated in the symplectic module are indeed symplectic"""
     theta = np.pi / 6
     r = np.arcsinh(1.0)

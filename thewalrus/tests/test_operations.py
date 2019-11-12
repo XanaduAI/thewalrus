@@ -13,8 +13,10 @@
 # limitations under the License.
 """Operations tests"""
 # pylint: disable=no-self-use, assignment-from-no-return
-import pytest
+
 from itertools import product
+
+import pytest
 
 import numpy as np
 from scipy.linalg import qr
@@ -174,7 +176,7 @@ def test_interferometer_single_excitation(r, nmodes, tol):
     cutoff = 2
     T = operations.fock_tensor(S, alphas, cutoff, r=r)
     # Construct a list with all the vectors |i \rangle
-    vec_list = [i for i in map(list, list(np.identity(nmodes, dtype=int)))]
+    vec_list = np.identity(nmodes, dtype=int).tolist()
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
     U_rec = np.empty([nmodes, nmodes], dtype=complex)
     for i, vec_i in enumerate(vec_list):
@@ -195,7 +197,7 @@ def test_hong_ou_mandel_interference(r, phi, tol):
     nmodes = 2
     alphas = np.zeros([nmodes])
     T = operations.fock_tensor(S, alphas, cutoff, r=r)
-    assert np.allclose(T[1, 1, 1, 1], 0.0)
+    assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
 
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_two_mode_squeezing(r, tol):
