@@ -101,7 +101,6 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    code/quantum
    code/samples
    code/symplectic
-   code/operations
    code/reference
 
 .. toctree::
