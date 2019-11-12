@@ -601,3 +601,19 @@ class TestIntegration:
         # check that we return to the vacuum state
         assert np.allclose(mu, mu_init, atol=tol, rtol=0)
         assert np.allclose(cov, cov_init, atol=tol, rtol=0)
+
+def test_is_symplectic(tol):
+    """ Tests that the matrices generated in the symplectic module are indeed symplectic"""
+    theta = np.pi / 6
+    r = np.arcsinh(1.0)
+    phi = np.pi / 8
+    S = symplectic.rotation(theta)
+    assert symplectic.is_symplectic(S)
+    S = symplectic.squeezing(r, theta)
+    assert symplectic.is_symplectic(S)
+    S = symplectic.beam_splitter(theta, phi)
+    assert symplectic.is_symplectic(S)
+    S = symplectic.two_mode_squeezing(r, theta)
+    assert symplectic.is_symplectic(S)
+    A = np.array([[2.0, 3.0], [4.0, 6.0]])
+    assert not symplectic.is_symplectic(A)

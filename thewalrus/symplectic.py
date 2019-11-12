@@ -51,7 +51,7 @@ Code details
 ^^^^^^^^^^^^
 """
 import numpy as np
-
+from thewalrus.quantum import Sympmat
 
 def expand(S, modes, N):
     r"""Expands a Symplectic matrix S to act on the entire subsystem.
@@ -283,16 +283,25 @@ def rotation(theta):
     return interferometer(V)
 
 
-def sympmat(nmodes):
-    """Symplectic matrix of :math:`n` modes.
+def is_symplectic(S, rtol=1e-05, atol=1e-08):
+    r""" Checks if matrix S is a symplectic matrix
 
     Args:
-        nmodes (int): number of modes
+        S (array): a square matrix
 
     Returns:
-        array: symplectic matrix of size :math:`2n\times2n`
+        (bool): whether the given matrix is symplectic
     """
-    idm = np.identity(nmodes)
-    zeros = np.zeros([nmodes, nmodes])
-    Omega = np.block([[zeros, idm], [-idm, zeros]])
-    return Omega
+    n,m = S.shape
+    if n != m:
+        return False
+    if n%2 != 0:
+        return False
+    nmodes = n//2
+
+    Omega = Sympmat(nmodes)
+
+    if np.allclose(S.T @ Omega @ S, Omega):
+        return True
+
+    return False
