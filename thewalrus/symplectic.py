@@ -51,7 +51,7 @@ Code details
 ^^^^^^^^^^^^
 """
 import numpy as np
-from thewalrus.quantum import Sympmat
+#from thewalrus.quantum import Sympmat
 
 
 def expand(S, modes, N):
@@ -284,25 +284,3 @@ def rotation(theta):
     return interferometer(V)
 
 
-def is_symplectic(S, rtol=1e-05, atol=1e-08):
-    r""" Checks if matrix S is a symplectic matrix
-
-    Args:
-        S (array): a square matrix
-
-    Returns:
-        (bool): whether the given matrix is symplectic
-    """
-    n, m = S.shape
-    if n != m:
-        return False
-    if n % 2 != 0:
-        return False
-    nmodes = n // 2
-
-    Omega = Sympmat(nmodes)
-
-    if np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol):
-        return True
-
-    return False

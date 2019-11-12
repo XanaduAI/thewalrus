@@ -19,7 +19,7 @@ import numpy as np
 from scipy.linalg import block_diag
 
 from thewalrus import symplectic
-
+from thewalrus.quantum import is_symplectic
 
 
 # make test deterministic
@@ -608,12 +608,12 @@ def test_is_symplectic():
     r = np.arcsinh(1.0)
     phi = np.pi / 8
     S = symplectic.rotation(theta)
-    assert symplectic.is_symplectic(S)
+    assert is_symplectic(S)
     S = symplectic.squeezing(r, theta)
-    assert symplectic.is_symplectic(S)
+    assert is_symplectic(S)
     S = symplectic.beam_splitter(theta, phi)
-    assert symplectic.is_symplectic(S)
+    assert is_symplectic(S)
     S = symplectic.two_mode_squeezing(r, theta)
-    assert symplectic.is_symplectic(S)
+    assert is_symplectic(S)
     A = np.array([[2.0, 3.0], [4.0, 6.0]])
-    assert not symplectic.is_symplectic(A)
+    assert not is_symplectic(A)

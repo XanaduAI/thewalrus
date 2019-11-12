@@ -65,6 +65,9 @@ Details
 .. autofunction::
     density_matrix
 
+.. autofunction::
+    fock_tensor
+
 
 Utility functions
 -----------------
@@ -85,20 +88,24 @@ Utility functions
     is_valid_cov
     is_pure_cov
     is_classical_cov
+    is_symplectic
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
+    choi_expand
 
 Details
 ^^^^^^^
 """
 # pylint: disable=too-many-arguments
-from itertools import count, product, chain
+from itertools import count, product, chain, product
 
 import numpy as np
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+
+from thewalrus.symplectic import expand#, is_symplectic
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -723,6 +730,30 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
     return False
 
 
+def is_symplectic(S, rtol=1e-05, atol=1e-08):
+    r""" Checks if matrix S is a symplectic matrix
+
+    Args:
+        S (array): a square matrix
+
+    Returns:
+        (bool): whether the given matrix is symplectic
+    """
+    n, m = S.shape
+    if n != m:
+        return False
+    if n % 2 != 0:
+        return False
+    nmodes = n // 2
+
+    Omega = Sympmat(nmodes)
+
+    if np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol):
+        return True
+
+    return False
+
+
 def gen_single_mode_dist(s, cutoff=50, N=1):
     """Generate the photon number distribution of :math:`N` identical single mode squeezed states.
 
@@ -789,3 +820,78 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
         rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
         return gen_multi_mode_dist(rs, cutoff=cutoff, padding_factor=padding_factor)[0:cutoff]
     raise ValueError("The Gaussian state is not pure")
+
+
+
+
+def choi_expand(S, r=np.arcsinh(1.0)):
+    r"""
+    Construct the Gaussian-Choi-Jamiolkowski expansion of a symplectic matrix S.
+
+    Args:
+        S (array): symplectic matrix
+
+    Returns:
+        (array): expanded symplectic matrix of twice the size of S
+    """
+
+    (n, m) = S.shape
+    if n != m:
+        raise ValueError("The matrix S is not square")
+    if n % 2 != 0:
+        raise ValueError("The matrix S is not of even size")
+
+    nmodes = n // 2
+
+    ch = np.cosh(r) * np.identity(nmodes)
+    sh = np.sinh(r) * np.identity(nmodes)
+    zh = np.zeros([nmodes, nmodes])
+    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
+
+    return expand(S, list(range(nmodes)), n) @ Schoi
+
+
+def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
+    r"""
+    Calculates the Fock representation of a Gaussian unitary parametrized by
+    the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
+    For a complete description of what is being done once the matrix B is obtained
+
+    Args:
+        S (array): symplectic matrix
+        alpha (array): complex vector of displacements
+        cutoff (int): cutoff in Fock space
+        r (float): squeezing parameter used for the Choi expansion
+        check_symplectic (boolean): checks whether the input matrix is symplectic
+    Return:
+        (array): Tensor containing the Fock representation of the Gaussian unitary
+    """
+    # Check the matrix is symplectic
+    if check_symplectic:
+        if not is_symplectic(S):
+            raise ValueError("The matrix S is not symplectic")
+
+    # And that S and alpha have compatible dimensions
+    l, _ = S.shape
+    if l // 2 != len(alpha):
+        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
+
+    # Construct its Choi expansion and then the covariance matrix and A matrix of such pure state
+    S_exp = choi_expand(S, r)
+    cov = S_exp @ S_exp.T
+    l = len(alpha)
+    alphat = np.array(list(alpha) + ([0] * l))
+    x = 2 * alphat.real
+    p = 2 * alphat.imag
+    mu = np.concatenate([x, p])
+    tensor = state_vector(mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False)
+
+    vals = list(range(l))
+    vals2 = list(range(l, 2 * l))
+
+    R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
+    tensor_view = tensor.transpose(vals2 + vals)
+    # There is probably a better way to do the following rescaling, but this is already "good"
+    for p in product(list(range(cutoff)), repeat=l):
+        tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
+    return tensor
