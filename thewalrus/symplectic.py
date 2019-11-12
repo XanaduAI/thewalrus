@@ -290,7 +290,7 @@ def sympmat(nmodes):
         nmodes (int): number of modes
 
     Returns:
-        array: symplectic matrix of size 2*nmodes times 2*nmodes
+        array: symplectic matrix of size :math:`2n\times2n`
     """
     idm = np.identity(nmodes)
     zeros = np.zeros([nmodes, nmodes])
