@@ -40,7 +40,9 @@ Operations
 """
 
 from itertools import product
+
 import numpy as np
+
 from thewalrus import hafnian_batched
 from thewalrus.symplectic import expand
 from thewalrus.quantum import Amat
