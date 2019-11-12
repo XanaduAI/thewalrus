@@ -44,7 +44,7 @@ import numpy as np
 
 from thewalrus import hafnian_batched
 from thewalrus.symplectic import expand, is_symplectic
-from thewalrus.quantum import Amat
+from thewalrus.quantum import Amat, state_vector
 
 
 def choi_expand(S, r=np.arcsinh(1.0)):
@@ -107,36 +107,17 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     # Construct its Choi expansion and then the covariance matrix and A matrix of such pure state
     S_exp = choi_expand(S, r)
     cov = S_exp @ S_exp.T
-    A = Amat(cov)
-
-    # Because the state is pure then A = B \oplus B^*. We now extract B^* and follow the procedure
-    # described in the paper cited above.
-    n, _ = A.shape
-    N = n // 2
-    B = A[0:N, 0:N].conj()
-
-    # Now we need to figure out the loops (cf. Eq. 111 of the reference above)
     l = len(alpha)
     alphat = np.array(list(alpha) + ([0] * l))
-    zeta = alphat - B @ alphat.conj()
+    x = 2*alphat.real
+    p = 2*alphat.imag
+    mu = np.concatenate([x,p])
+    tensor = state_vector(mu, cov, normalize = False, cutoff = cutoff, hbar = 2, check_purity=False)
 
-    # Finally, there are the prefactors (cf. Eq. 113 of the reference above).
-    # Note that the factorials that are not included here from Eq. 113 are calculated
-    # internally by hafnian_batched when the argument renorm is set to True
-    pref_exp = -0.5 * alphat.conj() @ zeta
-    R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
-    # pylint: disable=assignment-from-no-return
-    lt = np.arctanh(np.linalg.svd(B, compute_uv=False))
-    T = np.exp(pref_exp) / (np.sqrt(np.prod(np.cosh(lt))))
-
-    # Now we use hafnian_batched to get the hafnians of all possible reductions
-    tensor = T * hafnian_batched(B, cutoff, mu=zeta, renorm=True)
-
-    # Finally, we need to renormalize the tensor because we used TMSV to move the input
-    # Fock state to the end using auxiliary modes, cf. Fig. 40 and Eq. 60 of the paper
-    # cited above.
     vals = list(range(l))
     vals2 = list(range(l, 2 * l))
+
+    R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
     tensor_view = tensor.transpose(vals2 + vals)
     # There is probably a better way to do the following rescaling, but this is already "good"
     for p in product(list(range(cutoff)), repeat=l):

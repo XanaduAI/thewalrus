@@ -534,7 +534,8 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     B = A[0:N, 0:N]
     alpha = beta[0:N]
     gamma = np.conj(alpha) - B @ alpha
-    pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha))
+    prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
+    pref = np.exp(prefexp.conj())
     if post_select is None:
 
         psi = (
