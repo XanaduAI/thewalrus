@@ -284,7 +284,7 @@ def rotation(theta):
 
 
 def sympmat(nmodes):
-    """Symplectic matrix of n modes
+    """Symplectic matrix of :math:`n` modes.
 
     Args:
         nmodes (int): number of modes
