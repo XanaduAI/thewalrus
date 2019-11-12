@@ -75,7 +75,7 @@ def choi_expand(S, r=np.arcsinh(1.0)):
 
 
 # pylint: disable=too-many-arguments
-def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, rtol=1e-05, atol=1e-08):
+def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -97,7 +97,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, rtol
     """
     # Check the matrix is symplectic
     if check_symplectic:
-        if not is_symplectic(S, rtol=rtol, atol=atol):
+        if not is_symplectic(S):
             raise ValueError("The matrix S is not symplectic")
 
     # And that S and alpha have compatible dimensions
