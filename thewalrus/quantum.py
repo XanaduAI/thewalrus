@@ -40,8 +40,8 @@ states, see:
   <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.022341>`_
 
 
-Fock states
------------
+Fock states and tensors
+-----------------------
 
 .. autosummary::
 
@@ -49,6 +49,7 @@ Fock states
     state_vector
     density_matrix_element
     density_matrix
+    fock_tensor
 
 Details
 ^^^^^^^
