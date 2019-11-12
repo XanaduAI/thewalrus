@@ -83,7 +83,7 @@ def choi_expand(S, r=np.arcsinh(1.0)):
 
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0)):
     r"""
-    Calculates the Fock representation of a Gaussian unitary represented by symplectic matrix S
+    Calculates the Fock representation of a Gaussian unitary.
     and displacements alpha up to cutoff
     Args:
         S (array): symplectic matrix
