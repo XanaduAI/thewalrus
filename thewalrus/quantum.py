@@ -98,7 +98,7 @@ Details
 ^^^^^^^
 """
 # pylint: disable=too-many-arguments
-from itertools import count, product, chain, product
+from itertools import count, product, chain
 
 import numpy as np
 from scipy.optimize import root_scalar
@@ -855,7 +855,6 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
-    For a complete description of what is being done once the matrix B is obtained
 
     Args:
         S (array): symplectic matrix
@@ -876,7 +875,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     if l // 2 != len(alpha):
         raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
 
-    # Construct its Choi expansion and then the covariance matrix and A matrix of such pure state
+    # Construct its Choi expansion and state and the call state_vector
     S_exp = choi_expand(S, r)
     cov = S_exp @ S_exp.T
     l = len(alpha)

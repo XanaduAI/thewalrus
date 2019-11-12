@@ -51,7 +51,6 @@ Code details
 ^^^^^^^^^^^^
 """
 import numpy as np
-#from thewalrus.quantum import Sympmat
 
 
 def expand(S, modes, N):
@@ -282,5 +281,3 @@ def rotation(theta):
     """
     V = np.identity(1) * np.exp(1j * theta)
     return interferometer(V)
-
-
