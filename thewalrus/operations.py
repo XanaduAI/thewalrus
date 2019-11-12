@@ -79,10 +79,9 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, rtol
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
     For a complete description of what is being done once the matrix B is obtained
-    see
+    see:
 
-    * Quesada, N.
-    "Franck-Condon factors by counting perfect matchings of graphs with loops."
+    * Quesada, N. "Franck-Condon factors by counting perfect matchings of graphs with loops."
     `Journal of Chemical Physics 150, 164113 (2019) <https://aip.scitation.org/doi/10.1063/1.5086387>`_
 
 
