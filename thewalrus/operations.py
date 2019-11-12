@@ -74,7 +74,6 @@ def choi_expand(S, r=np.arcsinh(1.0)):
     return expand(S, list(range(nmodes)), n) @ Schoi
 
 
-# pylint: disable=too-many-arguments
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
