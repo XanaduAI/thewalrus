@@ -143,7 +143,7 @@ def test_single_mode_displacement_squeezing(r, tol):
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_interferometer_selection_rules(r, nmodes, tol):
     r"""Test the selection rules of an interferometer.
-    If one writes the interferometer gate of k as :math:`U` and its matrix elements as
+    If one writes the interferometer gate of k modes as :math:`U` and its matrix elements as
     :math:`\langle p_0 p_1 \ldots p_{k-1} |U|q_0 q_1 \ldots q_{k-1}\rangle` then these elements
     are nonzero if and only if :math:`\sum_{i=0}^k p_i = \sum_{i=0}^k q_i`. This test checks
     that this selection rule holds.
@@ -165,8 +165,8 @@ def test_interferometer_selection_rules(r, nmodes, tol):
 def test_interferometer_single_excitation(r, nmodes, tol):
     r"""Test that the representation of an interferometer in the single
     excitation manifold is precisely the unitary matrix that represents it
-    mode space.
-    Let :math:`V` be a unitary matrix in N modes and let be :math:`U` its Fock representation
+    mode in space.
+    Let :math:`V` be a unitary matrix in N modes and let :math:`U` be its Fock representation
     Also let :math:`|i \rangle = |0_0,\ldots, 1_i, 0_{N-1} \rangle`, i.e a single photon in mode :math:`i`.
     Then it must hold that :math:`V_{i,j} = \langle i | U | j \rangle`.
     """
@@ -175,7 +175,7 @@ def test_interferometer_single_excitation(r, nmodes, tol):
     alphas = np.zeros([nmodes])
     cutoff = 2
     T = operations.fock_tensor(S, alphas, cutoff, r=r)
-    # Construct a list with all the vectors |i \rangle
+    # Construct a list with all the indices corresponding to |i \rangle
     vec_list = np.identity(nmodes, dtype=int).tolist()
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
     U_rec = np.empty([nmodes, nmodes], dtype=complex)
@@ -190,7 +190,7 @@ def test_interferometer_single_excitation(r, nmodes, tol):
 def test_hong_ou_mandel_interference(r, phi, tol):
     r"""Tests Hong-Ou-Mandel interference for a 50:50 beamsplitter.
     If one writes :math:`U` for the Fock representation of a 50-50 beamsplitter
-    then it must hold that :math:`\langle 1,1|U|1,1 \rangle`.
+    then it must hold that :math:`\langle 1,1|U|1,1 \rangle = 0`.
     """
     S = beam_splitter(np.pi / 4, phi)  # a 50-50 beamsplitter with phase phi
     cutoff = 2
