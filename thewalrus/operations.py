@@ -67,7 +67,7 @@ def n_two_mode_squeezed_vac(n, r=np.arcsinh(1.0)):
 
 def choi_expand(S, r=np.arcsinh(1.0)):
     r"""
-    Construct the Gaussian-Choi-Jamiolkowski expansion of a symplectic matrix S
+    Construct the Gaussian-Choi-Jamiolkowski expansion of a symplectic matrix S.
 
     Args:
         S (array): symplectic matrix
