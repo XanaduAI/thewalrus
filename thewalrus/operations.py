@@ -48,7 +48,7 @@ from thewalrus.quantum import Amat
 
 def n_two_mode_squeezed_vac(n, r=np.arcsinh(1.0)):
     r"""
-    Returns the symplectic matrix associated with two mode squeezing operations by amount r between modes i and i+n for 0<=i<n
+    Returns the symplectic matrix associated with two mode squeezing operations.
 
     Args:
         n (integer): number of modes
