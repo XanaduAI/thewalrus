@@ -617,3 +617,7 @@ def test_is_symplectic():
     assert is_symplectic(S)
     A = np.array([[2.0, 3.0], [4.0, 6.0]])
     assert not is_symplectic(A)
+    A = np.identity(3)
+    assert not is_symplectic(A)
+    A = np.array([[2.0, 3.0], [4.0, 6.0], [4.0, 6.0]])
+    assert not is_symplectic(A)

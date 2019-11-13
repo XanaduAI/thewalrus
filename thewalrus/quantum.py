@@ -106,7 +106,7 @@ from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
 
-from thewalrus.symplectic import expand#, is_symplectic
+from thewalrus.symplectic import expand
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -749,10 +749,7 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
 
     Omega = Sympmat(nmodes)
 
-    if np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol):
-        return True
-
-    return False
+    return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
 
 
 def gen_single_mode_dist(s, cutoff=50, N=1):
@@ -821,8 +818,6 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
         rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
         return gen_multi_mode_dist(rs, cutoff=cutoff, padding_factor=padding_factor)[0:cutoff]
     raise ValueError("The Gaussian state is not pure")
-
-
 
 
 def choi_expand(S, r=np.arcsinh(1.0)):
