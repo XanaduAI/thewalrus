@@ -829,7 +829,7 @@ def test_interferometer_selection_rules(r, nmodes, tol):
         for q in product(list(range(cutoff)), repeat=nmodes):
             if sum(p) != sum(q): #Check that there are the same total number of photons in the bra and the ket
                 r = tuple(list(p) + list(q))
-                np.allclose(T[r], 0.0, atol=tol, rtol=0)
+                assert np.allclose(T[r], 0.0, atol=tol, rtol=0)
 
 
 @pytest.mark.parametrize("nmodes", [2, 3, 4])
