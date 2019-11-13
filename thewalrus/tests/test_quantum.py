@@ -49,24 +49,27 @@ from thewalrus.quantum import (
 # make tests deterministic
 np.random.seed(137)
 
+def random_interferometer(N, real=False):
+    r"""Random unitary matrix representing an interferometer.
 
-def TMS_cov(r, phi):
-    """returns the covariance matrix of a TMS state"""
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
+    For more details, see arXiv:math-ph/0609050
 
-    S = np.array(
-        [
-            [ch, cp * sh, 0, sp * sh],
-            [cp * sh, ch, sp * sh, 0],
-            [0, sp * sh, ch, -cp * sh],
-            [sp * sh, 0, -cp * sh, ch],
-        ]
-    )
+    Args:
+        N (int): number of modes
+        real (bool): return a random real orthogonal matrix
 
-    return S @ S.T
+    Returns:
+        array: random :math:`N\times N` unitary distributed with the Haar measure
+    """
+    if real:
+        z = np.random.randn(N, N)
+    else:
+        z = (np.random.randn(N, N) + 1j * np.random.randn(N, N)) / np.sqrt(2.0)
+    q, r = qr(z)
+    d = np.diag(r)
+    ph = d / np.abs(d)
+    U = np.multiply(q, ph, q)
+    return U
 
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -135,7 +138,7 @@ def test_Qmat_vacuum():
 
 def test_Qmat_TMS():
     """test Qmat returns correct result for a two-mode squeezed state"""
-    V = TMS_cov(np.arcsinh(1), 0)
+    V = two_mode_squeezing(2 * np.arcsinh(1), 0)
     res = Qmat(V)
 
     q = np.fliplr(np.diag([2.0] * 4))
@@ -162,7 +165,7 @@ def test_Amat_vacuum_using_Q():
 
 def test_Amat_TMS_using_cov():
     """test Amat returns correct result for a two-mode squeezed state"""
-    V = TMS_cov(np.arcsinh(1), 0)
+    V = two_mode_squeezing(2 * np.arcsinh(1), 0)
     res = Amat(V)
 
     B = np.fliplr(np.diag([1 / np.sqrt(2)] * 2))
@@ -532,7 +535,7 @@ def test_pure_state_amplitude_two_mode_squeezed(i, j):
     nbar = 1.0
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
-    cov = TMS_cov(r, phase)
+    cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
     if i != j:
         exact = 0.0
@@ -582,7 +585,7 @@ def test_state_vector_two_mode_squeezed():
     cutoff = 5
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
-    cov = TMS_cov(r, phase)
+    cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
     exact = np.array(
         [
@@ -601,7 +604,7 @@ def test_state_vector_two_mode_squeezed_post():
     cutoff = 5
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
-    cov = TMS_cov(r, phase)
+    cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
     exact = np.diag(
         np.array(
@@ -641,7 +644,7 @@ def test_state_vector_two_mode_squeezed_post_normalize():
     cutoff = 5
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
-    cov = TMS_cov(r, phase)
+    cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
     exact = np.diag(
         np.array(
@@ -664,7 +667,7 @@ def test_is_classical_cov_squeezed():
     nbar = 1.0
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
-    cov = TMS_cov(r, phase)
+    cov = two_mode_squeezing(2 * r, phase)
     assert not is_classical_cov(cov)
 
 
@@ -686,31 +689,6 @@ def test_total_photon_num_dist_pure_state(cutoff):
     p1 = total_photon_num_dist_pure_state(cov, cutoff=cutoff)
     p2 = gen_single_mode_dist(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
     assert np.allclose(p1, p2)
-
-
-
-
-def random_interferometer(N, real=False):
-    r"""Random unitary matrix representing an interferometer.
-
-    For more details, see :cite:`mezzadri2006`.
-
-    Args:
-        N (int): number of modes
-        real (bool): return a random real orthogonal matrix
-
-    Returns:
-        array: random :math:`N\times N` unitary distributed with the Haar measure
-    """
-    if real:
-        z = np.random.randn(N, N)
-    else:
-        z = (np.random.randn(N, N) + 1j * np.random.randn(N, N)) / np.sqrt(2.0)
-    q, r = qr(z)
-    d = np.diag(r)
-    ph = d / np.abs(d)
-    U = np.multiply(q, ph, q)
-    return U
 
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_single_mode_identity(r, tol):

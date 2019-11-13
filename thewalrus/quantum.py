@@ -833,7 +833,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     if l // 2 != len(alpha):
         raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
 
-    # Construct its Choi expansion and state and the call state_vector
+    # Construct its Choi expansion and state and then call state_vector
     S_exp = choi_expand(S, r)
     cov = S_exp @ S_exp.T
     l = len(alpha)
