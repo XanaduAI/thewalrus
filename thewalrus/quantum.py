@@ -77,7 +77,6 @@ Utility functions
 
     reduced_gaussian
     Xmat
-    Sympmat
     Qmat
     Covmat
     Amat
@@ -89,7 +88,6 @@ Utility functions
     is_valid_cov
     is_pure_cov
     is_classical_cov
-    is_symplectic
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
@@ -106,7 +104,7 @@ from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
 
-from thewalrus.symplectic import expand
+from thewalrus.symplectic import expand, sympmat, is_symplectic
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -158,21 +156,6 @@ def Xmat(N):
     O = np.zeros_like(I)
     X = np.block([[O, I], [I, O]])
     return X
-
-
-def Sympmat(N):
-    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
-
-    Args:
-        N (int): positive integer
-
-    Returns:
-        array: :math:`2N\times 2N` array
-    """
-    I = np.identity(N)
-    O = np.zeros_like(I)
-    S = np.block([[O, I], [-I, O]])
-    return S
 
 
 def Qmat(cov, hbar=2):
@@ -682,7 +665,7 @@ def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
         return False
 
     nmodes = n // 2
-    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes))
+    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * sympmat(nmodes))
     vals[np.abs(vals) < atol] = 0.0
     if np.all(vals >= 0):
         # raise ValueError("The input matrix violates the uncertainty relation")
@@ -729,27 +712,6 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
         if np.all(vals >= 0):
             return True
     return False
-
-
-def is_symplectic(S, rtol=1e-05, atol=1e-08):
-    r""" Checks if matrix S is a symplectic matrix
-
-    Args:
-        S (array): a square matrix
-
-    Returns:
-        (bool): whether the given matrix is symplectic
-    """
-    n, m = S.shape
-    if n != m:
-        return False
-    if n % 2 != 0:
-        return False
-    nmodes = n // 2
-
-    Omega = Sympmat(nmodes)
-
-    return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
 
 
 def gen_single_mode_dist(s, cutoff=50, N=1):

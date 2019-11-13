@@ -28,6 +28,8 @@ Auxiliary functions
     expand
     expand_vector
     reduced_state
+    is_symplectic
+    sympmat
 
 Gaussian states
 ---------------
@@ -281,3 +283,39 @@ def rotation(theta):
     """
     V = np.identity(1) * np.exp(1j * theta)
     return interferometer(V)
+
+
+def sympmat(N):
+    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
+
+    Args:
+        N (int): positive integer
+
+    Returns:
+        array: :math:`2N\times 2N` array
+    """
+    I = np.identity(N)
+    O = np.zeros_like(I)
+    S = np.block([[O, I], [-I, O]])
+    return S
+
+
+def is_symplectic(S, rtol=1e-05, atol=1e-08):
+    r""" Checks if matrix S is a symplectic matrix
+
+    Args:
+        S (array): a square matrix
+
+    Returns:
+        (bool): whether the given matrix is symplectic
+    """
+    n, m = S.shape
+    if n != m:
+        return False
+    if n % 2 != 0:
+        return False
+    nmodes = n // 2
+
+    Omega = sympmat(nmodes)
+
+    return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)

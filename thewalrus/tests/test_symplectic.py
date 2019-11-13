@@ -19,7 +19,6 @@ import numpy as np
 from scipy.linalg import block_diag
 
 from thewalrus import symplectic
-from thewalrus.quantum import is_symplectic
 
 
 # make test deterministic
@@ -608,16 +607,25 @@ def test_is_symplectic():
     r = np.arcsinh(1.0)
     phi = np.pi / 8
     S = symplectic.rotation(theta)
-    assert is_symplectic(S)
+    assert symplectic.is_symplectic(S)
     S = symplectic.squeezing(r, theta)
-    assert is_symplectic(S)
+    assert symplectic.is_symplectic(S)
     S = symplectic.beam_splitter(theta, phi)
-    assert is_symplectic(S)
+    assert symplectic.is_symplectic(S)
     S = symplectic.two_mode_squeezing(r, theta)
-    assert is_symplectic(S)
+    assert symplectic.is_symplectic(S)
     A = np.array([[2.0, 3.0], [4.0, 6.0]])
-    assert not is_symplectic(A)
+    assert not symplectic.is_symplectic(A)
     A = np.identity(3)
-    assert not is_symplectic(A)
+    assert not symplectic.is_symplectic(A)
     A = np.array([[2.0, 3.0], [4.0, 6.0], [4.0, 6.0]])
-    assert not is_symplectic(A)
+    assert not symplectic.is_symplectic(A)
+
+@pytest.mark.parametrize("n", [1, 2, 4])
+def test_sympmat(n):
+    """test X_n = [[0, I], [I, 0]]"""
+    I = np.identity(n)
+    O = np.zeros_like(I)
+    X = np.block([[O, I], [-I, O]])
+    res = symplectic.sympmat(n)
+    assert np.all(X == res)

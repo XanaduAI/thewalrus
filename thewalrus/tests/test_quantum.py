@@ -20,7 +20,7 @@ import pytest
 import numpy as np
 from scipy.linalg import qr
 
-from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter
+from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, sympmat
 
 from thewalrus.quantum import (
     reduced_gaussian,
@@ -35,7 +35,6 @@ from thewalrus.quantum import (
     Covmat,
     gen_Qmat_from_graph,
     Means,
-    Sympmat,
     is_valid_cov,
     is_pure_cov,
     pure_state_amplitude,
@@ -124,15 +123,6 @@ def test_xmat(n):
     res = Xmat(n)
     assert np.all(X == res)
 
-
-@pytest.mark.parametrize("n", [1, 2, 4])
-def test_sympmat(n):
-    """test X_n = [[0, I], [I, 0]]"""
-    I = np.identity(n)
-    O = np.zeros_like(I)
-    X = np.block([[O, I], [-I, O]])
-    res = Sympmat(n)
-    assert np.all(X == res)
 
 
 def test_Qmat_vacuum():
