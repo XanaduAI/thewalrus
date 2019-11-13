@@ -161,7 +161,7 @@ def squeezing(r, phi):
     return S
 
 
-def two_mode_squeezing(r, phi, num_twins=1):
+def two_mode_squeezing(r, phi):
     """Two-mode squeezing.
 
     Args:
