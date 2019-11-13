@@ -806,7 +806,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
         raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
 
     # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
-    l = m//2
+    l = m // 2
     ch = np.cosh(r) * np.identity(l)
     sh = np.sinh(r) * np.identity(l)
     zh = np.zeros([l, l])
