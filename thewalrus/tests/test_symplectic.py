@@ -623,7 +623,7 @@ def test_is_symplectic():
 
 @pytest.mark.parametrize("n", [1, 2, 4])
 def test_sympmat(n):
-    """test X_n = [[0, I], [I, 0]]"""
+    """test X_n = [[0, I], [-I, 0]]"""
     I = np.identity(n)
     O = np.zeros_like(I)
     X = np.block([[O, I], [-I, O]])
