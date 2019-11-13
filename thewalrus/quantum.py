@@ -91,7 +91,6 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
-    choi_expand
 
 Details
 ^^^^^^^
@@ -782,33 +781,6 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def choi_expand(S, r=np.arcsinh(1.0)):
-    r"""
-    Construct the Gaussian-Choi-Jamiolkowski expansion of a symplectic matrix S.
-
-    Args:
-        S (array): symplectic matrix
-
-    Returns:
-        (array): expanded symplectic matrix of twice the size of S
-    """
-
-    (n, m) = S.shape
-    if n != m:
-        raise ValueError("The matrix S is not square")
-    if n % 2 != 0:
-        raise ValueError("The matrix S is not of even size")
-
-    nmodes = n // 2
-
-    ch = np.cosh(r) * np.identity(nmodes)
-    sh = np.sinh(r) * np.identity(nmodes)
-    zh = np.zeros([nmodes, nmodes])
-    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
-
-    return expand(S, list(range(nmodes)), n) @ Schoi
-
-
 def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
@@ -829,14 +801,20 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
             raise ValueError("The matrix S is not symplectic")
 
     # And that S and alpha have compatible dimensions
-    l, _ = S.shape
-    if l // 2 != len(alpha):
+    m, _ = S.shape
+    if m // 2 != len(alpha):
         raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
 
-    # Construct its Choi expansion and state and then call state_vector
-    S_exp = choi_expand(S, r)
+    # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
+    l = m//2
+    ch = np.cosh(r) * np.identity(l)
+    sh = np.sinh(r) * np.identity(l)
+    zh = np.zeros([l, l])
+    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
+    # And then its Choi expanded symplectic
+    S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
+    # And this is the corresponding covariance matrix
     cov = S_exp @ S_exp.T
-    l = len(alpha)
     alphat = np.array(list(alpha) + ([0] * l))
     x = 2 * alphat.real
     p = 2 * alphat.imag
