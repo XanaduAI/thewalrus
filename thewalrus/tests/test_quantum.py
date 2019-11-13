@@ -20,7 +20,7 @@ import pytest
 import numpy as np
 from scipy.linalg import qr
 
-from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, sympmat
+from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter
 
 from thewalrus.quantum import (
     reduced_gaussian,
