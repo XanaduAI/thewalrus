@@ -42,11 +42,14 @@ class TestReferenceHafnian:
         length = len(list(pmp(tuple(range(n)))))
         assert np.allclose(length, factorial2(n - 1))
 
-    @pytest.mark.parametrize("n", [0, 2, 4, 6, 8, 10])
+    @pytest.mark.parametrize("n", [0, 1, 2, 3, 4, 5, 6])
     def test_hafnian(self, n):
         r"""Checks that the hafnian of the all ones matrix of size n is (n-1)!!"""
         M = np.ones([n, n])
-        assert np.allclose(factorial2(n - 1), hafnian(M))
+        if n % 2 == 0:
+            assert np.allclose(factorial2(n - 1), hafnian(M))
+        else:
+            assert np.allclose(0, hafnian(M))
 
     @pytest.mark.parametrize("n", [0, 1, 2, 3, 4, 5, 6])
     def test_loophafnian(self, n):
