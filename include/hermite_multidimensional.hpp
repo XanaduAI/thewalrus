@@ -167,7 +167,6 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
     std::vector<int> ek(dim, 0);
     std::vector<double> factors(resolution+1, 0);
     int jump = 0;
-    
 
     for (ullint jj = 0; jj < Hdim-1; jj++) {
 

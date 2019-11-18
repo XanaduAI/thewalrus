@@ -85,8 +85,6 @@ def test_hafnian_batched_loops():
         ]
     )
     expected = hafnian_batched(A, n_photon, mu=mu, make_tensor=False)
-    print(v1)
-    print(expected)
     assert np.allclose(expected, v1)
 
 
