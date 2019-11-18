@@ -416,9 +416,9 @@ class TestTorontonianSampling:
         probs[1] = 1 - probs[0]
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
-    def test_torontonian_sample_graph_pool(self):
+    def test_torontonian_sample_graph(self):
         """Test torontonian sampling from a graph using pooling"""
-        pytest.skip("Pool does not play nicely with pytest when all the test are run together")
+        # Pool does not play nicely with pytest when all the test are run together
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
         n_samples = 1000
         mean_n = 0.5
