@@ -528,11 +528,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     pref = np.exp(prefexp.conj())
     if post_select is None:
 
-        psi = (
-            pref
-            * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True)
-            / np.sqrt(np.sqrt(np.linalg.det(Q).real))
-        )
+        psi = pref * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
@@ -543,9 +539,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
             counter = count(0)
             modes = (np.arange(N)).tolist()
             el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
-            psi[idx] = pure_state_amplitude(
-                mu, cov, el, check_purity=False, include_prefactor=False
-            )
+            psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
 
         psi = psi * pref
 
@@ -727,14 +721,14 @@ def gen_single_mode_dist(s, cutoff=50, N=1):
     r = 0.5 * N
     q = 1.0 - np.tanh(s) ** 2
     N = cutoff // 2
-    ps = nbinom.pmf(np.arange(N), p=q, n=r)
     ps_tot = np.zeros(cutoff)
-
     if cutoff % 2 == 0:
+        ps = nbinom.pmf(np.arange(N), p=q, n=r)
         ps_tot[0::2] = ps
     else:
-        # This is a bit hacky.
-        ps_tot[0:-1][0::2] = ps
+        ps = nbinom.pmf(np.arange(N + 1), p=q, n=r)
+        ps_tot[0:-1][0::2] = ps[0:-1]
+        ps_tot[-1] = ps[-1]
 
     return ps_tot
 
