@@ -265,11 +265,12 @@ def hafnian_sample_state(
     nprocs = multiprocessing.cpu_count()
     localsamps = samples // nprocs
 
-    params = [[cov, localsamps, hbar, cutoff, max_photons, approx, approx_samples]] * (nprocs - 1)
+    params = [[cov, localsamps, mean, hbar, cutoff, max_photons, approx, approx_samples]] * (nprocs - 1)
     params.append(
         [
             cov,
             samples - localsamps * (nprocs - 1),
+            mean,
             hbar,
             cutoff,
             max_photons,
