@@ -205,10 +205,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
 
-	//        for (int ii = 0; ii < dim; ii++) {
-	// H[nextCoordinate] = H[nextCoordinate] + R(k, ii) * y(ii, 0);
 	H[nextCoordinate] = H[nextCoordinate] + y(k, 0);
-	    //        }
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);

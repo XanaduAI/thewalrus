@@ -77,10 +77,6 @@ def test_hafnian_batched_loops():
     A = np.random.rand(n_modes, n_modes) + 1j * np.random.rand(n_modes, n_modes)
     A += A.T
     mu = np.random.rand(n_modes) + 1j * np.random.rand(n_modes)
-    print(mu)
-    print(A)
-    print(A@mu)
-#    mu = 0.0 * mu
     n_photon = 5
     v1 = np.array(
         [
