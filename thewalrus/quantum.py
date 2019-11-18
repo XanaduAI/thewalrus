@@ -831,7 +831,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
         tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
 
     if sf_order:
-        sf_order = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
-        return tensor.transpose(sf_order)
+        sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
+        return tensor.transpose(sf_indexing)
 
     return tensor
