@@ -149,8 +149,7 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
         if mu is not None:
             return hermite_multidimensional(
                 -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor
-            )
-        
+            )        
         yi = np.zeros([n], dtype=complex)
         return hermite_multidimensional(
             -A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor

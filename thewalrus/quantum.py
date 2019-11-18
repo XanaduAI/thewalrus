@@ -381,15 +381,11 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
 
         if np.allclose(mu, np.zeros_like(mu)):
             tensor = pref * hermite_multidimensional(-A, cutoff, renorm=True)
-            return tensor.transpose(sf_order)
-        
+            return tensor.transpose(sf_order)        
         beta = Beta(mu)
         y = (beta - A @ beta.conj())
         tensor = pref * hermite_multidimensional(-A, cutoff, y=y, renorm=True)
         return tensor.transpose(sf_order)
-
-        
-        
 
     M = N - len(post_select)
     rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
