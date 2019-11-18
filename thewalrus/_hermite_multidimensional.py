@@ -149,11 +149,9 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
         if mu is not None:
             return hermite_multidimensional(
                 -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor
-            )        
+            )
         yi = np.zeros([n], dtype=complex)
-        return hermite_multidimensional(
-            -A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor
-        )
+        return hermite_multidimensional(-A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor)
     # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
 
     if mu is None:
