@@ -781,7 +781,7 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
+def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -829,4 +829,9 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True):
     # There is probably a better way to do the following rescaling, but this is already "good"
     for p in product(list(range(cutoff)), repeat=l):
         tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
+
+    if sf_order:
+        sf_order = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
+        return tensor.transpose(sf_order)
+
     return tensor

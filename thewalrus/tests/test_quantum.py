@@ -49,6 +49,7 @@ from thewalrus.quantum import (
 # make tests deterministic
 np.random.seed(137)
 
+
 def random_interferometer(N, real=False):
     r"""Random unitary matrix representing an interferometer.
 
@@ -81,12 +82,7 @@ def test_reduced_gaussian(n):
     cov = np.arange(N ** 2).reshape(N, N)
     res = reduced_gaussian(mu, cov, n)
     assert np.all(res[0] == np.array([n, n + m]))
-    assert np.all(
-        res[1]
-        == np.array(
-            [[(N + 1) * n, (N + 1) * n + m], [(N + 1) * n + N * m, (N + 1) * n + N * m + m]]
-        )
-    )
+    assert np.all(res[1] == np.array([[(N + 1) * n, (N + 1) * n + m], [(N + 1) * n + N * m, (N + 1) * n + N * m + m]]))
 
 
 def test_reduced_gaussian_two_mode():
@@ -125,7 +121,6 @@ def test_xmat(n):
     X = np.block([[O, I], [I, O]])
     res = Xmat(n)
     assert np.all(X == res)
-
 
 
 def test_Qmat_vacuum():
@@ -343,15 +338,7 @@ def test_density_matrix_squeezed():
 
     res = density_matrix(mu, V)
 
-    expected = np.array(
-        [
-            [0.91417429, 0, -0.26200733, 0, 0.09196943],
-            [0, 0, 0, 0, 0],
-            [-0.26200733, 0, 0.07509273, 0, -0.02635894],
-            [0, 0, 0, 0, 0],
-            [0.09196943, 0, -0.02635894, 0, 0.00925248],
-        ]
-    )
+    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
 
     assert np.allclose(res, expected)
 
@@ -386,15 +373,7 @@ def test_density_matrix_squeezed_postselect():
 
     res = density_matrix(mu, V, post_select={0: 0}, cutoff=15, normalize=True)[:5, :5]
 
-    expected = np.array(
-        [
-            [0.91417429, 0, -0.26200733, 0, 0.09196943],
-            [0, 0, 0, 0, 0],
-            [-0.26200733, 0, 0.07509273, 0, -0.02635894],
-            [0, 0, 0, 0, 0],
-            [0.09196943, 0, -0.02635894, 0, 0.00925248],
-        ]
-    )
+    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
 
     assert np.allclose(res, expected)
 
@@ -587,12 +566,7 @@ def test_state_vector_two_mode_squeezed():
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
-    exact = np.array(
-        [
-            (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
-            for i in range(cutoff)
-        ]
-    )
+    exact = np.array([(np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar)) for i in range(cutoff)])
     psi = state_vector(mu, cov, cutoff=cutoff)
     expected = np.diag(exact)
     assert np.allclose(psi, expected)
@@ -606,14 +580,7 @@ def test_state_vector_two_mode_squeezed_post():
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
-    exact = np.diag(
-        np.array(
-            [
-                (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
-                for i in range(cutoff)
-            ]
-        )
-    )
+    exact = np.diag(np.array([(np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar)) for i in range(cutoff)]))
     val = 2
     post_select = {0: val}
     psi = state_vector(mu, cov, cutoff=cutoff, post_select=post_select)
@@ -628,12 +595,7 @@ def test_state_vector_coherent():
     mu = np.array([1.0, 2.0])
     beta = Beta(mu)
     alpha = beta[0]
-    exact = np.array(
-        [
-            (np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i)))
-            for i in range(cutoff)
-        ]
-    )
+    exact = np.array([(np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))) for i in range(cutoff)])
     num = state_vector(mu, cov, cutoff=cutoff)
     assert np.allclose(exact, num)
 
@@ -646,14 +608,7 @@ def test_state_vector_two_mode_squeezed_post_normalize():
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
     mu = np.zeros([4], dtype=np.complex)
-    exact = np.diag(
-        np.array(
-            [
-                (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
-                for i in range(cutoff)
-            ]
-        )
-    )
+    exact = np.diag(np.array([(np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar)) for i in range(cutoff)]))
     val = 2
     post_select = {0: val}
     psi = state_vector(mu, cov, cutoff=cutoff, post_select=post_select, normalize=True)
@@ -677,6 +632,7 @@ def test_is_classical_cov_thermal(nbar):
     cov = (2 * nbar + 1) * np.identity(2)
     assert is_classical_cov(cov)
 
+
 @pytest.mark.parametrize("cutoff", [50, 51, 52, 53])
 def test_total_photon_num_dist_pure_state(cutoff):
     """ Test the correct photon number distribution is obtained for n modes
@@ -690,6 +646,7 @@ def test_total_photon_num_dist_pure_state(cutoff):
     p2 = gen_single_mode_dist(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
     assert np.allclose(p1, p2)
 
+
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_single_mode_identity(r, tol):
     """Tests the correct construction of the single mode identity operation"""
@@ -700,6 +657,7 @@ def test_single_mode_identity(r, tol):
     T = fock_tensor(S, alphas, cutoff, r=r)
     expected = np.identity(cutoff)
     assert np.allclose(T, expected, atol=tol, rtol=0)
+
 
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_single_mode_rotation(r, tol):
@@ -712,6 +670,7 @@ def test_single_mode_rotation(r, tol):
     T = fock_tensor(S, alphas, cutoff, r=r)
     expected = np.diag(np.exp(1j * theta * np.arange(cutoff)))
     assert np.allclose(T, expected, atol=tol, rtol=0)
+
 
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_single_mode_displacement(r, tol):
@@ -734,6 +693,7 @@ def test_single_mode_displacement(r, tol):
     T = fock_tensor(S, alphas, cutoff, r=r)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
+
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_single_mode_squeezing(r, tol):
     """Tests the correct construction of the single mode squeezing operation"""
@@ -755,6 +715,7 @@ def test_single_mode_squeezing(r, tol):
     )
     T = fock_tensor(S, alphas, cutoff, r=r)
     assert np.allclose(T, expected, atol=tol, rtol=0)
+
 
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_single_mode_displacement_squeezing(r, tol):
@@ -795,7 +756,7 @@ def test_interferometer_selection_rules(r, nmodes, tol):
     T = fock_tensor(S, alphas, cutoff, r=r)
     for p in product(list(range(cutoff)), repeat=nmodes):
         for q in product(list(range(cutoff)), repeat=nmodes):
-            if sum(p) != sum(q): #Check that there are the same total number of photons in the bra and the ket
+            if sum(p) != sum(q):  # Check that there are the same total number of photons in the bra and the ket
                 r = tuple(list(p) + list(q))
                 assert np.allclose(T[r], 0.0, atol=tol, rtol=0)
 
@@ -839,6 +800,7 @@ def test_hong_ou_mandel_interference(r, phi, tol):
     T = fock_tensor(S, alphas, cutoff, r=r)
     assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
 
+
 @pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
 def test_two_mode_squeezing(r, tol):
     r"""Tests the selection rules of a two mode squeezing operation.
@@ -859,3 +821,16 @@ def test_two_mode_squeezing(r, tol):
             if p[0] - q[0] != p[1] - q[1]:
                 t = tuple(list(p) + list(q))
                 assert np.allclose(T[t], 0, atol=tol, rtol=0)
+
+
+def test_sf_ordering_in_fock_tensor(tol):
+    """Test that the reordering works when using sf_order=True"""
+    cutoff = 5
+    nmodes = 2
+    s = np.arcsinh(1.0)
+    phi = np.pi / 6
+    alphas = np.zeros([nmodes])
+    S = two_mode_squeezing(s, phi)
+    T = fock_tensor(S, alphas, cutoff)
+    Tsf = fock_tensor(S, alphas, cutoff, sf_order=True)
+    assert np.allclose(T.transpose([0, 2, 1, 3]), Tsf, atol=tol, rtol=0)
