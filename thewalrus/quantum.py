@@ -40,8 +40,8 @@ states, see:
   <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.022341>`_
 
 
-Fock states
------------
+Fock states and tensors
+-----------------------
 
 .. autosummary::
 
@@ -49,6 +49,7 @@ Fock states
     state_vector
     density_matrix_element
     density_matrix
+    fock_tensor
 
 Details
 ^^^^^^^
@@ -65,6 +66,9 @@ Details
 .. autofunction::
     density_matrix
 
+.. autofunction::
+    fock_tensor
+
 
 Utility functions
 -----------------
@@ -73,7 +77,6 @@ Utility functions
 
     reduced_gaussian
     Xmat
-    Sympmat
     Qmat
     Covmat
     Amat
@@ -99,6 +102,8 @@ import numpy as np
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+
+from thewalrus.symplectic import expand, sympmat, is_symplectic
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -150,21 +155,6 @@ def Xmat(N):
     O = np.zeros_like(I)
     X = np.block([[O, I], [I, O]])
     return X
-
-
-def Sympmat(N):
-    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
-
-    Args:
-        N (int): positive integer
-
-    Returns:
-        array: :math:`2N\times 2N` array
-    """
-    I = np.identity(N)
-    O = np.zeros_like(I)
-    S = np.block([[O, I], [-I, O]])
-    return S
 
 
 def Qmat(cov, hbar=2):
@@ -533,7 +523,8 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     B = A[0:N, 0:N]
     alpha = beta[0:N]
     gamma = np.conj(alpha) - B @ alpha
-    pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha))
+    prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
+    pref = np.exp(prefexp.conj())
     if post_select is None:
 
         psi = (
@@ -672,7 +663,7 @@ def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
         return False
 
     nmodes = n // 2
-    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * Sympmat(nmodes))
+    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * sympmat(nmodes))
     vals[np.abs(vals) < atol] = 0.0
     if np.all(vals >= 0):
         # raise ValueError("The input matrix violates the uncertainty relation")
@@ -787,3 +778,59 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
         rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
         return gen_multi_mode_dist(rs, cutoff=cutoff, padding_factor=padding_factor)[0:cutoff]
     raise ValueError("The Gaussian state is not pure")
+
+
+def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
+    r"""
+    Calculates the Fock representation of a Gaussian unitary parametrized by
+    the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
+
+    Args:
+        S (array): symplectic matrix
+        alpha (array): complex vector of displacements
+        cutoff (int): cutoff in Fock space
+        r (float): squeezing parameter used for the Choi expansion
+        check_symplectic (boolean): checks whether the input matrix is symplectic
+    Return:
+        (array): Tensor containing the Fock representation of the Gaussian unitary
+    """
+    # Check the matrix is symplectic
+    if check_symplectic:
+        if not is_symplectic(S):
+            raise ValueError("The matrix S is not symplectic")
+
+    # And that S and alpha have compatible dimensions
+    m, _ = S.shape
+    if m // 2 != len(alpha):
+        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
+
+    # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
+    l = m // 2
+    ch = np.cosh(r) * np.identity(l)
+    sh = np.sinh(r) * np.identity(l)
+    zh = np.zeros([l, l])
+    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
+    # And then its Choi expanded symplectic
+    S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
+    # And this is the corresponding covariance matrix
+    cov = S_exp @ S_exp.T
+    alphat = np.array(list(alpha) + ([0] * l))
+    x = 2 * alphat.real
+    p = 2 * alphat.imag
+    mu = np.concatenate([x, p])
+    tensor = state_vector(mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False)
+
+    vals = list(range(l))
+    vals2 = list(range(l, 2 * l))
+
+    R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
+    tensor_view = tensor.transpose(vals2 + vals)
+    # There is probably a better way to do the following rescaling, but this is already "good"
+    for p in product(list(range(cutoff)), repeat=l):
+        tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
+
+    if sf_order:
+        sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
+        return tensor.transpose(sf_indexing)
+
+    return tensor
