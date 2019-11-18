@@ -147,16 +147,13 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
 
     if not np.allclose(A, np.zeros([n, n])):
         if mu is not None:
-            try:
-                yi = np.linalg.solve(A, mu)
-            except np.linalg.LinAlgError:
-                raise ValueError("The matrix does not have an inverse")
             return hermite_multidimensional(
-                -A, cutoff, y=-yi, renorm=renorm, make_tensor=make_tensor
+                -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor
             )
+        
         yi = np.zeros([n], dtype=complex)
         return hermite_multidimensional(
-            -A, cutoff, y=-yi, renorm=renorm, make_tensor=make_tensor
+            -A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor
         )
     # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
 

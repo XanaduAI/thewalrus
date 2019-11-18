@@ -40,7 +40,7 @@ def test_reduction_to_physicists_polys():
     n_max = 5
     A = np.ones([init, init], dtype=complex)
     vals = np.array(
-        [hermite_multidimensional(2 * A, n_max, y=np.array([x0], dtype=complex)) for x0 in x]
+        [hermite_multidimensional(2 * A, n_max, y=2 * A @np.array([x0], dtype=complex)) for x0 in x]
     ).T
     expected = np.array([eval_hermite(i, x) for i in range(len(vals))])
     assert np.allclose(vals, expected)
@@ -53,7 +53,7 @@ def test_reduction_to_probabilist_polys():
     n_max = 5
     A = np.ones([init, init], dtype=complex)
     vals = np.array(
-        [hermite_multidimensional(A, n_max, y=np.array([x0], dtype=complex)) for x0 in x]
+        [hermite_multidimensional(A, n_max, y=A @ np.array([x0], dtype=complex)) for x0 in x]
     ).T
     expected = np.array([eval_hermitenorm(i, x) for i in range(len(vals))])
     assert np.allclose(vals, expected)
@@ -73,10 +73,14 @@ def test_hafnian_batched_loops():
     """Test hafnian_batched with loops against hafnian_repeated with loops for a random symmetric matrix
     and a random vector of loops
     """
-    n_modes = 4
+    n_modes = 1
     A = np.random.rand(n_modes, n_modes) + 1j * np.random.rand(n_modes, n_modes)
     A += A.T
     mu = np.random.rand(n_modes) + 1j * np.random.rand(n_modes)
+    print(mu)
+    print(A)
+    print(A@mu)
+#    mu = 0.0 * mu
     n_photon = 5
     v1 = np.array(
         [
@@ -85,7 +89,8 @@ def test_hafnian_batched_loops():
         ]
     )
     expected = hafnian_batched(A, n_photon, mu=mu, make_tensor=False)
-
+    print(v1)
+    print(expected)
     assert np.allclose(expected, v1)
 
 
