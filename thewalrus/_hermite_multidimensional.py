@@ -145,15 +145,15 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
     input_validation(A, tol=tol)
     n, _ = A.shape
 
-    if not np.allclose(A, np.zeros([n, n])):
-        if mu is not None:
-            return hermite_multidimensional(
-                -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor
-            )
-        yi = np.zeros([n], dtype=complex)
-        return hermite_multidimensional(-A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor)
-    # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
-
+    #if not np.allclose(A, np.zeros([n, n])):
+    if mu is not None:
+        return hermite_multidimensional(
+            -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor
+        )
+    yi = np.zeros([n], dtype=complex)
+    return hermite_multidimensional(-A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor)
+# Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
+"""
     if mu is None:
         tensor = np.zeros([cutoff ** n], dtype=complex)
         tensor[0] = 1.0
@@ -168,3 +168,4 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
         return tensor
 
     return tensor.flatten()
+"""
