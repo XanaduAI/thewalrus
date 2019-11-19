@@ -19,7 +19,7 @@ import numpy as np
 from .libwalrus import hermite_multidimensional as hm
 from ._hafnian import input_validation
 
-# pylint: too-many-arguments
+# pylint: disable=too-many-arguments
 def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, modified=False):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
@@ -56,7 +56,7 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     input_validation(R)
     n, _ = R.shape
 
-    if modified == False and y is not None:
+    if (modified is False) and (y is not None):
         m = y.shape[0]
         if m == n:
             ym = R @ y
