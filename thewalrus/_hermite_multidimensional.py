@@ -14,13 +14,12 @@
 """
 Hermite Multidimensional Python interface
 """
-from itertools import product
 import numpy as np
 
 from .libwalrus import hermite_multidimensional as hm
 from ._hafnian import input_validation
 
-
+# pylint: too-many-arguments
 def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, modified=False):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
@@ -80,7 +79,7 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
 
     return values
 
-
+# pylint: disable=too-many-arguments
 def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=True):
     r"""Calculates the hafnian of :func:`reduction(A, k) <hafnian.reduction>`
     for all possible values of vector ``k`` below the specified cutoff.
@@ -114,7 +113,6 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
     Returns:
         (array): the values of the hafnians for each value of :math:`k` up to the cutoff
     """
-    # pylint: disable=too-many-return-statements,too-many-branches,too-many-arguments
     input_validation(A, tol=tol)
     n, _ = A.shape
 
