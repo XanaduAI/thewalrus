@@ -22,6 +22,7 @@ from thewalrus.samples import (
     hafnian_sample_state,
     hafnian_sample_graph,
     torontonian_sample_state,
+    torontonian_sample_graph,
     hafnian_sample_classical_state,
     torontonian_sample_classical_state,
     seed,
@@ -237,9 +238,9 @@ class TestHafnianSampling:
         A = np.eye(n)[::-1]
         n_mean = 2
         nr_samples = 10
-
+        pool = False
         samples = hafnian_sample_graph(
-            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples
+            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples, pool=pool
         )
 
         test_passed = True
@@ -413,6 +414,16 @@ class TestTorontonianSampling:
         probs[0] = 1.0 / (1.0 + mean_n)
         probs[1] = 1 - probs[0]
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
+
+    def test_torontonian_sample_graph(self):
+        """Test torontonian sampling from a graph"""
+        # Pool does not play nicely with pytest when all the test are run together
+        A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
+        n_samples = 1000
+        mean_n = 0.5
+        pool = False
+        samples = torontonian_sample_graph(A, mean_n, samples=n_samples, pool=pool)
+        assert np.all(samples[:, 0] == samples[:, 1])
 
 
 def test_seed():
