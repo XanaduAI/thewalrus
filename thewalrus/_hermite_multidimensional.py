@@ -116,7 +116,6 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
     input_validation(A, tol=tol)
     n, _ = A.shape
 
-    # if not np.allclose(A, np.zeros([n, n])):
     if mu is not None:
         return hermite_multidimensional(
             -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True

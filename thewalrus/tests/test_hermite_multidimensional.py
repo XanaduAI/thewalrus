@@ -73,7 +73,7 @@ def test_hafnian_batched_loops():
     """Test hafnian_batched with loops against hafnian_repeated with loops for a random symmetric matrix
     and a random vector of loops
     """
-    n_modes = 1
+    n_modes = 4
     A = np.random.rand(n_modes, n_modes) + 1j * np.random.rand(n_modes, n_modes)
     A += A.T
     mu = np.random.rand(n_modes) + 1j * np.random.rand(n_modes)
