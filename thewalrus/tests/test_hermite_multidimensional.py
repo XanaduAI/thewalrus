@@ -40,7 +40,7 @@ def test_reduction_to_physicists_polys():
     n_max = 5
     A = np.ones([init, init], dtype=complex)
     vals = np.array(
-        [hermite_multidimensional(2 * A, n_max, y=2 * A @np.array([x0], dtype=complex)) for x0 in x]
+        [hermite_multidimensional(2 * A, n_max, y=np.array([x0], dtype=complex)) for x0 in x]
     ).T
     expected = np.array([eval_hermite(i, x) for i in range(len(vals))])
     assert np.allclose(vals, expected)
@@ -53,7 +53,7 @@ def test_reduction_to_probabilist_polys():
     n_max = 5
     A = np.ones([init, init], dtype=complex)
     vals = np.array(
-        [hermite_multidimensional(A, n_max, y=A @ np.array([x0], dtype=complex)) for x0 in x]
+        [hermite_multidimensional(A, n_max, y=np.array([x0], dtype=complex)) for x0 in x]
     ).T
     expected = np.array([eval_hermitenorm(i, x) for i in range(len(vals))])
     assert np.allclose(vals, expected)
