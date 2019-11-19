@@ -232,7 +232,6 @@ class TestHafnianSampling:
     def test_single_pm_graphs(self):
         """Tests that the number of photons is the same for modes i and n-i
         in the special case of a graph with one single perfect matching
-        using the pool functionality
         """
         n = 10  # size of the graph
         approx_samples = 1e3  # number of samples in the hafnian approximation
@@ -417,7 +416,7 @@ class TestTorontonianSampling:
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
     def test_torontonian_sample_graph(self):
-        """Test torontonian sampling from a graph using pooling"""
+        """Test torontonian sampling from a graph"""
         # Pool does not play nicely with pytest when all the test are run together
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
         n_samples = 1000
