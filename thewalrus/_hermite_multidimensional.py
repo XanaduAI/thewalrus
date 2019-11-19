@@ -21,44 +21,6 @@ from .libwalrus import hermite_multidimensional as hm
 from ._hafnian import input_validation
 
 
-def return_prod(C, index):
-    r"""Given an array :math:`C_{i,j}` and an array or list of indices
-    :math:`index = [i_1,i_2,i_3,\dots,i_n] `, returns :math:`prod_{k=1}^n C_{k,i_k}`.
-
-    Args:
-        C (array): An array
-        index (array): A set of indices
-
-    Returns:
-        complex: the product of the array elements determined by index
-    """
-    return np.prod([C[mode, val] for mode, val in enumerate(index)])
-
-
-def expansion_coeff(alpha, cutoff, renorm=True):
-    r"""Returns the (quasi) geometric series as a vector with components
-    :math:`\alpha^i/\sqrt{i!}` for :math:`0 \leq i < \texttt{cutoff}`.
-
-    Args:
-        alpha (complex): ratio of the geometric series
-        cutoff (int): cutoff truncation of the geometric series
-        renorm (bool): if ``False``, the components are not normalized
-            by the square-root factorials
-
-    Returns:
-        array: the (quasi) geometric series
-    """
-    vals = np.empty([cutoff], dtype=type(alpha))
-    vals[0] = 1.0
-    if renorm:
-        for i in range(1, cutoff):
-            vals[i] = vals[i - 1] * alpha / np.sqrt(i)
-    else:
-        for i in range(1, cutoff):
-            vals[i] = vals[i - 1] * alpha
-    return vals
-
-
 def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
@@ -153,19 +115,3 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
     yi = np.zeros([n], dtype=complex)
     return hermite_multidimensional(-A, cutoff, y=yi, renorm=renorm, make_tensor=make_tensor)
 # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
-"""
-    if mu is None:
-        tensor = np.zeros([cutoff ** n], dtype=complex)
-        tensor[0] = 1.0
-    else:
-        index = cutoff * np.ones([n], dtype=int)
-        tensor = np.empty(index, dtype=complex)
-        prim = np.array([expansion_coeff(alpha, cutoff, renorm=renorm) for alpha in mu])
-        for i in product(range(cutoff), repeat=n):
-            tensor[i] = return_prod(prim, i)
-
-    if make_tensor:
-        return tensor
-
-    return tensor.flatten()
-"""
