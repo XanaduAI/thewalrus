@@ -12,7 +12,7 @@ This section provides a quick guide to find which function does what in The Walr
 Numerical hafnian                                                                :func:`thewalrus.hafnian()`
 Symbolic hafnian                                                                 :func:`thewalrus.reference.hafnian()`
 Hafnian of a matrix with repeated rows and columns                               :func:`thewalrus.hafnian_repeated()`
-Hafnians of all possible reductions of a given matrix                             :func:`thewalrus.hafnian_batched()`
+Hafnians of all possible reductions of a given matrix                            :func:`thewalrus.hafnian_batched()`
 Hafnian samples of a Gaussian state                                              :func:`thewalrus.samples.hafnian_sample_state()`
 Torontonian samples of a Gaussian state                                          :func:`thewalrus.samples.torontonian_sample_state()`
 Hafnian samples of a graph                                                       :func:`thewalrus.samples.hafnian_sample_graph()`
