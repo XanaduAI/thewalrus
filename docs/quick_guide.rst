@@ -21,6 +21,7 @@ All probability amplitudes of a pure Gaussian state                             
 All matrix elements of a general Gaussian state                                  :func:`thewalrus.quantum.density_matrix()`
 A particular probability amplitude of pure Gaussian state                        :func:`thewalrus.quantum.pure_state_amplitude()`
 A particular matrix element of a general Gaussian state                          :func:`thewalrus.quantum.density_matrix_element()`
+The Fock representation of a Gaussian unitary                                    :func:`thewalrus.quantum.fock_tensor()`
 ================================================================================ =============================
 
 Note that all the hafnian functions listed above generalize to loop hafnians.
