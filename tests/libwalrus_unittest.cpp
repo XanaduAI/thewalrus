@@ -734,7 +734,7 @@ TEST(LoopHafnianEigenComplex, EvenOnes) {
 }
 
 
-// Check loop hafnian with eignevalues for random complex matrices with even dimensions.
+// Check loop hafnian with eigenvalues for random complex matrices with even dimensions.
 TEST(LoopHafnianEigenComplex, EvenRandom) {
     std::vector<std::complex<double>> mat2(4, 0.0);
     std::vector<std::complex<double>> mat4(16, 0.0);
@@ -776,7 +776,7 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
 
 }
 
-// Check loop hafnian with eignevalues for complex matrices with odd dimensions.
+// Check loop hafnian with eigenvalues for complex matrices with odd dimensions.
 TEST(LoopHafnianEigenComplex, Odd) {
     std::vector<std::complex<double>> mat3(9, std::complex<double>(1.0, 0.0));
     std::vector<std::complex<double>> mat5(25, std::complex<double>(1.0, 0.0));
@@ -1139,7 +1139,7 @@ TEST(TorontonianDouble, Analytical) {
 
 
 namespace batchhafnian {
-TEST(BatchHafnian, CompleteGraph) {
+TEST(BatchHafnian, Clements) {
     std::vector<std::complex<double>> mat4{std::complex<double>(-0.28264629150778969, 0.39867701584672210), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(-0.22959477315790058, 0.00000000000000008), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(0.38245649793510783, -0.41413300040003126), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.13684045954832844, 0.00000000000000006), std::complex<double>(-0.22959477315790058, -0.00000000000000008), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.28264629150778969, -0.39867701584672210), std::complex<double>(-0.06086128222348247, 0.12220227033305252), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.13684045954832844, -0.00000000000000006), std::complex<double>(-0.06086128222348247, +0.12220227033305252), std::complex<double>(0.38245649793510783, 0.41413300040003126)};
     std::vector<std::complex<double>> d4{std::complex<double>(0.66917130190858, -1.52776303400764), std::complex<double>(-2.95847055822102, -1.29582519437023), std::complex<double>(0.66917130190858, 1.52776303400764), std::complex<double>(-2.95847055822102, 1.29582519437023)};
     std::vector<std::complex<double>> out(256, 0.0);
@@ -1273,8 +1273,17 @@ TEST(BatchHafnian, CompleteGraph) {
                                     9.62872951e-01, -2.53217806e+00,  3.10967275e+00, -1.42559575e-14};
     int res = 4;
     int renorm = 0;
-
-    out = libwalrus::hermite_multidimensional_cpp(mat4, d4, res, renorm);
+    std::vector<std::complex<double>> d4c{std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0)};
+    for(int i=0; i<4; i++) {
+        for(int j=0; j<4; j++) {
+            d4c[i] += mat4[4*i+j] * d4[j];
+        }
+    }
+    // Note that internaly we are implementing the modified multidimensional
+    // Hermite polynomials, which means that we have to mat4 * d4 as the
+    // second argument, this is precisely what is done in the previous two loops
+    
+    out = libwalrus::hermite_multidimensional_cpp(mat4, d4c, res, renorm);
 
     for (int i = 0; i < 256; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);

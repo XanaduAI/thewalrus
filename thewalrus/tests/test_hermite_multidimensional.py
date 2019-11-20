@@ -85,7 +85,6 @@ def test_hafnian_batched_loops():
         ]
     )
     expected = hafnian_batched(A, n_photon, mu=mu, make_tensor=False)
-
     assert np.allclose(expected, v1)
 
 
@@ -121,3 +120,15 @@ def test_hafnian_batched_zero_loops_no_edges():
     expected = hafnian_batched(A, n_photon, make_tensor=False)
 
     assert np.allclose(expected, v1)
+
+
+def test_hermite_vs_hermite_modified():
+    """Test the relation hermite and hermite modified"""
+    n_modes = 2
+    A = np.zeros([n_modes, n_modes], dtype=complex)
+    mu = np.random.rand(n_modes) + 1j * np.random.rand(n_modes)
+    cutoff = 3
+    assert np.allclose(
+        hermite_multidimensional(A, cutoff, y=A @ mu, modified=True),
+        hermite_multidimensional(A, cutoff, y=mu),
+    )
