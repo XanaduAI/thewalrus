@@ -781,6 +781,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
         cutoff (int): cutoff in Fock space
         r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
+        sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """
