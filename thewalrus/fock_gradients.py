@@ -36,9 +36,9 @@ Gates gates
 Code details
 ^^^^^^^^^^^^
 """
+import numpy as np
 from thewalrus.quantum import fock_tensor
 from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
-import numpy as np
 
 # import numba
 
@@ -169,7 +169,7 @@ def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
         for k in range(cutoff):
             for m in range(cutoff):
                 l = m - n + k
-                if l >= 0 and l < cutoff:
+                if 0 <= l < cutoff:
                     gradT[n, k, m, l] = np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1]
                     if m > 0 and l > 0:
                         gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
@@ -197,7 +197,7 @@ def BSgate(theta, cutoff, grad=False, r=np.arcsinh(1.0)):
         for k in range(cutoff):
             for m in range(cutoff):
                 l = n + k - m
-                if l >= 0 and l < cutoff:
+                if 0 <= l < cutoff:
                     if m > 0:
                         gradT[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1]
                     if l > 0:
