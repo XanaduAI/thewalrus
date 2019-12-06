@@ -156,6 +156,6 @@ def BSgate(theta, cutoff, grad=False, r=np.arcsinh(1.0)):
                     if m > 0:
                         gradT[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1]
                     if l > 0:
-                        gradT[n, k, m, l] += np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1]
+                        gradT[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1]
 
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
