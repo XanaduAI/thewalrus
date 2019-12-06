@@ -21,33 +21,17 @@ Gradients of Gaussian gates in the Fock representation
 
 Contains some the Fock representation of the standard Gaussian gates
 
-Auxiliary functions
--------------------
 
-.. autosummary::
-    expand
-    expand_vector
-    reduced_state
-    is_symplectic
-    sympmat
-
-Gaussian states
----------------
-
-.. autosummary::
-    vacuum_state
-
-
-Gates and operations
+Gates gates
 --------------------
 
 .. autosummary::
-    two_mode_squeezing
-    interferometer
-    loss
-    mean_photon_number
-    beam_splitter
-    rotation
+    Xgate
+    Zgate
+    Sgate
+    Rgate
+    S2gate
+    BSgate
 
 Code details
 ^^^^^^^^^^^^
@@ -67,7 +51,7 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
         cutoff (int): Fock ladder cutoff
         grad (boolean): Whether to calculate the gradient or not
         hbar (float): Value of hbar is the commutation relation
-        r (float): Value of the parameter used internally in fock_tensor. 
+        r (float): Value of the parameter used internally in fock_tensor.
     Returns:
         tuple(G,dG): The Fock representations of the gate and its gradient
     """
@@ -158,9 +142,9 @@ def Rgate(theta, cutoff, grad=False):
         tuple(G,dG): The Fock representations of the gate and its gradient
     """
     ns = np.arange(cutoff)
-    if not grad:
-        return np.diag(np.exp(1j * ns * theta)), None
     T = np.exp(1j * ns * theta)
+    if not grad:
+        return np.diag(T), None
     return np.diag(T), np.diag(1j * ns * T)
 
 
