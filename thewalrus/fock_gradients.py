@@ -53,9 +53,12 @@ Code details
 ^^^^^^^^^^^^
 """
 from thewalrus.quantum import fock_tensor
+from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 import numpy as np
 
+# import numba
 
+# @numba.jit
 def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     nmodes = 1
     pref = 1.0 / np.sqrt(2 * hbar)
@@ -63,34 +66,96 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        T = fock_tensor(S, alpha, cutoff, r=r)
-        return T
+        return fock_tensor(S, alpha, cutoff, r=r)
 
     T = fock_tensor(S, alpha, cutoff + 1, r=r)
-    gradT = np.zeros_like(T)
+    gradT = np.zeros([cutoff, cutoff], dtype=complex)
     for n in range(cutoff):
         for m in range(cutoff):
-            gradT[n, m] += np.sqrt(m + 1) * T[n, m + 1] * pref
+            gradT[n, m] = np.sqrt(m + 1) * T[n, m + 1] * pref
             if m > 0:
                 gradT[n, m] -= np.sqrt(m) * T[n, m - 1] * pref
-    return T[0:cutoff, 0:cutoff], gradT[0:cutoff, 0:cutoff]
+    return T[0:cutoff, 0:cutoff], gradT
 
 
+# @numba.jit
 def Zgate(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     nmodes = 1
     pref = 1.0 / np.sqrt(2 * hbar)
-    alpha = np.array([1j*pref * p])
+    alpha = np.array([1j * pref * p])
     S = np.identity(2 * nmodes)
 
     if not grad:
-        T = fock_tensor(S, alpha, cutoff, r=r)
-        return T
+        return fock_tensor(S, alpha, cutoff, r=r)
 
     T = fock_tensor(S, alpha, cutoff + 1, r=r)
-    gradT = np.zeros_like(T)
+    gradT = np.zeros([cutoff, cutoff], dtype=complex)
     for n in range(cutoff):
         for m in range(cutoff):
-            gradT[n, m] += 1j*np.sqrt(m + 1) * T[n, m + 1] * pref
+            gradT[n, m] = 1j * np.sqrt(m + 1) * T[n, m + 1] * pref
             if m > 0:
-                gradT[n, m] += 1j*np.sqrt(m) * T[n, m - 1] * pref
-    return T[0:cutoff, 0:cutoff], gradT[0:cutoff, 0:cutoff]
+                gradT[n, m] += 1j * np.sqrt(m) * T[n, m - 1] * pref
+    return T[0:cutoff, 0:cutoff], gradT
+
+
+# @numba.jit
+def Sgate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
+    S = squeezing(s, 0.0)
+    if not grad:
+        return fock_tensor(S, np.zeros([1]), cutoff, r=r).real
+
+    T = fock_tensor(S, np.zeros([1]), cutoff + 2, r=r).real
+    gradT = np.zeros([cutoff, cutoff])
+    for n in range(cutoff):
+        offset = n % 2
+        for m in range(offset, cutoff, 2):
+            gradT[n, m] = -0.5 * np.sqrt((m + 1) * (m + 2)) * T[n, m + 2]
+            if m > 1:
+                gradT[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2]
+    return T[0:cutoff, 0:cutoff], gradT
+
+
+def Rgate(theta, cutoff, grad=False):
+    ns = np.arange(cutoff)
+    if not grad:
+        return np.diag(np.exp(1j * ns * theta))
+    T = np.exp(1j * ns * theta)
+    return np.diag(T), np.diag(1j * ns * T)
+
+
+def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
+    S = two_mode_squeezing(s, 0)
+    if not grad:
+        return fock_tensor(S, np.zeros([2]), cutoff, r=r).real
+
+    T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r).real
+    gradT = np.zeros([cutoff, cutoff, cutoff, cutoff])
+    for n in range(cutoff):
+        for k in range(cutoff):
+            for m in range(cutoff):
+                l = m - n + k
+                if l >= 0 and l < cutoff:
+                    gradT[n, k, m, l] = np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1]
+                    if m > 0 and l > 0:
+                        gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
+    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
+
+
+def BSgate(theta, cutoff, grad=False, r=np.arcsinh(1.0)):
+    S = beam_splitter(theta, 0)
+    if not grad:
+        return fock_tensor(S, np.zeros([2]), cutoff, r=r).real
+
+    T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r).real
+    gradT = np.zeros([cutoff, cutoff, cutoff, cutoff],dtype=complex)
+    for n in range(cutoff):
+        for k in range(cutoff):
+            for m in range(cutoff):
+                l = n + k - m
+                if l >= 0 and l < cutoff:
+                    if m > 0:
+                        gradT[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1]
+                    if l > 0:
+                        gradT[n, k, m, l] += np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1]
+
+    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
