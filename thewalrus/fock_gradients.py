@@ -13,7 +13,7 @@
 # limitations under the License.
 """
 Gradients of Gaussian gates in the Fock representation
-=====================
+======================================================
 
 **Module name:** :mod:`thewalrus.fock_gradients`
 
@@ -22,8 +22,8 @@ Gradients of Gaussian gates in the Fock representation
 Contains some the Fock representation of the standard Gaussian gates
 
 
-Gates gates
---------------------
+Fock Gates
+----------
 
 .. autosummary::
     Xgate
@@ -40,9 +40,9 @@ import numpy as np
 from thewalrus.quantum import fock_tensor
 from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 
-import numba
+#import numba
 
-@numba.jit
+#@numba.jit
 def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     r"""
     Calculates the Fock representation of the Xgate and its gradient
@@ -61,10 +61,10 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, r=r), None
+        return fock_tensor(S, alpha, cutoff, r=r).real, None
 
-    T = fock_tensor(S, alpha, cutoff + 1, r=r)
-    gradT = np.zeros([cutoff, cutoff], dtype=complex)
+    T = fock_tensor(S, alpha, cutoff + 1, r=r).real
+    gradT = np.zeros([cutoff, cutoff])
     for n in range(cutoff):
         for m in range(cutoff):
             gradT[n, m] = np.sqrt(m + 1) * T[n, m + 1] * pref
@@ -73,7 +73,7 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff], gradT
 
 
-@numba.jit
+#@numba.jit
 def Zgate(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     r"""
     Calculates the Fock representation of the Zgate and its gradient
@@ -104,7 +104,7 @@ def Zgate(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff], gradT
 
 
-@numba.jit
+#@numba.jit
 def Sgate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
     r"""
     Calculates the Fock representation of the Sgate and its gradient
@@ -135,19 +135,19 @@ def Rgate(theta, cutoff, grad=False):
     r"""
     Calculates the Fock representation of the Rgate and its gradient
     Arg:
-        s (float): Parameter of the gate
+        theta (float): Parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): Whether to calculate the gradient or not
     Returns:
         tuple(G,dG): The Fock representations of the gate and its gradient
     """
     ns = np.arange(cutoff)
-    T = np.exp(1j * ns * theta)
+    T = np.exp(1j * theta) ** ns
     if not grad:
         return np.diag(T), None
     return np.diag(T), np.diag(1j * ns * T)
 
-@numba.jit
+#@numba.jit
 def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
     r"""
     Calculates the Fock representation of the S2gate and its gradient
@@ -175,12 +175,12 @@ def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
                         gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
 
-@numba.jit
+#@numba.jit
 def BSgate(theta, cutoff, grad=False, r=np.arcsinh(1.0)):
     r"""
     Calculates the Fock representation of the BSgate and its gradient
     Arg:
-        s (float): Parameter of the gate
+        theta (float): Parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): Whether to calculate the gradient or not
         r (float): Value of the parameter used internally in fock_tensor.
