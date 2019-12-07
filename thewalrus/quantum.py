@@ -522,7 +522,6 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
     pref = np.exp(prefexp.conj())
     if post_select is None:
-
         psi = pref * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
     else:
         M = N - len(post_select)

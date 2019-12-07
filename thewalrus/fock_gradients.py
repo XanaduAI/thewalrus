@@ -40,7 +40,7 @@ import numpy as np
 from thewalrus.quantum import fock_tensor
 from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 
-#import numba
+import numba
 
 #@numba.jit
 def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
@@ -147,7 +147,19 @@ def Rgate(theta, cutoff, grad=False):
         return np.diag(T), None
     return np.diag(T), np.diag(1j * ns * T)
 
-#@numba.jit
+#@numba.jit(nopython=True)
+def grad_S2gate(T, cutoff):
+    gradT = np.zeros([cutoff, cutoff, cutoff, cutoff])
+    for n in range(cutoff):
+        for k in range(cutoff):
+            for m in range(cutoff):
+                l = m - n + k
+                if 0 <= l < cutoff:
+                    gradT[n, k, m, l] = np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1]
+                    if m > 0 and l > 0:
+                        gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
+    return gradT    
+
 def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
     r"""
     Calculates the Fock representation of the S2gate and its gradient
@@ -164,16 +176,7 @@ def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
         return fock_tensor(S, np.zeros([2]), cutoff, r=r).real, None
 
     T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r).real
-    gradT = np.zeros([cutoff, cutoff, cutoff, cutoff])
-    for n in range(cutoff):
-        for k in range(cutoff):
-            for m in range(cutoff):
-                l = m - n + k
-                if 0 <= l < cutoff:
-                    gradT[n, k, m, l] = np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1]
-                    if m > 0 and l > 0:
-                        gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
-    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
+    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], grad_S2gate(T, cutoff)
 
 #@numba.jit
 def BSgate(theta, cutoff, grad=False, r=np.arcsinh(1.0)):
