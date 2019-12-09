@@ -17,7 +17,7 @@ Hermite Multidimensional Python interface
 import numpy as np
 
 from .libwalrus import hermite_multidimensional as hm
-from .libwalrus import hermite_multidimensional as hmr
+from .libwalrus import hermite_multidimensional_real as hmr
 from ._hafnian import input_validation
 
 # pylint: disable=too-many-arguments
@@ -76,7 +76,7 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     yt = np.real_if_close(y)
 
     if Rt.dtype == np.float and yt.dtype == np.float:
-        values = np.array(hmr(R, y, cutoff, renorm=renorm))
+        values = np.array(hmr(Rt, yt, cutoff, renorm=renorm))
     else:
         values = np.array(hm(R, y, cutoff, renorm=renorm))
 
