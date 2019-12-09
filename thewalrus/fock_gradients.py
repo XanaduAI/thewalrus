@@ -85,7 +85,7 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     T = fock_tensor(S, alpha, cutoff + 1, r=r)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Xgate(T, gradT, pref)
-    return T[0:cutoff, 0:cutoff], gradT  # grad_Xgate(T, pref)
+    return T[0:cutoff, 0:cutoff], gradT
 
 
 @jit("void(complex128[:,:], complex128[:,:], double)")
