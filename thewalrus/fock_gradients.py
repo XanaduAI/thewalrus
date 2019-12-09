@@ -45,7 +45,7 @@ from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 
 
 @jit("void(double[:,:], double[:,:], double)")
-def grad_Xgate(T, gradT, pref):
+def grad_Xgate(T, gradT, pref):# pragma: no cover
     """Calculates the gradient of the Xgate.
 
     Args:
@@ -89,7 +89,7 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
 
 
 @jit("void(complex128[:,:], complex128[:,:], double)")
-def grad_Zgate(T, gradT, pref):
+def grad_Zgate(T, gradT, pref):# pragma: no cover
     """Calculates the gradient of the Zgate.
 
     Args:
@@ -133,7 +133,7 @@ def Zgate(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
 
 
 @jit("void(double[:,:], double[:,:])")
-def grad_Sgate(T, gradT):
+def grad_Sgate(T, gradT):# pragma: no cover
     """Calculates the gradient of the Sgate.
 
     Args:
@@ -192,7 +192,7 @@ def Rgate(theta, cutoff, grad=False):
 
 
 @jit("void(double[:,:,:,:],double[:,:,:,:])")
-def grad_S2gate(T, gradT):
+def grad_S2gate(T, gradT):# pragma: no cover
     """Calculates the gradient of the S2gate.
 
     Args:
@@ -234,7 +234,7 @@ def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
 
 
 @jit("void(double[:,:,:,:], double[:,:,:,:])")
-def grad_BSgate(T, gradT):
+def grad_BSgate(T, gradT):# pragma: no cover
     """Calculates the gradient of the BSgate.
 
     Args:
