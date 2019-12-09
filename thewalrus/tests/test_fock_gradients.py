@@ -26,7 +26,7 @@ def test_Xgate():
     Xp, _ = Xgate(x + dx, cutoff)
     Xm, _ = Xgate(x - dx, cutoff)
     dXfd = (Xp - Xm) / (2 * dx)
-    assert np.allclose(dX, dXfd, atol=20 * dx ** 2, rtol=0)
+    assert np.allclose(dX, dXfd, atol=1e-5, rtol=0)
 
 
 def test_Zgate():
@@ -38,7 +38,7 @@ def test_Zgate():
     Zp, _ = Zgate(p + dp, cutoff)
     Zm, _ = Zgate(p - dp, cutoff)
     dZfd = (Zp - Zm) / (2 * dp)
-    assert np.allclose(dZ, dZfd, atol=20 * dp ** 2, rtol=0)
+    assert np.allclose(dZ, dZfd, atol=1e-5, rtol=0)
 
 
 def test_Sgate():
@@ -50,7 +50,7 @@ def test_Sgate():
     Ss, _ = Sgate(s + ds, cutoff)
     Sm, _ = Sgate(s - ds, cutoff)
     dSfd = (Ss - Sm) / (2 * ds)
-    assert np.allclose(dS, dSfd, atol=20 * ds ** 2, rtol=0)
+    assert np.allclose(dS, dSfd, atol=1e-5, rtol=0)
 
 
 def test_Rgate():
@@ -62,7 +62,7 @@ def test_Rgate():
     Rs, _ = Rgate(theta + dtheta, cutoff)
     Rm, _ = Rgate(theta - dtheta, cutoff)
     dRfd = (Rs - Rm) / (2 * dtheta)
-    assert np.allclose(dR, dRfd, atol=100 * dtheta ** 2, rtol=0)
+    assert np.allclose(dR, dRfd, atol=1e-5, rtol=0)
 
 
 def test_S2gate():
@@ -74,7 +74,7 @@ def test_S2gate():
     S2s, _ = S2gate(s + ds, cutoff)
     S2m, _ = S2gate(s - ds, cutoff)
     dS2fd = (S2s - S2m) / (2 * ds)
-    assert np.allclose(dS2, dS2fd, atol=200 * ds ** 2, rtol=0)
+    assert np.allclose(dS2, dS2fd, atol=1e-5, rtol=0)
 
 
 def test_BSgate():
@@ -86,4 +86,4 @@ def test_BSgate():
     BSs, _ = BSgate(theta + dtheta, cutoff)
     BSm, _ = BSgate(theta - dtheta, cutoff)
     dBSfd = (BSs - BSm) / (2 * dtheta)
-    assert np.allclose(dBS, dBSfd, atol=200 * dtheta ** 2, rtol=0)
+    assert np.allclose(dBS, dBSfd, atol=1e-5, rtol=0)

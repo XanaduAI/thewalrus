@@ -72,6 +72,7 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     if m != n:
         raise ValueError("The matrix R and vector y have incompatible dimensions")
 
+
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
 

@@ -380,11 +380,11 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
 
         if np.allclose(mu, np.zeros_like(mu)):
-            tensor = pref * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
+            tensor = np.real_if_close(pref) * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
             return tensor.transpose(sf_order)
         beta = Beta(mu)
         y = beta - A @ beta.conj()
-        tensor = pref * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
+        tensor = np.real_if_close(pref) * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
         return tensor.transpose(sf_order)
 
     M = N - len(post_select)
@@ -522,7 +522,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
     pref = np.exp(prefexp.conj())
     if post_select is None:
-        psi = pref * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
+        psi = np.real_if_close(pref) * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
