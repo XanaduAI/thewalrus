@@ -37,12 +37,14 @@ Code details
 ^^^^^^^^^^^^
 """
 import numpy as np
+# pylint: disable=unused-import
 from numba import jit, double, complex128
 
 from thewalrus.quantum import fock_tensor
 from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 
-@jit('double[:,:](double[:,:], double)')
+
+@jit("double[:,:](double[:,:], double)")
 def grad_Xgate(T, pref):
     """Calculate the gradient of the Xgate
     Args:
@@ -85,7 +87,7 @@ def Xgate(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff], grad_Xgate(T, pref)
 
 
-@jit('complex128[:,:](complex128[:,:], double)')
+@jit("complex128[:,:](complex128[:,:], double)")
 def grad_Zgate(T, pref):
     """Calculate the gradient of the Zgate
     Args:
@@ -102,6 +104,7 @@ def grad_Zgate(T, pref):
             if m > 0:
                 gradT[n, m] += 1j * np.sqrt(m) * T[n, m - 1] * pref
     return gradT
+
 
 def Zgate(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     r"""
@@ -126,7 +129,8 @@ def Zgate(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     T = fock_tensor(S, alpha, cutoff + 1, r=r)
     return T[0:cutoff, 0:cutoff], grad_Zgate(T, pref)
 
-@jit('double[:,:](double[:,:])')
+
+@jit("double[:,:](double[:,:])")
 def grad_Sgate(T):
     """Calculate the gradient of the Sgate
     Args:
@@ -183,8 +187,7 @@ def Rgate(theta, cutoff, grad=False):
     return np.diag(T), np.diag(1j * ns * T)
 
 
-
-@jit('double[:,:,:,:](double[:,:,:,:])')
+@jit("double[:,:,:,:](double[:,:,:,:])")
 def grad_S2gate(T):
     """Calculate the gradient of the S2gate
     Args:
@@ -224,7 +227,8 @@ def S2gate(s, cutoff, grad=False, r=np.arcsinh(1.0)):
     T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r).real
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], grad_S2gate(T)
 
-@jit('double[:,:,:,:](double[:,:,:,:])')
+
+@jit("double[:,:,:,:](double[:,:,:,:])")
 def grad_BSgate(T):
     """Calculates the gradient of the BSgate
     Args:
