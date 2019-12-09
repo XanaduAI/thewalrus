@@ -142,7 +142,7 @@ def vacuum_state(modes, hbar=2.0):
 
 
 def squeezing(r, phi):
-    r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) )
+    r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
 
     Args:
         r (float): squeezing magnitude
