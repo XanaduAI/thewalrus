@@ -229,8 +229,9 @@ def grad_BSgate(T, gradTr, gradTtheta, theta):# pragma: no cover
             for m in range(cutoff):
                 l = n + k - m
                 if 0 <= l < cutoff:
+                    gradTtheta[n ,k, m, l] = -1j*(n-m)*T[n,k,m,l]
                     if m > 0:
-                        gradTr[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1] * np.conj(exptheta)
+                        gradTr[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1] * exptheta
                     if l > 0:
-                        gradTr[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * exptheta
+                        gradTr[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * np.conj(exptheta)
 

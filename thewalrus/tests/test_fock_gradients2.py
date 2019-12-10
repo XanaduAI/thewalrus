@@ -15,11 +15,11 @@
 
 from thewalrus.fock_gradients2 import Dgate, Sgate, S2gate, BSgate
 import numpy as np
-np.set_printoptions(linewidth=200)
+np.set_printoptions(linewidth=100)
 
 
 def test_Dgate():
-    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    """Tests the value of the analytic gradient for the Dgate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi/8
@@ -37,7 +37,7 @@ def test_Dgate():
 
 
 def test_Sgate():
-    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    """Tests the value of the analytic gradient for the Sgate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi/8
@@ -55,7 +55,7 @@ def test_Sgate():
 
 
 def test_S2gate():
-    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    """Tests the value of the analytic gradient for the S2gate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi/8
@@ -73,7 +73,7 @@ def test_S2gate():
 
 
 def test_BSgate():
-    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    """Tests the value of the analytic gradient for the BSgate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi/8
@@ -86,7 +86,5 @@ def test_BSgate():
     Dthetam, _, _ = BSgate(r, theta - dtheta, cutoff, grad=False)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
-    print("\n",Dr[1,0,1,0])
-    print("\n",Drapprox[1,0,1,0])
-    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
-    #assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
