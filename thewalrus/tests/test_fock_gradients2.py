@@ -13,7 +13,7 @@
 # limitations under the License.
 """Tests for The Walrus fock_gradients functions"""
 
-from thewalrus.fock_gradients2 import Dgate
+from thewalrus.fock_gradients2 import Dgate, Sgate, S2gate, BSgate
 import numpy as np
 np.set_printoptions(linewidth=200)
 
@@ -35,3 +35,58 @@ def test_Dgate():
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
+
+def test_Sgate():
+    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi/8
+    _, Dr, Dtheta = Sgate(r, theta, cutoff, grad=True)
+    dr = 0.001
+    dtheta = 0.001
+    Drp, _, _ = Sgate(r + dr, theta, cutoff, grad=False)
+    Drm, _, _ = Sgate(r - dr, theta, cutoff, grad=False)
+    Dthetap, _, _ = Sgate(r, theta + dtheta, cutoff, grad=False)
+    Dthetam, _, _ = Sgate(r, theta - dtheta, cutoff, grad=False)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+
+
+def test_S2gate():
+    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi/8
+    _, Dr, Dtheta = S2gate(r, theta, cutoff, grad=True)
+    dr = 0.001
+    dtheta = 0.001
+    Drp, _, _ = S2gate(r + dr, theta, cutoff, grad=False)
+    Drm, _, _ = S2gate(r - dr, theta, cutoff, grad=False)
+    Dthetap, _, _ = S2gate(r, theta + dtheta, cutoff, grad=False)
+    Dthetam, _, _ = S2gate(r, theta - dtheta, cutoff, grad=False)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+
+
+def test_BSgate():
+    """Tests the value of the analytic gradient for the Xgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi/8
+    _, Dr, Dtheta = BSgate(r, theta, cutoff, grad=True)
+    dr = 0.001
+    dtheta = 0.001
+    Drp, _, _ = BSgate(r + dr, theta, cutoff, grad=False)
+    Drm, _, _ = BSgate(r - dr, theta, cutoff, grad=False)
+    Dthetap, _, _ = BSgate(r, theta + dtheta, cutoff, grad=False)
+    Dthetam, _, _ = BSgate(r, theta - dtheta, cutoff, grad=False)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    print("\n",Dr[1,0,1,0])
+    print("\n",Drapprox[1,0,1,0])
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    #assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
