@@ -56,7 +56,7 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     Args:
         T (array[complex]): array representing the gate
         gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
         theta (float): phase angle parametrizing the gate
     """
     cutoff = gradTr.shape[0]
@@ -103,7 +103,7 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     Args:
         T (array[complex]): array representing the gate
         gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
         theta (float): phase angle parametrizing the gate
     """
     cutoff = gradTr.shape[0]
@@ -150,7 +150,7 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     Args:
         T (array[complex]): array representing the gate
         gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
         theta (float): phase angle parametrizing the gate
     """
     cutoff = gradTr.shape[0]
@@ -197,17 +197,13 @@ def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
 
 @jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
 def grad_BSgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
-    """Calculates the Fock representation of the BSgate and its gradient.
+    """Calculates the gradient of the BSgate.
 
-    Arg:
-        r (float): magnitude parameter of the gate
-        theta (float): magnitude parameter of the gate
-        cutoff (int): Fock ladder cutoff
-        grad (boolean): whether to calculate the gradient or not
-        s (float): value of the parameter used internally in fock_tensor
-
-    Returns:
-        tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
+    Args:
+        T (array[complex]): array representing the gate
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        theta (float): phase angle parametrizing the gate
     """
     cutoff = gradTr.shape[0]
     exptheta = np.exp(1j * theta)
