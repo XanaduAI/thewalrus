@@ -76,7 +76,7 @@ def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        s (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -124,7 +124,7 @@ def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        s (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -177,7 +177,7 @@ def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        s (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -203,7 +203,7 @@ def grad_BSgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        s (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -229,10 +229,11 @@ def BSgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Arg:
-        s (float): parameter of the gate
+        r (float): magnitude parameter of the gate
+        theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        s (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
