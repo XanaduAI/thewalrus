@@ -88,7 +88,7 @@ def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     if not grad:
         return fock_tensor(S, alpha, cutoff, r=s), None, None
 
-    T = fock_tensor(S, alpha, cutoff + 1, r=s)
+    T = np.complex(fock_tensor(S, alpha, cutoff + 1, r=s))
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Dgate(T, gradTr, gradTtheta, theta)
@@ -135,7 +135,7 @@ def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     if not grad:
         return fock_tensor(S, alpha, cutoff, r=s), None, None
 
-    T = fock_tensor(S, alpha, cutoff + 2, r=s)
+    T = np.complex(fock_tensor(S, alpha, cutoff + 2, r=s))
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Sgate(T, gradTr, gradTtheta, theta)
@@ -186,7 +186,7 @@ def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     if not grad:
         return fock_tensor(S, np.zeros([2]), cutoff, r=s), None, None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r)
+    T = np.complex(fock_tensor(S, np.zeros([2]), cutoff + 1, r=r))
     gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_S2gate(T, gradTr, gradTtheta, theta)
@@ -241,7 +241,7 @@ def BSgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     if not grad:
         return fock_tensor(S, np.zeros([2]), cutoff, r=s), None, None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r)
+    T = np.complex(fock_tensor(S, np.zeros([2]), cutoff + 1, r=r))
     gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_BSgate(T, gradTr, gradTtheta, theta)
