@@ -28,10 +28,14 @@ Fock Gates
 .. autosummary::
     Xgate
     Zgate
+    Dgate
     Sgate
     Rgate
     S2gate
     BSgate
+    Sgate_one_param
+    S2gate_one_param
+    BSgate_one_param
 
 Code details
 ^^^^^^^^^^^^
@@ -42,8 +46,6 @@ from numba import jit
 
 from thewalrus.quantum import fock_tensor
 from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
-
-
 
 
 @jit("void(complex128[:,:], complex128[:,:], complex128[:,:], double)")
@@ -192,8 +194,6 @@ def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
-
-
 @jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
 def grad_BSgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     """Calculates the Fock representation of the BSgate and its gradient.
@@ -249,9 +249,8 @@ def BSgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
-
 @jit("void(double[:,:], double[:,:], double)")
-def grad_Xgate_one_param(T, gradT, pref):# pragma: no cover
+def grad_Xgate_one_param(T, gradT, pref):  # pragma: no cover
     """Calculates the gradient of the Xgate.
 
     Args:
@@ -295,7 +294,7 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
 
 
 @jit("void(complex128[:,:], complex128[:,:], double)")
-def grad_Zgate_one_param(T, gradT, pref):# pragma: no cover
+def grad_Zgate_one_param(T, gradT, pref):  # pragma: no cover
     """Calculates the gradient of the Zgate.
 
     Args:
@@ -339,7 +338,7 @@ def Zgate_one_param(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
 
 
 @jit("void(double[:,:], double[:,:])")
-def grad_Sgate_one_param(T, gradT):# pragma: no cover
+def grad_Sgate_one_param(T, gradT):  # pragma: no cover
     """Calculates the gradient of the Sgate.
 
     Args:
@@ -398,7 +397,7 @@ def Rgate(theta, cutoff, grad=False):
 
 
 @jit("void(double[:,:,:,:],double[:,:,:,:])")
-def grad_S2gate_one_param(T, gradT):# pragma: no cover
+def grad_S2gate_one_param(T, gradT):  # pragma: no cover
     """Calculates the gradient of the S2gate.
 
     Args:
@@ -440,7 +439,7 @@ def S2gate_one_param(s, cutoff, grad=False, r=np.arcsinh(1.0)):
 
 
 @jit("void(double[:,:,:,:], double[:,:,:,:])")
-def grad_BSgate_one_param(T, gradT):# pragma: no cover
+def grad_BSgate_one_param(T, gradT):  # pragma: no cover
     """Calculates the gradient of the BSgate.
 
     Args:

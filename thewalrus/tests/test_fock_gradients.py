@@ -13,8 +13,20 @@
 # limitations under the License.
 """Tests for The Walrus fock_gradients functions"""
 
-from thewalrus.fock_gradients import Dgate, BSgate, Sgate, S2gate, Xgate_one_param, Zgate_one_param, Sgate_one_param, S2gate_one_param, BSgate_one_param, Rgate
+from thewalrus.fock_gradients import (
+    Dgate,
+    BSgate,
+    Sgate,
+    S2gate,
+    Xgate_one_param,
+    Zgate_one_param,
+    Sgate_one_param,
+    S2gate_one_param,
+    BSgate_one_param,
+    Rgate,
+)
 import numpy as np
+
 
 def test_Dgate():
     """Tests the value of the analytic gradient for the Dgate against finite differences"""
@@ -86,7 +98,6 @@ def test_BSgate():
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
-
 
 
 def test_Xgate_one_param():
