@@ -19,7 +19,7 @@ Gradients of Gaussian gates in the Fock representation
 
 .. currentmodule:: thewalrus.fock_gradients
 
-Contains the Fock representation of the standard Gaussian gates, as well as their gradients.
+Contains the Fock representation of the standard Gaussian gates and the Kerr gate, as well as their gradients.
 
 
 Fock Gates
@@ -31,6 +31,7 @@ Fock Gates
     Dgate
     Sgate
     Rgate
+    Kgate
     S2gate
     BSgate
     Sgate_one_param
@@ -380,7 +381,7 @@ def Sgate_one_param(s, cutoff, grad=False, r=np.arcsinh(1.0)):
 
 
 def Rgate(theta, cutoff, grad=False):
-    """Calculates the Fock representation of the Sgate and its gradient.
+    """Calculates the Fock representation of the Rgate and its gradient.
 
     Arg:
         theta (float): parameter of the gate
@@ -395,6 +396,24 @@ def Rgate(theta, cutoff, grad=False):
     if not grad:
         return np.diag(T), None
     return np.diag(T), np.diag(1j * ns * T)
+
+
+def Kgate(theta, cutoff, grad=False):
+    """Calculates the Fock representation of the Kgate and its gradient.
+
+    Arg:
+        theta (float): parameter of the gate
+        cutoff (int): Fock ladder cutoff
+        grad (boolean): whether to calculate the gradient or not
+
+    Returns:
+        tuple[array[complex], array[complex] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
+    """
+    ns = np.arange(cutoff)
+    T = np.exp(1j * theta) ** (ns ** 2)
+    if not grad:
+        return np.diag(T), None
+    return np.diag(T), np.diag(1j * (ns ** 2) * T)
 
 
 @jit("void(double[:,:,:,:],double[:,:,:,:])")

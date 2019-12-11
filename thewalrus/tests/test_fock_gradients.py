@@ -24,6 +24,7 @@ from thewalrus.fock_gradients import (
     S2gate_one_param,
     BSgate_one_param,
     Rgate,
+    Kgate,
 )
 import numpy as np
 
@@ -137,7 +138,7 @@ def test_Sgate_one_param():
 
 
 def test_Rgate():
-    """Tests the value of the analytic gradient for the Rgate_one_param against finite differences"""
+    """Tests the value of the analytic gradient for the Rgate against finite differences"""
     theta = 1.0
     cutoff = 9
     _, dR = Rgate(theta, cutoff, grad=True)
@@ -146,6 +147,18 @@ def test_Rgate():
     Rm, _ = Rgate(theta - dtheta, cutoff)
     dRfd = (Rs - Rm) / (2 * dtheta)
     assert np.allclose(dR, dRfd, atol=1e-5, rtol=0)
+
+
+def test_Kgate():
+    """Tests the value of the analytic gradient for the Kgate against finite differences"""
+    theta = 1.0
+    cutoff = 9
+    _, dR = Kgate(theta, cutoff, grad=True)
+    dtheta = 0.0001
+    Rs, _ = Kgate(theta + dtheta, cutoff)
+    Rm, _ = Kgate(theta - dtheta, cutoff)
+    dRfd = (Rs - Rm) / (2 * dtheta)
+    assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
 
 
 def test_S2gate_one_param():
