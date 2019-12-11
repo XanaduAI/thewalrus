@@ -26,10 +26,8 @@ Fock Gates
 ----------
 
 .. autosummary::
-    Xgate
-    Zgate
+    Dgate
     Sgate
-    Rgate
     S2gate
     BSgate
 
@@ -46,14 +44,14 @@ from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 
 @jit("void(complex128[:,:], complex128[:,:], complex128[:,:], double)")
 def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
-    """Calculates the gradient of the Xgate.
+    """Calculates the gradient of the Dgate.
 
     Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
-        pref (float): prefactor used to rescale the gradient
+        T (array[complex]): array representing the gate
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        theta (float): phase angle parametrizing the gate
     """
-
     cutoff = gradTr.shape[0]
     exptheta = np.exp(1j * theta)
     for n in range(cutoff):
@@ -64,19 +62,18 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                 gradTr[n, m] -= np.sqrt(m) * T[n, m - 1] * np.conj(exptheta)
 
 
-def Dgate(r, theta, cutoff, grad=False, hbar=2, s=np.arcsinh(1.0)):
-    """Calculates the Fock representation of the Xgate and its gradient.
+def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
+    """Calculates the Fock representation of the Dgate and its gradient.
 
     Arg:
         r (float): magnitude parameter of the gate
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        hbar (float): value of hbar in the commutation relation
         r (float): value of the parameter used internally in fock_tensor
 
     Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
+        tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     nmodes = 1
     alpha = np.array([r * np.exp(1j * theta)])
@@ -92,19 +89,18 @@ def Dgate(r, theta, cutoff, grad=False, hbar=2, s=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
-
-
-
 @jit("void(complex128[:,:], complex128[:,:], complex128[:,:], double)")
-def grad_Sgate(T, gradTr, gradTtheta, theta):# pragma: no cover
+def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     """Calculates the gradient of the Sgate.
 
     Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
+        T (array[complex]): array representing the gate
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        theta (float): phase angle parametrizing the gate
     """
     cutoff = gradTr.shape[0]
-    exptheta = np.exp(1j*theta)
+    exptheta = np.exp(1j * theta)
     for n in range(cutoff):
         offset = n % 2
         for m in range(offset, cutoff, 2):
@@ -114,21 +110,19 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):# pragma: no cover
                 gradTr[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2] * np.conj(exptheta)
 
 
-def Sgate(r, theta, cutoff, grad=False, hbar=2, s=np.arcsinh(1.0)):
-    """Calculates the Fock representation of the Xgate and its gradient.
+def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
+    """Calculates the Fock representation of the Sgate and its gradient.
 
     Arg:
         r (float): magnitude parameter of the gate
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        hbar (float): value of hbar in the commutation relation
         r (float): value of the parameter used internally in fock_tensor
 
     Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
+        tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
-    nmodes = 1
     alpha = np.array([0.0])
     S = squeezing(r, theta)
 
@@ -142,18 +136,45 @@ def Sgate(r, theta, cutoff, grad=False, hbar=2, s=np.arcsinh(1.0)):
     return T[0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
+@jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
+def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
+    """Calculates the gradient of the S2gate.
+
+    Args:
+        T (array[complex]): array representing the gate
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        theta (float): phase angle parametrizing the gate
+    """
+    cutoff = gradTr.shape[0]
+    exptheta = np.exp(1j * theta)
+    for n in range(cutoff):
+        for k in range(cutoff):
+            for m in range(cutoff):
+                l = m - n + k
+                if 0 <= l < cutoff:
+                    gradTtheta[n, k, m, l] = 1j * (n - m) * T[n, k, m, l]
+                    gradTr[n, k, m, l] = (
+                        np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1] * exptheta
+                    )
+                    if m > 0 and l > 0:
+                        gradTr[n, k, m, l] -= (
+                            np.sqrt(m * l) * T[n, k, m - 1, l - 1] * np.conj(exptheta)
+                        )
+
 
 def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Arg:
-        s (float): parameter of the gate
+        r (float): magnitude parameter of the gate
+        theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         r (float): value of the parameter used internally in fock_tensor
 
     Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
+        tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     S = two_mode_squeezing(r, theta)
     if not grad:
@@ -166,26 +187,38 @@ def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
 
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTr, gradTtheta
 
-@jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
-def grad_S2gate(T, gradTr, gradTtheta, theta):# pragma: no cover
-    """Calculates the gradient of the S2gate.
 
-    Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
+
+
+@jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
+def grad_BSgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
+    """Calculates the Fock representation of the BSgate and its gradient.
+
+    Arg:
+        r (float): magnitude parameter of the gate
+        theta (float): magnitude parameter of the gate
+        cutoff (int): Fock ladder cutoff
+        grad (boolean): whether to calculate the gradient or not
+        r (float): value of the parameter used internally in fock_tensor
+
+    Returns:
+        tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     cutoff = gradTr.shape[0]
-    exptheta = np.exp(1j*theta)
+    exptheta = np.exp(1j * theta)
+
     for n in range(cutoff):
         for k in range(cutoff):
             for m in range(cutoff):
-                l = m - n + k
+                l = n + k - m
                 if 0 <= l < cutoff:
-                    gradTtheta[n ,k, m, l] = 1j*(n-m)*T[n,k,m,l]
-                    gradTr[n, k, m, l] = np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1] * exptheta
-                    if m > 0 and l > 0:
-                        gradTr[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1] *np.conj(exptheta)
-
+                    gradTtheta[n, k, m, l] = -1j * (n - m) * T[n, k, m, l]
+                    if m > 0:
+                        gradTr[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1] * exptheta
+                    if l > 0:
+                        gradTr[n, k, m, l] -= (
+                            np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * np.conj(exptheta)
+                        )
 
 
 def BSgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
@@ -210,28 +243,3 @@ def BSgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     grad_BSgate(T, gradTr, gradTtheta, theta)
 
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTr, gradTtheta
-
-
-
-@jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
-def grad_BSgate(T, gradTr, gradTtheta, theta):# pragma: no cover
-    """Calculates the gradient of the S2gate.
-
-    Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
-    """
-    cutoff = gradTr.shape[0]
-    exptheta = np.exp(1j*theta)
-
-    for n in range(cutoff):
-        for k in range(cutoff):
-            for m in range(cutoff):
-                l = n + k - m
-                if 0 <= l < cutoff:
-                    gradTtheta[n ,k, m, l] = -1j*(n-m)*T[n,k,m,l]
-                    if m > 0:
-                        gradTr[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1] * exptheta
-                    if l > 0:
-                        gradTr[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * np.conj(exptheta)
-

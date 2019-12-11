@@ -15,6 +15,7 @@
 
 from thewalrus.fock_gradients2 import Dgate, Sgate, S2gate, BSgate
 import numpy as np
+
 np.set_printoptions(linewidth=100)
 
 
@@ -22,7 +23,7 @@ def test_Dgate():
     """Tests the value of the analytic gradient for the Dgate against finite differences"""
     cutoff = 4
     r = 1.0
-    theta = np.pi/8
+    theta = np.pi / 8
     _, Dr, Dtheta = Dgate(r, theta, cutoff, grad=True)
     dr = 0.001
     dtheta = 0.001
@@ -40,7 +41,7 @@ def test_Sgate():
     """Tests the value of the analytic gradient for the Sgate against finite differences"""
     cutoff = 4
     r = 1.0
-    theta = np.pi/8
+    theta = np.pi / 8
     _, Dr, Dtheta = Sgate(r, theta, cutoff, grad=True)
     dr = 0.001
     dtheta = 0.001
@@ -58,7 +59,7 @@ def test_S2gate():
     """Tests the value of the analytic gradient for the S2gate against finite differences"""
     cutoff = 4
     r = 1.0
-    theta = np.pi/8
+    theta = np.pi / 8
     _, Dr, Dtheta = S2gate(r, theta, cutoff, grad=True)
     dr = 0.001
     dtheta = 0.001
@@ -76,7 +77,7 @@ def test_BSgate():
     """Tests the value of the analytic gradient for the BSgate against finite differences"""
     cutoff = 4
     r = 1.0
-    theta = np.pi/8
+    theta = np.pi / 8
     _, Dr, Dtheta = BSgate(r, theta, cutoff, grad=True)
     dr = 0.001
     dtheta = 0.001
