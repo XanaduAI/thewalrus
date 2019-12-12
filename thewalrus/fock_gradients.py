@@ -122,7 +122,7 @@ def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
 
     Arg:
         r (float): squeezing magnitude
-        theta (float): magnitude parameter of the gate
+        theta (float): squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         s (float): value of the parameter used internally in fock_tensor
