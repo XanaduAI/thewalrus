@@ -142,7 +142,7 @@ def vacuum_state(modes, hbar=2.0):
 
 
 def squeezing(r, phi):
-    """Squeezing.
+    r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
 
     Args:
         r (float): squeezing magnitude
@@ -150,6 +150,8 @@ def squeezing(r, phi):
 
     Returns:
         array: symplectic transformation matrix
+
+
     """
     # pylint: disable=assignment-from-no-return
     cp = np.cos(phi)

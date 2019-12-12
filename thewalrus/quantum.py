@@ -380,11 +380,11 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
 
         if np.allclose(mu, np.zeros_like(mu)):
-            tensor = pref * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
+            tensor = np.real_if_close(pref) * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
             return tensor.transpose(sf_order)
         beta = Beta(mu)
         y = beta - A @ beta.conj()
-        tensor = pref * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
+        tensor = np.real_if_close(pref) * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
         return tensor.transpose(sf_order)
 
     M = N - len(post_select)
@@ -522,8 +522,7 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
     pref = np.exp(prefexp.conj())
     if post_select is None:
-
-        psi = pref * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
+        psi = np.real_if_close(pref) * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
@@ -770,7 +769,7 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
+def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -779,7 +778,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
         S (array): symplectic matrix
         alpha (array): complex vector of displacements
         cutoff (int): cutoff in Fock space
-        r (float): squeezing parameter used for the Choi expansion
+        choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
         sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
     Return:
@@ -797,8 +796,8 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
 
     # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
     l = m // 2
-    ch = np.cosh(r) * np.identity(l)
-    sh = np.sinh(r) * np.identity(l)
+    ch = np.cosh(choi_r) * np.identity(l)
+    sh = np.sinh(choi_r) * np.identity(l)
     zh = np.zeros([l, l])
     Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
     # And then its Choi expanded symplectic
@@ -814,7 +813,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
     vals = list(range(l))
     vals2 = list(range(l, 2 * l))
 
-    R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
+    R = [1.0 / np.prod((np.tanh(choi_r) ** i) / np.cosh(choi_r)) for i in range(cutoff)]
     tensor_view = tensor.transpose(vals2 + vals)
     # There is probably a better way to do the following rescaling, but this is already "good"
     for p in product(list(range(cutoff)), repeat=l):
