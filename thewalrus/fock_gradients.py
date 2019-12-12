@@ -73,8 +73,8 @@ def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Dgate and its gradient.
 
     Arg:
-        r (float): magnitude parameter of the gate
-        theta (float): magnitude parameter of the gate
+        r (float): displacement magnitude
+        theta (float): displacement phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         s (float): value of the parameter used internally in fock_tensor
@@ -121,8 +121,8 @@ def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Sgate and its gradient.
 
     Arg:
-        r (float): magnitude parameter of the gate
-        theta (float): magnitude parameter of the gate
+        r (float): squeezing magnitude
+        theta (float): squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         s (float): value of the parameter used internally in fock_tensor
