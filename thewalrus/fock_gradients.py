@@ -73,7 +73,7 @@ def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Dgate and its gradient.
 
     Arg:
-        r (float): magnitude parameter of the gate
+        r (float): displacement magnitude
         theta (float): magnitude parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
