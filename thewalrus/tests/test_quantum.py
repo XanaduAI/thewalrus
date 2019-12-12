@@ -646,33 +646,33 @@ def test_total_photon_num_dist_pure_state(cutoff):
     assert np.allclose(p1, p2)
 
 
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_single_mode_identity(r, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_single_mode_identity(choi_r, tol):
     """Tests the correct construction of the single mode identity operation"""
     nmodes = 1
     cutoff = 7
     S = np.identity(2 * nmodes)
     alphas = np.zeros([nmodes])
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     expected = np.identity(cutoff)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_single_mode_rotation(r, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_single_mode_rotation(choi_r, tol):
     """Tests the correct construction of the single mode rotation operation"""
     nmodes = 1
     cutoff = 7
     theta = 2 * np.pi * np.random.rand()
     S = rotation(theta)
     alphas = np.zeros([nmodes])
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     expected = np.diag(np.exp(1j * theta * np.arange(cutoff)))
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_single_mode_displacement(r, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_single_mode_displacement(choi_r, tol):
     """Tests the correct construction of the single mode displacement operation"""
     nmodes = 1
     cutoff = 5
@@ -689,12 +689,12 @@ def test_single_mode_displacement(r, tol):
             [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j],
         ]
     )
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_single_mode_squeezing(r, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_single_mode_squeezing(choi_r, tol):
     """Tests the correct construction of the single mode squeezing operation"""
     nmodes = 1
     s = 1.0
@@ -712,12 +712,12 @@ def test_single_mode_squeezing(r, tol):
             [0.2859358 + 0.0j, 0.0 + 0.0j, -0.29199268 + 0.0j, 0.0 + 0.0j, -0.34474749 + 0.0j],
         ]
     )
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_single_mode_displacement_squeezing(r, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_single_mode_displacement_squeezing(choi_r, tol):
     """Tests the correct construction of the single mode squeezing operation followed by the single mode displacement operation"""
     nmodes = 1
     s = 1.0
@@ -735,13 +735,13 @@ def test_single_mode_displacement_squeezing(r, tol):
             [-0.14390852 - 0.08884069j, -0.37898007 - 0.07630228j, 0.12911863 - 0.08963054j, -0.12164023 + 0.04431394j, 0.1141808 + 0.01581529j],
         ]
     )
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
 @pytest.mark.parametrize("nmodes", [2, 3, 4])
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_interferometer_selection_rules(r, nmodes, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_interferometer_selection_rules(choi_r, nmodes, tol):
     r"""Test the selection rules of an interferometer.
     If one writes the interferometer gate of k modes as :math:`U` and its matrix elements as
     :math:`\langle p_0 p_1 \ldots p_{k-1} |U|q_0 q_1 \ldots q_{k-1}\rangle` then these elements
@@ -752,7 +752,7 @@ def test_interferometer_selection_rules(r, nmodes, tol):
     S = interferometer(U)
     alphas = np.zeros([nmodes])
     cutoff = 4
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     for p in product(list(range(cutoff)), repeat=nmodes):
         for q in product(list(range(cutoff)), repeat=nmodes):
             if sum(p) != sum(q):  # Check that there are the same total number of photons in the bra and the ket
@@ -761,8 +761,8 @@ def test_interferometer_selection_rules(r, nmodes, tol):
 
 
 @pytest.mark.parametrize("nmodes", [2, 3, 4])
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_interferometer_single_excitation(r, nmodes, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_interferometer_single_excitation(choi_r, nmodes, tol):
     r"""Test that the representation of an interferometer in the single
     excitation manifold is precisely the unitary matrix that represents it
     mode in space.
@@ -774,7 +774,7 @@ def test_interferometer_single_excitation(r, nmodes, tol):
     S = interferometer(U)
     alphas = np.zeros([nmodes])
     cutoff = 2
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     # Construct a list with all the indices corresponding to |i \rangle
     vec_list = np.identity(nmodes, dtype=int).tolist()
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
@@ -786,8 +786,8 @@ def test_interferometer_single_excitation(r, nmodes, tol):
 
 
 @pytest.mark.parametrize("phi", list(np.arange(0, np.pi, 0.1)))
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_hong_ou_mandel_interference(r, phi, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_hong_ou_mandel_interference(choi_r, phi, tol):
     r"""Tests Hong-Ou-Mandel interference for a 50:50 beamsplitter.
     If one writes :math:`U` for the Fock representation of a 50-50 beamsplitter
     then it must hold that :math:`\langle 1,1|U|1,1 \rangle = 0`.
@@ -796,12 +796,12 @@ def test_hong_ou_mandel_interference(r, phi, tol):
     cutoff = 2
     nmodes = 2
     alphas = np.zeros([nmodes])
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
 
 
-@pytest.mark.parametrize("r", [0.5, np.arcsinh(1.0), 2])
-def test_two_mode_squeezing(r, tol):
+@pytest.mark.parametrize("choi_r", [0.5, np.arcsinh(1.0), 2])
+def test_two_mode_squeezing(choi_r, tol):
     r"""Tests the selection rules of a two mode squeezing operation.
     If one writes the squeezing gate as :math:`S_2` and its matrix elements as
     :math:`\langle p_0 p_1|S_2|q_0 q_1 \rangle` then these elements are nonzero
@@ -814,7 +814,7 @@ def test_two_mode_squeezing(r, tol):
     phi = np.pi / 6
     alphas = np.zeros([nmodes])
     S = two_mode_squeezing(s, phi)
-    T = fock_tensor(S, alphas, cutoff, r=r)
+    T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
     for p in product(list(range(cutoff)), repeat=nmodes):
         for q in product(list(range(cutoff)), repeat=nmodes):
             if p[0] - q[0] != p[1] - q[1]:

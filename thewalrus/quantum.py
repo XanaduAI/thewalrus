@@ -769,7 +769,7 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
+def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -778,7 +778,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
         S (array): symplectic matrix
         alpha (array): complex vector of displacements
         cutoff (int): cutoff in Fock space
-        r (float): squeezing parameter used for the Choi expansion
+        choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
@@ -795,8 +795,8 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
 
     # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
     l = m // 2
-    ch = np.cosh(r) * np.identity(l)
-    sh = np.sinh(r) * np.identity(l)
+    ch = np.cosh(choi_r) * np.identity(l)
+    sh = np.sinh(choi_r) * np.identity(l)
     zh = np.zeros([l, l])
     Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
     # And then its Choi expanded symplectic
@@ -812,7 +812,7 @@ def fock_tensor(S, alpha, cutoff, r=np.arcsinh(1.0), check_symplectic=True, sf_o
     vals = list(range(l))
     vals2 = list(range(l, 2 * l))
 
-    R = [1.0 / np.prod((np.tanh(r) ** i) / np.cosh(r)) for i in range(cutoff)]
+    R = [1.0 / np.prod((np.tanh(choi_r) ** i) / np.cosh(choi_r)) for i in range(cutoff)]
     tensor_view = tensor.transpose(vals2 + vals)
     # There is probably a better way to do the following rescaling, but this is already "good"
     for p in product(list(range(cutoff)), repeat=l):

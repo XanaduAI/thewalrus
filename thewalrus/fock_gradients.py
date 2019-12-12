@@ -21,6 +21,10 @@ Gradients of Gaussian gates in the Fock representation
 
 Contains the Fock representation of the standard Gaussian gates and the Kerr gate, as well as their gradients.
 
+All the functions have an optional parameter called `choi_r` which can be used to set the value of the two-mode squeezed
+states used in the Choi-Jamiolkowski expansion of a given Gaussian gate. For details on this see the documentation of
+:mod:`thewalrus.quantum.fock_tensor`.
+
 
 Fock Gates
 ----------
@@ -55,9 +59,9 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
-        theta (float): phase angle parametrizing the gate
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r the displacement magnitude
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta the displacement phase
+        theta (float): displacement phase
     """
     cutoff = gradTr.shape[0]
     exptheta = np.exp(1j * theta)
@@ -69,7 +73,7 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                 gradTr[n, m] -= np.sqrt(m) * T[n, m - 1] * np.conj(exptheta)
 
 
-def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
+def Dgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Dgate and its gradient.
 
     Arg:
@@ -77,7 +81,7 @@ def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
         theta (float): displacement phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        s (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -87,9 +91,9 @@ def Dgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, r=s), None, None
+        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None, None
 
-    T = np.complex128(fock_tensor(S, alpha, cutoff + 1, r=s))
+    T = np.complex128(fock_tensor(S, alpha, cutoff + 1, choi_r=choi_r))
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Dgate(T, gradTr, gradTtheta, theta)
@@ -104,7 +108,7 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
         T (array[complex]): array representing the gate
         gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
         gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
-        theta (float): phase angle parametrizing the gate
+        theta (float): squeezing phase
     """
     cutoff = gradTr.shape[0]
     exptheta = np.exp(1j * theta)
@@ -117,7 +121,7 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                 gradTr[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2] * np.conj(exptheta)
 
 
-def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
+def Sgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Sgate and its gradient.
 
     Arg:
@@ -125,7 +129,7 @@ def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
         theta (float): squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        s (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -134,9 +138,9 @@ def Sgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
     S = squeezing(r, theta)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, r=s), None, None
+        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None, None
 
-    T = np.complex128(fock_tensor(S, alpha, cutoff + 2, r=s))
+    T = np.complex128(fock_tensor(S, alpha, cutoff + 2, choi_r=choi_r))
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Sgate(T, gradTr, gradTtheta, theta)
@@ -151,7 +155,7 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
         T (array[complex]): array representing the gate
         gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
         gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
-        theta (float): phase angle parametrizing the gate
+        theta (float): two-mode squeezing phase
     """
     cutoff = gradTr.shape[0]
     exptheta = np.exp(1j * theta)
@@ -170,24 +174,24 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                         )
 
 
-def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
+def S2gate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Arg:
-        r (float): magnitude parameter of the gate
-        theta (float): magnitude parameter of the gate
+        r (float): two-mode squeezing magnitude
+        theta (float): two-mode squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        s (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     S = two_mode_squeezing(r, theta)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, r=s), None, None
+        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None, None
 
-    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1, r=r))
+    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r))
     gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_S2gate(T, gradTr, gradTtheta, theta)
@@ -196,55 +200,55 @@ def S2gate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
 
 
 @jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
-def grad_BSgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
+def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
     """Calculates the gradient of the BSgate.
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
         gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        gradTphi (array[complex]): array of zeros that will contain the value of the gradient with respect to phi
         theta (float): phase angle parametrizing the gate
     """
-    cutoff = gradTr.shape[0]
-    exptheta = np.exp(1j * theta)
+    cutoff = gradTtheta.shape[0]
+    expphi = np.exp(1j * phi)
 
     for n in range(cutoff):
         for k in range(cutoff):
             for m in range(cutoff):
                 l = n + k - m
                 if 0 <= l < cutoff:
-                    gradTtheta[n, k, m, l] = -1j * (n - m) * T[n, k, m, l]
+                    gradTphi[n, k, m, l] = -1j * (n - m) * T[n, k, m, l]
                     if m > 0:
-                        gradTr[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1] * exptheta
+                        gradTtheta[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1] * expphi
                     if l > 0:
-                        gradTr[n, k, m, l] -= (
-                            np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * np.conj(exptheta)
+                        gradTtheta[n, k, m, l] -= (
+                            np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * np.conj(expphi)
                         )
 
 
-def BSgate(r, theta, cutoff, grad=False, s=np.arcsinh(1.0)):
-    """Calculates the Fock representation of the S2gate and its gradient.
+def BSgate(theta, phi, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+    r"""Calculates the Fock representation of the S2gate and its gradient.
 
     Arg:
-        r (float): magnitude parameter of the gate
-        theta (float): magnitude parameter of the gate
+        theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=cos(theta)`
+        phi (float): reflection phase of the beamsplitter
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        s (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
-    S = beam_splitter(r, theta)
+    S = beam_splitter(theta, phi)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, r=s), None, None
+        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None, None
 
-    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1, r=r))
-    gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
+    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r))
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
-    grad_BSgate(T, gradTr, gradTtheta, theta)
+    gradTphi = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
+    grad_BSgate(T, gradTtheta, gradTphi, phi)
 
-    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTr, gradTtheta
+    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTtheta, gradTphi
 
 
 @jit("void(double[:,:], double[:,:], double)")
@@ -264,7 +268,7 @@ def grad_Xgate_one_param(T, gradT, pref):  # pragma: no cover
                 gradT[n, m] -= np.sqrt(m) * T[n, m - 1] * pref
 
 
-def Xgate_one_param(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
+def Xgate_one_param(x, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Xgate and its gradient.
 
     Arg:
@@ -272,7 +276,7 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         hbar (float): value of hbar in the commutation relation
-        r (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
@@ -283,9 +287,9 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, r=r), None
+        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None
 
-    T = fock_tensor(S, alpha, cutoff + 1, r=r)
+    T = fock_tensor(S, alpha, cutoff + 1, choi_r=choi_r)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Xgate_one_param(T, gradT, pref)
     return T[0:cutoff, 0:cutoff], gradT
@@ -308,7 +312,7 @@ def grad_Zgate_one_param(T, gradT, pref):  # pragma: no cover
                 gradT[n, m] += 1j * np.sqrt(m) * T[n, m - 1] * pref
 
 
-def Zgate_one_param(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
+def Zgate_one_param(p, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Zgate and its gradient.
 
     Arg:
@@ -316,7 +320,7 @@ def Zgate_one_param(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         hbar (float): value of hbar in the commutation relation
-        r (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
@@ -327,9 +331,9 @@ def Zgate_one_param(p, cutoff, grad=False, hbar=2, r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, r=r), None
+        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None
 
-    T = fock_tensor(S, alpha, cutoff + 1, r=r)
+    T = fock_tensor(S, alpha, cutoff + 1, choi_r=choi_r)
     gradT = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Zgate_one_param(T, gradT, pref)
     return T[0:cutoff, 0:cutoff], gradT
@@ -352,24 +356,23 @@ def grad_Sgate_one_param(T, gradT):  # pragma: no cover
                 gradT[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2]
 
 
-def Sgate_one_param(s, cutoff, grad=False, r=np.arcsinh(1.0)):
+def Sgate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Sgate and its gradient.
 
     Arg:
         s (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        hbar (float): value of hbar in the commutation relation
-        r (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
     """
     S = squeezing(s, 0.0)
     if not grad:
-        return fock_tensor(S, np.zeros([1]), cutoff, r=r), None
+        return fock_tensor(S, np.zeros([1]), cutoff, choi_r=choi_r), None
 
-    T = fock_tensor(S, np.zeros([1]), cutoff + 2, r=r)
+    T = fock_tensor(S, np.zeros([1]), cutoff + 2, choi_r=choi_r)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Sgate_one_param(T, gradT)
 
@@ -431,23 +434,23 @@ def grad_S2gate_one_param(T, gradT):  # pragma: no cover
                         gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
 
 
-def S2gate_one_param(s, cutoff, grad=False, r=np.arcsinh(1.0)):
+def S2gate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Arg:
         s (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
     S = two_mode_squeezing(s, 0)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, r=r), None
+        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r)
+    T = fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r)
     gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
     grad_S2gate_one_param(T, gradT)
 
@@ -474,23 +477,23 @@ def grad_BSgate_one_param(T, gradT):  # pragma: no cover
                         gradT[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1]
 
 
-def BSgate_one_param(theta, cutoff, grad=False, r=np.arcsinh(1.0)):
+def BSgate_one_param(theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the BSgate and its gradient.
 
     Arg:
         theta (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        r (float): value of the parameter used internally in fock_tensor
+        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
     S = beam_splitter(theta, 0)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, r=r), None
+        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1, r=r)
+    T = fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r)
     gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
     grad_BSgate_one_param(T, gradT)
 
