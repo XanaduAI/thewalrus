@@ -15,19 +15,17 @@
 Gradients of Gaussian gates in the Fock representation
 ======================================================
 
-**Module name:** :mod:`thewalrus.fock_gradients`
-
 .. currentmodule:: thewalrus.fock_gradients
 
-Contains the Fock representation of the standard Gaussian gates and the Kerr gate, as well as their gradients.
+This module contains the Fock representation of the standard Gaussian gates and the Kerr gate, as well as their gradients.
 
-All the functions have an optional parameter called `choi_r` which can be used to set the value of the two-mode squeezed
+Most functions have an optional parameter called `choi_r` which can be used to set the value of the two-mode squeezed
 states used in the Choi-Jamiolkowski expansion of a given Gaussian gate. For details on this see the documentation of
-:mod:`thewalrus.quantum.fock_tensor`.
+:mod:`thewalrus.quantum`.
 
 
-Fock Gates
-----------
+Continous-variable gates
+------------------------
 
 .. autosummary::
     Xgate
@@ -42,8 +40,41 @@ Fock Gates
     S2gate_one_param
     BSgate_one_param
 
-Code details
-^^^^^^^^^^^^
+Details
+^^^^^^^
+
+.. autofunction::
+    Xgate
+
+.. autofunction::
+    Zgate
+
+.. autofunction::
+    Dgate
+
+.. autofunction::
+    Sgate
+
+.. autofunction::
+    Rgate
+
+.. autofunction::
+    Kgate
+
+.. autofunction::
+    S2gate
+
+.. autofunction::
+    BSgate
+
+.. autofunction::
+    Sgate_one_param
+
+.. autofunction::
+    S2gate_one_param
+
+.. autofunction::
+    BSgate_one_param
 """
 import numpy as np
 
@@ -59,8 +90,8 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r the displacement magnitude
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta the displacement phase
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r, the displacement magnitude
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the displacement phase
         theta (float): displacement phase
     """
     cutoff = gradTr.shape[0]
@@ -106,8 +137,8 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r, the squeezing amplitude
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the squeezing phase
         theta (float): squeezing phase
     """
     cutoff = gradTr.shape[0]
@@ -153,8 +184,8 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
+        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r, the squeezing amplitude
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the squeezing phase
         theta (float): two-mode squeezing phase
     """
     cutoff = gradTr.shape[0]
@@ -205,8 +236,8 @@ def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
 
     Args:
         T (array[complex]): array representing the gate
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta
-        gradTphi (array[complex]): array of zeros that will contain the value of the gradient with respect to phi
+        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the beamsplitter transmissivity angle
+        gradTphi (array[complex]): array of zeros that will contain the value of the gradient with respect to phi, the beamsplitter reflectivity phase
         theta (float): phase angle parametrizing the gate
     """
     cutoff = gradTtheta.shape[0]
