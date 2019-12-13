@@ -100,7 +100,9 @@ def rescale_adjacency_matrix(
         n = np.sum(vals2 / (1.0 - vals2))
         return n
 
-    def grad_mean_photon_number(x, vals):
+
+    # The following function is implicitly tested in test_rescaling_thermal
+    def grad_mean_photon_number(x, vals): # pragma: no cover
         r""" Returns the gradient of the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
         vals are the eigenvalues of A
