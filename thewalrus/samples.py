@@ -260,7 +260,7 @@ def hafnian_sample_state(
     if not pool:
         params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
         return _hafnian_sample(params)
-
+    # pragma: no cover
     pool = Pool()
     nprocs = multiprocessing.cpu_count()
     localsamps = samples // nprocs
@@ -458,7 +458,7 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, pool=False):
     if not pool:
         params = [cov, samples, hbar, max_photons]
         return _torontonian_sample(params)
-
+    # pragma: no cover
     pool = Pool()
     nprocs = multiprocessing.cpu_count()
     localsamps = samples // nprocs
