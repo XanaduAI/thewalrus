@@ -580,7 +580,7 @@ def find_scaling_adjacency_matrix(A, n_mean):
         vals2 = (x * vals) ** 2
         n = np.sum(vals2 / (1.0 - vals2))
         return n
-
+    # The following function is implicitly tested in test_find_scaling_adjacency_matrix
     def grad_mean_photon_number(x, vals): # pragma: no cover
         r""" Returns the gradient od the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
