@@ -97,7 +97,7 @@ complexity of the hafnian, still exponential in the size of the number of partic
 
 Our package has already been used in several research efforts to understand how to generate resource
 states for universal quantum computing [@quesada2019a; @tzitrin2019towards], study the dynamics of vibrational quanta in
-molecules [@quesada2019; @valson2019franck], and develop the applications of GBS to molecular docking [@banchi2019],
+molecules [@quesada2019; @valson2019franck], and develop the applications of GBS [@bromley2019] to molecular docking [@banchi2019],
 graph theory [@schuld2019], and point processes [@jahangiri2019]. More importantly, it has been
 useful in delineating when quantum computation can be simulated by classical computing resources and
 when it cannot [@gupt2018; @quesada2019c; @wu2019speedup; @killoran2019].
