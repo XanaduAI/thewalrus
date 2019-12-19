@@ -1,4 +1,4 @@
-# Version 0.10.0-dev
+# Version 0.11.0-dev
 
 ### New features
 
@@ -10,6 +10,33 @@
 
 This release contains contributions from (in alphabetical order):
 
+# Version 0.10.0
+
+### New features
+* Adds the function `thewalrus.quantum.fock_tensor` that returns the Fock space tensor corresponding to a Symplectic transformation in phase space. [#90](https://github.com/XanaduAI/thewalrus/pull/90)
+
+* Adds the `thewalrus.fock_gradients` module which provides the Fock representation of a set of continuous-variable universal gates in the Fock representation and their gradients. [#96](https://github.com/XanaduAI/thewalrus/pull/96)
+
+### Improvements
+
+* Unifies return values of all symplectic gates in the `thewalrus.symplectic` module. [#81](https://github.com/XanaduAI/thewalrus/pull/81)
+
+* Removes unnecessary citations in the tutorials. [#92](https://github.com/XanaduAI/thewalrus/pull/92)
+
+* Improves the efficiency of the multidimensional Hermite polynomials implementation and simplifies a number of derived functions. [#93](https://github.com/XanaduAI/thewalrus/pull/93)
+
+### Bug fixes
+
+* Fixes a bug in the calculation of the state vector in `thewalrus.quantum.state_vector`. This bug was found and fixed while implementing `thewalrus.quantum.fock_tensor`. [#90](https://github.com/XanaduAI/thewalrus/pull/90)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Josh Izaac, Nicolas Quesada
+
+
+---
 
 # Version 0.9.0
 
