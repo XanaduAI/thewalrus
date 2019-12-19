@@ -131,15 +131,17 @@ Repeated-moment algorithm
 By mapping the calculation of moments of the multinormal distribution to the calculation of the hafnian, Kan :cite:`kan2008moments` derived the following equation for the loop hafnian
 
 .. math::
-	\text{lhaf}\left( \text{vid}(\mathbf{B}_\mathbf{m},\mathbf{u}_\mathbf{m}) \right) = \sum_{\nu_0=0}^{m_0} \ldots \sum_{\nu_{n-1}}^{m_{n-1}} \sum_{r=0}^{[m/2]} (-1)^{\sum_{i=0}^{n-1} \nu_i} {m_0 \choose \nu_0} \ldots {m_{n-1} \choose \nu_{n-1}} \frac{\left( \frac{\mathbf{h}^T \mathbf{A} \ \mathbf{h}}{2} \right)^r \left(\mathbf{h}^T \mathbf{v} \right)}{r! (m-2r)!}
+	\text{lhaf}\left( \text{vid}(\mathbf{B}_\mathbf{m},\mathbf{u}_\mathbf{m}) \right) &= \sum_{\nu_0=0}^{m_0} \ldots \sum_{\nu_{n-1}}^{m_{n-1}} \sum_{r=0}^{[m/2]} (-1)^{\sum_{i=0}^{n-1} \nu_i} {m_0 \choose \nu_0} \ldots {m_{n-1} \choose \nu_{n-1}} \frac{\left( \frac{\mathbf{h}^T \mathbf{B} \ \mathbf{h}}{2} \right)^r \left(\mathbf{h}^T \mathbf{u} \right)^{m-2r}}{r! (m-2r)!} \\
+	\mathbf{h} &= \left(\tfrac{m_{0}}{2}-\nu_0,\ldots,\tfrac{m_{n-1}}{2}-\nu_{n-1} \right)\\
+	m&=m_0+\ldots+m_{n-1}
 
-where we use the notation :math:`\mathbf{m} = (m_{0},\ldots,m_{n-1}),\ m=m_0+\ldots+m_{n-1}`, and used the reduction and vector in diagonal (:math:`\text{vid}`) operations introduced in the  :ref:`notation <notation>` section.
+where we used the reduction and vector in diagonal (:math:`\text{vid}`) operations introduced in the  :ref:`notation <notation>` section.
 
 Note that if we pick :math:`m_i=1 \ \forall i` and :math:`\mathbf{v} = \text{diag}(\mathbf{A})` we recover the loop hafnian of :math:`\mathbf{A}`. In this case, the calculation of the loop hafnian requires :math:`O(n 2^n)` operations, which is quadratically worse than Björklund's algorithms. This formula is however useful when calculating hafnians and loop hafnians of matrices with repeated rows and columns for which column and row :math:`i` are repeated :math:`m_i` times; taking only :math:`O(n A G^n)` operations to calculate the loop hafnian, where
 
 .. math::
-	A &= \frac{1}{n} \sum_{i=0}^{n-1} (s_i+1), \\
- 	G &= \left( \prod_{i=0}^{n-1}(s_i+1) \right)^{1/n}.
+	A &= \frac{1}{n} \sum_{i=0}^{n-1} (m_i+1), \\
+ 	G &= \left( \prod_{i=0}^{n-1}(m_i+1) \right)^{1/n}.
 
 Compare this with Björklund's algorithm, which requires :math:`O\left((A n)^3 \left(\sqrt{2}^{A}\right)^n\right)` operations.
 
