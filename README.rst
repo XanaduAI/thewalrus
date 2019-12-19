@@ -25,6 +25,10 @@ The Walrus
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/thewalrus
 
+.. image:: https://joss.theoj.org/papers/10.21105/joss.01705/status.svg
+	:alt: JOSS - The Journal of Open Source Software
+	:target: https://doi.org/10.21105/joss.01705
+
 A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
 
 Features
@@ -208,13 +212,13 @@ We also encourage bug reports, suggestions for new features and enhancements, an
 Authors
 =======
 
-Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
+Brajesh Gupt, Josh Izaac and Nicolás Quesada.
 
 All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
-If you are doing research using The Walrus, please cite `our paper <https://dl.acm.org/citation.cfm?id=3325111>`_:
+If you are doing research using The Walrus, please cite `our paper <https://joss.theoj.org/papers/10.21105/joss.01705>`_:
 
- Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on a supercomputer, Journal of Experimental Algorithmics (JEA) 24 (1), 11 (2019)
+ Brajesh Gupt, Josh Izaac and Nicolás Quesada. The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. Journal of Open Source Software, 4(44), 1705 (2019)
 
 
 Support
