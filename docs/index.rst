@@ -41,10 +41,9 @@ Authors
 
 Nicolás Quesada, Brajesh Gupt, and Josh Izaac.
 
-If you are doing research using The Walrus, please cite `our paper <https://arxiv.org/abs/1805.12498>`_:
+If you are doing research using The Walrus, please cite `our paper <https://joss.theoj.org/papers/10.21105/joss.01705>`_:
 
-  Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer *arXiv*, 2018. arxiv:1805.12498
-
+ Brajesh Gupt, Josh Izaac and Nicolás Quesada. The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. Journal of Open Source Software, 4(44), 1705 (2019)
 
 License
 =======
