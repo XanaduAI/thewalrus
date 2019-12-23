@@ -20,6 +20,9 @@ This release contains contributions from (in alphabetical order):
 
 Josh Izaac, Nicolas Quesada
 
+
+---
+
 # Version 0.10.0
 
 ### New features
