@@ -474,7 +474,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
     return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
 
 
-def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity=True):
+def state_vector(mu, cov, normalize=False, post_select=None, cutoff=5, hbar=2, check_purity=True, extra_args=None):
     r"""Returns the state vector of a (PNR post-selected) Gaussian state.
 
     The resulting density matrix will have shape
@@ -522,6 +522,11 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
     pref = np.exp(prefexp.conj())
     if post_select is None:
+
+        if extra_args is not None:
+            B = np.diag(extra_args) @ B @ np.diag(extra_args)
+            gamma = extra_args * gamma
+
         psi = np.real_if_close(pref) * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
     else:
         M = N - len(post_select)
@@ -810,17 +815,15 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
     x = 2 * alphat.real
     p = 2 * alphat.imag
     mu = np.concatenate([x, p])
-    tensor = state_vector(mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False)
+    #
+    extra_args = np.concatenate([np.ones([l]), (1.0/np.tanh(choi_r))*np.ones([l])])
+    tensor = state_vector(mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False, extra_args=extra_args)
 
     vals = list(range(l))
     vals2 = list(range(l, 2 * l))
 
-    R = [1.0 / np.prod((np.tanh(choi_r) ** i) / np.cosh(choi_r)) for i in range(cutoff)]
-    tensor_view = tensor.transpose(vals2 + vals)
-    # There is probably a better way to do the following rescaling, but this is already "good"
-    for p in product(list(range(cutoff)), repeat=l):
-        tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
-
+    R = np.cosh(choi_r)**l
+    tensor = R*tensor
     if sf_order:
         sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
         return tensor.transpose(sf_indexing)
