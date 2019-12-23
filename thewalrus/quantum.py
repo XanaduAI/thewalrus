@@ -380,11 +380,15 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
 
         if np.allclose(mu, np.zeros_like(mu)):
-            tensor = np.real_if_close(pref) * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
+            tensor = np.real_if_close(pref) * hermite_multidimensional(
+                -A, cutoff, renorm=True, modified=True
+            )
             return tensor.transpose(sf_order)
         beta = Beta(mu)
         y = beta - A @ beta.conj()
-        tensor = np.real_if_close(pref) * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
+        tensor = np.real_if_close(pref) * hermite_multidimensional(
+            -A, cutoff, y=y, renorm=True, modified=True
+        )
         return tensor.transpose(sf_order)
 
     M = N - len(post_select)
@@ -474,7 +478,9 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
     return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
 
 
-def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity=True):
+def state_vector(
+    mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity=True, **kwargs
+):
     r"""Returns the state vector of a (PNR post-selected) Gaussian state.
 
     The resulting density matrix will have shape
@@ -502,6 +508,11 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
         check_purity (bool): if ``True``, the purity of the Gaussian state is checked
             before calculating the state vector.
 
+    Keyword Args:
+        choi_r (float or None): Value of the two-mode squeezing parameter used in Choi-Jamiolkoski
+            trick in :func:`~.fock_tensor`. This keyword argument should only be used when ``state_vector``
+            is called by :func:`~.fock_tensor`.
+
     Returns:
         np.array[complex]: the state vector of the Gaussian state
     """
@@ -522,7 +533,22 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
     prefexp = -0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha)
     pref = np.exp(prefexp.conj())
     if post_select is None:
-        psi = np.real_if_close(pref) * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / np.sqrt(np.sqrt(np.linalg.det(Q).real))
+        choi_r = kwargs.get("choi_r", None)
+        if choi_r is None:
+            denom = np.sqrt(np.sqrt(np.linalg.det(Q).real))
+        else:
+            rescaling = np.concatenate(
+                [np.ones([N // 2]), (1.0 / np.tanh(choi_r)) * np.ones([N // 2])]
+            )
+            B = np.diag(rescaling) @ B @ np.diag(rescaling)
+            gamma = rescaling * gamma
+            denom = np.sqrt(np.sqrt(np.linalg.det(Q / np.cosh(choi_r)).real))
+
+        psi = (
+            np.real_if_close(pref)
+            * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True)
+            / denom
+        )
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
@@ -533,7 +559,9 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
             counter = count(0)
             modes = (np.arange(N)).tolist()
             el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
-            psi[idx] = pure_state_amplitude(mu, cov, el, check_purity=False, include_prefactor=False)
+            psi[idx] = pure_state_amplitude(
+                mu, cov, el, check_purity=False, include_prefactor=False
+            )
 
         psi = psi * pref
 
@@ -581,9 +609,8 @@ def find_scaling_adjacency_matrix(A, n_mean):
         n = np.sum(vals2 / (1.0 - vals2))
         return n
 
-
     # The following function is implicitly tested in test_find_scaling_adjacency_matrix
-    def grad_mean_photon_number(x, vals): # pragma: no cover
+    def grad_mean_photon_number(x, vals):  # pragma: no cover
         r""" Returns the gradient od the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
         vals are the singular values of A
@@ -810,16 +837,10 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
     x = 2 * alphat.real
     p = 2 * alphat.imag
     mu = np.concatenate([x, p])
-    tensor = state_vector(mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False)
 
-    vals = list(range(l))
-    vals2 = list(range(l, 2 * l))
-
-    R = [1.0 / np.prod((np.tanh(choi_r) ** i) / np.cosh(choi_r)) for i in range(cutoff)]
-    tensor_view = tensor.transpose(vals2 + vals)
-    # There is probably a better way to do the following rescaling, but this is already "good"
-    for p in product(list(range(cutoff)), repeat=l):
-        tensor_view[p] = tensor_view[p] * np.prod([R[i] for i in p])
+    tensor = state_vector(
+        mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False, choi_r=choi_r
+    )
 
     if sf_order:
         sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))

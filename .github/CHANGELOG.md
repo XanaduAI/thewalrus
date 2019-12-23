@@ -1,3 +1,28 @@
+# Version 0.11.0-dev
+
+### New features
+
+### Improvements
+
+* Updates the reference that should be used when citing The Walrus. [#102](https://github.com/XanaduAI/thewalrus/pull/102)
+
+* Updates and improves the speed and accuracy of `thewalrus.quantum.fock_tensor`. [#107](https://github.com/XanaduAI/thewalrus/pull/107)
+
+### Bug fixes
+
+* Corrects typos in describing the repeated-moment algorithm of Kan in the documentation. [#104](https://github.com/XanaduAI/thewalrus/pull/104)
+
+* Removes paper.{md,pdf,bib} from the repository now that The Walrus paper is published in Journal of Open Source Software [#106](https://github.com/XanaduAI/thewalrus/pull/106)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Josh Izaac, Nicolas Quesada
+
+
+---
+
 # Version 0.10.0
 
 ### New features
