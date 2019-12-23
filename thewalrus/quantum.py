@@ -501,6 +501,9 @@ def state_vector(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, c
             relation :math:`[\x,\p]=i\hbar`.
         check_purity (bool): if ``True``, the purity of the Gaussian state is checked
             before calculating the state vector.
+        choi_r (float or None): Value of the two-mode squeezing parameter used in Choi-Jamiolkoski
+            trick in `fock_tensor`. This variable is only used when `state_vector` is called
+            by `fock_tensor`.
 
     Returns:
         np.array[complex]: the state vector of the Gaussian state
@@ -820,11 +823,6 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
 
     tensor = state_vector(mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False, choi_r=choi_r)
 
-    # vals = list(range(l))
-    # vals2 = list(range(l, 2 * l))
-
-    # R = np.cosh(choi_r)**l
-    # tensor = R*tensor
     if sf_order:
         sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
         return tensor.transpose(sf_indexing)
