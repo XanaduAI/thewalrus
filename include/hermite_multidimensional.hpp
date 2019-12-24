@@ -292,7 +292,7 @@ inline std::vector<T> quantum_hermite_multidimensional_cpp(std::vector<T> &R_mat
 
         ullint nextCoordinate = vec2index(nextPos, resolution);
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
-        double mkp1 = (static_cast<double>(nextPos[k]+1));
+        double mkp1 = (static_cast<double>(nextPos[k]-1));
 
         H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/std::sqrt(mkp1);
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
