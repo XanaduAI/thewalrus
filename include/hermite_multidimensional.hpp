@@ -204,7 +204,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
 
-	H[nextCoordinate] = H[nextCoordinate] + y(k, 0);
+	    H[nextCoordinate] = H[nextCoordinate] + y(k, 0);
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);
@@ -226,6 +226,91 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         H = renormalization(H, dim, resolution);
     }
 
+    return H;
+
+}
+
+
+
+
+
+
+
+template <typename T>
+inline std::vector<T> quantum_hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
+    int dim = std::sqrt(static_cast<double>(R_mat.size()));
+
+    namespace eg = Eigen;
+
+    eg::Matrix<T, eg::Dynamic, eg::Dynamic> R = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(R_mat.data(), dim, dim);
+    eg::Matrix<T, eg::Dynamic, eg::Dynamic> y = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(y_mat.data(), dim, dim);
+
+    ullint Hdim = pow(resolution, dim);
+    std::vector<T> H(Hdim, 0);
+    std::vector<double> ren_factor(Hdim, 0);
+
+    H[0] = 1;
+    ren_factor[0] = 1;
+
+    std::vector<int> nextPos(dim, 1);
+    std::vector<int> jumpFrom(dim, 1);
+    std::vector<int> ek(dim, 0);
+    std::vector<double> factors(resolution+1, 0);
+    int jump = 0;
+
+    for (ullint jj = 0; jj < Hdim-1; jj++) {
+
+        if (jump > 0) {
+            jumpFrom[jump] += 1;
+            jump = 0;
+        }
+
+
+        for (int ii = 0; ii < dim; ii++) {
+            std::vector<int> forwardStep(dim, 0);
+            forwardStep[ii] = 1;
+
+            if ( forwardStep[ii] + nextPos[ii] > resolution) {
+                nextPos[ii] = 1;
+                jumpFrom[ii] = 1;
+                jump = ii+1;
+            }
+            else {
+                jumpFrom[ii] = nextPos[ii];
+                nextPos[ii] = nextPos[ii] + 1;
+                break;
+            }
+        }
+
+        for (int ii = 0; ii < dim; ii++)
+            ek[ii] = nextPos[ii] - jumpFrom[ii];
+
+        int k = 0;
+        for(; k < static_cast<int>(ek.size()); k++) {
+            if(ek[k]) break;
+        }
+
+        ullint nextCoordinate = vec2index(nextPos, resolution);
+        ullint fromCoordinate = vec2index(jumpFrom, resolution);
+        mkp1 = (static_cast<T>(nextPos[k]+1));
+
+        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/std::sqrt(mkp1);
+        H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
+
+        std::vector<int> tmpjump(dim, 0);
+
+        for (int ii = 0; ii < dim; ii++) {
+            if (jumpFrom[ii] > 1) {
+                std::vector<int> prevJump(dim, 0);
+                prevJump[ii] = 1;
+                std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
+                ullint prevCoordinate = vec2index(tmpjump, resolution);
+                H[nextCoordinate] = H[nextCoordinate] - std::sqrt((static_cast<T>(jumpFrom[ii]-1))/mkp1)*static_cast<T>(R(k,ii))*H[prevCoordinate];
+
+            }
+        }
+
+    }
     return H;
 
 }
