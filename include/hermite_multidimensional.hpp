@@ -158,7 +158,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
     std::vector<double> ren_factor(Hdim, 0);
-
+    std::vector<double> intsqrt(Hdim, 0);
     H[0] = 1;
     ren_factor[0] = 1;
 
