@@ -1001,6 +1001,10 @@ table.indextable tr.cap {
   background-color: #f2f2f2;
 }
 
+table.docutils colgroup {
+    display: none;
+}
+
 img.toggler {
   margin-right: 3px;
   margin-top: 3px;
@@ -1951,6 +1955,10 @@ footer.page-footer .footer-copyright {
     border-right: 1px #ddd solid;
     width: 260px;
   }
+
+  .sidebar-toc {
+    width: 260px;
+  }
 }
 
 /* Sphinx gallery
@@ -2026,8 +2034,17 @@ footer.page-footer .footer-copyright {
   box-shadow: -1px 14px 30px -20px rgba(0,0,0,0.61);
 }
 
+.navbar li.dropdown {
+  width: 250px;
+  list-style-type: none;
+}
+
+.navbar li:hover > .dropdown-menu {
+  display: block;
+}
+
 .navbar-brand {
-  padding-bottom: 0px;
+  padding: 0px;
 }
 
 .navbar-nav {

@@ -323,7 +323,7 @@ html_theme_options = {
 }
 
 edit_on_github_project = 'XanaduAI/thewalrus'
-edit_on_github_branch = 'master/doc'
+edit_on_github_branch = 'master/docs'
 
 from custom_directives import CustomGalleryItemDirective
 
