@@ -324,7 +324,7 @@ html_theme_options = {
 edit_on_github_project = 'XanaduAI/thewalrus'
 edit_on_github_branch = 'master/doc'
 
-from custom_directives import IncludeDirective, GalleryItemDirective, CustomGalleryItemDirective
+from custom_directives import CustomGalleryItemDirective
 
 def setup(app):
     app.add_directive('customgalleryitem', CustomGalleryItemDirective)
