@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Gradients of Gaussian gates in the Fock representation
-======================================================
+Fock gradients of Gaussian gates
+================================
 
 .. currentmodule:: thewalrus.fock_gradients
 
-This module contains the Fock representation of the standard Gaussian gates and the Kerr gate, as well as their gradients.
+This module contains the Fock representation of the standard Gaussian gates and
+the Kerr gate, as well as their gradients.
 
-Most functions have an optional parameter called `choi_r` which can be used to set the value of the two-mode squeezed
-states used in the Choi-Jamiolkowski expansion of a given Gaussian gate. For details on this see the documentation of
+Most functions have an optional parameter called ``choi_r`` which can be used to
+set the value of the two-mode squeezed states used in the Choi-Jamiolkowski
+expansion of a given Gaussian gate. For details on this see the documentation of
 :mod:`thewalrus.quantum`.
 
-
-Continous-variable gates
-------------------------
-
 .. autosummary::
-    Xgate
-    Zgate
+    :toctree: api
+
+    Xgate_one_param
+    Zgate_one_param
     Dgate
     Sgate
     Rgate
@@ -40,41 +40,6 @@ Continous-variable gates
     S2gate_one_param
     BSgate_one_param
 
-Details
-^^^^^^^
-
-.. autofunction::
-    Xgate
-
-.. autofunction::
-    Zgate
-
-.. autofunction::
-    Dgate
-
-.. autofunction::
-    Sgate
-
-.. autofunction::
-    Rgate
-
-.. autofunction::
-    Kgate
-
-.. autofunction::
-    S2gate
-
-.. autofunction::
-    BSgate
-
-.. autofunction::
-    Sgate_one_param
-
-.. autofunction::
-    S2gate_one_param
-
-.. autofunction::
-    BSgate_one_param
 """
 import numpy as np
 
@@ -107,7 +72,7 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 def Dgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Dgate and its gradient.
 
-    Arg:
+    Args:
         r (float): displacement magnitude
         theta (float): displacement phase
         cutoff (int): Fock ladder cutoff
@@ -155,7 +120,7 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 def Sgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Sgate and its gradient.
 
-    Arg:
+    Args:
         r (float): squeezing magnitude
         theta (float): squeezing phase
         cutoff (int): Fock ladder cutoff
@@ -208,7 +173,7 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 def S2gate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the S2gate and its gradient.
 
-    Arg:
+    Args:
         r (float): two-mode squeezing magnitude
         theta (float): two-mode squeezing phase
         cutoff (int): Fock ladder cutoff
@@ -260,8 +225,8 @@ def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
 def BSgate(theta, phi, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     r"""Calculates the Fock representation of the S2gate and its gradient.
 
-    Arg:
-        theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=cos(theta)`
+    Args:
+        theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=\cos(\theta)`
         phi (float): reflection phase of the beamsplitter
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -302,7 +267,7 @@ def grad_Xgate_one_param(T, gradT, pref):  # pragma: no cover
 def Xgate_one_param(x, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Xgate and its gradient.
 
-    Arg:
+    Args:
         x (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -346,7 +311,7 @@ def grad_Zgate_one_param(T, gradT, pref):  # pragma: no cover
 def Zgate_one_param(p, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Zgate and its gradient.
 
-    Arg:
+    Args:
         p (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -390,7 +355,7 @@ def grad_Sgate_one_param(T, gradT):  # pragma: no cover
 def Sgate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the Sgate and its gradient.
 
-    Arg:
+    Args:
         s (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -413,7 +378,7 @@ def Sgate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
 def Rgate(theta, cutoff, grad=False):
     """Calculates the Fock representation of the Rgate and its gradient.
 
-    Arg:
+    Args:
         theta (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -431,7 +396,7 @@ def Rgate(theta, cutoff, grad=False):
 def Kgate(theta, cutoff, grad=False):
     """Calculates the Fock representation of the Kgate and its gradient.
 
-    Arg:
+    Args:
         theta (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -468,7 +433,7 @@ def grad_S2gate_one_param(T, gradT):  # pragma: no cover
 def S2gate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the S2gate and its gradient.
 
-    Arg:
+    Args:
         s (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
@@ -511,7 +476,7 @@ def grad_BSgate_one_param(T, gradT):  # pragma: no cover
 def BSgate_one_param(theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """Calculates the Fock representation of the BSgate and its gradient.
 
-    Arg:
+    Args:
         theta (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not

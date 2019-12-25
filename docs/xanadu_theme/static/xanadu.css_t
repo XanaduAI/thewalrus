@@ -1001,6 +1001,10 @@ table.indextable tr.cap {
   background-color: #f2f2f2;
 }
 
+table.docutils col {
+    width: auto;
+}
+
 table.docutils colgroup {
     display: none;
 }

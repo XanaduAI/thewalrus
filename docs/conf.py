@@ -43,7 +43,9 @@ MOCK_MODULES = [
     'scipy.optimize',
     'scipy.stats',
     'cython',
-    'thewalrus.libwalrus'
+    'thewalrus.libwalrus',
+    'numba',
+    'numba.jit'
     ]
 
 mock = Mock()
@@ -75,6 +77,9 @@ extensions = [
     'exhale',
     'sphinx_copybutton'
 ]
+
+autosummary_generate = True
+autosummary_imported_members = False
 
 # Setup the breathe extension
 breathe_projects = {
