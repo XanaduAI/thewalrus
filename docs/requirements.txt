@@ -1,5 +1,5 @@
 sphinxcontrib-bibtex
-sphinx>=1.4
+sphinx==2.2.2
 ipykernel
 nbsphinx
 cython>=0.20
@@ -7,3 +7,4 @@ numpy>=1.9
 breathe==4.12.0
 exhale
 version_information
+sphinx-copybutton

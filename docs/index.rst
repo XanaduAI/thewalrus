@@ -1,10 +1,90 @@
-The Walrus
-##########
+The Walrus Documentation
+########################
+
+.. rst-class:: lead grey-text ml-2
 
 :Release: |release|
-:Date: |today|
 
-A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling.
+.. raw:: html
+
+    <style>
+        #right-column.card {
+            box-shadow: none!important;
+        }
+        #right-column.card:hover {
+            box-shadow: none!important;
+        }
+        .breadcrumb {
+            display: none;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .footer-relations {
+            border-top: 0px;
+        }
+    </style>
+    <div class="row container-fluid">
+      <!--<div class="col-lg-4 col-12 align-middle mb-2 text-center">
+          <img src="_static/laptop.png" class="img-fluid" alt="Responsive image" style="width:100%; max-width: 300px;"></img>
+      </div>-->
+      <div class="col-lg-12 col-12 align-middle mb-2">
+        <p class="lead grey-text">
+            A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling.
+        </p>
+      </div>
+    </div>
+    <div style='clear:both'></div>
+    <div class="container mt-2 mb-2">
+        <div class="row mt-3">
+            <div class="col-lg-4 mb-2 adlign-items-stretch">
+                <a href="quick_guide.html">
+                    <div class="card rounded-lg" style="height:100%;">
+                        <div class="d-flex">
+                            <div>
+                                <h3 class="card-title pl-3 mt-4">
+                                Using The Walrus
+                                </h3>
+                                <p class="mb-3 grey-text px-3">
+                                    See the quick guide for an overview of available functions in The Walrus <i class="fas fa-angle-double-right"></i>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-4 mb-2 align-items-stretch">
+                <a href="hafnian.html">
+                <div class="card rounded-lg" style="height:100%;">
+                    <div class="d-flex">
+                        <div>
+                            <h3 class="card-title pl-3 mt-4">
+                            Background
+                            </h3>
+                            <p class="mb-3 grey-text px-3">Learn about the hafnian, loop hafnian, and its relationship to quantum photonics <i class="fas fa-angle-double-right"></i></p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            </div>
+            <div class="col-lg-4 mb-2 align-items-stretch">
+                <a href="code.html">
+                <div class="card rounded-lg" style="height:100%;">
+                    <div class="d-flex">
+                        <div>
+                            <h3 class="card-title pl-3 mt-4">
+                            API
+                            </h3>
+                            <p class="mb-3 grey-text px-3">Explore The Walrus Python and C++ APIs <i class="fas fa-angle-double-right"></i></p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            </div>
+        </div>
+    </div>
+
 
 Features
 ========
@@ -102,18 +182,4 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    code/symplectic
    code/fock_gradients
    code/reference
-
-.. toctree::
-   :maxdepth: 2
-   :caption: libwalrus
-   :hidden:
-
    code/libwalrus
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

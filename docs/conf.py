@@ -21,6 +21,7 @@ from unittest.mock import MagicMock
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('_ext'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath('.')), 'docs'))
 
 #-------------------------------------------------------------------------
 # Mock out all modules that aren't required for compiling of documentation
@@ -42,7 +43,9 @@ MOCK_MODULES = [
     'scipy.optimize',
     'scipy.stats',
     'cython',
-    'thewalrus.libwalrus'
+    'thewalrus.libwalrus',
+    'numba',
+    'numba.jit'
     ]
 
 mock = Mock()
@@ -71,8 +74,12 @@ extensions = [
     'edit_on_github',
     'nbsphinx',
     'breathe',
-    'exhale'
+    'exhale',
+    'sphinx_copybutton'
 ]
+
+autosummary_generate = True
+autosummary_imported_members = False
 
 # Setup the breathe extension
 breathe_projects = {
@@ -97,6 +104,9 @@ exhale_args = {
     "exhaleDoxygenStdin":    "INPUT = ../include/stdafx.h ../include/libwalrus.hpp ../include/version.hpp ../include/eigenvalue_hafnian.hpp ../include/hafnian_approx.hpp ../include/recursive_hafnian.hpp ../include/repeated_hafnian.hpp  ../include/torontonian.hpp ../include/permanent.hpp ../include/hermite_multidimensional.hpp",
     # "exhaleUseDoxyfile": True
 }
+
+mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"
+nbsphinx_requirejs_path = ""
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates', 'xanadu_theme']
@@ -198,7 +208,7 @@ todo_include_todos = True
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+html_favicon = "_static/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -297,32 +307,31 @@ html_theme_path = ['.']
 
 # xanadu theme options (see theme.conf for more information)
 html_theme_options = {
-
     # Set the path to a special layout to include for the homepage
-    # "index_template": "special_index.html",
+    # "homepage": "special_index.html",
 
     # Set the name of the project to appear in the left sidebar.
     "project_nav_name": "The Walrus",
+    "touch_icon": "_static/logo_new.png",
 
-    # Set your Disqus short name to enable comments
-    # "disqus_comments_shortname": "my_disqus_comments_short_name",
+    # Set GA account ID to enable tracking
+    "google_analytics_account": "UA-116279123-2",
 
-    # Set you GA account ID to enable tracking
-    # "google_analytics_account": "UA-112607589-1",
-
-    # Path to a touch icon
-    "touch_icon": "logo_new.png",
-
-    # Specify a base_url used to generate sitemap.xml links. If not
-    # specified, then no sitemap will be built.
-    # "base_url": ""
-
-    # Allow a separate homepage from the master_doc
-    # "homepage": "index",
-
-    # Allow the project link to be overriden to a custom URL.
-    # "projectlink": "http://myproject.url",
+    # colors
+    "navigation_button": "#3a8ab1",
+    "navigation_button_hover": "#2b5071",
+    "toc_caption": "#2C96CC",
+    "toc_hover": "#2C96CC",
+    "table_header_bg": "#ffdce5",
+    "table_header_border": "#2C96CC",
+    "download_button": "#2C96CC",
 }
 
 edit_on_github_project = 'XanaduAI/thewalrus'
-edit_on_github_branch = 'master/doc'
+edit_on_github_branch = 'master/docs'
+
+from custom_directives import CustomGalleryItemDirective
+
+def setup(app):
+    app.add_directive('customgalleryitem', CustomGalleryItemDirective)
+    app.add_stylesheet('xanadu_gallery.css')

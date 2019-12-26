@@ -12,54 +12,49 @@ The original idea of using general Gaussian states and photon-number-resolved me
 If you develop a new circuit and measurement scheme to prepare a non-Gaussian state, add it to the gallery!
 
 
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    fock
+    kitten
+    cubic
+    photon_added
+    cat
+    four_cat
+
 .. Copy the template below in order to create a link to your notebook, and a thumbnail.
 
-.. _Fock: fock.html
-.. |fock| image:: fock.svg
-   :width: 260px
-   :align: middle
-   :target: fock.html
+.. customgalleryitem::
+    :tooltip: Fock states
+    :description: :doc:`Fock states <fock>`
+    :figure: gallery/fock.png
 
-.. _Kitten: kitten.html
-.. |kitten| image:: kitten.svg
-   :width: 260px
-   :align: middle
-   :target: kitten.html
+.. customgalleryitem::
+    :tooltip: Kitten states
+    :description: :doc:`Kitten states <kitten>`
+    :figure: gallery/kitten.png
 
-.. _Cubic: cubic.html
-.. |cubic| image:: cubic.svg
-   :width: 260px
-   :align: middle
-   :target: cubic.html
+.. customgalleryitem::
+    :tooltip: Cubic phase states
+    :description: :doc:`Cubic phase states <cubic>`
+    :figure: gallery/cubic.png
 
-.. _Added: photon_added.html
-.. |photon_added| image:: photon_added.svg
-   :width: 260px
-   :align: middle
-   :target: photon_added.html
+.. customgalleryitem::
+    :tooltip: Photon added states
+    :description: :doc:`Photon added states <photon_added>`
+    :figure: gallery/photon_added.png
 
-.. _Cat: cat.html
-.. |cat| image:: cat.svg
-   :width: 260px
-   :align: middle
-   :target: cat.html
+.. customgalleryitem::
+    :tooltip: Cat states
+    :description: :doc:`Cat states <cat>`
+    :figure: gallery/cat.png
 
-.. _FourCat: fourcat.html
-.. |four_cat| image:: four_cat.svg
-   :width: 260px
-   :align: middle
-   :target: four_cat.html
+.. customgalleryitem::
+    :tooltip: Four-headed cat states
+    :description: :doc:`Four-headed cat states <four_cat>`
+    :figure: gallery/four_cat.png
 
-.. rst-class:: gallery-table
+.. raw:: html
 
-
-
-+-------------------------------+-------------------------------+------------------------------+
-| |fock|                        | |kitten|                      | |cubic|                      |
-|                               |                               |                              |
-| Fock states                   | Kitten states                 | Cubic phase states           |
-+-------------------------------+-------------------------------+------------------------------+
-| |photon_added|                | |cat|                         | |four_cat|                   |
-|                               |                               |                              |
-| Photon added states           | Cat states                    | Four-headed cat states       |
-+-------------------------------+-------------------------------+------------------------------+
+        <div style='clear:both'></div>

@@ -16,7 +16,7 @@ The exact calculation of the number of perfect matchings  (and the hafnian) for 
 Finally, Björklund :cite:`bjorklund2012counting` :cite:`bjorklund2018faster` and later Cygan and Pilipczuk :cite:`cygan2015faster` provided :math:`O(\text{poly}(n) 2^{n/2})` time and polynomial space algorithms for the calculation of the general ring hafnian. These algorithms are believed to be close to optimal unless there are surprisingly efficient algorithms for the Permanent. This is because these two algorithms can also be used to count (up to polynomial corrections) the number of perfect matchings for bipartite graphs with the same exponential growth as Ryser's algorithm for the permanent :cite:`ryser1963combinatorial`. Equivalently, if one could construct an algorithm that calculates hafnians in time :math:`O(\alpha^{n/2})` with :math:`\alpha<2` one could calculate permanents *faster* than Ryser's algorithm (which is the fastest known algorithm to calculate the permanent :cite:`rempala2007symmetric`). This is because of the identity
 
 .. math::
-	\haf \left( \left[
+	haf \left( \left[
 	\begin{array}{cc}
 	0 & \mathbf{W} \\
 	\mathbf{W}^T & 0 \\

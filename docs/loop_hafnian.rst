@@ -50,7 +50,9 @@ Once we allow for loops we have more options for making perfect matchings. For e
 As was done before for the hafnian we introduce the set of single pair matchings :math:`\text{SPM}(n)` as the set of perfect matchings of a graph of size :math:`n`with loops :cite:`bjorklund2018faster`. For :math:`n=4` we have
 
 .. math::
-	\text{SPM}(4) = \big\{ (0,1)(2,3),\ (0,2)(1,3),\ (0,3),(1,2),\ (0,0)(1,1)(2,3), \ (0,1)(2,2)(3,3),\ (0,0)(2,2)(1,3),\ (0,2)(1,1)(3,3),\ (0,0)(3,3)(1,2),\ (0,3)(1,1)(2,2),\ (0,0)(1,1)(2,2)(3,3)\big\}
+
+  \text{SPM}(4) = \big\{ (0,1)(2,3),\ (0,2)(1,3),\ (0,3),(1,2),\ (0,0)(1,1)(2,3), \ (0,1)(2,2)(3,3),\\
+  (0,0)(2,2)(1,3),\ (0,2)(1,1)(3,3),\ (0,0)(3,3)(1,2),\ (0,3)(1,1)(2,2),\ (0,0)(1,1)(2,2)(3,3)\big\}
 
 
 For a graph with 4 vertices they are

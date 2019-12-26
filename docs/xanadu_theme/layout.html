@@ -2,20 +2,23 @@
 
 {# Do this so that bootstrap is included before the main css file #}
 {%- block htmltitle %}
-  {% set script_files = script_files + ["_static/myscript.js"] %}
-  <!-- Licensed under the Apache 2.0 License -->
-  <link rel="stylesheet" type="text/css" href="{{ pathto('_static/fonts/open-sans/stylesheet.css', 1) }}" />
-  <!-- Licensed under the SIL Open Font License -->
-  <link rel="stylesheet" type="text/css" href="{{ pathto('_static/fonts/source-serif-pro/source-serif-pro.css', 1) }}" />
-  <link href="https://fonts.googleapis.com/css?family=Noto+Serif" rel="stylesheet"> 
-  <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/bootstrap.min.css', 1) }}" />
-  <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/bootstrap-theme.min.css', 1) }}" />
+  <link href="https://fonts.googleapis.com/css?family=Noto+Serif" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Material Design Bootstrap -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.14/css/mdb.min.css" rel="stylesheet">
+
+  <!-- nanoscroller -->
   <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/nanoscroller.css', 1) }}" />
-  <script defer src="https://use.fontawesome.com/releases/v5.0.2/js/all.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="text/x-mathjax-config">
      MathJax.Hub.Config({
-       "HTML-CSS": { scale: 90, linebreaks: { automatic: true } }, 
+       "HTML-CSS": { scale: 90, linebreaks: { automatic: true } },
        TeX: {
          Macros: {
            pr : ['|\#1\\rangle\\langle\#1|',1],
@@ -34,11 +37,9 @@
            di: ['\\frac{d}{d \#1}',1],
            uu: ['\\mathcal{U}',0],
            inn: ['\\text{in}',0],
-           haf: ['\\text{haf}',0],
-           lhaf: ['\\text{lhaf}',0],
            out: ['\\text{out}',0],
            vac: ['\\text{vac}',0],
-           I: ['I',0],
+           I: ['\\hat{\\mathbf{1}}',0],
            x: ['\\hat{x}',0],
            p: ['\\hat{p}',0],
            a: ['\\hat{a}',0],
@@ -57,12 +58,22 @@
            avg: ['\\left< \#1 \\right>',1],
            slashed: ['\\cancel{\#1}',1],
            bold: ['\\boldsymbol{\#1}',1],
-           d: ['\\mathrm d',0]
+           d: ['\\mathrm d',0],
+           expect: ["\\langle #1 \\rangle",1],
+           pde: ["\\frac{\\partial}{\\partial \#1}",1],
+           R: ["\\mathbb{R}",0],
+           C: ["\\mathbb{C}",0],
+           Ad: ["\\text{Ad}",0],
+           Var: ["\\text{Var}",0],
+           bx: ["\\mathbf{x}", 0],
+           bm: ["\\boldsymbol{\#1}",1],
+           haf: ["\\mathrm{haf}",0],
+           lhaf: ["\\mathrm{lhaf}",0]
          }
        }
      });
      </script>
-  
+
   {%- block ga %}
     {%- if theme_google_analytics_account %}
       <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -78,13 +89,6 @@
   {%- endblock %}
   {{ super() }}
 {%- endblock %}
-
-{%- block extrahead %}
-  {% if theme_touch_icon %}
-  <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" />
-  {% endif %}
-  {{ super() }}
-{% endblock %}
 
 {# Displays the URL for the homepage if it's set or the master_doc if it is not #}
 {% macro homepage() -%}
@@ -153,7 +157,6 @@
         {%- include sidebartemplate %}
         {%- endfor %}
       {% else %}
-        {% include "logo-text.html" %}
         {% include "searchbox.html" %}
         {% include "globaltoc.html" %}
       {%- endif %}
@@ -161,17 +164,16 @@
   </div>
 {%- endmacro %}
 
+{%- block header -%}
+  {% include "header.html" %}
+{%- endblock %}
+
 {%- block content %}
 
   {%- if pagename == 'index' and theme_index_template %}
     {% include theme_index_template %}
   {%- else %}
     <div class="container-wrapper">
-
-      <div id="mobile-toggle">
-        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
-      </div>
-
       {%- block sidebar1 %}{{ guzzle_sidebar() }}{% endblock %}
 
       {%- block document_wrapper %}
@@ -195,31 +197,41 @@
                       </a>
                     </li>
                   {%- endif %}
-                  <li style="float: right;" class="showsource">
-                    <a href="{{ pathto('_sources/' + sourcename, true)|e }}" class="reference-external" rel="nofollow">
-                      {{ _('Show Source') }}
-                    </a>
-                  </li>
                 {%- endif %}
               </ol>
             </div>
             {% endblock %}
             <div class="document clearer body">
+
               {% block body %} {% endblock %}
+              <div id="bottom-dl" class="xanadu-call-to-action-links">
+                <div id="tutorial-type">{{ pagename }}</div>
+                <div class="download-python-link">
+                  <i class="fab fa-python"></i>&nbsp;
+                  <div class="call-to-action-desktop-view">Download Python script</div>
+                </div>
+                <div class="download-notebook-link">
+                  <i class="fas fa-download"></i>&nbsp;
+                  <div class="call-to-action-desktop-view">Download Notebook</div>
+                </div>
+                <div class="github-view-link">
+                  <i class="fab fa-github"></i>&nbsp;
+                  <div class="call-to-action-desktop-view">View on GitHub</div>
+                </div>
+              </div>
+
             </div>
             {%- block bottom_rel_links %}
               {{ render_relations() }}
             {%- endblock %}
           </div>
           {%- block comments -%}
-            {% if theme_disqus_comments_shortname %}
-            <div class="container comment-container">
-              {% include "comments.html" %}
-            </div>
-            {% endif %}
+            {% include "localtoc.html" %}
           {%- endblock %}
+
           <div class="clearfix"></div>
         </div>
+
         {%- endblock %}
       {%- endblock %}
 
@@ -230,57 +242,91 @@
 
 {%- block footer %}
 <script type="text/javascript">
-  $("#mobile-toggle a").click(function () {
-    $("#left-column").toggle();
+  $("#mobile-toggle").click(function () {
+    $("#left-column").slideToggle("slow");
   });
 </script>
-<script type="text/javascript" src="{{ pathto('_static/js/bootstrap.js', 1)}}"></script>
+
+<!-- JQuery -->
+<script src="https://code.jquery.com/jquery-migrate-1.0.0.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js'></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/js/mdb.min.js"></script>
+
 <script type="text/javascript" src="{{ pathto('_static/js/nanoscroller.min.js', 1) }}"></script>
 <script type="text/javascript">
+    $('a.reference.internal').each(function(){
+      var link = $(this).attr("href");
+
+      var hash = link.split('#')[1];
+      var page = link.split('#')[0].split('/').slice(-1)[0].replace(".html", "");
+
+      if (hash == page) {
+        $(this).attr('href', link.split('#')[0]);
+      }
+    });
+
+    $(".document > .section").removeClass("section");
+    $(".comment-container .nano-content").css("height", $("#content").height());
+    $(".comment-container").css("height", $("#content").height());
     $(".nano").nanoScroller();
 </script>
 <script type="text/javascript">
+    $(window).scroll(function(){
+      var scrollBottom = $(document).height() - $(window).height() - $(window).scrollTop();
+      if (scrollBottom < 342) {
+        $('.comment-container').css("height", "calc(100% - " + (342 - scrollBottom) + "px)");
+        $('.comment-container .nano-content').css("height", "calc(100% - 119px)");
+      }
+    });
+</script>
+ <script type="text/javascript">
     if ($('.current').length) {
         var target = $('.current')[0]
         var rect = target.getBoundingClientRect();
         if (rect.bottom > window.innerHeight) {
-            $('.text-logo').addClass('active');
-            $('.logo').removeClass('active');
-            $('.logo-small').addClass('active');
             $(".nano").nanoScroller({ scrollTo: $('.current') });
         } else {
-            $('.text-logo').addClass('active');
-            $('.logo').removeClass('active');
-            $('.logo-small').addClass('active');
-            $(".nano").nanoScroller({ scrollTop: 93 });
+            $(".nano").nanoScroller({ scrollTop: 0 });
         }
     }
-    if ($('#search-documentation').length) {} else {
-        $(".nano").on("update", function(event, values){
-            $('.text-logo').toggleClass('active', $('.sphinxsidebar').scrollTop() > 0);
-            var act = $('.text-logo').hasClass('active');
-            if(act){
-                $('.logo').removeClass('active');
-                $('.logo-small').addClass('active');
-            }
-        });
-    }
-    $(".nano").bind("scrolltop", function(e){
-        $('.logo-small').removeClass('active');
-        $('.logo').addClass('active');
-    });
     $(document).ready(function () {
         $(".css-transitions-only-after-page-load").each(function (index, element) {
             setTimeout(function () { $(element).removeClass("css-transitions-only-after-page-load") }, 10);
         });
+        if (window.location.hash) {
+           var target = $("[id='"+window.location.hash.substr(1)+"']");
+           if (target.closest(".collapse").length) {
+              target.closest(".collapse").addClass("show");
+              target.closest(".collapse").prev().find(".rotate").addClass("up");
+           }
+        }
     });
 </script>
-{%- block footer_wrapper %}
-  <div class="footer">
-     Brajesh Gupt, Josh Izaac and Nicolás Quesada. <br>
-     The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. <br>
-     Journal of Open Source Software, 4(44), 1705 (2019) <br>
-    {{ copyright }} Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
-  </div>
-{%- endblock %}
+
+    <script type="text/javascript">
+    var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+    if (downloadNote.length >= 1) {
+      var tutorialUrlArray = $("#tutorial-type").text().split('/');
+      tutorialUrlArray[0] = "examples";
+
+      var githubLink = "https://github.com/" + "{{ theme_github_repo }}" + "/blob/master/" + tutorialUrlArray.join("/") + ".py",
+          pythonLink = $(".reference.download")[0].href,
+          notebookLink = $(".reference.download")[1].href,
+          notebookDownloadPath = notebookLink.split('_downloads')[1].split('/').pop();
+
+      $(".download-python-link").wrap("<a href=" + pythonLink + " data-behavior='call-to-action-event' data-response='Download Python script' download target='_blank'/>");
+      $(".download-notebook-link").wrap("<a href=" + notebookLink + " data-behavior='call-to-action-event' data-response='Download Notebook' download target='_blank'/>");
+      $(".github-view-link").wrap("<a href=" + githubLink + " data-behavior='call-to-action-event' data-response='View on Github' target='_blank'/>");
+      $("#right-column").addClass("page-shadow");
+    } else {
+      $(".xanadu-call-to-action-links").hide();
+      $("#bottom-dl").attr('style','display: none !important');
+    }
+    </script>
+<script type="text/javascript">jQuery.noConflict(true);</script>
+        {% include "footer.html" %}
 {%- endblock %}

@@ -4,7 +4,9 @@ Research and contribution
 Research
 ---------------
 
-If you are doing research using The Walrus please reference this page and our `our paper <https://arxiv.org/abs/1805.12498>`_.
+If you are doing research using The Walrus, please cite `our paper <https://joss.theoj.org/papers/10.21105/joss.01705>`_:
+
+	Brajesh Gupt, Josh Izaac and Nicolás Quesada. The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. Journal of Open Source Software, 4(44), 1705 (2019)
 
 We are always open for collaboration, and can be contacted at research@xanadu.ai.
 
