@@ -10,7 +10,7 @@ Multidimensional Hermite polynomials
 ====================================
 .. sectionauthor:: Nicolás Quesada <nicolas@xanadu.ai>
 
-In this section we study the multidimensional Hermite polynomials originally introduced by C. Hermite in 1865. Mizrahi :cite:`mizrahi1975generalized` provides an exhaustive reference on these subject. We however, follow the succinct treatment of Kok and Braunstein :cite:`kok2001multi`.
+In this section we study the multidimensional Hermite polynomials originally introduced by C. Hermite in 1865. Mizrahi :cite:`mizrahi1975generalized` provides an exhaustive reference on this subject. We however, follow the succinct treatment of Kok and Braunstein :cite:`kok2001multi`.
 
 In the next section, where we discuss quantum Gaussian states, we will explain how these polynomials relate to hafnians and loop hafnians. For the moment just let us introduce them and study their formal properties.
 
