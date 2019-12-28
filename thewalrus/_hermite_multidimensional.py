@@ -19,8 +19,8 @@ import numpy as np
 from .libwalrus import hermite_multidimensional as hm
 from .libwalrus import hermite_multidimensional_real as hmr
 
-from .libwalrus import quantum_hermite_multidimensional as qhm
-from .libwalrus import quantum_hermite_multidimensional_real as qhmr
+from .libwalrus import renorm_hermite_multidimensional as rhm
+from .libwalrus import renorm_hermite_multidimensional_real as rhmr
 
 from ._hafnian import input_validation
 
@@ -81,9 +81,13 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     yt = np.real_if_close(y)
 
     if Rt.dtype == np.float and yt.dtype == np.float:
-        values = np.array(hmr(Rt, yt, cutoff, renorm=renorm))
+        if renorm:
+            values = np.array(rhmr(Rt, yt, cutoff))
+        values = np.array(hmr(Rt, yt, cutoff))
     else:
-        values = np.array(hm(R, y, cutoff, renorm=renorm))
+        if renorm:
+            values = np.array(rhm(Rt, yt, cutoff))
+        values = np.array(hm(R, y, cutoff))
 
     if make_tensor:
         shape = cutoff * np.ones([n], dtype=int)

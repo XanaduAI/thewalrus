@@ -47,7 +47,7 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     double torontonian_fsum[T](vector[T] &mat)
 
     vector[T] hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution, bint &renorm)
-    vector[T] quantum_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
+    vector[T] renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
 
 
 # ==============================================================================
@@ -434,7 +434,7 @@ def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff, ren
 
 
 
-def quantum_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):
+def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
     via the C++ libwalrus library.
 
@@ -458,10 +458,10 @@ def quantum_hermite_multidimensional(double complex[:, :] R, double complex[:] y
     for i in range(n):
         y_mat.push_back(y[i])
 
-    return quantum_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
 
 
-def quantum_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
+def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
     via the C++ libwalrus library.
 
@@ -485,4 +485,4 @@ def quantum_hermite_multidimensional_real(double [:, :] R, double [:] y, int cut
     for i in range(n):
         y_mat.push_back(y[i])
 
-    return quantum_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)

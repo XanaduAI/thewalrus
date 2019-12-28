@@ -238,7 +238,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
 
 
 template <typename T>
-inline std::vector<T> quantum_hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
+inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
     int dim = std::sqrt(static_cast<double>(R_mat.size()));
 
     namespace eg = Eigen;
@@ -254,7 +254,7 @@ inline std::vector<T> quantum_hermite_multidimensional_cpp(std::vector<T> &R_mat
     ren_factor[0] = 1;
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
-        intsqrt[ii] = std::sqrt((static_cast<double>(ii)))
+        intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
@@ -296,9 +296,8 @@ inline std::vector<T> quantum_hermite_multidimensional_cpp(std::vector<T> &R_mat
 
         ullint nextCoordinate = vec2index(nextPos, resolution);
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
-        double mkp1 = (static_cast<double>(nextPos[k]-1));
 
-        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/std::sqrt(mkp1);
+        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/(static_cast<double>(intsqrt[nextPos[k]-1]));
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);
@@ -309,7 +308,7 @@ inline std::vector<T> quantum_hermite_multidimensional_cpp(std::vector<T> &R_mat
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
-                H[nextCoordinate] = H[nextCoordinate] - std::sqrt((static_cast<T>(jumpFrom[ii]-1))/mkp1)*static_cast<T>(R(k,ii))*H[prevCoordinate];
+                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*static_cast<T>(R(k,ii))*H[prevCoordinate];
 
             }
         }
