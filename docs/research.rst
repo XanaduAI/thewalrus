@@ -13,7 +13,7 @@ We are always open for collaboration, and can be contacted at research@xanadu.ai
 Contribution
 -------------
 
-If you would like to get involved with the Machine Learning Toolbox, or you would like to contribute, simply fork our Github repository, and make a descriptive pull request.
+If you would like to get involved with The Walrus, or you would like to contribute, simply fork our Github repository, and make a descriptive pull request.
 
 - **Source Code:** https://github.com/XanaduAI/thewalrus
 - **Issue Tracker:** https://github.com/XanaduAI/thewalrus/issues
