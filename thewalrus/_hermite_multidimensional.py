@@ -83,11 +83,13 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     if Rt.dtype == np.float and yt.dtype == np.float:
         if renorm:
             values = np.array(rhmr(Rt, yt, cutoff))
-        values = np.array(hmr(Rt, yt, cutoff))
+        else:
+            values = np.array(hmr(Rt, yt, cutoff))
     else:
         if renorm:
-            values = np.array(rhm(Rt, yt, cutoff))
-        values = np.array(hm(R, y, cutoff))
+            values = np.array(rhm(np.complex128(R), np.complex128(y), cutoff))
+        else:
+            values = np.array(hm(np.complex128(R), np.complex128(y), cutoff))
 
     if make_tensor:
         shape = cutoff * np.ones([n], dtype=int)
@@ -143,59 +145,3 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
 
 # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
 
-
-def quantum_hermite_multidimensional(R, cutoff, y=None, make_tensor=True):
-    r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
-
-    Here :math:`R` is an :math:`n \times n` square matrix, and
-    :math:`y` is an :math:`n` dimensional vector. The polynomials are
-    parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
-    and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
-    thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
-
-    This tensor can either be flattened into a vector or returned as an actual
-    tensor with :math:`n` indices.
-
-    .. note::
-
-        Note that if :math:`R = (1)` then :math:`H_k^{(R)}(y)`
-        are precisely the well known **probabilists' Hermite polynomials** :math:`He_k(y)`,
-        and if :math:`R = (2)` then :math:`H_k^{(R)}(y)` are precisely the well known
-        **physicists' Hermite polynomials** :math:`H_k(y)`.
-
-    Args:
-        R (array): square matrix parametrizing the Hermite polynomial family
-        cutoff (int): maximum size of the subindices in the Hermite polynomial
-        y (array): vector argument of the Hermite polynomial
-        make_tensor (bool): If ``False``, returns a flattened one dimensional array
-            containing the values of the polynomial
-
-
-    Returns:
-        (array): the multidimensional Hermite polynomials
-    """
-
-    input_validation(R)
-    n, _ = R.shape
-
-    if y is None:
-        y = np.zeros([n], dtype=complex)
-
-    m = y.shape[0]
-    if m != n:
-        raise ValueError("The matrix R and vector y have incompatible dimensions")
-
-
-    Rt = np.real_if_close(R)
-    yt = np.real_if_close(y)
-
-    if Rt.dtype == np.float and yt.dtype == np.float:
-        values = np.array(qhmr(Rt, yt, cutoff))
-    else:
-        values = np.array(qhm(R, y, cutoff))
-
-    if make_tensor:
-        shape = cutoff * np.ones([n], dtype=int)
-        values = np.reshape(values, shape)
-
-    return values

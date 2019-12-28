@@ -48,88 +48,6 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
-/**
- * Returns the indices of the tensor corresponding to a given element
- *
- * @param val
- * @param base
- * @param n
- *
- * @return tensor index
- */
-std::vector<int> find_rep(int val, int base, int n) {
-    std::vector<int> x(n, 0);
-    int local_val = val;
-
-    x[0] = 1;
-
-    for (int i = 1; i < n; i++)
-        x[i] = x[i-1]*base;
-
-    std::vector<int> digits(n, 0);
-
-    for (int i = 0; i < n; i++) {
-        digits[i] = local_val/x[n-i-1];
-        local_val = local_val - digits[i] * x[n-i-1];
-    }
-
-    return digits;
-}
-
-
-/**
- * Returns the sqrt of the factorial of an integer.
- *
- * @param nn input integer
- *
- * @return Square root of the factorial of \f$n\f$.
- */
-long double sqrtfactorial(int nn)
-{
-    long double n = static_cast<long double>(nn);
-
-    if(n > 1)
-        return std::sqrt(n) * sqrtfactorial(n - 1);
-    else
-        return 1;
-}
-
-
-/**
- * Renormalizes an unnormalized photon number statistics of a Gaussian state.
- * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
- *
- * @param tn unnormalized flattened vector of size \f$res**nmodes$ representing unnormalized photon number statistics
- *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
- * @param nmodes number of modes
- * @param res highest number of photons to be resolved.
- *
- * @return Renormalized photon number statistics
- */
-template <typename T>
-inline std::vector<T> renormalization(std::vector<T> tn, int nmodes, int res) {
-    std::vector<long double> invsqfacts(res, 0);
-    std::vector<int> digits(nmodes, 0);
-
-    ullint Hdim = pow(res, nmodes);
-
-    for (int i = 0; i < res; i++)
-        invsqfacts[i] = sqrtfactorial(i);
-
-    for (ullint i = 0; i < Hdim; i++) {
-        digits = find_rep(i, res, nmodes);
-        long double pref = 1;
-        for (int j = 0; j < nmodes; j++)
-            pref *= 1.0L/invsqfacts[digits[j]];
-        tn[i] = tn[i]*static_cast<double>(pref);
-    }
-
-    return tn;
-
-}
-
-
-
 namespace libwalrus {
 
 /**
@@ -222,11 +140,6 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         }
 
     }
-
-    if (renorm) {
-        H = renormalization(H, dim, resolution);
-    }
-
     return H;
 
 }
