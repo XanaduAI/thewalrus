@@ -58,7 +58,7 @@ namespace libwalrus {
  * This implementation is based on the MATLAB code available at
  * https://github.com/clementsw/gaussian-optics
  *
- * @param mat a flattened vector of size \f$2n^2\f$, representing an
+ * @param mat a flattened vector of size \f$2n^2\f$, representing a
  *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
  * @param d a flattened vector of size \f$2n\f$, representing the first order moments.
  * @param resolution highest number of photons to be resolved.
