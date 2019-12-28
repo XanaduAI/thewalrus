@@ -65,7 +65,7 @@ namespace libwalrus {
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution, int &renorm) {
+inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
     int dim = std::sqrt(static_cast<double>(R_mat.size()));
 
     namespace eg = Eigen;
@@ -75,11 +75,9 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
-    std::vector<double> ren_factor(Hdim, 0);
 
 
     H[0] = 1;
-    ren_factor[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
@@ -161,10 +159,8 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat,
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
-    std::vector<double> ren_factor(Hdim, 0);
 
     H[0] = 1;
-    ren_factor[0] = 1;
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
         intsqrt[ii] = std::sqrt((static_cast<double>(ii)));

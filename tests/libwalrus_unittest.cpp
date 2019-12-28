@@ -1272,7 +1272,6 @@ TEST(BatchHafnian, Clements) {
                                     2.91297712e-01, -6.63359067e-01, -1.47024726e-02,  2.58202829e+00,
                                     9.62872951e-01, -2.53217806e+00,  3.10967275e+00, -1.42559575e-14};
     int res = 4;
-    int renorm = 0;
     std::vector<std::complex<double>> d4c{std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0), std::complex<double>(0.0, 0.0)};
     for(int i=0; i<4; i++) {
         for(int j=0; j<4; j++) {
@@ -1283,7 +1282,7 @@ TEST(BatchHafnian, Clements) {
     // Hermite polynomials, which means that we have to mat4 * d4 as the
     // second argument, this is precisely what is done in the previous two loops
     
-    out = libwalrus::hermite_multidimensional_cpp(mat4, d4c, res, renorm);
+    out = libwalrus::hermite_multidimensional_cpp(mat4, d4c, res);
 
     for (int i = 0; i < 256; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
@@ -1305,12 +1304,11 @@ TEST(BatchHafnian, UnitRenormalization) {
 
     std::vector<std::complex<double>> out(res*res, 0.0);
 
-    int renorm = 1;
 
     for (int i = 0; i < res; i++)
         expected_re[i*res+i] = pow(0.5, static_cast<double>(i)/2.0);
 
-    out = libwalrus::hermite_multidimensional_cpp(B, d, res, renorm);
+    out = libwalrus::renorm_hermite_multidimensional_cpp(B, d, res);
 
     for (int i = 0; i < res*res; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);

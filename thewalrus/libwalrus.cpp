@@ -1979,7 +1979,6 @@ static const char __pyx_k_mat[] = "mat";
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_nud[] = "nud";
 static const char __pyx_k_obj[] = "obj";
-static const char __pyx_k_ren[] = "ren";
 static const char __pyx_k_rpt[] = "rpt";
 static const char __pyx_k_base[] = "base";
 static const char __pyx_k_dict[] = "__dict__";
@@ -2012,7 +2011,6 @@ static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_name_2[] = "__name__";
 static const char __pyx_k_pickle[] = "pickle";
 static const char __pyx_k_reduce[] = "__reduce__";
-static const char __pyx_k_renorm[] = "renorm";
 static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
@@ -2182,8 +2180,6 @@ static PyObject *__pyx_n_s_recursive;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
-static PyObject *__pyx_n_s_ren;
-static PyObject *__pyx_n_s_renorm;
 static PyObject *__pyx_n_s_renorm_hermite_multidimensional;
 static PyObject *__pyx_n_s_renorm_hermite_multidimensional_2;
 static PyObject *__pyx_n_s_rpt;
@@ -2218,8 +2214,8 @@ static PyObject *__pyx_pf_9libwalrus_10haf_complex(CYTHON_UNUSED PyObject *__pyx
 static PyObject *__pyx_pf_9libwalrus_12haf_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, int __pyx_v_loop, int __pyx_v_recursive, PyObject *__pyx_v_quad, int __pyx_v_approx, PyObject *__pyx_v_nsamples); /* proto */
 static PyObject *__pyx_pf_9libwalrus_14perm_complex(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_quad); /* proto */
 static PyObject *__pyx_pf_9libwalrus_16perm_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_A, PyObject *__pyx_v_quad, PyObject *__pyx_v_fsum); /* proto */
-static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff, PyObject *__pyx_v_renorm); /* proto */
-static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff, PyObject *__pyx_v_renorm); /* proto */
+static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff); /* proto */
+static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff); /* proto */
 static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff); /* proto */
 static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -4717,33 +4713,29 @@ static PyObject *__pyx_pf_9libwalrus_16perm_real(CYTHON_UNUSED PyObject *__pyx_s
 /* "libwalrus.pyx":371
  * # Batch hafnian
  * 
- * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_9libwalrus_19hermite_multidimensional(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_9libwalrus_18hermite_multidimensional[] = "hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff, renorm=False)\nReturns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`\n    via the C++ libwalrus library.\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n        renorm (bool): if ``True``, normalizes the returned multidimensional Hermite\n            polynomials such that :math:`H_k^{(R)}(y)/\\sqrt{\\prod(\\prod_i k_i!)}`\n\n    Returns:\n        array[float64]: the multidimensional Hermite polynomials\n    ";
+static char __pyx_doc_9libwalrus_18hermite_multidimensional[] = "hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff)\nReturns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`\n    via the C++ libwalrus library.\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n\n    Returns:\n        array[complex128]: the multidimensional Hermite polynomials\n    ";
 static PyMethodDef __pyx_mdef_9libwalrus_19hermite_multidimensional = {"hermite_multidimensional", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9libwalrus_19hermite_multidimensional, METH_VARARGS|METH_KEYWORDS, __pyx_doc_9libwalrus_18hermite_multidimensional};
 static PyObject *__pyx_pw_9libwalrus_19hermite_multidimensional(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_R = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_y = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_cutoff;
-  PyObject *__pyx_v_renorm = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("hermite_multidimensional (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_R,&__pyx_n_s_y,&__pyx_n_s_cutoff,&__pyx_n_s_renorm,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject *)Py_False);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_R,&__pyx_n_s_y,&__pyx_n_s_cutoff,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -4762,62 +4754,50 @@ static PyObject *__pyx_pw_9libwalrus_19hermite_multidimensional(PyObject *__pyx_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 0, 3, 4, 1); __PYX_ERR(0, 371, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 1, 3, 3, 1); __PYX_ERR(0, 371, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 0, 3, 4, 2); __PYX_ERR(0, 371, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_renorm);
-          if (value) { values[3] = value; kw_args--; }
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 1, 3, 3, 2); __PYX_ERR(0, 371, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "hermite_multidimensional") < 0)) __PYX_ERR(0, 371, __pyx_L3_error)
       }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        break;
-        default: goto __pyx_L5_argtuple_error;
-      }
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 371, __pyx_L3_error)
     __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 371, __pyx_L3_error)
     __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 371, __pyx_L3_error)
-    __pyx_v_renorm = values[3];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 371, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 371, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9libwalrus_18hermite_multidimensional(__pyx_self, __pyx_v_R, __pyx_v_y, __pyx_v_cutoff, __pyx_v_renorm);
+  __pyx_r = __pyx_pf_9libwalrus_18hermite_multidimensional(__pyx_self, __pyx_v_R, __pyx_v_y, __pyx_v_cutoff);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff, PyObject *__pyx_v_renorm) {
+static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
   std::vector<__pyx_t_double_complex>  __pyx_v_R_mat;
   std::vector<__pyx_t_double_complex>  __pyx_v_y_mat;
-  int __pyx_v_ren;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -4826,15 +4806,14 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
   int __pyx_t_4;
   int __pyx_t_5;
   int __pyx_t_6;
-  int __pyx_t_7;
+  Py_ssize_t __pyx_t_7;
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
-  Py_ssize_t __pyx_t_10;
-  PyObject *__pyx_t_11 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("hermite_multidimensional", 0);
 
-  /* "libwalrus.pyx":385
- *         array[float64]: the multidimensional Hermite polynomials
+  /* "libwalrus.pyx":383
+ *         array[complex128]: the multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
  *     cdef vector[double complex] R_mat, y_mat
@@ -4842,138 +4821,101 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":388
+  /* "libwalrus.pyx":386
  *     cdef vector[double complex] R_mat, y_mat
- * 
- *     cdef int ren = 0             # <<<<<<<<<<<<<<
- * 
- *     if renorm:
- */
-  __pyx_v_ren = 0;
-
-  /* "libwalrus.pyx":390
- *     cdef int ren = 0
- * 
- *     if renorm:             # <<<<<<<<<<<<<<
- *         ren = 1
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_renorm); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 390, __pyx_L1_error)
-  if (__pyx_t_1) {
-
-    /* "libwalrus.pyx":391
- * 
- *     if renorm:
- *         ren = 1             # <<<<<<<<<<<<<<
- * 
- *     for i in range(n):
- */
-    __pyx_v_ren = 1;
-
-    /* "libwalrus.pyx":390
- *     cdef int ren = 0
- * 
- *     if renorm:             # <<<<<<<<<<<<<<
- *         ren = 1
- * 
- */
-  }
-
-  /* "libwalrus.pyx":393
- *         ren = 1
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  */
-  __pyx_t_2 = __pyx_v_n;
-  __pyx_t_3 = __pyx_t_2;
-  for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-    __pyx_v_i = __pyx_t_4;
+  __pyx_t_1 = __pyx_v_n;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":394
+    /* "libwalrus.pyx":387
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
  *             R_mat.push_back(R[i, j])
  * 
  */
-    __pyx_t_5 = __pyx_v_n;
-    __pyx_t_6 = __pyx_t_5;
-    for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
-      __pyx_v_j = __pyx_t_7;
+    __pyx_t_4 = __pyx_v_n;
+    __pyx_t_5 = __pyx_t_4;
+    for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+      __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":395
+      /* "libwalrus.pyx":388
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
  * 
  *     for i in range(n):
  */
-      __pyx_t_8 = __pyx_v_i;
-      __pyx_t_9 = __pyx_v_j;
+      __pyx_t_7 = __pyx_v_i;
+      __pyx_t_8 = __pyx_v_j;
       try {
-        __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_8 * __pyx_v_R.strides[0]) ) + __pyx_t_9 * __pyx_v_R.strides[1]) ))));
+        __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 395, __pyx_L1_error)
+        __PYX_ERR(0, 388, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":397
+  /* "libwalrus.pyx":390
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
  *         y_mat.push_back(y[i])
  * 
  */
-  __pyx_t_2 = __pyx_v_n;
-  __pyx_t_3 = __pyx_t_2;
-  for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-    __pyx_v_i = __pyx_t_4;
+  __pyx_t_1 = __pyx_v_n;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":398
+    /* "libwalrus.pyx":391
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
  * 
- *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff, ren)
+ *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
  */
-    __pyx_t_10 = __pyx_v_i;
+    __pyx_t_9 = __pyx_v_i;
     try {
-      __pyx_v_y_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_10 * __pyx_v_y.strides[0]) ))));
+      __pyx_v_y_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 398, __pyx_L1_error)
+      __PYX_ERR(0, 391, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":400
+  /* "libwalrus.pyx":393
  *         y_mat.push_back(y[i])
  * 
- *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff, ren)             # <<<<<<<<<<<<<<
+ *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_11 = __pyx_convert_vector_to_py___pyx_t_double_complex(libwalrus::hermite_multidimensional_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff, __pyx_v_ren)); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 400, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_r = __pyx_t_11;
-  __pyx_t_11 = 0;
+  __pyx_t_10 = __pyx_convert_vector_to_py___pyx_t_double_complex(libwalrus::hermite_multidimensional_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
   /* "libwalrus.pyx":371
  * # Batch hafnian
  * 
- * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -4984,36 +4926,32 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":403
+/* "libwalrus.pyx":396
  * 
  * 
- * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_9libwalrus_21hermite_multidimensional_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_9libwalrus_20hermite_multidimensional_real[] = "hermite_multidimensional_real(double[:, :] R, double[:] y, int cutoff, renorm=False)\nReturns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`\n    via the C++ libwalrus library.\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n        renorm (bool): if ``True``, normalizes the returned multidimensional Hermite\n            polynomials such that :math:`H_k^{(R)}(y)/\\sqrt{\\prod(\\prod_i k_i!)}`\n\n    Returns:\n        array[float64]: the multidimensional Hermite polynomials\n    ";
+static char __pyx_doc_9libwalrus_20hermite_multidimensional_real[] = "hermite_multidimensional_real(double[:, :] R, double[:] y, int cutoff)\nReturns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`\n    via the C++ libwalrus library.\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n\n    Returns:\n        array[float64]: the multidimensional Hermite polynomials\n    ";
 static PyMethodDef __pyx_mdef_9libwalrus_21hermite_multidimensional_real = {"hermite_multidimensional_real", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9libwalrus_21hermite_multidimensional_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_9libwalrus_20hermite_multidimensional_real};
 static PyObject *__pyx_pw_9libwalrus_21hermite_multidimensional_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_R = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_y = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_cutoff;
-  PyObject *__pyx_v_renorm = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("hermite_multidimensional_real (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_R,&__pyx_n_s_y,&__pyx_n_s_cutoff,&__pyx_n_s_renorm,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject *)Py_False);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_R,&__pyx_n_s_y,&__pyx_n_s_cutoff,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -5032,62 +4970,50 @@ static PyObject *__pyx_pw_9libwalrus_21hermite_multidimensional_real(PyObject *_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 0, 3, 4, 1); __PYX_ERR(0, 403, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(0, 396, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 0, 3, 4, 2); __PYX_ERR(0, 403, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_renorm);
-          if (value) { values[3] = value; kw_args--; }
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(0, 396, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "hermite_multidimensional_real") < 0)) __PYX_ERR(0, 403, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "hermite_multidimensional_real") < 0)) __PYX_ERR(0, 396, __pyx_L3_error)
       }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        break;
-        default: goto __pyx_L5_argtuple_error;
-      }
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 403, __pyx_L3_error)
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 403, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 403, __pyx_L3_error)
-    __pyx_v_renorm = values[3];
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 396, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 396, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 396, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 403, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 396, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9libwalrus_20hermite_multidimensional_real(__pyx_self, __pyx_v_R, __pyx_v_y, __pyx_v_cutoff, __pyx_v_renorm);
+  __pyx_r = __pyx_pf_9libwalrus_20hermite_multidimensional_real(__pyx_self, __pyx_v_R, __pyx_v_y, __pyx_v_cutoff);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff, PyObject *__pyx_v_renorm) {
+static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_R, __Pyx_memviewslice __pyx_v_y, int __pyx_v_cutoff) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_n;
   std::vector<double>  __pyx_v_R_mat;
   std::vector<double>  __pyx_v_y_mat;
-  int __pyx_v_ren;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -5096,14 +5022,13 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   int __pyx_t_4;
   int __pyx_t_5;
   int __pyx_t_6;
-  int __pyx_t_7;
+  Py_ssize_t __pyx_t_7;
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
-  Py_ssize_t __pyx_t_10;
-  PyObject *__pyx_t_11 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("hermite_multidimensional_real", 0);
 
-  /* "libwalrus.pyx":417
+  /* "libwalrus.pyx":408
  *         array[float64]: the multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -5112,138 +5037,101 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":420
+  /* "libwalrus.pyx":411
  *     cdef vector[double] R_mat, y_mat
- * 
- *     cdef int ren = 0             # <<<<<<<<<<<<<<
- * 
- *     if renorm:
- */
-  __pyx_v_ren = 0;
-
-  /* "libwalrus.pyx":422
- *     cdef int ren = 0
- * 
- *     if renorm:             # <<<<<<<<<<<<<<
- *         ren = 1
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_renorm); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 422, __pyx_L1_error)
-  if (__pyx_t_1) {
-
-    /* "libwalrus.pyx":423
- * 
- *     if renorm:
- *         ren = 1             # <<<<<<<<<<<<<<
- * 
- *     for i in range(n):
- */
-    __pyx_v_ren = 1;
-
-    /* "libwalrus.pyx":422
- *     cdef int ren = 0
- * 
- *     if renorm:             # <<<<<<<<<<<<<<
- *         ren = 1
- * 
- */
-  }
-
-  /* "libwalrus.pyx":425
- *         ren = 1
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  */
-  __pyx_t_2 = __pyx_v_n;
-  __pyx_t_3 = __pyx_t_2;
-  for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-    __pyx_v_i = __pyx_t_4;
+  __pyx_t_1 = __pyx_v_n;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":426
+    /* "libwalrus.pyx":412
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
  *             R_mat.push_back(R[i, j])
  * 
  */
-    __pyx_t_5 = __pyx_v_n;
-    __pyx_t_6 = __pyx_t_5;
-    for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
-      __pyx_v_j = __pyx_t_7;
+    __pyx_t_4 = __pyx_v_n;
+    __pyx_t_5 = __pyx_t_4;
+    for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
+      __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":427
+      /* "libwalrus.pyx":413
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
  * 
  *     for i in range(n):
  */
-      __pyx_t_8 = __pyx_v_i;
-      __pyx_t_9 = __pyx_v_j;
+      __pyx_t_7 = __pyx_v_i;
+      __pyx_t_8 = __pyx_v_j;
       try {
-        __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_8 * __pyx_v_R.strides[0]) ) + __pyx_t_9 * __pyx_v_R.strides[1]) ))));
+        __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 427, __pyx_L1_error)
+        __PYX_ERR(0, 413, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":429
+  /* "libwalrus.pyx":415
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
  *         y_mat.push_back(y[i])
  * 
  */
-  __pyx_t_2 = __pyx_v_n;
-  __pyx_t_3 = __pyx_t_2;
-  for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
-    __pyx_v_i = __pyx_t_4;
+  __pyx_t_1 = __pyx_v_n;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":430
+    /* "libwalrus.pyx":416
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
  * 
- *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff, ren)
+ *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
  */
-    __pyx_t_10 = __pyx_v_i;
+    __pyx_t_9 = __pyx_v_i;
     try {
-      __pyx_v_y_mat.push_back((*((double *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_10 * __pyx_v_y.strides[0]) ))));
+      __pyx_v_y_mat.push_back((*((double *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 430, __pyx_L1_error)
+      __PYX_ERR(0, 416, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":432
+  /* "libwalrus.pyx":418
  *         y_mat.push_back(y[i])
  * 
- *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff, ren)             # <<<<<<<<<<<<<<
+ *     return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_11 = __pyx_convert_vector_to_py_double(libwalrus::hermite_multidimensional_cpp<double>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff, __pyx_v_ren)); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 432, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_r = __pyx_t_11;
-  __pyx_t_11 = 0;
+  __pyx_t_10 = __pyx_convert_vector_to_py_double(libwalrus::hermite_multidimensional_cpp<double>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 418, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":403
+  /* "libwalrus.pyx":396
  * 
  * 
- * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -5254,17 +5142,17 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":437
+/* "libwalrus.pyx":423
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_9libwalrus_23renorm_hermite_multidimensional(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_9libwalrus_22renorm_hermite_multidimensional[] = "renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff)\nReturns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`\n    via the C++ libwalrus library.\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n        renorm (bool): if ``True``, normalizes the returned multidimensional Hermite\n            polynomials such that :math:`H_k^{(R)}(y)/\\sqrt{\\prod(\\prod_i k_i!)}`\n\n    Returns:\n        array[float64]: the multidimensional Hermite polynomials\n    ";
+static char __pyx_doc_9libwalrus_22renorm_hermite_multidimensional[] = "renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff)\nReturns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`\n    via the C++ libwalrus library. They are given in terms of the standard multidimensional\n    Hermite polynomials as :math:`H_k^{(R)}(y)/\\sqrt{\\prod(\\prod_i k_i!)}`\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n\n    Returns:\n        array[complex128]: the renormalized multidimensional Hermite polynomials\n    ";
 static PyMethodDef __pyx_mdef_9libwalrus_23renorm_hermite_multidimensional = {"renorm_hermite_multidimensional", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9libwalrus_23renorm_hermite_multidimensional, METH_VARARGS|METH_KEYWORDS, __pyx_doc_9libwalrus_22renorm_hermite_multidimensional};
 static PyObject *__pyx_pw_9libwalrus_23renorm_hermite_multidimensional(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_R = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5298,17 +5186,17 @@ static PyObject *__pyx_pw_9libwalrus_23renorm_hermite_multidimensional(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 1); __PYX_ERR(0, 437, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 1); __PYX_ERR(0, 423, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 2); __PYX_ERR(0, 437, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 2); __PYX_ERR(0, 423, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional") < 0)) __PYX_ERR(0, 437, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional") < 0)) __PYX_ERR(0, 423, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -5317,13 +5205,13 @@ static PyObject *__pyx_pw_9libwalrus_23renorm_hermite_multidimensional(PyObject 
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 437, __pyx_L3_error)
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 437, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 437, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 423, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 423, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 423, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 437, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 423, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.renorm_hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5356,8 +5244,8 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("renorm_hermite_multidimensional", 0);
 
-  /* "libwalrus.pyx":451
- *         array[float64]: the multidimensional Hermite polynomials
+  /* "libwalrus.pyx":436
+ *         array[complex128]: the renormalized multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
  *     cdef vector[double complex] R_mat, y_mat
@@ -5365,7 +5253,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":454
+  /* "libwalrus.pyx":439
  *     cdef vector[double complex] R_mat, y_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -5377,7 +5265,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":455
+    /* "libwalrus.pyx":440
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -5389,7 +5277,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":456
+      /* "libwalrus.pyx":441
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -5402,12 +5290,12 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
         __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 456, __pyx_L1_error)
+        __PYX_ERR(0, 441, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":458
+  /* "libwalrus.pyx":443
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -5419,7 +5307,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":459
+    /* "libwalrus.pyx":444
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -5431,11 +5319,11 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
       __pyx_v_y_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 459, __pyx_L1_error)
+      __PYX_ERR(0, 444, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":461
+  /* "libwalrus.pyx":446
  *         y_mat.push_back(y[i])
  * 
  *     return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
@@ -5443,18 +5331,18 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_10 = __pyx_convert_vector_to_py___pyx_t_double_complex(libwalrus::renorm_hermite_multidimensional_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 461, __pyx_L1_error)
+  __pyx_t_10 = __pyx_convert_vector_to_py___pyx_t_double_complex(libwalrus::renorm_hermite_multidimensional_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 446, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __pyx_r = __pyx_t_10;
   __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":437
+  /* "libwalrus.pyx":423
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
 
   /* function exit code */
@@ -5470,17 +5358,17 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":464
+/* "libwalrus.pyx":449
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_9libwalrus_24renorm_hermite_multidimensional_real[] = "renorm_hermite_multidimensional_real(double[:, :] R, double[:] y, int cutoff)\nReturns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`\n    via the C++ libwalrus library.\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n        renorm (bool): if ``True``, normalizes the returned multidimensional Hermite\n            polynomials such that :math:`H_k^{(R)}(y)/\\sqrt{\\prod(\\prod_i k_i!)}`\n\n    Returns:\n        array[float64]: the multidimensional Hermite polynomials\n    ";
+static char __pyx_doc_9libwalrus_24renorm_hermite_multidimensional_real[] = "renorm_hermite_multidimensional_real(double[:, :] R, double[:] y, int cutoff)\nReturns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`\n    via the C++ libwalrus library. They are given in terms of the standard multidimensional\n    Hermite polynomials as :math:`H_k^{(R)}(y)/\\sqrt{\\prod(\\prod_i k_i!)}`\n\n    Args:\n        R (array[float64]): square matrix parametrizing the Hermite polynomial family\n        y (array[float64]): vector argument of the Hermite polynomial\n        cutoff (int): maximum size of the subindices in the Hermite polynomial\n\n    Returns:\n        array[complex128]: the renormalized multidimensional Hermite polynomials\n    ";
 static PyMethodDef __pyx_mdef_9libwalrus_25renorm_hermite_multidimensional_real = {"renorm_hermite_multidimensional_real", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real, METH_VARARGS|METH_KEYWORDS, __pyx_doc_9libwalrus_24renorm_hermite_multidimensional_real};
 static PyObject *__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_R = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5514,17 +5402,17 @@ static PyObject *__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real(PyOb
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(0, 464, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(0, 449, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(0, 464, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(0, 449, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional_real") < 0)) __PYX_ERR(0, 464, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional_real") < 0)) __PYX_ERR(0, 449, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -5533,13 +5421,13 @@ static PyObject *__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real(PyOb
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 464, __pyx_L3_error)
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 464, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 464, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 464, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 449, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.renorm_hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5572,8 +5460,8 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("renorm_hermite_multidimensional_real", 0);
 
-  /* "libwalrus.pyx":478
- *         array[float64]: the multidimensional Hermite polynomials
+  /* "libwalrus.pyx":462
+ *         array[complex128]: the renormalized multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
  *     cdef vector[double] R_mat, y_mat
@@ -5581,7 +5469,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":481
+  /* "libwalrus.pyx":465
  *     cdef vector[double] R_mat, y_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -5593,7 +5481,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":482
+    /* "libwalrus.pyx":466
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -5605,7 +5493,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":483
+      /* "libwalrus.pyx":467
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -5618,12 +5506,12 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
         __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 483, __pyx_L1_error)
+        __PYX_ERR(0, 467, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":485
+  /* "libwalrus.pyx":469
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -5635,7 +5523,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":486
+    /* "libwalrus.pyx":470
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -5647,28 +5535,28 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
       __pyx_v_y_mat.push_back((*((double *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 486, __pyx_L1_error)
+      __PYX_ERR(0, 470, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":488
+  /* "libwalrus.pyx":472
  *         y_mat.push_back(y[i])
  * 
  *     return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_10 = __pyx_convert_vector_to_py_double(libwalrus::renorm_hermite_multidimensional_cpp<double>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 488, __pyx_L1_error)
+  __pyx_t_10 = __pyx_convert_vector_to_py_double(libwalrus::renorm_hermite_multidimensional_cpp<double>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __pyx_r = __pyx_t_10;
   __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":464
+  /* "libwalrus.pyx":449
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
 
   /* function exit code */
@@ -19390,8 +19278,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
-  {&__pyx_n_s_ren, __pyx_k_ren, sizeof(__pyx_k_ren), 0, 0, 1, 1},
-  {&__pyx_n_s_renorm, __pyx_k_renorm, sizeof(__pyx_k_renorm), 0, 0, 1, 1},
   {&__pyx_n_s_renorm_hermite_multidimensional, __pyx_k_renorm_hermite_multidimensional, sizeof(__pyx_k_renorm_hermite_multidimensional), 0, 0, 1, 1},
   {&__pyx_n_s_renorm_hermite_multidimensional_2, __pyx_k_renorm_hermite_multidimensional_2, sizeof(__pyx_k_renorm_hermite_multidimensional_2), 0, 0, 1, 1},
   {&__pyx_n_s_rpt, __pyx_k_rpt, sizeof(__pyx_k_rpt), 0, 0, 1, 1},
@@ -19740,50 +19626,50 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "libwalrus.pyx":371
  * # Batch hafnian
  * 
- * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
-  __pyx_tuple__39 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_renorm, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_ren); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_tuple__39 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional, 371, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional, 371, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 371, __pyx_L1_error)
 
-  /* "libwalrus.pyx":403
+  /* "libwalrus.pyx":396
  * 
  * 
- * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
-  __pyx_tuple__41 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_renorm, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_ren); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 403, __pyx_L1_error)
+  __pyx_tuple__41 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 396, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__41);
   __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional_real, 403, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 403, __pyx_L1_error)
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional_real, 396, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 396, __pyx_L1_error)
 
-  /* "libwalrus.pyx":437
+  /* "libwalrus.pyx":423
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_tuple__43 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 437, __pyx_L1_error)
+  __pyx_tuple__43 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 423, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__43);
   __Pyx_GIVEREF(__pyx_tuple__43);
-  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional, 437, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 437, __pyx_L1_error)
+  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional, 423, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 423, __pyx_L1_error)
 
-  /* "libwalrus.pyx":464
+  /* "libwalrus.pyx":449
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_tuple__45 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_tuple__45 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(0, 449, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__45);
   __Pyx_GIVEREF(__pyx_tuple__45);
-  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional_2, 464, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(3, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional_2, 449, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 449, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -20303,7 +20189,7 @@ if (!__Pyx_RefNanny) {
   /* "libwalrus.pyx":371
  * # Batch hafnian
  * 
- * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
@@ -20312,40 +20198,40 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":403
+  /* "libwalrus.pyx":396
  * 
  * 
- * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff, renorm=False):             # <<<<<<<<<<<<<<
+ * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_21hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_21hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 396, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional_real, __pyx_t_1) < 0) __PYX_ERR(0, 403, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional_real, __pyx_t_1) < 0) __PYX_ERR(0, 396, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":437
+  /* "libwalrus.pyx":423
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_23renorm_hermite_multidimensional, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 437, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_23renorm_hermite_multidimensional, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 423, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(0, 437, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(0, 423, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":464
+  /* "libwalrus.pyx":449
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
- *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
- *     via the C++ libwalrus library.
+ *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
+ *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_25renorm_hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_25renorm_hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional_2, __pyx_t_1) < 0) __PYX_ERR(0, 464, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional_2, __pyx_t_1) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "libwalrus.pyx":1
