@@ -449,7 +449,7 @@ def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y,
 def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
     via the C++ libwalrus library. They are given in terms of the standard multidimensional
-    Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`
+    Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`.
 
     Args:
         R (array[float64]): square matrix parametrizing the Hermite polynomial family
