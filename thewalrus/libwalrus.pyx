@@ -423,7 +423,7 @@ def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
 def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):
     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
     via the C++ libwalrus library. They are given in terms of the standard multidimensional
-    Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`
+    Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`.
 
     Args:
         R (array[float64]): square matrix parametrizing the Hermite polynomial family
@@ -457,7 +457,7 @@ def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cuto
         cutoff (int): maximum size of the subindices in the Hermite polynomial
 
     Returns:
-        array[complex128]: the renormalized multidimensional Hermite polynomials
+        array[float64]: the renormalized multidimensional Hermite polynomials
     """
     cdef int i, j, n = R.shape[0]
     cdef vector[double] R_mat, y_mat
