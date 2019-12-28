@@ -373,8 +373,8 @@ def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cu
     via the C++ libwalrus library.
 
     Args:
-        R (array[float64]): square matrix parametrizing the Hermite polynomial family
-        y (array[float64]): vector argument of the Hermite polynomial
+        R (array[complex128]): square matrix parametrizing the Hermite polynomial family
+        y (array[complex128]): vector argument of the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
 
     Returns:
@@ -426,8 +426,8 @@ def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y,
     Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`.
 
     Args:
-        R (array[float64]): square matrix parametrizing the Hermite polynomial family
-        y (array[float64]): vector argument of the Hermite polynomial
+        R (array[complex128]): square matrix parametrizing the Hermite polynomial family
+        y (array[complex128]): vector argument of the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
 
     Returns:
