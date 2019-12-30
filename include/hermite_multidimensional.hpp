@@ -21,8 +21,6 @@
 #pragma once
 #include <stdafx.h>
 
-#include <Eigen/Eigenvalues>
-#include <Eigen/LU>
 
 typedef unsigned long long int ullint;
 
@@ -56,20 +54,15 @@ namespace libwalrus {
  * This implementation is based on the MATLAB code available at
  * https://github.com/clementsw/gaussian-optics
  *
- * @param R_mat a flattened vector of size \f$n^2\f$, representing a
+ * @param R a flattened vector of size \f$n^2\f$, representing a
  *       \f$n\times n\f$ symmetric matrix.
- * @param y_mat a flattened vector of size \f$n\f$.
+ * @param y a flattened vector of size \f$n\f$.
  * @param resolution highest number of photons to be resolved.
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
-    int dim = std::sqrt(static_cast<double>(R_mat.size()));
-
-    namespace eg = Eigen;
-
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> R = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(R_mat.data(), dim, dim);
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> y = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(y_mat.data(), dim, dim);
+inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
+    int dim = std::sqrt(static_cast<double>(R.size()));
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
@@ -119,7 +112,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
 
-        H[nextCoordinate] = H[nextCoordinate] + y(k, 0);
+        H[nextCoordinate] = H[nextCoordinate] + y[k];
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);
@@ -130,7 +123,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
-                H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*(R(k,ii))*H[prevCoordinate];
+                H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*(R[dim*k+ii])*H[prevCoordinate];
 
             }
         }
@@ -148,20 +141,15 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
  * This implementation is based on the MATLAB code available at
  * https://github.com/clementsw/gaussian-optics
  *
- * @param R_mat a flattened vector of size \f$n^2\f$, representing a
+ * @param R a flattened vector of size \f$n^2\f$, representing a
  *       \f$n\times n\f$ symmetric matrix.
- * @param y_mat a flattened vector of size \f$n\f$.
+ * @param y a flattened vector of size \f$n\f$.
  * @param resolution highest number of photons to be resolved.
  *
  */
 template <typename T>
-inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
-    int dim = std::sqrt(static_cast<double>(R_mat.size()));
-
-    namespace eg = Eigen;
-
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> R = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(R_mat.data(), dim, dim);
-    eg::Matrix<T, eg::Dynamic, eg::Dynamic> y = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(y_mat.data(), dim, dim);
+inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
+    int dim = std::sqrt(static_cast<double>(R.size()));
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
@@ -212,7 +200,7 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat,
         ullint nextCoordinate = vec2index(nextPos, resolution);
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
-        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/(intsqrt[nextPos[k]-1]);
+        H[nextCoordinate] = H[nextCoordinate] + y[k]/(intsqrt[nextPos[k]-1]);
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);
@@ -223,7 +211,7 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat,
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
-                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*(R(k,ii))*H[prevCoordinate];
+                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*(R[k*dim+ii])*H[prevCoordinate];
 
             }
         }
