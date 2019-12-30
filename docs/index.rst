@@ -138,7 +138,7 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    installing
    research
    quick_guide
-
+   gallery/gallery
 
 .. toctree::
    :maxdepth: 2
@@ -153,22 +153,6 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    gbs_sampling
    notation
    references
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Tutorials
-   :hidden:
-
-   basics.ipynb
-   hafnian_tutorial.ipynb
-   permanent_tutorial.ipynb
-
-.. toctree::
-   :maxdepth: 2
-   :caption: The Walrus Gallery
-   :hidden:
-
-   gallery/gallery
 
 .. toctree::
    :maxdepth: 2

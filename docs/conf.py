@@ -81,6 +81,12 @@ extensions = [
 autosummary_generate = True
 autosummary_imported_members = False
 
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
+nbsphinx_execute = 'never'
+nbsphinx_epilog = """
+.. note:: :download:`Click here <../{{env.docname}}.ipynb>` to download this gallery page as an interactive Jupyter notebook.
+"""
+
 # Setup the breathe extension
 breathe_projects = {
     "libwalrus C++": "./doxyoutput/xml"
