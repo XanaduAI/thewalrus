@@ -51,16 +51,14 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 namespace libwalrus {
 
 /**
- * Returns photon number statistics of a Gaussian state for a given covariance matrix `mat`.
- * as described in *Multidimensional Hermite polynomials and photon distribution for polymode mixed light*
- * [arxiv:9308033](https://arxiv.org/abs/hep-th/9308033).
+ * Returns the multidimensional Hermite polynomials \f$H_k^{(R)}(y)\f$.
  *
  * This implementation is based on the MATLAB code available at
  * https://github.com/clementsw/gaussian-optics
  *
- * @param mat a flattened vector of size \f$2n^2\f$, representing a
- *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
- * @param d a flattened vector of size \f$2n\f$, representing the first order moments.
+ * @param R_mat a flattened vector of size \f$n^2\f$, representing a
+ *       \f$n\times n\f$ symmetric matrix.
+ * @param y_mat a flattened vector of size \f$n\f$.
  * @param resolution highest number of photons to be resolved.
  *
  */
@@ -132,7 +130,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
-                H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*static_cast<T>(R(k,ii))*H[prevCoordinate];
+                H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*(R(k,ii))*H[prevCoordinate];
 
             }
         }
@@ -144,10 +142,18 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
 
 
 
-
-
-
-
+/**
+ * Returns the normalized multidimensional Hermite polynomials \f$\tilde{H}_k^{(R)}(y)\f$.
+ *
+ * This implementation is based on the MATLAB code available at
+ * https://github.com/clementsw/gaussian-optics
+ *
+ * @param R_mat a flattened vector of size \f$n^2\f$, representing a
+ *       \f$n\times n\f$ symmetric matrix.
+ * @param y_mat a flattened vector of size \f$n\f$.
+ * @param resolution highest number of photons to be resolved.
+ *
+ */
 template <typename T>
 inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
     int dim = std::sqrt(static_cast<double>(R_mat.size()));
@@ -206,7 +212,7 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat,
         ullint nextCoordinate = vec2index(nextPos, resolution);
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
-        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/(static_cast<double>(intsqrt[nextPos[k]-1]));
+        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/(intsqrt[nextPos[k]-1]);
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);
@@ -217,7 +223,7 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat,
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
-                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*static_cast<T>(R(k,ii))*H[prevCoordinate];
+                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*(R(k,ii))*H[prevCoordinate];
 
             }
         }
