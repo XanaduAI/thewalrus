@@ -18,6 +18,10 @@ import numpy as np
 
 from .libwalrus import hermite_multidimensional as hm
 from .libwalrus import hermite_multidimensional_real as hmr
+
+from .libwalrus import renorm_hermite_multidimensional as rhm
+from .libwalrus import renorm_hermite_multidimensional_real as rhmr
+
 from ._hafnian import input_validation
 
 # pylint: disable=too-many-arguments
@@ -77,9 +81,15 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     yt = np.real_if_close(y)
 
     if Rt.dtype == np.float and yt.dtype == np.float:
-        values = np.array(hmr(Rt, yt, cutoff, renorm=renorm))
+        if renorm:
+            values = np.array(rhmr(Rt, yt, cutoff))
+        else:
+            values = np.array(hmr(Rt, yt, cutoff))
     else:
-        values = np.array(hm(R, y, cutoff, renorm=renorm))
+        if renorm:
+            values = np.array(rhm(np.complex128(R), np.complex128(y), cutoff))
+        else:
+            values = np.array(hm(np.complex128(R), np.complex128(y), cutoff))
 
     if make_tensor:
         shape = cutoff * np.ones([n], dtype=int)
@@ -131,6 +141,4 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
     return hermite_multidimensional(
         -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True
     )
-
-
 # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering

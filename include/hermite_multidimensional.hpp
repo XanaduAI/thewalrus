@@ -48,88 +48,6 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
-/**
- * Returns the indices of the tensor corresponding to a given element
- *
- * @param val
- * @param base
- * @param n
- *
- * @return tensor index
- */
-std::vector<int> find_rep(int val, int base, int n) {
-    std::vector<int> x(n, 0);
-    int local_val = val;
-
-    x[0] = 1;
-
-    for (int i = 1; i < n; i++)
-        x[i] = x[i-1]*base;
-
-    std::vector<int> digits(n, 0);
-
-    for (int i = 0; i < n; i++) {
-        digits[i] = local_val/x[n-i-1];
-        local_val = local_val - digits[i] * x[n-i-1];
-    }
-
-    return digits;
-}
-
-
-/**
- * Returns the sqrt of the factorial of an integer.
- *
- * @param nn input integer
- *
- * @return Square root of the factorial of \f$n\f$.
- */
-long double sqrtfactorial(int nn)
-{
-    long double n = static_cast<long double>(nn);
-
-    if(n > 1)
-        return std::sqrt(n) * sqrtfactorial(n - 1);
-    else
-        return 1;
-}
-
-
-/**
- * Renormalizes an unnormalized photon number statistics of a Gaussian state.
- * Based on the MATLAB code available at: https://github.com/clementsw/gaussian-optics
- *
- * @param tn unnormalized flattened vector of size \f$res**nmodes$ representing unnormalized photon number statistics
- *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
- * @param nmodes number of modes
- * @param res highest number of photons to be resolved.
- *
- * @return Renormalized photon number statistics
- */
-template <typename T>
-inline std::vector<T> renormalization(std::vector<T> tn, int nmodes, int res) {
-    std::vector<long double> invsqfacts(res, 0);
-    std::vector<int> digits(nmodes, 0);
-
-    ullint Hdim = pow(res, nmodes);
-
-    for (int i = 0; i < res; i++)
-        invsqfacts[i] = sqrtfactorial(i);
-
-    for (ullint i = 0; i < Hdim; i++) {
-        digits = find_rep(i, res, nmodes);
-        long double pref = 1;
-        for (int j = 0; j < nmodes; j++)
-            pref *= 1.0L/invsqfacts[digits[j]];
-        tn[i] = tn[i]*static_cast<double>(pref);
-    }
-
-    return tn;
-
-}
-
-
-
 namespace libwalrus {
 
 /**
@@ -140,14 +58,14 @@ namespace libwalrus {
  * This implementation is based on the MATLAB code available at
  * https://github.com/clementsw/gaussian-optics
  *
- * @param mat a flattened vector of size \f$2n^2\f$, representing an
+ * @param mat a flattened vector of size \f$2n^2\f$, representing a
  *       \f$2n\times 2n\f$ row-ordered symmetric matrix.
  * @param d a flattened vector of size \f$2n\f$, representing the first order moments.
  * @param resolution highest number of photons to be resolved.
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution, int &renorm) {
+inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
     int dim = std::sqrt(static_cast<double>(R_mat.size()));
 
     namespace eg = Eigen;
@@ -157,10 +75,9 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
 
     ullint Hdim = pow(resolution, dim);
     std::vector<T> H(Hdim, 0);
-    std::vector<double> ren_factor(Hdim, 0);
+
 
     H[0] = 1;
-    ren_factor[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
@@ -204,7 +121,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
 
-	H[nextCoordinate] = H[nextCoordinate] + y(k, 0);
+        H[nextCoordinate] = H[nextCoordinate] + y(k, 0);
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
 
         std::vector<int> tmpjump(dim, 0);
@@ -221,11 +138,91 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R_mat, std::v
         }
 
     }
+    return H;
 
-    if (renorm) {
-        H = renormalization(H, dim, resolution);
+}
+
+
+
+
+
+
+
+template <typename T>
+inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R_mat, std::vector<T> &y_mat, int &resolution) {
+    int dim = std::sqrt(static_cast<double>(R_mat.size()));
+
+    namespace eg = Eigen;
+
+    eg::Matrix<T, eg::Dynamic, eg::Dynamic> R = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(R_mat.data(), dim, dim);
+    eg::Matrix<T, eg::Dynamic, eg::Dynamic> y = eg::Map<eg::Matrix<T, eg::Dynamic, eg::Dynamic>, eg::Unaligned>(y_mat.data(), dim, dim);
+
+    ullint Hdim = pow(resolution, dim);
+    std::vector<T> H(Hdim, 0);
+
+    H[0] = 1;
+    std::vector<double> intsqrt(resolution+1, 0);
+    for (int ii = 0; ii<=resolution; ii++) {
+        intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
     }
+    std::vector<int> nextPos(dim, 1);
+    std::vector<int> jumpFrom(dim, 1);
+    std::vector<int> ek(dim, 0);
+    std::vector<double> factors(resolution+1, 0);
+    int jump = 0;
 
+    for (ullint jj = 0; jj < Hdim-1; jj++) {
+
+        if (jump > 0) {
+            jumpFrom[jump] += 1;
+            jump = 0;
+        }
+
+
+        for (int ii = 0; ii < dim; ii++) {
+            std::vector<int> forwardStep(dim, 0);
+            forwardStep[ii] = 1;
+
+            if ( forwardStep[ii] + nextPos[ii] > resolution) {
+                nextPos[ii] = 1;
+                jumpFrom[ii] = 1;
+                jump = ii+1;
+            }
+            else {
+                jumpFrom[ii] = nextPos[ii];
+                nextPos[ii] = nextPos[ii] + 1;
+                break;
+            }
+        }
+
+        for (int ii = 0; ii < dim; ii++)
+            ek[ii] = nextPos[ii] - jumpFrom[ii];
+
+        int k = 0;
+        for(; k < static_cast<int>(ek.size()); k++) {
+            if(ek[k]) break;
+        }
+
+        ullint nextCoordinate = vec2index(nextPos, resolution);
+        ullint fromCoordinate = vec2index(jumpFrom, resolution);
+
+        H[nextCoordinate] = H[nextCoordinate] + y(k, 0)/(static_cast<double>(intsqrt[nextPos[k]-1]));
+        H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
+
+        std::vector<int> tmpjump(dim, 0);
+
+        for (int ii = 0; ii < dim; ii++) {
+            if (jumpFrom[ii] > 1) {
+                std::vector<int> prevJump(dim, 0);
+                prevJump[ii] = 1;
+                std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
+                ullint prevCoordinate = vec2index(tmpjump, resolution);
+                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*static_cast<T>(R(k,ii))*H[prevCoordinate];
+
+            }
+        }
+
+    }
     return H;
 
 }
