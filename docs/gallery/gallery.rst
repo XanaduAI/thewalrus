@@ -1,8 +1,47 @@
+Tutorials and gallery
+=====================
+
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+   :hidden:
+
+   basics
+   hafnian_tutorial
+   permanent_tutorial
+
+
+The following tutorials introduce core mathematical concepts
+provided by The Walrus, including the hafnian, loop hafnian,
+and the permanent.
+
+.. customgalleryitem::
+    :tooltip: Basics of hafnians and loop hafnians
+    :description: :doc:`basics`
+    :figure: gallery/hafnian.png
+
+.. customgalleryitem::
+    :tooltip: Benchmarking the hafnian
+    :description: :doc:`hafnian_tutorial`
+    :figure: gallery/haf_benchmark.png
+
+.. customgalleryitem::
+    :tooltip: Benchmarking the permanent
+    :description: :doc:`permanent_tutorial`
+    :figure: gallery/perm_benchmark.png
+
+.. raw:: html
+
+        <div style='clear:both'></div>
+
+
 .. _gallery:
 
 Non-Gaussian states gallery
-###########################
-
+---------------------------
 
 Here you can find a curated list of Gaussian circuits and photon-number-resolved measurements to prepare non-Gaussian states of interest in quantum optics, information, metrology and computing.
 
