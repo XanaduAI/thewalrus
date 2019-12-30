@@ -84,7 +84,7 @@ autosummary_imported_members = False
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
 nbsphinx_execute = 'never'
 nbsphinx_epilog = """
-.. note:: :download:`Click here <../../{{env.docname}}.ipynb>` to download this gallery page as an interactive Jupyter notebook.
+.. note:: :download:`Click here <../{{env.docname}}.ipynb>` to download this gallery page as an interactive Jupyter notebook.
 """
 
 # Setup the breathe extension
