@@ -20,11 +20,6 @@ Fock gradients of Gaussian gates
 This module contains the Fock representation of the standard Gaussian gates and
 the Kerr gate, as well as their gradients.
 
-Most functions have an optional parameter called ``choi_r`` which can be used to
-set the value of the two-mode squeezed states used in the Choi-Jamiolkowski
-expansion of a given Gaussian gate. For details on this see the documentation of
-:mod:`thewalrus.quantum`.
-
 .. autosummary::
     :toctree: api
 
@@ -77,7 +72,6 @@ def Dgate(r, theta, cutoff, grad=False):
         theta (float): displacement phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -125,7 +119,6 @@ def Sgate(r, theta, cutoff, grad=False):
         theta (float): squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -170,7 +163,7 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                         )
 
 
-def S2gate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def S2gate(r, theta, cutoff, grad=False):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Args:
@@ -178,7 +171,6 @@ def S2gate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
         theta (float): two-mode squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
@@ -230,7 +222,6 @@ def BSgate(theta, phi, cutoff, grad=False):
         phi (float): reflection phase of the beamsplitter
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
@@ -272,7 +263,6 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2):
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         hbar (float): value of hbar in the commutation relation
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
@@ -316,7 +306,6 @@ def Zgate_one_param(p, cutoff, grad=False, hbar=2):
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
         hbar (float): value of hbar in the commutation relation
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[complex], array[complex] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
@@ -359,7 +348,6 @@ def Sgate_one_param(s, cutoff, grad=False):
         s (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
@@ -437,7 +425,6 @@ def S2gate_one_param(s, cutoff, grad=False):
         s (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
@@ -480,7 +467,6 @@ def BSgate_one_param(theta, cutoff, grad=False):
         theta (float): parameter of the gate
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
-        choi_r (float): value of the parameter used internally in fock_tensor
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
