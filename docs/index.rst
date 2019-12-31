@@ -27,7 +27,7 @@ The Walrus Documentation
     </style>
     <div class="row container-fluid">
       <div class="col-lg-4 col-12 mb-2 text-center">
-          <img src="_static/walrus.png" class="img-fluid" alt="Responsive image" style="width:100%; max-width: 300px;"></img>
+          <img src="_static/walrus.svg" class="img-fluid" alt="Responsive image" style="width:100%; max-width: 300px;"></img>
       </div>
       <div class="col-lg-8 col-12 mb-2" style="display: flex;justify-content: center;align-items: center;flex-flow: column;">
         <p class="lead grey-text">
