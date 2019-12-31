@@ -69,7 +69,7 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                 gradTr[n, m] -= np.sqrt(m) * T[n, m - 1] * np.conj(exptheta)
 
 
-def Dgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def Dgate(r, theta, cutoff, grad=False):
     """Calculates the Fock representation of the Dgate and its gradient.
 
     Args:
@@ -87,9 +87,9 @@ def Dgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None, None
+        return fock_tensor(S, alpha, cutoff), None, None
 
-    T = np.complex128(fock_tensor(S, alpha, cutoff + 1, choi_r=choi_r))
+    T = np.complex128(fock_tensor(S, alpha, cutoff + 1))
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Dgate(T, gradTr, gradTtheta, theta)
@@ -117,7 +117,7 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                 gradTr[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2] * np.conj(exptheta)
 
 
-def Sgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def Sgate(r, theta, cutoff, grad=False):
     """Calculates the Fock representation of the Sgate and its gradient.
 
     Args:
@@ -134,9 +134,9 @@ def Sgate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     S = squeezing(r, theta)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None, None
+        return fock_tensor(S, alpha, cutoff), None, None
 
-    T = np.complex128(fock_tensor(S, alpha, cutoff + 2, choi_r=choi_r))
+    T = np.complex128(fock_tensor(S, alpha, cutoff + 2))
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Sgate(T, gradTr, gradTtheta, theta)
@@ -185,9 +185,9 @@ def S2gate(r, theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """
     S = two_mode_squeezing(r, theta)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None, None
+        return fock_tensor(S, np.zeros([2]), cutoff), None, None
 
-    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r))
+    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1))
     gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_S2gate(T, gradTr, gradTtheta, theta)
@@ -222,7 +222,7 @@ def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
                         )
 
 
-def BSgate(theta, phi, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def BSgate(theta, phi, cutoff, grad=False):
     r"""Calculates the Fock representation of the S2gate and its gradient.
 
     Args:
@@ -237,9 +237,9 @@ def BSgate(theta, phi, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """
     S = beam_splitter(theta, phi)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None, None
+        return fock_tensor(S, np.zeros([2]), cutoff), None, None
 
-    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r))
+    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1))
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTphi = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_BSgate(T, gradTtheta, gradTphi, phi)
@@ -264,7 +264,7 @@ def grad_Xgate_one_param(T, gradT, pref):  # pragma: no cover
                 gradT[n, m] -= np.sqrt(m) * T[n, m - 1] * pref
 
 
-def Xgate_one_param(x, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
+def Xgate_one_param(x, cutoff, grad=False, hbar=2):
     """Calculates the Fock representation of the Xgate and its gradient.
 
     Args:
@@ -283,9 +283,9 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None
+        return fock_tensor(S, alpha, cutoff), None
 
-    T = fock_tensor(S, alpha, cutoff + 1, choi_r=choi_r)
+    T = fock_tensor(S, alpha, cutoff + 1)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Xgate_one_param(T, gradT, pref)
     return T[0:cutoff, 0:cutoff], gradT
@@ -308,7 +308,7 @@ def grad_Zgate_one_param(T, gradT, pref):  # pragma: no cover
                 gradT[n, m] += 1j * np.sqrt(m) * T[n, m - 1] * pref
 
 
-def Zgate_one_param(p, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
+def Zgate_one_param(p, cutoff, grad=False, hbar=2):
     """Calculates the Fock representation of the Zgate and its gradient.
 
     Args:
@@ -327,9 +327,9 @@ def Zgate_one_param(p, cutoff, grad=False, hbar=2, choi_r=np.arcsinh(1.0)):
     S = np.identity(2 * nmodes)
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff, choi_r=choi_r), None
+        return fock_tensor(S, alpha, cutoff), None
 
-    T = fock_tensor(S, alpha, cutoff + 1, choi_r=choi_r)
+    T = fock_tensor(S, alpha, cutoff + 1)
     gradT = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Zgate_one_param(T, gradT, pref)
     return T[0:cutoff, 0:cutoff], gradT
@@ -352,7 +352,7 @@ def grad_Sgate_one_param(T, gradT):  # pragma: no cover
                 gradT[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2]
 
 
-def Sgate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def Sgate_one_param(s, cutoff, grad=False):
     """Calculates the Fock representation of the Sgate and its gradient.
 
     Args:
@@ -366,9 +366,9 @@ def Sgate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """
     S = squeezing(s, 0.0)
     if not grad:
-        return fock_tensor(S, np.zeros([1]), cutoff, choi_r=choi_r), None
+        return fock_tensor(S, np.zeros([1]), cutoff), None
 
-    T = fock_tensor(S, np.zeros([1]), cutoff + 2, choi_r=choi_r)
+    T = fock_tensor(S, np.zeros([1]), cutoff + 2)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Sgate_one_param(T, gradT)
 
@@ -430,7 +430,7 @@ def grad_S2gate_one_param(T, gradT):  # pragma: no cover
                         gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
 
 
-def S2gate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def S2gate_one_param(s, cutoff, grad=False):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Args:
@@ -444,9 +444,9 @@ def S2gate_one_param(s, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """
     S = two_mode_squeezing(s, 0)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None
+        return fock_tensor(S, np.zeros([2]), cutoff), None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r)
+    T = fock_tensor(S, np.zeros([2]), cutoff + 1)
     gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
     grad_S2gate_one_param(T, gradT)
 
@@ -473,7 +473,7 @@ def grad_BSgate_one_param(T, gradT):  # pragma: no cover
                         gradT[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1]
 
 
-def BSgate_one_param(theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
+def BSgate_one_param(theta, cutoff, grad=False):
     """Calculates the Fock representation of the BSgate and its gradient.
 
     Args:
@@ -487,9 +487,9 @@ def BSgate_one_param(theta, cutoff, grad=False, choi_r=np.arcsinh(1.0)):
     """
     S = beam_splitter(theta, 0)
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff, choi_r=choi_r), None
+        return fock_tensor(S, np.zeros([2]), cutoff), None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1, choi_r=choi_r)
+    T = fock_tensor(S, np.zeros([2]), cutoff + 1)
     gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
     grad_BSgate_one_param(T, gradT)
 
