@@ -40,7 +40,7 @@ TEST(PermanentFsum, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -73,7 +73,7 @@ TEST(PermanentReal, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -96,7 +96,7 @@ TEST(PermanentComplex, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -138,12 +138,13 @@ TEST(HafianRecursiveDouble, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum = distribution(generator);
             mat[i * 4 + j] = randnum;
+	    mat[j * 4 + i] = mat[i * 4 + j];
         }
     }
 
@@ -219,13 +220,14 @@ TEST(HafianRecursiveDoubleComplex, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat[i * 4 + j] = std::complex<double>(randnum1, randnum2);
+	    mat[j * 4 + i] = mat[i * 4 + j];
         }
     }
 
@@ -293,12 +295,13 @@ TEST(HafianEigenDouble, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum = distribution(generator);
             mat[i * 4 + j] = randnum;
+	    mat[j * 4 + i] = mat[i * 4 + j];
         }
     }
 
@@ -374,13 +377,14 @@ TEST(HafianEigenDoubleComplex, Random) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat[i * 4 + j] = std::complex<double>(randnum1, randnum2);
+	    mat[j * 4 + i] = mat[i * 4 + j];
         }
     }
 
@@ -529,19 +533,21 @@ TEST(HafnianRepeatedDouble, AllOneRpt) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
-
+    std::normal_distribution<double> distribution(0.0, 1.0);
+    
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum = distribution(generator);
             mat2rand[i * 2 + j] = randnum;
+	    mat2rand[j * 2 + i] = mat2rand[i * 2 + j];
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum = distribution(generator);
             mat4rand[i * 4 + j] = randnum;
+	    mat4rand[j * 4 + i] = mat4rand[i * 4 + j];
         }
     }
 
@@ -591,21 +597,25 @@ TEST(HafnianRepeatedComplex, AllOneRpt) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat2rand[i * 2 + j] = std::complex<double>(randnum1, randnum2);
+	    mat2rand[j * 2 + i] = mat2rand[i * 2 + j];
+	    mat2[j * 2 + i] = mat2[i * 2 + j];
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat4rand[i * 4 + j] = std::complex<double>(randnum1, randnum2);
+	    mat4rand[j * 4 + i] = mat4rand[i * 4 + j];
+	    mat4[j * 4 + i] = mat4[i * 4 + j];
         }
     }
 
@@ -674,19 +684,21 @@ TEST(LoopHafnianEigenDouble, EvenRandom) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             mat2[i * 2 + j] = randnum1;
+	    mat2[j * 2 + i] = mat2[i * 2 + j];
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             mat4[i * 4 + j] = randnum1;
+	    mat4[j * 4 + i] = mat4[i * 4 + j];
         }
     }
 
@@ -741,21 +753,23 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat2[i * 2 + j] = std::complex<double>(randnum1, randnum2);
+	    mat2[j * 2 + i] = mat2[i * 2 + j];
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat4[i * 4 + j] = std::complex<double>(randnum1, randnum2);
+	    mat4[j * 4 + i] = mat4[i * 4 + j];
         }
     }
 
@@ -848,7 +862,7 @@ TEST(LoopHafnianRepeatedDouble, EvenRandom) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
 
     std::vector<double> mu2(2, 0);
@@ -859,18 +873,20 @@ TEST(LoopHafnianRepeatedDouble, EvenRandom) {
 
 
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             mat2[i * 2 + j] = randnum1;
+	    mat2[j * 2 + i] = mat2[i * 2 + j];
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             mat4[i * 4 + j] = randnum1;
+	    mat4[j * 4 + i] = mat4[i * 4 + j];
         }
-    }
+    }    
 
     for (int i = 0; i < 2; i++)
         mu2[i] = mat2[i * 2 + i];
@@ -980,28 +996,29 @@ TEST(LoopHafnianRepeatedComplex, EvenRandom) {
 
     std::default_random_engine generator;
     generator.seed(20);
-    std::normal_distribution<double> distribution(1.0, 0.0);
+    std::normal_distribution<double> distribution(0.0, 1.0);
 
     std::vector<std::complex<double>> mu2(2, 0);
     std::vector<std::complex<double>> mu4(4, 0);
 
     std::vector<int> rpt2(2, 1);
-    std::vector<int> rpt4(4, 1);
-
+    std::vector<int> rpt4(4, 1);    
 
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat2[i * 2 + j] = std::complex<double>(randnum1, randnum2);
+	    mat2[j * 2 + i] = mat2[i * 2 + j];
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j <= i; j++) {
             double randnum1 = distribution(generator);
             double randnum2 = distribution(generator);
             mat4[i * 4 + j] = std::complex<double>(randnum1, randnum2);
+	    mat4[j * 4 + i] = mat4[i * 4 + j];
         }
     }
 
