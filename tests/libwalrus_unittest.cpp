@@ -532,27 +532,6 @@ namespace hafnian_repeated {
     std::vector<double> mat4(16, 1.0);
     std::vector<int> rpt4(4, 1);
 
-    std::default_random_engine generator;
-    generator.seed(20);
-    std::normal_distribution<double> distribution(0.0, 1.0);
-    
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j <= i; j++) {
-	double randnum = distribution(generator);
-	mat2rand[i * 2 + j] = randnum;
-	mat2rand[j * 2 + i] = mat2rand[i * 2 + j];
-      }
-    }
-
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j <= i; j++) {
-	double randnum = distribution(generator);
-	mat4rand[i * 4 + j] = randnum;
-	mat4rand[j * 4 + i] = mat4rand[i * 4 + j];
-      }
-    }
-
-
     double expected2 = mat2[1];
     double expected2rand = mat2rand[1];
 
@@ -595,31 +574,6 @@ namespace hafnian_repeated {
     std::vector<std::complex<double>> mat4rand(16, std::complex<double>(0.0, 0.0));
     std::vector<std::complex<double>> mat4(16, std::complex<double>(1.0, 0.0));
     std::vector<int> rpt4(4, 1);
-
-    std::default_random_engine generator;
-    generator.seed(20);
-    std::normal_distribution<double> distribution(0.0, 1.0);
-
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j <= i; j++) {
-	double randnum1 = distribution(generator);
-	double randnum2 = distribution(generator);
-	mat2rand[i * 2 + j] = std::complex<double>(randnum1, randnum2);
-	mat2rand[j * 2 + i] = mat2rand[i * 2 + j];
-	mat2[j * 2 + i] = mat2[i * 2 + j];
-      }
-    }
-
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j <= i; j++) {
-	double randnum1 = distribution(generator);
-	double randnum2 = distribution(generator);
-	mat4rand[i * 4 + j] = std::complex<double>(randnum1, randnum2);
-	mat4rand[j * 4 + i] = mat4rand[i * 4 + j];
-	mat4[j * 4 + i] = mat4[i * 4 + j];
-      }
-    }
-
 
     double expected2_re = std::real(mat2[1]);
     double expected2_im = std::imag(mat2[1]);
