@@ -6,6 +6,8 @@
 
 * [Nicolás Quesada](https://github.com/nquesada) (Xanadu)
 
+* [Trevor Vincent](https://github.com/trevor-vincent) (Xanadu)
+
 # Acknowledgements
 
 * [achan001](https://github.com/achan001) - ➕ summation expert
