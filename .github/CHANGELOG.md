@@ -12,6 +12,8 @@
 
 ### Bug fixes
 
+* Corrects typos in the random number generation in the C++ unit tests. [#118](https://github.com/XanaduAI/thewalrus/pull/118)
+
 * Corrects typos in describing the repeated-moment algorithm of Kan in the documentation. [#104](https://github.com/XanaduAI/thewalrus/pull/104)
 
 * Removes paper.{md,pdf,bib} from the repository now that The Walrus paper is published in Journal of Open Source Software [#106](https://github.com/XanaduAI/thewalrus/pull/106)
@@ -20,7 +22,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Josh Izaac, Nicolas Quesada
+Josh Izaac, Nicolas Quesada, Trevor Vincent
 
 
 ---
