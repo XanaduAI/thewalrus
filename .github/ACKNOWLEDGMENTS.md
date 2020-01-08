@@ -28,4 +28,4 @@
 
 * [Guillaume Thekkadath](https://www2.physics.ox.ac.uk/contacts/people/thekkadath) (University of Oxford) - :smiley_cat: Master cat herder
 
-* [Trevor Vincent](https://github.com/trevor-vincent) (Xanadu) - :apple: master of gravitations
+* [Trevor Vincent](https://github.com/trevor-vincent) (Xanadu) - :apple: master of gravitation
