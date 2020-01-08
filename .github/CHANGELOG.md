@@ -22,7 +22,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Josh Izaac, Nicolas Quesada
+Josh Izaac, Nicolas Quesada, Trevor Vincent
 
 
 ---
