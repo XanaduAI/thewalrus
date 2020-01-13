@@ -10,6 +10,8 @@
 
 * Updates and improves the speed and accuracy of `thewalrus.quantum.fock_tensor`. [#107](https://github.com/XanaduAI/thewalrus/pull/107)
 
+* Add OpenMP support to the repeated moment hafnian code. [#120](https://github.com/XanaduAI/thewalrus/pull/120)
+
 ### Bug fixes
 
 * Corrects typos in the random number generation in the C++ unit tests. [#118](https://github.com/XanaduAI/thewalrus/pull/118)
