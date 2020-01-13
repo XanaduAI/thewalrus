@@ -88,16 +88,14 @@ template <typename T> T get_binom_coeff(T N, T K) {
  * described in *From moments of sum to moments of product*,
  * [doi:10.1016/j.jmva.2007.01.013](https://dx.doi.org/10.1016/j.jmva.2007.01.013>).
  *
- * Note that this algorithm, while generally slower than others, can be
- * significantly more efficient in the cases where the matrix has repeated rows
- * and columns.
+ * Note that this algorithm, while generally slower than others, can be significantly more
+ * efficient in the cases where the matrix has repeated rows and columns.
  *
  * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
  * @param rpt a vector of integers, representing the number of
  *      times each row/column in `mat` is repeated. For example,
- *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all
- * ones.
+ *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return hafnian of the input matrix
  */
 template <typename T>
@@ -185,23 +183,21 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
   return y;
 }
 
+
 /**
  * Returns the loop hafnian of a matrix using the algorithm
  * described in *From moments of sum to moments of product*,
  * [doi:10.1016/j.jmva.2007.01.013](https://dx.doi.org/10.1016/j.jmva.2007.01.013>).
  *
- * Note that this algorithm, while generally slower than others, can be
- * significantly more efficient in the cases where the matrix has repeated rows
- * and columns.
+ * Note that this algorithm, while generally slower than others, can be significantly more
+ * efficient in the cases where the matrix has repeated rows and columns.
  *
  * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @param mu a vector of length \f$n\f$ representing the vector of
- * means/displacement.
+ * @param mu a vector of length \f$n\f$ representing the vector of means/displacement.
  * @param rpt a vector of integers, representing the number of
  *      times each row/column in `mat` is repeated. For example,
- *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all
- * ones.
+ *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return loop hafnian of the input matrix
  */
 template <typename T>
@@ -313,12 +309,11 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu,
  * described in *From moments of sum to moments of product*,
  * [doi:10.1016/j.jmva.2007.01.013](https://dx.doi.org/10.1016/j.jmva.2007.01.013>).
  *
- * Note that this algorithm, while generally slower than others, can be
- * significantly more efficient in the cases where the matrix has repeated rows
- * and columns.
+ * Note that this algorithm, while generally slower than others, can be significantly more
+ * efficient in the cases where the matrix has repeated rows and columns.
  *
- * This is a wrapper around the templated function `libwalrus::hafnian_rpt` for
- * Python integration. It accepts and returns complex double numeric types, and
+ * This is a wrapper around the templated function `libwalrus::hafnian_rpt` for Python
+ * integration. It accepts and returns complex double numeric types, and
  * returns sensible values for empty and non-even matrices.
  *
  * In addition, this wrapper function automatically casts all matrices
@@ -329,8 +324,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu,
  *      \f$n\times n\f$ row-ordered symmetric matrix.
  * @param rpt a vector of integers, representing the number of
  *      times each row/column in `mat` is repeated. For example,
- *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all
- * ones.
+ *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return hafnian of the input matrix
  */
 std::complex<double> hafnian_rpt_quad(std::vector<std::complex<double>> &mat,
@@ -353,13 +347,12 @@ std::complex<double> hafnian_rpt_quad(std::vector<std::complex<double>> &mat,
  * described in *From moments of sum to moments of product*,
  * [doi:10.1016/j.jmva.2007.01.013](https://dx.doi.org/10.1016/j.jmva.2007.01.013>).
  *
- * Note that this algorithm, while generally slower than others, can be
- * significantly more efficient in the cases where the matrix has repeated rows
- * and columns.
+ * Note that this algorithm, while generally slower than others, can be significantly more
+ * efficient in the cases where the matrix has repeated rows and columns.
  *
- * This is a wrapper around the templated function `libwalrus::hafnian_rpt` for
- * Python integration. It accepts and returns double numeric types, and returns
- * sensible values for empty and non-even matrices.
+ * This is a wrapper around the templated function `libwalrus::hafnian_rpt` for Python
+ * integration. It accepts and returns double numeric types, and
+ * returns sensible values for empty and non-even matrices.
  *
  * In addition, this wrapper function automatically casts all matrices
  * to type `long double`, allowing for greater precision than supported
@@ -369,8 +362,7 @@ std::complex<double> hafnian_rpt_quad(std::vector<std::complex<double>> &mat,
  *      \f$n\times n\f$ row-ordered symmetric matrix.
  * @param rpt a vector of integers, representing the number of
  *      times each row/column in `mat` is repeated. For example,
- *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all
- * ones.
+ *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return hafnian of the input matrix
  */
 double hafnian_rpt_quad(std::vector<double> &mat, std::vector<int> &rpt) {
@@ -392,13 +384,12 @@ double hafnian_rpt_quad(std::vector<double> &mat, std::vector<int> &rpt) {
  * described in *From moments of sum to moments of product*,
  * [doi:10.1016/j.jmva.2007.01.013](https://dx.doi.org/10.1016/j.jmva.2007.01.013>).
  *
- * Note that this algorithm, while generally slower than others, can be
- * significantly more efficient in the cases where the matrix has repeated rows
- * and columns.
+ * Note that this algorithm, while generally slower than others, can be significantly more
+ * efficient in the cases where the matrix has repeated rows and columns.
  *
- * This is a wrapper around the templated function `libwalrus::hafnian_rpt_loop`
- * for Python integration. It accepts and returns complex double numeric types,
- * and returns sensible values for empty and non-even matrices.
+ * This is a wrapper around the templated function `libwalrus::hafnian_rpt_loop` for Python
+ * integration. It accepts and returns complex double numeric types, and
+ * returns sensible values for empty and non-even matrices.
  *
  * In addition, this wrapper function automatically casts all matrices
  * to type `complex<long double>`, allowing for greater precision than supported
@@ -406,12 +397,10 @@ double hafnian_rpt_quad(std::vector<double> &mat, std::vector<int> &rpt) {
  *
  * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @param mu a vector of length \f$n\f$ representing the vector of
- * means/displacement.
+ * @param mu a vector of length \f$n\f$ representing the vector of means/displacement.
  * @param rpt a vector of integers, representing the number of
  *      times each row/column in `mat` is repeated. For example,
- *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all
- * ones.
+ *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return loop hafnian of the input matrix
  */
 std::complex<double>
@@ -437,12 +426,11 @@ loop_hafnian_rpt_quad(std::vector<std::complex<double>> &mat,
  * described in *From moments of sum to moments of product*,
  * [doi:10.1016/j.jmva.2007.01.013](https://dx.doi.org/10.1016/j.jmva.2007.01.013>).
  *
- * Note that this algorithm, while generally slower than others, can be
- * significantly more efficient in the cases where the matrix has repeated rows
- * and columns.
+ * Note that this algorithm, while generally slower than others, can be significantly more
+ * efficient in the cases where the matrix has repeated rows and columns.
  *
- * This is a wrapper around the templated function `libwalrus::hafnian_rpt_loop`
- * for Python integration. It accepts and returns double numeric types, and
+ * This is a wrapper around the templated function `libwalrus::hafnian_rpt_loop` for Python
+ * integration. It accepts and returns double numeric types, and
  * returns sensible values for empty and non-even matrices.
  *
  * In addition, this wrapper function automatically casts all matrices
@@ -451,12 +439,10 @@ loop_hafnian_rpt_quad(std::vector<std::complex<double>> &mat,
  *
  * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @param mu a vector of length \f$n\f$ representing the vector of
- * means/displacement.
+ * @param mu a vector of length \f$n\f$ representing the vector of means/displacement.
  * @param rpt a vector of integers, representing the number of
  *      times each row/column in `mat` is repeated. For example,
- *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all
- * ones.
+ *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return loop hafnian of the input matrix
  */
 double loop_hafnian_rpt_quad(std::vector<double> &mat, std::vector<double> &mu,
