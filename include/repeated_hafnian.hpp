@@ -46,14 +46,10 @@ std::vector<int> lin_to_multi(unsigned long long int linear_index, const std::ve
   unsigned long long int gl = linear_index;
 
   while (l < i.size() - 1) {
-    if (prod > linear_index) {
-      break;
-    } else {
-      unsigned long long int glp1 = (gl - i[l]) / (maxes[l] + 1);
-      i[l + 1] = glp1 % (maxes[l + 1] + 1);
-      prod *= (maxes[1 + 1] + 1);
-      gl = glp1;
-    }
+    unsigned long long int glp1 = (gl - i[l]) / (maxes[l] + 1);
+    i[l + 1] = glp1 % (maxes[l + 1] + 1);
+    prod *= (maxes[1 + 1] + 1);
+    gl = glp1;
     l++;
   }
   return i;
