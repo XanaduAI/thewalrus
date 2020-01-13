@@ -37,19 +37,19 @@ namespace libwalrus {
  * @return hafnian of the input matrix
  */
 
-std::vector<int> lin_to_multi(int linear_index, const std::vector<int> &maxes) {
+std::vector<int> lin_to_multi(unsigned long long int linear_index, const std::vector<int> &maxes) {
   std::vector<int> i(maxes.size(), 0);
-  int l = 0;
+  unsigned int l = 0;
   int s0 = maxes[0] + 1;
   i[l] = linear_index % s0;
-  int prod = s0;
-  int gl = linear_index;
+  unsigned long long int prod = s0;
+  unsigned long long int gl = linear_index;
 
   while (l < i.size() - 1) {
     if (prod > linear_index) {
       break;
     } else {
-      int glp1 = (gl - i[l]) / (maxes[l] + 1);
+      unsigned long long int glp1 = (gl - i[l]) / (maxes[l] + 1);
       i[l + 1] = glp1 % (maxes[l + 1] + 1);
       prod *= (maxes[1 + 1] + 1);
       gl = glp1;
@@ -128,9 +128,9 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
 
     int chunks = omp_get_num_threads();
     int id = omp_get_thread_num();
-    int chunk_size = steps / chunks;
-    int beg = id * chunk_size;
-    int end = (id == chunks - 1) ? steps : beg + chunk_size;
+    unsigned long long int chunk_size = steps / chunks;
+    unsigned long long int beg = id * chunk_size;
+    unsigned long long int end = (id == chunks - 1) ? steps : beg + chunk_size;
     T sum_chunk = 0.L;
 
     std::vector<int> x = lin_to_multi(beg, rpt);
@@ -222,9 +222,9 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu,
 
     int chunks = omp_get_num_threads();
     int id = omp_get_thread_num();
-    int chunk_size = steps / chunks;
-    int beg = id * chunk_size;
-    int end = (id == chunks - 1) ? steps : beg + chunk_size;
+    unsigned long long int chunk_size = steps / chunks;
+    unsigned long long int beg = id * chunk_size;
+    unsigned long long int end = (id == chunks - 1) ? steps : beg + chunk_size;
     T sum_chunk = 0.L;
 
     std::vector<int> x = lin_to_multi(beg, rpt);
