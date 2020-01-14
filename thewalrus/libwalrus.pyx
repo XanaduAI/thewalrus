@@ -14,8 +14,51 @@
 #cython: boundscheck=False, wraparound=False, embedsignature=True
 # distutils: language=c++
 cimport cython
+cimport numpy as np
+import numpy as np
+from libc.stdlib cimport free
+from cpython cimport PyObject, Py_INCREF
 from libcpp.vector cimport vector
 
+np.import_array()
+
+
+cdef class ArrayWrapper:
+    cdef void* data_ptr
+    cdef int size
+
+    cdef set_data(self, int size, void* data_ptr):
+        self.data_ptr = data_ptr
+        self.size = size
+
+    def __array__(self):
+        cdef np.npy_intp shape[1]
+        shape[0] = <np.npy_intp> self.size
+        ndarray = np.PyArray_SimpleNewFromData(1, shape,
+                                               np.NPY_COMPLEX128, self.data_ptr)
+        return ndarray
+
+    def __dealloc__(self):
+        free(<void*>self.data_ptr)
+
+
+cdef class ArrayWrapperFloat:
+    cdef void* data_ptr
+    cdef int size
+
+    cdef set_data(self, int size, void* data_ptr):
+        self.data_ptr = data_ptr
+        self.size = size
+
+    def __array__(self):
+        cdef np.npy_intp shape[1]
+        shape[0] = <np.npy_intp> self.size
+        ndarray = np.PyArray_SimpleNewFromData(1, shape,
+                                               np.NPY_FLOAT64, self.data_ptr)
+        return ndarray
+
+    def __dealloc__(self):
+        free(<void*>self.data_ptr)
 
 cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     T hafnian[T](vector[T] &mat)
@@ -46,8 +89,8 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     double complex torontonian_quad(vector[double complex] &mat)
     double torontonian_fsum[T](vector[T] &mat)
 
-    vector[T] hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
-    vector[T] renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
+    T* hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
+    T* renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
 
 
 # ==============================================================================
@@ -278,7 +321,7 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True, bi
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note that
             the approximation algorithm can only be applied to matrices ``A`` that only have non-negative entries.
         num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples`` iterations
-        	for estimation of the hafnian of the non-negative matrix ``A``.
+            for estimation of the hafnian of the non-negative matrix ``A``.
 
     Returns:
         np.float64: the hafnian of matrix A
@@ -389,8 +432,16 @@ def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cu
 
     for i in range(n):
         y_mat.push_back(y[i])
+    length = cutoff**n
 
-    return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef double complex *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapper()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
 
 
 def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
@@ -414,9 +465,28 @@ def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
 
     for i in range(n):
         y_mat.push_back(y[i])
+    length = cutoff**n
+    cdef double *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+    """
+        cdef int i, j, n = R.shape[0]
+        cdef vector[double] R_mat, y_mat
 
-    return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+        for i in range(n):
+            for j in range(n):
+                R_mat.push_back(R[i, j])
 
+        for i in range(n):
+            y_mat.push_back(y[i])
+
+        return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    """
 
 
 
@@ -442,8 +512,16 @@ def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y,
 
     for i in range(n):
         y_mat.push_back(y[i])
+    length = cutoff**n
 
-    return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef double complex *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapper()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
 
 
 def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
@@ -468,5 +546,26 @@ def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cuto
 
     for i in range(n):
         y_mat.push_back(y[i])
+    length = cutoff**n
+    cdef double *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+    """
+        cdef int i, j, n = R.shape[0]
+        cdef vector[double] R_mat, y_mat
 
-    return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+        for i in range(n):
+            for j in range(n):
+                R_mat.push_back(R[i, j])
+
+        for i in range(n):
+            y_mat.push_back(y[i])
+        length = cutoff**n
+
+        return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    """
