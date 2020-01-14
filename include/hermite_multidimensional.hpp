@@ -106,7 +106,7 @@ inline T* hermite_multidimensional_cpp(const std::vector<T> &R, const std::vecto
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
     T val = 0;
-    memset(H,sizeof(val),sizeof(H));
+    memset(&H[0],0,sizeof(T)*Hdim);
     H[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
@@ -164,7 +164,7 @@ inline T*  renorm_hermite_multidimensional_cpp(const std::vector<T> &R, const st
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
     T val = 0;
-    memset(H,sizeof(val),sizeof(H));	//std::cout<<H[0];
+    memset(&H[0],0,sizeof(T)*Hdim);	//std::cout<<H[0];
     //std::cout<<H[1];
     //std::cout<<H[2];
     
@@ -219,7 +219,7 @@ inline T* interferometer_cpp(const std::vector<T> &R, const int &resolution) {
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
     T val = 0;
-    memset(H,sizeof(val),sizeof(H));
+    memset(&H[0],0,sizeof(T)*Hdim);
     H[0] = 1;
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -288,7 +288,7 @@ inline T* squeezing_cpp(const std::vector<T> &R, const int &resolution) {
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
     T val = 0;
-    memset(H,sizeof(val),sizeof(H));
+    memset(&H[0],0,sizeof(T)*Hdim);
     H[0] = std::sqrt(-R[1]);
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -344,7 +344,7 @@ inline T* displacement_cpp(const std::vector<T> &y, const int &resolution) {
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
     T val = 0;
-    memset(H,sizeof(val),sizeof(H));
+    memset(&H[0],0,sizeof(T)*Hdim);
     H[0] = std::exp(0.5*y[0]*y[1]);
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -403,12 +403,8 @@ inline T* two_mode_squeezing_cpp(const std::vector<T> &R, const int &resolution)
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
     T val = 0;
-    memset(H,sizeof(val),sizeof(H));
-    //memset(H, 0x00, sizeof(H));
-    for (ullint jj = 0; jj < Hdim; jj++){
-    	H[jj] = 0.0;
-    	std::cout << H[jj];
-    }
+    memset(&H[0],0,sizeof(T)*Hdim);
+
 
     H[0] = -R[2];
     std::vector<double> intsqrt(resolution+1, 0);
