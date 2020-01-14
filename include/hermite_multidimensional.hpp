@@ -105,13 +105,12 @@ inline T* hermite_multidimensional_cpp(const std::vector<T> &R, const std::vecto
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
-
-
+    T val = 0;
+    memset(H,sizeof(val),sizeof(H));
     H[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
@@ -164,7 +163,11 @@ inline T*  renorm_hermite_multidimensional_cpp(const std::vector<T> &R, const st
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
-
+    T val = 0;
+    memset(H,sizeof(val),sizeof(H));	//std::cout<<H[0];
+    //std::cout<<H[1];
+    //std::cout<<H[2];
+    
     H[0] = 1;
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -172,7 +175,6 @@ inline T*  renorm_hermite_multidimensional_cpp(const std::vector<T> &R, const st
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
@@ -216,7 +218,8 @@ inline T* interferometer_cpp(const std::vector<T> &R, const int &resolution) {
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
-
+    T val = 0;
+    memset(H,sizeof(val),sizeof(H));
     H[0] = 1;
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -224,7 +227,6 @@ inline T* interferometer_cpp(const std::vector<T> &R, const int &resolution) {
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
@@ -285,7 +287,8 @@ inline T* squeezing_cpp(const std::vector<T> &R, const int &resolution) {
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
-
+    T val = 0;
+    memset(H,sizeof(val),sizeof(H));
     H[0] = std::sqrt(-R[1]);
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -340,7 +343,8 @@ inline T* displacement_cpp(const std::vector<T> &y, const int &resolution) {
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
-
+    T val = 0;
+    memset(H,sizeof(val),sizeof(H));
     H[0] = std::exp(0.5*y[0]*y[1]);
     std::vector<double> intsqrt(resolution+1, 0);
     for (int ii = 0; ii<=resolution; ii++) {
@@ -348,7 +352,6 @@ inline T* displacement_cpp(const std::vector<T> &y, const int &resolution) {
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
@@ -399,6 +402,13 @@ inline T* two_mode_squeezing_cpp(const std::vector<T> &R, const int &resolution)
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);
+    T val = 0;
+    memset(H,sizeof(val),sizeof(H));
+    //memset(H, 0x00, sizeof(H));
+    for (ullint jj = 0; jj < Hdim; jj++){
+    	H[jj] = 0.0;
+    	std::cout << H[jj];
+    }
 
     H[0] = -R[2];
     std::vector<double> intsqrt(resolution+1, 0);
@@ -407,8 +417,6 @@ inline T* two_mode_squeezing_cpp(const std::vector<T> &R, const int &resolution)
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<int> ek(dim, 0);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
