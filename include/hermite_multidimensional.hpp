@@ -147,6 +147,32 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
  * @param resolution highest number of photons to be resolved.
  *
  */
+
+
+void update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &resolution, const int &dim){
+    if (jump > 0) {
+	    jumpFrom[jump] += 1;
+        jump = 0;
+    }
+    for (int ii = 0; ii < dim; ii++) {
+	    std::vector<int> forwardStep(dim, 0);
+	    forwardStep[ii] = 1;
+
+	    if ( forwardStep[ii] + nextPos[ii] > resolution) {
+	        nextPos[ii] = 1;
+	        jumpFrom[ii] = 1;
+	        jump = ii+1;
+	    }
+	    else {
+	        jumpFrom[ii] = nextPos[ii];
+	        nextPos[ii] = nextPos[ii] + 1;
+	        break;
+	    }
+}
+
+
+}
+
 template <typename T>
 inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
     int dim = std::sqrt(static_cast<double>(R.size()));
@@ -161,10 +187,10 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<int> ek(dim, 0);
     std::vector<double> factors(resolution+1, 0);
     int jump = 0;
-
+    int k;
+    ullint nextCoordinate, fromCoordinate;
     for (ullint jj = 0; jj < Hdim-1; jj++) {
 
         if (jump > 0) {
@@ -189,18 +215,15 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
             }
         }
 
-        for (int ii = 0; ii < dim; ii++)
-            ek[ii] = nextPos[ii] - jumpFrom[ii];
-
-        int k = 0;
-        for(; k < static_cast<int>(ek.size()); k++) {
-            if(ek[k]) break;
+        k = 0;
+        for(; k < dim; k++) {
+            if(nextPos[k] != jumpFrom[k]) break;
         }
 
-        ullint nextCoordinate = vec2index(nextPos, resolution);
-        ullint fromCoordinate = vec2index(jumpFrom, resolution);
+        nextCoordinate = vec2index(nextPos, resolution);
+        fromCoordinate = vec2index(jumpFrom, resolution);
 
-        H[nextCoordinate] = H[fromCoordinate] + y[k]/(intsqrt[nextPos[k]-1]);
+        H[nextCoordinate] = H[fromCoordinate] * y[k]/(intsqrt[nextPos[k]-1]);
 
 
         std::vector<int> tmpjump(dim, 0);
