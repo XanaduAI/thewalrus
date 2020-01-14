@@ -99,18 +99,18 @@ namespace libwalrus {
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
+inline T* hermite_multidimensional_cpp(const std::vector<T> &R, const std::vector<T> &y, const int &resolution) {
     int dim = std::sqrt(static_cast<double>(R.size()));
 
     ullint Hdim = pow(resolution, dim);
-    std::vector<T> H(Hdim, 0);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
 
 
     H[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<int> ek(dim, 0);
     std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
@@ -123,8 +123,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
         nextCoordinate = vec2index(nextPos, resolution);
         fromCoordinate = vec2index(jumpFrom, resolution);
 
-        H[nextCoordinate] = H[nextCoordinate] + y[k];
-        H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
+        H[nextCoordinate] = H[fromCoordinate] * y[k];
 
         std::vector<int> tmpjump(dim, 0);
 
@@ -159,11 +158,12 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
  *
  */
 template <typename T>
-inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
+inline T*  renorm_hermite_multidimensional_cpp(const std::vector<T> &R, const std::vector<T> &y, const int &resolution) {
     int dim = std::sqrt(static_cast<double>(R.size()));
 
     ullint Hdim = pow(resolution, dim);
-    std::vector<T> H(Hdim, 0);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
 
     H[0] = 1;
     std::vector<double> intsqrt(resolution+1, 0);

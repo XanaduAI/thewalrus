@@ -1142,7 +1142,6 @@ namespace batchhafnian {
 TEST(BatchHafnian, Clements) {
     std::vector<std::complex<double>> mat4{std::complex<double>(-0.28264629150778969, 0.39867701584672210), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(-0.22959477315790058, 0.00000000000000008), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.06086128222348247, -0.12220227033305252), std::complex<double>(0.38245649793510783, -0.41413300040003126), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.13684045954832844, 0.00000000000000006), std::complex<double>(-0.22959477315790058, -0.00000000000000008), std::complex<double>(-0.00660678867199307, 0.09884501458235322), std::complex<double>(-0.28264629150778969, -0.39867701584672210), std::complex<double>(-0.06086128222348247, 0.12220227033305252), std::complex<double>(-0.00660678867199307, -0.09884501458235322), std::complex<double>(-0.13684045954832844, -0.00000000000000006), std::complex<double>(-0.06086128222348247, +0.12220227033305252), std::complex<double>(0.38245649793510783, 0.41413300040003126)};
     std::vector<std::complex<double>> d4{std::complex<double>(0.66917130190858, -1.52776303400764), std::complex<double>(-2.95847055822102, -1.29582519437023), std::complex<double>(0.66917130190858, 1.52776303400764), std::complex<double>(-2.95847055822102, 1.29582519437023)};
-    std::vector<std::complex<double>> out(256, 0.0);
     std::vector<double> expected_re{1.00000000e+00, -1.64614736e+00,  1.94351456e+00, -1.44618627e+00,
                                     4.35642368e-01, -1.32047906e+00,  2.23766490e+00, -1.86917564e+00,
                                     -6.76966967e-01,  5.73670333e-01, -7.33188149e-02, -1.21997190e-01,
@@ -1281,39 +1280,36 @@ TEST(BatchHafnian, Clements) {
     // Note that internaly we are implementing the modified multidimensional
     // Hermite polynomials, which means that we have to mat4 * d4 as the
     // second argument, this is precisely what is done in the previous two loops
-    
-    out = libwalrus::hermite_multidimensional_cpp(mat4, d4c, res);
+    std::complex<double> *out  = libwalrus::hermite_multidimensional_cpp(mat4, d4c, res);
 
     for (int i = 0; i < 256; i++) {
         EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
         EXPECT_NEAR(expected_im[i], std::imag(out[i]), tol2);
     }
-
+    free(out);
 }
-
 
 
 TEST(BatchHafnian, UnitRenormalization) {
     std::vector<std::complex<double>> B = {std::complex<double>(0, 0), std::complex<double>(-0.70710678, 0), std::complex<double>(-0.70710678, 0), std::complex<double>(0, 0)};
     std::vector<std::complex<double>> d(4, std::complex<double>(0.0, 0.0));
 
-    int res = 10;
+    int res = 4;
 
     std::vector<double> expected_re(res*res, 0);
     std::vector<double> expected_im(res*res, 0);
 
-    std::vector<std::complex<double>> out(res*res, 0.0);
-
-
     for (int i = 0; i < res; i++)
         expected_re[i*res+i] = pow(0.5, static_cast<double>(i)/2.0);
 
-    out = libwalrus::renorm_hermite_multidimensional_cpp(B, d, res);
+    std::complex<double> *tout  = libwalrus::renorm_hermite_multidimensional_cpp(B, d, res);
 
     for (int i = 0; i < res*res; i++) {
-        EXPECT_NEAR(expected_re[i], std::real(out[i]), tol2);
-        EXPECT_NEAR(expected_im[i], std::imag(out[i]), tol2);
+        EXPECT_NEAR(expected_re[i], std::real(tout[i]), tol2);
+        EXPECT_NEAR(expected_im[i], std::imag(tout[i]), tol2);
     }
+    free(tout);
+
 
 }
 
