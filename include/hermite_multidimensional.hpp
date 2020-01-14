@@ -54,8 +54,10 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
  * @param jump integer specifying whether to jump to the next index
  * @param resolution integer specifying the cuotff
  * @dim dimension of the R matrix
+ *
+ * @k index necessary for knowing which elements are needed from the input vector y and matrix R
  */
-void update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &resolution, const int &dim) {
+int update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &resolution, const int &dim) {
     if (jump > 0) {
         jumpFrom[jump] += 1;
         jump = 0;
@@ -75,8 +77,11 @@ void update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int 
             break;
         }
     }
-
-
+    int k=0;
+    for(; k < dim; k++) {
+        if(nextPos[k] != jumpFrom[k]) break;
+    }
+    return k;
 }
 
 namespace libwalrus {
@@ -113,15 +118,10 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
 
     for (ullint jj = 0; jj < Hdim-1; jj++) {
 
-        update_iterator(nextPos, jumpFrom, jump, resolution, dim);
+        k = update_iterator(nextPos, jumpFrom, jump, resolution, dim);
 
-        k = 0;
-        for(; k < dim; k++) {
-            if(nextPos[k] != jumpFrom[k]) break;
-        }
         nextCoordinate = vec2index(nextPos, resolution);
         fromCoordinate = vec2index(jumpFrom, resolution);
-
 
         H[nextCoordinate] = H[nextCoordinate] + y[k];
         H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
@@ -177,16 +177,15 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
     int k;
     ullint nextCoordinate, fromCoordinate;
     for (ullint jj = 0; jj < Hdim-1; jj++) {
-        update_iterator(nextPos, jumpFrom, jump, resolution, dim);
+        k = update_iterator(nextPos, jumpFrom, jump, resolution, dim);
 
-        k = 0;
-        for(; k < dim; k++) {
-            if(nextPos[k] != jumpFrom[k]) break;
-        }
         nextCoordinate = vec2index(nextPos, resolution);
         fromCoordinate = vec2index(jumpFrom, resolution);
+
         H[nextCoordinate] = H[fromCoordinate] * y[k]/(intsqrt[nextPos[k]-1]);
+
         std::vector<int> tmpjump(dim, 0);
+
         for (int ii = 0; ii < dim; ii++) {
             if (jumpFrom[ii] > 1) {
                 std::vector<int> prevJump(dim, 0);
