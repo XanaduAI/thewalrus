@@ -25,5 +25,12 @@ example.o: example.cpp
 example-cpp: example.o
 	$(CC) $^ $(LFLAGS) -o $@
 
+
+example_hermite.o: example_hermite.cpp
+	$(CC) $^ $(CFLAGS) -c
+
+example_hermite.out: example_hermite.o
+	$(CC) $^ $(LFLAGS) -o $@
+
 clean:
 	rm -rf *~ *.out *.o *.so *.pyc *.mod

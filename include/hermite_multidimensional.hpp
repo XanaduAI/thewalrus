@@ -200,8 +200,8 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
         ullint nextCoordinate = vec2index(nextPos, resolution);
         ullint fromCoordinate = vec2index(jumpFrom, resolution);
 
-        H[nextCoordinate] = H[nextCoordinate] + y[k]/(intsqrt[nextPos[k]-1]);
-        H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
+        H[nextCoordinate] = H[fromCoordinate] + y[k]/(intsqrt[nextPos[k]-1]);
+
 
         std::vector<int> tmpjump(dim, 0);
 
