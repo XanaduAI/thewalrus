@@ -474,20 +474,6 @@ def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
     return ndarray
-    """
-        cdef int i, j, n = R.shape[0]
-        cdef vector[double] R_mat, y_mat
-
-        for i in range(n):
-            for j in range(n):
-                R_mat.push_back(R[i, j])
-
-        for i in range(n):
-            y_mat.push_back(y[i])
-
-        return hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
-    """
-
 
 
 def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):
@@ -555,17 +541,3 @@ def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cuto
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
     return ndarray
-    """
-        cdef int i, j, n = R.shape[0]
-        cdef vector[double] R_mat, y_mat
-
-        for i in range(n):
-            for j in range(n):
-                R_mat.push_back(R[i, j])
-
-        for i in range(n):
-            y_mat.push_back(y[i])
-        length = cutoff**n
-
-        return renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
-    """
