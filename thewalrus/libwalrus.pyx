@@ -91,6 +91,10 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
 
     T* hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
     T* renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
+    T* interferometer_cpp[T](vector[T] &mat, int &resolution)
+    T* squeezing_cpp[T](vector[T] &mat, int &resolution)
+    T* displacement_cpp[T](vector[T] &y, int &resolution)
+    T* two_mode_squeezing_cpp[T](vector[T] &y, int &resolution)
 
 
 # ==============================================================================
@@ -534,6 +538,223 @@ def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cuto
         y_mat.push_back(y[i])
     length = cutoff**n
     cdef double *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+
+def interferometer(double complex[:, :] R, int cutoff):
+    r"""Returns the matrix elements of an interferometer by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        R (array[complex128]): square matrix parametrizing the interferometer
+        cutoff (int): maximum size of the subindices in the tensor
+
+    Returns:
+        array[complex128]: the matrix elements of the interferometer
+    """
+    cdef int i, j, n = R.shape[0]
+    cdef vector[double complex] R_mat
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(R[i, j])
+
+    length = cutoff**n
+    cdef double complex *array = interferometer_cpp(R_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapper()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+def interferometer_real(double [:, :] R, int cutoff):
+    r"""Returns the matrix elements of an interferometer by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        R (array[float64]): square matrix parametrizing the interferometer
+        cutoff (int): maximum size of the subindices in the tensor
+
+    Returns:
+        array[float64]: the matrix elements of the interferometer
+    """
+    cdef int i, j, n = R.shape[0]
+    cdef vector[double] R_mat
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(R[i, j])
+    length = cutoff**n
+    cdef double *array = interferometer_cpp(R_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+
+def squeezing(double complex[:, :] R, int cutoff):
+    r"""Returns the matrix elements of a single mode squeezer by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        R (array[complex128]): square matrix parametrizing the squeezing
+        cutoff (int): maximum size of the subindices in the tensor
+
+    Returns:
+        array[complex128]: the matrix elements of the squeezing operator
+    """
+    cdef int i, j, n = R.shape[0]
+    cdef vector[double complex] R_mat
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(R[i, j])
+    length = cutoff**n
+    cdef double complex *array = squeezing_cpp(R_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapper()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+
+def squeezing_real(double [:, :] R, int cutoff):
+    r"""Returns the matrix elements of a single mode squeezer by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        R (array[float64]): square matrix parametrizing the squeezing
+        cutoff (int): maximum size of the subindices in the tensor
+
+    Returns:
+        array[float64]: the matrix elements of the squeezing operator
+    """
+    cdef int i, j, n = R.shape[0]
+    cdef vector[double] R_mat
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(R[i, j])
+    length = cutoff**n
+    cdef double *array = squeezing_cpp(R_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+def displacement(double complex [:] y, int cutoff):
+    r"""Returns the matrix elements of a displacement by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        y (array[complex128]): vector parametrizing the displacement. It has the form :math:`[\alpha, -\alpha^*]`
+        cutoff (int): square matrix parametrizing the squeezing
+
+    Returns:
+        array[complex128]: the matrix elements of the squeezing operator
+    """
+    cdef int i, n = 2
+    cdef vector[double complex] y_mat
+    for i in range(n):
+        y_mat.push_back(y[i])
+    length = cutoff**n
+    cdef double complex *array = displacement_cpp(y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapper()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+
+def displacement_real(double [:] y, int cutoff):
+    r"""Returns the matrix elements of a displacement by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        y (array[float64]): vector parametrizing the displacement. It has the form :math:`[\alpha, -\alpha]`
+        cutoff (int): square matrix parametrizing the squeezing
+
+    Returns:
+        array[float64]: the matrix elements of the squeezing operator
+    """
+    cdef int i, n = 2
+    cdef vector[double] y_mat
+    for i in range(n):
+        y_mat.push_back(y[i])
+    length = cutoff**n
+    cdef double *array = displacement_cpp(y_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+def two_mode_squeezing(double complex[:, :] R, int cutoff):
+    r"""Returns the matrix elements of a two mode squeezer by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        R (array[complex128]): square matrix parametrizing the squeezing
+        cutoff (int): maximum size of the subindices in the tensor
+
+    Returns:
+        array[complex128]: the matrix elements of the squeezing operator
+    """
+    cdef int i, j, n = R.shape[0]
+    cdef vector[double complex] R_mat
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(R[i, j])
+    length = cutoff**n
+    cdef double complex *array = two_mode_squeezing_cpp(R_mat, cutoff)
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapper()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+def two_squeezing_real(double [:, :] R, int cutoff):
+    r"""Returns the matrix elements of a single mode squeezer by using a custom version of
+    the renormalized Hermite polynomials.
+
+    Args:
+        R (array[float64]): square matrix parametrizing the squeezing
+        cutoff (int): maximum size of the subindices in the tensor
+
+    Returns:
+        array[float64]: the matrix elements of the squeezing operator
+    """
+    cdef int i, j, n = R.shape[0]
+    cdef vector[double] R_mat
+
+    for i in range(n):
+        for j in range(n):
+            R_mat.push_back(R[i, j])
+    length = cutoff**n
+    cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)
     cdef np.ndarray ndarray
     array_wrapper = ArrayWrapperFloat()
     array_wrapper.set_data(length, <void*> array)
