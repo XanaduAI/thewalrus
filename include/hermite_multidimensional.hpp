@@ -46,6 +46,39 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
 
 }
 
+/**
+ * Updates the iterators needed for the calculation of the Hermite multidimensional functions
+ *
+ * @param nextPos a vector of integers
+ * @param jumpFrom a vector of integers
+ * @param jump integer specifying whether to jump to the next index
+ * @param resolution integer specifying the cuotff
+ * @dim dimension of the R matrix
+ */
+void update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &resolution, const int &dim) {
+    if (jump > 0) {
+        jumpFrom[jump] += 1;
+        jump = 0;
+    }
+    for (int ii = 0; ii < dim; ii++) {
+        std::vector<int> forwardStep(dim, 0);
+        forwardStep[ii] = 1;
+
+        if ( forwardStep[ii] + nextPos[ii] > resolution) {
+            nextPos[ii] = 1;
+            jumpFrom[ii] = 1;
+            jump = ii+1;
+        }
+        else {
+            jumpFrom[ii] = nextPos[ii];
+            nextPos[ii] = nextPos[ii] + 1;
+            break;
+        }
+    }
+
+
+}
+
 namespace libwalrus {
 
 /**
@@ -75,41 +108,19 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
     std::vector<int> ek(dim, 0);
     std::vector<double> factors(resolution+1, 0);
     int jump = 0;
+    int k;
+    ullint nextCoordinate, fromCoordinate;
 
     for (ullint jj = 0; jj < Hdim-1; jj++) {
 
-        if (jump > 0) {
-            jumpFrom[jump] += 1;
-            jump = 0;
+        update_iterator(nextPos, jumpFrom, jump, resolution, dim);
+
+        k = 0;
+        for(; k < dim; k++) {
+            if(nextPos[k] != jumpFrom[k]) break;
         }
-
-
-        for (int ii = 0; ii < dim; ii++) {
-            std::vector<int> forwardStep(dim, 0);
-            forwardStep[ii] = 1;
-
-            if ( forwardStep[ii] + nextPos[ii] > resolution) {
-                nextPos[ii] = 1;
-                jumpFrom[ii] = 1;
-                jump = ii+1;
-            }
-            else {
-                jumpFrom[ii] = nextPos[ii];
-                nextPos[ii] = nextPos[ii] + 1;
-                break;
-            }
-        }
-
-        for (int ii = 0; ii < dim; ii++)
-            ek[ii] = nextPos[ii] - jumpFrom[ii];
-
-        int k = 0;
-        for(; k < static_cast<int>(ek.size()); k++) {
-            if(ek[k]) break;
-        }
-
-        ullint nextCoordinate = vec2index(nextPos, resolution);
-        ullint fromCoordinate = vec2index(jumpFrom, resolution);
+        nextCoordinate = vec2index(nextPos, resolution);
+        fromCoordinate = vec2index(jumpFrom, resolution);
 
 
         H[nextCoordinate] = H[nextCoordinate] + y[k];
@@ -147,32 +158,6 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
  * @param resolution highest number of photons to be resolved.
  *
  */
-
-
-void update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &resolution, const int &dim){
-    if (jump > 0) {
-	    jumpFrom[jump] += 1;
-        jump = 0;
-    }
-    for (int ii = 0; ii < dim; ii++) {
-	    std::vector<int> forwardStep(dim, 0);
-	    forwardStep[ii] = 1;
-
-	    if ( forwardStep[ii] + nextPos[ii] > resolution) {
-	        nextPos[ii] = 1;
-	        jumpFrom[ii] = 1;
-	        jump = ii+1;
-	    }
-	    else {
-	        jumpFrom[ii] = nextPos[ii];
-	        nextPos[ii] = nextPos[ii] + 1;
-	        break;
-	    }
-}
-
-
-}
-
 template <typename T>
 inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
     int dim = std::sqrt(static_cast<double>(R.size()));
@@ -192,42 +177,16 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
     int k;
     ullint nextCoordinate, fromCoordinate;
     for (ullint jj = 0; jj < Hdim-1; jj++) {
-
-        if (jump > 0) {
-            jumpFrom[jump] += 1;
-            jump = 0;
-        }
-
-
-        for (int ii = 0; ii < dim; ii++) {
-            std::vector<int> forwardStep(dim, 0);
-            forwardStep[ii] = 1;
-
-            if ( forwardStep[ii] + nextPos[ii] > resolution) {
-                nextPos[ii] = 1;
-                jumpFrom[ii] = 1;
-                jump = ii+1;
-            }
-            else {
-                jumpFrom[ii] = nextPos[ii];
-                nextPos[ii] = nextPos[ii] + 1;
-                break;
-            }
-        }
+        update_iterator(nextPos, jumpFrom, jump, resolution, dim);
 
         k = 0;
         for(; k < dim; k++) {
             if(nextPos[k] != jumpFrom[k]) break;
         }
-
         nextCoordinate = vec2index(nextPos, resolution);
         fromCoordinate = vec2index(jumpFrom, resolution);
-
         H[nextCoordinate] = H[fromCoordinate] * y[k]/(intsqrt[nextPos[k]-1]);
-
-
         std::vector<int> tmpjump(dim, 0);
-
         for (int ii = 0; ii < dim; ii++) {
             if (jumpFrom[ii] > 1) {
                 std::vector<int> prevJump(dim, 0);
@@ -235,13 +194,10 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
                 ullint prevCoordinate = vec2index(tmpjump, resolution);
                 H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*(R[k*dim+ii])*H[prevCoordinate];
-
             }
         }
-
     }
     return H;
-
 }
 
 
