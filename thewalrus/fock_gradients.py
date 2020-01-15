@@ -250,14 +250,11 @@ def BSgate(theta, phi, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
-    U = np.array(
-        [
-            [np.cos(theta), -np.sin(theta) * np.exp(-1j * phi)],
-            [np.sin(theta) * np.exp(1j * phi), np.cos(theta)],
-        ]
+    ct = np.cos(theta)
+    st = np.sin(theta) * np.exp(1j * phi)
+    mat = np.array(
+        [[0, 0, ct, -np.conj(st)], [0, 0, st, ct], [ct, st, 0, 0], [-np.conj(st), ct, 0, 0]]
     )
-    zm = np.zeros_like(U)
-    mat = np.block([[zm, -U], [-U.T, zm]])
 
     if not grad:
         return interferometer(mat, cutoff), None, None
@@ -458,9 +455,9 @@ def BSgate_real(theta, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
-    U = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-    zm = np.zeros_like(U)
-    mat = np.block([[zm, -U], [-U.T, zm]])
+    ct = np.cos(theta)
+    st = np.sin(theta)
+    mat = np.array([[0, 0, ct, -st], [0, 0, st, ct], [ct, st, 0, 0], [-st, ct, 0, 0]])
 
     if not grad:
         return interferometer_real(mat, cutoff), None

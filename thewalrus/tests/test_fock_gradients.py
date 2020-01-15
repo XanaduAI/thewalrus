@@ -111,6 +111,7 @@ def test_Xgate():
     dXfd = (Xp - Xm) / (2 * dx)
     assert np.allclose(dX, dXfd, atol=1e-5, rtol=0)
 
+
 def test_Sgate_real():
     """Tests the value of the analytic gradient for the Sgate_real against finite differences"""
     cutoff = 10
@@ -145,6 +146,7 @@ def test_Kgate():
     Rm, _ = Kgate(theta - dtheta, cutoff)
     dRfd = (Rs - Rm) / (2 * dtheta)
     assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
+
 
 def test_S2gate_real():
     """Tests the value of the analytic gradient for the S2gate_real against finite differences"""
