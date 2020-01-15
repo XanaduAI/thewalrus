@@ -279,7 +279,6 @@ inline T* interferometer_cpp(const std::vector<T> &R, const int &resolution) {
 template <typename T>
 inline T* squeezing_cpp(const std::vector<T> &R, const int &resolution) {
     int dim = std::sqrt(static_cast<double>(R.size()));
-
     ullint Hdim = pow(resolution, dim);
     T *H;
     H = (T*) malloc(sizeof(T)*Hdim);

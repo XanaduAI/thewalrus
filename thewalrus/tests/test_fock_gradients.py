@@ -18,7 +18,7 @@ from thewalrus.fock_gradients import (
     BSgate,
     Sgate,
     S2gate,
-    Xgate_one_param,
+    Xgate,
     Zgate_one_param,
     Sgate_one_param,
     S2gate_one_param,
@@ -101,14 +101,14 @@ def test_BSgate():
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
 
 
-def test_Xgate_one_param():
+def test_Xgate():
     """Tests the value of the analytic gradient for the Xgate_one_param against finite differences"""
     cutoff = 10
     x = 1.0
-    _, dX = Xgate_one_param(x, cutoff, grad=True)
+    _, dX = Xgate(x, cutoff, grad=True)
     dx = 0.001
-    Xp, _ = Xgate_one_param(x + dx, cutoff)
-    Xm, _ = Xgate_one_param(x - dx, cutoff)
+    Xp, _ = Xgate(x + dx, cutoff)
+    Xm, _ = Xgate(x - dx, cutoff)
     dXfd = (Xp - Xm) / (2 * dx)
     assert np.allclose(dX, dXfd, atol=1e-5, rtol=0)
 
@@ -123,7 +123,6 @@ def test_Zgate_one_param():
     Zm, _ = Zgate_one_param(p - dp, cutoff)
     dZfd = (Zp - Zm) / (2 * dp)
     assert np.allclose(dZ, dZfd, atol=1e-5, rtol=0)
-
 
 def test_Sgate_one_param():
     """Tests the value of the analytic gradient for the Sgate_one_param against finite differences"""
@@ -159,7 +158,6 @@ def test_Kgate():
     Rm, _ = Kgate(theta - dtheta, cutoff)
     dRfd = (Rs - Rm) / (2 * dtheta)
     assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
-
 
 def test_S2gate_one_param():
     """Tests the value of the analytic gradient for the S2gate_one_param against finite differences"""

@@ -23,7 +23,7 @@ the Kerr gate, as well as their gradients.
 .. autosummary::
     :toctree: api
 
-    Xgate_one_param
+    Xgate
     Zgate_one_param
     Dgate
     Sgate
@@ -44,7 +44,7 @@ from numba import jit
 from thewalrus.libwalrus import interferometer, squeezing, displacement, interferometer_real, displacement_real, squeezing_real, two_mode_squeezing, two_mode_squeezing_real
 
 from thewalrus.quantum import fock_tensor
-from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
+from thewalrus.symplectic import beam_splitter
 
 
 @jit("void(complex128[:,:], complex128[:,:], complex128[:,:], double)")
@@ -84,9 +84,9 @@ def Dgate(r, theta, cutoff, grad=False):
     y = np.array([r * phase, -r * np.conj(phase)])
 
     if not grad:
-        return np.reshape(displacement(y, cutoff), [cutoff, cutoff]), None, None
+        return displacement(y, cutoff), None, None
 
-    T = np.reshape(displacement(y, cutoff+1), [cutoff+1, cutoff+1])
+    T = displacement(y, cutoff+1)
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Dgate(T, gradTr, gradTtheta, theta)
@@ -126,15 +126,14 @@ def Sgate(r, theta, cutoff, grad=False):
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
-    alpha = np.array([0.0])
-    S = squeezing(r, theta)
-
+    mat = np.array([[np.exp(1j*theta)*np.tanh(r), -1.0/np.cosh(r)],[-1.0/np.cosh(r),-np.exp(-1j*theta)*np.tanh(r)]])
     if not grad:
-        return fock_tensor(S, alpha, cutoff), None, None
+        return squeezing(mat, cutoff), None, None
 
-    T = np.complex128(fock_tensor(S, alpha, cutoff + 2))
+    T = squeezing(mat, cutoff+2)
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
+
     grad_Sgate(T, gradTr, gradTtheta, theta)
     return T[0:cutoff, 0:cutoff], gradTr, gradTtheta
 
@@ -178,11 +177,17 @@ def S2gate(r, theta, cutoff, grad=False):
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
-    S = two_mode_squeezing(r, theta)
-    if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff), None, None
 
-    T = np.complex128(fock_tensor(S, np.zeros([2]), cutoff + 1))
+    sc = 1.0/np.cosh(r)
+    eiptr = np.exp(-1j*theta)*np.tanh(r)
+    mat = np.array([[0, -np.conj(eiptr), -sc, 0],
+                   [-np.conj(eiptr),0,0,-sc],
+                   [-sc,0,0,eiptr],
+                   [0,-sc,eiptr,0]])
+    if not grad:
+        return two_mode_squeezing(mat, cutoff), None, None
+
+    T = two_mode_squeezing(mat, cutoff+1)
     gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_S2gate(T, gradTr, gradTtheta, theta)
@@ -242,7 +247,7 @@ def BSgate(theta, phi, cutoff, grad=False):
 
 
 @jit("void(double[:,:], double[:,:])")
-def grad_Xgate_one_param(T, gradT):  # pragma: no cover
+def grad_Xgate(T, gradT):  # pragma: no cover
     """Calculates the gradient of the Xgate.
 
     Args:
@@ -257,7 +262,7 @@ def grad_Xgate_one_param(T, gradT):  # pragma: no cover
                 gradT[n, m] -= np.sqrt(m) * T[n, m - 1]
 
 
-def Xgate_one_param(x, cutoff, grad=False, hbar=2):
+def Xgate(x, cutoff, grad=False, hbar=2):
     """Calculates the Fock representation of the Xgate and its gradient.
 
     Args:
@@ -272,11 +277,11 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2):
     y = np.array([x, -x ])
 
     if not grad:
-        return np.reshape(displacement_real(y, cutoff), [cutoff, cutoff]), None
+        return displacement_real(y, cutoff), None
 
-    T = np.reshape(displacement_real(y, cutoff+1), [cutoff+1, cutoff+1])
+    T = displacement_real(y, cutoff+1)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
-    grad_Xgate_one_param(T, gradT)
+    grad_Xgate(T, gradT)
     return T[0:cutoff, 0:cutoff], gradT
 
     """
@@ -360,11 +365,11 @@ def Sgate_one_param(s, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
     """
-    S = squeezing(s, 0.0)
+    mat = np.array([[np.tanh(s), -1.0/np.cosh(s)],[-1.0/np.cosh(s),-np.tanh(s)]])
     if not grad:
-        return fock_tensor(S, np.zeros([1]), cutoff), None
+        return squeezing_real(mat, cutoff), None
 
-    T = fock_tensor(S, np.zeros([1]), cutoff + 2)
+    T = squeezing_real(mat, cutoff+2)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Sgate_one_param(T, gradT)
 
@@ -437,11 +442,16 @@ def S2gate_one_param(s, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
-    S = two_mode_squeezing(s, 0)
+    sc = 1.0/np.cosh(s)
+    tr = np.tanh(s)
+    mat = np.array([[0, -tr, -sc, 0],
+                   [-tr,0,0,-sc],
+                   [-sc,0,0,tr],
+                   [0,-sc,tr,0]])
     if not grad:
-        return fock_tensor(S, np.zeros([2]), cutoff), None
+        return two_mode_squeezing_real(mat, cutoff), None
 
-    T = fock_tensor(S, np.zeros([2]), cutoff + 1)
+    T = two_mode_squeezing_real(mat, cutoff+1)
     gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
     grad_S2gate_one_param(T, gradT)
 

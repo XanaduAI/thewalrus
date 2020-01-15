@@ -583,7 +583,7 @@ def interferometer(double complex[:, :] R, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 def interferometer_real(double [:, :] R, int cutoff):
     r"""Returns the matrix elements of an interferometer by using a custom version of
@@ -610,7 +610,7 @@ def interferometer_real(double [:, :] R, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 
 def squeezing(double complex[:, :] R, int cutoff):
@@ -624,7 +624,7 @@ def squeezing(double complex[:, :] R, int cutoff):
     Returns:
         array[complex128]: the matrix elements of the squeezing operator
     """
-    cdef int i, j, n = R.shape[0]
+    cdef int i, j, n = 2
     cdef vector[double complex] R_mat
 
     for i in range(n):
@@ -638,7 +638,7 @@ def squeezing(double complex[:, :] R, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 
 def squeezing_real(double [:, :] R, int cutoff):
@@ -652,7 +652,7 @@ def squeezing_real(double [:, :] R, int cutoff):
     Returns:
         array[float64]: the matrix elements of the squeezing operator
     """
-    cdef int i, j, n = R.shape[0]
+    cdef int i, j, n = 2
     cdef vector[double] R_mat
 
     for i in range(n):
@@ -666,7 +666,7 @@ def squeezing_real(double [:, :] R, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 def displacement(double complex [:] y, int cutoff):
     r"""Returns the matrix elements of a displacement by using a custom version of
@@ -691,7 +691,7 @@ def displacement(double complex [:] y, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 
 def displacement_real(double [:] y, int cutoff):
@@ -717,7 +717,7 @@ def displacement_real(double [:] y, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 def two_mode_squeezing(double complex[:, :] R, int cutoff):
     r"""Returns the matrix elements of a two mode squeezer by using a custom version of
@@ -744,7 +744,7 @@ def two_mode_squeezing(double complex[:, :] R, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
 
 def two_mode_squeezing_real(double [:, :] R, int cutoff):
     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
@@ -771,4 +771,4 @@ def two_mode_squeezing_real(double [:, :] R, int cutoff):
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return ndarray
+    return np.reshape(ndarray, [cutoff]*n)
