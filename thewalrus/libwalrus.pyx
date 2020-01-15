@@ -24,6 +24,11 @@ np.import_array()
 
 
 cdef class ArrayWrapper:
+    """Wrapper class to pass arrays of complex doubles transparently between
+    C++ and python.
+    Modified from:
+    https://stackoverflow.com/questions/45133276/passing-c-vector-to-numpy-through-cython-without-copying-and-taking-care-of-me
+    """
     cdef void* data_ptr
     cdef int size
 
@@ -43,6 +48,11 @@ cdef class ArrayWrapper:
 
 
 cdef class ArrayWrapperFloat:
+    """Wrapper class to pass arrays of doubles transparently between
+    C++ and python.
+    Modified from:
+    https://stackoverflow.com/questions/45133276/passing-c-vector-to-numpy-through-cython-without-copying-and-taking-care-of-me
+    """
     cdef void* data_ptr
     cdef int size
 
@@ -736,7 +746,7 @@ def two_mode_squeezing(double complex[:, :] R, int cutoff):
     Py_INCREF(array_wrapper)
     return ndarray
 
-def two_squeezing_real(double [:, :] R, int cutoff):
+def two_mode_squeezing_real(double [:, :] R, int cutoff):
     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
     the renormalized Hermite polynomials.
 
