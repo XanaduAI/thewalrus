@@ -40,6 +40,9 @@ import numpy as np
 
 from numba import jit
 
+
+from thewalrus.libwalrus import interferometer, squeezing, displacement, interferometer_real, displacement_real, squeezing_real, two_mode_squeezing, two_mode_squeezing_real
+
 from thewalrus.quantum import fock_tensor
 from thewalrus.symplectic import squeezing, two_mode_squeezing, beam_splitter
 
@@ -77,13 +80,13 @@ def Dgate(r, theta, cutoff, grad=False):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     nmodes = 1
-    alpha = np.array([r * np.exp(1j * theta)])
-    S = np.identity(2 * nmodes)
+    phase = np.exp(1j * theta)
+    y = np.array([r * phase, -r * np.conj(phase)])
 
     if not grad:
-        return fock_tensor(S, alpha, cutoff), None, None
+        return np.reshape(displacement(y, cutoff), [cutoff, cutoff]), None, None
 
-    T = np.complex128(fock_tensor(S, alpha, cutoff + 1))
+    T = np.reshape(displacement(y, cutoff+1), [cutoff+1, cutoff+1])
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Dgate(T, gradTr, gradTtheta, theta)
@@ -238,21 +241,20 @@ def BSgate(theta, phi, cutoff, grad=False):
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTtheta, gradTphi
 
 
-@jit("void(double[:,:], double[:,:], double)")
-def grad_Xgate_one_param(T, gradT, pref):  # pragma: no cover
+@jit("void(double[:,:], double[:,:])")
+def grad_Xgate_one_param(T, gradT):  # pragma: no cover
     """Calculates the gradient of the Xgate.
 
     Args:
         T (array[float]): array representing the gate
         gradT (array[float]): array of zeros that will contain the value of the gradient
-        pref (float): prefactor used to rescale the gradient
     """
     cutoff = gradT.shape[0]
     for n in range(cutoff):
         for m in range(cutoff):
-            gradT[n, m] = np.sqrt(m + 1) * T[n, m + 1] * pref
+            gradT[n, m] = np.sqrt(m + 1) * T[n, m + 1]
             if m > 0:
-                gradT[n, m] -= np.sqrt(m) * T[n, m - 1] * pref
+                gradT[n, m] -= np.sqrt(m) * T[n, m - 1]
 
 
 def Xgate_one_param(x, cutoff, grad=False, hbar=2):
@@ -267,11 +269,17 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
     """
-    nmodes = 1
-    pref = 1.0 / np.sqrt(2 * hbar)
-    alpha = np.array([pref * x])
-    S = np.identity(2 * nmodes)
+    y = np.array([x, -x ])
 
+    if not grad:
+        return np.reshape(displacement_real(y, cutoff), [cutoff, cutoff]), None
+
+    T = np.reshape(displacement_real(y, cutoff+1), [cutoff+1, cutoff+1])
+    gradT = np.zeros([cutoff, cutoff], dtype=float)
+    grad_Xgate_one_param(T, gradT)
+    return T[0:cutoff, 0:cutoff], gradT
+
+    """
     if not grad:
         return fock_tensor(S, alpha, cutoff), None
 
@@ -279,7 +287,7 @@ def Xgate_one_param(x, cutoff, grad=False, hbar=2):
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Xgate_one_param(T, gradT, pref)
     return T[0:cutoff, 0:cutoff], gradT
-
+    """
 
 @jit("void(complex128[:,:], complex128[:,:], double)")
 def grad_Zgate_one_param(T, gradT, pref):  # pragma: no cover
