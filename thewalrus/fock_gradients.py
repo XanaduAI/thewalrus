@@ -24,7 +24,6 @@ the Kerr gate, as well as their gradients.
     :toctree: api
 
     Xgate
-    Zgate
     Dgate
     Sgate
     Rgate
