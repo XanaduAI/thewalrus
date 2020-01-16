@@ -3470,7 +3470,7 @@ static PyObject *__pyx_pf_9libwalrus_17ArrayWrapperFloat_6__setstate_cython__(CY
  * 
  * 
  * cdef double_pointer_to_array(double *array, int length):             # <<<<<<<<<<<<<<
- *     """Converts an pointer of C doubles into a numpy array.
+ *     """Converts a pointer of C doubles into a numpy array.
  * 
  */
 
@@ -3571,7 +3571,7 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
  * 
  * 
  * cdef double_pointer_to_array(double *array, int length):             # <<<<<<<<<<<<<<
- *     """Converts an pointer of C doubles into a numpy array.
+ *     """Converts a pointer of C doubles into a numpy array.
  * 
  */
 
@@ -3595,7 +3595,7 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
  * 
  * 
  * cdef complex_pointer_to_array(double complex *array, int length):             # <<<<<<<<<<<<<<
- *     """Converts an pointer of C doubles into a numpy array.
+ *     """Converts a pointer of C complex doubles into a numpy array.
  * 
  */
 
@@ -3696,7 +3696,7 @@ static PyObject *__pyx_f_9libwalrus_complex_pointer_to_array(__pyx_t_double_comp
  * 
  * 
  * cdef complex_pointer_to_array(double complex *array, int length):             # <<<<<<<<<<<<<<
- *     """Converts an pointer of C doubles into a numpy array.
+ *     """Converts a pointer of C complex doubles into a numpy array.
  * 
  */
 
@@ -9050,7 +9050,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)
- *     #    cdef np.ndarray ndarray
+ * 
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
@@ -9058,28 +9058,27 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n
  *     cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
- *     #    cdef np.ndarray ndarray
- *     #    array_wrapper = ArrayWrapperFloat()
+ * 
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  */
   __pyx_v_array = libwalrus::two_mode_squeezing_cpp<double>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":762
- *     #    ndarray.base = <PyObject*> array_wrapper
- *     #    Py_INCREF(array_wrapper)
+  /* "libwalrus.pyx":757
+ *     cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)
+ * 
  *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
- *     #    return np.reshape(ndarray, [cutoff]*n)
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 762, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 757, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 762, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 757, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 762, __pyx_L1_error)
+  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 757, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 762, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 757, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 762, __pyx_L1_error)
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 757, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
@@ -9104,7 +9103,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_11)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
-    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 762, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 757, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -9114,7 +9113,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
-    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 762, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 757, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -9122,7 +9121,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   } else
   #endif
   {
-    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 762, __pyx_L1_error)
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     if (__pyx_t_12) {
       __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
@@ -9133,7 +9132,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
     PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
     __pyx_t_13 = 0;
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 762, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
