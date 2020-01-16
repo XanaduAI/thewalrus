@@ -674,10 +674,10 @@ def displacement(double complex [:] y, int cutoff):
 
     Args:
         y (array[complex128]): vector parametrizing the displacement. It has the form :math:`[\alpha, -\alpha^*]`
-        cutoff (int): square matrix parametrizing the squeezing
+        cutoff (int): maximum size of the subindices in the tensor
 
     Returns:
-        array[complex128]: the matrix elements of the squeezing operator
+        array[complex128]: the matrix elements of the displacement operator
     """
     cdef int i, n = 2
     cdef vector[double complex] y_mat
@@ -699,11 +699,11 @@ def displacement_real(double [:] y, int cutoff):
     the renormalized Hermite polynomials.
 
     Args:
-        y (array[float64]): vector parametrizing the displacement. It has the form :math:`[\alpha, -\alpha]`
-        cutoff (int): square matrix parametrizing the squeezing
+        y (array[float64]): vector parametrizing the displacement. It has the form :math:`[x, -x]`
+        cutoff (int): maximum size of the subindices in the tensor
 
     Returns:
-        array[float64]: the matrix elements of the squeezing operator
+        array[float64]: the matrix elements of the real displacement operator
     """
     cdef int i, n = 2
     cdef vector[double] y_mat
@@ -724,11 +724,11 @@ def two_mode_squeezing(double complex[:, :] R, int cutoff):
     the renormalized Hermite polynomials.
 
     Args:
-        R (array[complex128]): square matrix parametrizing the squeezing
+        R (array[complex128]): square matrix parametrizing the two-mode squeezing operator
         cutoff (int): maximum size of the subindices in the tensor
 
     Returns:
-        array[complex128]: the matrix elements of the squeezing operator
+        array[complex128]: the matrix elements of the two-mode squeezing operator
     """
     cdef int i, j, n = R.shape[0]
     cdef vector[double complex] R_mat
@@ -751,11 +751,11 @@ def two_mode_squeezing_real(double [:, :] R, int cutoff):
     the renormalized Hermite polynomials.
 
     Args:
-        R (array[float64]): square matrix parametrizing the squeezing
+        R (array[float64]): square matrix parametrizing the two-mode squeezing operator
         cutoff (int): maximum size of the subindices in the tensor
 
     Returns:
-        array[float64]: the matrix elements of the squeezing operator
+        array[float64]: the matrix elements of the two-mode squeezing operator
     """
     cdef int i, j, n = R.shape[0]
     cdef vector[double] R_mat
