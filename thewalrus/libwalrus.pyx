@@ -70,6 +70,8 @@ cdef class ArrayWrapperFloat:
     def __dealloc__(self):
         free(<void*>self.data_ptr)
 
+
+
 cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     T hafnian[T](vector[T] &mat)
     T hafnian_recursive[T](vector[T] &mat)
@@ -738,13 +740,55 @@ def two_mode_squeezing(double complex[:, :] R, int cutoff):
             R_mat.push_back(R[i, j])
     length = cutoff**n
     cdef double complex *array = two_mode_squeezing_cpp(R_mat, cutoff)
+    #cdef np.ndarray ndarray
+    #array_wrapper = ArrayWrapper()
+    #array_wrapper.set_data(length, <void*> array)
+    #ndarray = np.array(array_wrapper, copy=False)
+    #ndarray.base = <PyObject*> array_wrapper
+    #Py_INCREF(array_wrapper)
+    #return np.reshape(ndarray, [cutoff]*n)
+    return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
+
+cdef double_pointer_to_array(double *array, int length):
+    """Converts an pointer of C doubles into a numpy array.
+
+    Args:
+        array (double*): pointer of double
+        length (int): size of the array
+
+    Returns:
+        array[float64]: a numpy array with the contents of the input array
+    """
+
+    cdef np.ndarray ndarray
+    array_wrapper = ArrayWrapperFloat()
+    array_wrapper.set_data(length, <void*> array)
+    ndarray = np.array(array_wrapper, copy=False)
+    ndarray.base = <PyObject*> array_wrapper
+    Py_INCREF(array_wrapper)
+    return ndarray
+
+
+cdef complex_pointer_to_array(double complex *array, int length):
+    """Converts an pointer of C doubles into a numpy array.
+
+    Args:
+        array (double complex*): pointer of double
+        length (int): size of the array
+
+    Returns:
+        array[complex128]: a numpy array with the contents of the input array
+    """
+
     cdef np.ndarray ndarray
     array_wrapper = ArrayWrapper()
     array_wrapper.set_data(length, <void*> array)
     ndarray = np.array(array_wrapper, copy=False)
     ndarray.base = <PyObject*> array_wrapper
     Py_INCREF(array_wrapper)
-    return np.reshape(ndarray, [cutoff]*n)
+    return ndarray
+
+
 
 def two_mode_squeezing_real(double [:, :] R, int cutoff):
     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
@@ -765,10 +809,11 @@ def two_mode_squeezing_real(double [:, :] R, int cutoff):
             R_mat.push_back(R[i, j])
     length = cutoff**n
     cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)
-    cdef np.ndarray ndarray
-    array_wrapper = ArrayWrapperFloat()
-    array_wrapper.set_data(length, <void*> array)
-    ndarray = np.array(array_wrapper, copy=False)
-    ndarray.base = <PyObject*> array_wrapper
-    Py_INCREF(array_wrapper)
-    return np.reshape(ndarray, [cutoff]*n)
+    #    cdef np.ndarray ndarray
+    #    array_wrapper = ArrayWrapperFloat()
+    #    array_wrapper.set_data(length, <void*> array)
+    #    ndarray = np.array(array_wrapper, copy=False)
+    #    ndarray.base = <PyObject*> array_wrapper
+    #    Py_INCREF(array_wrapper)
+    return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
+    #    return np.reshape(ndarray, [cutoff]*n)
