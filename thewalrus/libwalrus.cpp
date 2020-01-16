@@ -1618,41 +1618,6 @@ static CYTHON_INLINE int __pyx_sub_acquisition_count_locked(
 static CYTHON_INLINE void __Pyx_INC_MEMVIEW(__Pyx_memviewslice *, int, int);
 static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *, int, int);
 
-/* PyFunctionFastCall.proto */
-#if CYTHON_FAST_PYCALL
-#define __Pyx_PyFunction_FastCall(func, args, nargs)\
-    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
-#if 1 || PY_VERSION_HEX < 0x030600B1
-static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
-#else
-#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
-#endif
-#define __Pyx_BUILD_ASSERT_EXPR(cond)\
-    (sizeof(char [1 - 2*!(cond)]) - 1)
-#ifndef Py_MEMBER_SIZE
-#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
-#endif
-  static size_t __pyx_pyframe_localsplus_offset = 0;
-  #include "frameobject.h"
-  #define __Pxy_PyFrame_Initialize_Offsets()\
-    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
-     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
-  #define __Pyx_PyFrame_GetLocalsplus(frame)\
-    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
-#endif
-
-/* PyObjectCallMethO.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
-#endif
-
-/* PyObjectCallNoArg.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
-#else
-#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
-#endif
-
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1700,8 +1665,28 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
 #endif
 
-/* ExtTypeTest.proto */
-static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
+/* PyFunctionFastCall.proto */
+#if CYTHON_FAST_PYCALL
+#define __Pyx_PyFunction_FastCall(func, args, nargs)\
+    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
+#if 1 || PY_VERSION_HEX < 0x030600B1
+static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
+#else
+#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
+#endif
+#define __Pyx_BUILD_ASSERT_EXPR(cond)\
+    (sizeof(char [1 - 2*!(cond)]) - 1)
+#ifndef Py_MEMBER_SIZE
+#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
+#endif
+  static size_t __pyx_pyframe_localsplus_offset = 0;
+  #include "frameobject.h"
+  #define __Pxy_PyFrame_Initialize_Offsets()\
+    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
+     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
+  #define __Pyx_PyFrame_GetLocalsplus(frame)\
+    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
+#endif
 
 /* PyCFunctionFastCall.proto */
 #if CYTHON_FAST_PYCCALL
@@ -1709,6 +1694,21 @@ static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObje
 #else
 #define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
 #endif
+
+/* PyObjectCallMethO.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+/* PyObjectCallNoArg.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
+#else
+#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
+#endif
+
+/* ExtTypeTest.proto */
+static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
 
 /* PyObjectCallOneArg.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
@@ -2499,7 +2499,6 @@ static const char __pyx_k_update[] = "update";
 static const char __pyx_k_fortran[] = "fortran";
 static const char __pyx_k_haf_int[] = "haf_int";
 static const char __pyx_k_memview[] = "memview";
-static const char __pyx_k_ndarray[] = "ndarray";
 static const char __pyx_k_reshape[] = "reshape";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
 static const char __pyx_k_getstate[] = "__getstate__";
@@ -2531,7 +2530,6 @@ static const char __pyx_k_haf_rpt_real[] = "haf_rpt_real";
 static const char __pyx_k_perm_complex[] = "perm_complex";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
-static const char __pyx_k_array_wrapper[] = "array_wrapper";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_interferometer[] = "interferometer";
@@ -2625,7 +2623,6 @@ static PyObject *__pyx_n_s_View_MemoryView;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_approx;
 static PyObject *__pyx_n_s_array;
-static PyObject *__pyx_n_s_array_wrapper;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
@@ -2677,7 +2674,6 @@ static PyObject *__pyx_n_s_mu;
 static PyObject *__pyx_n_s_n;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_name_2;
-static PyObject *__pyx_n_s_ndarray;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
 static PyObject *__pyx_n_s_ndim;
@@ -5946,8 +5942,6 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
   std::vector<__pyx_t_double_complex>  __pyx_v_y_mat;
   int __pyx_v_length;
   __pyx_t_double_complex *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapper *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -5960,9 +5954,6 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   PyObject *__pyx_t_10 = NULL;
-  PyObject *__pyx_t_11 = NULL;
-  PyObject *__pyx_t_12 = NULL;
-  PyObject *__pyx_t_13 = NULL;
   __Pyx_RefNannySetupContext("hermite_multidimensional", 0);
 
   /* "libwalrus.pyx":442
@@ -6057,91 +6048,23 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
  *     length = cutoff**n
  * 
  *     cdef double complex *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapper()
  */
   __pyx_v_array = libwalrus::hermite_multidimensional_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":455
- *     cdef double complex *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_10 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 455, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapper *)__pyx_t_10);
-  __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":456
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_10 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 456, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":457
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 457, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 457, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = PyTuple_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 457, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 457, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 457, __pyx_L1_error)
-  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_10, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 457, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  if (!(likely(((__pyx_t_13) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_13, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 457, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_13);
-  __pyx_t_13 = 0;
-
-  /* "libwalrus.pyx":458
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return ndarray
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":459
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return ndarray
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":460
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return ndarray             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":461
+ *     #Py_INCREF(array_wrapper)
+ *     #return ndarray
+ *     return complex_pointer_to_array(array, length)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-  __pyx_r = ((PyObject *)__pyx_v_ndarray);
+  __pyx_t_10 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 461, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
   /* "libwalrus.pyx":430
@@ -6155,14 +6078,9 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_XDECREF(__pyx_t_12);
-  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_y, 1);
   __Pyx_XGIVEREF(__pyx_r);
@@ -6170,7 +6088,7 @@ static PyObject *__pyx_pf_9libwalrus_18hermite_multidimensional(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":463
+/* "libwalrus.pyx":464
  * 
  * 
  * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -6214,17 +6132,17 @@ static PyObject *__pyx_pw_9libwalrus_21hermite_multidimensional_real(PyObject *_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(1, 463, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(1, 464, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(1, 463, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(1, 464, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "hermite_multidimensional_real") < 0)) __PYX_ERR(1, 463, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "hermite_multidimensional_real") < 0)) __PYX_ERR(1, 464, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6233,13 +6151,13 @@ static PyObject *__pyx_pw_9libwalrus_21hermite_multidimensional_real(PyObject *_
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 463, __pyx_L3_error)
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 463, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 463, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 464, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 464, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 464, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 463, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 464, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6260,8 +6178,6 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   std::vector<double>  __pyx_v_y_mat;
   int __pyx_v_length;
   double *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapperFloat *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -6274,12 +6190,9 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   PyObject *__pyx_t_10 = NULL;
-  PyObject *__pyx_t_11 = NULL;
-  PyObject *__pyx_t_12 = NULL;
-  PyObject *__pyx_t_13 = NULL;
   __Pyx_RefNannySetupContext("hermite_multidimensional_real", 0);
 
-  /* "libwalrus.pyx":475
+  /* "libwalrus.pyx":476
  *         array[float64]: the multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -6288,7 +6201,7 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":478
+  /* "libwalrus.pyx":479
  *     cdef vector[double] R_mat, y_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -6300,7 +6213,7 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":479
+    /* "libwalrus.pyx":480
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -6312,7 +6225,7 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":480
+      /* "libwalrus.pyx":481
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -6325,12 +6238,12 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
         __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 480, __pyx_L1_error)
+        __PYX_ERR(1, 481, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":482
+  /* "libwalrus.pyx":483
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -6342,7 +6255,7 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":483
+    /* "libwalrus.pyx":484
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -6354,111 +6267,43 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
       __pyx_v_y_mat.push_back((*((double *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 483, __pyx_L1_error)
+      __PYX_ERR(1, 484, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":484
+  /* "libwalrus.pyx":485
  *     for i in range(n):
  *         y_mat.push_back(y[i])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":485
+  /* "libwalrus.pyx":486
  *         y_mat.push_back(y[i])
  *     length = cutoff**n
  *     cdef double *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapperFloat()
  */
   __pyx_v_array = libwalrus::hermite_multidimensional_cpp<double>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":487
- *     cdef double *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_10 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 487, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapperFloat *)__pyx_t_10);
-  __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":488
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_10 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 488, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":489
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 489, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 489, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = PyTuple_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 489, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 489, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 489, __pyx_L1_error)
-  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_10, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 489, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  if (!(likely(((__pyx_t_13) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_13, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 489, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_13);
-  __pyx_t_13 = 0;
-
-  /* "libwalrus.pyx":490
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return ndarray
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":491
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return ndarray
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":492
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return ndarray             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":494
+ *     #Py_INCREF(array_wrapper)
+ *     #return ndarray
+ *     return double_pointer_to_array(array, length)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-  __pyx_r = ((PyObject *)__pyx_v_ndarray);
+  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 494, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":463
+  /* "libwalrus.pyx":464
  * 
  * 
  * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -6469,14 +6314,9 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_XDECREF(__pyx_t_12);
-  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_AddTraceback("libwalrus.hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_y, 1);
   __Pyx_XGIVEREF(__pyx_r);
@@ -6484,7 +6324,7 @@ static PyObject *__pyx_pf_9libwalrus_20hermite_multidimensional_real(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":495
+/* "libwalrus.pyx":497
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -6528,17 +6368,17 @@ static PyObject *__pyx_pw_9libwalrus_23renorm_hermite_multidimensional(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 1); __PYX_ERR(1, 495, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 1); __PYX_ERR(1, 497, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 2); __PYX_ERR(1, 495, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, 2); __PYX_ERR(1, 497, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional") < 0)) __PYX_ERR(1, 495, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional") < 0)) __PYX_ERR(1, 497, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6547,13 +6387,13 @@ static PyObject *__pyx_pw_9libwalrus_23renorm_hermite_multidimensional(PyObject 
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 495, __pyx_L3_error)
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 495, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 495, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 497, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 497, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 497, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 495, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 497, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.renorm_hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6574,8 +6414,6 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   std::vector<__pyx_t_double_complex>  __pyx_v_y_mat;
   int __pyx_v_length;
   __pyx_t_double_complex *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapper *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -6588,12 +6426,9 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   PyObject *__pyx_t_10 = NULL;
-  PyObject *__pyx_t_11 = NULL;
-  PyObject *__pyx_t_12 = NULL;
-  PyObject *__pyx_t_13 = NULL;
   __Pyx_RefNannySetupContext("renorm_hermite_multidimensional", 0);
 
-  /* "libwalrus.pyx":508
+  /* "libwalrus.pyx":510
  *         array[complex128]: the renormalized multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -6602,7 +6437,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":511
+  /* "libwalrus.pyx":513
  *     cdef vector[double complex] R_mat, y_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -6614,7 +6449,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":512
+    /* "libwalrus.pyx":514
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -6626,7 +6461,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":513
+      /* "libwalrus.pyx":515
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -6639,12 +6474,12 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
         __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 513, __pyx_L1_error)
+        __PYX_ERR(1, 515, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":515
+  /* "libwalrus.pyx":517
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -6656,7 +6491,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":516
+    /* "libwalrus.pyx":518
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -6668,11 +6503,11 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
       __pyx_v_y_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 516, __pyx_L1_error)
+      __PYX_ERR(1, 518, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":517
+  /* "libwalrus.pyx":519
  *     for i in range(n):
  *         y_mat.push_back(y[i])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
@@ -6681,98 +6516,30 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":519
+  /* "libwalrus.pyx":521
  *     length = cutoff**n
  * 
  *     cdef double complex *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapper()
  */
   __pyx_v_array = libwalrus::renorm_hermite_multidimensional_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":521
- *     cdef double complex *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_10 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 521, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapper *)__pyx_t_10);
-  __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":522
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_10 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 522, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":523
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 523, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 523, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = PyTuple_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 523, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 523, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 523, __pyx_L1_error)
-  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_10, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 523, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  if (!(likely(((__pyx_t_13) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_13, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 523, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_13);
-  __pyx_t_13 = 0;
-
-  /* "libwalrus.pyx":524
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return ndarray
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":525
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return ndarray
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":526
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return ndarray             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":529
+ *     #Py_INCREF(array_wrapper)
+ *     #return ndarray
+ *     return complex_pointer_to_array(array, length)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-  __pyx_r = ((PyObject *)__pyx_v_ndarray);
+  __pyx_t_10 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 529, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":495
+  /* "libwalrus.pyx":497
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -6783,14 +6550,9 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_XDECREF(__pyx_t_12);
-  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_AddTraceback("libwalrus.renorm_hermite_multidimensional", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_y, 1);
   __Pyx_XGIVEREF(__pyx_r);
@@ -6798,7 +6560,7 @@ static PyObject *__pyx_pf_9libwalrus_22renorm_hermite_multidimensional(CYTHON_UN
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":529
+/* "libwalrus.pyx":532
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -6842,17 +6604,17 @@ static PyObject *__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real(PyOb
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(1, 529, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 1); __PYX_ERR(1, 532, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(1, 529, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, 2); __PYX_ERR(1, 532, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional_real") < 0)) __PYX_ERR(1, 529, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "renorm_hermite_multidimensional_real") < 0)) __PYX_ERR(1, 532, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6861,13 +6623,13 @@ static PyObject *__pyx_pw_9libwalrus_25renorm_hermite_multidimensional_real(PyOb
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 529, __pyx_L3_error)
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 529, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 529, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 532, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 532, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 532, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 529, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("renorm_hermite_multidimensional_real", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 532, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.renorm_hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6888,8 +6650,6 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   std::vector<double>  __pyx_v_y_mat;
   int __pyx_v_length;
   double *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapperFloat *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -6902,12 +6662,9 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   PyObject *__pyx_t_10 = NULL;
-  PyObject *__pyx_t_11 = NULL;
-  PyObject *__pyx_t_12 = NULL;
-  PyObject *__pyx_t_13 = NULL;
   __Pyx_RefNannySetupContext("renorm_hermite_multidimensional_real", 0);
 
-  /* "libwalrus.pyx":542
+  /* "libwalrus.pyx":545
  *         array[float64]: the renormalized multidimensional Hermite polynomials
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -6916,7 +6673,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":545
+  /* "libwalrus.pyx":548
  *     cdef vector[double] R_mat, y_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -6928,7 +6685,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":546
+    /* "libwalrus.pyx":549
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -6940,7 +6697,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":547
+      /* "libwalrus.pyx":550
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -6953,12 +6710,12 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
         __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 547, __pyx_L1_error)
+        __PYX_ERR(1, 550, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":549
+  /* "libwalrus.pyx":552
  *             R_mat.push_back(R[i, j])
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -6970,7 +6727,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":550
+    /* "libwalrus.pyx":553
  * 
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -6982,111 +6739,43 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
       __pyx_v_y_mat.push_back((*((double *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_9 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 550, __pyx_L1_error)
+      __PYX_ERR(1, 553, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":551
+  /* "libwalrus.pyx":554
  *     for i in range(n):
  *         y_mat.push_back(y[i])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":552
+  /* "libwalrus.pyx":555
  *         y_mat.push_back(y[i])
  *     length = cutoff**n
  *     cdef double *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapperFloat()
  */
   __pyx_v_array = libwalrus::renorm_hermite_multidimensional_cpp<double>(__pyx_v_R_mat, __pyx_v_y_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":554
- *     cdef double *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_10 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 554, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapperFloat *)__pyx_t_10);
-  __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":555
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_10 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 555, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-
-  /* "libwalrus.pyx":556
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 556, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 556, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = PyTuple_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 556, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_10, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 556, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 556, __pyx_L1_error)
-  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_10, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 556, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  if (!(likely(((__pyx_t_13) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_13, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 556, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_13);
-  __pyx_t_13 = 0;
-
-  /* "libwalrus.pyx":557
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return ndarray
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":558
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return ndarray
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":559
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return ndarray             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":563
+ *     #Py_INCREF(array_wrapper)
+ *     #return ndarray
+ *     return double_pointer_to_array(array, length)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-  __pyx_r = ((PyObject *)__pyx_v_ndarray);
+  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 563, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":529
+  /* "libwalrus.pyx":532
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -7097,14 +6786,9 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_XDECREF(__pyx_t_12);
-  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_AddTraceback("libwalrus.renorm_hermite_multidimensional_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_y, 1);
   __Pyx_XGIVEREF(__pyx_r);
@@ -7112,7 +6796,7 @@ static PyObject *__pyx_pf_9libwalrus_24renorm_hermite_multidimensional_real(CYTH
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":562
+/* "libwalrus.pyx":566
  * 
  * 
  * def interferometer(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -7153,11 +6837,11 @@ static PyObject *__pyx_pw_9libwalrus_27interferometer(PyObject *__pyx_self, PyOb
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("interferometer", 1, 2, 2, 1); __PYX_ERR(1, 562, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("interferometer", 1, 2, 2, 1); __PYX_ERR(1, 566, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "interferometer") < 0)) __PYX_ERR(1, 562, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "interferometer") < 0)) __PYX_ERR(1, 566, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7165,12 +6849,12 @@ static PyObject *__pyx_pw_9libwalrus_27interferometer(PyObject *__pyx_self, PyOb
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 562, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 562, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 566, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 566, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("interferometer", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 562, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("interferometer", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 566, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.interferometer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7190,8 +6874,6 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
   std::vector<__pyx_t_double_complex>  __pyx_v_R_mat;
   int __pyx_v_length;
   __pyx_t_double_complex *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapper *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -7207,9 +6889,10 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("interferometer", 0);
 
-  /* "libwalrus.pyx":573
+  /* "libwalrus.pyx":577
  *         array[complex128]: the matrix elements of the interferometer
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -7218,7 +6901,7 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":576
+  /* "libwalrus.pyx":580
  *     cdef vector[double complex] R_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -7230,7 +6913,7 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":577
+    /* "libwalrus.pyx":581
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -7242,7 +6925,7 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":578
+      /* "libwalrus.pyx":582
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -7255,176 +6938,110 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
         __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 578, __pyx_L1_error)
+        __PYX_ERR(1, 582, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":580
+  /* "libwalrus.pyx":584
  *             R_mat.push_back(R[i, j])
  * 
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double complex *array = interferometer_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":581
+  /* "libwalrus.pyx":585
  * 
  *     length = cutoff**n
  *     cdef double complex *array = interferometer_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapper()
  */
   __pyx_v_array = libwalrus::interferometer_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":583
- *     cdef double complex *array = interferometer_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_9 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 583, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapper *)__pyx_t_9);
-  __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":584
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_9 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 584, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":585
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 585, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 585, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 585, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 585, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 585, __pyx_L1_error)
-  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_9, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 585, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (!(likely(((__pyx_t_12) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_12, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 585, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_12);
-  __pyx_t_12 = 0;
-
-  /* "libwalrus.pyx":586
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":587
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return np.reshape(ndarray, [cutoff]*n)
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":588
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":593
+ *     #Py_INCREF(array_wrapper)
+ *     #return np.reshape(ndarray, [cutoff]*n)
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  * 
  * def interferometer_real(double [:, :] R, int cutoff):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 588, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_reshape); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 588, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 588, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_10 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 588, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 593, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 593, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_t_10 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 593, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 593, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 593, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
-      __Pyx_INCREF(__pyx_t_11);
-      __Pyx_GIVEREF(__pyx_t_11);
-      PyList_SET_ITEM(__pyx_t_10, __pyx_temp, __pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
+      __Pyx_GIVEREF(__pyx_t_12);
+      PyList_SET_ITEM(__pyx_t_13, __pyx_temp, __pyx_t_12);
     }
   }
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = NULL;
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  __pyx_t_12 = NULL;
   __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-    __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_9);
-    if (likely(__pyx_t_11)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-      __Pyx_INCREF(__pyx_t_11);
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+    __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_11);
+    if (likely(__pyx_t_12)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_9, function);
+      __Pyx_DECREF_SET(__pyx_t_11, function);
       __pyx_t_1 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 588, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (PyFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 593, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 588, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 593, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   {
-    __pyx_t_13 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 588, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    if (__pyx_t_11) {
-      __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_11); __pyx_t_11 = NULL;
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 593, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
+    if (__pyx_t_12) {
+      __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
     }
-    __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_ndarray));
-    PyTuple_SET_ITEM(__pyx_t_13, 0+__pyx_t_1, ((PyObject *)__pyx_v_ndarray));
     __Pyx_GIVEREF(__pyx_t_10);
-    PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_1, __pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_14, 0+__pyx_t_1, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_13);
+    PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
-    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_13, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 588, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_13 = 0;
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 593, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_r = __pyx_t_12;
-  __pyx_t_12 = 0;
+  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+  __pyx_r = __pyx_t_9;
+  __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":562
+  /* "libwalrus.pyx":566
  * 
  * 
  * def interferometer(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -7439,19 +7056,18 @@ static PyObject *__pyx_pf_9libwalrus_26interferometer(CYTHON_UNUSED PyObject *__
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("libwalrus.interferometer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":590
- *     return np.reshape(ndarray, [cutoff]*n)
+/* "libwalrus.pyx":595
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def interferometer_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of an interferometer by using a custom version of
@@ -7491,11 +7107,11 @@ static PyObject *__pyx_pw_9libwalrus_29interferometer_real(PyObject *__pyx_self,
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("interferometer_real", 1, 2, 2, 1); __PYX_ERR(1, 590, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("interferometer_real", 1, 2, 2, 1); __PYX_ERR(1, 595, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "interferometer_real") < 0)) __PYX_ERR(1, 590, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "interferometer_real") < 0)) __PYX_ERR(1, 595, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7503,12 +7119,12 @@ static PyObject *__pyx_pw_9libwalrus_29interferometer_real(PyObject *__pyx_self,
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 590, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 590, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 595, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 595, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("interferometer_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 590, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("interferometer_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 595, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.interferometer_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7528,8 +7144,6 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
   std::vector<double>  __pyx_v_R_mat;
   int __pyx_v_length;
   double *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapperFloat *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -7545,9 +7159,10 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("interferometer_real", 0);
 
-  /* "libwalrus.pyx":601
+  /* "libwalrus.pyx":606
  *         array[float64]: the matrix elements of the interferometer
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -7556,7 +7171,7 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":604
+  /* "libwalrus.pyx":609
  *     cdef vector[double] R_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -7568,7 +7183,7 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":605
+    /* "libwalrus.pyx":610
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -7580,7 +7195,7 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":606
+      /* "libwalrus.pyx":611
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -7593,177 +7208,111 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
         __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 606, __pyx_L1_error)
+        __PYX_ERR(1, 611, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":607
+  /* "libwalrus.pyx":612
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double *array = interferometer_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":608
+  /* "libwalrus.pyx":613
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n
  *     cdef double *array = interferometer_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapperFloat()
  */
   __pyx_v_array = libwalrus::interferometer_cpp<double>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":610
- *     cdef double *array = interferometer_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_9 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 610, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapperFloat *)__pyx_t_9);
-  __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":611
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_9 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 611, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":612
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 612, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 612, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 612, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 612, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 612, __pyx_L1_error)
-  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_9, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 612, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (!(likely(((__pyx_t_12) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_12, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 612, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_12);
-  __pyx_t_12 = 0;
-
-  /* "libwalrus.pyx":613
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":614
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return np.reshape(ndarray, [cutoff]*n)
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":615
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":621
+ *     #Py_INCREF(array_wrapper)
+ *     #return np.reshape(ndarray, [cutoff]*n)
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 615, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_reshape); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 615, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 615, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_10 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 615, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 621, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 621, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 621, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 621, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 621, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
-      __Pyx_INCREF(__pyx_t_11);
-      __Pyx_GIVEREF(__pyx_t_11);
-      PyList_SET_ITEM(__pyx_t_10, __pyx_temp, __pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
+      __Pyx_GIVEREF(__pyx_t_12);
+      PyList_SET_ITEM(__pyx_t_13, __pyx_temp, __pyx_t_12);
     }
   }
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = NULL;
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  __pyx_t_12 = NULL;
   __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-    __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_9);
-    if (likely(__pyx_t_11)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-      __Pyx_INCREF(__pyx_t_11);
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+    __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_11);
+    if (likely(__pyx_t_12)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_9, function);
+      __Pyx_DECREF_SET(__pyx_t_11, function);
       __pyx_t_1 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 615, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (PyFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 621, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 615, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 621, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   {
-    __pyx_t_13 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 615, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    if (__pyx_t_11) {
-      __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_11); __pyx_t_11 = NULL;
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 621, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
+    if (__pyx_t_12) {
+      __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
     }
-    __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_ndarray));
-    PyTuple_SET_ITEM(__pyx_t_13, 0+__pyx_t_1, ((PyObject *)__pyx_v_ndarray));
     __Pyx_GIVEREF(__pyx_t_10);
-    PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_1, __pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_14, 0+__pyx_t_1, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_13);
+    PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
-    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_13, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 615, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_13 = 0;
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 621, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_r = __pyx_t_12;
-  __pyx_t_12 = 0;
+  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+  __pyx_r = __pyx_t_9;
+  __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":590
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":595
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def interferometer_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of an interferometer by using a custom version of
@@ -7777,18 +7326,17 @@ static PyObject *__pyx_pf_9libwalrus_28interferometer_real(CYTHON_UNUSED PyObjec
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("libwalrus.interferometer_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":618
+/* "libwalrus.pyx":624
  * 
  * 
  * def squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -7829,11 +7377,11 @@ static PyObject *__pyx_pw_9libwalrus_31squeezing(PyObject *__pyx_self, PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("squeezing", 1, 2, 2, 1); __PYX_ERR(1, 618, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("squeezing", 1, 2, 2, 1); __PYX_ERR(1, 624, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "squeezing") < 0)) __PYX_ERR(1, 618, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "squeezing") < 0)) __PYX_ERR(1, 624, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7841,12 +7389,12 @@ static PyObject *__pyx_pw_9libwalrus_31squeezing(PyObject *__pyx_self, PyObject 
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 618, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 618, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 624, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 624, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("squeezing", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 618, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("squeezing", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 624, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.squeezing", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7866,8 +7414,6 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
   std::vector<__pyx_t_double_complex>  __pyx_v_R_mat;
   int __pyx_v_length;
   __pyx_t_double_complex *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapper *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -7883,9 +7429,10 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("squeezing", 0);
 
-  /* "libwalrus.pyx":629
+  /* "libwalrus.pyx":635
  *         array[complex128]: the matrix elements of the squeezing operator
  *     """
  *     cdef int i, j, n = 2             # <<<<<<<<<<<<<<
@@ -7894,7 +7441,7 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
  */
   __pyx_v_n = 2;
 
-  /* "libwalrus.pyx":632
+  /* "libwalrus.pyx":638
  *     cdef vector[double complex] R_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -7906,7 +7453,7 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":633
+    /* "libwalrus.pyx":639
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -7918,7 +7465,7 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":634
+      /* "libwalrus.pyx":640
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -7931,176 +7478,110 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
         __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 634, __pyx_L1_error)
+        __PYX_ERR(1, 640, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":635
+  /* "libwalrus.pyx":641
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double complex *array = squeezing_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":636
+  /* "libwalrus.pyx":642
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n
  *     cdef double complex *array = squeezing_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapper()
  */
   __pyx_v_array = libwalrus::squeezing_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":638
- *     cdef double complex *array = squeezing_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_9 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 638, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapper *)__pyx_t_9);
-  __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":639
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_9 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 639, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":640
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 640, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 640, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 640, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 640, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 640, __pyx_L1_error)
-  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_9, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 640, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (!(likely(((__pyx_t_12) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_12, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 640, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_12);
-  __pyx_t_12 = 0;
-
-  /* "libwalrus.pyx":641
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":642
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return np.reshape(ndarray, [cutoff]*n)
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":643
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":650
+ *     #Py_INCREF(array_wrapper)
+ *     #return np.reshape(ndarray, [cutoff]*n)
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 643, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_reshape); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 643, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 643, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_10 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 643, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 650, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 650, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_t_10 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 650, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 650, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 650, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
-      __Pyx_INCREF(__pyx_t_11);
-      __Pyx_GIVEREF(__pyx_t_11);
-      PyList_SET_ITEM(__pyx_t_10, __pyx_temp, __pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
+      __Pyx_GIVEREF(__pyx_t_12);
+      PyList_SET_ITEM(__pyx_t_13, __pyx_temp, __pyx_t_12);
     }
   }
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = NULL;
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  __pyx_t_12 = NULL;
   __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-    __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_9);
-    if (likely(__pyx_t_11)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-      __Pyx_INCREF(__pyx_t_11);
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+    __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_11);
+    if (likely(__pyx_t_12)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_9, function);
+      __Pyx_DECREF_SET(__pyx_t_11, function);
       __pyx_t_1 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 643, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (PyFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 650, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 643, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 650, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   {
-    __pyx_t_13 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 643, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    if (__pyx_t_11) {
-      __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_11); __pyx_t_11 = NULL;
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 650, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
+    if (__pyx_t_12) {
+      __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
     }
-    __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_ndarray));
-    PyTuple_SET_ITEM(__pyx_t_13, 0+__pyx_t_1, ((PyObject *)__pyx_v_ndarray));
     __Pyx_GIVEREF(__pyx_t_10);
-    PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_1, __pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_14, 0+__pyx_t_1, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_13);
+    PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
-    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_13, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 643, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_13 = 0;
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 650, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_r = __pyx_t_12;
-  __pyx_t_12 = 0;
+  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+  __pyx_r = __pyx_t_9;
+  __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":618
+  /* "libwalrus.pyx":624
  * 
  * 
  * def squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -8115,18 +7596,17 @@ static PyObject *__pyx_pf_9libwalrus_30squeezing(CYTHON_UNUSED PyObject *__pyx_s
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("libwalrus.squeezing", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":646
+/* "libwalrus.pyx":653
  * 
  * 
  * def squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -8167,11 +7647,11 @@ static PyObject *__pyx_pw_9libwalrus_33squeezing_real(PyObject *__pyx_self, PyOb
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("squeezing_real", 1, 2, 2, 1); __PYX_ERR(1, 646, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("squeezing_real", 1, 2, 2, 1); __PYX_ERR(1, 653, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "squeezing_real") < 0)) __PYX_ERR(1, 646, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "squeezing_real") < 0)) __PYX_ERR(1, 653, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -8179,12 +7659,12 @@ static PyObject *__pyx_pw_9libwalrus_33squeezing_real(PyObject *__pyx_self, PyOb
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 646, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 646, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 653, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 653, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("squeezing_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 646, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("squeezing_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 653, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.squeezing_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8204,8 +7684,6 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
   std::vector<double>  __pyx_v_R_mat;
   int __pyx_v_length;
   double *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapperFloat *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -8221,9 +7699,10 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("squeezing_real", 0);
 
-  /* "libwalrus.pyx":657
+  /* "libwalrus.pyx":664
  *         array[float64]: the matrix elements of the squeezing operator
  *     """
  *     cdef int i, j, n = 2             # <<<<<<<<<<<<<<
@@ -8232,7 +7711,7 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
  */
   __pyx_v_n = 2;
 
-  /* "libwalrus.pyx":660
+  /* "libwalrus.pyx":667
  *     cdef vector[double] R_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -8244,7 +7723,7 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":661
+    /* "libwalrus.pyx":668
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -8256,7 +7735,7 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":662
+      /* "libwalrus.pyx":669
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -8269,176 +7748,110 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
         __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 662, __pyx_L1_error)
+        __PYX_ERR(1, 669, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":663
+  /* "libwalrus.pyx":670
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double *array = squeezing_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":664
+  /* "libwalrus.pyx":671
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n
  *     cdef double *array = squeezing_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapperFloat()
  */
   __pyx_v_array = libwalrus::squeezing_cpp<double>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":666
- *     cdef double *array = squeezing_cpp(R_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_9 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 666, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapperFloat *)__pyx_t_9);
-  __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":667
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_9 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 667, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-  /* "libwalrus.pyx":668
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 668, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 668, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 668, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_9, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 668, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 668, __pyx_L1_error)
-  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_9, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 668, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (!(likely(((__pyx_t_12) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_12, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 668, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_12);
-  __pyx_t_12 = 0;
-
-  /* "libwalrus.pyx":669
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":670
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return np.reshape(ndarray, [cutoff]*n)
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":671
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":679
+ *     #Py_INCREF(array_wrapper)
+ *     #return np.reshape(ndarray, [cutoff]*n)
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  * 
  * def displacement(double complex [:] y, int cutoff):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 671, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_reshape); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 671, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 671, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_10 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 671, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 679, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 679, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 679, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 679, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 679, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
-      __Pyx_INCREF(__pyx_t_11);
-      __Pyx_GIVEREF(__pyx_t_11);
-      PyList_SET_ITEM(__pyx_t_10, __pyx_temp, __pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
+      __Pyx_GIVEREF(__pyx_t_12);
+      PyList_SET_ITEM(__pyx_t_13, __pyx_temp, __pyx_t_12);
     }
   }
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_11 = NULL;
+  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+  __pyx_t_12 = NULL;
   __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-    __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_9);
-    if (likely(__pyx_t_11)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-      __Pyx_INCREF(__pyx_t_11);
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+    __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_11);
+    if (likely(__pyx_t_12)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+      __Pyx_INCREF(__pyx_t_12);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_9, function);
+      __Pyx_DECREF_SET(__pyx_t_11, function);
       __pyx_t_1 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 671, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (PyFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 679, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_11, ((PyObject *)__pyx_v_ndarray), __pyx_t_10};
-    __pyx_t_12 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 671, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __Pyx_GOTREF(__pyx_t_12);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 679, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   {
-    __pyx_t_13 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 671, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    if (__pyx_t_11) {
-      __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_11); __pyx_t_11 = NULL;
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 679, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
+    if (__pyx_t_12) {
+      __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
     }
-    __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_ndarray));
-    PyTuple_SET_ITEM(__pyx_t_13, 0+__pyx_t_1, ((PyObject *)__pyx_v_ndarray));
     __Pyx_GIVEREF(__pyx_t_10);
-    PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_1, __pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_14, 0+__pyx_t_1, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_13);
+    PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
-    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_13, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 671, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_13 = 0;
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 679, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_r = __pyx_t_12;
-  __pyx_t_12 = 0;
+  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+  __pyx_r = __pyx_t_9;
+  __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":646
+  /* "libwalrus.pyx":653
  * 
  * 
  * def squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -8453,19 +7866,18 @@ static PyObject *__pyx_pf_9libwalrus_32squeezing_real(CYTHON_UNUSED PyObject *__
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("libwalrus.squeezing_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_R, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":673
- *     return np.reshape(ndarray, [cutoff]*n)
+/* "libwalrus.pyx":681
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def displacement(double complex [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a displacement by using a custom version of
@@ -8505,11 +7917,11 @@ static PyObject *__pyx_pw_9libwalrus_35displacement(PyObject *__pyx_self, PyObje
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("displacement", 1, 2, 2, 1); __PYX_ERR(1, 673, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("displacement", 1, 2, 2, 1); __PYX_ERR(1, 681, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "displacement") < 0)) __PYX_ERR(1, 673, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "displacement") < 0)) __PYX_ERR(1, 681, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -8517,12 +7929,12 @@ static PyObject *__pyx_pw_9libwalrus_35displacement(PyObject *__pyx_self, PyObje
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 673, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 673, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 681, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 681, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("displacement", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 673, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("displacement", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 681, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.displacement", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8541,8 +7953,6 @@ static PyObject *__pyx_pf_9libwalrus_34displacement(CYTHON_UNUSED PyObject *__py
   std::vector<__pyx_t_double_complex>  __pyx_v_y_mat;
   int __pyx_v_length;
   __pyx_t_double_complex *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapper *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -8554,9 +7964,10 @@ static PyObject *__pyx_pf_9libwalrus_34displacement(CYTHON_UNUSED PyObject *__py
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("displacement", 0);
 
-  /* "libwalrus.pyx":684
+  /* "libwalrus.pyx":692
  *         array[complex128]: the matrix elements of the displacement operator
  *     """
  *     cdef int i, n = 2             # <<<<<<<<<<<<<<
@@ -8565,7 +7976,7 @@ static PyObject *__pyx_pf_9libwalrus_34displacement(CYTHON_UNUSED PyObject *__py
  */
   __pyx_v_n = 2;
 
-  /* "libwalrus.pyx":686
+  /* "libwalrus.pyx":694
  *     cdef int i, n = 2
  *     cdef vector[double complex] y_mat
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -8577,7 +7988,7 @@ static PyObject *__pyx_pf_9libwalrus_34displacement(CYTHON_UNUSED PyObject *__py
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":687
+    /* "libwalrus.pyx":695
  *     cdef vector[double complex] y_mat
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -8589,176 +8000,110 @@ static PyObject *__pyx_pf_9libwalrus_34displacement(CYTHON_UNUSED PyObject *__py
       __pyx_v_y_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_4 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 687, __pyx_L1_error)
+      __PYX_ERR(1, 695, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":688
+  /* "libwalrus.pyx":696
  *     for i in range(n):
  *         y_mat.push_back(y[i])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double complex *array = displacement_cpp(y_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":689
+  /* "libwalrus.pyx":697
  *         y_mat.push_back(y[i])
  *     length = cutoff**n
  *     cdef double complex *array = displacement_cpp(y_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
+ *     #cdef np.ndarray ndarray
+ *     #array_wrapper = ArrayWrapper()
  */
   __pyx_v_array = libwalrus::displacement_cpp<__pyx_t_double_complex>(__pyx_v_y_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":691
- *     cdef double complex *array = displacement_cpp(y_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_5 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 691, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapper *)__pyx_t_5);
-  __pyx_t_5 = 0;
-
-  /* "libwalrus.pyx":692
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_5 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 692, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "libwalrus.pyx":693
- *     array_wrapper = ArrayWrapper()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 693, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 693, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 693, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_5, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 693, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 693, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 693, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 693, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_8);
-  __pyx_t_8 = 0;
-
-  /* "libwalrus.pyx":694
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":695
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return np.reshape(ndarray, [cutoff]*n)
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":696
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":705
+ *     #Py_INCREF(array_wrapper)
+ *     #return np.reshape(ndarray, [cutoff]*n)
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 696, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_reshape); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 696, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 696, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_6 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 696, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 705, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_reshape); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 705, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 705, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 705, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_t_9 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 705, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyList_SET_ITEM(__pyx_t_6, __pyx_temp, __pyx_t_7);
+      __Pyx_INCREF(__pyx_t_8);
+      __Pyx_GIVEREF(__pyx_t_8);
+      PyList_SET_ITEM(__pyx_t_9, __pyx_temp, __pyx_t_8);
     }
   }
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = NULL;
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_8 = NULL;
   __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-      __Pyx_INCREF(__pyx_t_7);
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_8)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_8);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_5, function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
       __pyx_t_1 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_5)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_7, ((PyObject *)__pyx_v_ndarray), __pyx_t_6};
-    __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 696, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_GOTREF(__pyx_t_8);
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_9};
+    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 705, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_7, ((PyObject *)__pyx_v_ndarray), __pyx_t_6};
-    __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 696, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_GOTREF(__pyx_t_8);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_9};
+    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 705, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 696, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    if (__pyx_t_7) {
-      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+    __pyx_t_10 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 705, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    if (__pyx_t_8) {
+      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
     }
-    __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_ndarray));
-    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_1, ((PyObject *)__pyx_v_ndarray));
     __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_1, __pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_1, __pyx_t_6);
+    __Pyx_GIVEREF(__pyx_t_9);
+    PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_1, __pyx_t_9);
     __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 696, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_9 = 0;
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 705, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   }
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_r = __pyx_t_8;
-  __pyx_t_8 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":673
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":681
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def displacement(double complex [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a displacement by using a custom version of
@@ -8772,18 +8117,17 @@ static PyObject *__pyx_pf_9libwalrus_34displacement(CYTHON_UNUSED PyObject *__py
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("libwalrus.displacement", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_y, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":699
+/* "libwalrus.pyx":708
  * 
  * 
  * def displacement_real(double [:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -8824,11 +8168,11 @@ static PyObject *__pyx_pw_9libwalrus_37displacement_real(PyObject *__pyx_self, P
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("displacement_real", 1, 2, 2, 1); __PYX_ERR(1, 699, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("displacement_real", 1, 2, 2, 1); __PYX_ERR(1, 708, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "displacement_real") < 0)) __PYX_ERR(1, 699, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "displacement_real") < 0)) __PYX_ERR(1, 708, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -8836,12 +8180,12 @@ static PyObject *__pyx_pw_9libwalrus_37displacement_real(PyObject *__pyx_self, P
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 699, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 699, __pyx_L3_error)
+    __pyx_v_y = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_y.memview)) __PYX_ERR(1, 708, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 708, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("displacement_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 699, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("displacement_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 708, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.displacement_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8860,8 +8204,6 @@ static PyObject *__pyx_pf_9libwalrus_36displacement_real(CYTHON_UNUSED PyObject 
   std::vector<double>  __pyx_v_y_mat;
   int __pyx_v_length;
   double *__pyx_v_array;
-  PyArrayObject *__pyx_v_ndarray = 0;
-  struct __pyx_obj_9libwalrus_ArrayWrapperFloat *__pyx_v_array_wrapper = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -8873,9 +8215,10 @@ static PyObject *__pyx_pf_9libwalrus_36displacement_real(CYTHON_UNUSED PyObject 
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("displacement_real", 0);
 
-  /* "libwalrus.pyx":710
+  /* "libwalrus.pyx":719
  *         array[float64]: the matrix elements of the real displacement operator
  *     """
  *     cdef int i, n = 2             # <<<<<<<<<<<<<<
@@ -8884,7 +8227,7 @@ static PyObject *__pyx_pf_9libwalrus_36displacement_real(CYTHON_UNUSED PyObject 
  */
   __pyx_v_n = 2;
 
-  /* "libwalrus.pyx":712
+  /* "libwalrus.pyx":721
  *     cdef int i, n = 2
  *     cdef vector[double] y_mat
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -8896,7 +8239,7 @@ static PyObject *__pyx_pf_9libwalrus_36displacement_real(CYTHON_UNUSED PyObject 
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":713
+    /* "libwalrus.pyx":722
  *     cdef vector[double] y_mat
  *     for i in range(n):
  *         y_mat.push_back(y[i])             # <<<<<<<<<<<<<<
@@ -8908,175 +8251,109 @@ static PyObject *__pyx_pf_9libwalrus_36displacement_real(CYTHON_UNUSED PyObject 
       __pyx_v_y_mat.push_back((*((double *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_4 * __pyx_v_y.strides[0]) ))));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 713, __pyx_L1_error)
+      __PYX_ERR(1, 722, __pyx_L1_error)
     }
   }
 
-  /* "libwalrus.pyx":714
+  /* "libwalrus.pyx":723
  *     for i in range(n):
  *         y_mat.push_back(y[i])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
  *     cdef double *array = displacement_cpp(y_mat, cutoff)
- *     cdef np.ndarray ndarray
+ *     #    cdef np.ndarray ndarray
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":715
+  /* "libwalrus.pyx":724
  *         y_mat.push_back(y[i])
  *     length = cutoff**n
  *     cdef double *array = displacement_cpp(y_mat, cutoff)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
+ *     #    cdef np.ndarray ndarray
+ *     #    array_wrapper = ArrayWrapperFloat()
  */
   __pyx_v_array = libwalrus::displacement_cpp<double>(__pyx_v_y_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":717
- *     cdef double *array = displacement_cpp(y_mat, cutoff)
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()             # <<<<<<<<<<<<<<
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- */
-  __pyx_t_5 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 717, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapperFloat *)__pyx_t_5);
-  __pyx_t_5 = 0;
-
-  /* "libwalrus.pyx":718
- *     cdef np.ndarray ndarray
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- */
-  __pyx_t_5 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 718, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "libwalrus.pyx":719
- *     array_wrapper = ArrayWrapperFloat()
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 719, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 719, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 719, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
-  PyTuple_SET_ITEM(__pyx_t_5, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 719, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 719, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 719, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 719, __pyx_L1_error)
-  __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_8);
-  __pyx_t_8 = 0;
-
-  /* "libwalrus.pyx":720
- *     array_wrapper.set_data(length, <void*> array)
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)
- */
-  __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
-
-  /* "libwalrus.pyx":721
- *     ndarray = np.array(array_wrapper, copy=False)
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
- *     return np.reshape(ndarray, [cutoff]*n)
- * 
- */
-  Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
-
-  /* "libwalrus.pyx":722
- *     ndarray.base = <PyObject*> array_wrapper
- *     Py_INCREF(array_wrapper)
- *     return np.reshape(ndarray, [cutoff]*n)             # <<<<<<<<<<<<<<
+  /* "libwalrus.pyx":732
+ *     #    Py_INCREF(array_wrapper)
+ *     #    return np.reshape(ndarray, [cutoff]*n)
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  * 
  * def two_mode_squeezing(double complex[:, :] R, int cutoff):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 722, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_reshape); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 722, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 722, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_6 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 722, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 732, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_reshape); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 732, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 732, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 732, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_t_9 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 732, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyList_SET_ITEM(__pyx_t_6, __pyx_temp, __pyx_t_7);
+      __Pyx_INCREF(__pyx_t_8);
+      __Pyx_GIVEREF(__pyx_t_8);
+      PyList_SET_ITEM(__pyx_t_9, __pyx_temp, __pyx_t_8);
     }
   }
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = NULL;
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_8 = NULL;
   __pyx_t_1 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-      __Pyx_INCREF(__pyx_t_7);
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_8)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_8);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_5, function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
       __pyx_t_1 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_5)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_7, ((PyObject *)__pyx_v_ndarray), __pyx_t_6};
-    __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 722, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_GOTREF(__pyx_t_8);
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_9};
+    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 732, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_7, ((PyObject *)__pyx_v_ndarray), __pyx_t_6};
-    __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 722, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_GOTREF(__pyx_t_8);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_9};
+    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 732, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 722, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    if (__pyx_t_7) {
-      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+    __pyx_t_10 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 732, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    if (__pyx_t_8) {
+      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
     }
-    __Pyx_INCREF(((PyObject *)__pyx_v_ndarray));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_ndarray));
-    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_1, ((PyObject *)__pyx_v_ndarray));
     __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_1, __pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_1, __pyx_t_6);
+    __Pyx_GIVEREF(__pyx_t_9);
+    PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_1, __pyx_t_9);
     __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 722, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_9 = 0;
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 732, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   }
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_r = __pyx_t_8;
-  __pyx_t_8 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":699
+  /* "libwalrus.pyx":708
  * 
  * 
  * def displacement_real(double [:] y, int cutoff):             # <<<<<<<<<<<<<<
@@ -9091,19 +8368,18 @@ static PyObject *__pyx_pf_9libwalrus_36displacement_real(CYTHON_UNUSED PyObject 
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("libwalrus.displacement_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_ndarray);
-  __Pyx_XDECREF((PyObject *)__pyx_v_array_wrapper);
   __PYX_XDEC_MEMVIEW(&__pyx_v_y, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":724
- *     return np.reshape(ndarray, [cutoff]*n)
+/* "libwalrus.pyx":734
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def two_mode_squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a two mode squeezer by using a custom version of
@@ -9143,11 +8419,11 @@ static PyObject *__pyx_pw_9libwalrus_39two_mode_squeezing(PyObject *__pyx_self, 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("two_mode_squeezing", 1, 2, 2, 1); __PYX_ERR(1, 724, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("two_mode_squeezing", 1, 2, 2, 1); __PYX_ERR(1, 734, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "two_mode_squeezing") < 0)) __PYX_ERR(1, 724, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "two_mode_squeezing") < 0)) __PYX_ERR(1, 734, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -9155,12 +8431,12 @@ static PyObject *__pyx_pw_9libwalrus_39two_mode_squeezing(PyObject *__pyx_self, 
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 724, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 724, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds___pyx_t_double_complex(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 734, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 734, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("two_mode_squeezing", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 724, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("two_mode_squeezing", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 734, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.two_mode_squeezing", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9198,7 +8474,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("two_mode_squeezing", 0);
 
-  /* "libwalrus.pyx":735
+  /* "libwalrus.pyx":745
  *         array[complex128]: the matrix elements of the two-mode squeezing operator
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -9207,7 +8483,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":738
+  /* "libwalrus.pyx":748
  *     cdef vector[double complex] R_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -9219,7 +8495,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":739
+    /* "libwalrus.pyx":749
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -9231,7 +8507,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":740
+      /* "libwalrus.pyx":750
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -9244,12 +8520,12 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
         __pyx_v_R_mat.push_back((*((__pyx_t_double_complex *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 740, __pyx_L1_error)
+        __PYX_ERR(1, 750, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":741
+  /* "libwalrus.pyx":751
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
@@ -9258,7 +8534,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":742
+  /* "libwalrus.pyx":752
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n
  *     cdef double complex *array = two_mode_squeezing_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
@@ -9267,7 +8543,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
  */
   __pyx_v_array = libwalrus::two_mode_squeezing_cpp<__pyx_t_double_complex>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":750
+  /* "libwalrus.pyx":760
  *     #Py_INCREF(array_wrapper)
  *     #return np.reshape(ndarray, [cutoff]*n)
  *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
@@ -9275,16 +8551,16 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
  * cdef double_pointer_to_array(double *array, int length):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 750, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 750, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 750, __pyx_L1_error)
+  __pyx_t_10 = __pyx_f_9libwalrus_complex_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 750, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 750, __pyx_L1_error)
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
@@ -9309,7 +8585,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_11)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
-    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 750, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 760, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -9319,7 +8595,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
-    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 750, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 760, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -9327,7 +8603,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   } else
   #endif
   {
-    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 750, __pyx_L1_error)
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     if (__pyx_t_12) {
       __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
@@ -9338,7 +8614,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
     PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
     __pyx_t_13 = 0;
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 750, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
@@ -9347,8 +8623,8 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":724
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":734
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def two_mode_squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a two mode squeezer by using a custom version of
@@ -9372,7 +8648,7 @@ static PyObject *__pyx_pf_9libwalrus_38two_mode_squeezing(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":752
+/* "libwalrus.pyx":762
  *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
  * 
  * cdef double_pointer_to_array(double *array, int length):             # <<<<<<<<<<<<<<
@@ -9391,59 +8667,59 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("double_pointer_to_array", 0);
 
-  /* "libwalrus.pyx":764
+  /* "libwalrus.pyx":774
  * 
  *     cdef np.ndarray ndarray
  *     array_wrapper = ArrayWrapperFloat()             # <<<<<<<<<<<<<<
  *     array_wrapper.set_data(length, <void*> array)
  *     ndarray = np.array(array_wrapper, copy=False)
  */
-  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 764, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapperFloat)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 774, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapperFloat *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":765
+  /* "libwalrus.pyx":775
  *     cdef np.ndarray ndarray
  *     array_wrapper = ArrayWrapperFloat()
  *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
  *     ndarray = np.array(array_wrapper, copy=False)
  *     ndarray.base = <PyObject*> array_wrapper
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 765, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapperFloat *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 775, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":766
+  /* "libwalrus.pyx":776
  *     array_wrapper = ArrayWrapperFloat()
  *     array_wrapper.set_data(length, <void*> array)
  *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
  *     ndarray.base = <PyObject*> array_wrapper
  *     Py_INCREF(array_wrapper)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 766, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 776, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 766, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 776, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 766, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 776, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
   PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 766, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 776, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 766, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 766, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 776, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 776, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 766, __pyx_L1_error)
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 776, __pyx_L1_error)
   __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "libwalrus.pyx":767
+  /* "libwalrus.pyx":777
  *     array_wrapper.set_data(length, <void*> array)
  *     ndarray = np.array(array_wrapper, copy=False)
  *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
@@ -9452,7 +8728,7 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
  */
   __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
 
-  /* "libwalrus.pyx":768
+  /* "libwalrus.pyx":778
  *     ndarray = np.array(array_wrapper, copy=False)
  *     ndarray.base = <PyObject*> array_wrapper
  *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
@@ -9461,7 +8737,7 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
  */
   Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
 
-  /* "libwalrus.pyx":769
+  /* "libwalrus.pyx":779
  *     ndarray.base = <PyObject*> array_wrapper
  *     Py_INCREF(array_wrapper)
  *     return ndarray             # <<<<<<<<<<<<<<
@@ -9473,7 +8749,7 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
   __pyx_r = ((PyObject *)__pyx_v_ndarray);
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":752
+  /* "libwalrus.pyx":762
  *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
  * 
  * cdef double_pointer_to_array(double *array, int length):             # <<<<<<<<<<<<<<
@@ -9497,7 +8773,7 @@ static PyObject *__pyx_f_9libwalrus_double_pointer_to_array(double *__pyx_v_arra
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":772
+/* "libwalrus.pyx":782
  * 
  * 
  * cdef complex_pointer_to_array(double complex *array, int length):             # <<<<<<<<<<<<<<
@@ -9516,59 +8792,59 @@ static PyObject *__pyx_f_9libwalrus_complex_pointer_to_array(__pyx_t_double_comp
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("complex_pointer_to_array", 0);
 
-  /* "libwalrus.pyx":784
+  /* "libwalrus.pyx":794
  * 
  *     cdef np.ndarray ndarray
  *     array_wrapper = ArrayWrapper()             # <<<<<<<<<<<<<<
  *     array_wrapper.set_data(length, <void*> array)
  *     ndarray = np.array(array_wrapper, copy=False)
  */
-  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 784, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_9libwalrus_ArrayWrapper)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 794, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_array_wrapper = ((struct __pyx_obj_9libwalrus_ArrayWrapper *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":785
+  /* "libwalrus.pyx":795
  *     cdef np.ndarray ndarray
  *     array_wrapper = ArrayWrapper()
  *     array_wrapper.set_data(length, <void*> array)             # <<<<<<<<<<<<<<
  *     ndarray = np.array(array_wrapper, copy=False)
  *     ndarray.base = <PyObject*> array_wrapper
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 785, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_9libwalrus_ArrayWrapper *)__pyx_v_array_wrapper->__pyx_vtab)->set_data(__pyx_v_array_wrapper, __pyx_v_length, ((void *)__pyx_v_array)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 795, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":786
+  /* "libwalrus.pyx":796
  *     array_wrapper = ArrayWrapper()
  *     array_wrapper.set_data(length, <void*> array)
  *     ndarray = np.array(array_wrapper, copy=False)             # <<<<<<<<<<<<<<
  *     ndarray.base = <PyObject*> array_wrapper
  *     Py_INCREF(array_wrapper)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 786, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 786, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 786, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(((PyObject *)__pyx_v_array_wrapper));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_array_wrapper));
   PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject *)__pyx_v_array_wrapper));
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 786, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 786, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 786, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_copy, Py_False) < 0) __PYX_ERR(1, 796, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 786, __pyx_L1_error)
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(1, 796, __pyx_L1_error)
   __pyx_v_ndarray = ((PyArrayObject *)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "libwalrus.pyx":787
+  /* "libwalrus.pyx":797
  *     array_wrapper.set_data(length, <void*> array)
  *     ndarray = np.array(array_wrapper, copy=False)
  *     ndarray.base = <PyObject*> array_wrapper             # <<<<<<<<<<<<<<
@@ -9577,7 +8853,7 @@ static PyObject *__pyx_f_9libwalrus_complex_pointer_to_array(__pyx_t_double_comp
  */
   __pyx_v_ndarray->base = ((PyObject *)__pyx_v_array_wrapper);
 
-  /* "libwalrus.pyx":788
+  /* "libwalrus.pyx":798
  *     ndarray = np.array(array_wrapper, copy=False)
  *     ndarray.base = <PyObject*> array_wrapper
  *     Py_INCREF(array_wrapper)             # <<<<<<<<<<<<<<
@@ -9586,7 +8862,7 @@ static PyObject *__pyx_f_9libwalrus_complex_pointer_to_array(__pyx_t_double_comp
  */
   Py_INCREF(((PyObject *)__pyx_v_array_wrapper));
 
-  /* "libwalrus.pyx":789
+  /* "libwalrus.pyx":799
  *     ndarray.base = <PyObject*> array_wrapper
  *     Py_INCREF(array_wrapper)
  *     return ndarray             # <<<<<<<<<<<<<<
@@ -9598,7 +8874,7 @@ static PyObject *__pyx_f_9libwalrus_complex_pointer_to_array(__pyx_t_double_comp
   __pyx_r = ((PyObject *)__pyx_v_ndarray);
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":772
+  /* "libwalrus.pyx":782
  * 
  * 
  * cdef complex_pointer_to_array(double complex *array, int length):             # <<<<<<<<<<<<<<
@@ -9622,7 +8898,7 @@ static PyObject *__pyx_f_9libwalrus_complex_pointer_to_array(__pyx_t_double_comp
   return __pyx_r;
 }
 
-/* "libwalrus.pyx":793
+/* "libwalrus.pyx":803
  * 
  * 
  * def two_mode_squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -9663,11 +8939,11 @@ static PyObject *__pyx_pw_9libwalrus_41two_mode_squeezing_real(PyObject *__pyx_s
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cutoff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("two_mode_squeezing_real", 1, 2, 2, 1); __PYX_ERR(1, 793, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("two_mode_squeezing_real", 1, 2, 2, 1); __PYX_ERR(1, 803, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "two_mode_squeezing_real") < 0)) __PYX_ERR(1, 793, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "two_mode_squeezing_real") < 0)) __PYX_ERR(1, 803, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -9675,12 +8951,12 @@ static PyObject *__pyx_pw_9libwalrus_41two_mode_squeezing_real(PyObject *__pyx_s
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 793, __pyx_L3_error)
-    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 793, __pyx_L3_error)
+    __pyx_v_R = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_R.memview)) __PYX_ERR(1, 803, __pyx_L3_error)
+    __pyx_v_cutoff = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_cutoff == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 803, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("two_mode_squeezing_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 793, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("two_mode_squeezing_real", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 803, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("libwalrus.two_mode_squeezing_real", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9718,7 +8994,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("two_mode_squeezing_real", 0);
 
-  /* "libwalrus.pyx":804
+  /* "libwalrus.pyx":814
  *         array[float64]: the matrix elements of the two-mode squeezing operator
  *     """
  *     cdef int i, j, n = R.shape[0]             # <<<<<<<<<<<<<<
@@ -9727,7 +9003,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
  */
   __pyx_v_n = (__pyx_v_R.shape[0]);
 
-  /* "libwalrus.pyx":807
+  /* "libwalrus.pyx":817
  *     cdef vector[double] R_mat
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -9739,7 +9015,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "libwalrus.pyx":808
+    /* "libwalrus.pyx":818
  * 
  *     for i in range(n):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -9751,7 +9027,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_j = __pyx_t_6;
 
-      /* "libwalrus.pyx":809
+      /* "libwalrus.pyx":819
  *     for i in range(n):
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])             # <<<<<<<<<<<<<<
@@ -9764,12 +9040,12 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
         __pyx_v_R_mat.push_back((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_R.data + __pyx_t_7 * __pyx_v_R.strides[0]) ) + __pyx_t_8 * __pyx_v_R.strides[1]) ))));
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(1, 809, __pyx_L1_error)
+        __PYX_ERR(1, 819, __pyx_L1_error)
       }
     }
   }
 
-  /* "libwalrus.pyx":810
+  /* "libwalrus.pyx":820
  *         for j in range(n):
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n             # <<<<<<<<<<<<<<
@@ -9778,7 +9054,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
  */
   __pyx_v_length = __Pyx_pow_int(__pyx_v_cutoff, __pyx_v_n);
 
-  /* "libwalrus.pyx":811
+  /* "libwalrus.pyx":821
  *             R_mat.push_back(R[i, j])
  *     length = cutoff**n
  *     cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)             # <<<<<<<<<<<<<<
@@ -9787,23 +9063,23 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
  */
   __pyx_v_array = libwalrus::two_mode_squeezing_cpp<double>(__pyx_v_R_mat, __pyx_v_cutoff);
 
-  /* "libwalrus.pyx":818
+  /* "libwalrus.pyx":828
  *     #    ndarray.base = <PyObject*> array_wrapper
  *     #    Py_INCREF(array_wrapper)
  *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)             # <<<<<<<<<<<<<<
  *     #    return np.reshape(ndarray, [cutoff]*n)
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 818, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 828, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 818, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_reshape); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 828, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 818, __pyx_L1_error)
+  __pyx_t_10 = __pyx_f_9libwalrus_double_pointer_to_array(__pyx_v_array, __pyx_v_length); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 828, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 818, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cutoff); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 828, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 818, __pyx_L1_error)
+  __pyx_t_13 = PyList_New(1 * ((__pyx_v_n<0) ? 0:__pyx_v_n)); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 828, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   { Py_ssize_t __pyx_temp;
     for (__pyx_temp=0; __pyx_temp < __pyx_v_n; __pyx_temp++) {
@@ -9828,7 +9104,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_11)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
-    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 818, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 828, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -9838,7 +9114,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_t_10, __pyx_t_13};
-    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 818, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_1, 2+__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 828, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -9846,7 +9122,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   } else
   #endif
   {
-    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 818, __pyx_L1_error)
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 828, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     if (__pyx_t_12) {
       __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_12); __pyx_t_12 = NULL;
@@ -9857,7 +9133,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
     PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_1, __pyx_t_13);
     __pyx_t_10 = 0;
     __pyx_t_13 = 0;
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 818, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 828, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
@@ -9866,7 +9142,7 @@ static PyObject *__pyx_pf_9libwalrus_40two_mode_squeezing_real(CYTHON_UNUSED PyO
   __pyx_t_9 = 0;
   goto __pyx_L0;
 
-  /* "libwalrus.pyx":793
+  /* "libwalrus.pyx":803
  * 
  * 
  * def two_mode_squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
@@ -26145,7 +25421,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_approx, __pyx_k_approx, sizeof(__pyx_k_approx), 0, 0, 1, 1},
   {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
-  {&__pyx_n_s_array_wrapper, __pyx_k_array_wrapper, sizeof(__pyx_k_array_wrapper), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
@@ -26197,7 +25472,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_n, __pyx_k_n, sizeof(__pyx_k_n), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_name_2, __pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 0, 1, 1},
-  {&__pyx_n_s_ndarray, __pyx_k_ndarray, sizeof(__pyx_k_ndarray), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
   {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
@@ -26704,142 +25978,142 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
-  __pyx_tuple__50 = PyTuple_Pack(12, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(1, 430, __pyx_L1_error)
+  __pyx_tuple__50 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(1, 430, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__50);
   __Pyx_GIVEREF(__pyx_tuple__50);
-  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional, 430, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(1, 430, __pyx_L1_error)
+  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional, 430, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(1, 430, __pyx_L1_error)
 
-  /* "libwalrus.pyx":463
+  /* "libwalrus.pyx":464
  * 
  * 
  * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
-  __pyx_tuple__52 = PyTuple_Pack(12, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(1, 463, __pyx_L1_error)
+  __pyx_tuple__52 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(1, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__52);
   __Pyx_GIVEREF(__pyx_tuple__52);
-  __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional_real, 463, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) __PYX_ERR(1, 463, __pyx_L1_error)
+  __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_hermite_multidimensional_real, 464, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) __PYX_ERR(1, 464, __pyx_L1_error)
 
-  /* "libwalrus.pyx":495
+  /* "libwalrus.pyx":497
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
  *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_tuple__54 = PyTuple_Pack(12, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__54)) __PYX_ERR(1, 495, __pyx_L1_error)
+  __pyx_tuple__54 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__54)) __PYX_ERR(1, 497, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__54);
   __Pyx_GIVEREF(__pyx_tuple__54);
-  __pyx_codeobj__55 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__54, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional, 495, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__55)) __PYX_ERR(1, 495, __pyx_L1_error)
+  __pyx_codeobj__55 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__54, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional, 497, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__55)) __PYX_ERR(1, 497, __pyx_L1_error)
 
-  /* "libwalrus.pyx":529
+  /* "libwalrus.pyx":532
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
  *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_tuple__56 = PyTuple_Pack(12, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__56)) __PYX_ERR(1, 529, __pyx_L1_error)
+  __pyx_tuple__56 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__56)) __PYX_ERR(1, 532, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__56);
   __Pyx_GIVEREF(__pyx_tuple__56);
-  __pyx_codeobj__57 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__56, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional_2, 529, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__57)) __PYX_ERR(1, 529, __pyx_L1_error)
+  __pyx_codeobj__57 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__56, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_renorm_hermite_multidimensional_2, 532, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__57)) __PYX_ERR(1, 532, __pyx_L1_error)
 
-  /* "libwalrus.pyx":562
+  /* "libwalrus.pyx":566
  * 
  * 
  * def interferometer(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of an interferometer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__58 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__58)) __PYX_ERR(1, 562, __pyx_L1_error)
+  __pyx_tuple__58 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__58)) __PYX_ERR(1, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__58);
   __Pyx_GIVEREF(__pyx_tuple__58);
-  __pyx_codeobj__59 = (PyObject*)__Pyx_PyCode_New(2, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__58, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_interferometer, 562, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__59)) __PYX_ERR(1, 562, __pyx_L1_error)
+  __pyx_codeobj__59 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__58, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_interferometer, 566, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__59)) __PYX_ERR(1, 566, __pyx_L1_error)
 
-  /* "libwalrus.pyx":590
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":595
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def interferometer_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of an interferometer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__60 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__60)) __PYX_ERR(1, 590, __pyx_L1_error)
+  __pyx_tuple__60 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__60)) __PYX_ERR(1, 595, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__60);
   __Pyx_GIVEREF(__pyx_tuple__60);
-  __pyx_codeobj__61 = (PyObject*)__Pyx_PyCode_New(2, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__60, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_interferometer_real, 590, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__61)) __PYX_ERR(1, 590, __pyx_L1_error)
+  __pyx_codeobj__61 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__60, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_interferometer_real, 595, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__61)) __PYX_ERR(1, 595, __pyx_L1_error)
 
-  /* "libwalrus.pyx":618
+  /* "libwalrus.pyx":624
  * 
  * 
  * def squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__62 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__62)) __PYX_ERR(1, 618, __pyx_L1_error)
+  __pyx_tuple__62 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__62)) __PYX_ERR(1, 624, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__62);
   __Pyx_GIVEREF(__pyx_tuple__62);
-  __pyx_codeobj__63 = (PyObject*)__Pyx_PyCode_New(2, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__62, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_squeezing, 618, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__63)) __PYX_ERR(1, 618, __pyx_L1_error)
+  __pyx_codeobj__63 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__62, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_squeezing, 624, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__63)) __PYX_ERR(1, 624, __pyx_L1_error)
 
-  /* "libwalrus.pyx":646
+  /* "libwalrus.pyx":653
  * 
  * 
  * def squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__64 = PyTuple_Pack(10, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__64)) __PYX_ERR(1, 646, __pyx_L1_error)
+  __pyx_tuple__64 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__64)) __PYX_ERR(1, 653, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__64);
   __Pyx_GIVEREF(__pyx_tuple__64);
-  __pyx_codeobj__65 = (PyObject*)__Pyx_PyCode_New(2, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__64, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_squeezing_real, 646, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__65)) __PYX_ERR(1, 646, __pyx_L1_error)
+  __pyx_codeobj__65 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__64, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_squeezing_real, 653, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__65)) __PYX_ERR(1, 653, __pyx_L1_error)
 
-  /* "libwalrus.pyx":673
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":681
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def displacement(double complex [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a displacement by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__66 = PyTuple_Pack(9, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_n, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__66)) __PYX_ERR(1, 673, __pyx_L1_error)
+  __pyx_tuple__66 = PyTuple_Pack(7, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_n, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__66)) __PYX_ERR(1, 681, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__66);
   __Pyx_GIVEREF(__pyx_tuple__66);
-  __pyx_codeobj__67 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__66, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_displacement, 673, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__67)) __PYX_ERR(1, 673, __pyx_L1_error)
+  __pyx_codeobj__67 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__66, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_displacement, 681, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__67)) __PYX_ERR(1, 681, __pyx_L1_error)
 
-  /* "libwalrus.pyx":699
+  /* "libwalrus.pyx":708
  * 
  * 
  * def displacement_real(double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a displacement by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__68 = PyTuple_Pack(9, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_n, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array, __pyx_n_s_ndarray, __pyx_n_s_array_wrapper); if (unlikely(!__pyx_tuple__68)) __PYX_ERR(1, 699, __pyx_L1_error)
+  __pyx_tuple__68 = PyTuple_Pack(7, __pyx_n_s_y, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_n, __pyx_n_s_y_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__68)) __PYX_ERR(1, 708, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__68);
   __Pyx_GIVEREF(__pyx_tuple__68);
-  __pyx_codeobj__69 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__68, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_displacement_real, 699, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__69)) __PYX_ERR(1, 699, __pyx_L1_error)
+  __pyx_codeobj__69 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__68, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_displacement_real, 708, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__69)) __PYX_ERR(1, 708, __pyx_L1_error)
 
-  /* "libwalrus.pyx":724
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":734
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def two_mode_squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a two mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__70 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(1, 724, __pyx_L1_error)
+  __pyx_tuple__70 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(1, 734, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__70);
   __Pyx_GIVEREF(__pyx_tuple__70);
-  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_two_mode_squeezing, 724, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(1, 724, __pyx_L1_error)
+  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_two_mode_squeezing, 734, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(1, 734, __pyx_L1_error)
 
-  /* "libwalrus.pyx":793
+  /* "libwalrus.pyx":803
  * 
  * 
  * def two_mode_squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_tuple__72 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(1, 793, __pyx_L1_error)
+  __pyx_tuple__72 = PyTuple_Pack(8, __pyx_n_s_R, __pyx_n_s_cutoff, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_n, __pyx_n_s_R_mat, __pyx_n_s_length, __pyx_n_s_array); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(1, 803, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__72);
   __Pyx_GIVEREF(__pyx_tuple__72);
-  __pyx_codeobj__73 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__72, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_two_mode_squeezing_real, 793, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__73)) __PYX_ERR(1, 793, __pyx_L1_error)
+  __pyx_codeobj__73 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__72, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_thewalrus_libwalrus_pyx, __pyx_n_s_two_mode_squeezing_real, 803, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__73)) __PYX_ERR(1, 803, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -27462,136 +26736,136 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(1, 430, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":463
+  /* "libwalrus.pyx":464
  * 
  * 
  * def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
  *     via the C++ libwalrus library.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_21hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 463, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_21hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional_real, __pyx_t_1) < 0) __PYX_ERR(1, 463, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_hermite_multidimensional_real, __pyx_t_1) < 0) __PYX_ERR(1, 464, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":495
+  /* "libwalrus.pyx":497
  * 
  * 
  * def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
  *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_23renorm_hermite_multidimensional, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 495, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_23renorm_hermite_multidimensional, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 497, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(1, 495, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional, __pyx_t_1) < 0) __PYX_ERR(1, 497, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":529
+  /* "libwalrus.pyx":532
  * 
  * 
  * def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
  *     via the C++ libwalrus library. They are given in terms of the standard multidimensional
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_25renorm_hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 529, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_25renorm_hermite_multidimensional_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 532, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional_2, __pyx_t_1) < 0) __PYX_ERR(1, 529, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_renorm_hermite_multidimensional_2, __pyx_t_1) < 0) __PYX_ERR(1, 532, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":562
+  /* "libwalrus.pyx":566
  * 
  * 
  * def interferometer(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of an interferometer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_27interferometer, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 562, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_27interferometer, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_interferometer, __pyx_t_1) < 0) __PYX_ERR(1, 562, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_interferometer, __pyx_t_1) < 0) __PYX_ERR(1, 566, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":590
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":595
+ *     return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def interferometer_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of an interferometer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_29interferometer_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 590, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_29interferometer_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 595, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_interferometer_real, __pyx_t_1) < 0) __PYX_ERR(1, 590, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_interferometer_real, __pyx_t_1) < 0) __PYX_ERR(1, 595, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":618
+  /* "libwalrus.pyx":624
  * 
  * 
  * def squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_31squeezing, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 618, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_31squeezing, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 624, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_squeezing, __pyx_t_1) < 0) __PYX_ERR(1, 618, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_squeezing, __pyx_t_1) < 0) __PYX_ERR(1, 624, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":646
+  /* "libwalrus.pyx":653
  * 
  * 
  * def squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_33squeezing_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 646, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_33squeezing_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 653, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_squeezing_real, __pyx_t_1) < 0) __PYX_ERR(1, 646, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_squeezing_real, __pyx_t_1) < 0) __PYX_ERR(1, 653, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":673
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":681
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def displacement(double complex [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a displacement by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_35displacement, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 673, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_35displacement, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 681, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_displacement, __pyx_t_1) < 0) __PYX_ERR(1, 673, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_displacement, __pyx_t_1) < 0) __PYX_ERR(1, 681, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":699
+  /* "libwalrus.pyx":708
  * 
  * 
  * def displacement_real(double [:] y, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a displacement by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_37displacement_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 699, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_37displacement_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 708, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_displacement_real, __pyx_t_1) < 0) __PYX_ERR(1, 699, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_displacement_real, __pyx_t_1) < 0) __PYX_ERR(1, 708, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":724
- *     return np.reshape(ndarray, [cutoff]*n)
+  /* "libwalrus.pyx":734
+ *     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
  * 
  * def two_mode_squeezing(double complex[:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a two mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_39two_mode_squeezing, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 724, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_39two_mode_squeezing, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 734, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_two_mode_squeezing, __pyx_t_1) < 0) __PYX_ERR(1, 724, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_two_mode_squeezing, __pyx_t_1) < 0) __PYX_ERR(1, 734, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "libwalrus.pyx":793
+  /* "libwalrus.pyx":803
  * 
  * 
  * def two_mode_squeezing_real(double [:, :] R, int cutoff):             # <<<<<<<<<<<<<<
  *     r"""Returns the matrix elements of a single mode squeezer by using a custom version of
  *     the renormalized Hermite polynomials.
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_41two_mode_squeezing_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 793, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9libwalrus_41two_mode_squeezing_real, NULL, __pyx_n_s_libwalrus); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 803, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_two_mode_squeezing_real, __pyx_t_1) < 0) __PYX_ERR(1, 793, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_two_mode_squeezing_real, __pyx_t_1) < 0) __PYX_ERR(1, 803, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "libwalrus.pyx":1
@@ -28316,6 +27590,67 @@ static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *memslice,
     }
 }
 
+/* PyDictVersioning */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
+    PyObject **dictptr = NULL;
+    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
+    if (offset) {
+#if CYTHON_COMPILING_IN_CPYTHON
+        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
+#else
+        dictptr = _PyObject_GetDictPtr(obj);
+#endif
+    }
+    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
+}
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
+        return 0;
+    return obj_dict_version == __Pyx_get_object_dict_version(obj);
+}
+#endif
+
+/* GetModuleGlobalName */
+#if CYTHON_USE_DICT_VERSIONS
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
+#else
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
+#endif
+{
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    } else if (unlikely(PyErr_Occurred())) {
+        return NULL;
+    }
+#else
+    result = PyDict_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+#endif
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+    PyErr_Clear();
+#endif
+    return __Pyx_GetBuiltinName(name);
+}
+
 /* PyFunctionFastCall */
 #if CYTHON_FAST_PYCALL
 static PyObject* __Pyx_PyFunction_FastCallNoKw(PyCodeObject *co, PyObject **args, Py_ssize_t na,
@@ -28435,6 +27770,29 @@ done:
 #endif
 #endif
 
+/* PyCFunctionFastCall */
+#if CYTHON_FAST_PYCCALL
+static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
+    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
+    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
+    PyObject *self = PyCFunction_GET_SELF(func);
+    int flags = PyCFunction_GET_FLAGS(func);
+    assert(PyCFunction_Check(func));
+    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
+    assert(nargs >= 0);
+    assert(nargs == 0 || args != NULL);
+    /* _PyCFunction_FastCallDict() must not be called with an exception set,
+       because it may clear it (directly or indirectly) and so the
+       caller loses its exception */
+    assert(!PyErr_Occurred());
+    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
+        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
+    } else {
+        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
+    }
+}
+#endif
+
 /* PyObjectCallMethO */
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
@@ -28477,67 +27835,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
 }
 #endif
 
-/* PyDictVersioning */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
-    PyObject **dictptr = NULL;
-    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
-    if (offset) {
-#if CYTHON_COMPILING_IN_CPYTHON
-        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
-#else
-        dictptr = _PyObject_GetDictPtr(obj);
-#endif
-    }
-    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
-}
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
-        return 0;
-    return obj_dict_version == __Pyx_get_object_dict_version(obj);
-}
-#endif
-
-/* GetModuleGlobalName */
-#if CYTHON_USE_DICT_VERSIONS
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
-#else
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
-#endif
-{
-    PyObject *result;
-#if !CYTHON_AVOID_BORROWED_REFS
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    } else if (unlikely(PyErr_Occurred())) {
-        return NULL;
-    }
-#else
-    result = PyDict_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-#endif
-#else
-    result = PyObject_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-    PyErr_Clear();
-#endif
-    return __Pyx_GetBuiltinName(name);
-}
-
 /* ExtTypeTest */
 static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
     if (unlikely(!type)) {
@@ -28550,29 +27847,6 @@ static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
                  Py_TYPE(obj)->tp_name, type->tp_name);
     return 0;
 }
-
-/* PyCFunctionFastCall */
-#if CYTHON_FAST_PYCCALL
-static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
-    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
-    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
-    PyObject *self = PyCFunction_GET_SELF(func);
-    int flags = PyCFunction_GET_FLAGS(func);
-    assert(PyCFunction_Check(func));
-    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
-    assert(nargs >= 0);
-    assert(nargs == 0 || args != NULL);
-    /* _PyCFunction_FastCallDict() must not be called with an exception set,
-       because it may clear it (directly or indirectly) and so the
-       caller loses its exception */
-    assert(!PyErr_Occurred());
-    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
-        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
-    } else {
-        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
-    }
-}
-#endif
 
 /* PyObjectCallOneArg */
 #if CYTHON_COMPILING_IN_CPYTHON
