@@ -42,8 +42,8 @@ namespace libwalrus {
  *
  * @return hafnian of the input matrix
  */
-
-std::vector<int> lin_to_multi(unsigned long long int linear_index, const std::vector<int> &maxes) {
+std::vector<int> lin_to_multi(unsigned long long int linear_index,
+                              const std::vector<int> &maxes) {
   std::vector<int> i(maxes.size(), 0);
   unsigned int l = 0;
   int s0 = maxes[0] + 1;
@@ -68,7 +68,6 @@ std::vector<int> lin_to_multi(unsigned long long int linear_index, const std::ve
  *
  * @return N!/K!(N-K)!
  */
-
 template <typename T> T get_binom_coeff(T N, T K) {
   T r = 1;
   T d;
@@ -98,7 +97,6 @@ template <typename T> T get_binom_coeff(T N, T K) {
  */
 template <typename T>
 inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
-
   int n = std::sqrt(static_cast<double>(mat.size()));
   assert(static_cast<int>(rpt.size()) == n);
   T y = 0.0;
@@ -131,20 +129,24 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
     unsigned long long int end = (id == chunks - 1) ? steps : beg + chunk_size;
     T sum_chunk = 0.L;
 
-    std::vector<int> x = lin_to_multi(beg, rpt);
+    std::vector<int> x =
+        (chunks == 1) ? std::vector<int>(n, 0) : lin_to_multi(beg, rpt);
     std::vector<long double> nu2(n);
-    for (int i = 0; i < n; i++)
-      nu2[i] = 0.5 * rpt[i] - x[i];
+    for (int i = 0; i < n; i++) nu2[i] = 0.5 * rpt[i];
 
-    int x_sum = std::accumulate(x.begin(), x.end(), 0);
-    for (int i = 0; i < n; i++) {
-      p *= get_binom_coeff(rpt[i], x[i]);
+    if (chunks != 1) {
+      for (int i = 0; i < n; i++) {
+        p *= get_binom_coeff(rpt[i], x[i]);
+      }
+      p *= (std::accumulate(x.begin(), x.end(), 0) % 2 == 0) ? 1 : -1;
     }
-    p *= (x_sum % 2 == 0) ? 1 : -1;
 
     for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        q += 0.5L * nu2[j] * mat[i * n + j] * nu2[i];
+      T nu2_min_x = (nu2[i] - static_cast<long double>(x[i]));
+      q += 0.5L * nu2_min_x * nu2_min_x * mat[i * n + i];
+      for (int j = 0; j < i; j++) {
+        q += (nu2[j] - static_cast<long double>(x[j])) * nu2_min_x *
+             mat[i * n + j];
       }
     }
 
@@ -152,13 +154,12 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
       sum_chunk += static_cast<long double>(p) * pow(q, s2);
 
       for (int j = 0; j < n; j++) {
-
         if (x[j] < rpt[j]) {
           x[j] += 1;
           p *= -static_cast<long double>(rpt[j] + 1 - x[j]) / x[j];
 
           for (int k = 0; k < n; k++) {
-            q -= mat[k * n + j] * (0.5L * rpt[k] - x[k]);
+            q -= mat[k * n + j] * (nu2[k] - static_cast<long double>(x[k]));
           }
           q -= 0.5L * mat[j * n + j];
           break;
@@ -168,7 +169,8 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
             p *= -1;
           }
           for (int k = 0; k < n; k++) {
-            q += (1.0L * rpt[j]) * mat[k * n + j] * (0.5L * rpt[k] - x[k]);
+            q += static_cast<long double>(rpt[j]) * mat[k * n + j] *
+                 (nu2[k] - static_cast<long double>(x[k]));
           }
           q -= 0.5L * rpt[j] * rpt[j] * mat[j * n + j];
         }
@@ -180,7 +182,6 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
 
   return y;
 }
-
 
 /**
  * Returns the loop hafnian of a matrix using the algorithm
@@ -217,34 +218,39 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu,
     T q = 0.0L, q1 = 0.0L;
 
     int chunks = omp_get_num_threads();
-    int id = omp_get_thread_num();
+    int id = (chunks == 1) ? 0 : omp_get_thread_num();
     unsigned long long int chunk_size = steps / chunks;
     unsigned long long int beg = id * chunk_size;
     unsigned long long int end = (id == chunks - 1) ? steps : beg + chunk_size;
+
     T sum_chunk = 0.L;
 
-    std::vector<int> x = lin_to_multi(beg, rpt);
+    std::vector<int> x =
+        (chunks == 1) ? std::vector<int>(n, 0) : lin_to_multi(beg, rpt);
     int s = std::accumulate(rpt.begin(), rpt.end(), 0);
     int s1 = std::floor(0.5 * s) + 1;
     std::vector<T> z1(s1, 1.0L);
     std::vector<T> z2(s1, 1.0L);
 
-    std::vector<long double> nu2(n);
-    for (int i = 0; i < n; i++)
-      nu2[i] = 0.5 * rpt[i] - x[i];
+    std::vector<T> nu2(n);
+    for (int i = 0; i < n; i++) nu2[i] = 0.5 * rpt[i];
 
     for (int i = 0; i < n; i++) {
-      q1 += nu2[i] * mu[i];
-      for (int j = 0; j < n; j++) {
-        q += 0.5L * nu2[j] * mat[i * n + j] * nu2[i];
+      T nu2_min_x = (nu2[i] - static_cast<long double>(x[i]));
+      q1 += nu2_min_x * mu[i];
+      q += 0.5L * nu2_min_x * nu2_min_x * mat[i * n + i];
+      for (int j = 0; j < i; j++) {
+        q += (nu2[j] - static_cast<long double>(x[j])) * nu2_min_x *
+             mat[i * n + j];
       }
     }
 
-    int x_sum = std::accumulate(x.begin(), x.end(), 0);
-    for (int i = 0; i < n; i++) {
-      p *= get_binom_coeff(rpt[i], x[i]);
+    if (chunks != 1) {
+      for (int i = 0; i < n; i++) {
+        p *= get_binom_coeff(rpt[i], x[i]);
+      }
+      p *= (std::accumulate(x.begin(), x.end(), 0) % 2 == 0) ? 1 : -1;
     }
-    p *= (x_sum % 2 == 0) ? 1 : -1;
 
     for (unsigned long long int i = beg; i < end; i++) {
       for (int j = 1; j < s1; j++) {
@@ -276,7 +282,7 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu,
                           x[j]);
 
           for (int k = 0; k < n; k++) {
-            q -= mat[k * n + j] * (0.5L * rpt[k] - x[k]);
+            q -= mat[k * n + j] * (nu2[k] - static_cast<long double>(x[k]));
           }
           q -= 0.5L * mat[j * n + j];
           q1 -= mu[j];
@@ -287,7 +293,8 @@ inline T loop_hafnian_rpt(std::vector<T> &mat, std::vector<T> &mu,
             p *= -1;
           }
           for (int k = 0; k < n; k++) {
-            q += (1.0L * rpt[j]) * mat[k * n + j] * (0.5L * rpt[k] - x[k]);
+            q += static_cast<long double>(rpt[j]) * mat[k * n + j] *
+                 (nu2[k] - static_cast<long double>(x[k]));
           }
           q -= 0.5L * rpt[j] * rpt[j] * mat[j * n + j];
           q1 += static_cast<long double>(rpt[j]) * mu[j];
