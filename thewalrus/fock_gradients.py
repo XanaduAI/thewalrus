@@ -84,7 +84,6 @@ def Dgate(r, theta, cutoff, grad=False):
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
-    nmodes = 1
     phase = np.exp(1j * theta)
     y = np.array([r * phase, -r * np.conj(phase)])
 
@@ -283,7 +282,7 @@ def grad_Xgate(T, gradT):  # pragma: no cover
                 gradT[n, m] -= np.sqrt(m) * T[n, m - 1]
 
 
-def Xgate(x, cutoff, grad=False, hbar=2):
+def Xgate(x, cutoff, grad=False):
     """Calculates the Fock representation of the Xgate and its gradient.
 
     Args:
