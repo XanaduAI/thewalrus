@@ -72,7 +72,7 @@ cdef class ArrayWrapperFloat:
 
 
 cdef double_pointer_to_array(double *array, int length):
-    """Converts an pointer of C doubles into a numpy array.
+    """Converts a pointer of C doubles into a numpy array.
 
     Args:
         array (double*): pointer of double
@@ -92,7 +92,7 @@ cdef double_pointer_to_array(double *array, int length):
 
 
 cdef complex_pointer_to_array(double complex *array, int length):
-    """Converts an pointer of C doubles into a numpy array.
+    """Converts a pointer of C complex doubles into a numpy array.
 
     Args:
         array (double complex*): pointer of double
@@ -753,11 +753,5 @@ def two_mode_squeezing_real(double [:, :] R, int cutoff):
             R_mat.push_back(R[i, j])
     length = cutoff**n
     cdef double *array = two_mode_squeezing_cpp(R_mat, cutoff)
-    #    cdef np.ndarray ndarray
-    #    array_wrapper = ArrayWrapperFloat()
-    #    array_wrapper.set_data(length, <void*> array)
-    #    ndarray = np.array(array_wrapper, copy=False)
-    #    ndarray.base = <PyObject*> array_wrapper
-    #    Py_INCREF(array_wrapper)
+
     return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
-    #    return np.reshape(ndarray, [cutoff]*n)
