@@ -141,12 +141,12 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     double complex torontonian_quad(vector[double complex] &mat)
     double torontonian_fsum[T](vector[T] &mat)
 
-    T* hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
-    T* renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &resolution)
-    T* interferometer_cpp[T](vector[T] &mat, int &resolution)
-    T* squeezing_cpp[T](vector[T] &mat, int &resolution)
-    T* displacement_cpp[T](vector[T] &y, int &resolution)
-    T* two_mode_squeezing_cpp[T](vector[T] &y, int &resolution)
+    T* hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &cutoff)
+    T* renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &cutoff)
+    T* interferometer_cpp[T](vector[T] &mat, int &cutoff)
+    T* squeezing_cpp[T](vector[T] &mat, int &cutoff)
+    T* displacement_cpp[T](vector[T] &y, int &cutoff)
+    T* two_mode_squeezing_cpp[T](vector[T] &y, int &cutoff)
 
 
 # ==============================================================================
