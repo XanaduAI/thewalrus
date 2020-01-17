@@ -18,11 +18,10 @@ from thewalrus.fock_gradients import (
     BSgate,
     Sgate,
     S2gate,
-    Xgate_one_param,
-    Zgate_one_param,
-    Sgate_one_param,
-    S2gate_one_param,
-    BSgate_one_param,
+    Xgate,
+    Sgate_real,
+    S2gate_real,
+    BSgate_real,
     Rgate,
     Kgate,
 )
@@ -101,38 +100,26 @@ def test_BSgate():
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
 
 
-def test_Xgate_one_param():
-    """Tests the value of the analytic gradient for the Xgate_one_param against finite differences"""
+def test_Xgate():
+    """Tests the value of the analytic gradient for the Xgate_real against finite differences"""
     cutoff = 10
     x = 1.0
-    _, dX = Xgate_one_param(x, cutoff, grad=True)
+    _, dX = Xgate(x, cutoff, grad=True)
     dx = 0.001
-    Xp, _ = Xgate_one_param(x + dx, cutoff)
-    Xm, _ = Xgate_one_param(x - dx, cutoff)
+    Xp, _ = Xgate(x + dx, cutoff)
+    Xm, _ = Xgate(x - dx, cutoff)
     dXfd = (Xp - Xm) / (2 * dx)
     assert np.allclose(dX, dXfd, atol=1e-5, rtol=0)
 
 
-def test_Zgate_one_param():
-    """Tests the value of the analytic gradient for the Zgate_one_param against finite differences"""
-    cutoff = 10
-    p = 1.0
-    _, dZ = Zgate_one_param(p, cutoff, grad=True)
-    dp = 0.001
-    Zp, _ = Zgate_one_param(p + dp, cutoff)
-    Zm, _ = Zgate_one_param(p - dp, cutoff)
-    dZfd = (Zp - Zm) / (2 * dp)
-    assert np.allclose(dZ, dZfd, atol=1e-5, rtol=0)
-
-
-def test_Sgate_one_param():
-    """Tests the value of the analytic gradient for the Sgate_one_param against finite differences"""
+def test_Sgate_real():
+    """Tests the value of the analytic gradient for the Sgate_real against finite differences"""
     cutoff = 10
     s = np.arcsinh(1.0)
-    _, dS = Sgate_one_param(s, cutoff, grad=True)
+    _, dS = Sgate_real(s, cutoff, grad=True)
     ds = 0.0001
-    Ss, _ = Sgate_one_param(s + ds, cutoff)
-    Sm, _ = Sgate_one_param(s - ds, cutoff)
+    Ss, _ = Sgate_real(s + ds, cutoff)
+    Sm, _ = Sgate_real(s - ds, cutoff)
     dSfd = (Ss - Sm) / (2 * ds)
     assert np.allclose(dS, dSfd, atol=1e-5, rtol=0)
 
@@ -161,25 +148,25 @@ def test_Kgate():
     assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
 
 
-def test_S2gate_one_param():
-    """Tests the value of the analytic gradient for the S2gate_one_param against finite differences"""
+def test_S2gate_real():
+    """Tests the value of the analytic gradient for the S2gate_real against finite differences"""
     cutoff = 10
     s = np.arcsinh(1.0)
-    _, dS2 = S2gate_one_param(s, cutoff, grad=True)
+    _, dS2 = S2gate_real(s, cutoff, grad=True)
     ds = 0.0001
-    S2s, _ = S2gate_one_param(s + ds, cutoff)
-    S2m, _ = S2gate_one_param(s - ds, cutoff)
+    S2s, _ = S2gate_real(s + ds, cutoff)
+    S2m, _ = S2gate_real(s - ds, cutoff)
     dS2fd = (S2s - S2m) / (2 * ds)
     assert np.allclose(dS2, dS2fd, atol=1e-5, rtol=0)
 
 
-def test_BSgate_one_param():
-    """Tests the value of the analytic gradient for the BSgate_one_param against finite differences"""
+def test_BSgate_real():
+    """Tests the value of the analytic gradient for the BSgate_real against finite differences"""
     theta = 1.0
     cutoff = 9
-    _, dBS = BSgate_one_param(theta, cutoff, grad=True)
+    _, dBS = BSgate_real(theta, cutoff, grad=True)
     dtheta = 0.0001
-    BSs, _ = BSgate_one_param(theta + dtheta, cutoff)
-    BSm, _ = BSgate_one_param(theta - dtheta, cutoff)
+    BSs, _ = BSgate_real(theta + dtheta, cutoff)
+    BSm, _ = BSgate_real(theta - dtheta, cutoff)
     dBSfd = (BSs - BSm) / (2 * dtheta)
     assert np.allclose(dBS, dBSfd, atol=1e-5, rtol=0)

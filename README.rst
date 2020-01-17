@@ -74,6 +74,7 @@ The Walrus depends on the following Python packages:
 
 * `Python <http://python.org/>`_ >=3.5
 * `NumPy <http://numpy.org/>`_  >=1.13.3
+* `Numba <https://numba.pydata.org/>`_ >=0.43.1
 
 In addition, to compile the C++ extension, the following dependencies are required:
 

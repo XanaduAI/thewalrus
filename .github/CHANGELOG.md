@@ -12,6 +12,11 @@
 
 * Add OpenMP support to the repeated moment hafnian code. [#120](https://github.com/XanaduAI/thewalrus/pull/120)
 
+* Improves speed of the functions in `hermite_multidimensional.hpp`. [#123](https://github.com/XanaduAI/thewalrus/pull/123)
+
+* Improves speed of the functions in `thewalrus.fock_gradients` by doing calls to optimized functions in `hermite_multidimensional.hpp`. [#123](https://github.com/XanaduAI/thewalrus/pull/123)
+
+
 ### Bug fixes
 
 * Corrects typos in the random number generation in the C++ unit tests. [#118](https://github.com/XanaduAI/thewalrus/pull/118)
