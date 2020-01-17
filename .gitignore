@@ -21,3 +21,4 @@ docs/libwalrus_cpp_api/*
 docs/.ipynb_checkpoints/*
 coverage.xml
 docs/code/api/*
+thewalrus/libwalrus.cpp

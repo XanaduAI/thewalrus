@@ -20,7 +20,7 @@
 
 #pragma once
 #include <stdafx.h>
-
+#include <assert.h>
 
 typedef unsigned long long int ullint;
 
@@ -29,17 +29,17 @@ typedef unsigned long long int ullint;
  * Returns the index of the one dimensional flattened vector corresponding to the multidimensional tensor
  *
  * @param pos
- * @param resolution
+ * @param cutoff
  *
  * @return index on flattened vector
  */
-ullint vec2index(std::vector<int> &pos, int resolution) {
+ullint vec2index(std::vector<int> &pos, int cutoff) {
     int dim = pos.size();
     ullint nextCoordinate = 0;
 
     nextCoordinate = pos[0]-1;
     for(int ii = 0; ii < dim-1; ii++) {
-        nextCoordinate = nextCoordinate*resolution + (pos[ii+1]-1);
+        nextCoordinate = nextCoordinate*cutoff + (pos[ii+1]-1);
     }
 
     return nextCoordinate;
@@ -52,12 +52,12 @@ ullint vec2index(std::vector<int> &pos, int resolution) {
  * @param nextPos a vector of integers
  * @param jumpFrom a vector of integers
  * @param jump integer specifying whether to jump to the next index
- * @param resolution integer specifying the cuotff
+ * @param cutoff integer specifying the cuotff
  * @dim dimension of the R matrix
  *
  * @k index necessary for knowing which elements are needed from the input vector y and matrix R
  */
-int update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &resolution, const int &dim) {
+int update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &jump, const int &cutoff, const int &dim) {
     if (jump > 0) {
         jumpFrom[jump] += 1;
         jump = 0;
@@ -66,7 +66,7 @@ int update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &
         std::vector<int> forwardStep(dim, 0);
         forwardStep[ii] = 1;
 
-        if ( forwardStep[ii] + nextPos[ii] > resolution) {
+        if ( forwardStep[ii] + nextPos[ii] > cutoff) {
             nextPos[ii] = 1;
             jumpFrom[ii] = 1;
             jump = ii+1;
@@ -95,36 +95,33 @@ namespace libwalrus {
  * @param R a flattened vector of size \f$n^2\f$, representing a
  *       \f$n\times n\f$ symmetric matrix.
  * @param y a flattened vector of size \f$n\f$.
- * @param resolution highest number of photons to be resolved.
+ * @param cutoff highest number of photons to be resolved.
  *
  */
 template <typename T>
-inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
+inline T* hermite_multidimensional_cpp(const std::vector<T> &R, const std::vector<T> &y, const int &cutoff) {
     int dim = std::sqrt(static_cast<double>(R.size()));
 
-    ullint Hdim = pow(resolution, dim);
-    std::vector<T> H(Hdim, 0);
-
-
+    ullint Hdim = pow(cutoff, dim);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
+    memset(&H[0],0,sizeof(T)*Hdim);
     H[0] = 1;
 
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<int> ek(dim, 0);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
 
     for (ullint jj = 0; jj < Hdim-1; jj++) {
 
-        k = update_iterator(nextPos, jumpFrom, jump, resolution, dim);
+        k = update_iterator(nextPos, jumpFrom, jump, cutoff, dim);
 
-        nextCoordinate = vec2index(nextPos, resolution);
-        fromCoordinate = vec2index(jumpFrom, resolution);
+        nextCoordinate = vec2index(nextPos, cutoff);
+        fromCoordinate = vec2index(jumpFrom, cutoff);
 
-        H[nextCoordinate] = H[nextCoordinate] + y[k];
-        H[nextCoordinate] = H[nextCoordinate] * H[fromCoordinate];
+        H[nextCoordinate] = H[fromCoordinate] * y[k];
 
         std::vector<int> tmpjump(dim, 0);
 
@@ -133,7 +130,7 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
                 std::vector<int> prevJump(dim, 0);
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
-                ullint prevCoordinate = vec2index(tmpjump, resolution);
+                ullint prevCoordinate = vec2index(tmpjump, cutoff);
                 H[nextCoordinate] = H[nextCoordinate] - (static_cast<T>(jumpFrom[ii]-1))*(R[dim*k+ii])*H[prevCoordinate];
 
             }
@@ -155,34 +152,34 @@ inline std::vector<T> hermite_multidimensional_cpp(std::vector<T> &R, std::vecto
  * @param R a flattened vector of size \f$n^2\f$, representing a
  *       \f$n\times n\f$ symmetric matrix.
  * @param y a flattened vector of size \f$n\f$.
- * @param resolution highest number of photons to be resolved.
+ * @param cutoff highest number of photons to be resolved.
  *
  */
 template <typename T>
-inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std::vector<T> &y, int &resolution) {
+inline T*  renorm_hermite_multidimensional_cpp(const std::vector<T> &R, const std::vector<T> &y, const int &cutoff) {
     int dim = std::sqrt(static_cast<double>(R.size()));
 
-    ullint Hdim = pow(resolution, dim);
-    std::vector<T> H(Hdim, 0);
-
+    ullint Hdim = pow(cutoff, dim);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
+    memset(&H[0],0,sizeof(T)*Hdim);
     H[0] = 1;
-    std::vector<double> intsqrt(resolution+1, 0);
-    for (int ii = 0; ii<=resolution; ii++) {
+    std::vector<double> intsqrt(cutoff+1, 0);
+    for (int ii = 0; ii<=cutoff; ii++) {
         intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
     }
     std::vector<int> nextPos(dim, 1);
     std::vector<int> jumpFrom(dim, 1);
-    std::vector<double> factors(resolution+1, 0);
     int jump = 0;
     int k;
     ullint nextCoordinate, fromCoordinate;
     for (ullint jj = 0; jj < Hdim-1; jj++) {
-        k = update_iterator(nextPos, jumpFrom, jump, resolution, dim);
+        k = update_iterator(nextPos, jumpFrom, jump, cutoff, dim);
 
-        nextCoordinate = vec2index(nextPos, resolution);
-        fromCoordinate = vec2index(jumpFrom, resolution);
+        nextCoordinate = vec2index(nextPos, cutoff);
+        fromCoordinate = vec2index(jumpFrom, cutoff);
 
-        H[nextCoordinate] = H[fromCoordinate] * y[k]/(intsqrt[nextPos[k]-1]);
+        H[nextCoordinate] = H[fromCoordinate] * y[k];
 
         std::vector<int> tmpjump(dim, 0);
 
@@ -191,13 +188,254 @@ inline std::vector<T> renorm_hermite_multidimensional_cpp(std::vector<T> &R, std
                 std::vector<int> prevJump(dim, 0);
                 prevJump[ii] = 1;
                 std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
-                ullint prevCoordinate = vec2index(tmpjump, resolution);
-                H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1]/intsqrt[nextPos[k]-1])*(R[k*dim+ii])*H[prevCoordinate];
+                ullint prevCoordinate = vec2index(tmpjump, cutoff);
+                H[nextCoordinate] = H[nextCoordinate] - intsqrt[jumpFrom[ii]-1]*(R[k*dim+ii])*H[prevCoordinate];
             }
+        }
+		H[nextCoordinate] = H[nextCoordinate]/intsqrt[nextPos[k]-1];
+    }
+    return H;
+}
+
+/**
+ * Returns the matrix elements of an interferometer parametrized in terms of its R matrix
+ *
+ * @param R a flattened vector of size \f$n^2\f$, representing a
+ *       \f$n\times n\f$ symmetric matrix.
+ * @param cutoff highest number of photons to be resolved.
+ *
+ */
+template <typename T>
+inline T* interferometer_cpp(const std::vector<T> &R, const int &cutoff) {
+
+    int dim = std::sqrt(static_cast<double>(R.size()));
+    assert(dim % 2 == 0);
+    int num_modes = dim/2;
+    ullint Hdim = pow(cutoff, dim);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
+    memset(&H[0],0,sizeof(T)*Hdim);
+    H[0] = 1;
+    std::vector<double> intsqrt(cutoff+1, 0);
+    for (int ii = 0; ii<=cutoff; ii++) {
+        intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
+    }
+    std::vector<int> nextPos(dim, 1);
+    std::vector<int> jumpFrom(dim, 1);
+    int jump = 0;
+    int k;
+    ullint nextCoordinate, fromCoordinate;
+
+    for (ullint jj = 0; jj < Hdim-1; jj++) {
+        k = update_iterator(nextPos, jumpFrom, jump, cutoff, dim);
+        int bran = 0;
+        for (int ii=0; ii < num_modes; ii++) {
+            bran += nextPos[ii];
+        }
+
+        int ketn = 0;
+        for (int ii=num_modes; ii < dim; ii++) {
+            ketn += nextPos[ii];
+        }
+        if (bran == ketn) {
+            nextCoordinate = vec2index(nextPos, cutoff);
+            fromCoordinate = vec2index(jumpFrom, cutoff);
+            std::vector<int> tmpjump(dim, 0);
+            int low_lim;
+            int high_lim;
+
+            if (k > num_modes) {
+                low_lim = 0;
+                high_lim = num_modes;
+            }
+            else {
+                low_lim = num_modes;
+                high_lim = dim;
+            }
+
+            for (int ii = low_lim; ii < high_lim; ii++) {
+                if (jumpFrom[ii] > 1) {
+                    std::vector<int> prevJump(dim, 0);
+                    prevJump[ii] = 1;
+                    std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
+                    ullint prevCoordinate = vec2index(tmpjump, cutoff);
+                    H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1])*(R[k*dim+ii])*H[prevCoordinate];
+                }
+            }
+            H[nextCoordinate] = H[nextCoordinate] /intsqrt[nextPos[k]-1];
         }
     }
     return H;
 }
+
+/**
+ * Returns the matrix elements of a single mode squeezing operation parametrized in terms of its R matrix
+ *
+ * @param R a flattened vector of size 4, representing a
+ *       \f$2\times 2\f$ symmetric matrix.
+ * @param cutoff highest number of photons to be resolved.
+ *
+ */
+template <typename T>
+inline T* squeezing_cpp(const std::vector<T> &R, const int &cutoff) {
+    int dim = std::sqrt(static_cast<double>(R.size()));
+    ullint Hdim = pow(cutoff, dim);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
+    memset(&H[0],0,sizeof(T)*Hdim);
+    H[0] = std::sqrt(-R[1]);
+    std::vector<double> intsqrt(cutoff+1, 0);
+    for (int ii = 0; ii<=cutoff; ii++) {
+        intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
+    }
+    assert(dim == 2);
+    int num_modes = dim/2;
+
+    std::vector<int> nextPos(dim, 1);
+    std::vector<int> jumpFrom(dim, 1);
+    int jump = 0;
+    int k;
+    ullint nextCoordinate, fromCoordinate;
+    for (ullint jj = 0; jj < Hdim-1; jj++) {
+        k = update_iterator(nextPos, jumpFrom, jump, cutoff, dim);
+
+        int bran = nextPos[0];
+        int ketn = nextPos[1];
+        if (bran % 2 == ketn % 2) {
+            ullint nextCoordinate = vec2index(nextPos, cutoff);
+            ullint fromCoordinate = vec2index(jumpFrom, cutoff);
+
+            std::vector<int> tmpjump(dim, 0);
+            for (int ii = 0; ii < dim; ii++) {
+                if (jumpFrom[ii] > 1) {
+                    std::vector<int> prevJump(dim, 0);
+                    prevJump[ii] = 1;
+                    std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
+                    ullint prevCoordinate = vec2index(tmpjump, cutoff);
+                    H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1])*(R[k*dim+ii])*H[prevCoordinate];
+                }
+            }
+            H[nextCoordinate] = H[nextCoordinate]/intsqrt[nextPos[k]-1];
+        }
+    }
+    return H;
+}
+
+
+
+/**
+ * Returns the matrix elements of a displacement operation
+ *
+ * @param y a flattened vector of size \f$2\f$, represeting the displacement via \f$\alpha, \alpha^*\f$
+ * @param cutoff highest number of photons to be resolved.
+ *
+ */
+template <typename T>
+inline T* displacement_cpp(const std::vector<T> &y, const int &cutoff) {
+    int dim = 2;
+
+    ullint Hdim = pow(cutoff, dim);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
+    memset(&H[0],0,sizeof(T)*Hdim);
+    H[0] = std::exp(-0.5*std::pow(std::abs(y[0]),2));
+    std::vector<double> intsqrt(cutoff+1, 0);
+    for (int ii = 0; ii<=cutoff; ii++) {
+        intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
+    }
+    std::vector<int> nextPos(dim, 1);
+    std::vector<int> jumpFrom(dim, 1);
+    int jump = 0;
+    int k;
+    ullint nextCoordinate, fromCoordinate;
+    for (ullint jj = 0; jj < Hdim-1; jj++) {
+        k = update_iterator(nextPos, jumpFrom, jump, cutoff, dim);
+
+        nextCoordinate = vec2index(nextPos, cutoff);
+        fromCoordinate = vec2index(jumpFrom, cutoff);
+
+        H[nextCoordinate] = H[fromCoordinate] * y[k];
+
+        std::vector<int> tmpjump(dim, 0);
+
+
+        int ii = 0;
+        if(k==0) {
+            ii = 1;
+        }
+
+        if (jumpFrom[ii] > 1) {
+            std::vector<int> prevJump(dim, 0);
+            prevJump[ii] = 1;
+            std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
+            ullint prevCoordinate = vec2index(tmpjump, cutoff);
+            H[nextCoordinate] = H[nextCoordinate] + (intsqrt[jumpFrom[ii]-1])*H[prevCoordinate];
+
+        }
+        H[nextCoordinate] = H[nextCoordinate]/intsqrt[nextPos[k]-1];
+
+    }
+    return H;
+
+}
+
+/**
+ * Returns the matrix elements of a two-mode squeezer parametrized in terms of its R matrix
+ *
+ * @param R a flattened vector of size \f$n^2\f$, representing a
+ *       \f$n\times n\f$ symmetric matrix.
+ * @param cutoff highest number of photons to be resolved.
+ *
+ */
+
+template <typename T>
+inline T* two_mode_squeezing_cpp(const std::vector<T> &R, const int &cutoff) {
+    int dim = std::sqrt(static_cast<double>(R.size()));
+    assert(dim == 4);
+
+    ullint Hdim = pow(cutoff, dim);
+    T *H;
+    H = (T*) malloc(sizeof(T)*Hdim);
+    memset(&H[0],0,sizeof(T)*Hdim);
+
+
+    H[0] = -R[2];
+    std::vector<double> intsqrt(cutoff+1, 0);
+    for (int ii = 0; ii<=cutoff; ii++) {
+        intsqrt[ii] = std::sqrt((static_cast<double>(ii)));
+    }
+    std::vector<int> nextPos(dim, 1);
+    std::vector<int> jumpFrom(dim, 1);
+    int jump = 0;
+    int k;
+    ullint nextCoordinate, fromCoordinate;
+    for (ullint jj = 0; jj < Hdim-1; jj++) {
+        k = update_iterator(nextPos, jumpFrom, jump, cutoff, dim);
+        int bran = nextPos[0]-nextPos[1];
+        int ketn = nextPos[2]-nextPos[3];
+        if (bran == ketn) {
+            ullint nextCoordinate = vec2index(nextPos, cutoff);
+            ullint fromCoordinate = vec2index(jumpFrom, cutoff);
+
+            std::vector<int> tmpjump(dim, 0);
+
+            for (int ii = 0; ii < dim; ii++) {
+                if (jumpFrom[ii] > 1) {
+                    std::vector<int> prevJump(dim, 0);
+                    prevJump[ii] = 1;
+                    std::transform(jumpFrom.begin(), jumpFrom.end(), prevJump.begin(), tmpjump.begin(), std::minus<int>());
+                    ullint prevCoordinate = vec2index(tmpjump, cutoff);
+                    H[nextCoordinate] = H[nextCoordinate] - (intsqrt[jumpFrom[ii]-1])*(R[k*dim+ii])*H[prevCoordinate];
+
+                }
+            }
+            H[nextCoordinate] = H[nextCoordinate]/intsqrt[nextPos[k]-1];
+        }
+    }
+    return H;
+}
+
+
 
 
 
