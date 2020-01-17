@@ -16,8 +16,8 @@
  * \rst
  * Contains functions for computing the hafnian using the algorithm
  * described in *From moments of sum to moments of product*,
- * `doi:10.1016/j.jmva.2007.01.013
- * <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__. \endrst
+ * `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
+ * \endrst
  */
 #pragma once
 #include <stdafx.h>
@@ -40,7 +40,7 @@ namespace libwalrus {
  * @param maxes a vector of integers, representing the max index value
  * of each indice in the multi-index object.
  *
- * @return hafnian of the input matrix
+ * @return multi-index corresponding to the linear index
  */
 std::vector<int> lin_to_multi(unsigned long long int linear_index,
                               const std::vector<int> &maxes) {
@@ -60,19 +60,19 @@ std::vector<int> lin_to_multi(unsigned long long int linear_index,
 }
 
 /**
- * Returns the binomial coefficient N!/K!(N-K)!
+ * Returns the binomial coefficient \f$N!/K!(N-K)!\f$
  * Adapted from http://blog.plover.com/math/choose.html
  *
  * @param N
  * @param K
  *
- * @return N!/K!(N-K)!
+ * @return \f$N!/K!(N-K)!\f$
  */
-template <typename T> T get_binom_coeff(T N, T K) {
+template <typename T>
+T get_binom_coeff(T N, T K) {
   T r = 1;
   T d;
-  if (K > N)
-    return 0;
+  if (K > N) return 0;
   for (d = 1; d <= K; d++) {
     r *= N--;
     r /= d;
@@ -106,7 +106,6 @@ inline T hafnian_rpt(std::vector<T> &mat, std::vector<int> &rpt) {
     T q = 0.0L;
 
     long double p = 2;
-    // std::vector<int> x(n, 0.0);
     int s = std::accumulate(rpt.begin(), rpt.end(), 0);
     int s2 = s / 2;
 
@@ -408,10 +407,9 @@ double hafnian_rpt_quad(std::vector<double> &mat, std::vector<int> &rpt) {
  *      `mat = [1]` and `rpt = [6]` represents a \f$6\times 6\f$ matrix of all ones.
  * @return loop hafnian of the input matrix
  */
-std::complex<double>
-loop_hafnian_rpt_quad(std::vector<std::complex<double>> &mat,
-                      std::vector<std::complex<double>> &mu,
-                      std::vector<int> &rpt) {
+std::complex<double> loop_hafnian_rpt_quad(
+    std::vector<std::complex<double>> &mat,
+    std::vector<std::complex<double>> &mu, std::vector<int> &rpt) {
   std::vector<std::complex<long double>> matq(mat.begin(), mat.end());
   std::vector<std::complex<long double>> muq(mu.begin(), mu.end());
   std::complex<long double> haf;
