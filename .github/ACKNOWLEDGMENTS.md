@@ -30,6 +30,6 @@
 
 * [Trevor Vincent](https://github.com/trevor-vincent) (Xanadu) - :apple: master of gravitation
 
-* [Ilan Tzitrin](https://github.com/ilan-tz) (organization) emoji title
+* [Ilan Tzitrin](https://github.com/ilan-tz) (Xanadu, University of Toronto) 🚞 local optimist
 
-* [J. Eli Bourassa](https://github.com/elib20) (organization) emoji title
+* [J. Eli Bourassa](https://github.com/elib20) (Xanadu, University of Toronto) 🏄 GKP surfer
