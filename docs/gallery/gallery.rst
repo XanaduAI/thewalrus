@@ -94,6 +94,11 @@ If you develop a new circuit and measurement scheme to prepare a non-Gaussian st
     :description: :doc:`Four-headed cat states <four_cat>`
     :figure: gallery/four_cat.png
 
+.. customgalleryitem::
+    :tooltip: GKP states
+    :description: :doc:`GKP states <gkp>`
+    :figure: gallery/gkp.png
+
 .. raw:: html
 
         <div style='clear:both'></div>
