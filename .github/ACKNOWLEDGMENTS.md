@@ -29,3 +29,7 @@
 * [Guillaume Thekkadath](https://www2.physics.ox.ac.uk/contacts/people/thekkadath) (University of Oxford) - :smiley_cat: Master cat herder
 
 * [Trevor Vincent](https://github.com/trevor-vincent) (Xanadu) - :apple: master of gravitation
+
+* [Ilan Tzitrin](https://github.com/ilan-tz) (Xanadu, University of Toronto) 🚞 local optimist
+
+* [J. Eli Bourassa](https://github.com/elib20) (Xanadu, University of Toronto) 🏄 GKP surfer
