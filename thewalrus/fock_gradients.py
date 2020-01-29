@@ -251,7 +251,7 @@ def BSgate(theta, phi, cutoff, grad=False):
     """
     ct = np.cos(theta)
     st = np.sin(theta) * np.exp(1j * phi)
-    mat = np.array(
+    mat = -np.array(
         [[0, 0, ct, -np.conj(st)], [0, 0, st, ct], [ct, st, 0, 0], [-np.conj(st), ct, 0, 0]]
     )
 
