@@ -80,7 +80,7 @@ A 6 vertex graph is shown here
     :width: 25%
     :target: javascript:void(0);
 
-the vertices are labelled :math:`V = \{1,2,3,4,5,6 \}` and the edges are :math:`E=\{(1,1),(1,4),(2,4),(2,5),(3,4),(3,5),(3,6),(5,5) \}`.
+the vertices are labelled :math:`V = \{1,2,3,4,5,6 \}` and the edges are :math:`E=\{(1,4),(2,4),(2,5),(3,4),(3,5),(3,6),(5,5) \}`.
 
 A matching :math:`M` is a subset of the edges in which no two edges share a vertex. An example of matching is :math:`M=(1,4)(3,6)` represented by the blue lines in the following figure
 
