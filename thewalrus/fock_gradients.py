@@ -52,7 +52,25 @@ from thewalrus.libwalrus import (
 )
 
 
-@jit("void(complex128[:,:], complex128[:,:], complex128[:,:], double)")
+
+
+@jit(nopython=True)
+def displacement_rec(alpha, D):
+    y = np.array([alpha, -np.conj(alpha)])
+    cutoff, _ = D.shape
+    sqns = np.sqrt(np.arange(cutoff))
+    D[0,0] = np.exp(-0.5*np.abs(y[0])**2)
+    D[1,0] = y[0]*D[0,0]
+    for m in range(2,cutoff):
+        D[m,0] = (y[0]*D[m-1,0])/sqns[m]
+    for n in range(1, cutoff):
+        shifted = np.roll(D[:,n-1],1)*sqns
+        D[:,n] = (y[1]*D[:,n-1]+shifted)/sqns[n]
+    return D
+
+
+
+@jit(nopython=True)
 def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     """Calculates the gradient of the Dgate.
 
@@ -84,20 +102,19 @@ def Dgate(r, theta, cutoff, grad=False):
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
-    phase = np.exp(1j * theta)
-    y = np.array([r * phase, -r * np.conj(phase)])
-
     if not grad:
-        return displacement(y, cutoff), None, None
-
-    T = displacement(y, cutoff + 1)
+        T = np.empty([cutoff, cutoff], dtype=complex)
+        displacement_rec(r * np.exp(1j * theta), T)
+        return T, None, None
+    T = np.empty([cutoff+1, cutoff+1], dtype=complex)
+    displacement_rec(r * np.exp(1j * theta), T)
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
     grad_Dgate(T, gradTr, gradTtheta, theta)
     return T[0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
-@jit("void(complex128[:,:], complex128[:,:], complex128[:,:], double)")
+@jit(nopython=True)
 def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     """Calculates the gradient of the Sgate.
 
@@ -147,7 +164,7 @@ def Sgate(r, theta, cutoff, grad=False):
     return T[0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
-@jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
+@jit(nopython=True)
 def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
     """Calculates the gradient of the S2gate.
 
@@ -208,7 +225,7 @@ def S2gate(r, theta, cutoff, grad=False):
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTr, gradTtheta
 
 
-@jit("void(complex128[:,:,:,:],complex128[:,:,:,:], complex128[:,:,:,:], double)")
+@jit(nopython=True)
 def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
     """Calculates the gradient of the BSgate.
 
@@ -266,7 +283,7 @@ def BSgate(theta, phi, cutoff, grad=False):
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTtheta, gradTphi
 
 
-@jit("void(double[:,:], double[:,:])")
+@jit(nopython=True)
 def grad_Xgate(T, gradT):  # pragma: no cover
     """Calculates the gradient of the Xgate.
 
@@ -294,18 +311,19 @@ def Xgate(x, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
     """
-    y = np.array([x, -x])
-
     if not grad:
-        return displacement_real(y, cutoff), None
+        T = np.empty([cutoff, cutoff])
+        displacement_rec(x, T)
+        return T, None
 
-    T = displacement_real(y, cutoff + 1)
+    T = np.empty([cutoff+1, cutoff+1])
+    displacement_rec(x, T)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Xgate(T, gradT)
     return T[0:cutoff, 0:cutoff], gradT
 
 
-@jit("void(double[:,:], double[:,:])")
+@jit(nopython=True)
 def grad_Sgate_real(T, gradT):  # pragma: no cover
     """Calculates the gradient of the Sgate.
 
@@ -380,7 +398,7 @@ def Kgate(theta, cutoff, grad=False):
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
 
 
-@jit("void(double[:,:,:,:],double[:,:,:,:])")
+@jit(nopython=True)
 def grad_S2gate_real(T, gradT):  # pragma: no cover
     """Calculates the gradient of the S2gate.
 
@@ -423,7 +441,7 @@ def S2gate_real(s, cutoff, grad=False):
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
 
 
-@jit("void(double[:,:,:,:], double[:,:,:,:])")
+@jit(nopython=True)
 def grad_BSgate_real(T, gradT):  # pragma: no cover
     """Calculates the gradient of the BSgate.
 
