@@ -23,16 +23,12 @@ the Kerr gate, as well as their gradients.
 .. autosummary::
     :toctree: api
 
-    Xgate
     Dgate
     Sgate
     Rgate
     Kgate
     S2gate
     BSgate
-    Sgate_real
-    S2gate_real
-    BSgate_real
 
 """
 import numpy as np
@@ -42,9 +38,7 @@ from numba import jit
 
 from thewalrus.libwalrus import (
     interferometer,
-    interferometer_real,
     two_mode_squeezing,
-    two_mode_squeezing_real,
 )
 
 
@@ -304,88 +298,6 @@ def BSgate(theta, phi, cutoff, grad=False):
 
     return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradTtheta, gradTphi
 
-
-@jit(nopython=True)
-def grad_Xgate(T, gradT):  # pragma: no cover
-    """Calculates the gradient of the Xgate.
-
-    Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
-    """
-    cutoff = gradT.shape[0]
-    for n in range(cutoff):
-        for m in range(cutoff):
-            gradT[n, m] = np.sqrt(m + 1) * T[n, m + 1]
-            if m > 0:
-                gradT[n, m] -= np.sqrt(m) * T[n, m - 1]
-
-
-def Xgate(x, cutoff, grad=False):
-    """Calculates the Fock representation of the Xgate and its gradient.
-
-    Args:
-        x (float): parameter of the gate
-        cutoff (int): Fock ladder cutoff
-        grad (boolean): whether to calculate the gradient or not
-        hbar (float): value of hbar in the commutation relation
-
-    Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
-    """
-    if not grad:
-        T = np.zeros([cutoff, cutoff])
-        displacement_rec(x, T)
-        return T, None
-
-    T = np.zeros([cutoff + 1, cutoff + 1])
-    displacement_rec(x, T)
-    gradT = np.zeros([cutoff, cutoff], dtype=float)
-    grad_Xgate(T, gradT)
-    return T[0:cutoff, 0:cutoff], gradT
-
-
-@jit(nopython=True)
-def grad_Sgate_real(T, gradT):  # pragma: no cover
-    """Calculates the gradient of the Sgate.
-
-    Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
-    """
-    cutoff = gradT.shape[0]
-    for n in range(cutoff):
-        offset = n % 2
-        for m in range(offset, cutoff, 2):
-            gradT[n, m] = -0.5 * np.sqrt((m + 1) * (m + 2)) * T[n, m + 2]
-            if m > 1:
-                gradT[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2]
-
-
-def Sgate_real(s, cutoff, grad=False):
-    """Calculates the Fock representation of the Sgate and its gradient.
-
-    Args:
-        s (float): parameter of the gate
-        cutoff (int): Fock ladder cutoff
-        grad (boolean): whether to calculate the gradient or not
-
-    Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
-    """
-    if not grad:
-        T = np.zeros([cutoff, cutoff])
-        squeezing_rec(s, 1.0, T)
-        return T, None
-
-    T = np.zeros([cutoff + 2, cutoff + 2])
-    squeezing_rec(s, 1.0, T)
-    gradT = np.zeros([cutoff, cutoff], dtype=float)
-    grad_Sgate_real(T, gradT)
-
-    return T[0:cutoff, 0:cutoff], gradT
-
-
 def Rgate(theta, cutoff, grad=False):
     """Calculates the Fock representation of the Rgate and its gradient.
 
@@ -421,90 +333,3 @@ def Kgate(theta, cutoff, grad=False):
         return np.diag(T), None
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
 
-
-@jit(nopython=True)
-def grad_S2gate_real(T, gradT):  # pragma: no cover
-    """Calculates the gradient of the S2gate.
-
-    Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
-    """
-    cutoff = gradT.shape[0]
-    for n in range(cutoff):
-        for k in range(cutoff):
-            for m in range(cutoff):
-                l = m - n + k
-                if 0 <= l < cutoff:
-                    gradT[n, k, m, l] = np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1]
-                    if m > 0 and l > 0:
-                        gradT[n, k, m, l] -= np.sqrt(m * l) * T[n, k, m - 1, l - 1]
-
-
-def S2gate_real(s, cutoff, grad=False):
-    """Calculates the Fock representation of the S2gate and its gradient.
-
-    Args:
-        s (float): parameter of the gate
-        cutoff (int): Fock ladder cutoff
-        grad (boolean): whether to calculate the gradient or not
-
-    Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
-    """
-    sc = 1.0 / np.cosh(s)
-    tr = np.tanh(s)
-    mat = np.array([[0, -tr, -sc, 0], [-tr, 0, 0, -sc], [-sc, 0, 0, tr], [0, -sc, tr, 0]])
-    if not grad:
-        return two_mode_squeezing_real(mat, cutoff), None
-
-    T = two_mode_squeezing_real(mat, cutoff + 1)
-    gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
-    grad_S2gate_real(T, gradT)
-
-    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT
-
-
-@jit(nopython=True)
-def grad_BSgate_real(T, gradT):  # pragma: no cover
-    """Calculates the gradient of the BSgate.
-
-    Args:
-        T (array[float]): array representing the gate
-        gradT (array[float]): array of zeros that will contain the value of the gradient
-    """
-    cutoff = gradT.shape[0]
-    for n in range(cutoff):
-        for k in range(cutoff):
-            for m in range(cutoff):
-                l = n + k - m
-                if 0 <= l < cutoff:
-                    if m > 0:
-                        gradT[n, k, m, l] = np.sqrt(m * (l + 1)) * T[n, k, m - 1, l + 1]
-                    if l > 0:
-                        gradT[n, k, m, l] -= np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1]
-
-
-def BSgate_real(theta, cutoff, grad=False):
-    """Calculates the Fock representation of the BSgate and its gradient.
-
-    Args:
-        theta (float): parameter of the gate
-        cutoff (int): Fock ladder cutoff
-        grad (boolean): whether to calculate the gradient or not
-
-    Returns:
-        tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
-    """
-    ct = np.cos(theta)
-    st = np.sin(theta)
-    mat = -np.array([[0, 0, ct, -st], [0, 0, st, ct], [ct, st, 0, 0], [-st, ct, 0, 0]])
-
-    if not grad:
-        return interferometer_real(mat, cutoff), None
-
-    T = interferometer_real(mat, cutoff + 1)
-    gradT = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=float)
-    grad_BSgate_real(T, gradT)
-
-    return T[0:cutoff, 0:cutoff, 0:cutoff, 0:cutoff], gradT

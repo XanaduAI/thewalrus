@@ -18,10 +18,6 @@ from thewalrus.fock_gradients import (
     BSgate,
     Sgate,
     S2gate,
-    Xgate,
-    Sgate_real,
-    S2gate_real,
-    BSgate_real,
     Rgate,
     Kgate,
 )
@@ -104,30 +100,6 @@ def test_BSgate():
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
 
 
-def test_Xgate():
-    """Tests the value of the analytic gradient for the Xgate_real against finite differences"""
-    cutoff = 10
-    x = 1.0
-    _, dX = Xgate(x, cutoff, grad=True)
-    dx = 0.001
-    Xp, _ = Xgate(x + dx, cutoff)
-    Xm, _ = Xgate(x - dx, cutoff)
-    dXfd = (Xp - Xm) / (2 * dx)
-    assert np.allclose(dX, dXfd, atol=1e-5, rtol=0)
-
-
-def test_Sgate_real():
-    """Tests the value of the analytic gradient for the Sgate_real against finite differences"""
-    cutoff = 10
-    s = np.arcsinh(1.0)
-    _, dS = Sgate_real(s, cutoff, grad=True)
-    ds = 0.0001
-    Ss, _ = Sgate_real(s + ds, cutoff)
-    Sm, _ = Sgate_real(s - ds, cutoff)
-    dSfd = (Ss - Sm) / (2 * ds)
-    assert np.allclose(dS, dSfd, atol=1e-5, rtol=0)
-
-
 def test_Rgate():
     """Tests the value of the analytic gradient for the Rgate against finite differences"""
     theta = 1.0
@@ -152,28 +124,7 @@ def test_Kgate():
     assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
 
 
-def test_S2gate_real():
-    """Tests the value of the analytic gradient for the S2gate_real against finite differences"""
-    cutoff = 10
-    s = np.arcsinh(1.0)
-    _, dS2 = S2gate_real(s, cutoff, grad=True)
-    ds = 0.0001
-    S2s, _ = S2gate_real(s + ds, cutoff)
-    S2m, _ = S2gate_real(s - ds, cutoff)
-    dS2fd = (S2s - S2m) / (2 * ds)
-    assert np.allclose(dS2, dS2fd, atol=1e-5, rtol=0)
 
-
-def test_BSgate_real():
-    """Tests the value of the analytic gradient for the BSgate_real against finite differences"""
-    theta = 1.0
-    cutoff = 9
-    _, dBS = BSgate_real(theta, cutoff, grad=True)
-    dtheta = 0.0001
-    BSs, _ = BSgate_real(theta + dtheta, cutoff)
-    BSm, _ = BSgate_real(theta - dtheta, cutoff)
-    dBSfd = (BSs - BSm) / (2 * dtheta)
-    assert np.allclose(dBS, dBSfd, atol=1e-5, rtol=0)
 
 
 def test_Dgate_values(tol):
@@ -193,27 +144,6 @@ def test_Dgate_values(tol):
     )
     T = Dgate(np.abs(alpha), np.angle(alpha), cutoff)[0]
     assert np.allclose(T, expected, atol=tol, rtol=0)
-
-
-def test_Sgate_values_real(tol):
-    """Tests the correct construction of the single mode squeezing operation"""
-    s = 1.0
-    cutoff = 5
-    # This data is obtained by using qutip
-    # np.array(squeeze(40,r).data.todense())[0:5,0:5]
-    expected = np.array(
-        [
-            [0.80501818 + 0.0j, 0.0 + 0.0j, 0.43352515 + 0.0j, 0.0 + 0.0j, 0.2859358 + 0.0j],
-            [0.0 + 0.0j, 0.52169547 + 0.0j, 0.0 + 0.0j, 0.48661591 + 0.0j, 0.0 + 0.0j],
-            [-0.43352515 + 0.0j, 0.0 + 0.0j, 0.10462138 + 0.0j, 0.0 + 0.0j, 0.29199268 + 0.0j],
-            [0.0 + 0.0j, -0.48661591 + 0.0j, 0.0 + 0.0j, -0.23479643 + 0.0j, 0.0 + 0.0j],
-            [0.2859358 + 0.0j, 0.0 + 0.0j, -0.29199268 + 0.0j, 0.0 + 0.0j, -0.34474749 + 0.0j],
-        ]
-    )
-    T = Sgate(s, 0.0, cutoff)[0]
-    Tr = Sgate_real(s, cutoff)[0]
-    assert np.allclose(T, expected, atol=tol, rtol=0)
-    assert np.allclose(Tr, expected, atol=tol, rtol=0)
 
 
 def test_Sgate_values_complex(tol):
@@ -245,14 +175,12 @@ def test_BS_selection_rules(tol):
     """
     cutoff = 4
     T = BSgate(np.random.rand(), np.random.rand(), cutoff)[0]
-    Tr = BSgate_real(np.random.rand(), cutoff)[0]
     for m in range(cutoff):
         for n in range(cutoff):
             for k in range(cutoff):
                 for l in range(cutoff):
                     if m + n != k + l:  # Check that there are the same total number of photons in the bra and the ket
                         assert np.allclose(T[m, n, k, l], 0.0, atol=tol, rtol=0)
-                        assert np.allclose(Tr[m, n, k, l], 0.0, atol=tol, rtol=0)
 
 
 def test_BS_hong_ou_mandel_interference(tol):
@@ -264,8 +192,6 @@ def test_BS_hong_ou_mandel_interference(tol):
     phi = 2 * np.pi * np.random.rand()
     T = BSgate(np.pi / 4, phi, cutoff)[0]  # a 50-50 beamsplitter with phase phi
     assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
-    Tr = BSgate_real(np.pi / 4, cutoff)[0]  # a 50-50 real beamsplitter
-    assert np.allclose(Tr[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
 
 
 def test_S2_selection_rules(tol):
@@ -279,14 +205,12 @@ def test_S2_selection_rules(tol):
     s = np.arcsinh(1.0)
     phi = np.pi / 6
     T = S2gate(s, phi, cutoff)[0]
-    Tr = S2gate_real(s, cutoff)[0]
     for m in range(cutoff):
         for n in range(cutoff):
             for k in range(cutoff):
                 for l in range(cutoff):
                     if m - n != k - l:
                         assert np.allclose(T[m, n, k, l], 0, atol=tol, rtol=0)
-                        assert np.allclose(Tr[m, n, k, l], 0, atol=tol, rtol=0)
 
 
 def test_BS_values(tol):
@@ -302,20 +226,13 @@ def test_BS_values(tol):
     ct = np.cos(theta)
     st = np.sin(theta) * np.exp(1j * phi)
     U = np.array([[ct, -np.conj(st)], [st, ct]])
-    ct1 = np.cos(theta)
-    st1 = np.sin(theta)
-    Ur = np.array([[ct1, -st1], [st1, ct1]])
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
     T = BSgate(theta, phi, 3)[0]
-    Tr = BSgate_real(theta, 3)[0]
     U_rec = np.empty([nmodes, nmodes], dtype=complex)
-    U_rec_real = np.empty([nmodes, nmodes])
     for i, vec_i in enumerate(vec_list):
         for j, vec_j in enumerate(vec_list):
             U_rec[i, j] = T[tuple(vec_i + vec_j)]
-            U_rec_real[i, j] = Tr[tuple(vec_i + vec_j)]
     assert np.allclose(U, U_rec, atol=tol, rtol=0)
-    assert np.allclose(Ur, U_rec_real, atol=tol, rtol=0)
 
 
 def test_S2gate_values(tol):
