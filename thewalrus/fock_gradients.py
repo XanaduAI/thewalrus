@@ -332,4 +332,3 @@ def Kgate(theta, cutoff, grad=False):
     if not grad:
         return np.diag(T), None
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
-
