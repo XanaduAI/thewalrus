@@ -198,11 +198,11 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                 l = m - n + k
                 if 0 <= l < cutoff:
                     gradTtheta[n, k, m, l] = 1j * (n - m) * T[n, k, m, l]
-                    gradTr[n, k, m, l] = (
+                    gradTr[n, k, m, l] = -(
                         np.sqrt((m + 1) * (l + 1)) * T[n, k, m + 1, l + 1] * exptheta
                     )
                     if m > 0 and l > 0:
-                        gradTr[n, k, m, l] -= (
+                        gradTr[n, k, m, l] += (
                             np.sqrt(m * l) * T[n, k, m - 1, l - 1] * np.conj(exptheta)
                         )
 
@@ -221,7 +221,7 @@ def S2gate(r, theta, cutoff, grad=False):
     """
 
     sc = 1.0 / np.cosh(r)
-    eiptr = np.exp(-1j * theta) * np.tanh(r)
+    eiptr = np.exp(-1j * theta) * np.tanh(-r)
     mat = np.array(
         [
             [0, -np.conj(eiptr), -sc, 0],
