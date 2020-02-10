@@ -246,7 +246,6 @@ def test_BS_selection_rules(tol):
     cutoff = 4
     T = BSgate(np.random.rand(), np.random.rand(), cutoff)[0]
     Tr = BSgate_real(np.random.rand(), cutoff)[0]
-    nmodes = 2
     for m in range(cutoff):
         for n in range(cutoff):
             for k in range(cutoff):
@@ -293,7 +292,7 @@ def test_S2_selection_rules(tol):
 def test_BS_single_excitation(tol):
     r"""Test that the representation of an interferometer in the single
     excitation manifold is precisely the unitary matrix that represents it
-    mode in space. This test in particular checks that the BS gate is 
+    mode in space. This test in particular checks that the BS gate is
     consistent with strawberryfields
     """
     nmodes = 2

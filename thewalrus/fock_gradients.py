@@ -42,11 +42,7 @@ from numba import jit
 
 from thewalrus.libwalrus import (
     interferometer,
-    squeezing,
-    displacement,
     interferometer_real,
-    displacement_real,
-    squeezing_real,
     two_mode_squeezing,
     two_mode_squeezing_real,
 )
