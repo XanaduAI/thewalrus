@@ -52,22 +52,50 @@ from thewalrus.libwalrus import (
 )
 
 
-
-
 @jit(nopython=True)
 def displacement_rec(alpha, D):
+    r"""Calculate the matrix elements of the real or complex displacement gate using a recursion relation.
+
+    Args:
+        alpha (float or complex): value of the displacement.
+        D (array): matrix representing the displacement operation.
+    """
     y = np.array([alpha, -np.conj(alpha)])
     cutoff, _ = D.shape
     sqns = np.sqrt(np.arange(cutoff))
-    D[0,0] = np.exp(-0.5*np.abs(y[0])**2)
-    D[1,0] = y[0]*D[0,0]
-    for m in range(2,cutoff):
-        D[m,0] = (y[0]*D[m-1,0])/sqns[m]
+    D[0, 0] = np.exp(-0.5 * np.abs(y[0]) ** 2)
+    D[1, 0] = y[0] * D[0, 0]
+    for m in range(2, cutoff):
+        D[m, 0] = (y[0] * D[m - 1, 0]) / sqns[m]
     for n in range(1, cutoff):
-        shifted = np.roll(D[:,n-1],1)*sqns
-        D[:,n] = (y[1]*D[:,n-1]+shifted)/sqns[n]
+        shifted = np.roll(D[:, n - 1], 1) * sqns
+        D[:, n] = (y[1] * D[:, n - 1] + shifted) / sqns[n]
     return D
 
+
+@jit(nopython=True)
+def squeezing_rec(r, eitheta, S):
+    r"""Calculate the matrix elements of the real or complex squeezing gate using a recursion relation.
+    Args:
+        r (float): amplitude of the squeezing.
+        eitheta (float): exponential of phase of the squeezing, i.e. exp(1j*theta).
+        S (array): matrix representing the squeezing operation.
+    """
+    R = np.array(
+        [
+            [-eitheta * np.tanh(r), 1.0 / np.cosh(r)],
+            [1.0 / np.cosh(r), np.conj(eitheta) * np.tanh(r)],
+        ]
+    )
+    cutoff, _ = S.shape
+    sqns = np.sqrt(np.arange(cutoff))
+    S[0, 0] = 1.0 / np.sqrt(np.cosh(r))
+    for m in range(2, cutoff):
+        S[m, 0] = (sqns[m - 1] * R[0, 0] * S[m - 2, 0]) / sqns[m]
+    for n in range(1, cutoff):
+        shifted = np.roll(S[:, n - 1], 1) * sqns
+        S[:, n] = (sqns[n - 1] * R[1, 1] * S[:, n - 2] + shifted * R[0, 1]) / sqns[n]
+    return S
 
 
 @jit(nopython=True)
@@ -103,10 +131,10 @@ def Dgate(r, theta, cutoff, grad=False):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     if not grad:
-        T = np.empty([cutoff, cutoff], dtype=complex)
+        T = np.zeros([cutoff, cutoff], dtype=complex)
         displacement_rec(r * np.exp(1j * theta), T)
         return T, None, None
-    T = np.empty([cutoff+1, cutoff+1], dtype=complex)
+    T = np.zeros([cutoff + 1, cutoff + 1], dtype=complex)
     displacement_rec(r * np.exp(1j * theta), T)
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
@@ -147,16 +175,14 @@ def Sgate(r, theta, cutoff, grad=False):
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
-    mat = np.array(
-        [
-            [np.exp(1j * theta) * np.tanh(r), -1.0 / np.cosh(r)],
-            [-1.0 / np.cosh(r), -np.exp(-1j * theta) * np.tanh(r)],
-        ]
-    )
     if not grad:
-        return squeezing(mat, cutoff), None, None
+        T = np.zeros([cutoff, cutoff], dtype=complex)
+        squeezing_rec(r, np.exp(1j * theta), T)
 
-    T = squeezing(mat, cutoff + 2)
+        return T, None, None
+
+    T = np.zeros([cutoff + 2, cutoff + 2], dtype=complex)
+    squeezing_rec(r, np.exp(1j * theta), T)
     gradTr = np.zeros([cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
 
@@ -312,11 +338,11 @@ def Xgate(x, cutoff, grad=False):
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
     """
     if not grad:
-        T = np.empty([cutoff, cutoff])
+        T = np.zeros([cutoff, cutoff])
         displacement_rec(x, T)
         return T, None
 
-    T = np.empty([cutoff+1, cutoff+1])
+    T = np.zeros([cutoff + 1, cutoff + 1])
     displacement_rec(x, T)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Xgate(T, gradT)
@@ -351,11 +377,13 @@ def Sgate_real(s, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*2``
     """
-    mat = np.array([[np.tanh(s), -1.0 / np.cosh(s)], [-1.0 / np.cosh(s), -np.tanh(s)]])
     if not grad:
-        return squeezing_real(mat, cutoff), None
+        T = np.zeros([cutoff, cutoff])
+        squeezing_rec(s, 1.0, T)
+        return T, None
 
-    T = squeezing_real(mat, cutoff + 2)
+    T = np.zeros([cutoff + 2, cutoff + 2])
+    squeezing_rec(s, 1.0, T)
     gradT = np.zeros([cutoff, cutoff], dtype=float)
     grad_Sgate_real(T, gradT)
 
@@ -474,7 +502,7 @@ def BSgate_real(theta, cutoff, grad=False):
     """
     ct = np.cos(theta)
     st = np.sin(theta)
-    mat = np.array([[0, 0, ct, -st], [0, 0, st, ct], [ct, st, 0, 0], [-st, ct, 0, 0]])
+    mat = -np.array([[0, 0, ct, -st], [0, 0, st, ct], [ct, st, 0, 0], [-st, ct, 0, 0]])
 
     if not grad:
         return interferometer_real(mat, cutoff), None
