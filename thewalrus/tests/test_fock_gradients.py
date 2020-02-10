@@ -289,7 +289,7 @@ def test_S2_selection_rules(tol):
                         assert np.allclose(Tr[m, n, k, l], 0, atol=tol, rtol=0)
 
 
-def test_BS_single_excitation(tol):
+def test_BS_values(tol):
     r"""Test that the representation of an interferometer in the single
     excitation manifold is precisely the unitary matrix that represents it
     mode in space. This test in particular checks that the BS gate is
@@ -316,3 +316,13 @@ def test_BS_single_excitation(tol):
             U_rec_real[i, j] = Tr[tuple(vec_i + vec_j)]
     assert np.allclose(U, U_rec, atol=tol, rtol=0)
     assert np.allclose(Ur, U_rec_real, atol=tol, rtol=0)
+
+
+def test_S2gate_values(tol):
+    """Tests the correct construction of the single mode squeezing operation"""
+    r = 0.5
+    theta = 0.7
+    cutoff = 5
+    T = S2gate(r, theta, cutoff)[0]
+    expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
+    assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
