@@ -229,7 +229,7 @@ def two_mode_squeezing_rec(r, theta, cutoff):
 
     sqrt = np.sqrt(np.arange(cutoff))
 
-    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=complex)
+    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=np.complex64)
     Z[0, 0, 0, 0] = sc
 
     # rank 2
@@ -267,7 +267,6 @@ def S2gate(r, theta, cutoff, grad=False):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
 
-    
     if not grad:
         return two_mode_squeezing_rec(r, theta, cutoff), None, None
 
@@ -322,7 +321,7 @@ def beamsplitter_rec(theta, phi, cutoff):
     """
     ct = np.cos(theta)
     st = np.sin(theta) * np.exp(1j * phi)
-    R = -np.array(
+    R = np.array(
         [[0, 0, ct, -np.conj(st)],
         [0, 0, st, ct],
         [ct, st, 0, 0],
@@ -331,7 +330,7 @@ def beamsplitter_rec(theta, phi, cutoff):
 
     sqrt = np.sqrt(np.arange(cutoff+1))
 
-    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=complex)
+    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=np.complex64)
     Z[0, 0, 0, 0] = 1.0
 
     # rank 3
