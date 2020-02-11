@@ -43,7 +43,7 @@ from thewalrus.libwalrus import (
 
 
 @jit(nopython=True)
-def displacement_rec(alpha, D):
+def displacement_rec(alpha, D):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex displacement gate using a recursion relation.
 
     Args:
@@ -64,7 +64,7 @@ def displacement_rec(alpha, D):
 
 
 @jit(nopython=True)
-def squeezing_rec(r, eitheta, S):
+def squeezing_rec(r, eitheta, S):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex squeezing gate using a recursion relation.
     Args:
         r (float): amplitude of the squeezing.
