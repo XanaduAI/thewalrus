@@ -207,6 +207,53 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                         )
 
 
+@jit(nopython=True)
+def two_mode_squeezing_rec(r, theta, cutoff):
+    """Calculates the matrix elements of the S2gate recursively.
+
+    Args:
+        r (float): squeezing magnitude
+        theta (float): squeezing phase
+        cutoff (int): Fock ladder cutoff
+    """
+    sc = 1.0 / np.cosh(r)
+    eiptr = np.exp(-1j * theta) * np.tanh(-r)
+    R = np.array(
+        [
+            [0, -np.conj(eiptr), -sc, 0],
+            [-np.conj(eiptr), 0, 0, -sc],
+            [-sc, 0, 0, eiptr],
+            [0, -sc, eiptr, 0],
+        ]
+    )
+
+    sqrt = np.sqrt(np.arange(cutoff))
+
+    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=complex)
+    Z[0, 0, 0, 0] = sc
+
+    # rank 2
+    for n in range(1, cutoff):
+        Z[n, n, 0, 0] = R[0, 1]*Z[n-1, n-1, 0, 0]
+
+    # rank 3
+    for m in range(0, cutoff):
+        for n in range(0, m):
+            p = m-n
+            if 0 < p < cutoff:
+                Z[m, n, p, 0] = R[0, 2]*sqrt[m]/sqrt[p]*Z[m-1, n, p-1, 0]
+
+    # rank 4
+    for m in range(0, cutoff):
+        for n in range(0, cutoff):
+            for p in range(0, cutoff):
+                q = p-(m-n)
+                if 0 < q < cutoff:
+                    Z[m, n, p, q] = R[1, 3]*sqrt[n]/sqrt[q]*Z[m, n-1, p, q-1] + R[2, 3]*sqrt[p]/sqrt[q]*Z[m, n, p-1, q-1]
+
+    return Z[:cutoff, :cutoff, :cutoff, :cutoff]
+
+
 def S2gate(r, theta, cutoff, grad=False):
     """Calculates the Fock representation of the S2gate and its gradient.
 
@@ -220,20 +267,11 @@ def S2gate(r, theta, cutoff, grad=False):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
 
-    sc = 1.0 / np.cosh(r)
-    eiptr = np.exp(-1j * theta) * np.tanh(-r)
-    mat = np.array(
-        [
-            [0, -np.conj(eiptr), -sc, 0],
-            [-np.conj(eiptr), 0, 0, -sc],
-            [-sc, 0, 0, eiptr],
-            [0, -sc, eiptr, 0],
-        ]
-    )
+    
     if not grad:
-        return two_mode_squeezing(mat, cutoff), None, None
+        return two_mode_squeezing_rec(r, theta, cutoff), None, None
 
-    T = two_mode_squeezing(mat, cutoff + 1)
+    T = two_mode_squeezing_rec(r, theta, cutoff + 1)
     gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_S2gate(T, gradTr, gradTtheta, theta)
@@ -270,6 +308,49 @@ def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
                         )
 
 
+@jit(nopython=True)
+def beamsplitter_rec(theta, phi, cutoff):
+    r"""Calculates the Fock representation of the beamsplitter.
+
+    Args:
+        theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=\cos(\theta)`
+        phi (float): reflection phase of the beamsplitter
+        cutoff (int): Fock ladder cutoff
+
+    Returns:
+        array[float]: The Fock representation of the gate
+    """
+    ct = np.cos(theta)
+    st = np.sin(theta) * np.exp(1j * phi)
+    R = -np.array(
+        [[0, 0, ct, -np.conj(st)],
+        [0, 0, st, ct],
+        [ct, st, 0, 0],
+        [-np.conj(st), ct, 0, 0]]
+    )
+
+    sqrt = np.sqrt(np.arange(cutoff+1))
+
+    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=complex)
+    Z[0, 0, 0, 0] = 1.0
+
+    # rank 3
+    for m in range(0, cutoff):
+        for n in range(0, cutoff-m):
+            p = m+n
+            if 0 < p < cutoff:
+                Z[m, n, p, 0] = R[0, 2]*sqrt[m]/sqrt[p]*Z[m-1, n, p-1, 0] + R[1, 2]*sqrt[n]/sqrt[p]*Z[m, n-1, p-1, 0]
+
+    # rank 4
+    for m in range(0, cutoff):
+        for n in range(0, cutoff):
+            for p in range(0, cutoff):
+                q = m+n-p
+                if 0 < q < cutoff:
+                    Z[m, n, p, q] = R[0, 3]*sqrt[m]/sqrt[q]*Z[m-1, n, p, q-1] + R[1, 3]*sqrt[n]/sqrt[q]*Z[m, n-1, p, q-1]
+
+    return Z[:cutoff, :cutoff, :cutoff, :cutoff]
+
 def BSgate(theta, phi, cutoff, grad=False):
     r"""Calculates the Fock representation of the S2gate and its gradient.
 
@@ -282,16 +363,10 @@ def BSgate(theta, phi, cutoff, grad=False):
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
-    ct = np.cos(theta)
-    st = np.sin(theta) * np.exp(1j * phi)
-    mat = -np.array(
-        [[0, 0, ct, -np.conj(st)], [0, 0, st, ct], [ct, st, 0, 0], [-np.conj(st), ct, 0, 0]]
-    )
-
     if not grad:
-        return interferometer(mat, cutoff), None, None
+        return beamsplitter_rec(theta, phi, cutoff), None, None
 
-    T = interferometer(mat, cutoff + 1)
+    T = beamsplitter_rec(theta, phi, cutoff + 1)
     gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     gradTphi = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
     grad_BSgate(T, gradTtheta, gradTphi, phi)
