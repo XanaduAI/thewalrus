@@ -49,7 +49,6 @@ def displacement_rec(alpha, cutoff):  # pragma: no cover
     """
     D = np.zeros((cutoff, cutoff), dtype=np.complex128)
     y = np.array([alpha, -np.conj(alpha)])
-    cutoff, _ = D.shape
     sqns = np.sqrt(np.arange(cutoff))
     D[0, 0] = np.exp(-0.5 * np.abs(y[0]) ** 2)
     D[1, 0] = y[0] * D[0, 0]
@@ -79,7 +78,6 @@ def squeezing_rec(r, theta, cutoff):  # pragma: no cover
             [1.0 / np.cosh(r), np.conj(eitheta) * np.tanh(r)],
         ]
     )
-    cutoff, _ = S.shape
     sqns = np.sqrt(np.arange(cutoff))
     S[0, 0] = 1.0 / np.sqrt(np.cosh(r))
     for m in range(2, cutoff):
