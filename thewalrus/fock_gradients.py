@@ -210,6 +210,10 @@ def two_mode_squeezing_rec(r, theta, cutoff):  # pragma: no cover
         r (float): squeezing magnitude
         theta (float): squeezing phase
         cutoff (int): Fock ladder cutoff
+
+    Returns:
+        array[float]: The Fock representation of the gate
+
     """
     sc = 1.0 / np.cosh(r)
     eiptr = np.exp(-1j * theta) * np.tanh(-r)
