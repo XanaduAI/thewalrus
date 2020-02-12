@@ -1,5 +1,13 @@
 #pragma once
+#include <vector>
 
+
+#if (defined(__GNUC__) || defined(__GNUG__)) && !(defined(__clang__) || defined(__INTEL_COMPILER))
+typedef __float128 qp;
+//#include <quadmath.h>
+#else
+typedef long double qp;
+#endif
 
 template <typename T> inline auto get_norm_sqr(const std::vector<T> &vec) {
 
@@ -191,12 +199,12 @@ void get_reflection_vector(size_t size, std::vector<T> &matrix, size_t sizeH,
  * @return coefficients
  */
 template <typename T>
-void apply_householder(vector<T> &A, vector<T> &v, size_t size_A, size_t k) {
+void apply_householder(std::vector<T> &A, std::vector<T> &v, size_t size_A, size_t k) {
   size_t sizeH = v.size();
 
   auto norm_v_sqr = get_norm_sqr(v);
-  vector<T> vHA(size_A - k + 1, 0.);
-  vector<T> Av(size_A, 0.);
+  std::vector<T> vHA(size_A - k + 1, 0.);
+  std::vector<T> Av(size_A, 0.);
   for (size_t j = 0; j < size_A - k + 1; j++) {
     for (size_t l = 0; l < sizeH; l++) {
       if constexpr (std::is_same<T, std::complex<double>>::value ||
@@ -317,10 +325,11 @@ powtrace_from_charpoly
  * @return a vector containing the power traces of matrix `z` to power
  *       \f$1\leq j \leq l\f$.
  */
-std::vector<std::complex<double>> powtrace_from_labudde(std::vector<std::complex<double>> & z, int n, int l){
+template <typename T>
+std::vector<T> powtrace(std::vector<T> & z, int n, int l){
   reduce_matrix_to_hessenberg(z, n);
-  std::vector<std::complex<double>> coeffs = charpoly_from_labudde(z, n);
-  std::vector<std::complex<double>> coeffs_labudde(n+1);
+  std::vector<T> coeffs = charpoly_from_labudde(z, n);
+  std::vector<T> coeffs_labudde(n+1);
   coeffs_labudde[0] = 1;
   for(int j = 1; j <= n; j++) {
     coeffs_labudde[j] = coeffs[(n - 1) * n + j - 1];
