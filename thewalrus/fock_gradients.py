@@ -202,7 +202,7 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
 
 
 @jit(nopython=True)
-def two_mode_squeezing_rec(r, theta, cutoff):
+def two_mode_squeezing_rec(r, theta, cutoff):  # pragma: no cover
     """Calculates the matrix elements of the S2gate recursively.
 
     Args:
@@ -302,7 +302,7 @@ def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
 
 
 @jit(nopython=True)
-def beamsplitter_rec(theta, phi, cutoff):
+def beamsplitter_rec(theta, phi, cutoff):  # pragma: no cover
     r"""Calculates the Fock representation of the beamsplitter.
 
     Args:
