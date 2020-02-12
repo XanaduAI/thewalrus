@@ -34,4 +34,4 @@
 
 * [J. Eli Bourassa](https://github.com/elib20) (Xanadu, University of Toronto) 🏄 GKP surfer
 
-* [Filippo Miatto](https://github.com/ziofil) (Télécom ParisTech) :male_elf: Lord of recursion
+* [Filippo Miatto](https://github.com/ziofil) (Télécom ParisTech) 🧝‍♂️ Lord of recursion
