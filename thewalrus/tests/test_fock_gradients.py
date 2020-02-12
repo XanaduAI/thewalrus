@@ -79,8 +79,8 @@ def test_S2gate():
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     print(np.max(np.abs(Dr-Drapprox)))
-    assert np.allclose(Dr, Drapprox, atol=3e-5, rtol=0)
-    assert np.allclose(Dtheta, Dthetaapprox, atol=3e-5, rtol=0)
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
 
 def test_BSgate():
