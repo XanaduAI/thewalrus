@@ -42,7 +42,10 @@ def displacement_rec(alpha, cutoff):  # pragma: no cover
 
     Args:
         alpha (float or complex): value of the displacement.
-        D (array): matrix representing the displacement operation.
+        cutoff (int): Fock ladder cutoff
+
+    Returns:
+        (array): matrix representing the displacement operation.
     """
     D = np.zeros((cutoff, cutoff), dtype=np.complex128)
     y = np.array([alpha, -np.conj(alpha)])
@@ -63,8 +66,10 @@ def squeezing_rec(r, theta, cutoff):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex squeezing gate using a recursion relation.
     Args:
         r (float): amplitude of the squeezing.
-        eitheta (float): exponential of phase of the squeezing, i.e. exp(1j*theta).
-        S (array): matrix representing the squeezing operation.
+        theta (float): phase of the squeezing.
+
+    Returns:
+        (array): matrix representing the squeezing operation.
     """
     S = np.zeros((cutoff, cutoff), dtype=np.complex128)
     eitheta = np.exp(1j * theta)
