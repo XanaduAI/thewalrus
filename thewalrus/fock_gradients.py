@@ -218,7 +218,7 @@ def two_mode_squeezing_rec(r, theta, cutoff):
     """
     sc = 1.0 / np.cosh(r)
     eiptr = np.exp(-1j * theta) * np.tanh(-r)
-    R = np.array(
+    R = -np.array(
         [
             [0, -np.conj(eiptr), -sc, 0],
             [-np.conj(eiptr), 0, 0, -sc],
