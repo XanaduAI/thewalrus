@@ -36,12 +36,6 @@ import numpy as np
 from numba import jit
 
 
-from thewalrus.libwalrus import (
-    interferometer,
-    two_mode_squeezing,
-)
-
-
 @jit(nopython=True)
 def displacement_rec(alpha, D):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex displacement gate using a recursion relation.
