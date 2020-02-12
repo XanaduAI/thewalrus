@@ -223,7 +223,7 @@ def two_mode_squeezing_rec(r, theta, cutoff):  # pragma: no cover
 
     sqrt = np.sqrt(np.arange(cutoff))
 
-    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=np.complex64)
+    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=np.complex128)
     Z[0, 0, 0, 0] = sc
 
     # rank 2
@@ -324,7 +324,7 @@ def beamsplitter_rec(theta, phi, cutoff):  # pragma: no cover
 
     sqrt = np.sqrt(np.arange(cutoff+1))
 
-    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=np.complex64)
+    Z = np.zeros((cutoff+1, cutoff+1, cutoff+1, cutoff+1), dtype=np.complex128)
     Z[0, 0, 0, 0] = 1.0
 
     # rank 3
