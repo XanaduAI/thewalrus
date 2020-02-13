@@ -55,11 +55,11 @@ def displacement_rec(alpha, cutoff):  # pragma: no cover
     D[1, 0] = y[0] * D[0, 0]
 
     for m in range(2, cutoff):
-        D[m, 0] = y[0]/sqns[m] * D[m-1, 0]
+        D[m, 0] = y[0] / sqns[m] * D[m - 1, 0]
 
     for m in range(0, cutoff):
         for n in range(1, cutoff):
-            D[m, n] = y[1]/sqns[n] * D[m, n-1] + sqns[m]/sqns[n] * D[m-1, n-1]
+            D[m, n] = y[1] / sqns[n] * D[m, n - 1] + sqns[m] / sqns[n] * D[m - 1, n - 1]
 
     return D
 
@@ -76,39 +76,39 @@ def squeezing_rec(r, theta, cutoff):  # pragma: no cover
         (array): matrix representing the squeezing operation.
     """
     S = np.zeros((cutoff, cutoff), dtype=np.complex128)
-    eitheta_tanhr = np.exp(1j * theta)* np.tanh(r)
+    eitheta_tanhr = np.exp(1j * theta) * np.tanh(r)
     sinhr = 1.0 / np.cosh(r)
-    R = np.array(
-        [
-            [-eitheta_tanhr, sinhr],
-            [sinhr, np.conj(eitheta_tanhr)],
-        ]
-    )
+    R = np.array([[-eitheta_tanhr, sinhr], [sinhr, np.conj(eitheta_tanhr)],])
     sqns = np.sqrt(np.arange(cutoff))
     S[0, 0] = np.sqrt(sinhr)
 
     for m in range(2, cutoff, 2):
-        S[m, 0] = sqns[m-1]/ sqns[m] * R[0, 0] * S[m-2, 0]
+        S[m, 0] = sqns[m - 1] / sqns[m] * R[0, 0] * S[m - 2, 0]
 
     for m in range(0, cutoff):
         for n in range(1, cutoff):
-            if (m+n)%2 == 0:
-                S[m, n] = sqns[n-1]/sqns[n] * R[1, 1] * S[m, n-2] + sqns[m]/sqns[n] * R[0, 1] * S[m-1, n-1]
+            if (m + n) % 2 == 0:
+                S[m, n] = (
+                    sqns[n - 1] / sqns[n] * R[1, 1] * S[m, n - 2]
+                    + sqns[m] / sqns[n] * R[0, 1] * S[m - 1, n - 1]
+                )
 
     return S
 
 
 @jit(nopython=True)
-def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
+def grad_Dgate(T, theta, cutoff):  # pragma: no cover
     """Calculates the gradient of the Dgate.
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r, the displacement magnitude
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the displacement phase
         theta (float): displacement phase
+        cutoff (int): Fock ladder cutoff
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the Dgate with respect to r (the amplitude) and theta (the phase)
     """
-    cutoff = gradTr.shape[0]
+    gradTr = np.zeros((cutoff, cutoff), dtype=np.complex128)
+    gradTtheta = np.zeros((cutoff, cutoff), dtype=np.complex128)
     exptheta = np.exp(1j * theta)
     for n in range(cutoff):
         for m in range(cutoff):
@@ -116,6 +116,7 @@ def grad_Dgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
             gradTr[n, m] = np.sqrt(m + 1) * T[n, m + 1] * exptheta
             if m > 0:
                 gradTr[n, m] -= np.sqrt(m) * T[n, m - 1] * np.conj(exptheta)
+    return gradTr, gradTtheta
 
 
 def Dgate(r, theta, cutoff, grad=False):
@@ -133,23 +134,25 @@ def Dgate(r, theta, cutoff, grad=False):
     if not grad:
         return displacement_rec(r * np.exp(1j * theta), cutoff), None, None
     T = displacement_rec(r * np.exp(1j * theta), cutoff + 1)
-    gradTr = np.zeros([cutoff, cutoff], dtype=complex)
-    gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
-    grad_Dgate(T, gradTr, gradTtheta, theta)
+    (gradTr, gradTtheta) = grad_Dgate(T, theta, cutoff)
     return T[:cutoff, :cutoff], gradTr, gradTtheta
 
 
 @jit(nopython=True)
-def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
+def grad_Sgate(T, theta, cutoff):  # pragma: no cover
     """Calculates the gradient of the Sgate.
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r, the squeezing amplitude
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the squeezing phase
         theta (float): squeezing phase
+        cutoff (int): Fock ladder cutoff
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the Sgate with respect to r (the amplitude) and theta (the phase)
+
     """
-    cutoff = gradTr.shape[0]
+    gradTr = np.zeros((cutoff, cutoff), dtype=np.complex128)
+    gradTtheta = np.zeros((cutoff, cutoff), dtype=np.complex128)
+
     exptheta = np.exp(1j * theta)
     for n in range(cutoff):
         offset = n % 2
@@ -158,6 +161,8 @@ def grad_Sgate(T, gradTr, gradTtheta, theta):  # pragma: no cover
             gradTr[n, m] = -0.5 * np.sqrt((m + 1) * (m + 2)) * T[n, m + 2] * exptheta
             if m > 1:
                 gradTr[n, m] += 0.5 * np.sqrt(m * (m - 1)) * T[n, m - 2] * np.conj(exptheta)
+
+    return gradTr, gradTtheta
 
 
 def Sgate(r, theta, cutoff, grad=False):
@@ -176,24 +181,26 @@ def Sgate(r, theta, cutoff, grad=False):
         return squeezing_rec(r, theta, cutoff), None, None
 
     T = squeezing_rec(r, theta, cutoff + 2)
-    gradTr = np.zeros([cutoff, cutoff], dtype=complex)
-    gradTtheta = np.zeros([cutoff, cutoff], dtype=complex)
+    (gradTr, gradTtheta) = grad_Sgate(T, theta, cutoff)
 
-    grad_Sgate(T, gradTr, gradTtheta, theta)
     return T[:cutoff, :cutoff], gradTr, gradTtheta
 
 
 @jit(nopython=True)
-def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
+def grad_S2gate(T, theta, cutoff):  # pragma: no cover
     """Calculates the gradient of the S2gate.
 
     Args:
         T (array[complex]): array representing the gate
-        gradTr (array[complex]): array of zeros that will contain the value of the gradient with respect to r, the squeezing amplitude
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the squeezing phase
         theta (float): two-mode squeezing phase
+        cutoff (int): Fock ladder cutoff
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the S2gate with respect to r (the amplitude) and theta (the phase)
+
     """
-    cutoff = gradTr.shape[0]
+    gradTr = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=np.complex128)
+    gradTtheta = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=np.complex128)
+
     exptheta = np.exp(1j * theta)
     for n in range(cutoff):
         for k in range(cutoff):
@@ -208,6 +215,7 @@ def grad_S2gate(T, gradTr, gradTtheta, theta):  # pragma: no cover
                         gradTr[n, k, m, l] += (
                             np.sqrt(m * l) * T[n, k, m - 1, l - 1] * np.conj(exptheta)
                         )
+    return gradTr, gradTtheta
 
 
 @jit(nopython=True)
@@ -281,25 +289,25 @@ def S2gate(r, theta, cutoff, grad=False):
         return two_mode_squeezing_rec(r, theta, cutoff), None, None
 
     T = two_mode_squeezing_rec(r, theta, cutoff + 1)
-    gradTr = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
-    gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
-    grad_S2gate(T, gradTr, gradTtheta, theta)
+    (gradTr, gradTtheta) = grad_S2gate(T, theta, cutoff)
 
     return T[:cutoff, :cutoff, :cutoff, :cutoff], gradTr, gradTtheta
 
 
 @jit(nopython=True)
-def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
+def grad_BSgate(T, phi, cutoff):  # pragma: no cover
     """Calculates the gradient of the BSgate.
 
     Args:
         T (array[complex]): array representing the gate
-        gradTtheta (array[complex]): array of zeros that will contain the value of the gradient with respect to theta, the beamsplitter transmissivity angle
-        gradTphi (array[complex]): array of zeros that will contain the value of the gradient with respect to phi, the beamsplitter reflectivity phase
         theta (float): phase angle parametrizing the gate
+        cutoff (int): Fock ladder cutoff
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the BSgate with respect to r (the amplitude) and theta (the phase)
     """
-    cutoff = gradTtheta.shape[0]
     expphi = np.exp(1j * phi)
+    gradTtheta = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=np.complex128)
+    gradTphi = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=np.complex128)
 
     for n in range(cutoff):
         for k in range(cutoff):
@@ -315,6 +323,7 @@ def grad_BSgate(T, gradTtheta, gradTphi, phi):  # pragma: no cover
                         gradTtheta[n, k, m, l] -= (
                             np.sqrt((m + 1) * l) * T[n, k, m + 1, l - 1] * np.conj(expphi)
                         )
+    return gradTtheta, gradTphi
 
 
 @jit(nopython=True)
@@ -380,9 +389,7 @@ def BSgate(theta, phi, cutoff, grad=False):
         return beamsplitter_rec(theta, phi, cutoff), None, None
 
     T = beamsplitter_rec(theta, phi, cutoff + 1)
-    gradTtheta = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
-    gradTphi = np.zeros([cutoff, cutoff, cutoff, cutoff], dtype=complex)
-    grad_BSgate(T, gradTtheta, gradTphi, phi)
+    gradTtheta, gradTphi = grad_BSgate(T, phi, cutoff)
 
     return T[:cutoff, :cutoff, :cutoff, :cutoff], gradTtheta, gradTphi
 
