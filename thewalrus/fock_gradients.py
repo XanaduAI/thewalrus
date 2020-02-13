@@ -272,7 +272,7 @@ def two_mode_squeezing(r, theta, cutoff):  # pragma: no cover
     return Z[:cutoff, :cutoff, :cutoff, :cutoff]
 
 
-def S2gate(r, theta, cutoff, grad=False):
+def S2gate(r, theta, cutoff, grad=False, sf_order=False):
     """Calculates the Fock representation of the S2gate and its gradient.
 
     Args:
@@ -280,16 +280,28 @@ def S2gate(r, theta, cutoff, grad=False):
         theta (float): two-mode squeezing phase
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
+        sf_order (boolean): whether to use Strawberry Fields ordering for the indices
 
     Returns:
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
 
     if not grad:
+        if sf_order:
+            index_order = (0, 2, 1, 3)
+            return two_mode_squeezing(r, theta, cutoff).transpose(index_order), None, None
         return two_mode_squeezing(r, theta, cutoff), None, None
 
     T = two_mode_squeezing(r, theta, cutoff + 1)
     (gradTr, gradTtheta) = grad_S2gate(T, theta, cutoff)
+
+    if sf_order:
+        index_order = (0, 2, 1, 3)
+        return (
+            T[:cutoff, :cutoff, :cutoff, :cutoff].transpose(index_order),
+            gradTr.transpose(index_order),
+            gradTtheta.transpose(index_order),
+        )
 
     return T[:cutoff, :cutoff, :cutoff, :cutoff], gradTr, gradTtheta
 
@@ -373,7 +385,7 @@ def beamsplitter(theta, phi, cutoff):  # pragma: no cover
     return Z[:cutoff, :cutoff, :cutoff, :cutoff]
 
 
-def BSgate(theta, phi, cutoff, grad=False):
+def BSgate(theta, phi, cutoff, grad=False, sf_order=False):
     r"""Calculates the Fock representation of the S2gate and its gradient.
 
     Args:
@@ -381,15 +393,27 @@ def BSgate(theta, phi, cutoff, grad=False):
         phi (float): reflection phase of the beamsplitter
         cutoff (int): Fock ladder cutoff
         grad (boolean): whether to calculate the gradient or not
+        sf_order (boolean): whether to use Strawberry Fields ordering for the indices
 
     Returns:
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
     if not grad:
+        if sf_order:
+            index_order = (0, 2, 1, 3)
+            return beamsplitter(theta, phi, cutoff).transpose(index_order), None, None
         return beamsplitter(theta, phi, cutoff), None, None
 
     T = beamsplitter(theta, phi, cutoff + 1)
     gradTtheta, gradTphi = grad_BSgate(T, phi, cutoff)
+
+    if sf_order:
+        index_order = (0, 2, 1, 3)
+        return (
+            T[:cutoff, :cutoff, :cutoff, :cutoff].transpose(index_order),
+            gradTtheta.transpose(index_order),
+            gradTphi.transpose(index_order),
+        )
 
     return T[:cutoff, :cutoff, :cutoff, :cutoff], gradTtheta, gradTphi
 

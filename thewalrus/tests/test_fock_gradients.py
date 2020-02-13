@@ -124,9 +124,6 @@ def test_Kgate():
     assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
 
 
-
-
-
 def test_Dgate_values(tol):
     """Tests the correct construction of the single mode displacement operation"""
     cutoff = 5
@@ -243,3 +240,27 @@ def test_S2gate_values(tol):
     T = S2gate(r, theta, cutoff)[0]
     expected = ((np.tanh(-r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
+
+
+def test_sf_order_BSgate(tol):
+    """Test the correct sf ordering for BSgate"""
+    T = BSgate(1.0, 0.5, 10)[0]
+    Tsf = BSgate(1.0, 0.5, 10, sf_order=True)[0]
+    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
+    T, T1, T2 = BSgate(1.0, 0.5, 10, grad=True)
+    Tsf, Tsf1, Tsf2 = BSgate(1.0, 0.5, 10, grad=True, sf_order=True)
+    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
+    assert np.allclose(T1.transpose((0, 2, 1, 3)), Tsf1)
+    assert np.allclose(T2.transpose((0, 2, 1, 3)), Tsf2)
+
+
+def test_sf_order_S2gate(tol):
+    """Test the correct sf ordering for S2gate"""
+    T = S2gate(1.0, 0.5, 10)[0]
+    Tsf = S2gate(1.0, 0.5, 10, sf_order=True)[0]
+    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
+    T, T1, T2 = S2gate(1.0, 0.5, 10, grad=True)
+    Tsf, Tsf1, Tsf2 = S2gate(1.0, 0.5, 10, grad=True, sf_order=True)
+    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
+    assert np.allclose(T1.transpose((0, 2, 1, 3)), Tsf1)
+    assert np.allclose(T2.transpose((0, 2, 1, 3)), Tsf2)
