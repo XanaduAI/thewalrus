@@ -284,7 +284,7 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
 
     return Z[:cutoff, :cutoff, :cutoff, :cutoff]
 
-
+#pylint: disable=too-many-arguments
 def S2gate(r, theta, cutoff, grad=False, sf_order=False, dtype=np.complex128):
     """Calculates the Fock representation of the S2gate and its gradient.
 
@@ -405,7 +405,7 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
     return Z[:cutoff, :cutoff, :cutoff, :cutoff]
 
-
+#pylint: disable=too-many-arguments
 def BSgate(theta, phi, cutoff, grad=False, sf_order=False, dtype=np.complex128):
     r"""Calculates the Fock representation of the S2gate and its gradient.
 
