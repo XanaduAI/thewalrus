@@ -75,22 +75,25 @@ def squeezing_rec(r, theta, cutoff):  # pragma: no cover
         (array): matrix representing the squeezing operation.
     """
     S = np.zeros((cutoff, cutoff), dtype=np.complex128)
-    eitheta = np.exp(1j * theta)
+    eitheta_tanhr = np.exp(1j * theta)* np.tanh(r)
+    sinhr = 1.0 / np.cosh(r)
     R = np.array(
         [
-            [-eitheta * np.tanh(r), 1.0 / np.cosh(r)],
-            [1.0 / np.cosh(r), np.conj(eitheta) * np.tanh(r)],
+            [-eitheta_tanhr, sinhr],
+            [sinhr, np.conj(eitheta_tanhr)],
         ]
     )
     sqns = np.sqrt(np.arange(cutoff))
-    S[0, 0] = 1.0 / np.sqrt(np.cosh(r))
-
-    for m in range(2, cutoff):
-        S[m, 0] = (sqns[m - 1] * R[0, 0] * S[m - 2, 0]) / sqns[m]
-
-    for n in range(1, cutoff):
-        shifted = np.roll(S[:, n - 1], 1) * sqns
-        S[:, n] = (sqns[n - 1] * R[1, 1] * S[:, n - 2] + shifted * R[0, 1]) / sqns[n]
+    S[0, 0] = np.sqrt(sinhr)
+    
+    
+    for m in range(2, cutoff, 2):
+        S[m, 0] = sqns[m-1]/ sqns[m] * R[0,0] * S[m-2, 0]
+        
+    for m in range(0, cutoff):
+        for n in range(1, cutoff):
+            if (m+n)%2 == 0:
+                S[m, n] = sqns[n-1]/sqns[n] * R[1,1] * S[m, n-2] + sqns[m]/sqns[n] * R[0,1] * S[m-1, n-1]
 
     return S
 
