@@ -52,17 +52,21 @@ def displacement_rec(alpha, cutoff):  # pragma: no cover
     sqns = np.sqrt(np.arange(cutoff))
     D[0, 0] = np.exp(-0.5 * np.abs(y[0]) ** 2)
     D[1, 0] = y[0] * D[0, 0]
+
     for m in range(2, cutoff):
         D[m, 0] = (y[0] * D[m - 1, 0]) / sqns[m]
+
     for n in range(1, cutoff):
         shifted = np.roll(D[:, n - 1], 1) * sqns
         D[:, n] = (y[1] * D[:, n - 1] + shifted) / sqns[n]
+
     return D
 
 
 @jit(nopython=True)
 def squeezing_rec(r, theta, cutoff):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex squeezing gate using a recursion relation.
+
     Args:
         r (float): amplitude of the squeezing.
         theta (float): phase of the squeezing.
@@ -80,11 +84,14 @@ def squeezing_rec(r, theta, cutoff):  # pragma: no cover
     )
     sqns = np.sqrt(np.arange(cutoff))
     S[0, 0] = 1.0 / np.sqrt(np.cosh(r))
+
     for m in range(2, cutoff):
         S[m, 0] = (sqns[m - 1] * R[0, 0] * S[m - 2, 0]) / sqns[m]
+
     for n in range(1, cutoff):
         shifted = np.roll(S[:, n - 1], 1) * sqns
         S[:, n] = (sqns[n - 1] * R[1, 1] * S[:, n - 2] + shifted * R[0, 1]) / sqns[n]
+
     return S
 
 
