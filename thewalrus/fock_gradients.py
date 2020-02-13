@@ -50,15 +50,16 @@ def displacement_rec(alpha, cutoff):  # pragma: no cover
     D = np.zeros((cutoff, cutoff), dtype=np.complex128)
     y = np.array([alpha, -np.conj(alpha)])
     sqns = np.sqrt(np.arange(cutoff))
+
     D[0, 0] = np.exp(-0.5 * np.abs(y[0]) ** 2)
     D[1, 0] = y[0] * D[0, 0]
 
     for m in range(2, cutoff):
-        D[m, 0] = (y[0] * D[m - 1, 0]) / sqns[m]
+        D[m, 0] = y[0]/sqns[m] * D[m-1, 0]
 
-    for n in range(1, cutoff):
-        shifted = np.roll(D[:, n - 1], 1) * sqns
-        D[:, n] = (y[1] * D[:, n - 1] + shifted) / sqns[n]
+    for m in range(0, cutoff):
+        for n in range(1, cutoff):
+            D[m, n] = y[1]/sqns[n] * D[m, n-1] + sqns[m]/sqns[n] * D[m-1, n-1]
 
     return D
 
