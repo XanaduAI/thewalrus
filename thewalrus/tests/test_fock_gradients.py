@@ -242,7 +242,7 @@ def test_S2gate_values(tol):
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
 
 
-def test_sf_order_BSgate(tol):
+def test_sf_order_BSgate():
     """Test the correct sf ordering for BSgate"""
     T = BSgate(1.0, 0.5, 10)[0]
     Tsf = BSgate(1.0, 0.5, 10, sf_order=True)[0]
@@ -254,7 +254,7 @@ def test_sf_order_BSgate(tol):
     assert np.allclose(T2.transpose((0, 2, 1, 3)), Tsf2)
 
 
-def test_sf_order_S2gate(tol):
+def test_sf_order_S2gate():
     """Test the correct sf ordering for S2gate"""
     T = S2gate(1.0, 0.5, 10)[0]
     Tsf = S2gate(1.0, 0.5, 10, sf_order=True)[0]
