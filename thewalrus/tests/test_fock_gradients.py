@@ -172,12 +172,17 @@ def test_BS_selection_rules(tol):
     """
     cutoff = 4
     T = BSgate(np.random.rand(), np.random.rand(), cutoff)[0]
-    for m in range(cutoff):
-        for n in range(cutoff):
-            for k in range(cutoff):
-                for l in range(cutoff):
-                    if m + n != k + l:  # Check that there are the same total number of photons in the bra and the ket
-                        assert np.allclose(T[m, n, k, l], 0.0, atol=tol, rtol=0)
+    m = np.arange(cutoff).reshape(-1, 1, 1, 1)
+    n = np.arange(cutoff).reshape(1, -1, 1, 1)
+    k = np.arange(cutoff).reshape(1, 1, -1, 1)
+    l = np.arange(cutoff).reshape(1, 1, 1, -1)
+
+    # create a copy of T, but replace all elements where
+    # m+n != k+l with 0.
+    S = np.where(m + n != k + l, 0, T)
+
+    # check that S and T remain equal
+    assert np.allclose(S, T, atol=tol, rtol=0)
 
 
 def test_BS_hong_ou_mandel_interference(tol):
@@ -202,12 +207,17 @@ def test_S2_selection_rules(tol):
     s = np.arcsinh(1.0)
     phi = np.pi / 6
     T = S2gate(s, phi, cutoff)[0]
-    for m in range(cutoff):
-        for n in range(cutoff):
-            for k in range(cutoff):
-                for l in range(cutoff):
-                    if m - n != k - l:
-                        assert np.allclose(T[m, n, k, l], 0, atol=tol, rtol=0)
+    m = np.arange(cutoff).reshape(-1, 1, 1, 1)
+    n = np.arange(cutoff).reshape(1, -1, 1, 1)
+    k = np.arange(cutoff).reshape(1, 1, -1, 1)
+    l = np.arange(cutoff).reshape(1, 1, 1, -1)
+
+    # create a copy of T, but replace all elements where
+    # m+n != k+l with 0.
+    S = np.where(m - n != k - l, 0, T)
+
+    # check that S and T remain equal
+    assert np.allclose(S, T, atol=tol, rtol=0)
 
 
 def test_BS_values(tol):
