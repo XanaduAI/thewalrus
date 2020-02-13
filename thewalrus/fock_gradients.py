@@ -37,7 +37,7 @@ from numba import jit
 
 
 @jit(nopython=True)
-def displacement_rec(alpha, cutoff):  # pragma: no cover
+def displacement(alpha, cutoff):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex displacement gate using a recursion relation.
 
     Args:
@@ -65,7 +65,7 @@ def displacement_rec(alpha, cutoff):  # pragma: no cover
 
 
 @jit(nopython=True)
-def squeezing_rec(r, theta, cutoff):  # pragma: no cover
+def squeezing(r, theta, cutoff):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex squeezing gate using a recursion relation.
 
     Args:
@@ -132,8 +132,8 @@ def Dgate(r, theta, cutoff, grad=False):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     if not grad:
-        return displacement_rec(r * np.exp(1j * theta), cutoff), None, None
-    T = displacement_rec(r * np.exp(1j * theta), cutoff + 1)
+        return displacement(r * np.exp(1j * theta), cutoff), None, None
+    T = displacement(r * np.exp(1j * theta), cutoff + 1)
     (gradTr, gradTtheta) = grad_Dgate(T, theta, cutoff)
     return T[:cutoff, :cutoff], gradTr, gradTtheta
 
@@ -178,9 +178,9 @@ def Sgate(r, theta, cutoff, grad=False):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     if not grad:
-        return squeezing_rec(r, theta, cutoff), None, None
+        return squeezing(r, theta, cutoff), None, None
 
-    T = squeezing_rec(r, theta, cutoff + 2)
+    T = squeezing(r, theta, cutoff + 2)
     (gradTr, gradTtheta) = grad_Sgate(T, theta, cutoff)
 
     return T[:cutoff, :cutoff], gradTr, gradTtheta
@@ -219,7 +219,7 @@ def grad_S2gate(T, theta, cutoff):  # pragma: no cover
 
 
 @jit(nopython=True)
-def two_mode_squeezing_rec(r, theta, cutoff):  # pragma: no cover
+def two_mode_squeezing(r, theta, cutoff):  # pragma: no cover
     """Calculates the matrix elements of the S2gate recursively.
 
     Args:
@@ -286,9 +286,9 @@ def S2gate(r, theta, cutoff, grad=False):
     """
 
     if not grad:
-        return two_mode_squeezing_rec(r, theta, cutoff), None, None
+        return two_mode_squeezing(r, theta, cutoff), None, None
 
-    T = two_mode_squeezing_rec(r, theta, cutoff + 1)
+    T = two_mode_squeezing(r, theta, cutoff + 1)
     (gradTr, gradTtheta) = grad_S2gate(T, theta, cutoff)
 
     return T[:cutoff, :cutoff, :cutoff, :cutoff], gradTr, gradTtheta
@@ -327,7 +327,7 @@ def grad_BSgate(T, phi, cutoff):  # pragma: no cover
 
 
 @jit(nopython=True)
-def beamsplitter_rec(theta, phi, cutoff):  # pragma: no cover
+def beamsplitter(theta, phi, cutoff):  # pragma: no cover
     r"""Calculates the Fock representation of the beamsplitter.
 
     Args:
@@ -386,9 +386,9 @@ def BSgate(theta, phi, cutoff, grad=False):
         tuple[array[float], array[float] or None]: The Fock representations of the gate and its gradient with size ``[cutoff]*4``
     """
     if not grad:
-        return beamsplitter_rec(theta, phi, cutoff), None, None
+        return beamsplitter(theta, phi, cutoff), None, None
 
-    T = beamsplitter_rec(theta, phi, cutoff + 1)
+    T = beamsplitter(theta, phi, cutoff + 1)
     gradTtheta, gradTphi = grad_BSgate(T, phi, cutoff)
 
     return T[:cutoff, :cutoff, :cutoff, :cutoff], gradTtheta, gradTphi
