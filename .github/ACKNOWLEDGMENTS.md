@@ -33,3 +33,5 @@
 * [Ilan Tzitrin](https://github.com/ilan-tz) (Xanadu, University of Toronto) 🚞 local optimist
 
 * [J. Eli Bourassa](https://github.com/elib20) (Xanadu, University of Toronto) 🏄 GKP surfer
+
+* [Filippo Miatto](https://github.com/ziofil) (Télécom Paris) 🧝‍♂️ Lord of recursion
