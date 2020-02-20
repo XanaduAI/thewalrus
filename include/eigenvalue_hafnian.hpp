@@ -167,7 +167,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
 
         std::vector<T> traces(m, 0.0);
         if (sum != 0) {
-            traces = powtrace(B, sum, m);
+            traces = powtrace<StorageType::RowOrder>(B, sum, m);
         }
 
         char cnt = 1;
@@ -257,7 +257,7 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
 
         std::vector<T> traces(m, 0.0);
         if (sum != 0) {
-            traces = powtrace(B, sum, m);
+	  traces = powtrace<StorageType::RowOrder>(B, sum, m);
         }
 
         char cnt = 1;
