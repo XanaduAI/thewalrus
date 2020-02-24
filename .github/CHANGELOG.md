@@ -27,11 +27,13 @@
 
 * Removes paper.{md,pdf,bib} from the repository now that The Walrus paper is published in Journal of Open Source Software [#106](https://github.com/XanaduAI/thewalrus/pull/106)
 
+* Updates the S2gate to use the correct definition. [#130](https://github.com/XanaduAI/thewalrus/pull/130)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Josh Izaac, Filippo Miatto, Nicolas Quesada, Trevor Vincent
+Theodor Isacsson, Josh Izaac, Filippo Miatto, Nicolas Quesada, Trevor Vincent
 
 
 ---
