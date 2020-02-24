@@ -76,7 +76,7 @@ if BUILD_EXT:
     if platform.system() == 'Windows':
         USE_OPENMP = False
         cflags_default = "-static -O3 -Wall -fPIC"
-        extra_link_args_CPP = ["-std=c++11 -static", "-static-libgfortran", "-static-libgcc"]
+        extra_link_args_CPP = ["-std=c++17 -static", "-static-libgfortran", "-static-libgcc"]
     elif platform.system() == 'Darwin':
         cflags_default = "-O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp -mmacosx-version-min=10.9"
         libraries += ["omp"]
@@ -120,7 +120,7 @@ if BUILD_EXT:
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 libraries=libraries,
                 language="c++",
-                extra_compile_args=["-std=c++11"] + CFLAGS,
+                extra_compile_args=["-std=c++17"] + CFLAGS,
                 extra_link_args=extra_link_args_CPP)
     ], compile_time_env={'_OPENMP': USE_OPENMP, 'LAPACKE': USE_LAPACK})
 else:

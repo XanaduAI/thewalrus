@@ -32,96 +32,10 @@
 
 #include "powtrace.hpp"
 
-#include <Eigen/Eigenvalues>
 
 namespace libwalrus {
 
-/**
- * Given a complex matrix \f$z\f$ of dimensions \f$n\times n\f$, it calculates
- * \f$Tr(z^j)~\forall~1\leq j\leq l\f$.
- *
- * @param z a flattened complex vector of size \f$n^2\f$, representing an
- *       \f$n\times n\f$ row-ordered matrix.
- * @param n size of the matrix `z`.
- * @param l maximum matrix power when calculating the power trace.
- * @return a vector containing the power traces of matrix `z` to power
- *       \f$1\leq j \leq l\f$.
- */
-// inline vec_complex powtrace(vec_complex &z, int n, int l) {
-//     vec_complex traces(l, 0.0);
-//     vec_complex vals(n, 0.0);
-//     vec_complex pvals(n, 0.0);
-
-//     Eigen::MatrixXcd A = Eigen::Map<Eigen::MatrixXcd, Eigen::Unaligned>(z.data(), n, n);
-//     Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(A, false);
-//     Eigen::MatrixXcd evals = solver.eigenvalues();
-//     vals = vec_complex(evals.data(), evals.data() + evals.size());
-
-//     double_complex sum;
-//     int i, j;
-
-//     for (j = 0; j < n; j++) {
-//         pvals[j] = vals[j];
-//     }
-
-//     for (i = 0; i < l; i++) {
-//         sum = 0.0;
-//         for (j = 0; j < n; j++) {
-//             sum += pvals[j];
-//         }
-//         traces[i] = sum;
-//         for (j = 0; j < n; j++) {
-//             pvals[j] = pvals[j] * vals[j];
-//         }
-//     }
-
-//     return traces;
-// };
-
-/**
-* Given a real matrix \f$z\f$ of dimensions \f$n\times n\f$, it calculates
-* \f$Tr(z^j)~\forall~1\leq j\leq l\f$.
-*
-* @param z a flattened complex vector of size \f$n^2\f$, representing an
-*       \f$n\times n\f$ row-ordered matrix.
-* @param n size of the matrix `z`.
-* @param l maximum matrix power when calculating the power trace.
-* @return a vector containing the power traces of matrix `z` to power
-*       \f$1\leq j \leq l\f$.
-*/
-// inline vec_double powtrace(vec_double &z, int n, int l) {
-//     vec_double traces(l, 0.0);
-//     vec_complex vals(n, 0.0);
-//     vec_complex pvals(n, 0.0);
-
-//     Eigen::MatrixXd A = Eigen::Map<Eigen::MatrixXd, Eigen::Unaligned>(z.data(), n, n);
-//     Eigen::EigenSolver<Eigen::MatrixXd> solver(A, false);
-//     Eigen::MatrixXcd evals = solver.eigenvalues();
-//     vals = vec_complex(evals.data(), evals.data() + evals.size());
-
-//     double_complex sum;
-//     int i, j;
-
-//     for (j = 0; j < n; j++) {
-//         pvals[j] = vals[j];
-//     }
-//     for (i = 0; i < l; i++) {
-//         sum = 0.0;
-//         for (j = 0; j < n; j++) {
-//             sum += pvals[j];
-//         }
-//         traces[i] = sum.real();
-//         for (j = 0; j < n; j++) {
-//             pvals[j] = pvals[j] * vals[j];
-//         }
-//     }
-
-//     return traces;
-// };
-
-
-
-/**
+  /**
  * Calculates the partial sum \f$X,X+1,\dots,X+\text{chunksize}\f$ using
  * the Cygan and Pilipczuk formula for the hafnian of matrix `mat`.
  *
