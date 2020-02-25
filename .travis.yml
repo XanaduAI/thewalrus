@@ -9,7 +9,7 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
         packages:
-        - gcc-7.4
+        - gcc
 before_install:
 - |
   sudo apt-get -qq update;
