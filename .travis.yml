@@ -8,7 +8,7 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
         packages:
-        - gcc-4.8
+        - gcc-7.4
 before_install:
 - |
   sudo apt-get -qq update;
