@@ -659,6 +659,70 @@ def gen_Qmat_from_graph(A, n_mean):
     return Q
 
 
+def photon_number_var(mu, cov, j, k, hbar=2):
+    r""" Calculate the variance/covariance of the photon number distribution
+    of a Gaussian state.
+
+    Last two eq. of Part II. in 'Multidimensional Hermite polynomials and
+    photon distribution for polymode mixed light', Dodonov et al.
+    (https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813).
+
+    Args:
+        mu (array): mean <Q> in ref. above consisting of [q1, q2, ..., qn, p1, p2, ..., pn]
+        cov (array): the covariant matrix of the gaussian state
+        j (int): the first index of the covariance matrix
+        k (int): the second index of the covariance matrix
+        hbar (float): the hbar convention used for cov/mu
+
+    Returns:
+        float: the value at index (j, k) of the covariance matrix
+    """
+    # renormalise the covariance matrix
+    cov = cov / hbar
+
+    N = len(mu) // 2
+    mu = np.array(mu) / np.sqrt(hbar)
+
+    lambda_1 = np.zeros((2 * N, 2 * N))
+    lambda_1[j, j] = lambda_1[j + N, j + N] = 1
+
+    lambda_2 = np.zeros((2 * N, 2 * N))
+    lambda_2[k, k] = lambda_2[k + N, k + N] = 1
+
+    if j == k:
+        idxs = ((j, j, j + N, j + N), (j, j + N, j, j + N))
+        M = (lambda_1 @ cov @ lambda_2)[idxs].reshape(2, 2)
+
+        term_1 = (np.trace(M) ** 2 - 2 * np.linalg.det(M) - 0.5) / 2
+        term_2 = mu[[j, j + N]] @ M @ mu[[j, j + N]]
+    else:
+        term_1 = np.trace(lambda_1 @ cov @ lambda_2 @ cov) / 2
+        term_2 = (mu @ lambda_1 @ cov @ lambda_2 @ mu) / 2
+
+    return term_1 + term_2
+
+
+def photon_number_covmat(mu, cov, hbar=2):
+    r""" Calculate the covariance matrix of the photon number distribution of a
+    Gaussian state.
+
+    Args:
+        mu (array): mean <Q> in ref. above consisting of [q1, q2, ..., qn, p1, p2, ..., pn]
+        cov (array): the covariant matrix of the gaussian state
+        hbar (float): the hbar convention used for cov/mu
+
+    Returns:
+        array: the covariance matrix of the photon number distribution
+    """
+
+    N = len(mu) // 2
+    pnd_cov = np.zeros((N, N))
+    for i in range(N):
+        for j in range(N):
+            pnd_cov[i][j] = photon_number_var(mu, cov, i, j, hbar=hbar)
+    return pnd_cov
+
+
 def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix.
 
