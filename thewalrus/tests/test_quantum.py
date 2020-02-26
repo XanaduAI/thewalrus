@@ -32,6 +32,8 @@ from thewalrus.quantum import (
     density_matrix_element,
     density_matrix,
     find_scaling_adjacency_matrix,
+    find_scaling_adjacency_matrix_torontonian,
+    mean_number_of_clicks,
     Covmat,
     gen_Qmat_from_graph,
     Means,
@@ -338,7 +340,15 @@ def test_density_matrix_squeezed():
 
     res = density_matrix(mu, V)
 
-    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
+    expected = np.array(
+        [
+            [0.91417429, 0, -0.26200733, 0, 0.09196943],
+            [0, 0, 0, 0, 0],
+            [-0.26200733, 0, 0.07509273, 0, -0.02635894],
+            [0, 0, 0, 0, 0],
+            [0.09196943, 0, -0.02635894, 0, 0.00925248],
+        ]
+    )
 
     assert np.allclose(res, expected)
 
@@ -373,7 +383,15 @@ def test_density_matrix_squeezed_postselect():
 
     res = density_matrix(mu, V, post_select={0: 0}, cutoff=15, normalize=True)[:5, :5]
 
-    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
+    expected = np.array(
+        [
+            [0.91417429, 0, -0.26200733, 0, 0.09196943],
+            [0, 0, 0, 0, 0],
+            [-0.26200733, 0, 0.07509273, 0, -0.02635894],
+            [0, 0, 0, 0, 0],
+            [0.09196943, 0, -0.02635894, 0, 0.00925248],
+        ]
+    )
 
     assert np.allclose(res, expected)
 
@@ -407,6 +425,16 @@ def test_find_scaling_adjacency_matrix():
     sc_exact = np.sqrt(n_mean / (1.0 + n_mean)) / rabs
     sc_num = find_scaling_adjacency_matrix(A, n_mean)
     assert np.allclose(sc_exact, sc_num)
+
+
+def test_find_scaling_adjacency_matrix_torontonian():
+    """Test the find_scaling_adjacency matrix_torontonian for a multimode problem"""
+    n = 10
+    A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    A += A.T
+    nc = 3.0
+    x = find_scaling_adjacency_matrix_torontonian(A, nc)
+    assert np.allclose(mean_number_of_clicks(x * A), nc)
 
 
 def test_Covmat():
@@ -682,11 +710,41 @@ def test_single_mode_displacement(choi_r, tol):
     # np.array(displace(40,alpha).data.todense())[0:5,0:5]
     expected = np.array(
         [
-            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j],
-            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j],
-            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j],
-            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j],
-            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j],
+            [
+                0.84366482 + 0.00000000e00j,
+                -0.25309944 + 4.21832408e-01j,
+                -0.09544978 - 1.78968334e-01j,
+                0.06819609 + 3.44424719e-03j,
+                -0.01109048 + 1.65323865e-02j,
+            ],
+            [
+                0.25309944 + 4.21832408e-01j,
+                0.55681878 + 0.00000000e00j,
+                -0.29708743 + 4.95145724e-01j,
+                -0.14658716 - 2.74850926e-01j,
+                0.12479885 + 6.30297236e-03j,
+            ],
+            [
+                -0.09544978 + 1.78968334e-01j,
+                0.29708743 + 4.95145724e-01j,
+                0.31873657 + 0.00000000e00j,
+                -0.29777767 + 4.96296112e-01j,
+                -0.18306015 - 3.43237787e-01j,
+            ],
+            [
+                -0.06819609 + 3.44424719e-03j,
+                -0.14658716 + 2.74850926e-01j,
+                0.29777767 + 4.96296112e-01j,
+                0.12389162 + 1.10385981e-17j,
+                -0.27646677 + 4.60777945e-01j,
+            ],
+            [
+                -0.01109048 - 1.65323865e-02j,
+                -0.12479885 + 6.30297236e-03j,
+                -0.18306015 + 3.43237787e-01j,
+                0.27646677 + 4.60777945e-01j,
+                -0.03277289 + 1.88440656e-17j,
+            ],
         ]
     )
     T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)

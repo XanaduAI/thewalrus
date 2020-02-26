@@ -84,6 +84,7 @@ Utility functions
     Means
     prefactor
     find_scaling_adjacency_matrix
+    find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
     is_valid_cov
     is_pure_cov
@@ -572,6 +573,71 @@ def state_vector(
     return psi
 
 
+def mean_number_of_clicks(A):
+    r"""
+    Given an adjacency matrix it calculates the mean number of clicks.
+    For this to make sense the user must provide a matrix with singular values
+    less than or equal to one.
+
+    Args:
+        A (array): rescaled adjacency matrix
+    Returns:
+        float: mean number of clicks
+    """
+    n, _ = A.shape
+    idn = np.identity(n)
+    X = np.block([[0 * idn, idn], [idn, 0 * idn]])
+    B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
+    Q = np.linalg.inv(np.identity(2 * n) - X @ B)
+    meanc = 1.0 * n
+    for i in range(n):
+        det_val = np.real(Q[i, i] * Q[i + n, i + n] - Q[i + n, i] * Q[i, i + n])
+        meanc -= 1.0 / np.sqrt(det_val)
+    return meanc
+
+
+def find_scaling_adjacency_matrix_torontonian(A, c_mean):
+    r""" Returns the scaling parameter by which the adjacency matrix A
+    should be rescaled so that the Gaussian state that endodes it has
+    give a mean number of clicks equal c_mean when measured with
+    threshold detectors.
+
+    Args:
+        A (array): adjacency matrix
+        c_mean (float): mean photon number of the Gaussian state
+
+    Returns:
+        float: scaling parameter
+    """
+    n, _ = A.shape
+    if 0 >= c_mean > n:
+        raise ValueError("The mean number of clicks should be smaller than the number of modes")
+
+    vals = np.linalg.svd(A, compute_uv=False)
+    localA = A / vals[0]  # rescale the matrix so that the singular values are between 0 and 1.
+
+    def cost(x):
+        r""" Cost function giving the difference between the wanted number of clicks and the number of clicks at a given scaling value.
+
+        Args:
+            x (float): scaling value
+
+        Return:
+            float: difference between desired and obtained mean number of clicks
+        """
+        if x >= 1.0:
+            return c_mean - n
+        if x <= 0:
+            return c_mean
+        return c_mean - mean_number_of_clicks(x * localA)
+
+    res = root_scalar(cost, x0=0.5, bracket=(0.0, 1.0))  # Do the optimization
+
+    if not res.converged:
+        raise ValueError("The search for a scaling value failed")
+    return res.root / vals[0]
+
+
 def find_scaling_adjacency_matrix(A, n_mean):
     r""" Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that endodes it has
@@ -630,7 +696,10 @@ def find_scaling_adjacency_matrix(A, n_mean):
     f = lambda x: mean_photon_number(x, ls) - n_mean
     df = lambda x: grad_mean_photon_number(x, ls)
     res = root_scalar(f, fprime=df, x0=x_init, bracket=(a_lim, b_lim))
-    assert res.converged
+
+    if not res.converged:
+        raise ValueError("The search for a scaling value failed")
+
     return res.root
 
 
