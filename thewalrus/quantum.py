@@ -384,7 +384,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
                 -A, cutoff, renorm=True, modified=True
             )
             return tensor.transpose(sf_order)
-        beta = Beta(mu)
+        beta = Beta(mu, hbar=hbar)
         y = beta - A @ beta.conj()
         tensor = np.real_if_close(pref) * hermite_multidimensional(
             -A, cutoff, y=y, renorm=True, modified=True
