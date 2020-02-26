@@ -29,11 +29,13 @@
 
 * Updates the S2gate to use the correct definition. [#130](https://github.com/XanaduAI/thewalrus/pull/130)
 
+* Corrects the issue with hbar taking a default value when calculating mu in the density matrix function [#134] (https://github.com/XanaduAI/thewalrus/pull/134)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Theodor Isacsson, Josh Izaac, Filippo Miatto, Nicolas Quesada, Trevor Vincent
+Theodor Isacsson, Josh Izaac, Filippo Miatto, Nicolas Quesada, Trevor Vincent, Kieran Wilkinson
 
 
 ---
