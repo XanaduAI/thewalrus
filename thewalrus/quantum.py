@@ -668,7 +668,7 @@ def photon_number_var(mu, cov, j, k, hbar=2):
     <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_.
 
     Args:
-        mu (array): mean <Q> in ref. above consisting of [q1, q2, ..., qn, p1, p2, ..., pn]
+        mu (array): vector of means of the Gaussian state using the ordering :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
         cov (array): the covariance matrix of the Gaussian state
         j (int): the first index of the covariance matrix
         k (int): the second index of the covariance matrix
