@@ -574,8 +574,8 @@ def state_vector(
 
 
 def mean_number_of_clicks(A):
-    r"""
-    Given an adjacency matrix it calculates the mean number of clicks.
+    r"""Given an adjacency matrix this function calculates the mean number of clicks.
+
     For this to make sense the user must provide a matrix with singular values
     less than or equal to one. See Appendix A.3 of arxiv.org/abs/1902.00462
     by Banchi et al.
@@ -591,6 +591,7 @@ def mean_number_of_clicks(A):
     B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
     Q = np.linalg.inv(np.identity(2 * n) - X @ B)
     meanc = 1.0 * n
+
     for i in range(n):
         det_val = np.real(Q[i, i] * Q[i + n, i + n] - Q[i + n, i] * Q[i, i + n])
         meanc -= 1.0 / np.sqrt(det_val)
@@ -599,8 +600,10 @@ def mean_number_of_clicks(A):
 
 def find_scaling_adjacency_matrix_torontonian(A, c_mean):
     r""" Returns the scaling parameter by which the adjacency matrix A
-    should be rescaled so that the Gaussian state that endodes it has
-    give a mean number of clicks equal c_mean when measured with
+    should be rescaled so that the Gaussian state that encodes it has
+
+    give a mean number of clicks equal to ``c_mean`` when measured with
+
     threshold detectors.
 
     Args:
@@ -618,7 +621,8 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
     localA = A / vals[0]  # rescale the matrix so that the singular values are between 0 and 1.
 
     def cost(x):
-        r""" Cost function giving the difference between the wanted number of clicks and the number of clicks at a given scaling value.
+        r""" Cost function giving the difference between the wanted number of clicks and the number
+        of clicks at a given scaling value.
 
         Args:
             x (float): scaling value

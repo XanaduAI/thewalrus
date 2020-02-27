@@ -412,7 +412,7 @@ def test_find_scaling_adjacency_matrix():
 
 
 def test_find_scaling_adjacency_matrix_torontonian():
-    """Test the find_scaling_adjacency matrix_torontonian for a multimode problem"""
+    """Test the find_scaling_adjacency_matrix_torontonian for a multimode problem"""
     n = 10
     A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     A += A.T
