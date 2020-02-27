@@ -84,7 +84,11 @@ Utility functions
     Means
     prefactor
     find_scaling_adjacency_matrix
+    mean_number_of_clicks
+    find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
+    photon_number_covar
+    photon_number_covmat
     is_valid_cov
     is_pure_cov
     is_classical_cov
@@ -384,7 +388,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
                 -A, cutoff, renorm=True, modified=True
             )
             return tensor.transpose(sf_order)
-        beta = Beta(mu)
+        beta = Beta(mu, hbar=hbar)
         y = beta - A @ beta.conj()
         tensor = np.real_if_close(pref) * hermite_multidimensional(
             -A, cutoff, y=y, renorm=True, modified=True
@@ -572,6 +576,74 @@ def state_vector(
     return psi
 
 
+def mean_number_of_clicks(A):
+    r""" Given an adjacency matrix this function calculates the mean number of clicks.
+    For this to make sense the user must provide a matrix with singular values
+    less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
+    by Banchi et al.
+
+    Args:
+        A (array): rescaled adjacency matrix
+    Returns:
+        float: mean number of clicks
+    """
+    n, _ = A.shape
+    idn = np.identity(n)
+    X = np.block([[0 * idn, idn], [idn, 0 * idn]])
+    B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
+    Q = np.linalg.inv(np.identity(2 * n) - X @ B)
+    meanc = 1.0 * n
+
+    for i in range(n):
+        det_val = np.real(Q[i, i]*Q[i+n, i+n] - Q[i+n, i]*Q[i, i+n])
+        meanc -= 1.0 / np.sqrt(det_val)
+    return meanc
+
+
+def find_scaling_adjacency_matrix_torontonian(A, c_mean):
+    r""" Returns the scaling parameter by which the adjacency matrix A
+    should be rescaled so that the Gaussian state that encodes it has
+    give a mean number of clicks equal to ``c_mean`` when measured with
+    threshold detectors.
+
+    Args:
+        A (array): adjacency matrix
+        c_mean (float): mean photon number of the Gaussian state
+
+    Returns:
+        float: scaling parameter
+    """
+    n, _ = A.shape
+    if c_mean < 0 or c_mean > n:
+        raise ValueError("The mean number of clicks should be smaller than the number of modes")
+
+    vals = np.linalg.svd(A, compute_uv=False)
+    localA = A / vals[0]  # rescale the matrix so that the singular values are between 0 and 1.
+
+    def cost(x):
+        r""" Cost function giving the difference between the wanted number of clicks and the number
+        of clicks at a given scaling value. It assumes that the adjacency matrix has been rescaled
+        so that it has singular values between 0 and 1.
+
+        Args:
+            x (float): scaling value
+
+        Return:
+            float: difference between desired and obtained mean number of clicks
+        """
+        if x >= 1.0:
+            return c_mean - n
+        if x <= 0:
+            return c_mean
+        return c_mean - mean_number_of_clicks(x * localA)
+
+    res = root_scalar(cost, x0=0.5, bracket=(0.0, 1.0))  # Do the optimization
+
+    if not res.converged:
+        raise ValueError("The search for a scaling value failed")
+    return res.root / vals[0]
+
+
 def find_scaling_adjacency_matrix(A, n_mean):
     r""" Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that endodes it has
@@ -630,7 +702,10 @@ def find_scaling_adjacency_matrix(A, n_mean):
     f = lambda x: mean_photon_number(x, ls) - n_mean
     df = lambda x: grad_mean_photon_number(x, ls)
     res = root_scalar(f, fprime=df, x0=x_init, bracket=(a_lim, b_lim))
-    assert res.converged
+
+    if not res.converged:
+        raise ValueError("The search for a scaling value failed")
+
     return res.root
 
 
@@ -657,6 +732,87 @@ def gen_Qmat_from_graph(A, n_mean):
     X = Xmat(n)
     Q = np.linalg.inv(I - X @ A)
     return Q
+
+
+def photon_number_covar(mu, cov, j, k, hbar=2):
+    r""" Calculate the variance/covariance of the photon number distribution
+    of a Gaussian state.
+
+    Implements the covariance matrix of the photon number distribution of a
+    Gaussian state according to the Last two eq. of Part II. in
+    `'Multidimensional Hermite polynomials and photon distribution for polymode
+    mixed light', Dodonov et al. <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_
+
+    .. math::
+        \sigma_{n_j n_j} &= \frac{1}{2}\left(T_j^2 - 2d_j - \frac{1}{2}\right)
+        + \left<\mathbf{Q}_j\right>\mathcal{M}_j\left<\mathbf{Q}_j\right>, \\
+        \sigma_{n_j n_k} &= \frac{1}{2}\mathrm{Tr}\left(\Lambda_j \mathbf{M} \Lambda_k \mathbf{M}\right)
+        + \frac{1}{2}\left<\mathbf{Q}\right>\Lambda_j \mathbf{M} \Lambda_k\left<\mathbf{Q}\right>,
+
+    where :math:`T_j` and :math:`d_j` are the trace and the determinant of
+    :math:`2 \times 2` matrix :math:`\mathcal{M}_j` whose elements coincide
+    with the nonzero elements of matrix :math:`\mathbf{M}_j = \Lambda_j \mathbf{M} \Lambda_k`
+    while the two-vector :math:`\mathbf{Q}_j` has the components :math:`(p_j, q_j)`.
+    :math:`2N \times 2N` projector matrix :math:`\Lambda_j` has only two nonzero
+    elements: :math:`\left(\Lambda_j\right)_{jj} = \left(\Lambda_j\right)_{j+N,j+N} = 1`.
+
+    Args:
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[p_1, p_2, \dots, p_n, q_1, q_2, \dots, q_n]`
+        cov (array): the covariance matrix of the Gaussian state
+        j (int): the j :sup:`th` mode
+        k (int): the k :sup:`th` mode
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[p, q]=i\hbar`
+
+    Returns:
+        float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
+    """
+    # renormalise the covariance matrix
+    cov = cov / hbar
+
+    N = len(mu) // 2
+    mu = np.array(mu) / np.sqrt(hbar)
+
+    lambda_1 = np.zeros((2 * N, 2 * N))
+    lambda_1[j, j] = lambda_1[j + N, j + N] = 1
+
+    lambda_2 = np.zeros((2 * N, 2 * N))
+    lambda_2[k, k] = lambda_2[k + N, k + N] = 1
+
+    if j == k:
+        idxs = ((j, j, j + N, j + N), (j, j + N, j, j + N))
+        M = (lambda_1 @ cov @ lambda_2)[idxs].reshape(2, 2)
+
+        term_1 = (np.trace(M) ** 2 - 2 * np.linalg.det(M) - 0.5) / 2
+        term_2 = mu[[j, j + N]] @ M @ mu[[j, j + N]]
+    else:
+        term_1 = np.trace(lambda_1 @ cov @ lambda_2 @ cov) / 2
+        term_2 = (mu @ lambda_1 @ cov @ lambda_2 @ mu) / 2
+
+    return term_1 + term_2
+
+
+def photon_number_covmat(mu, cov, hbar=2):
+    r""" Calculate the covariance matrix of the photon number distribution of a
+    Gaussian state.
+
+    Args:
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
+        cov (array): the covariance matrix of the Gaussian state
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[q, p]=i\hbar`
+
+    Returns:
+        array: the covariance matrix of the photon number distribution
+    """
+    N = len(mu) // 2
+    pnd_cov = np.zeros((N, N))
+    for i in range(N):
+        for j in range(N):
+            pnd_cov[i][j] = photon_number_covar(mu, cov, i, j, hbar=hbar)
+    return pnd_cov
 
 
 def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):

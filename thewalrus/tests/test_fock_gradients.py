@@ -248,7 +248,7 @@ def test_S2gate_values(tol):
     theta = 0.7
     cutoff = 5
     T = S2gate(r, theta, cutoff)[0]
-    expected = ((np.tanh(-r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
+    expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
 
 
