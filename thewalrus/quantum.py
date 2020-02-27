@@ -663,9 +663,9 @@ def photon_number_var(mu, cov, j, k, hbar=2):
     r""" Calculate the variance/covariance of the photon number distribution
     of a Gaussian state.
 
-    Last two eq. of Part II. in 'Multidimensional Hermite polynomials and
+    Last two eq. of Part II. in `'Multidimensional Hermite polynomials and
     photon distribution for polymode mixed light', Dodonov et al.
-    (https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813).
+    <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_.
 
     Args:
         mu (array): mean <Q> in ref. above consisting of [q1, q2, ..., qn, p1, p2, ..., pn]
