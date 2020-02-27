@@ -576,6 +576,7 @@ def state_vector(
 def mean_number_of_clicks(A):
     r"""Given an adjacency matrix this function calculates the mean number of clicks.
 
+
     For this to make sense the user must provide a matrix with singular values
     less than or equal to one. See Appendix A.3 of arxiv.org/abs/1902.00462
     by Banchi et al.
@@ -591,6 +592,7 @@ def mean_number_of_clicks(A):
     B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
     Q = np.linalg.inv(np.identity(2 * n) - X @ B)
     meanc = 1.0 * n
+
 
     for i in range(n):
         det_val = np.real(Q[i, i] * Q[i + n, i + n] - Q[i + n, i] * Q[i, i + n])
