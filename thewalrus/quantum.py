@@ -576,9 +576,6 @@ def state_vector(
 
 def mean_number_of_clicks(A):
     r"""Given an adjacency matrix this function calculates the mean number of clicks.
-
-
-
     For this to make sense the user must provide a matrix with singular values
     less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
     by Banchi et al.
@@ -604,9 +601,7 @@ def mean_number_of_clicks(A):
 def find_scaling_adjacency_matrix_torontonian(A, c_mean):
     r""" Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that encodes it has
-
     give a mean number of clicks equal to ``c_mean`` when measured with
-
     threshold detectors.
 
     Args:
