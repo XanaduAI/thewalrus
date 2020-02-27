@@ -35,3 +35,5 @@
 * [J. Eli Bourassa](https://github.com/elib20) (Xanadu, University of Toronto) 🏄 GKP surfer
 
 * [Filippo Miatto](https://github.com/ziofil) (Télécom Paris) 🧝‍♂️ Lord of recursion
+
+* [Theodor Isacsson](https://github.com/thisac) (Xanadu)  :postal_horn: Jarl of contractions
