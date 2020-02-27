@@ -694,7 +694,6 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
 
     Returns:
         float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
-
     """
     # renormalise the covariance matrix
     cov = cov / hbar
@@ -735,7 +734,6 @@ def photon_number_covmat(mu, cov, hbar=2):
     Returns:
         array: the covariance matrix of the photon number distribution
     """
-
     N = len(mu) // 2
     pnd_cov = np.zeros((N, N))
     for i in range(N):
