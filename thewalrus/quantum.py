@@ -84,6 +84,7 @@ Utility functions
     Means
     prefactor
     find_scaling_adjacency_matrix
+    mean_number_of_clicks
     find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
     is_valid_cov
@@ -578,7 +579,7 @@ def mean_number_of_clicks(A):
 
 
     For this to make sense the user must provide a matrix with singular values
-    less than or equal to one. See Appendix A.3 of arxiv.org/abs/1902.00462
+    less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
     by Banchi et al.
 
     Args:
@@ -592,7 +593,6 @@ def mean_number_of_clicks(A):
     B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
     Q = np.linalg.inv(np.identity(2 * n) - X @ B)
     meanc = 1.0 * n
-
 
     for i in range(n):
         det_val = np.real(Q[i, i] * Q[i + n, i + n] - Q[i + n, i] * Q[i, i + n])
@@ -616,7 +616,7 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
         float: scaling parameter
     """
     n, _ = A.shape
-    if 0 >= c_mean > n:
+    if 0 >= c_mean or c_mean > n:
         raise ValueError("The mean number of clicks should be smaller than the number of modes")
 
     vals = np.linalg.svd(A, compute_uv=False)
@@ -624,7 +624,8 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
 
     def cost(x):
         r""" Cost function giving the difference between the wanted number of clicks and the number
-        of clicks at a given scaling value.
+        of clicks at a given scaling value. It assumes that the adjacency matrix has been rescaled
+        so that it has singular values between 0 and 1.
 
         Args:
             x (float): scaling value

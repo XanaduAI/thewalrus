@@ -420,6 +420,14 @@ def test_find_scaling_adjacency_matrix_torontonian():
     x = find_scaling_adjacency_matrix_torontonian(A, nc)
     assert np.allclose(mean_number_of_clicks(x * A), nc)
 
+def test_mean_number_of_clicks():
+    """Test that a two mode squeezed vacuum with parameter r has been number of clicks 2 tanh(r)"""
+    r = 3.0
+    tr = np.tanh(r)
+    A = np.array([[0, tr], [tr, 0]])
+    value = mean_number_of_clicks(A)
+    expected = 2 * tr**2
+    assert np.allclose(expected, value)
 
 def test_Covmat():
     """ Test the Covmat function by checking that its inverse function is Qmat """
