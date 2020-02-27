@@ -4,6 +4,8 @@
 
 * Introduces the renormalized hermite polynomials. These new polynomials improve the speed and accuracy of `thewalrus.quantum.state_vector` and `thewalrus.quantum.density_matrix` and also `hafnian_batched` and `hermite_multimensional` when called with the optional argument `renorm=True`. [#108](https://github.com/XanaduAI/thewalrus/pull/108)
 
+* Adds functions for calculating the covariance for the photon number distribution of a Gaussian state including a function for the full covariance matrix. [#137](https://github.com/XanaduAI/thewalrus/pull/137)
+
 ### Improvements
 
 * Updates the reference that should be used when citing The Walrus. [#102](https://github.com/XanaduAI/thewalrus/pull/102)
