@@ -421,7 +421,7 @@ def test_find_scaling_adjacency_matrix_torontonian():
     assert np.allclose(mean_number_of_clicks(x * A), nc)
 
 def test_mean_number_of_clicks():
-    """Test that a two mode squeezed vacuum with parameter r has been number of clicks 2 tanh(r)"""
+    """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2 tanh(r)"""
     r = 3.0
     tr = np.tanh(r)
     A = np.array([[0, tr], [tr, 0]])
