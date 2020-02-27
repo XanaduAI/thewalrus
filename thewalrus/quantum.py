@@ -575,7 +575,7 @@ def state_vector(
 
 
 def mean_number_of_clicks(A):
-    r"""Given an adjacency matrix this function calculates the mean number of clicks.
+    r""" Given an adjacency matrix this function calculates the mean number of clicks.
     For this to make sense the user must provide a matrix with singular values
     less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
     by Banchi et al.
