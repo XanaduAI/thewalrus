@@ -596,6 +596,7 @@ def mean_number_of_clicks(A):
     meanc = 1.0 * n
 
     for i in range(n):
+        det_val = np.real(Q[i,i]*Q[i+n,i+n] - Q[i+n,i]*Q[i,i+n])
         meanc -= 1.0 / np.sqrt(det_val)
     return meanc
 
@@ -616,7 +617,7 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
         float: scaling parameter
     """
     n, _ = A.shape
-    if 0 >= c_mean or c_mean > n:
+    if c_mean < 0 or c_mean > n:
         raise ValueError("The mean number of clicks should be smaller than the number of modes")
 
     vals = np.linalg.svd(A, compute_uv=False)
