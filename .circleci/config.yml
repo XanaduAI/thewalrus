@@ -84,7 +84,7 @@ jobs:
       - run:
           name: Build the Linux wheels.
           command: |
-            pip install --user cibuildwheel==0.10.2
+            pip install --user cibuildwheel==1.1.0
             python -m cibuildwheel --output-dir wheelhouse
       - run:
           name: Upload Linux wheels.
