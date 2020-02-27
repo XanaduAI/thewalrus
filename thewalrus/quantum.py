@@ -672,7 +672,7 @@ def photon_number_var(mu, cov, j, k, hbar=2):
         cov (array): the covariance matrix of the Gaussian state
         j (int): the first index of the covariance matrix
         k (int): the second index of the covariance matrix
-        hbar (float): the hbar convention used for cov/mu
+        hbar (float): the :math:`hbar` convention used in the commutation relation :math:`[q, p]=i\hbar`
 
     Returns:
         float: the value at index (j, k) of the covariance matrix
