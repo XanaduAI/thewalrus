@@ -596,7 +596,8 @@ def mean_number_of_clicks(A):
     meanc = 1.0 * n
 
     for i in range(n):
-        det_val = np.real(Q[i, i] * Q[i + n, i + n] - Q[i + n, i] * Q[i, i + n])
+
+    for i in range(n):
         meanc -= 1.0 / np.sqrt(det_val)
     return meanc
 
