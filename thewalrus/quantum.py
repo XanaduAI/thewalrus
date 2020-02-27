@@ -85,6 +85,8 @@ Utility functions
     prefactor
     find_scaling_adjacency_matrix
     gen_Qmat_from_graph
+    photon_number_covar
+    photon_number_covmat
     is_valid_cov
     is_pure_cov
     is_classical_cov
@@ -659,23 +661,39 @@ def gen_Qmat_from_graph(A, n_mean):
     return Q
 
 
-def photon_number_var(mu, cov, j, k, hbar=2):
+def photon_number_covar(mu, cov, j, k, hbar=2):
     r""" Calculate the variance/covariance of the photon number distribution
     of a Gaussian state.
 
-    Last two eq. of Part II. in `'Multidimensional Hermite polynomials and
-    photon distribution for polymode mixed light', Dodonov et al.
-    <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_.
+    Implements the covariance matrix of the photon number distribution of a
+    Gaussian state according to the Last two eq. of Part II. in
+    `'Multidimensional Hermite polynomials and photon distribution for polymode
+    mixed light', Dodonov et al. <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_
+
+    .. math::
+        \sigma_{n_j n_j} &= \frac{1}{2}\left(T_j^2 - 2d_j - \frac{1}{2}\right)
+        + \left<\mathbf{Q}_j\right>\mathcal{M}_j\left<\mathbf{Q}_j\right>, \\
+        \sigma_{n_j n_k} &= \frac{1}{2}\mathrm{Tr}\left(\Lambda_j \mathbf{M} \Lambda_k \mathbf{M}\right)
+        + \frac{1}{2}\left<\mathbf{Q}\right>\Lambda_j \mathbf{M} \Lambda_k\left<\mathbf{Q}\right>,
+
+    where :math:`T_j` and :math:`d_j` are the trace and the determinant of
+    :math:`2 \times 2` matrix :math:`\mathcal{M}_j` whose elements coincide
+    with the nonzero elements of matrix :math:`\mathbf{M}_j = \Lambda_j \mathbf{M} \Lambda_k`
+    while the two-vector :math:`\mathbf{Q}_j` has the components :math:`(p_j, q_j)`.
+    :math:`2N \times 2N` projector matrix :math:`\Lambda_j` has only two nonzero
+    elements: :math:`\left(\Lambda_j\right)_{jj} = \left(\Lambda_j\right)_{j+N,j+N} = 1`.
 
     Args:
-        mu (array): vector of means of the Gaussian state using the ordering :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[p_1, p_2, \dots, p_n, q_1, q_2, \dots, q_n]`
         cov (array): the covariance matrix of the Gaussian state
-        j (int): the first index of the covariance matrix
-        k (int): the second index of the covariance matrix
-        hbar (float): the :math:`hbar` convention used in the commutation relation :math:`[q, p]=i\hbar`
+        j (int): the j :sup:`th` mode
+        k (int): the k :sup:`th` mode
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[p, q]=i\hbar`
 
     Returns:
-        float: the value at index (j, k) of the photon number covariance matrix
+        float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
 
     """
     # renormalise the covariance matrix
@@ -708,9 +726,11 @@ def photon_number_covmat(mu, cov, hbar=2):
     Gaussian state.
 
     Args:
-        mu (array): mean <Q> in ref. above consisting of [q1, q2, ..., qn, p1, p2, ..., pn]
-        cov (array): the covariant matrix of the gaussian state
-        hbar (float): the hbar convention used for cov/mu
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
+        cov (array): the covariance matrix of the Gaussian state
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[q, p]=i\hbar`
 
     Returns:
         array: the covariance matrix of the photon number distribution
@@ -720,7 +740,7 @@ def photon_number_covmat(mu, cov, hbar=2):
     pnd_cov = np.zeros((N, N))
     for i in range(N):
         for j in range(N):
-            pnd_cov[i][j] = photon_number_var(mu, cov, i, j, hbar=hbar)
+            pnd_cov[i][j] = photon_number_covar(mu, cov, i, j, hbar=hbar)
     return pnd_cov
 
 
