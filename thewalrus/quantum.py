@@ -675,7 +675,8 @@ def photon_number_var(mu, cov, j, k, hbar=2):
         hbar (float): the :math:`hbar` convention used in the commutation relation :math:`[q, p]=i\hbar`
 
     Returns:
-        float: the value at index (j, k) of the covariance matrix
+        float: the value at index (j, k) of the photon number covariance matrix
+
     """
     # renormalise the covariance matrix
     cov = cov / hbar
