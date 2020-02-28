@@ -6,6 +6,8 @@
 
 * Adds functions for calculating the covariance for the photon number distribution of a Gaussian state including a function for the full covariance matrix. [#137](https://github.com/XanaduAI/thewalrus/pull/137)
 
+* Adds support for Python 3.8. [#138](https://github.com/XanaduAI/thewalrus/pull/138)
+
 ### Improvements
 
 * Updates the reference that should be used when citing The Walrus. [#102](https://github.com/XanaduAI/thewalrus/pull/102)
