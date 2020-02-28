@@ -752,18 +752,20 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     where :math:`T_j` and :math:`d_j` are the trace and the determinant of
     :math:`2 \times 2` matrix :math:`\mathcal{M}_j` whose elements coincide
     with the nonzero elements of matrix :math:`\mathbf{M}_j = \Lambda_j \mathbf{M} \Lambda_k`
-    while the two-vector :math:`\mathbf{Q}_j` has the components :math:`(p_j, q_j)`.
+    while the two-vector :math:`\mathbf{Q}_j` has the components :math:`(q_j, p_j)`.
     :math:`2N \times 2N` projector matrix :math:`\Lambda_j` has only two nonzero
     elements: :math:`\left(\Lambda_j\right)_{jj} = \left(\Lambda_j\right)_{j+N,j+N} = 1`.
+    Note that the convention for ``mu`` used here differs from the one used in Dodonov et al.,
+    They both provide the same results in this particular case.
 
     Args:
         mu (array): vector of means of the Gaussian state using the ordering
-            :math:`[p_1, p_2, \dots, p_n, q_1, q_2, \dots, q_n]`
+            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
         cov (array): the covariance matrix of the Gaussian state
         j (int): the j :sup:`th` mode
         k (int): the k :sup:`th` mode
         hbar (float): the ``hbar`` convention used in the commutation
-            relation :math:`[p, q]=i\hbar`
+            relation :math:`[q, p]=i\hbar`
 
     Returns:
         float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
