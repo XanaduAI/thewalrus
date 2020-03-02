@@ -63,10 +63,7 @@ int update_iterator(std::vector<int> &nextPos, std::vector<int> &jumpFrom, int &
         jump = 0;
     }
     for (int ii = 0; ii < dim; ii++) {
-        std::vector<int> forwardStep(dim, 0);
-        forwardStep[ii] = 1;
-
-        if ( forwardStep[ii] + nextPos[ii] > cutoff) {
+        if ( 1 + nextPos[ii] > cutoff) {
             nextPos[ii] = 1;
             jumpFrom[ii] = 1;
             jump = ii+1;
