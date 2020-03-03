@@ -44,6 +44,7 @@ Code details
 ------------
 """
 # pylint: disable=too-many-arguments
+import dask
 import numpy as np
 from scipy.special import factorial as fac
 
@@ -254,17 +255,7 @@ def hafnian_sample_state(
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
-    # pylint: disable=import-outside-toplevel
     if parallel:
-        try:
-            import dask
-        except:
-            raise ImportError(
-                "Dask must be installed for parallel evaluation. "
-                "\nDask can be installed using pip:"
-                "\n\npip install dask[delayed]"
-            )
-
         params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
         compute_list = []
         for p in params:
@@ -448,17 +439,7 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=Fals
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
-    # pylint: disable=import-outside-toplevel
     if parallel:
-        try:
-            import dask
-        except:
-            raise ImportError(
-                "Dask must be installed for parallel evaluation. "
-                "\nDask can be installed using pip:"
-                "\n\npip install dask[delayed]"
-            )
-
         params = [[cov, 1, hbar, max_photons]] * samples
         compute_list = []
         for p in params:
