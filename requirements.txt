@@ -2,3 +2,4 @@ numpy>=1.13.3
 scipy>=1.2.1
 numba>=0.43.1
 cython
+dask[delayed]
