@@ -12,6 +12,8 @@
 
 This release contains contributions from (in alphabetical order):
 
+Kieran Wilkinson
+
 
 
 
