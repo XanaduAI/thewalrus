@@ -57,6 +57,15 @@ def TMS_cov(r, phi):
 class TestHafnianSampling:
     """Tests for hafnian sampling"""
 
+    @pytest.mark.parametrize("max_photons", [10, 2, 0])
+    def test_hafnian_state_lowmax(self, max_photons):
+        """test sampling never exceeds max photons for hafnian"""
+        m = 0.432
+        phi = 0.546
+        V = TMS_cov(np.arcsinh(m), phi)
+        res = hafnian_sample_state(V, samples=10, max_photons=max_photons)
+        assert np.max(res) <= max_photons
+
     def test_TMS_hafnian_sample_states(self):
         """test sampling from TMS hafnians is correlated"""
         m = 0.432
@@ -317,6 +326,15 @@ class TestHafnianSampling:
 class TestTorontonianSampling:
     """Tests for torontonian sampling"""
 
+    @pytest.mark.parametrize("max_photons", [10, 2, 0])
+    def test_torontonian_state_lowmax(self, max_photons):
+        """test sampling never exceeds max photons for torontonian"""
+        m = 0.432
+        phi = 0.546
+        V = TMS_cov(np.arcsinh(m), phi)
+        res = torontonian_sample_state(V, samples=10, max_photons=max_photons)
+        assert np.max(res) <= max_photons
+
     def test_torontonian_samples_nonnumpy(self):
         """test exception is raised if not a numpy array"""
         with pytest.raises(TypeError):
@@ -423,6 +441,9 @@ class TestTorontonianSampling:
         mean_n = 0.5
         samples = torontonian_sample_graph(A, mean_n, samples=n_samples, parallel=parallel)
         assert np.all(samples[:, 0] == samples[:, 1])
+
+
+# def test_max_photons
 
 
 def test_seed():

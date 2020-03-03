@@ -140,7 +140,7 @@ def generate_hafnian_sample(
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
         if result[-1] == cutoff:
             return -1
-        if sum(result) > max_photons:
+        if np.sum(result) > max_photons:
             return -1
         prev_prob = probs1[result[-1]]
 
@@ -364,7 +364,7 @@ def generate_torontonian_sample(cov, hbar=2, max_photons=30):
 
         prev_prob = probs1a[result[-1]]
 
-        if np.sum(result) >= max_photons:
+        if np.sum(result) > max_photons:
             return -1
 
     return result
