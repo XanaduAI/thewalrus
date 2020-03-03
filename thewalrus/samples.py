@@ -44,9 +44,6 @@ Code details
 ------------
 """
 # pylint: disable=too-many-arguments
-import multiprocessing
-from multiprocessing import Pool
-
 import numpy as np
 from scipy.special import factorial as fac
 
@@ -233,7 +230,7 @@ def hafnian_sample_state(
     max_photons=30,
     approx=False,
     approx_samples=1e5,
-    pool=False,
+    parallel=False,
 ):
     r"""Returns samples from the Hafnian of a Gaussian state.
 
@@ -252,42 +249,38 @@ def hafnian_sample_state(
             to approximate the hafnian. Note that this can only be used for
             real, non-negative matrices.
         approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
-        pool (bool): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
-    if not pool:
-        params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
-        return _hafnian_sample(params)
+    # pylint: disable=import-outside-toplevel
+    if parallel:
+        try:
+            import dask
+        except:
+            raise ImportError(
+                "Dask must be installed for parallel evaluation. "
+                "\nDask can be installed using pip:"
+                "\n\npip install dask[delayed]"
+            )
 
-    pool = Pool()
-    nprocs = multiprocessing.cpu_count()
-    localsamps = samples // nprocs
+        params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
+        compute_list = []
+        for p in params:
+            compute_list.append(dask.delayed(_hafnian_sample)(p))
 
-    params = [[cov, localsamps, mean, hbar, cutoff, max_photons, approx, approx_samples]] * (nprocs - 1)
-    params.append(
-        [
-            cov,
-            samples - localsamps * (nprocs - 1),
-            mean,
-            hbar,
-            cutoff,
-            max_photons,
-            approx,
-            approx_samples,
-        ]
-    )
+        results = dask.compute(*compute_list, scheduler="threads")
 
-    result = np.vstack(pool.map(_hafnian_sample, params))
-    pool.close()  # no more tasks
-    pool.join()  # wrap up current tasks
+        return np.vstack(results)
 
-    return result
+    params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
+    return _hafnian_sample(params)
+
 
 
 def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, pool=False
+    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
 ):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
@@ -301,7 +294,7 @@ def hafnian_sample_graph(
         approx (bool): if ``True``, the approximate hafnian algorithm is used.
             Note that this can only be used for real, non-negative matrices.
         approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
-        pool (bool): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
@@ -317,7 +310,7 @@ def hafnian_sample_graph(
         max_photons=max_photons,
         approx=approx,
         approx_samples=approx_samples,
-        pool=pool,
+        parallel=parallel,
     )
 
 
@@ -439,7 +432,7 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, pool=False):
+def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=False):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -450,30 +443,37 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, pool=False):
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         max_photons (int): specifies the maximum number of clicks that can be counted.
-        pool (boolean): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
-    if not pool:
-        params = [cov, samples, hbar, max_photons]
-        return _torontonian_sample(params)
+    # pylint: disable=import-outside-toplevel
+    if parallel:
+        try:
+            import dask
+        except:
+            raise ImportError(
+                "Dask must be installed for parallel evaluation. "
+                "\nDask can be installed using pip:"
+                "\n\npip install dask[delayed]"
+            )
 
-    pool = Pool()
-    nprocs = multiprocessing.cpu_count()
-    localsamps = samples // nprocs
+        params = [[cov, 1, hbar, max_photons]] * samples
+        compute_list = []
+        for p in params:
+            compute_list.append(dask.delayed(_torontonian_sample)(p))
 
-    params = [[cov, localsamps, hbar, max_photons]] * (nprocs - 1)
-    params.append([cov, samples - localsamps * (nprocs - 1), hbar, max_photons])
+        results = dask.compute(*compute_list, scheduler="threads")
 
-    result = np.vstack(pool.map(_torontonian_sample, params))
-    pool.close()  # no more tasks
-    pool.join()  # wrap up current tasks
+        return np.vstack(results)
 
-    return result
+    params = [cov, samples, hbar, max_photons]
+    return _torontonian_sample(params)
 
 
-def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
+
+def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=False):
     r"""Returns samples from the Torontonian of a Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -482,14 +482,14 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
         n_mean (float): mean photon number of the Gaussian state
         samples (int): the number of samples to return.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        pool (boolean): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Torontonian of the Gaussian state
     """
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q)
-    return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
+    return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, parallel=parallel)
 
 
 # pylint: disable=unused-argument
