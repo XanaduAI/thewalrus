@@ -4,11 +4,15 @@
 
 ### Improvements
 
+* Improves the efficiency of Hermite polynomial calculation in `hermite_multidimensional.hpp`. [#141](https://github.com/XanaduAI/thewalrus/pull/141)
+
 ### Bug fixes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Kieran Wilkinson
 
 
 
