@@ -4,13 +4,15 @@
 
 ### Improvements
 
+* Implements parallelization with Dask for sampling from the Hafnian/Torontonian of a Gaussian state. [#145](https://github.com/XanaduAI/thewalrus/pull/145)
+
 ### Bug fixes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-
+Theodor Isacsson
 
 
 ---
