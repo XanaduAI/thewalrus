@@ -84,7 +84,7 @@ jobs:
       - run:
           name: Build the Linux wheels.
           command: |
-            pip install --user cibuildwheel==0.10.2
+            pip install --user cibuildwheel==1.1.0
             python -m cibuildwheel --output-dir wheelhouse
       - run:
           name: Upload Linux wheels.
@@ -107,7 +107,7 @@ jobs:
     macos:
       xcode: "10.0.0"
     environment:
-      CIBW_SKIP: "cp27-* cp34-* cp38-* *i686"
+      CIBW_SKIP: "cp27-* cp34-* *i686"
       CIBW_BEFORE_BUILD_MACOS: brew cask uninstall --force oclint && brew install gcc eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
       CIBW_TEST_COMMAND: python -m pytest {project}/thewalrus

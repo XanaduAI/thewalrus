@@ -32,9 +32,12 @@ from thewalrus.quantum import (
     density_matrix_element,
     density_matrix,
     find_scaling_adjacency_matrix,
+    find_scaling_adjacency_matrix_torontonian,
+    mean_number_of_clicks,
     Covmat,
     gen_Qmat_from_graph,
     Means,
+    photon_number_covmat,
     is_valid_cov,
     is_pure_cov,
     pure_state_amplitude,
@@ -338,7 +341,7 @@ def test_density_matrix_squeezed():
 
     res = density_matrix(mu, V)
 
-    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
+    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248],])
 
     assert np.allclose(res, expected)
 
@@ -373,7 +376,7 @@ def test_density_matrix_squeezed_postselect():
 
     res = density_matrix(mu, V, post_select={0: 0}, cutoff=15, normalize=True)[:5, :5]
 
-    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
+    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248],])
 
     assert np.allclose(res, expected)
 
@@ -408,6 +411,24 @@ def test_find_scaling_adjacency_matrix():
     sc_num = find_scaling_adjacency_matrix(A, n_mean)
     assert np.allclose(sc_exact, sc_num)
 
+
+def test_find_scaling_adjacency_matrix_torontonian():
+    """Test the find_scaling_adjacency_matrix_torontonian for a multimode problem"""
+    n = 10
+    A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    A += A.T
+    nc = 3.0
+    x = find_scaling_adjacency_matrix_torontonian(A, nc)
+    assert np.allclose(mean_number_of_clicks(x * A), nc)
+
+def test_mean_number_of_clicks():
+    """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2 tanh(r)"""
+    r = 3.0
+    tr = np.tanh(r)
+    A = np.array([[0, tr], [tr, 0]])
+    value = mean_number_of_clicks(A)
+    expected = 2 * tr**2
+    assert np.allclose(expected, value)
 
 def test_Covmat():
     """ Test the Covmat function by checking that its inverse function is Qmat """
@@ -682,11 +703,11 @@ def test_single_mode_displacement(choi_r, tol):
     # np.array(displace(40,alpha).data.todense())[0:5,0:5]
     expected = np.array(
         [
-            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j],
-            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j],
-            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j],
-            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j],
-            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j],
+            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j,],
+            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j,],
+            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j,],
+            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j,],
+            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j,],
         ]
     )
     T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
@@ -833,3 +854,69 @@ def test_sf_ordering_in_fock_tensor(tol):
     T = fock_tensor(S, alphas, cutoff)
     Tsf = fock_tensor(S, alphas, cutoff, sf_order=True)
     assert np.allclose(T.transpose([0, 2, 1, 3]), Tsf, atol=tol, rtol=0)
+
+
+LIST_FUNCS = [np.zeros, np.ones, np.arange]
+
+@pytest.mark.parametrize("list_func", LIST_FUNCS)
+@pytest.mark.parametrize("N", [1, 2, 4])
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_coherent_state(tol, list_func, N, hbar):
+    r"""Test the covariance matrix :math:`\frac{\hbar}{2} \mathbb{I}`."""
+    cov = np.eye(2 * N) * hbar / 2
+    mu = list_func(2 * N)
+
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+    alpha = (mu[:N] ** 2 + mu[N:] ** 2) / (2 * hbar)
+
+    assert np.allclose(pnd_cov, np.diag(alpha), atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("r", np.linspace(0, 2, 4))
+@pytest.mark.parametrize("phi", np.linspace(0, np.pi, 4))
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_two_mode_squeeze_vacuum(tol, r, phi, hbar):
+    """Test the photon number distribution for the two-mode squeezed vacuum"""
+    S = two_mode_squeezing(r, phi)
+    mu = np.zeros(4)
+
+    cov = hbar / 2 * (S @ S.T)
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+    n = np.sinh(r) ** 2
+
+    assert np.allclose(pnd_cov, np.full((2, 2), n ** 2 + n), atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("n", np.linspace(0, 10, 4))
+@pytest.mark.parametrize("N", [1, 2, 4])
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_thermal(tol, n, N, hbar):
+    """Test the photon number distribution for thermal states"""
+    cov = np.eye(2 * N) * hbar / 2 * (2 * n + 1)
+    mu = np.zeros(2 * N)
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+
+    assert np.allclose(pnd_cov, np.diag([n ** 2 + n] * N), atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("r", np.linspace(0, 2, 4))
+@pytest.mark.parametrize("phi", np.linspace(0, np.pi, 4))
+@pytest.mark.parametrize("alpha", [0, 1.0, 1j, 1.0 + 1j])
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
+    """Test the photon number distribution for the squeezed displaced state
+
+    Eq. (17) in 'Benchmarking of Gaussian boson sampling using two-point correlators',
+    Phillips et al. (https://ris.utwente.nl/ws/files/122721825/PhysRevA.99.023836.pdf).
+    """
+    S = squeezing(r, phi)
+    mu = [np.sqrt(2 * hbar) * np.real(alpha), np.sqrt(2 * hbar) * np.imag(alpha)]
+
+    cov = hbar / 2 * (S @ S.T)
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+
+    pnd_cov_analytic = np.sinh(r) ** 2 * np.cosh(r) ** 2 + np.sinh(r) ** 4 \
+        + np.sinh(r) ** 2 + np.abs(alpha) ** 2 * (1 + 2 * np.sinh(r) ** 2) \
+        - 2 * np.real(alpha ** 2 * np.exp(-1j * phi) * np.sinh(r) * np.cosh(r))
+
+    assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
