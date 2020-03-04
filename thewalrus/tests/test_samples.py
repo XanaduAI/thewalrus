@@ -443,9 +443,6 @@ class TestTorontonianSampling:
         assert np.all(samples[:, 0] == samples[:, 1])
 
 
-# def test_max_photons
-
-
 def test_seed():
     """Tests that seed method does reset the random number generators"""
     n_samples = 10
