@@ -4,7 +4,10 @@
 
 ### Improvements
 
+
 * Improves the efficiency of Hermite polynomial calculation in `hermite_multidimensional.hpp`. [#141](https://github.com/XanaduAI/thewalrus/pull/141)
+
+* Implements parallelization with Dask for sampling from the Hafnian/Torontonian of a Gaussian state. [#145](https://github.com/XanaduAI/thewalrus/pull/145)
 
 ### Bug fixes
 
@@ -12,9 +15,8 @@
 
 This release contains contributions from (in alphabetical order):
 
-Kieran Wilkinson
 
-
+Theodor Isacsson, Kieran Wilkinson
 
 
 ---

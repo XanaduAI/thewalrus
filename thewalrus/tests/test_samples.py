@@ -57,6 +57,15 @@ def TMS_cov(r, phi):
 class TestHafnianSampling:
     """Tests for hafnian sampling"""
 
+    @pytest.mark.parametrize("max_photons", [10, 2, 0])
+    def test_hafnian_state_lowmax(self, max_photons):
+        """test sampling never exceeds max photons for hafnian"""
+        m = 0.432
+        phi = 0.546
+        V = TMS_cov(np.arcsinh(m), phi)
+        res = hafnian_sample_state(V, samples=10, max_photons=max_photons)
+        assert np.max(res) <= max_photons
+
     def test_TMS_hafnian_sample_states(self):
         """test sampling from TMS hafnians is correlated"""
         m = 0.432
@@ -229,7 +238,8 @@ class TestHafnianSampling:
         approx_mean_n = np.sum(samples) / n_samples
         assert np.allclose(mean_n, approx_mean_n, rtol=2e-1)
 
-    def test_single_pm_graphs(self):
+    @pytest.mark.parametrize("parallel", [True, False])
+    def test_single_pm_graphs(self, parallel):
         """Tests that the number of photons is the same for modes i and n-i
         in the special case of a graph with one single perfect matching
         """
@@ -238,9 +248,8 @@ class TestHafnianSampling:
         A = np.eye(n)[::-1]
         n_mean = 2
         nr_samples = 10
-        pool = False
         samples = hafnian_sample_graph(
-            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples, pool=pool
+            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples, parallel=parallel
         )
 
         test_passed = True
@@ -316,6 +325,15 @@ class TestHafnianSampling:
 
 class TestTorontonianSampling:
     """Tests for torontonian sampling"""
+
+    @pytest.mark.parametrize("max_photons", [10, 2, 0])
+    def test_torontonian_state_lowmax(self, max_photons):
+        """test sampling never exceeds max photons for torontonian"""
+        m = 0.432
+        phi = 0.546
+        V = TMS_cov(np.arcsinh(m), phi)
+        res = torontonian_sample_state(V, samples=10, max_photons=max_photons)
+        assert np.max(res) <= max_photons
 
     def test_torontonian_samples_nonnumpy(self):
         """test exception is raised if not a numpy array"""
@@ -415,14 +433,13 @@ class TestTorontonianSampling:
         probs[1] = 1 - probs[0]
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
-    def test_torontonian_sample_graph(self):
+    @pytest.mark.parametrize("parallel", [True, False])
+    def test_torontonian_sample_graph(self, parallel):
         """Test torontonian sampling from a graph"""
-        # Pool does not play nicely with pytest when all the test are run together
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
         n_samples = 1000
         mean_n = 0.5
-        pool = False
-        samples = torontonian_sample_graph(A, mean_n, samples=n_samples, pool=pool)
+        samples = torontonian_sample_graph(A, mean_n, samples=n_samples, parallel=parallel)
         assert np.all(samples[:, 0] == samples[:, 1])
 
 
