@@ -19,7 +19,7 @@ Classical Sampling Algorithms
 
 This submodule provides access to classical sampling algorithms for thermal states going through
 an interferometer specified by a real orthogonal matrix. The quantum state to be sampled is
-specified by positive semidefinite real matrix and a mean photon number. The algorithm implemented
+specified by a positive semidefinite real matrix and a mean photon number. The algorithm implemented
 here was first derived in
 
 * Saleh Rahimi-Keshari, Austin P Lund, and Timothy C Ralph.
