@@ -477,3 +477,145 @@ def Kgate(theta, cutoff, grad=False, dtype=np.complex128):
     if not grad:
         return np.diag(T), None
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
+
+@jit(nopython=True)
+def Ggate_jit(phiR, w, z, cutoff, dtype=np.complex128):
+    """Calculates the Fock representation of the single-mode Gaussian gate parametrized
+    as the product of the three gates R(phi)D(w)S(z).
+
+    Args:
+        phiR (float): angle of the phase rotation gate
+        w (complex): displacement parameter
+        z (complex): squeezing parameter
+        cutoff (int): Fock ladder cutoff
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        tuple[array[complex], array[complex] or None]: The Fock representations of the gate
+    """
+
+    rS = np.abs(z)
+    phiS = np.angle(z)
+    EZ = np.exp(1j*phiS)
+    T = np.tanh(rS)
+    S = 1/np.cosh(rS)
+    ER = np.exp(1j*phiR)
+    wc = np.conj(w)
+
+    # 2nd derivatives of G
+    R = np.array([
+        [-T*EZ*ER**2, ER*S],
+        [ER*S, T*np.conj(EZ)]
+    ])
+
+    # 1st derivatives of G
+    y = np.array([ER*(w + T*EZ*wc), -wc*S])
+
+    sqrt = np.sqrt(np.arange(cutoff))
+    Z = np.zeros((cutoff, cutoff), dtype=dtype)
+
+    Z[0, 0] = np.exp(-0.5*np.abs(w)**2 - 0.5*wc**2 * EZ * T)*np.sqrt(S)
+    Z[1, 0] = y[0] * Z[0, 0]
+
+    # rank 1
+    for m in range(2, cutoff):
+        Z[m, 0] = (y[0]/sqrt[m]*Z[m-1, 0] + R[0, 0]*sqrt[m-1]/sqrt[m]*Z[m-2, 0])
+
+    # rank 2
+    for m in range(cutoff):
+        for n in range(1, cutoff):
+            Z[m, n] = (y[1]/sqrt[n]*Z[m, n-1] + R[1, 1]*sqrt[n-1]/sqrt[n]*Z[m, n-2] + R[0, 1]*sqrt[m]/sqrt[n]*Z[m-1, n-1])
+
+    return Z
+
+@jit(nopython=True)
+def Ggate_gradients(phiR, w, z, gate):
+    """Computes the complex gradients with respect to all the parameters of the Gaussian gate.
+    As the parameters are complex, it returns two gradients per gate (with respect to the parameter and
+    with respect to its complex conjugate).
+
+    Args:
+        phiR (float): angle of the phase rotation gate
+        w (complex): displacement parameter
+        z (complex): squeezing parameter
+        gate (array): Gaussian gate evaluated at the same parameter values
+
+    Returns:
+        tuple[array[complex] x 5]: 1 gradient array for phiR and 2 gradient arrays for (complex) w and z.
+    """
+    dtype = gate.dtype
+    cutoff = gate.shape[0]
+    sqrt = np.sqrt(np.arange(cutoff))
+
+    rS = np.abs(z)
+    phiS = np.angle(z)
+    phiD = np.angle(w)
+    T = np.tanh(rS)
+    S = 1/np.cosh(rS)
+    wc = np.conj(w)
+
+    # Taylor series to avoid division by zero for rS -> 0
+    if rS > 1e-3:
+        TSplus = (T/rS + S**2)
+        TSminus = (T/rS - S**2)
+    else:
+        TSplus = (1 - rS**2/3 + S**2)
+        TSminus = (1 - rS**2/3 - S**2)
+
+    ### Gradient with respect to phiR
+
+    phi_a = 1j*(w*np.exp(1j*phiR) + wc*np.exp(1j*(phiR + phiS))*T)
+    phi_a2 = -1j*np.exp(1j*(2*phiR + phiS))*T
+    phi_ab = 1j*S*np.exp(1j*phiR)
+
+    Grad_phi = np.zeros((cutoff, cutoff), dtype=np.complex128)
+    for m in range(cutoff):
+        for n in range(cutoff):
+            Grad_phi[m, n] = phi_a*sqrt[m]*gate[m-1, n] + phi_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + phi_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1]
+
+    ### Gradients with respect to w
+
+    w_a = np.exp(1j*phiR)
+    w_1 = -0.5*wc
+
+    Grad_w = np.zeros((cutoff, cutoff), dtype=dtype)
+    for m in range(cutoff):
+        for n in range(cutoff):
+            Grad_w[m, n] = w_a*sqrt[m]*gate[m-1, n] + w_1*gate[m, n]
+
+    wc_a = np.exp(1j*(phiR+phiS))*T
+    wc_b = -S +0.0j
+    wc_1 = -0.5*w * (1 + 2*T*np.exp(1j*(phiS - 2*phiD)))
+
+    Grad_wconj = np.zeros((cutoff, cutoff), dtype=dtype)
+    for m in range(cutoff):
+        for n in range(cutoff):
+            Grad_wconj[m, n] = wc_a*sqrt[m]*gate[m-1, n] + wc_b*sqrt[n]*gate[m, n-1] + wc_1*gate[m, n]
+
+    ### Gradients with respect to z
+
+    z_a = 0.5*wc * np.exp(1j*phiR) * TSplus
+    z_a2 = - 0.25*np.exp(2*1j*phiR) * TSplus
+    z_b = 0.5*wc * np.exp(-1j*phiS) * T*S
+    z_b2 = -0.25*np.exp(-2*1j*phiS) * TSminus
+    z_ab = -0.5*np.exp(1j*(phiR-phiS))*T*S
+    z_1 = -0.25*wc**2 * TSplus - 0.25*np.exp(-1j*phiS)*T
+
+    Grad_z = np.zeros((cutoff, cutoff), dtype=dtype)
+    for m in range(cutoff):
+        for n in range(cutoff):
+            Grad_z[m, n] = z_a*sqrt[m]*gate[m-1, n] + z_b*sqrt[n]*gate[m, n-1] + z_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + z_b2*sqrt[n]*sqrt[n-1]*gate[m, n-2] + z_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1] + z_1*gate[m,n]
+
+    zc_a = -0.5*wc * np.exp(1j*(phiR + 2*phiS)) * TSminus
+    zc_a2 = 0.25*np.exp(2*1j*(phiR + phiS)) * TSminus
+    zc_b = 0.5*wc * np.exp(1j*phiS) * T*S
+    zc_b2 = 0.25 * TSplus + 0.0j
+    zc_ab = -0.5*np.exp(1j*(phiR+phiS))*T*S
+    zc_1 = 0.25*wc**2 *np.exp(2*1j*phiS)* TSminus - 0.25*np.exp(1j*phiS)*T
+
+    Grad_zconj = np.zeros((cutoff, cutoff), dtype=dtype)
+    for m in range(cutoff):
+        for n in range(cutoff):
+            Grad_zconj[m, n] = zc_a*sqrt[m]*gate[m-1, n] + zc_b*sqrt[n]*gate[m, n-1] + zc_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + zc_b2*sqrt[n]*sqrt[n-1]*gate[m, n-2] + zc_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1] + zc_1*gate[m,n]
+
+    return np.conj(Grad_phi), np.conj(Grad_w), Grad_wconj, np.conj(Grad_z), Grad_zconj
