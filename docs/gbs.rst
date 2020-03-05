@@ -123,7 +123,7 @@ This terminology is explained in the next section when sampling is discussed.
 
 Gaussian states in the Fock basis
 *********************************
-In this section we use a generalization :cite:`quesada2019franck,quesada2019simulating` of the results of Hamilton et al. :cite:`hamilton2017gaussian` by providing an explicit expression for Fock basis matrix elements :math:`\langle \bm{m} | \rho | \bm{n} \rangle`, :math:`\bm{n} = (n_0,\ldots, n_{\ell-1}), \bm{m} = (m_0,\ldots, m_{\ell-1})`, of an :math:`\ell`-mode Gaussian state :math:`\rho` with covariance matrix :math:`\bm{\bm{\sigma}}` and displacement vector :math:`\vec \beta`.
+In this section we use a generalization :cite:`quesada2019franck,quesada2019simulating` of the results of Hamilton et al. :cite:`hamilton2017gaussian` by providing an explicit expression for Fock basis matrix elements :math:`\langle \bm{m} | \rho | \bm{n} \rangle`, :math:`\bm{n} = (n_0,\ldots, n_{\ell-1}), \bm{m} = (m_0,\ldots, m_{\ell-1})`, of an :math:`\ell`-mode Gaussian state :math:`\rho` with covariance matrix :math:`\bm{\sigma}` and displacement vector :math:`\vec \beta`.
 Note that these matrix elements can also be calculated using multidimensional Hermite polynomials as shown by Dodonov et al. :cite:`dodonov1994multidimensional`. Depending on how many of these elements are required one can prefer to calculate loop hafnians or multidimensional Hermite polynomials. In particular if one only needs a few matrix elements it is more advantageous to use the formulas derived below. On the other hand if one requires **all** the matrix elements up to a certain Fock occupation cutoff it is more efficient to use the methods of Dodonov et al., which are also implemented in this library.
 
 
@@ -133,7 +133,7 @@ We first define the following useful quantities:
 		0 &  \mathbb{I} \\
 		\mathbb{I} & 0
 		\end{bmatrix} , \\
-	\bm{\Sigma} &= \bm{\bm{\sigma}} +\tfrac{1}{2} \mathbb{I}_{2\ell},\\
+	\bm{\Sigma} &= \bm{\sigma} +\tfrac{1}{2} \mathbb{I}_{2\ell},\\
 	T &=\frac{\exp\left(-\tfrac{1}{2} \vec \beta^\dagger \bm{\Sigma}^{-1} \vec \beta \right)}{ \sqrt{\text{det}(\bm{\Sigma}) \prod_{s=1}^\ell n_s! m_s!}},\\
 	\bm{p} &= (n_0,\ldots,n_{\ell-1},m_0,\ldots,m_{\ell-1}).
 
