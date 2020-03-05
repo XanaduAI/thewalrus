@@ -17,7 +17,22 @@ Classical Sampling Algorithms
 
 .. currentmodule:: thewalrus.csamples
 
-This submodule provides access to classical sampling algorithms.
+This submodule provides access to classical sampling algorithms for thermal states going through
+an interferometer specified by a real orthogonal matrix. The quantum state to be sampled is
+specified by positive semidefinite real matrix and a mean photon number. The algorithm implemented
+here was first derived in
+
+* Saleh Rahimi-Keshari, Austin P Lund, and Timothy C Ralph.
+  "What can quantum optics say about computational complexity theory?" `Physical Review Letters, 114(6):060501, (2015).
+  <https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.114.060501>`_
+
+For more precise details of the implementation see
+
+* Soran Jahangiri, Juan Miguel Arrazola, Nicolás Quesada, and Nathan Killoran.
+  "Point processes with Gaussian boson sampling" `Phys. Rev. E 101, 022134, (2020).
+  <https://journals.aps.org/pre/abstract/10.1103/PhysRevE.101.022134>`_.
+
+
 
 Summary
 -------
