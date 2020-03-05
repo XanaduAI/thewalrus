@@ -568,7 +568,7 @@ def Ggate_gradients(phiR, w, z, gate):
     phi_a2 = -1j*np.exp(1j*(2*phiR + phiS))*T
     phi_ab = 1j*S*np.exp(1j*phiR)
 
-    Grad_phi = np.zeros((cutoff, cutoff), dtype=np.complex128)
+    Grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
     for m in range(cutoff):
         for n in range(cutoff):
             Grad_phi[m, n] = phi_a*sqrt[m]*gate[m-1, n] + phi_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + phi_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1]
