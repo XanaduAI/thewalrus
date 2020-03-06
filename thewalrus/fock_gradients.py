@@ -499,7 +499,7 @@ def Ggate_jit(phiR, w, z, cutoff, dtype=np.complex128):
     EZ = np.exp(1j*phiS)
     T = np.tanh(rS)
     S = 1/np.cosh(rS)
-    ER = np.exp(1j*phiR)
+    ER = np.exp(-1j*phiR)
     wc = np.conj(w)
 
     # 2nd derivatives of G
@@ -564,9 +564,9 @@ def Ggate_gradients(phiR, w, z, gate):
 
     ### Gradient with respect to phiR
 
-    phi_a = 1j*(w*np.exp(1j*phiR) + wc*np.exp(1j*(phiR + phiS))*T)
-    phi_a2 = -1j*np.exp(1j*(2*phiR + phiS))*T
-    phi_ab = 1j*S*np.exp(1j*phiR)
+    phi_a = 1j*(w*np.exp(-1j*phiR) + wc*np.exp(1j*(-phiR + phiS))*T)
+    phi_a2 = -1j*np.exp(1j*(-2*phiR + phiS))*T
+    phi_ab = 1j*S*np.exp(-1j*phiR)
 
     Grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
     for m in range(cutoff):
@@ -575,7 +575,7 @@ def Ggate_gradients(phiR, w, z, gate):
 
     ### Gradients with respect to w
 
-    w_a = np.exp(1j*phiR)
+    w_a = np.exp(-1j*phiR)
     w_1 = -0.5*wc
 
     Grad_w = np.zeros((cutoff, cutoff), dtype=dtype)
@@ -583,7 +583,7 @@ def Ggate_gradients(phiR, w, z, gate):
         for n in range(cutoff):
             Grad_w[m, n] = w_a*sqrt[m]*gate[m-1, n] + w_1*gate[m, n]
 
-    wc_a = np.exp(1j*(phiR+phiS))*T
+    wc_a = np.exp(1j*(-phiR+phiS))*T
     wc_b = -S +0.0j
     wc_1 = -0.5*w * (1 + 2*T*np.exp(1j*(phiS - 2*phiD)))
 
@@ -594,11 +594,11 @@ def Ggate_gradients(phiR, w, z, gate):
 
     ### Gradients with respect to z
 
-    z_a = 0.5*wc * np.exp(1j*phiR) * TSplus
-    z_a2 = - 0.25*np.exp(2*1j*phiR) * TSplus
+    z_a = 0.5*wc * np.exp(-1j*phiR) * TSplus
+    z_a2 = - 0.25*np.exp(-2j*phiR) * TSplus
     z_b = 0.5*wc * np.exp(-1j*phiS) * T*S
-    z_b2 = -0.25*np.exp(-2*1j*phiS) * TSminus
-    z_ab = -0.5*np.exp(1j*(phiR-phiS))*T*S
+    z_b2 = -0.25*np.exp(-2j*phiS) * TSminus
+    z_ab = -0.5*np.exp(1j*(-phiR-phiS))*T*S
     z_1 = -0.25*wc**2 * TSplus - 0.25*np.exp(-1j*phiS)*T
 
     Grad_z = np.zeros((cutoff, cutoff), dtype=dtype)
@@ -606,11 +606,11 @@ def Ggate_gradients(phiR, w, z, gate):
         for n in range(cutoff):
             Grad_z[m, n] = z_a*sqrt[m]*gate[m-1, n] + z_b*sqrt[n]*gate[m, n-1] + z_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + z_b2*sqrt[n]*sqrt[n-1]*gate[m, n-2] + z_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1] + z_1*gate[m,n]
 
-    zc_a = -0.5*wc * np.exp(1j*(phiR + 2*phiS)) * TSminus
-    zc_a2 = 0.25*np.exp(2*1j*(phiR + phiS)) * TSminus
+    zc_a = -0.5*wc * np.exp(1j*(-phiR + 2*phiS)) * TSminus
+    zc_a2 = 0.25*np.exp(2*1j*(-phiR + phiS)) * TSminus
     zc_b = 0.5*wc * np.exp(1j*phiS) * T*S
     zc_b2 = 0.25 * TSplus + 0.0j
-    zc_ab = -0.5*np.exp(1j*(phiR+phiS))*T*S
+    zc_ab = -0.5*np.exp(1j*(-phiR+phiS))*T*S
     zc_1 = 0.25*wc**2 *np.exp(2*1j*phiS)* TSminus - 0.25*np.exp(1j*phiS)*T
 
     Grad_zconj = np.zeros((cutoff, cutoff), dtype=dtype)
