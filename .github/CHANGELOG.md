@@ -2,7 +2,7 @@
 
 ### New features
 
-* Adds the ability to calculate to calculate the mean number of photon in a given mode of a Gaussian state. [#148](https://github.com/XanaduAI/thewalrus/pull/148)
+* Adds the ability to calculate the mean number of photons in a given mode of a Gaussian state. [#148](https://github.com/XanaduAI/thewalrus/pull/148)
 
 ### Improvements
 
