@@ -46,6 +46,8 @@ from thewalrus.quantum import (
     total_photon_num_dist_pure_state,
     gen_single_mode_dist,
     fock_tensor,
+    photon_number_mean_vector,
+    photon_number_mean,
 )
 
 
@@ -862,41 +864,45 @@ LIST_FUNCS = [np.zeros, np.ones, np.arange]
 @pytest.mark.parametrize("N", [1, 2, 4])
 @pytest.mark.parametrize("hbar", [1, 2])
 def test_pnd_coherent_state(tol, list_func, N, hbar):
-    r"""Test the covariance matrix :math:`\frac{\hbar}{2} \mathbb{I}`."""
+    r"""Test the photon number mean and covariance of coherent states"""
     cov = np.eye(2 * N) * hbar / 2
     mu = list_func(2 * N)
 
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
     alpha = (mu[:N] ** 2 + mu[N:] ** 2) / (2 * hbar)
-
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar = hbar)
     assert np.allclose(pnd_cov, np.diag(alpha), atol=tol, rtol=0)
+    assert np.allclose(pnd_mean, alpha, atol=tol, rtol=0)
+
 
 
 @pytest.mark.parametrize("r", np.linspace(0, 2, 4))
 @pytest.mark.parametrize("phi", np.linspace(0, np.pi, 4))
 @pytest.mark.parametrize("hbar", [1, 2])
 def test_pnd_two_mode_squeeze_vacuum(tol, r, phi, hbar):
-    """Test the photon number distribution for the two-mode squeezed vacuum"""
+    """Test the photon number mean and covariance of the two-mode squeezed vacuum"""
     S = two_mode_squeezing(r, phi)
     mu = np.zeros(4)
 
     cov = hbar / 2 * (S @ S.T)
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
     n = np.sinh(r) ** 2
-
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar = hbar)
     assert np.allclose(pnd_cov, np.full((2, 2), n ** 2 + n), atol=tol, rtol=0)
-
+    assert np.allclose(pnd_mean, np.array([n, n]), atol=tol, rtol=0)
 
 @pytest.mark.parametrize("n", np.linspace(0, 10, 4))
 @pytest.mark.parametrize("N", [1, 2, 4])
 @pytest.mark.parametrize("hbar", [1, 2])
 def test_pnd_thermal(tol, n, N, hbar):
-    """Test the photon number distribution for thermal states"""
-    cov = np.eye(2 * N) * hbar / 2 * (2 * n + 1)
+    """Test the photon number mean and covariance of thermal states"""
+    cov = (2 * n + 1) * np.eye(2 * N) * hbar / 2
     mu = np.zeros(2 * N)
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
-
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar = hbar)
     assert np.allclose(pnd_cov, np.diag([n ** 2 + n] * N), atol=tol, rtol=0)
+    mean_expected = n * np.ones([N])
+    assert np.allclose(pnd_mean, mean_expected, atol=tol, rtol=0)
 
 
 @pytest.mark.parametrize("r", np.linspace(0, 2, 4))
@@ -904,7 +910,7 @@ def test_pnd_thermal(tol, n, N, hbar):
 @pytest.mark.parametrize("alpha", [0, 1.0, 1j, 1.0 + 1j])
 @pytest.mark.parametrize("hbar", [1, 2])
 def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
-    """Test the photon number distribution for the squeezed displaced state
+    """Test the photon number number mean and covariance of the squeezed displaced state
 
     Eq. (17) in 'Benchmarking of Gaussian boson sampling using two-point correlators',
     Phillips et al. (https://ris.utwente.nl/ws/files/122721825/PhysRevA.99.023836.pdf).
@@ -919,4 +925,6 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
         + np.sinh(r) ** 2 + np.abs(alpha) ** 2 * (1 + 2 * np.sinh(r) ** 2) \
         - 2 * np.real(alpha ** 2 * np.exp(-1j * phi) * np.sinh(r) * np.cosh(r))
 
+    mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
     assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
+    assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic)

@@ -87,6 +87,8 @@ Utility functions
     mean_number_of_clicks
     find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
+    photon_number_mean
+    photon_number_mean_vector
     photon_number_covar
     photon_number_covmat
     is_valid_cov
@@ -95,6 +97,7 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
+
 
 Details
 ^^^^^^^
@@ -749,10 +752,10 @@ def photon_number_mean(mu, cov, j, hbar=2):
     """
     num_modes = len(mu) // 2
     return (
-        mu[mode] ** 2
-        + mu[mode + num_modes] ** 2
-        + cov[mode, mode]
-        + cov[mode + num_modes, mode + num_modes]
+        mu[j] ** 2
+        + mu[j + num_modes] ** 2
+        + cov[j, j]
+        + cov[j + num_modes, j + num_modes]
         - hbar
     ) / (2 * hbar)
 
@@ -834,8 +837,9 @@ def photon_number_covmat(mu, cov, hbar=2):
     N = len(mu) // 2
     pnd_cov = np.zeros((N, N))
     for i in range(N):
-        for j in range(N):
+        for j in range(i+1):
             pnd_cov[i][j] = photon_number_covar(mu, cov, i, j, hbar=hbar)
+            pnd_cov[j][i] = pnd_cov[i][j]
     return pnd_cov
 
 
