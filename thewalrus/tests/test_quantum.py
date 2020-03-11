@@ -870,7 +870,7 @@ def test_pnd_coherent_state(tol, list_func, N, hbar):
 
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
     alpha = (mu[:N] ** 2 + mu[N:] ** 2) / (2 * hbar)
-    pnd_mean = photon_number_mean_vector(mu, cov, hbar = hbar)
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
     assert np.allclose(pnd_cov, np.diag(alpha), atol=tol, rtol=0)
     assert np.allclose(pnd_mean, alpha, atol=tol, rtol=0)
 
@@ -887,7 +887,7 @@ def test_pnd_two_mode_squeeze_vacuum(tol, r, phi, hbar):
     cov = hbar / 2 * (S @ S.T)
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
     n = np.sinh(r) ** 2
-    pnd_mean = photon_number_mean_vector(mu, cov, hbar = hbar)
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
     assert np.allclose(pnd_cov, np.full((2, 2), n ** 2 + n), atol=tol, rtol=0)
     assert np.allclose(pnd_mean, np.array([n, n]), atol=tol, rtol=0)
 
@@ -899,7 +899,7 @@ def test_pnd_thermal(tol, n, N, hbar):
     cov = (2 * n + 1) * np.eye(2 * N) * hbar / 2
     mu = np.zeros(2 * N)
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
-    pnd_mean = photon_number_mean_vector(mu, cov, hbar = hbar)
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
     assert np.allclose(pnd_cov, np.diag([n ** 2 + n] * N), atol=tol, rtol=0)
     mean_expected = n * np.ones([N])
     assert np.allclose(pnd_mean, mean_expected, atol=tol, rtol=0)
