@@ -338,7 +338,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
             haf = hafnian_repeated(A, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        haf *= prefactor(mu, cov, hbar=2)
+        haf *= prefactor(mu, cov, hbar=hbar)
 
     return haf / np.sqrt(np.prod(fac(rpt)))
 
