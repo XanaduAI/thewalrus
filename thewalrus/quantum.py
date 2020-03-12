@@ -521,7 +521,7 @@ def state_vector(
         np.array[complex]: the state vector of the Gaussian state
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
+        if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     beta = Beta(mu, hbar=hbar)
