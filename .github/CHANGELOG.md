@@ -11,7 +11,7 @@
 
 ### Bug fixes
 
-* Corrects the issue with hbar taking a default value when calling `state_vector` and `density_matrix_element` [#149]. (https://github.com/XanaduAI/thewalrus/pull/149)
+* Corrects the issue with hbar taking a default value when calling `state_vector` and `density_matrix_element` [#149](https://github.com/XanaduAI/thewalrus/pull/149)
 
 ### Contributors
 
