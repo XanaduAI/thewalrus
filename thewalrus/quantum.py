@@ -447,7 +447,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         complex: the pure state amplitude
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
+        if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
