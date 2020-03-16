@@ -341,7 +341,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
             haf = hafnian_repeated(A, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        haf *= prefactor(mu, cov, hbar=2)
+        haf *= prefactor(mu, cov, hbar=hbar)
 
     return haf / np.sqrt(np.prod(fac(rpt)))
 
@@ -450,7 +450,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
         complex: the pure state amplitude
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
+        if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
@@ -524,7 +524,7 @@ def state_vector(
         np.array[complex]: the state vector of the Gaussian state
     """
     if check_purity:
-        if not is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
+        if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     beta = Beta(mu, hbar=hbar)
@@ -567,7 +567,7 @@ def state_vector(
             modes = (np.arange(N)).tolist()
             el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
             psi[idx] = pure_state_amplitude(
-                mu, cov, el, check_purity=False, include_prefactor=False
+                mu, cov, el, check_purity=False, include_prefactor=False, hbar=hbar
             )
 
         psi = psi * pref
