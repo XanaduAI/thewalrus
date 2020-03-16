@@ -564,7 +564,7 @@ def state_vector(
             modes = (np.arange(N)).tolist()
             el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
             psi[idx] = pure_state_amplitude(
-                mu, cov, el, check_purity=False, include_prefactor=False
+                mu, cov, el, check_purity=False, include_prefactor=False, hbar=hbar
             )
 
         psi = psi * pref

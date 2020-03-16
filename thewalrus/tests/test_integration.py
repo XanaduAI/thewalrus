@@ -15,14 +15,15 @@
 # pylint: disable=no-self-use,redefined-outer-name
 
 import numpy as np
+import pytest
 from thewalrus.quantum import density_matrix, state_vector
 
-
-def test_cubic_phase():
+@pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0/137])
+def test_cubic_phase(hbar):
     """Test that all the possible ways of obtaining a cubic phase state using the different methods agree"""
-    mu = np.array([-0.50047867, 0.37373598, 0.01421683, 0.26999427, 0.04450994, 0.01903583])
+    mu = np.sqrt(hbar/2.0) * np.array([-0.50047867, 0.37373598, 0.01421683, 0.26999427, 0.04450994, 0.01903583])
 
-    cov = np.array(
+    cov = (hbar/2.0) * np.array(
         [
             [1.57884241, 0.81035494, 1.03468307, 1.14908791, 0.09179507, -0.11893174],
             [0.81035494, 1.06942863, 0.89359234, 0.20145142, 0.16202296, 0.4578259],
@@ -39,10 +40,10 @@ def test_cubic_phase():
     # the Fock state measurement of mode 1 to be post-selected
     m2 = 2
 
-    psi = state_vector(mu, cov, post_select={0: m1, 1: m2}, cutoff=cutoff, hbar=2)
-    psi_c = state_vector(mu, cov, cutoff=cutoff, hbar=2)[m1, m2, :]
-    rho = density_matrix(mu, cov, post_select={0: m1, 1: m2}, cutoff=cutoff, hbar=2)
-    rho_c = density_matrix(mu, cov, cutoff=cutoff, hbar=2)[m1, m1, m2, m2, :, :]
+    psi = state_vector(mu, cov, post_select={0: m1, 1: m2}, cutoff=cutoff, hbar=hbar)
+    psi_c = state_vector(mu, cov, cutoff=cutoff, hbar=hbar)[m1, m2, :]
+    rho = density_matrix(mu, cov, post_select={0: m1, 1: m2}, cutoff=cutoff, hbar=hbar)
+    rho_c = density_matrix(mu, cov, cutoff=cutoff, hbar=hbar)[m1, m1, m2, m2, :, :]
     assert np.allclose(np.outer(psi, psi.conj()), rho)
     assert np.allclose(np.outer(psi_c, psi_c.conj()), rho)
     assert np.allclose(rho_c, rho)
