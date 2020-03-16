@@ -291,7 +291,7 @@ def hafnian_sample_graph(
         np.array[int]: photon number samples from the Gaussian state
     """
     Q = gen_Qmat_from_graph(A, n_mean)
-    cov = Covmat(Q)
+    cov = Covmat(Q, hbar=2)
     return hafnian_sample_state(
         cov,
         samples,
@@ -469,7 +469,7 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=Fals
         np.array[int]: photon number samples from the Torontonian of the Gaussian state
     """
     Q = gen_Qmat_from_graph(A, n_mean)
-    cov = Covmat(Q)
+    cov = Covmat(Q, hbar=2)
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, parallel=parallel)
 
 
