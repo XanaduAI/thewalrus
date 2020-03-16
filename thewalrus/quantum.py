@@ -87,6 +87,8 @@ Utility functions
     mean_number_of_clicks
     find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
+    photon_number_mean
+    photon_number_mean_vector
     photon_number_covar
     photon_number_covmat
     is_valid_cov
@@ -95,6 +97,7 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
+
 
 Details
 ^^^^^^^
@@ -733,6 +736,28 @@ def gen_Qmat_from_graph(A, n_mean):
     Q = np.linalg.inv(I - X @ A)
     return Q
 
+def photon_number_mean(mu, cov, j, hbar=2):
+    r""" Calculate the mean photon number of mode j of a Gaussian state.
+
+    Args:
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
+        cov (array): the covariance matrix of the Gaussian state
+        j (int): the j :sup:`th` mode
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[q, p]=i\hbar`
+
+    Returns:
+        float: the mean photon number in mode :math:`j`.
+    """
+    num_modes = len(mu) // 2
+    return (
+        mu[j] ** 2
+        + mu[j + num_modes] ** 2
+        + cov[j, j]
+        + cov[j + num_modes, j + num_modes]
+        - hbar
+    ) / (2 * hbar)
 
 def photon_number_covar(mu, cov, j, k, hbar=2):
     r""" Calculate the variance/covariance of the photon number distribution
@@ -812,10 +837,28 @@ def photon_number_covmat(mu, cov, hbar=2):
     N = len(mu) // 2
     pnd_cov = np.zeros((N, N))
     for i in range(N):
-        for j in range(N):
+        for j in range(i+1):
             pnd_cov[i][j] = photon_number_covar(mu, cov, i, j, hbar=hbar)
+            pnd_cov[j][i] = pnd_cov[i][j]
     return pnd_cov
 
+
+def photon_number_mean_vector(mu, cov, hbar=2):
+    r""" Calculate the mean photon number of each of the modes in a Gaussian state
+
+    Args:
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
+        cov (array): the covariance matrix of the Gaussian state
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[q, p]=i\hbar`
+
+    Returns:
+        array: the vector of means of the photon number distribution
+    """
+
+    N = len(mu) // 2
+    return np.array([photon_number_mean(mu, cov, j, hbar=hbar) for j in range(N)])
 
 def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix.

@@ -2,6 +2,8 @@
 
 ### New features
 
+* Adds the ability to calculate the mean number of photons in a given mode of a Gaussian state. [#148](https://github.com/XanaduAI/thewalrus/pull/148)
+
 ### Improvements
 
 
@@ -18,7 +20,7 @@
 This release contains contributions from (in alphabetical order):
 
 
-Theodor Isacsson, Kieran Wilkinson
+Theodor Isacsson, Nicolas Quesada, Kieran Wilkinson
 
 
 ---
