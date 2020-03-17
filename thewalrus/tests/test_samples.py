@@ -461,7 +461,7 @@ def test_photon_number_sampler_out_of_bounds():
     probs = generate_probabilities(np.zeros([4]), cov, cutoff, hbar=hbar)
     samples = photon_number_sampler(probs, 1000, out_of_bounds='Coo coo ca choo')
     assert 'Coo coo ca choo' in samples
-    numerical_samples = np.array([x for x in samples if x!='Coo coo ca choo'])
+    numerical_samples = np.array([x for x in samples if x != "Coo coo ca choo"])
     assert np.allclose(numerical_samples[:, 0], numerical_samples[:, 1])
 
 def test_seed():
