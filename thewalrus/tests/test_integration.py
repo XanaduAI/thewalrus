@@ -19,6 +19,8 @@ import pytest
 from scipy.linalg import block_diag
 from thewalrus.quantum import density_matrix, state_vector, generate_probabilities, update_probabilities_with_loss
 from thewalrus.symplectic import expand, interferometer, two_mode_squeezing, loss
+
+
 @pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0/137])
 def test_cubic_phase(hbar):
     """Test that all the possible ways of obtaining a cubic phase state using the different methods agree"""
