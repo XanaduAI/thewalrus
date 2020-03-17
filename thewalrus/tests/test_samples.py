@@ -442,6 +442,7 @@ class TestTorontonianSampling:
         samples = torontonian_sample_graph(A, mean_n, samples=n_samples, parallel=parallel)
         assert np.all(samples[:, 0] == samples[:, 1])
 
+
 def test_photon_number_sampler_two_mode_squeezed():
     """Test the brute force sampler when one truncates the probability distribution """
     hbar = 2.0
