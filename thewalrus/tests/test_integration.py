@@ -49,6 +49,7 @@ def test_cubic_phase(hbar):
     assert np.allclose(np.outer(psi_c, psi_c.conj()), rho)
     assert np.allclose(rho_c, rho)
 
+
 @pytest.mark.parametrize("hbar", [2.0, 1.0/137])
 def test_four_modes(hbar):
     """ Test that probabilities are correctly updates for a four modes system under loss"""
