@@ -990,6 +990,7 @@ def test_loss_is_nonnegative_matrix(eta):
     M = loss_mat(eta, n)
     assert np.alltrue(M >= 0.0)
 
+
 @pytest.mark.parametrize("eta", [-1.0, 2.0])
 def test_loss_value_error(eta):
     """Tests the correct error is raised"""
