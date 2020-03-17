@@ -112,6 +112,7 @@ import numpy as np
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+from numba import jit
 
 from thewalrus.symplectic import expand, sympmat, is_symplectic
 
@@ -590,6 +591,7 @@ def mean_number_of_clicks(A):
 
     Args:
         A (array): rescaled adjacency matrix
+
     Returns:
         float: mean number of clicks
     """
@@ -966,6 +968,7 @@ def gen_multi_mode_dist(s, cutoff=50, padding_factor=2):
     Args:
         s (array): array of squeezing parameters
         cutoff (int): Fock cutoff
+
     Returns:
         (array[int]): total photon number distribution
     """
@@ -1014,6 +1017,7 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
         choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
         sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
+
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """
@@ -1054,13 +1058,15 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
 
 
 def generate_probabilities(mu, cov, cutoff, hbar=2.0):
-    """ Generate the Fock space probabilities of a Gaussian state with vector of mean
+    """ Generate the Fock space probabilities of Gaussian state with vector of mean
     mu and covariance matrix cov up Fock space cutoff.
+
     Args:
         mu (array): vector of means of length 2*n_modes
         cov (array): covariance matrix of shape [2*n_modes, 2*n_modes]
         cutoff (int): Fock space cutoff
         hbar (float): value of hbar
+
     Returns:
         (array): Fock space probabilities up to cutoff. The shape of this tensor is [cutoff]*num_modes
     """
@@ -1075,14 +1081,18 @@ def generate_probabilities(mu, cov, cutoff, hbar=2.0):
         # The maximum is needed because every now and then a probability is very close to zero from below.
     return probabilities
 
+
 @jit(nopython=True)
 def loss_mat(eta, cutoff):
     """ Constructs a binomial loss matrix with transmission eta up to n photons.
+
     Args:
         eta (float): Transmission coefficient. eta=0.0 means complete loss and eta=1.0 means no loss.
         n (int): photon number cutoff.
+
     Returns:
         array: `n\times n` matrix representing the loss.
+
     """
     # If full transmission return the identity
 
@@ -1100,3 +1110,31 @@ def loss_mat(eta, cutoff):
             for j in range(1, i + 1):
                 lm[i, j] = lm[i, j - 1] * (eta / mu) * (i - j + 1) / (j)
         return lm
+
+
+def update_probabilities_with_loss(etas, probs):
+    """ Give a list of transmissivities etas and a tensor of probabilitites probs it calculates
+    an updated tensor of probabilities after loss is applied.
+
+    Args:
+        etas (list): List of transmission descrbing the loss in each of the modes
+        probs (array): Array of probabilitites in the different modes
+
+    Returns:
+        array: List of loss-updated probabilities.
+
+    """
+
+    probs_shape = probs.shape
+    if len(probs_shape) != len(etas):
+        raise ValueError("The list of transmission etas and the tensor of probabilities probs have incompatible dimensions.")
+
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    cutoff = probs_shape[0]
+    for i, eta in enumerate(etas):
+        einstrings = "ij,{}i...->{}j...".format(alphabet[:i], alphabet[:i])
+
+        qein = np.zeros_like(probs)
+        qein = np.einsum(einstrings, loss_mat(eta, cutoff), probs)
+        probs = np.copy(qein)
+    return qein
