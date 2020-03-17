@@ -538,6 +538,7 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
 
 def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
     """ Given a photon-number probability mass function(PMF) it returns samples according to said PMF.
+
     Args:
         probabilities (array): probability tensor of the modes, has shape [cutoff]*num_modes
         num_samples (int): number of samples requested
