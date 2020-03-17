@@ -571,6 +571,7 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
     probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
     return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 
+
 def seed(seed_val=None):
     r""" Seeds the random number generator used in the sampling algorithms.
 
