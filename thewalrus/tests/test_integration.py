@@ -53,9 +53,10 @@ def test_cubic_phase(hbar):
 def test_four_modes(hbar):
     """ Test that probabilities are correctly updates for a four modes system under loss"""
     # All this block is to generate the correct covariance matrix.
-    # It correnponds to num_modes=4 modes that undergo two mode squeezing between modes i and i + (num_modes / 2)
-    # The signal and idlers see and interferometer with unitary matrix u2x2
-    # And then they see loss by amount eta
+    # It correnponds to num_modes=4 modes that undergo two mode squeezing between modes i and i + (num_modes / 2).
+    # Then they undergo displacement.
+    # The signal and idlers see and interferometer with unitary matrix u2x2.
+    # And then they see loss by amount etas[i].
     num_modes = 4
     theta = 0.45
     phi = 0.7

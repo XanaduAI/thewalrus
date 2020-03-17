@@ -1063,7 +1063,7 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
 
 def generate_probabilities(mu, cov, cutoff, hbar=2.0):
     """ Generate the Fock space probabilities of Gaussian state with vector of mean
-    mu and covariance matrix cov up Fock space cutoff.
+    mu and covariance matrix cov up to Fock space cutoff.
 
     Args:
         mu (array): vector of means of length 2*n_modes
@@ -1075,7 +1075,7 @@ def generate_probabilities(mu, cov, cutoff, hbar=2.0):
         (array): Fock space probabilities up to cutoff. The shape of this tensor is [cutoff]*num_modes
     """
     if is_pure_cov(cov, hbar=hbar):  # Check if the covariance matrix cov is pure
-        return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar)) ** 2
+        return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
     probabilities = np.zeros([cutoff] * num_modes)
     for i in product(range(cutoff), repeat=num_modes):
@@ -1117,7 +1117,7 @@ def loss_mat(eta, cutoff):
 
 
 def update_probabilities_with_loss(etas, probs):
-    """ Give a list of transmissivities etas and a tensor of probabilitites probs it calculates
+    """ Given a list of transmissivities etas and a tensor of probabilitites probs it calculates
     an updated tensor of probabilities after loss is applied.
 
     Args:

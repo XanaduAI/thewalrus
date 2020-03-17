@@ -541,7 +541,7 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
     Args:
         probabilities (array): probability tensor of the modes, has shape [cutoff]*num_modes
         num_samples (int): number of samples requested
-        out_of_bounds (boolean): if False is renormalizes the probability distribution. If not False it returns
+        out_of_bounds (boolean): if False it renormalizes the probability distribution. If not False it returns
             out_of_bounds as place holder for samples where more than the cutoff of probabilities are detected.
     Returns
         (array): Samples, with shape [num_sample, num_modes]
