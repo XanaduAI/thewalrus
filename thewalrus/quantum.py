@@ -1087,7 +1087,7 @@ def generate_probabilities(mu, cov, cutoff, hbar=2.0):
 
 
 @jit(nopython=True)
-def loss_mat(eta, cutoff):
+def loss_mat(eta, cutoff): # pragma: no cover
     """ Constructs a binomial loss matrix with transmission eta up to n photons.
 
     Args:
