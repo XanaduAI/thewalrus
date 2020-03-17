@@ -4,6 +4,12 @@
 
 * Adds the ability to calculate the mean number of photons in a given mode of a Gaussian state. [#148](https://github.com/XanaduAI/thewalrus/pull/148)
 
+* Adds the ability to calculate the photon number distribution of a pure state or mixed state using `generate_probabilities`. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
+
+* Allows to update the photon number distirbution when undergoing loss by using `update_probabilities_with_loss`. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
+
+* Adds a brute force sampler `photon_number_sampler` that given a (multi-)mode photon number distribution generates photon number samples. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
+
 ### Improvements
 
 

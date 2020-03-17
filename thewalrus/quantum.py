@@ -51,6 +51,7 @@ Fock states and tensors
     density_matrix
     fock_tensor
     generate_probabilities
+    update_probabilities_with_loss
 
 Details
 ^^^^^^^
@@ -72,6 +73,9 @@ Details
 
 .. autofunction::
     generate_probabilities
+
+.. autofunction::
+    update_probabilities_with_loss
 
 Utility functions
 -----------------

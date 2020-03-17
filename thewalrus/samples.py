@@ -40,6 +40,12 @@ Torontonian sampling
     torontonian_sample_graph
     torontonian_sample_classical_state
 
+Brute force sampling
+--------------------
+
+.. autosummary::
+    photon_number_sampler
+
 Code details
 ------------
 """
