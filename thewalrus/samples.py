@@ -550,7 +550,7 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
     cutoff = probabilities.shape[0]
     sum_p = np.sum(probabilities)
 
-    if renorm is False:
+    if out_of_bounds is False:
         probabilities = probabilities.flatten() / sum_p
         vals = np.arange(cutoff**num_modes, dtype=int)
         return [
