@@ -1105,15 +1105,15 @@ def loss_mat(eta, cutoff):
 
     if eta == 1.0:
         return np.identity(cutoff)
-    else:
-        # Otherwise construct the matrix elements recursively
-        lm = np.zeros((cutoff, cutoff))
-        mu = 1.0 - eta
-        lm[:, 0] = mu ** (np.arange(cutoff))
-        for i in range(cutoff):
-            for j in range(1, i + 1):
-                lm[i, j] = lm[i, j - 1] * (eta / mu) * (i - j + 1) / (j)
-        return lm
+
+    # Otherwise construct the matrix elements recursively
+    lm = np.zeros((cutoff, cutoff))
+    mu = 1.0 - eta
+    lm[:, 0] = mu ** (np.arange(cutoff))
+    for i in range(cutoff):
+        for j in range(1, i + 1):
+            lm[i, j] = lm[i, j - 1] * (eta / mu) * (i - j + 1) / (j)
+    return lm
 
 
 def update_probabilities_with_loss(etas, probs):

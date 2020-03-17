@@ -960,6 +960,7 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
 def test_update_with_loss_coherent_states(etas, etai, hbar):
+    """Checks probabilities are updated correctly for coherent states"""
     n_modes = 2
     cov = hbar * np.identity(2 * n_modes) / 2
     eta_vals = [etas, etai]

@@ -536,22 +536,21 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
     )
 
 
-def photon_number_sampler(probabilities, num_samples, renorm=True, out_of_bounds=False):
+def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
     """ Given a photon-number probability mass function(PMF) it returns samples according to said PMF.
     Args:
         probabilities (array): probability tensor of the modes, has shape [cutoff]*num_modes
         num_samples (int): number of samples requested
+        out_of_bounds (boolean): if False is renormalizes the probability distribution. If not False it returns
+            out_of_bounds as place holder for samples where more than the cutoff of probabilities are detected.
     Returns
         (array): Samples, with shape [num_sample, num_modes]
     """
-    if (renorm is True and out_of_bounds is not False) or (renorm is False and out_of_bounds is False):
-        raise ValueError("One and only one of renorm and out_of_bounds can be False")
-
     num_modes = len(probabilities.shape)
     cutoff = probabilities.shape[0]
     sum_p = np.sum(probabilities)
 
-    if renorm is True:
+    if renorm is False:
         probabilities = probabilities.flatten() / sum_p
         vals = np.arange(cutoff**num_modes, dtype=int)
         return [
@@ -559,19 +558,17 @@ def photon_number_sampler(probabilities, num_samples, renorm=True, out_of_bounds
             for _ in range(num_samples)
             ]
 
-    if out_of_bounds is not False:
+    upper_limit = cutoff ** num_modes
 
-        upper_limit = cutoff ** num_modes
+    def sorter(index):
+        if index == upper_limit:
+            return out_of_bounds
 
-        def sorter(index):
-            if index == upper_limit:
-                return out_of_bounds
-            else:
-                return np.unravel_index(index, [cutoff] * num_modes)
+        return np.unravel_index(index, [cutoff] * num_modes)
 
-        vals = np.arange(1 + cutoff**num_modes, dtype=int)
-        probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
-        return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
+    vals = np.arange(1 + cutoff**num_modes, dtype=int)
+    probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
+    return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 
 def seed(seed_val=None):
     r""" Seeds the random number generator used in the sampling algorithms.
