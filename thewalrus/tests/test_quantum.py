@@ -938,7 +938,6 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
 def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
     """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
-#    hbar = 2.0
     cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
     cov2 = hbar * cov2 @ cov2.T / 2.0
     mean2 = np.zeros([4])
