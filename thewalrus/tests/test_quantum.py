@@ -50,6 +50,7 @@ from thewalrus.quantum import (
     photon_number_mean,
     generate_probabilities,
     update_probabilities_with_loss,
+    loss_mat,
 )
 
 
@@ -971,3 +972,30 @@ def test_update_with_loss_coherent_states(etas, etai, hbar):
     probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
+
+
+
+@pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
+def test_loss_is_stochastic_matrix(eta):
+    """Test the loss matrix is an stochastic matrix, implying that the sum
+    of the entries a long the rows is 1"""
+    n = 50
+    M = loss_mat(eta, n)
+    assert np.allclose(np.sum(M, axis=1), np.ones([n]))
+
+
+@pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
+def test_loss_is_nonnegative_matrix(eta):
+    """Test the loss matrix is a nonnegative matrix"""
+    n = 50
+    M = loss_mat(eta, n)
+    assert np.alltrue(M >= 0.0)
+
+@pytest.mark.parametrize("eta", [-1.0, 2.0])
+def test_loss_value_error(eta):
+    """Tests the correct error is raised"""
+    n = 50
+    with pytest.raises(
+        ValueError, match="The transmission parameter eta should be a number between 0 and 1."
+    ):
+        loss_mat(eta, n)
