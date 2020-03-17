@@ -453,6 +453,7 @@ def test_photon_number_sampler_two_mode_squeezed():
     samples = np.array(photon_number_sampler(probs, 1000))
     assert np.allclose(samples[:, 0], samples[:, 1])
 
+
 def test_photon_number_sampler_out_of_bounds():
     """Test the brute force sampler when one use 'Coo coo ca choo' as the string for out_of_bounds"""
     hbar = 2.0
@@ -464,6 +465,7 @@ def test_photon_number_sampler_out_of_bounds():
     assert 'Coo coo ca choo' in samples
     numerical_samples = np.array([x for x in samples if x != "Coo coo ca choo"])
     assert np.allclose(numerical_samples[:, 0], numerical_samples[:, 1])
+
 
 def test_seed():
     """Tests that seed method does reset the random number generators"""
