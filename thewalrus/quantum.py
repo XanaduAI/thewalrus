@@ -1095,7 +1095,8 @@ def loss_mat(eta, cutoff): # pragma: no cover
         n (int): photon number cutoff.
 
     Returns:
-        array: `n\times n` matrix representing the loss.
+        array: :math:`n\times n` matrix representing the loss.
+
 
     """
     # If full transmission return the identity
