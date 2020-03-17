@@ -974,7 +974,6 @@ def test_update_with_loss_coherent_states(etas, etai, hbar):
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
 
 
-
 @pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
 def test_loss_is_stochastic_matrix(eta):
     """Test the loss matrix is an stochastic matrix, implying that the sum
