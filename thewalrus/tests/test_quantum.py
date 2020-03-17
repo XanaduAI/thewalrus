@@ -20,7 +20,7 @@ import pytest
 import numpy as np
 from scipy.linalg import qr
 
-from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter
+from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
 from thewalrus.quantum import (
     reduced_gaussian,
@@ -48,6 +48,8 @@ from thewalrus.quantum import (
     fock_tensor,
     photon_number_mean_vector,
     photon_number_mean,
+    generate_probabilities,
+    update_probabilities_with_loss,
 )
 
 
@@ -928,3 +930,44 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
     mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
     assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
     assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic, atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+@pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
+def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
+    """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
+#    hbar = 2.0
+    cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
+    cov2 = hbar * cov2 @ cov2.T / 2.0
+    mean2 = np.zeros([4])
+    eta2 = [etas, etai]
+    cov2l = np.copy(cov2)
+
+    for i, eta in enumerate(eta2):
+        mean2, cov2l = loss(mean2, cov2l, eta, i, hbar=hbar)
+
+    cutoff = 6
+    probs = generate_probabilities(mean2, cov2l, cutoff, hbar=hbar)
+    probs_lossless = generate_probabilities(mean2, cov2, 3 * cutoff, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(eta2, probs_lossless)
+
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
+
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+@pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
+def test_update_with_loss_coherent_states(etas, etai, hbar):
+    n_modes = 2
+    cov = hbar * np.identity(2 * n_modes) / 2
+    eta_vals = [etas, etai]
+    means = 2 * np.random.rand(2 * n_modes)
+    means_lossy = np.sqrt(np.array(eta_vals + eta_vals)) * means
+    cutoff = 6
+    probs_lossless = generate_probabilities(means, cov, 10 * cutoff, hbar=hbar)
+
+    probs = generate_probabilities(means_lossy, cov, cutoff, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
+
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)

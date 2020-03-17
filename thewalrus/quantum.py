@@ -1117,7 +1117,7 @@ def update_probabilities_with_loss(etas, probs):
     an updated tensor of probabilities after loss is applied.
 
     Args:
-        etas (list): List of transmission descrbing the loss in each of the modes
+        etas (list): List of transmission describing the loss in each of the modes
         probs (array): Array of probabilitites in the different modes
 
     Returns:

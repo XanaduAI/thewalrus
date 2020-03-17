@@ -16,8 +16,9 @@
 
 import numpy as np
 import pytest
-from thewalrus.quantum import density_matrix, state_vector
-
+from scipy.linalg import block_diag
+from thewalrus.quantum import density_matrix, state_vector, generate_probabilities, update_probabilities_with_loss
+from thewalrus.symplectic import expand, interferometer, two_mode_squeezing, loss
 @pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0/137])
 def test_cubic_phase(hbar):
     """Test that all the possible ways of obtaining a cubic phase state using the different methods agree"""
@@ -47,3 +48,41 @@ def test_cubic_phase(hbar):
     assert np.allclose(np.outer(psi, psi.conj()), rho)
     assert np.allclose(np.outer(psi_c, psi_c.conj()), rho)
     assert np.allclose(rho_c, rho)
+
+@pytest.mark.parametrize("hbar", [2.0, 1.0/137])
+def test_four_modes(hbar):
+    # All this block is to generate the correct covariance matrix.
+    # It correnponds to num_modes=4 modes that undergo two mode squeezing between modes i and i + (num_modes / 2)
+    # The signal and idlers see and interferometer with unitary matrix u2x2
+    # And then they see loss by amount eta
+    num_modes = 4
+    theta = 0.45
+    phi = 0.7
+    u2x2 = np.array([[np.cos(theta / 2), np.exp(1j * phi) * np.sin(theta / 2)],
+                    [-np.exp(-1j * phi) * np.sin(theta / 2), np.cos(theta / 2)]])
+
+    u4x4 = block_diag(u2x2, u2x2)
+
+    cov = np.identity(2 * num_modes) * hbar / 2
+    means = 0.5 * np.random.rand(2 * num_modes) * np.sqrt(hbar / 2)
+    rs = [0.1, 0.9]
+    n_half = num_modes // 2
+
+    for i, r_val in enumerate(rs):
+        Sexpanded = expand(two_mode_squeezing(r_val, 0.0), [i, n_half + i], num_modes)
+        cov = Sexpanded @ cov @ (Sexpanded.T)
+
+    Su = expand(interferometer(u4x4), range(num_modes), num_modes)
+    cov = Su @ cov @ (Su.T)
+    cov_lossless = np.copy(cov)
+    means_lossless = np.copy(means)
+    etas = [0.9, 0.7, 0.9, 0.1]
+
+    for i, eta in enumerate(etas):
+        means, cov = loss(means, cov, eta, i, hbar=hbar)
+
+    cutoff = 3
+    probs_lossless = generate_probabilities(means_lossless, cov_lossless, 4 * cutoff, hbar = hbar)
+    probs = generate_probabilities(means, cov, cutoff, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(etas, probs_lossless)
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff, :cutoff, :cutoff], atol = 1e-6)
