@@ -50,6 +50,7 @@ Fock states and tensors
     density_matrix_element
     density_matrix
     fock_tensor
+    generate_probabilities
 
 Details
 ^^^^^^^
@@ -69,6 +70,8 @@ Details
 .. autofunction::
     fock_tensor
 
+.. autofunction::
+    generate_probabilities
 
 Utility functions
 -----------------
@@ -1048,3 +1051,52 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
         return tensor.transpose(sf_indexing)
 
     return tensor
+
+
+def generate_probabilities(mu, cov, cutoff, hbar=2.0):
+    """ Generate the Fock space probabilities of a Gaussian state with vector of mean
+    mu and covariance matrix cov up Fock space cutoff.
+    Args:
+        mu (array): vector of means of length 2*n_modes
+        cov (array): covariance matrix of shape [2*n_modes, 2*n_modes]
+        cutoff (int): Fock space cutoff
+        hbar (float): value of hbar
+    Returns:
+        (array): Fock space probabilities up to cutoff. The shape of this tensor is [cutoff]*num_modes
+    """
+    if is_pure_cov(cov, hbar=hbar):  # Check if the covariance matrix cov is pure
+        return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar)) ** 2
+    num_modes = len(mu) // 2
+    probabilities = np.zeros([cutoff] * num_modes)
+    for i in product(range(cutoff), repeat=num_modes):
+        probabilities[i] = np.maximum(
+            0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
+        )
+        # The maximum is needed because every now and then a probability is very close to zero from below.
+    return probabilities
+
+@jit(nopython=True)
+def loss_mat(eta, cutoff):
+    """ Constructs a binomial loss matrix with transmission eta up to n photons.
+    Args:
+        eta (float): Transmission coefficient. eta=0.0 means complete loss and eta=1.0 means no loss.
+        n (int): photon number cutoff.
+    Returns:
+        array: `n\times n` matrix representing the loss.
+    """
+    # If full transmission return the identity
+
+    if eta < 0.0 or eta > 1.0:
+        raise ValueError("The transmission parameter eta should be a number between 0 and 1.")
+
+    if eta == 1.0:
+        return np.identity(cutoff)
+    else:
+        # Otherwise construct the matrix elements recursively
+        lm = np.zeros((cutoff, cutoff))
+        mu = 1.0 - eta
+        lm[:, 0] = mu ** (np.arange(cutoff))
+        for i in range(cutoff):
+            for j in range(1, i + 1):
+                lm[i, j] = lm[i, j - 1] * (eta / mu) * (i - j + 1) / (j)
+        return lm
