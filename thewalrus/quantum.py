@@ -1062,17 +1062,18 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
 
 
 def generate_probabilities(mu, cov, cutoff, hbar=2.0):
-    """ Generate the Fock space probabilities of Gaussian state with vector of mean
-    mu and covariance matrix cov up to Fock space cutoff.
+    """Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
 
     Args:
-        mu (array): vector of means of length 2*n_modes
-        cov (array): covariance matrix of shape [2*n_modes, 2*n_modes]
+        mu (array): vector of means of length ``2*n_modes``
+
+        cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
+
         cutoff (int): Fock space cutoff
-        hbar (float): value of hbar
+        hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
 
     Returns:
-        (array): Fock space probabilities up to cutoff. The shape of this tensor is [cutoff]*num_modes
+        (array): Fock space probabilities up to cutoff. The shape of this tensor is ``[cutoff]*num_modes``.
     """
     if is_pure_cov(cov, hbar=hbar):  # Check if the covariance matrix cov is pure
         return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
@@ -1088,16 +1089,15 @@ def generate_probabilities(mu, cov, cutoff, hbar=2.0):
 
 @jit(nopython=True)
 def loss_mat(eta, cutoff): # pragma: no cover
-    """ Constructs a binomial loss matrix with transmission eta up to n photons.
+    """Constructs a binomial loss matrix with transmission eta up to n photons.
 
     Args:
-        eta (float): Transmission coefficient. eta=0.0 means complete loss and eta=1.0 means no loss.
+        eta (float): Transmission coefficient. ``eta=0.0`` corresponds to complete loss and ``eta=1.0`` corresponds to no loss.
+
         n (int): photon number cutoff.
 
     Returns:
         array: :math:`n\times n` matrix representing the loss.
-
-
     """
     # If full transmission return the identity
 
@@ -1118,16 +1118,15 @@ def loss_mat(eta, cutoff): # pragma: no cover
 
 
 def update_probabilities_with_loss(etas, probs):
-    """ Given a list of transmissivities etas and a tensor of probabilitites probs it calculates
+    """Given a list of transmissivities a tensor of probabilitites, calculate
     an updated tensor of probabilities after loss is applied.
 
     Args:
-        etas (list): List of transmission describing the loss in each of the modes
+        etas (list): List of transmissitivities describing the loss in each of the modes
         probs (array): Array of probabilitites in the different modes
 
     Returns:
         array: List of loss-updated probabilities.
-
     """
 
     probs_shape = probs.shape
