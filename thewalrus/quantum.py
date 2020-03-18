@@ -1076,13 +1076,13 @@ def probabilities(mu, cov, cutoff, hbar=2.0):
     if is_pure_cov(cov, hbar=hbar):  # Check if the covariance matrix cov is pure
         return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
-    probabilities = np.zeros([cutoff] * num_modes)
+    probs = np.zeros([cutoff] * num_modes)
     for i in product(range(cutoff), repeat=num_modes):
-        probabilities[i] = np.maximum(
+        probs[i] = np.maximum(
             0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
         )
         # The maximum is needed because every now and then a probability is very close to zero from below.
-    return probabilities
+    return probs
 
 
 @jit(nopython=True)
