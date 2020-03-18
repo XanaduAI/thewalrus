@@ -48,7 +48,7 @@ from thewalrus.quantum import (
     fock_tensor,
     photon_number_mean_vector,
     photon_number_mean,
-    generate_probabilities,
+    probabilities,
     update_probabilities_with_loss,
     loss_mat,
 )
@@ -948,8 +948,8 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
         mean2, cov2l = loss(mean2, cov2l, eta, i, hbar=hbar)
 
     cutoff = 6
-    probs = generate_probabilities(mean2, cov2l, cutoff, hbar=hbar)
-    probs_lossless = generate_probabilities(mean2, cov2, 3 * cutoff, hbar=hbar)
+    probs = probabilities(mean2, cov2l, cutoff, hbar=hbar)
+    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta2, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
@@ -966,9 +966,9 @@ def test_update_with_loss_coherent_states(etas, etai, hbar):
     means = 2 * np.random.rand(2 * n_modes)
     means_lossy = np.sqrt(np.array(eta_vals + eta_vals)) * means
     cutoff = 6
-    probs_lossless = generate_probabilities(means, cov, 10 * cutoff, hbar=hbar)
+    probs_lossless = probabilities(means, cov, 10 * cutoff, hbar=hbar)
 
-    probs = generate_probabilities(means_lossy, cov, cutoff, hbar=hbar)
+    probs = probabilities(means_lossy, cov, cutoff, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)

@@ -50,7 +50,7 @@ Fock states and tensors
     density_matrix_element
     density_matrix
     fock_tensor
-    generate_probabilities
+    probabilities
     update_probabilities_with_loss
 
 Details
@@ -72,7 +72,7 @@ Details
     fock_tensor
 
 .. autofunction::
-    generate_probabilities
+    probabilities
 
 .. autofunction::
     update_probabilities_with_loss
@@ -1061,15 +1061,13 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
     return tensor
 
 
-def generate_probabilities(mu, cov, cutoff, hbar=2.0):
-    """Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
+def probabilities(mu, cov, cutoff, hbar=2.0):
+    r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
 
     Args:
         mu (array): vector of means of length ``2*n_modes``
-
         cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
-
-        cutoff (int): Fock space cutoff
+        cutoff (int): cutoff in Fock space
         hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
 
     Returns:
@@ -1089,12 +1087,11 @@ def generate_probabilities(mu, cov, cutoff, hbar=2.0):
 
 @jit(nopython=True)
 def loss_mat(eta, cutoff): # pragma: no cover
-    """Constructs a binomial loss matrix with transmission eta up to n photons.
+    r"""Constructs a binomial loss matrix with transmission eta up to n photons.
 
     Args:
         eta (float): Transmission coefficient. ``eta=0.0`` corresponds to complete loss and ``eta=1.0`` corresponds to no loss.
-
-        n (int): photon number cutoff.
+        cutoff (int): cutoff in Fock space.
 
     Returns:
         array: :math:`n\times n` matrix representing the loss.
@@ -1126,7 +1123,7 @@ def update_probabilities_with_loss(etas, probs):
         probs (array): Array of probabilitites in the different modes
 
     Returns:
-        array: List of loss-updated probabilities.
+        array: List of loss-updated probabilities with the same shape as probs.
     """
 
     probs_shape = probs.shape

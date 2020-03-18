@@ -17,7 +17,7 @@
 import numpy as np
 import pytest
 from scipy.linalg import block_diag
-from thewalrus.quantum import density_matrix, state_vector, generate_probabilities, update_probabilities_with_loss
+from thewalrus.quantum import density_matrix, state_vector, probabilities, update_probabilities_with_loss
 from thewalrus.symplectic import expand, interferometer, two_mode_squeezing, loss
 
 
@@ -87,7 +87,7 @@ def test_four_modes(hbar):
         means, cov = loss(means, cov, eta, i, hbar=hbar)
 
     cutoff = 3
-    probs_lossless = generate_probabilities(means_lossless, cov_lossless, 4 * cutoff, hbar=hbar)
-    probs = generate_probabilities(means, cov, cutoff, hbar=hbar)
+    probs_lossless = probabilities(means_lossless, cov_lossless, 4 * cutoff, hbar=hbar)
+    probs = probabilities(means, cov, cutoff, hbar=hbar)
     probs_updated = update_probabilities_with_loss(etas, probs_lossless)
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff, :cutoff, :cutoff], atol=1e-6)
