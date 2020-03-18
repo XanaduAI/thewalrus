@@ -50,6 +50,8 @@ Fock states and tensors
     density_matrix_element
     density_matrix
     fock_tensor
+    probabilities
+    update_probabilities_with_loss
 
 Details
 ^^^^^^^
@@ -69,6 +71,11 @@ Details
 .. autofunction::
     fock_tensor
 
+.. autofunction::
+    probabilities
+
+.. autofunction::
+    update_probabilities_with_loss
 
 Utility functions
 -----------------
@@ -109,6 +116,7 @@ import numpy as np
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+from numba import jit
 
 from thewalrus.symplectic import expand, sympmat, is_symplectic
 
@@ -587,6 +595,7 @@ def mean_number_of_clicks(A):
 
     Args:
         A (array): rescaled adjacency matrix
+
     Returns:
         float: mean number of clicks
     """
@@ -963,6 +972,7 @@ def gen_multi_mode_dist(s, cutoff=50, padding_factor=2):
     Args:
         s (array): array of squeezing parameters
         cutoff (int): Fock cutoff
+
     Returns:
         (array[int]): total photon number distribution
     """
@@ -1011,6 +1021,7 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
         choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
         sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
+
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """
@@ -1048,3 +1059,83 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
         return tensor.transpose(sf_indexing)
 
     return tensor
+
+
+def probabilities(mu, cov, cutoff, hbar=2.0):
+    r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
+
+    Args:
+        mu (array): vector of means of length ``2*n_modes``
+        cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
+        cutoff (int): cutoff in Fock space
+        hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
+
+    Returns:
+        (array): Fock space probabilities up to cutoff. The shape of this tensor is ``[cutoff]*num_modes``.
+    """
+    if is_pure_cov(cov, hbar=hbar):  # Check if the covariance matrix cov is pure
+        return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
+    num_modes = len(mu) // 2
+    probs = np.zeros([cutoff] * num_modes)
+    for i in product(range(cutoff), repeat=num_modes):
+        probs[i] = np.maximum(
+            0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
+        )
+        # The maximum is needed because every now and then a probability is very close to zero from below.
+    return probs
+
+
+@jit(nopython=True)
+def loss_mat(eta, cutoff): # pragma: no cover
+    r"""Constructs a binomial loss matrix with transmission eta up to n photons.
+
+    Args:
+        eta (float): Transmission coefficient. ``eta=0.0`` corresponds to complete loss and ``eta=1.0`` corresponds to no loss.
+        cutoff (int): cutoff in Fock space.
+
+    Returns:
+        array: :math:`n\times n` matrix representing the loss.
+    """
+    # If full transmission return the identity
+
+    if eta < 0.0 or eta > 1.0:
+        raise ValueError("The transmission parameter eta should be a number between 0 and 1.")
+
+    if eta == 1.0:
+        return np.identity(cutoff)
+
+    # Otherwise construct the matrix elements recursively
+    lm = np.zeros((cutoff, cutoff))
+    mu = 1.0 - eta
+    lm[:, 0] = mu ** (np.arange(cutoff))
+    for i in range(cutoff):
+        for j in range(1, i + 1):
+            lm[i, j] = lm[i, j - 1] * (eta / mu) * (i - j + 1) / (j)
+    return lm
+
+
+def update_probabilities_with_loss(etas, probs):
+    """Given a list of transmissivities a tensor of probabilitites, calculate
+    an updated tensor of probabilities after loss is applied.
+
+    Args:
+        etas (list): List of transmissitivities describing the loss in each of the modes
+        probs (array): Array of probabilitites in the different modes
+
+    Returns:
+        array: List of loss-updated probabilities with the same shape as probs.
+    """
+
+    probs_shape = probs.shape
+    if len(probs_shape) != len(etas):
+        raise ValueError("The list of transmission etas and the tensor of probabilities probs have incompatible dimensions.")
+
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    cutoff = probs_shape[0]
+    for i, eta in enumerate(etas):
+        einstrings = "ij,{}i...->{}j...".format(alphabet[:i], alphabet[:i])
+
+        qein = np.zeros_like(probs)
+        qein = np.einsum(einstrings, loss_mat(eta, cutoff), probs)
+        probs = np.copy(qein)
+    return qein

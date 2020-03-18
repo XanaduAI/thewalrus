@@ -20,7 +20,7 @@ import pytest
 import numpy as np
 from scipy.linalg import qr
 
-from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter
+from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
 from thewalrus.quantum import (
     reduced_gaussian,
@@ -48,6 +48,9 @@ from thewalrus.quantum import (
     fock_tensor,
     photon_number_mean_vector,
     photon_number_mean,
+    probabilities,
+    update_probabilities_with_loss,
+    loss_mat,
 )
 
 
@@ -928,3 +931,71 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
     mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
     assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
     assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic, atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+@pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
+def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
+    """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
+    cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
+    cov2 = hbar * cov2 @ cov2.T / 2.0
+    mean2 = np.zeros([4])
+    eta2 = [etas, etai]
+    cov2l = np.copy(cov2)
+
+    for i, eta in enumerate(eta2):
+        mean2, cov2l = loss(mean2, cov2l, eta, i, hbar=hbar)
+
+    cutoff = 6
+    probs = probabilities(mean2, cov2l, cutoff, hbar=hbar)
+    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(eta2, probs_lossless)
+
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
+
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+@pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
+def test_update_with_loss_coherent_states(etas, etai, hbar):
+    """Checks probabilities are updated correctly for coherent states"""
+    n_modes = 2
+    cov = hbar * np.identity(2 * n_modes) / 2
+    eta_vals = [etas, etai]
+    means = 2 * np.random.rand(2 * n_modes)
+    means_lossy = np.sqrt(np.array(eta_vals + eta_vals)) * means
+    cutoff = 6
+    probs_lossless = probabilities(means, cov, 10 * cutoff, hbar=hbar)
+
+    probs = probabilities(means_lossy, cov, cutoff, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
+
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
+
+
+@pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
+def test_loss_is_stochastic_matrix(eta):
+    """Test the loss matrix is an stochastic matrix, implying that the sum
+    of the entries a long the rows is 1"""
+    n = 50
+    M = loss_mat(eta, n)
+    assert np.allclose(np.sum(M, axis=1), np.ones([n]))
+
+
+@pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
+def test_loss_is_nonnegative_matrix(eta):
+    """Test the loss matrix is a nonnegative matrix"""
+    n = 50
+    M = loss_mat(eta, n)
+    assert np.alltrue(M >= 0.0)
+
+
+@pytest.mark.parametrize("eta", [-1.0, 2.0])
+def test_loss_value_error(eta):
+    """Tests the correct error is raised"""
+    n = 50
+    with pytest.raises(
+        ValueError, match="The transmission parameter eta should be a number between 0 and 1."
+    ):
+        loss_mat(eta, n)

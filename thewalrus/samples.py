@@ -40,6 +40,12 @@ Torontonian sampling
     torontonian_sample_graph
     torontonian_sample_classical_state
 
+Brute force sampling
+--------------------
+
+.. autosummary::
+    photon_number_sampler
+
 Code details
 ------------
 """
@@ -528,6 +534,43 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
     return np.where(
         hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
     )
+
+
+def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
+    """Given a photon-number probability mass function(PMF) it returns samples according to said PMF.
+
+    Args:
+        probabilities (array): probability tensor of the modes, has shape ``[cutoff]*num_modes``
+        num_samples (int): number of samples requested
+        out_of_bounds (boolean): if ``False`` the probability distribution is renormalized. If not ``False``, the value of
+            ``out_of_bounds`` is used as a placeholder for samples where more than the cutoff of probabilities are detected.
+
+    Returns:
+        (array): Samples, with shape [num_sample, num_modes]
+    """
+    num_modes = len(probabilities.shape)
+    cutoff = probabilities.shape[0]
+    sum_p = np.sum(probabilities)
+
+    if out_of_bounds is False:
+        probabilities = probabilities.flatten() / sum_p
+        vals = np.arange(cutoff**num_modes, dtype=int)
+        return [
+            np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
+            for _ in range(num_samples)
+            ]
+
+    upper_limit = cutoff ** num_modes
+
+    def sorter(index):
+        if index == upper_limit:
+            return out_of_bounds
+
+        return np.unravel_index(index, [cutoff] * num_modes)
+
+    vals = np.arange(1 + cutoff**num_modes, dtype=int)
+    probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
+    return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 
 
 def seed(seed_val=None):

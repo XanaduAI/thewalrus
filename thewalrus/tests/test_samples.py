@@ -26,9 +26,9 @@ from thewalrus.samples import (
     hafnian_sample_classical_state,
     torontonian_sample_classical_state,
     seed,
+    photon_number_sampler,
 )
-from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element
-
+from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
 seed(137)
 
 rel_tol = 3.0
@@ -441,6 +441,30 @@ class TestTorontonianSampling:
         mean_n = 0.5
         samples = torontonian_sample_graph(A, mean_n, samples=n_samples, parallel=parallel)
         assert np.all(samples[:, 0] == samples[:, 1])
+
+
+def test_photon_number_sampler_two_mode_squeezed():
+    """Test the brute force sampler when one truncates the probability distribution """
+    hbar = 2.0
+    r = np.arcsinh(1.0)
+    cov = TMS_cov(r, 0.0)
+    cutoff = 10
+    probs = probabilities(np.zeros([4]), cov, cutoff, hbar=hbar)
+    samples = np.array(photon_number_sampler(probs, 1000))
+    assert np.allclose(samples[:, 0], samples[:, 1])
+
+
+def test_photon_number_sampler_out_of_bounds():
+    """Test the brute force sampler when one use 'Coo coo ca choo' as the string for out_of_bounds"""
+    hbar = 2.0
+    r = np.arcsinh(np.sqrt(100))
+    cov = TMS_cov(r, 0.0)
+    cutoff = 5
+    probs = probabilities(np.zeros([4]), cov, cutoff, hbar=hbar)
+    samples = photon_number_sampler(probs, 1000, out_of_bounds='Coo coo ca choo')
+    assert 'Coo coo ca choo' in samples
+    numerical_samples = np.array([x for x in samples if x != "Coo coo ca choo"])
+    assert np.allclose(numerical_samples[:, 0], numerical_samples[:, 1])
 
 
 def test_seed():
