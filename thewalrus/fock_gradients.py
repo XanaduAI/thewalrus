@@ -491,7 +491,7 @@ def Ggate_jit(phiR, w, z, cutoff, dtype=np.complex128):
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        tuple[array[complex], array[complex] or None]: The Fock representations of the gate
+        array[complex]: The Fock representation of the gate
     """
 
     rS = np.abs(z)
@@ -619,3 +619,113 @@ def Ggate_gradients(phiR, w, z, gate):
             Grad_zconj[m, n] = zc_a*sqrt[m]*gate[m-1, n] + zc_b*sqrt[n]*gate[m, n-1] + zc_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + zc_b2*sqrt[n]*sqrt[n-1]*gate[m, n-2] + zc_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1] + zc_1*gate[m,n]
 
     return np.conj(Grad_phi), np.conj(Grad_w), Grad_wconj, np.conj(Grad_z), Grad_zconj
+
+
+@jit(nopython=True)
+def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
+    """Calculates the Fock representation of the two-mode Gaussian gate parametrized
+    as the product of the gates R(phi1)xR(phi2) D(w1) x D(w2) BS(th1,vphi1) S(z1)xS(z2) BS(th2,vphi2).
+
+    Args:
+        phi12 (float, float): angles of the phase rotation gates
+        w12 (complex, complex): displacement parameters
+        BS1 (float, float): angles of the first beamsplitter
+        z12 (complex, complex): squeezing parameters
+        BS2 (float, float): angles of the second beamsplitter
+        cutoff (int): Fock ladder cutoff
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array[complex]: The Fock representation of the gate
+    """
+    # init variables
+    phi1, phi2 = phi12
+    w1, w2 = w12
+    th1, vphi1 = BS1
+    th2, vphi2 = BS2
+    z1, z2 = z12
+    
+    # derived quantities
+    S1 = 1/np.cosh(np.abs(z1))
+    S2 = 1/np.cosh(np.abs(z2))
+    T1 = np.tanh(np.abs(z1))
+    T2 = np.tanh(np.abs(z2))
+    
+    c1 = np.cos(th1)
+    c2 = np.cos(th2)
+    s1 = np.sin(th1)
+    s2 = np.sin(th2)
+    
+    zeta1 = np.angle(z1)
+    zeta2 = np.angle(z2)
+    
+    w1c = np.conj(w1)
+    w2c = np.conj(w2)
+    
+    # 2nd derivatives of G (order: a1, b1, a2, b2), omitted symmetric lower part
+    R = np.array([
+        [-np.exp(2j*phi1)*(np.exp(1j*zeta1)*c1**2*T1 + np.exp(1j*(zeta2-2*vphi1))*s1**2*T2),
+         np.exp(1j*phi1)*(c1*c2*S1 - np.exp(1j*(-vphi1+vphi2))*S2*s1*s2),
+         np.exp(1j*(phi1+phi2+vphi1))*c1*s1*(-np.exp(1j*zeta1)*T1 + np.exp(1j*(zeta2-2*vphi1))*T2),
+         np.exp(1j*phi1)*(-np.exp(-1j*vphi1)*c2*S2*s1 - np.exp(-1j*vphi2)*c1*S1*s2)
+        ],
+        [0,
+         np.exp(-1j*zeta1)*c2**2*T1 + np.exp(-1j*(zeta2-2*vphi2))*s2**2*T2,
+         np.exp(1j*phi2)*(np.exp(1j*vphi1)*c2*S1*s1 + np.exp(1j*vphi2)*c1*S2*s2),
+         -np.exp(-1j*(zeta1+zeta2+vphi2))*c2*s2*(np.exp(1j*zeta2)*T1-np.exp(1j*(zeta1+2*vphi2))*T2)
+        ],
+        [0,
+         0,
+         np.exp(2j*phi2)*(-np.exp(1j*(zeta1+2*vphi1))*s1**2*T1 - np.exp(1j*zeta2)*c1**2*T2),
+         np.exp(1j*phi2)*(c1*c2*S2 - np.exp(-1j*(-vphi1+vphi2))*S1*s1*s2)
+        ],
+        [0,
+         0,
+         0,
+         np.exp(-1j*(zeta1 + 2*vphi2))*s2**2*T1 + np.exp(-1j*zeta2)*c2**2*T2
+        ]
+    ])
+    print(R)
+    # recurring quantities
+    C = (-c1*w1c - np.exp(1j*vphi1)*s1*w2c)
+    D = (np.exp(-1j*vphi1)*s1*w1c - c1*w2c)
+
+    # 1st derivatives of G
+    y = np.array([
+        np.exp(1j*phi1)*(w1-np.exp(1j*zeta1)*c1*C*T1 + np.exp(1j*(zeta2-vphi1))*s1*D*T2),
+        np.exp(1j*vphi2)*S2*s2*D + c2*S1*C,
+        np.exp(1j*phi2)*(w2-np.exp(1j*(zeta1+2*vphi1))*s1*C*T1 - np.exp(1j*zeta2)*c1*D*T2),
+        c2*S2*D - np.exp(-1j*vphi2)*S1*s2*C
+    ])
+    print(y)
+    
+    sqrt = np.sqrt(np.arange(cutoff))
+    Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    
+    Z[0,0,0,0] = np.sqrt(S1*S2)*np.exp(0.5*(-np.abs(w1)**2 - np.abs(w2**2) - np.exp(1j*zeta1)*T1*C**2 - np.exp(1j*zeta2)*T2*D**2))
+    
+    # rank 1
+    for m in range(1, cutoff):
+        Z[m,0,0,0] = y[0]/sqrt[m]*Z[m-1,0,0,0] + R[0,0]*sqrt[m-1]/sqrt[m]*Z[m-2,0,0,0]
+
+    
+    # rank 2
+    for m in range(cutoff):
+        for n in range(1, cutoff):
+            Z[m,n,0,0] = y[1]/sqrt[n]*Z[m,n-1,0,0] + sqrt[m]/sqrt[n]*R[0,1]*Z[m-1,n-1,0,0] + sqrt[n-1]/sqrt[n]*R[1,1]*Z[m,n-2,0,0]
+
+    
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(1, cutoff):
+                Z[m,n,p,0] = y[2]/sqrt[p]*Z[m,n,p-1,0] + sqrt[m]/sqrt[p]*R[0,2]*Z[m-1,n,p-1,0] + sqrt[n]/sqrt[p]*R[1,2]*Z[m,n-1,p-1,0] + sqrt[p-1]/sqrt[p]*R[2,2]*Z[m,n,p-2,0]
+
+    # rank 4
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                for q in range(1, cutoff):
+                    Z[m,n,p,q] = y[3]/sqrt[q]*Z[m,n,p,q-1] + sqrt[m]/sqrt[q]*R[0,3]*Z[m-1,n,p,q-1] + sqrt[n]/sqrt[q]*R[1,3]*Z[m,n-1,p,q-1] + sqrt[p]/sqrt[q]*R[2,3]*Z[m,n,p-1,q-1] + sqrt[q-1]/sqrt[q]*R[3,3]*Z[m,n,p,q-2]
+                    
+    return Z
