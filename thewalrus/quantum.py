@@ -1159,7 +1159,7 @@ def update_probabilities_with_noise(probs_noise, probs):
     probs_shape = probs.shape
     num_modes = len(probs_shape)
     cutoff = probs_shape[0]
-    if num_modes != len(probs_shape):
+    if num_modes != len(probs_noise):
         raise ValueError(
             "The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions."
         )
