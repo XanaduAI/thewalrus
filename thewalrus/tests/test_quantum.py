@@ -19,6 +19,7 @@ import pytest
 
 import numpy as np
 from scipy.linalg import qr
+from scipy.stats import poisson,geom
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
@@ -50,6 +51,7 @@ from thewalrus.quantum import (
     photon_number_mean,
     probabilities,
     update_probabilities_with_loss,
+    update_probabilities_with_noise,
     loss_mat,
 )
 
@@ -999,3 +1001,7 @@ def test_loss_value_error(eta):
         ValueError, match="The transmission parameter eta should be a number between 0 and 1."
     ):
         loss_mat(eta, n)
+
+
+def update_with_noise_coherent():
+    nbar = 

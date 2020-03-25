@@ -52,6 +52,7 @@ Fock states and tensors
     fock_tensor
     probabilities
     update_probabilities_with_loss
+    update_probabilities_with_noise
 
 Details
 ^^^^^^^
@@ -76,6 +77,9 @@ Details
 
 .. autofunction::
     update_probabilities_with_loss
+
+.. autofunction::
+    update_probabilities_with_noise
 
 Utility functions
 -----------------
@@ -1139,3 +1143,51 @@ def update_probabilities_with_loss(etas, probs):
         qein = np.einsum(einstrings, loss_mat(eta, cutoff), probs)
         probs = np.copy(qein)
     return qein
+
+
+def update_probabilities_with_noise(probs_noise, probs):
+    """Given a list of noise probability distributions for each of the modes and a tensor of 
+    probabilitites, calculate an updated tensor of probabilities after noise is applied.
+    
+    Args:
+        probs_noise (list): List of probability distributions describing the noise in each of the modes
+        probs (array): Array of probabilitites in the different modes
+
+    Returns:
+        array: List of noise-updated probabilities with the same shape as probs.
+    """
+    probs_shape = probs.shape
+    num_modes = len(probs_shape)
+    cutoff = probs_shape[0]
+    if num_modes != len(probs_shape):
+        raise ValueError(
+            "The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions."
+        )
+
+    @jit(nopython=True)
+    def update_1d(probs, one_d):
+        """ Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is we do not use ``np.convolve``.
+
+        Args:
+            probs (array): (multidimensional) array
+            one_d (array): one dimensional array
+
+        Returns:
+            (array): the convolution of the two arrays, with the same shape as ``probs``. 
+        """
+        cutoff = probs.shape[0]
+        new_d = np.zeros_like(probs)
+        for i in range(cutoff):
+            for j in range(min(i + 1, len(one_d))):
+                new_d[i] += probs[i - j] * one_d[j]
+        return new_d
+
+    for k in range(num_modes): #update one mode at a time
+        perm = np.arange(num_modes)
+        perm[0] = k
+        perm[k] = 0
+        one_d = probs_noise[k]
+        probs_masked = np.transpose(probs, axes=perm)
+        probs_masked = update_1d(probs_masked, one_d)
+        probs = np.transpose(probs_masked, axes=perm)
+    return probs
