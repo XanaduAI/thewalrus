@@ -19,7 +19,7 @@ import pytest
 
 import numpy as np
 from scipy.linalg import qr
-from scipy.stats import poisson,geom
+from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
@@ -1017,7 +1017,6 @@ def test_update_with_noise_coherent(num_modes):
 
     probs = probabilities(means, cov, cutoff, hbar=2)
     updated_probs = update_probabilities_with_noise(noise_dists, probs)
-    total_nbar_vals = nbar_vals + np.abs(beta) ** 2
     beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
     means_expected = Means(
         np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
