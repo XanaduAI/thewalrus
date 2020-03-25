@@ -1002,39 +1002,44 @@ def test_loss_value_error(eta):
     ):
         loss_mat(eta, n)
 
+
 @pytest.mark.parametrize("num_modes", [1, 2, 3])
 def test_update_with_noise_coherent(num_modes):
+    """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
     cutoff = 15
     nbar_vals = np.random.rand(num_modes)
     noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
     hbar = 2
-    beta = np.random.rand(num_modes)+1j*np.random.rand(num_modes)
+    beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
     means = Means(np.concatenate((beta, beta.conj())), hbar=hbar)
-    cov = hbar*np.identity(2*num_modes)/2
+    cov = hbar * np.identity(2 * num_modes) / 2
     cutoff = 10
 
-    probs = probabilities(means, cov, cutoff, hbar = 2)
+    probs = probabilities(means, cov, cutoff, hbar=2)
     updated_probs = update_probabilities_with_noise(noise_dists, probs)
-    total_nbar_vals = nbar_vals+np.abs(beta)**2
-    beta_expected = np.sqrt(nbar_vals+np.abs(beta)**2)
-    means_expected = Means(np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar)
-    expected = probabilities(means_expected, cov, cutoff, hbar = 2)
+    total_nbar_vals = nbar_vals + np.abs(beta) ** 2
+    beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
+    means_expected = Means(
+        np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
+    )
+    expected = probabilities(means_expected, cov, cutoff, hbar=2)
     assert np.allclose(updated_probs, expected)
+
 
 def test_update_with_noise_coherent_value_error():
     """Tests the correct error is raised"""
     cutoff = 15
     num_modes = 3
-    nbar_vals = np.random.rand(num_modes-1)
+    nbar_vals = np.random.rand(num_modes - 1)
     noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
     hbar = 2
-    beta = np.random.rand(num_modes)+1j*np.random.rand(num_modes)
+    beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
     means = Means(np.concatenate((beta, beta.conj())), hbar=hbar)
-    cov = hbar*np.identity(2*num_modes)/2
+    cov = hbar * np.identity(2 * num_modes) / 2
     cutoff = 10
-    probs = probabilities(means, cov, cutoff, hbar = 2)
+    probs = probabilities(means, cov, cutoff, hbar=2)
     with pytest.raises(
-        ValueError, match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions."
-
+        ValueError,
+        match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions.",
     ):
         update_probabilities_with_noise(noise_dists, probs)
