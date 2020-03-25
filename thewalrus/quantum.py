@@ -1148,7 +1148,7 @@ def update_probabilities_with_loss(etas, probs):
 def update_probabilities_with_noise(probs_noise, probs):
     """Given a list of noise probability distributions for each of the modes and a tensor of
     probabilitites, calculate an updated tensor of probabilities after noise is applied.
-    
+
     Args:
         probs_noise (list): List of probability distributions describing the noise in each of the modes
         probs (array): Array of probabilitites in the different modes
@@ -1173,7 +1173,7 @@ def update_probabilities_with_noise(probs_noise, probs):
             one_d (array): one dimensional array
 
         Returns:
-            (array): the convolution of the two arrays, with the same shape as ``probs``. 
+            (array): the convolution of the two arrays, with the same shape as ``probs``.
         """
         new_d = np.zeros_like(probs)
         for i in range(cutoff):
