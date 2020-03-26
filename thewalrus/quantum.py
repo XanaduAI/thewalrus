@@ -1166,7 +1166,8 @@ def update_probabilities_with_noise(probs_noise, probs):
 
     @jit(nopython=True)
     def update_1d(probs, one_d): # pragma: no cover
-        """ Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
+        """Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
+
 
         Args:
             probs (array): (multidimensional) array
