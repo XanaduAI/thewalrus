@@ -1145,12 +1145,13 @@ def update_probabilities_with_loss(etas, probs):
     return qein
 
 @jit(nopython=True)
-def _update_1d(probs, one_d): # pragma: no cover
+def _update_1d(probs, one_d, cutoff): # pragma: no cover
     """ Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
 
     Args:
         probs (array): (multidimensional) array
         one_d (array): one dimensional array
+        cutoff (int): cutoff in Fock space for the first array
 
     Returns:
         (array): the convolution of the two arrays, with the same shape as ``probs``.
@@ -1186,6 +1187,6 @@ def update_probabilities_with_noise(probs_noise, probs):
         perm[k] = 0
         one_d = probs_noise[k]
         probs_masked = np.transpose(probs, axes=perm)
-        probs_masked = _update_1d(probs_masked, one_d)
+        probs_masked = _update_1d(probs_masked, one_d, cutoff)
         probs = np.transpose(probs_masked, axes=perm)
     return probs
