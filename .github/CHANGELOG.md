@@ -8,6 +8,8 @@
 
 * Allows to update the photon number distribution when undergoing loss by using `update_probabilities_with_loss`. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
 
+* Allows to update the photon number distribution when undergoing noise `update_probabilities_with_noise`. [#153](https://github.com/XanaduAI/thewalrus/pull/153)
+
 * Adds a brute force sampler `photon_number_sampler` that given a (multi-)mode photon number distribution generates photon number samples. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
 
 ### Improvements

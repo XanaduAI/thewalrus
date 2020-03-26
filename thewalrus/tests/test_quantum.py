@@ -19,6 +19,7 @@ import pytest
 
 import numpy as np
 from scipy.linalg import qr
+from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
@@ -50,6 +51,7 @@ from thewalrus.quantum import (
     photon_number_mean,
     probabilities,
     update_probabilities_with_loss,
+    update_probabilities_with_noise,
     loss_mat,
 )
 
@@ -999,3 +1001,44 @@ def test_loss_value_error(eta):
         ValueError, match="The transmission parameter eta should be a number between 0 and 1."
     ):
         loss_mat(eta, n)
+
+
+@pytest.mark.parametrize("num_modes", [1, 2, 3])
+def test_update_with_noise_coherent(num_modes):
+    """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
+    cutoff = 15
+    nbar_vals = np.random.rand(num_modes)
+    noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
+    hbar = 2
+    beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means = Means(np.concatenate((beta, beta.conj())), hbar=hbar)
+    cov = hbar * np.identity(2 * num_modes) / 2
+    cutoff = 10
+
+    probs = probabilities(means, cov, cutoff, hbar=2)
+    updated_probs = update_probabilities_with_noise(noise_dists, probs)
+    beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
+    means_expected = Means(
+        np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
+    )
+    expected = probabilities(means_expected, cov, cutoff, hbar=2)
+    assert np.allclose(updated_probs, expected)
+
+
+def test_update_with_noise_coherent_value_error():
+    """Tests the correct error is raised"""
+    cutoff = 15
+    num_modes = 3
+    nbar_vals = np.random.rand(num_modes - 1)
+    noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
+    hbar = 2
+    beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means = Means(np.concatenate((beta, beta.conj())), hbar=hbar)
+    cov = hbar * np.identity(2 * num_modes) / 2
+    cutoff = 10
+    probs = probabilities(means, cov, cutoff, hbar=2)
+    with pytest.raises(
+        ValueError,
+        match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions.",
+    ):
+        update_probabilities_with_noise(noise_dists, probs)
