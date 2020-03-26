@@ -1144,6 +1144,22 @@ def update_probabilities_with_loss(etas, probs):
         probs = np.copy(qein)
     return qein
 
+@jit(nopython=True)
+def _update_1d(probs, one_d): # pragma: no cover
+    """ Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
+
+    Args:
+        probs (array): (multidimensional) array
+        one_d (array): one dimensional array
+
+    Returns:
+        (array): the convolution of the two arrays, with the same shape as ``probs``.
+    """
+    new_d = np.zeros_like(probs)
+    for i in range(cutoff):
+        for j in range(min(i + 1, len(one_d))):
+            new_d[i] += probs[i - j] * one_d[j]
+    return new_d
 
 def update_probabilities_with_noise(probs_noise, probs):
     """Given a list of noise probability distributions for each of the modes and a tensor of
@@ -1164,29 +1180,12 @@ def update_probabilities_with_noise(probs_noise, probs):
             "The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions."
         )
 
-    @jit(nopython=True)
-    def update_1d(probs, one_d): # pragma: no cover
-        """ Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
-
-        Args:
-            probs (array): (multidimensional) array
-            one_d (array): one dimensional array
-
-        Returns:
-            (array): the convolution of the two arrays, with the same shape as ``probs``.
-        """
-        new_d = np.zeros_like(probs)
-        for i in range(cutoff):
-            for j in range(min(i + 1, len(one_d))):
-                new_d[i] += probs[i - j] * one_d[j]
-        return new_d
-
     for k in range(num_modes): #update one mode at a time
         perm = np.arange(num_modes)
         perm[0] = k
         perm[k] = 0
         one_d = probs_noise[k]
         probs_masked = np.transpose(probs, axes=perm)
-        probs_masked = update_1d(probs_masked, one_d)
+        probs_masked = _update_1d(probs_masked, one_d)
         probs = np.transpose(probs_masked, axes=perm)
     return probs
