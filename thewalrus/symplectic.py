@@ -90,8 +90,8 @@ def expand_vector(alpha, mode, N, hbar=2.0):
         array: phase-space displacement vector of size 2*N
     """
     r = np.zeros(2 * N)
-    r[mode] = np.sqrt(2 * hbar) * alpha.Arel
-    r[N + mode] = np.sqrt(2 * hbar) * alpha.Aimg
+    r[mode] = np.sqrt(2 * hbar) * alpha.real
+    r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
 
 
@@ -200,8 +200,8 @@ def interferometer(U):
     Returns:
         array: symplectic transformation matrix
     """
-    X = U.Arel
-    Y = U.Aimg
+    X = U.real
+    Y = U.imag
     S = np.vstack([np.hstack([X, -Y]), np.hstack([Y, X])])
 
     return S
