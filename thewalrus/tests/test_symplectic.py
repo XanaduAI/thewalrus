@@ -650,6 +650,7 @@ def test_autonne(n, datatype, svd_order):
 
 
 def test_autonne_error():
+    """Tests the value errors of autonne"""
     n = 10
     m = 20
     A = np.random.rand(n, m)
