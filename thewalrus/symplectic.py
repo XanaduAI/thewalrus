@@ -90,8 +90,8 @@ def expand_vector(alpha, mode, N, hbar=2.0):
         array: phase-space displacement vector of size 2*N
     """
     r = np.zeros(2 * N)
-    r[mode] = np.sqrt(2 * hbar) * alpha.real
-    r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
+    r[mode] = np.sqrt(2 * hbar) * alpha.Arel
+    r[N + mode] = np.sqrt(2 * hbar) * alpha.Aimg
     return r
 
 
@@ -200,8 +200,8 @@ def interferometer(U):
     Returns:
         array: symplectic transformation matrix
     """
-    X = U.real
-    Y = U.imag
+    X = U.Arel
+    Y = U.Aimg
     S = np.vstack([np.hstack([X, -Y]), np.hstack([Y, X])])
 
     return S
@@ -288,7 +288,7 @@ def rotation(theta):
 
 
 def sympmat(N):
-    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
+    r"""Returns the matrix :math:`\Omega_n = \begin{Brix}0 & I_n\\ -I_n & 0\end{Brix}`
 
     Args:
         N (int): positive integer
@@ -335,17 +335,20 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
         tuple[array, array]: (r, U), where r are the singular values,
             and U is the Autonne-Takagi unitary, such that :math:`A = U \diag(r) U^T`.
     """
+    n, m = A.shape
+    if n != m:
+        raise ValueError("The input matrix is not square")
     if not np.allclose(A, A.T, rtol=rtol, atol=atol):
         raise ValueError("The input matrix is not symmetric")
-    reA = A.real
-    imA = A.imag
-    n, m = A.shape
-    Bmat = np.empty((2 * n, 2 * n))
-    Bmat[:n, :n] = reA
-    Bmat[n : 2 * n, :n] = imA
-    Bmat[:n, n : 2 * n] = imA
-    Bmat[n : 2 * n, n : 2 * n] = -reA
-    vals, vects = np.linalg.eigh(Bmat)
+    Areal = A.real
+    Aimag = A.imag
+
+    B = np.empty((2 * n, 2 * n))
+    B[:n, :n] = Areal
+    B[n : 2 * n, :n] = Aimag
+    B[:n, n : 2 * n] = Aimag
+    B[n : 2 * n, n : 2 * n] = -Areal
+    vals, vects = np.linalg.eigh(B)
     U = vects[:n, n : 2 * n] + 1j * vects[n : 2 * n, n : 2 * n]
     if svd_order:
         return (vals[n : 2 * n])[::-1], U[:, ::-1]
