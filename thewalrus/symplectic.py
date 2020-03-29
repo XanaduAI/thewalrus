@@ -288,7 +288,7 @@ def rotation(theta):
 
 
 def sympmat(N):
-    r"""Returns the matrix :math:`\Omega_n = \begin{Brix}0 & I_n\\ -I_n & 0\end{Brix}`
+    r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
 
     Args:
         N (int): positive integer
