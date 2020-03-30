@@ -879,6 +879,8 @@ def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     Args:
         cov (array): a covariance matrix
         hbar (float): value of hbar in the uncertainty relation
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         (bool): whether the given covariance matrix is a valid covariance matrix
@@ -911,6 +913,8 @@ def is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     Args:
         cov (array): a covariance matrix
         hbar (float): value of hbar in the uncertainty relation
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         (bool): whether the given covariance matrix corresponds to a pure state
@@ -1065,7 +1069,7 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
     return tensor
 
 
-def probabilities(mu, cov, cutoff, hbar=2.0):
+def probabilities(mu, cov, cutoff, hbar=2.0, rtol=1e-05, atol=1e-08):
     r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
 
     Args:
@@ -1073,11 +1077,13 @@ def probabilities(mu, cov, cutoff, hbar=2.0):
         cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
         cutoff (int): cutoff in Fock space
         hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         (array): Fock space probabilities up to cutoff. The shape of this tensor is ``[cutoff]*num_modes``.
     """
-    if is_pure_cov(cov, hbar=hbar):  # Check if the covariance matrix cov is pure
+    if is_pure_cov(cov, hbar=hbar, rtol=rtol, atol=atol):  # Check if the covariance matrix cov is pure
         return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
     probs = np.zeros([cutoff] * num_modes)
