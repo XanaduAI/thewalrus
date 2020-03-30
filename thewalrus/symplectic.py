@@ -321,3 +321,35 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     Omega = sympmat(nmodes)
 
     return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
+
+def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
+    r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
+
+    Args:
+        A (array): square, symmetric matrix
+        rtol (float): the relative tolerance parameter between ``A`` and ``A.T``
+        atol (float): the absolute tolerance parameter between ``A`` and ``A.T``
+        svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or asceding (``False``) order.
+
+    Returns:
+        tuple[array, array]: (r, U), where r are the singular values,
+            and U is the Autonne-Takagi unitary, such that :math:`A = U \diag(r) U^T`.
+    """
+    n, m = A.shape
+    if n != m:
+        raise ValueError("The input matrix is not square")
+    if not np.allclose(A, A.T, rtol=rtol, atol=atol):
+        raise ValueError("The input matrix is not symmetric")
+    Areal = A.real
+    Aimag = A.imag
+
+    B = np.empty((2 * n, 2 * n))
+    B[:n, :n] = Areal
+    B[n : 2 * n, :n] = Aimag
+    B[:n, n : 2 * n] = Aimag
+    B[n : 2 * n, n : 2 * n] = -Areal
+    vals, vects = np.linalg.eigh(B)
+    U = vects[:n, n : 2 * n] + 1j * vects[n : 2 * n, n : 2 * n]
+    if svd_order:
+        return (vals[n : 2 * n])[::-1], U[:, ::-1]
+    return vals[n : 2 * n], U

@@ -12,6 +12,8 @@
 
 * Adds a brute force sampler `photon_number_sampler` that given a (multi-)mode photon number distribution generates photon number samples. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
 
+* Adds the ability to perform the Autonne-Takagi decomposition of a complex-symmetric matrix using `autonne` from the `symplectic` module. [#154](https://github.com/XanaduAI/thewalrus/pull/154)
+
 ### Improvements
 
 
