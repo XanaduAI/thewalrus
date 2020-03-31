@@ -333,7 +333,7 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
 
     Returns:
         tuple[array, array]: (r, U), where r are the singular values,
-            and U is the Autonne-Takagi unitary, such that :math:`A = U \diag(r) U^T`.
+        and U is the Autonne-Takagi unitary, such that :math:`A = U \diag(r) U^T`.
     """
     n, m = A.shape
     if n != m:
