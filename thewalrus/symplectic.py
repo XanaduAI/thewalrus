@@ -90,8 +90,9 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
-    alpharealdtype = (alpha.real).dtype
-    r = np.zeros(2 * N, dtype=alpharealdtype)
+    #alpharealdtype = (alpha.real).dtype
+    # This one is problematic because alpha is not a numpy object
+    r = np.zeros(2 * N)
     r[mode] = np.sqrt(2 * hbar) * alpha.real
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
@@ -150,8 +151,7 @@ def squeezing(r, phi, dtype=np.float64):
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
-        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
-
+        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
     Returns:
         array: symplectic transformation matrix
 
@@ -173,7 +173,7 @@ def two_mode_squeezing(r, phi, dtype=np.float64):
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
-        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
+        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic transformation matrix
@@ -242,7 +242,8 @@ def loss(mu, cov, T, mode, nbar=0, hbar=2):
 
     return mu_res, cov_res
 
-
+### Comment: This function strongly overlaps with `quantum.photon_number_mean`
+### Wonder if it is worth removing it.
 def mean_photon_number(mu, cov, hbar=2):
     r"""Calculates the mean photon number for a given one-mode state.
 
@@ -260,39 +261,44 @@ def mean_photon_number(mu, cov, hbar=2):
     return ex, var
 
 
-def beam_splitter(theta, phi):
+def beam_splitter(theta, phi, dtype=np.float64):
     """Beam-splitter.
 
     Args:
         theta (float): transmissivity parameter
         phi (float): phase parameter
+        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic-orthogonal transformation matrix of an interferometer with angles theta and phi
     """
+    ct = np.cos(theta, dtype=dtype)
+    st = np.sin(theta, dtype=dtype)
+    eip = np.cos(phi, dtype=dtype) + 1j * np.sin(phi, dtype=dtype)
     U = np.array(
         [
-            [np.cos(theta), -np.exp(-1j * phi) * np.sin(theta)],
-            [np.exp(1j * phi) * np.sin(theta), np.cos(theta)],
+            [ct, -eip.conj() * st],
+            [eip * st, ct],
         ]
     )
     return interferometer(U)
 
 
-def rotation(theta):
+def rotation(theta, dtype=np.float64):
     """Rotation gate.
 
     Args:
         theta (float): rotation angle
+        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
 
     Returns:
         array: rotation matrix by angle theta
     """
-    V = np.identity(1) * np.exp(1j * theta)
+    V = np.identity(1) * (np.cos(theta, dtype=dtype) + 1j * np.sin(theta, dtype=dtype))
     return interferometer(V)
 
 
-def sympmat(N):
+def sympmat(N, dtype=np.float64):
     r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
 
     Args:
@@ -301,8 +307,8 @@ def sympmat(N):
     Returns:
         array: :math:`2N\times 2N` array
     """
-    I = np.identity(N)
-    O = np.zeros_like(I)
+    I = np.identity(N, dtype=dtype)
+    O = np.zeros_like(I, dtype=dtype)
     S = np.block([[O, I], [-I, O]])
     return S
 
@@ -322,8 +328,8 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     if n % 2 != 0:
         return False
     nmodes = n // 2
-
-    Omega = sympmat(nmodes)
+    Sdtype = S.dtype
+    Omega = sympmat(nmodes, dtype=Sdtype)
 
     return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
 
