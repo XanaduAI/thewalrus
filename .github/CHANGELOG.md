@@ -1,4 +1,4 @@
-# Version 0.12.0-dev
+# Version 0.12.0
 
 ### New features
 
