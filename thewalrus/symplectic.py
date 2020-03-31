@@ -67,7 +67,8 @@ def expand(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = len(S) // 2
-    S2 = np.identity(2 * N)
+    Sdtype = S.dtype
+    S2 = np.identity(2 * N, dtype=Sdtype)
     w = np.array(modes)
 
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
@@ -89,7 +90,8 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
-    r = np.zeros(2 * N)
+    alpharealdtype = (alpha.real).dtype
+    r = np.zeros(2 * N, dtype=alpharealdtype)
     r[mode] = np.sqrt(2 * hbar) * alpha.real
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
@@ -125,28 +127,30 @@ def reduced_state(mu, cov, modes):
     return mu.copy()[ind], cov.copy()[rows, cols]
 
 
-def vacuum_state(modes, hbar=2.0):
+def vacuum_state(modes, hbar=2.0, dtype=np.float64):
     r"""Returns the vacuum state.
 
     Args:
         modes (str): Returns the vector of means and the covariance matrix
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`
+        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
     Returns:
         list[array]: the means vector and covariance matrix of the vacuum state
     """
-    means = np.zeros((2 * modes))
-    cov = np.identity(2 * modes) * hbar / 2
+    means = np.zeros((2 * modes), dtype=dtype)
+    cov = np.identity(2 * modes, dtype=dtype) * hbar / 2
     state = [means, cov]
     return state
 
 
-def squeezing(r, phi):
+def squeezing(r, phi, dtype=np.float64):
     r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
 
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
+        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
 
     Returns:
         array: symplectic transformation matrix
@@ -154,30 +158,31 @@ def squeezing(r, phi):
 
     """
     # pylint: disable=assignment-from-no-return
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
+    cp = np.cos(phi, dtype=dtype)
+    sp = np.sin(phi, dtype=dtype)
+    ch = np.cosh(r, dtype=dtype)
+    sh = np.sinh(r, dtype=dtype)
     S = np.array([[ch - cp * sh, -sp * sh], [-sp * sh, ch + cp * sh]])
 
     return S
 
 
-def two_mode_squeezing(r, phi):
+def two_mode_squeezing(r, phi, dtype=np.float64):
     """Two-mode squeezing.
 
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
+        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
 
     Returns:
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
+    cp = np.cos(phi, dtype=dtype)
+    sp = np.sin(phi, dtype=dtype)
+    ch = np.cosh(r, dtype=dtype)
+    sh = np.sinh(r, dtype=dtype)
 
     S = np.array(
         [
@@ -202,7 +207,7 @@ def interferometer(U):
     """
     X = U.real
     Y = U.imag
-    S = np.vstack([np.hstack([X, -Y]), np.hstack([Y, X])])
+    S = np.block([[X, -Y], [Y, X]])
 
     return S
 
