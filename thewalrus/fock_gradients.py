@@ -371,39 +371,38 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     Returns:
         array[float]: The Fock representation of the gate
     """
-    ct = np.cos(theta)
-    st = np.sin(theta) * np.exp(1j * phi)
-    R = np.array(
-        [[0, 0, ct, -np.conj(st)], [0, 0, st, ct], [ct, st, 0, 0], [-np.conj(st), ct, 0, 0]]
-    )
+    c = np.cos(theta)
+    s = np.sin(theta) * np.exp(1j * phi)
+    sc = np.sin(theta) * np.exp(-1j * phi)
 
-    sqrt = np.sqrt(np.arange(cutoff + 1))
+    sqrt = np.sqrt(np.arange(cutoff))
 
-    Z = np.zeros((cutoff + 1, cutoff + 1, cutoff + 1, cutoff + 1), dtype=dtype)
+    Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
     Z[0, 0, 0, 0] = 1.0
+
+    # rank 2
+    for m in range(1, cutoff):
+        Z[m, m, 0, 0] = c * Z[m-1, m-1, 0, 0]
 
     # rank 3
     for m in range(0, cutoff):
-        for n in range(0, cutoff - m):
-            p = m + n
+        for n in range(0, cutoff):
+            p = n - m
             if 0 < p < cutoff:
-                Z[m, n, p, 0] = (
-                    R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0]
-                    + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
-                )
+                Z[m, n, p, 0] = sc * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
 
     # rank 4
     for m in range(0, cutoff):
         for n in range(0, cutoff):
             for p in range(0, cutoff):
-                q = m + n - p
+                q = m + p - n
                 if 0 < q < cutoff:
                     Z[m, n, p, q] = (
-                        R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1]
-                        + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                        -s * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1]
+                        + c * sqrt[p] / sqrt[q] * Z[m, n, p - 1, q - 1]
                     )
 
-    return Z[:cutoff, :cutoff, :cutoff, :cutoff]
+    return Z
 
 #pylint: disable=too-many-arguments
 def BSgate(theta, phi, cutoff, grad=False, sf_order=False, dtype=np.complex128):
@@ -499,7 +498,7 @@ def Ggate_jit(phiR, w, z, cutoff, dtype=np.complex128):
     EZ = np.exp(1j*phiS)
     T = np.tanh(rS)
     S = 1/np.cosh(rS)
-    ER = np.exp(-1j*phiR)
+    ER = np.exp(1j*phiR)
     wc = np.conj(w)
 
     # 2nd derivatives of G
@@ -515,10 +514,9 @@ def Ggate_jit(phiR, w, z, cutoff, dtype=np.complex128):
     Z = np.zeros((cutoff, cutoff), dtype=dtype)
 
     Z[0, 0] = np.exp(-0.5*np.abs(w)**2 - 0.5*wc**2 * EZ * T)*np.sqrt(S)
-    Z[1, 0] = y[0] * Z[0, 0]
 
     # rank 1
-    for m in range(2, cutoff):
+    for m in range(1, cutoff):
         Z[m, 0] = (y[0]/sqrt[m]*Z[m-1, 0] + R[0, 0]*sqrt[m-1]/sqrt[m]*Z[m-2, 0])
 
     # rank 2
@@ -527,6 +525,8 @@ def Ggate_jit(phiR, w, z, cutoff, dtype=np.complex128):
             Z[m, n] = (y[1]/sqrt[n]*Z[m, n-1] + R[1, 1]*sqrt[n-1]/sqrt[n]*Z[m, n-2] + R[0, 1]*sqrt[m]/sqrt[n]*Z[m-1, n-1])
 
     return Z
+
+
 
 @jit(nopython=True)
 def Ggate_gradients(phiR, w, z, gate):
@@ -549,7 +549,6 @@ def Ggate_gradients(phiR, w, z, gate):
 
     rS = np.abs(z)
     phiS = np.angle(z)
-    phiD = np.angle(w)
     T = np.tanh(rS)
     S = 1/np.cosh(rS)
     wc = np.conj(w)
@@ -563,10 +562,9 @@ def Ggate_gradients(phiR, w, z, gate):
         TSminus = (1 - rS**2/3 - S**2)
 
     ### Gradient with respect to phiR
-
-    phi_a = 1j*(w*np.exp(-1j*phiR) + wc*np.exp(1j*(-phiR + phiS))*T)
-    phi_a2 = -1j*np.exp(1j*(-2*phiR + phiS))*T
-    phi_ab = 1j*S*np.exp(-1j*phiR)
+    phi_a = 1j*np.exp(1j*phiR)*(w + wc*np.exp(1j*phiS)*T)
+    phi_a2 = -1j*np.exp(1j*(2*phiR + phiS))*T
+    phi_ab = 1j*S*np.exp(1j*phiR)
 
     Grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
     for m in range(cutoff):
@@ -574,8 +572,7 @@ def Ggate_gradients(phiR, w, z, gate):
             Grad_phi[m, n] = phi_a*sqrt[m]*gate[m-1, n] + phi_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + phi_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1]
 
     ### Gradients with respect to w
-
-    w_a = np.exp(-1j*phiR)
+    w_a = np.exp(1j*phiR)
     w_1 = -0.5*wc
 
     Grad_w = np.zeros((cutoff, cutoff), dtype=dtype)
@@ -583,9 +580,9 @@ def Ggate_gradients(phiR, w, z, gate):
         for n in range(cutoff):
             Grad_w[m, n] = w_a*sqrt[m]*gate[m-1, n] + w_1*gate[m, n]
 
-    wc_a = np.exp(1j*(-phiR+phiS))*T
+    wc_a = np.exp(1j*(phiR+phiS))*T
     wc_b = -S +0.0j
-    wc_1 = -0.5*w * (1 + 2*T*np.exp(1j*(phiS - 2*phiD)))
+    wc_1 = -0.5*(w + 2*wc*np.exp(1j*phiS)*T)
 
     Grad_wconj = np.zeros((cutoff, cutoff), dtype=dtype)
     for m in range(cutoff):
@@ -593,12 +590,11 @@ def Ggate_gradients(phiR, w, z, gate):
             Grad_wconj[m, n] = wc_a*sqrt[m]*gate[m-1, n] + wc_b*sqrt[n]*gate[m, n-1] + wc_1*gate[m, n]
 
     ### Gradients with respect to z
-
-    z_a = 0.5*wc * np.exp(-1j*phiR) * TSplus
-    z_a2 = - 0.25*np.exp(-2j*phiR) * TSplus
+    z_a = 0.5*wc * np.exp(1j*phiR) * TSplus
+    z_a2 = - 0.25*np.exp(2j*phiR) * TSplus
     z_b = 0.5*wc * np.exp(-1j*phiS) * T*S
     z_b2 = -0.25*np.exp(-2j*phiS) * TSminus
-    z_ab = -0.5*np.exp(1j*(-phiR-phiS))*T*S
+    z_ab = -0.5*np.exp(1j*(phiR-phiS))*T*S
     z_1 = -0.25*wc**2 * TSplus - 0.25*np.exp(-1j*phiS)*T
 
     Grad_z = np.zeros((cutoff, cutoff), dtype=dtype)
@@ -606,11 +602,11 @@ def Ggate_gradients(phiR, w, z, gate):
         for n in range(cutoff):
             Grad_z[m, n] = z_a*sqrt[m]*gate[m-1, n] + z_b*sqrt[n]*gate[m, n-1] + z_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + z_b2*sqrt[n]*sqrt[n-1]*gate[m, n-2] + z_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1] + z_1*gate[m,n]
 
-    zc_a = -0.5*wc * np.exp(1j*(-phiR + 2*phiS)) * TSminus
-    zc_a2 = 0.25*np.exp(2*1j*(-phiR + phiS)) * TSminus
+    zc_a = -0.5*wc * np.exp(1j*(phiR + 2*phiS)) * TSminus
+    zc_a2 = 0.25*np.exp(2*1j*(phiR + phiS)) * TSminus
     zc_b = 0.5*wc * np.exp(1j*phiS) * T*S
     zc_b2 = 0.25 * TSplus + 0.0j
-    zc_ab = -0.5*np.exp(1j*(-phiR+phiS))*T*S
+    zc_ab = -0.5*np.exp(1j*(phiR+phiS))*T*S
     zc_1 = 0.25*wc**2 *np.exp(2*1j*phiS)* TSminus - 0.25*np.exp(1j*phiS)*T
 
     Grad_zconj = np.zeros((cutoff, cutoff), dtype=dtype)
@@ -618,7 +614,8 @@ def Ggate_gradients(phiR, w, z, gate):
         for n in range(cutoff):
             Grad_zconj[m, n] = zc_a*sqrt[m]*gate[m-1, n] + zc_b*sqrt[n]*gate[m, n-1] + zc_a2*sqrt[m]*sqrt[m-1]*gate[m-2, n] + zc_b2*sqrt[n]*sqrt[n-1]*gate[m, n-2] + zc_ab*sqrt[m]*sqrt[n]*gate[m-1, n-1] + zc_1*gate[m,n]
 
-    return np.conj(Grad_phi), np.conj(Grad_w), Grad_wconj, np.conj(Grad_z), Grad_zconj
+    return Grad_phi, np.conj(Grad_w), Grad_wconj, np.conj(Grad_z), Grad_zconj
+
 
 
 @jit(nopython=True)
@@ -644,24 +641,24 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
     th1, vphi1 = BS1
     th2, vphi2 = BS2
     z1, z2 = z12
-    
+
     # derived quantities
     S1 = 1/np.cosh(np.abs(z1))
     S2 = 1/np.cosh(np.abs(z2))
     T1 = np.tanh(np.abs(z1))
     T2 = np.tanh(np.abs(z2))
-    
+
     c1 = np.cos(th1)
     c2 = np.cos(th2)
     s1 = np.sin(th1)
     s2 = np.sin(th2)
-    
+
     zeta1 = np.angle(z1)
     zeta2 = np.angle(z2)
-    
+
     w1c = np.conj(w1)
     w2c = np.conj(w2)
-    
+
     # 2nd derivatives of G (order: a1, b1, a2, b2), omitted symmetric lower part
     R = np.array([
         [-np.exp(2j*phi1)*(np.exp(1j*zeta1)*c1**2*T1 + np.exp(1j*(zeta2-2*vphi1))*s1**2*T2),
@@ -685,7 +682,7 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
          np.exp(-1j*(zeta1 + 2*vphi2))*s2**2*T1 + np.exp(-1j*zeta2)*c2**2*T2
         ]
     ])
-    print(R)
+
     # recurring quantities
     C = (-c1*w1c - np.exp(1j*vphi1)*s1*w2c)
     D = (np.exp(-1j*vphi1)*s1*w1c - c1*w2c)
@@ -697,24 +694,21 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
         np.exp(1j*phi2)*(w2-np.exp(1j*(zeta1+2*vphi1))*s1*C*T1 - np.exp(1j*zeta2)*c1*D*T2),
         c2*S2*D - np.exp(-1j*vphi2)*S1*s2*C
     ])
-    print(y)
-    
+
     sqrt = np.sqrt(np.arange(cutoff))
     Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
-    
+
     Z[0,0,0,0] = np.sqrt(S1*S2)*np.exp(0.5*(-np.abs(w1)**2 - np.abs(w2**2) - np.exp(1j*zeta1)*T1*C**2 - np.exp(1j*zeta2)*T2*D**2))
-    
+
     # rank 1
     for m in range(1, cutoff):
         Z[m,0,0,0] = y[0]/sqrt[m]*Z[m-1,0,0,0] + R[0,0]*sqrt[m-1]/sqrt[m]*Z[m-2,0,0,0]
 
-    
     # rank 2
     for m in range(cutoff):
         for n in range(1, cutoff):
             Z[m,n,0,0] = y[1]/sqrt[n]*Z[m,n-1,0,0] + sqrt[m]/sqrt[n]*R[0,1]*Z[m-1,n-1,0,0] + sqrt[n-1]/sqrt[n]*R[1,1]*Z[m,n-2,0,0]
 
-    
     # rank 3
     for m in range(cutoff):
         for n in range(cutoff):
@@ -727,5 +721,5 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
             for p in range(cutoff):
                 for q in range(1, cutoff):
                     Z[m,n,p,q] = y[3]/sqrt[q]*Z[m,n,p,q-1] + sqrt[m]/sqrt[q]*R[0,3]*Z[m-1,n,p,q-1] + sqrt[n]/sqrt[q]*R[1,3]*Z[m,n-1,p,q-1] + sqrt[p]/sqrt[q]*R[2,3]*Z[m,n,p-1,q-1] + sqrt[q-1]/sqrt[q]*R[3,3]*Z[m,n,p,q-2]
-                    
+
     return Z
