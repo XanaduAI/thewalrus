@@ -638,67 +638,62 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
     # init variables
     phi1, phi2 = phi12
     w1, w2 = w12
+    w1c, w2c = np.conj(w12)
     th1, vphi1 = BS1
     th2, vphi2 = BS2
-    z1, z2 = z12
 
     # derived quantities
-    S1 = 1/np.cosh(np.abs(z1))
-    S2 = 1/np.cosh(np.abs(z2))
-    T1 = np.tanh(np.abs(z1))
-    T2 = np.tanh(np.abs(z2))
-
+    S1, S2 = 1/np.cosh(np.abs(z12))
+    T1, T2 = np.tanh(np.abs(z12))*np.exp(1j*np.angle(z12))
     c1 = np.cos(th1)
     c2 = np.cos(th2)
     s1 = np.sin(th1)
     s2 = np.sin(th2)
+    e1 = np.exp(1j*vphi1)
+    e1c= np.exp(-1j*vphi1)
+    e2 = np.exp(1j*vphi2) 
+    e2c= np.exp(-1j*vphi2)
+    p1 = np.exp(1j*phi1)
+    p2 = np.exp(1j*phi2)
+    p1c= np.exp(-1j*phi1)
+    p2c= np.exp(-1j*phi2)
 
-    zeta1 = np.angle(z1)
-    zeta2 = np.angle(z2)
-
-    w1c = np.conj(w1)
-    w2c = np.conj(w2)
-
-    # 2nd derivatives of G (order: a1, b1, a2, b2), omitted symmetric lower part
+    # 2nd derivatives of Q (order: a1, b1, a2, b2), omitted symmetric lower part
     R = np.array([
-        [-np.exp(2j*phi1)*(np.exp(1j*zeta1)*c1**2*T1 + np.exp(1j*(zeta2-2*vphi1))*s1**2*T2),
-         np.exp(1j*phi1)*(c1*c2*S1 - np.exp(1j*(-vphi1+vphi2))*S2*s1*s2),
-         np.exp(1j*(phi1+phi2+vphi1))*c1*s1*(-np.exp(1j*zeta1)*T1 + np.exp(1j*(zeta2-2*vphi1))*T2),
-         np.exp(1j*phi1)*(-np.exp(-1j*vphi1)*c2*S2*s1 - np.exp(-1j*vphi2)*c1*S1*s2)
+        [-p1**2*(c1**2*T1 + e1**2*s1**2*T2),
+         p1*(c1*c2*S1 - e1*e2*s1*s2*S2),
+         c1*p1*p2*e1c*s1*(T2*e1**2 - T1),
+        -p1*e2c*(c1*s2*S1 + c2*e1*e2*s1*S2)
         ],
         [0,
-         np.exp(-1j*zeta1)*c2**2*T1 + np.exp(-1j*(zeta2-2*vphi2))*s2**2*T2,
-         np.exp(1j*phi2)*(np.exp(1j*vphi1)*c2*S1*s1 + np.exp(1j*vphi2)*c1*S2*s2),
-         -np.exp(-1j*(zeta1+zeta2+vphi2))*c2*s2*(np.exp(1j*zeta2)*T1-np.exp(1j*(zeta1+2*vphi2))*T2)
-        ],
-        [0,
-         0,
-         np.exp(2j*phi2)*(-np.exp(1j*(zeta1+2*vphi1))*s1**2*T1 - np.exp(1j*zeta2)*c1**2*T2),
-         np.exp(1j*phi2)*(c1*c2*S2 - np.exp(-1j*(-vphi1+vphi2))*S1*s1*s2)
+         c2**2*np.conj(T1) + e2**2*s2**2*np.conj(T2),
+         p2*(c2*e1c*s1*S1 + c1*e2*s2*S2),
+         c2*e2*s2*np.conj(T2) - c2*e2c*s2*np.conj(T1)
         ],
         [0,
          0,
+         -p2**2*(e1c**2*s1**2*T1 + c1**2*T2),
+        p2*(c1*c2*S2 - s1*s2*S1*e1c*e2c)
+        ],
+        [0,
          0,
-         np.exp(-1j*(zeta1 + 2*vphi2))*s2**2*T1 + np.exp(-1j*zeta2)*c2**2*T2
+         0,
+         e2c**2*s2**2*np.conj(T1) + c2**2*np.conj(T2)
         ]
     ])
 
-    # recurring quantities
-    C = (-c1*w1c - np.exp(1j*vphi1)*s1*w2c)
-    D = (np.exp(-1j*vphi1)*s1*w1c - c1*w2c)
-
-    # 1st derivatives of G
+    # 1st derivatives of Q
     y = np.array([
-        np.exp(1j*phi1)*(w1-np.exp(1j*zeta1)*c1*C*T1 + np.exp(1j*(zeta2-vphi1))*s1*D*T2),
-        np.exp(1j*vphi2)*S2*s2*D + c2*S1*C,
-        np.exp(1j*phi2)*(w2-np.exp(1j*(zeta1+2*vphi1))*s1*C*T1 - np.exp(1j*zeta2)*c1*D*T2),
-        c2*S2*D - np.exp(-1j*vphi2)*S1*s2*C
+        p1*(w1 + e1*s1*T2*(e1*s1*w1c - c1*w2c) + c1*T1*(c1*w1c + e1c*s1*w2c)),
+        e2*s2*S2*(e1*s1*w1c - c1*w2c) - c2*S1*(c1*w1c + e1c*s1*w2c),
+        p2*(w2+c1*T2*(c1*w2c - e1*s1*w1c) + e1c**2*s1*T1*(c1*e1*w1c + s1*w2c)),
+        (c1*e2c*S1*s2 + c2*e1*s1*S2)*w1c + (e1c*e2c*s1*S1*s2 - c1*c2*S2)*w2c
     ])
 
     sqrt = np.sqrt(np.arange(cutoff))
     Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
 
-    Z[0,0,0,0] = np.sqrt(S1*S2)*np.exp(0.5*(-np.abs(w1)**2 - np.abs(w2**2) - np.exp(1j*zeta1)*T1*C**2 - np.exp(1j*zeta2)*T2*D**2))
+    Z[0,0,0,0] = np.sqrt(S1*S2)*np.exp(0.5*(-np.abs(w1)**2 - np.abs(w2)**2 - T1*(c1*w1c + e1c*s1*w2c)**2 - T2*(e1*s1*w1c - c1*w2c)**2))
 
     # rank 1
     for m in range(1, cutoff):
@@ -723,3 +718,310 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
                     Z[m,n,p,q] = y[3]/sqrt[q]*Z[m,n,p,q-1] + sqrt[m]/sqrt[q]*R[0,3]*Z[m-1,n,p,q-1] + sqrt[n]/sqrt[q]*R[1,3]*Z[m,n-1,p,q-1] + sqrt[p]/sqrt[q]*R[2,3]*Z[m,n,p-1,q-1] + sqrt[q-1]/sqrt[q]*R[3,3]*Z[m,n,p,q-2]
 
     return Z
+
+
+@jit(nopython=True)
+def G2gate_gradients(phi12, w12, BS1, z12, BS2, gate):
+    """Computes the complex gradients with respect to all the parameters of the two-mode Gaussian gate.
+    For complex parameters it returns two gradients per gate (with respect to the parameter and
+    with respect to its complex conjugate).
+
+    Args:
+        phi12 (float, float): angles of the phase rotation gates
+        w12 (complex, complex): displacement parameters
+        BS1 (float, float): first beamsplitter parameters
+        z12 (complex, complex): squeezing parameters
+        BS2 (float, float): second beamsplitter parameters
+        gate (array): Gaussian gate evaluated at the same parameter values
+
+    Returns:
+        tuple[array[complex] x 14]: 1 gradient array for the each real parameter (6) and 2 gradient arrays for each complex parameter (4)
+    """
+    dtype = gate.dtype
+    cutoff = gate.shape[0]
+    sqrt = np.sqrt(np.arange(cutoff))
+
+    # init variables
+    phi1, phi2 = phi12
+    w1, w2 = w12
+    w1c, w2c = np.conj(w12)
+    th1, vphi1 = BS1
+    th2, vphi2 = BS2
+
+    # derived quantities
+    r12 = np.abs(z12)
+    r1,r2 = r12
+    zeta1, zeta2 = np.angle(z12)
+    S1, S2 = 1/np.cosh(np.abs(z12))
+    T1, T2 = np.tanh(r12)*np.exp(1j*np.angle(z12))
+    c1 = np.cos(th1)
+    c2 = np.cos(th2)
+    s1 = np.sin(th1)
+    s2 = np.sin(th2)
+    e1 = np.exp(1j*vphi1)
+    e1c= np.conj(e1)
+    e2 = np.exp(1j*vphi2)
+    e2c= np.conj(e2)
+    p1 = np.exp(1j*phi1)
+    p2 = np.exp(1j*phi2)
+    p1c= np.exp(-1j*phi1)
+    p2c= np.exp(-1j*phi2)
+
+    # Gradients with respect to phi1 and phi2
+    phi1_a1   = 1j*p1*(w1 + (c1**2*T1 + e1**2*s1**2*T2)*w1c + 0.5*e1c*(T1-e1**2*T2)*np.sin(2*th1)*w2c)
+    phi1_a1b2 = -1j*p1*(e1*s1*c2*S2 + e2c*s2*c1*S1)
+    phi1_a1a2 = -1j*p1*p2*c1*s1*(T1*e1c - T2*e1)
+    phi1_a1b1 = 1j*p1*(c1*c2*S1 - s1*s2*S2*e1*e2)
+    phi1_a1a1 = -1j*np.exp(2j*phi1)*(T1*c1**2 + T2*s1**2*e1**2)
+
+    phi2_a2   = 1j*p2*(w2 + 0.5*e1*(T1*e1c**2 - T2)*np.sin(2*th1)*w1c + (s1**2*e1c**2*T1 + c1**2*T2)*w2c)
+    phi2_a2b2 = 1j*p2*(c1*c2*S2 - e1c*e2c*S1*s2*s1)
+    phi2_a2a2 = -1j*np.exp(2j*phi2)*(T1*s1**2*e1c**2 + T2*c1**2)
+    phi2_a2b1 = 1j*p2*(e1c*c2*S1*s1 + e2*c1*S2*s2)
+    phi2_a2a1 = -1j*p1*p2*c1*s1*(T1*e1c - T2*e1)
+
+    Grad_phi1 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_phi1[a1, b1, a2, b2] = phi1_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + phi1_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + phi1_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + phi1_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + phi1_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2]
+
+    Grad_phi2 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_phi2[a1, b1, a2, b2] = phi2_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + phi2_a2b2*sqrt[a2]*sqrt[b2]*gate[a1, b1, a2-1, b2-1] + phi2_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1, b1, a2-2, b2] + phi2_a2b1*sqrt[a2]*sqrt[b1]*gate[a1, b1-1, a2-1, b2] + phi2_a2a1*sqrt[a2]*sqrt[a1]*gate[a1-1, b1, a2-1, b2]
+
+    # Gradients with respect to w12
+    w1_1 = -0.5*w1c
+    w1_a1 = p1
+
+    w2_1 = -0.5*w2c
+    w2_a2 = p2
+
+    w1c_1  = -0.5*w1 - 0.5*np.sin(2*th1)*w2c*e1c*(T1 - T2*e1**2) - w1c*(T1*c1**2 + e1**2*T2*s1**2)
+    w1c_b2 = e2c*c1*s2*S1 + e1*c2*s1*S2
+    w1c_a2 = c1*p2*e1c*s1*(T1-e1**2*T2)
+    w1c_b1 = -c1*c2*S1 + e1*e2*S2*s1*s2
+    w1c_a1 = p1*(c1**2*T1 + e1**2*s1**2*T2)
+
+    w2c_1  = -0.5*w2 +c1*e1*s1*T2*w1c -0.5*e1c*T1*np.sin(2*th1)*w1c - e1c**2*s1**2*T1*w2c - c1**2*T2*w2c
+    w2c_b2 = e1c*e2c*s1*s2*S1 - c1*c2*S2
+    w2c_a2 = p2*(e1c**2*s1**2*T1 + c1**2*T2)
+    w2c_b1 = -c2*e1c*s1*S1 - c1*e2*s2*S2
+    w2c_a1 = c1*p1*e1c*s1*(T1 - e1**2*T2)
+
+    Grad_w1 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_w1[a1, b1, a2, b2] = w1_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + w1_1*gate[a1, b1, a2, b2]
+
+    Grad_w2 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_w2[a1, b1, a2, b2] = w2_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + w2_1*gate[a1, b1, a2, b2]
+
+    Grad_w1c = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_w1c[a1, b1, a2, b2] = w1c_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + w1c_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + w1c_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + w1c_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + w1c_1*gate[a1, b1, a2, b2]
+
+    Grad_w2c = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_w2c[a1, b1, a2, b2] = w2c_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + w2c_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + w2c_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + w2c_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + w2c_1*gate[a1, b1, a2, b2]
+
+    # Gradients with respect to z12
+    # Taylor series to avoid division by zero for r -> 0
+    if r1 > 1e-3:
+        TS1plus = (np.tanh(r1)/r1 + S1**2)
+        TS1minus = (np.tanh(r1)/r1 - S1**2)
+    else:
+        TS1plus = (1 - r1**2/3 + S1**2)
+        TS1minus = (1 - r1**2/3 - S1**2)
+    if r2 > 1e-3:
+        TS2plus = (np.tanh(r2)/r2 + S2**2)
+        TS2minus = (np.tanh(r2)/r2 - S2**2)
+    else:
+        TS2plus = (1 - r2**2/3 + S2**2)
+        TS2minus = (1 - r2**2/3 - S2**2)
+
+    z1_1    =-0.25*TS1plus*(c1*w1c + e1c*s1*w2c)**2 - 0.25*np.conj(T1)
+    z1_b2   =-0.5*e2c*S1*np.conj(T1)*s2*(c1*w1c + e1c*s1*w2c)
+    z1_b2b2 =-0.25*e2c**2*np.exp(-2j*zeta1)*s2**2*TS1minus
+    z1_a2   = 0.5*p2*e1c*s1*TS1plus*(c1*w1c + e1c*s1*w2c)
+    z1_a2b2 = 0.5*np.conj(T1)*p2*e1c*e2c*S1*s1*s2
+    z1_a2a2 =-0.25*np.exp(2j*phi2)*e1c**2*s1**2*TS1plus
+    z1_b1   = 0.5*S1*np.conj(T1)*c2*(c1*w1c + e1c*s1*w2c)
+    z1_b1b2 = 0.25*np.exp(-2j*zeta1)*e2c*np.sin(2*th2)*TS1minus
+    z1_b1a2 =-0.5*np.conj(T1)*np.exp(1j*phi2)*e1c*S1*c2*s1
+    z1_b1b1 =-0.25*np.exp(-2j*zeta1)*c2**2*TS1minus
+    z1_a1   = 0.5*p1*c1*TS1plus*(c1*w1c + e1c*s1*w2c)
+    z1_a1b2 = 0.5*p1*np.conj(T1)*S1*e2c*c1*s2
+    z1_a1a2 =-0.25*np.exp(1j*(phi1+phi2))*e1c*np.sin(2*th1)*TS1plus
+    z1_a1b1 =-0.5*np.conj(T1)*p1*S1*c1*c2
+    z1_a1a1 =-0.25*np.exp(2j*phi1)*c1**2*TS1plus
+
+    z1c_1    = 0.25*np.exp(2j*zeta1)*TS1minus*(c1*w1c + e1c*s1*w2c)**2 - 0.25*T1
+    z1c_b2   =-0.5*e2c*S1*T1*s2*(c1*w1c + e1c*s1*w2c)
+    z1c_b2b2 = 0.25*e2c**2*s2**2*TS1plus
+    z1c_a2   =-0.5*np.exp(2j*zeta1)*p2*e1c*s1*TS1minus*(c1*w1c + e1c*s1*w2c)
+    z1c_a2b2 = 0.5*T1*np.exp(1j*phi2)*e1c*e2c*S1*s2*s1
+    z1c_a2a2 = 0.25*np.exp(2j*zeta1)*np.exp(2j*phi2)*e1c**2*s1**2*TS1minus
+    z1c_b1   = 0.5*S1*T1*c2*(c1*w1c + e1c*s1*w2c)
+    z1c_b1b2 =-0.25*e2c*np.sin(2*th2)*TS1plus
+    z1c_b1a2 =-0.5*T1*p2*e1c*S1*c2*s1
+    z1c_b1b1 = 0.25*c2**2*TS1plus
+    z1c_a1   =-0.5*np.exp(2j*zeta1)*np.exp(1j*phi1)*c1*TS1minus*(c1*w1c + e1c*s1*w2c)
+    z1c_a1b2 = 0.5*p1*T1*S1*e2c*c1*s2
+    z1c_a1a2 = 0.25*np.exp(2j*zeta1)*p1*p2*e1c*np.sin(2*th1)*TS1minus
+    z1c_a1b1 =-0.5*T1*p1*S1*c1*c2
+    z1c_a1a1 = 0.25*np.exp(2j*zeta1)*np.exp(2j*phi1)*c1**2*TS1minus
+
+    Grad_z1 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_z1[a1, b1, a2, b2] = z1_1*gate[a1,b1,a2,b2] + z1_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + z1_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + z1_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + z1_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + z1_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2] + z1_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + z1_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + z1_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + z1_b1b1*sqrt[b1]*sqrt[b1-1]*gate[a1, b1-2, a2, b2] + z1_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + z1_b1b2*sqrt[b1]*sqrt[b2]*gate[a1,b1-1,a2,b2-1] + z1_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1,b1,a2-2,b2] + z1_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1] + z1_b2b2*sqrt[b2]*sqrt[b2-1]*gate[a1,b1,a2,b2-2]
+
+    Grad_z1c = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_z1c[a1, b1, a2, b2] = z1c_1*gate[a1,b1,a2,b2] + z1c_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + z1c_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + z1c_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + z1c_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + z1c_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2] + z1c_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + z1c_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + z1c_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + z1c_b1b1*sqrt[b1]*sqrt[b1-1]*gate[a1, b1-2, a2, b2] + z1c_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + z1c_b1b2*sqrt[b1]*sqrt[b2]*gate[a1,b1-1,a2,b2-1] + z1c_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1,b1,a2-2,b2] + z1c_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1] + z1c_b2b2*sqrt[b2]*sqrt[b2-1]*gate[a1,b1,a2,b2-2]
+
+    z2_1    =-0.25*TS2plus*(e1*s1*w1c - c1*w2c)**2 - 0.25*np.conj(T2)
+    z2_b2   =-0.5*S2*np.conj(T2)*c2*(e1*s1*w1c - c1*w2c)
+    z2_b2b2 =-0.25*np.exp(-2j*zeta2)*c2**2*TS2minus
+    z2_a2   =-0.5*p2*c1*TS2plus*(e1*s1*w1c - c1*w2c)
+    z2_a2b2 =-0.5*p2*S2*np.conj(T2)*c1*c2
+    z2_a2a2 =-0.25*np.exp(2j*phi2)*c1**2*TS2plus
+    z2_b1   =-0.5*e2*S2*np.conj(T2)*s2*(e1*s1*w1c - c1*w2c)
+    z2_b1b2 =-0.25*np.exp(-2j*zeta2)*e2*np.sin(2*th2)*TS2minus
+    z2_b1a2 =-0.5*np.exp(1j*phi2)*e2*S2*np.conj(T2)*c1*s2
+    z2_b1b1 =-0.25*np.exp(-2j*zeta2)*e2**2*s2**2*TS2minus
+    z2_a1   = 0.5*np.exp(1j*phi1)*e1*s1*TS2plus*(e1*s1*w1c - c1*w2c)
+    z2_a1b2 = 0.5*np.exp(1j*phi1)*e1*S2*np.conj(T2)*c2*s1
+    z2_a1a2 = 0.25*p1*p2*e1*np.sin(2*th1)*TS2plus
+    z2_a1b1 = 0.5*p1*e1*e2*S2*np.conj(T2)*s2*s1
+    z2_a1a1 =-0.25*np.exp(2j*phi1)*e1**2*s1**2*TS2plus
+
+    z2c_1    = 0.25*np.exp(2j*zeta2)*TS2minus*(e1*s1*w1c - c1*w2c)**2 - 0.25*T2
+    z2c_b2   =-0.5*S2*T2*c2*(e1*s1*w1c - c1*w2c)
+    z2c_b2b2 = 0.25*c2**2*TS2plus
+    z2c_a2   = 0.5*np.exp(2j*zeta2)*p2*c1*TS2minus*(e1*s1*w1c - c1*w2c)
+    z2c_a2b2 =-0.5*p2*S2*T2*c1*c2
+    z2c_a2a2 = 0.25*np.exp(2j*zeta2)*np.exp(2j*phi2)*c1**2*TS2minus
+    z2c_b1   =-0.5*e2*S2*T2*s2*(e1*s1*w1c - c1*w2c)
+    z2c_b1b2 = 0.25*e2*np.sin(2*th2)*TS2plus
+    z2c_b1a2 =-0.5*p2*e2*S2*T2*c1*s2
+    z2c_b1b1 = 0.25*e2**2*s2**2*TS2plus
+    z2c_a1   =-0.5*np.exp(2j*zeta2)*p1*e1*s1*TS2minus*(e1*s1*w1c - c1*w2c)
+    z2c_a1b2 = 0.5*p1*e1*S2*T2*c2*s1
+    z2c_a1a2 =-0.25*p1*p2*np.exp(2j*zeta2)*e1*np.sin(2*th1)*TS2minus
+    z2c_a1b1 = 0.5*p1*e1*e2*S2*T2*s2*s1
+    z2c_a1a1 = 0.25*np.exp(2j*phi1)*np.exp(2j*zeta2)*e1**2*s1**2*TS2minus
+
+    Grad_z2 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_z2[a1, b1, a2, b2] = z2_1*gate[a1,b1,a2,b2] + z2_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + z2_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + z2_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + z2_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + z2_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2] + z2_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + z2_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + z2_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + z2_b1b1*sqrt[b1]*sqrt[b1-1]*gate[a1, b1-2, a2, b2] + z2_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + z2_b1b2*sqrt[b1]*sqrt[b2]*gate[a1,b1-1,a2,b2-1] + z2_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1,b1,a2-2,b2] + z2_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1] + z2_b2b2*sqrt[b2]*sqrt[b2-1]*gate[a1,b1,a2,b2-2]
+
+    Grad_z2c = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_z2c[a1, b1, a2, b2] = z2c_1*gate[a1,b1,a2,b2] + z2c_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + z2c_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + z2c_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + z2c_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + z2c_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2] + z2c_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + z2c_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + z2c_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + z2c_b1b1*sqrt[b1]*sqrt[b1-1]*gate[a1, b1-2, a2, b2] + z2c_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + z2c_b1b2*sqrt[b1]*sqrt[b2]*gate[a1,b1-1,a2,b2-1] + z2c_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1,b1,a2-2,b2] + z2c_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1] + z2c_b2b2*sqrt[b2]*sqrt[b2-1]*gate[a1,b1,a2,b2-2]
+
+    # Gradients with respect to theta1 and varphi1
+    th1_1    = -(T1 - T2*e1**2)*(c1*w2c*e1c - s1*w1c)*(c1*w1c + e1c*s1*w2c)
+    th1_b2   = e2c*s2*S1*(c1*w2c*e1c - s1*w1c) + c2*S2*(e1*c1*w1c + s1*w2c)
+    th1_a2   = p2*e1*(T1*e1c**2 - T2)*((c1**2 - s1**2)*w1c + 2*e1c*c1*s1*w2c)
+    th1_a2b2 = p2*(-e1c*e2c*c1*s2*S1 - c2*s1*S2)
+    th1_a2a2 = -np.exp(2j*phi2)*c1*s1*(e1c**2*T1 - T2)
+    th1_b1   = c2*S1*(s1*w1c - e1c*c1*w2c) + e1*e2*s2*S2*(c1*w1c + e1c*s1*w2c)
+    th1_b1a2 = p2*(e1c*c1*c2*S1 - e2*s1*s2*S2)
+    th1_a1   = p1*(T1 - T2*e1**2)*(e1c*(c1**2-s1**2)*w2c - 2*c1*s1*w1c)
+    th1_a1b2 = p1*(e2c*s1*s2*S1 - e1*c1*c2*S2)
+    th1_a1a2 = p1*p2*e1c*np.cos(2*th1)*(e1**2*T2-T1)
+    th1_a1b1 = -p1*(c2*s1*S1 + e1*e2*c1*s2*S2)
+    th1_a1a1 = np.exp(2j*phi1)*c1*s1*(T1 - T2*e1**2)
+
+    vphi1_1    =-1j*s1*(T2*w1c*e1**2*(s1*w1c-e1c*c1*w2c) - T1*w2c*e1c*(c1*w1c + e1c*s1*w2c))
+    vphi1_b2   = 1j*s1*(c2*S2*w1c*e1 - e1c*e2c*s2*S1*w2c)
+    vphi1_a2   =-1j*p2*e1*s1*(c1*(T1*e1c**2 + T2)*w1c + 2*T1*e1c**3*s1*w2c)
+    vphi1_a2b2 = 1j*p2*e1c*e2c*s1*s2*S1
+    vphi1_a2a2 = 1j*T1*np.exp(2j*phi2)*e1c**2*s1**2
+    vphi1_b1   = 1j*e1*s1*(e2*s2*S2*w1c + e1c**2*c2*S1*w2c)
+    vphi1_b1a2 =-1j*p2*e1c*c2*s1*S1
+    vphi1_a1   =-1j*p1*e1**2*s1*(-2*s1*T2*w1c + e1c*c1*(T1*e1c**2 + T2)*w2c)
+    vphi1_a1b2 =-1j*p1*e1*c2*s1*S2
+    vphi1_a1a2 = 1j*p1*p2*e1*c1*s1*(T1*e1c**2 + T2)
+    vphi1_a1b1 =-1j*p1*e1*e2*s1*s2*S2
+    vphi1_a1a1 =-1j*np.exp(2j*phi1)*e1**2*s1**2*T2
+
+    Grad_th1 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_th1[a1, b1, a2, b2] = th1_1*gate[a1,b1,a2,b2] + th1_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + th1_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + th1_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + th1_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + th1_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2] + th1_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + th1_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + th1_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + th1_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + th1_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1,b1,a2-2,b2] + th1_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1]
+
+    Grad_vphi1 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_vphi1[a1, b1, a2, b2] = vphi1_1*gate[a1,b1,a2,b2] + vphi1_a1*sqrt[a1]*gate[a1-1, b1, a2, b2] + vphi1_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + vphi1_a2*sqrt[a2]*gate[a1, b1, a2-1, b2] + vphi1_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + vphi1_a1a1*sqrt[a1]*sqrt[a1-1]*gate[a1-2, b1, a2, b2] + vphi1_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + vphi1_a1a2*sqrt[a1]*sqrt[a2]*gate[a1-1, b1, a2-1, b2] + vphi1_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + vphi1_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + vphi1_a2a2*sqrt[a2]*sqrt[a2-1]*gate[a1,b1,a2-2,b2] + vphi1_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1]
+
+    # Gradients with respect to theta2 and varphi2
+    th2_b2   = (c1*c2*e2c*S1 - e1*s1*s2*S2)*w1c + (c2*e1c*e2c*s1*S1 + c1*s2*S2)*w2c
+    th2_b2b2 = c2*s2*(e2c**2*np.conj(T1) - np.conj(T2))
+    th2_a2b2 = p2*(-c2*e1c*e2c*s1*S1 - c1*s2*S2)
+    th2_b1   = (c1*S1*s2 + c2*e1*e2*s1*S2)*w1c + (e1c*s1*S1*s2 - c1*c2*e2*S2)*w2c
+    th2_b1b2 = e2c*(-np.conj(T1)+e2**2*np.conj(T2))*np.cos(2*th2)
+    th2_b1a2 = p2*(-e1c*s1*S1*s2 + c1*c2*e2*S2)
+    th2_b1b1 = c2*s2*(-np.conj(T1) + e2**2*np.conj(T2))
+    th2_a1b2 = p1*(-c1*c2*e2c*S1 + e1*s1*s2*S2)
+    th2_a1b1 = -p1*(c1*S1*s2 + c2*(e1*e2*s1*S2))
+
+    vphi2_b2   = -1j*e2c*S1*s2*(c1*w1c + e1c*s1*w2c)
+    vphi2_b2b2 = -1j*e2c**2*s2**2*np.conj(T1)
+    vphi2_a2b2 = 1j*p2*e1c*e2c*s1*S1*s2
+    vphi2_b1   = 1j*e2*S2*s2*(e1*s1*w1c - c1*w2c)
+    vphi2_b1b2 = 1j*c2*e2c*s2*(np.conj(T1) + np.conj(T2)*e2**2)
+    vphi2_b1a2 = 1j*c1*p2*e2*s2*S2
+    vphi2_b1b1 = 1j*e2**2*s2**2*np.conj(T2)
+    vphi2_a1b2 = 1j*c1*p1*e2c*S1*s2
+    vphi2_a1b1 = -1j*p1*e1*e2*s1*s2*S2
+
+    Grad_th2 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_th2[a1, b1, a2, b2] = th2_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + th2_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + th2_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + th2_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + th2_b1b1*sqrt[b1]*sqrt[b1-1]*gate[a1, b1-2, a2, b2] + th2_b1b2*sqrt[b1]*sqrt[b2]*gate[a1, b1-1, a2, b2-1] + th2_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + th2_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1] + th2_b2b2*sqrt[b2]*sqrt[b2-1]*gate[a1,b1,a2,b2-2]
+
+    Grad_vphi2 = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    for a1 in range(cutoff):
+        for b1 in range(cutoff):
+            for a2 in range(cutoff):
+                for b2 in range(cutoff):
+                    Grad_vphi2[a1, b1, a2, b2] = vphi2_b1*sqrt[b1]*gate[a1, b1-1, a2, b2] + vphi2_b2*sqrt[b2]*gate[a1, b1, a2, b2-1] + vphi2_a1b1*sqrt[a1]*sqrt[b1]*gate[a1-1, b1-1, a2, b2] + vphi2_a1b2*sqrt[a1]*sqrt[b2]*gate[a1-1, b1, a2, b2-1] + vphi2_b1b1*sqrt[b1]*sqrt[b1-1]*gate[a1, b1-2, a2, b2] + vphi2_b1b2*sqrt[b1]*sqrt[b2]*gate[a1, b1-1, a2, b2-1] + vphi2_b1a2*sqrt[b1]*sqrt[a2]*gate[a1,b1-1,a2-1,b2] + vphi2_a2b2*sqrt[a2]*sqrt[b2]*gate[a1,b1,a2-1,b2-1] + vphi2_b2b2*sqrt[b2]*sqrt[b2-1]*gate[a1,b1,a2,b2-2]
+
+    return Grad_phi1, Grad_phi2, np.conj(Grad_w1), Grad_w1c, np.conj(Grad_w2), Grad_w2c, Grad_th1, Grad_vphi1, np.conj(Grad_z1), Grad_z1c, np.conj(Grad_z2), Grad_z2c, Grad_th2, Grad_vphi2
