@@ -117,6 +117,7 @@ Details
 from itertools import count, product, chain
 
 import numpy as np
+import dask
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
@@ -1069,13 +1070,14 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
     return tensor
 
 
-def probabilities(mu, cov, cutoff, hbar=2.0, rtol=1e-05, atol=1e-08):
+def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e-08):
     r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
 
     Args:
         mu (array): vector of means of length ``2*n_modes``
         cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
         cutoff (int): cutoff in Fock space
+        parallel (bool): if ``True``, uses ``dask`` for parallelization
         hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
         rtol (float): the relative tolerance parameter used in `np.allclose`
         atol (float): the absolute tolerance parameter used in `np.allclose`
@@ -1086,12 +1088,24 @@ def probabilities(mu, cov, cutoff, hbar=2.0, rtol=1e-05, atol=1e-08):
     if is_pure_cov(cov, hbar=hbar, rtol=rtol, atol=atol):  # Check if the covariance matrix cov is pure
         return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
-    probs = np.zeros([cutoff] * num_modes)
-    for i in product(range(cutoff), repeat=num_modes):
-        probs[i] = np.maximum(
-            0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
-        )
+
+    if parallel:
+        compute_list = []
+        # Create a list of parallelizable computations
+        for i in product(range(cutoff), repeat=num_modes):
+            compute_list.append(dask.delayed(density_matrix_element)(mu, cov, i, i, hbar=hbar))
+
+        probs = np.maximum(
+            0.0, np.real_if_close(dask.compute(*compute_list, scheduler="threads"))
+        ).reshape([cutoff] * num_modes)
         # The maximum is needed because every now and then a probability is very close to zero from below.
+    else:
+        probs = np.zeros([cutoff] * num_modes)
+        for i in product(range(cutoff), repeat=num_modes):
+            probs[i] = np.maximum(
+                0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
+            )
+            # The maximum is needed because every now and then a probability is very close to zero from below.
     return probs
 
 
