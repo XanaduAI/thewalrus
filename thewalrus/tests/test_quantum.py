@@ -938,7 +938,8 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
-def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar):
     """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
     cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
     cov2 = hbar * cov2 @ cov2.T / 2.0
@@ -950,8 +951,8 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
         mean2, cov2l = loss(mean2, cov2l, eta, i, hbar=hbar)
 
     cutoff = 6
-    probs = probabilities(mean2, cov2l, cutoff, hbar=hbar)
-    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, hbar=hbar)
+    probs = probabilities(mean2, cov2l, cutoff, parallel=parallel, hbar=hbar)
+    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, parallel=parallel, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta2, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
@@ -960,7 +961,8 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
-def test_update_with_loss_coherent_states(etas, etai, hbar):
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_loss_coherent_states(etas, etai, parallel, hbar):
     """Checks probabilities are updated correctly for coherent states"""
     n_modes = 2
     cov = hbar * np.identity(2 * n_modes) / 2
@@ -968,9 +970,9 @@ def test_update_with_loss_coherent_states(etas, etai, hbar):
     means = 2 * np.random.rand(2 * n_modes)
     means_lossy = np.sqrt(np.array(eta_vals + eta_vals)) * means
     cutoff = 6
-    probs_lossless = probabilities(means, cov, 10 * cutoff, hbar=hbar)
+    probs_lossless = probabilities(means, cov, 10 * cutoff, parallel=parallel, hbar=hbar)
 
-    probs = probabilities(means_lossy, cov, cutoff, hbar=hbar)
+    probs = probabilities(means_lossy, cov, cutoff, parallel=parallel, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
@@ -1004,7 +1006,8 @@ def test_loss_value_error(eta):
 
 
 @pytest.mark.parametrize("num_modes", [1, 2, 3])
-def test_update_with_noise_coherent(num_modes):
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_noise_coherent(num_modes, parallel):
     """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
     cutoff = 15
     nbar_vals = np.random.rand(num_modes)
@@ -1015,13 +1018,13 @@ def test_update_with_noise_coherent(num_modes):
     cov = hbar * np.identity(2 * num_modes) / 2
     cutoff = 10
 
-    probs = probabilities(means, cov, cutoff, hbar=2)
+    probs = probabilities(means, cov, cutoff, parallel=parallel, hbar=2)
     updated_probs = update_probabilities_with_noise(noise_dists, probs)
     beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
     means_expected = Means(
         np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
     )
-    expected = probabilities(means_expected, cov, cutoff, hbar=2)
+    expected = probabilities(means_expected, cov, cutoff, parallel=parallel, hbar=2)
     assert np.allclose(updated_probs, expected)
 
 
