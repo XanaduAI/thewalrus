@@ -53,8 +53,6 @@ Pre-built binary wheels are available for the following platforms:
 +------------+-------------+------------------+---------------+
 |            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |
 +============+=============+==================+===============+
-| Python 3.5 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
 | Python 3.6 |      X      |        X         |       X       |
 +------------+-------------+------------------+---------------+
 | Python 3.7 |      X      |        X         |       X       |
@@ -74,9 +72,9 @@ Compiling from source
 
 The Walrus depends on the following Python packages:
 
-* `Python <http://python.org/>`_ >=3.5
-* `NumPy <http://numpy.org/>`_  >=1.13.3
-* `Numba <https://numba.pydata.org/>`_ >=0.43.1
+* `Python <http://python.org/>`_ >= 3.6
+* `NumPy <http://numpy.org/>`_  >= 1.13.3
+* `Numba <https://numba.pydata.org/>`_ >= 0.43.1
 
 In addition, to compile the C++ extension, the following dependencies are required:
 
@@ -183,11 +181,11 @@ The Walrus documentation is available online on `Read the Docs <https://the-walr
 
 To build it locally, you need to have the following packages installed:
 
-* `Sphinx <http://sphinx-doc.org/>`_ >=1.5
-* `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >=0.3.6
+* `Sphinx <http://sphinx-doc.org/>`_ >= 1.5
+* `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >= 0.3.6
 * `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_
 * `Pandoc <https://pandoc.org/>`_
-* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >=4.12.0
+* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >= 4.12.0
 * `exhale <https://exhale.readthedocs.io/en/latest/>`_
 * `Doxygen <http://www.doxygen.nl/>`_
 
