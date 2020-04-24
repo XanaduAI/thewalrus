@@ -215,7 +215,7 @@ We also encourage bug reports, suggestions for new features and enhancements, an
 Authors
 =======
 
-Brajesh Gupt, Josh Izaac and Nicol\'as Quesada.
+Brajesh Gupt, Josh Izaac and Nicolas Quesada.
 
 All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
