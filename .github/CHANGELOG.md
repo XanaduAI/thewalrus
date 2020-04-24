@@ -4,11 +4,15 @@
 
 ### Improvements
 
+* Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
+
 ### Bug fixes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Theodor Isacsson
 
 ---
 
