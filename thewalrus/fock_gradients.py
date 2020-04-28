@@ -891,8 +891,6 @@ def G2gate_jit(phi12, w12, BS1, z12, BS2, cutoff, dtype=np.complex128):
     e2c = np.exp(-1j * vphi2)
     p1 = np.exp(1j * phi1)
     p2 = np.exp(1j * phi2)
-    p1c = np.exp(-1j * phi1)
-    p2c = np.exp(-1j * phi2)
 
     # 2nd derivatives of Q (order: a1, b1, a2, b2), omitted symmetric lower part
     R = np.array(
@@ -1041,8 +1039,6 @@ def G2gate_gradients(phi12, w12, BS1, z12, BS2, gate):
     e2c = np.conj(e2)
     p1 = np.exp(1j * phi1)
     p2 = np.exp(1j * phi2)
-    p1c = np.exp(-1j * phi1)
-    p2c = np.exp(-1j * phi2)
 
     # Gradients with respect to phi1 and phi2
     phi1_a1 = (
