@@ -20,12 +20,98 @@ from thewalrus.fock_gradients import (
     S2gate,
     Rgate,
     Kgate,
+    displacement,
+    grad_displacement,
+    squeezing,
+    grad_squeezing,
+    two_mode_squeezing,
+    grad_two_mode_squeezing,
+    beamsplitter,
+    grad_beamsplitter
 )
 import numpy as np
 
 
 # make tests deterministic
 np.random.seed(137)
+
+def test_grad_displacement():
+    """Tests the value of the analytic gradient for the Dgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi / 8
+    T = displacement(r*np.exp(1j*theta), cutoff)
+    Dz, Dzconj = grad_displacement(T, r*np.exp(1j*theta))
+    Dr = Dz*np.exp(1j*theta) + Dzconj*np.exp(-1j*theta)
+    Dtheta = Dz*1j*r*np.exp(1j*theta) - Dzconj*1j*r*np.exp(-1j*theta)
+
+    dr = 0.001
+    dtheta = 0.001
+    Drp = displacement((r + dr)*np.exp(1j*theta), cutoff)
+    Drm = displacement((r - dr)*np.exp(1j*theta), cutoff)
+    Dthetap = displacement(r*np.exp(1j*(theta + dtheta)), cutoff)
+    Dthetam = displacement(r*np.exp(1j*(theta - dtheta)), cutoff)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+
+def test_grad_squeezing():
+    """Tests the value of the analytic gradient for the Sgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi / 8
+    T = squeezing(r, theta, cutoff)
+    Dr, Dtheta = grad_squeezing(T, r, theta)
+
+    dr = 0.001
+    dtheta = 0.001
+    Drp = squeezing((r + dr), theta, cutoff)
+    Drm = squeezing((r - dr), theta, cutoff)
+    Dthetap = squeezing(r, theta + dtheta, cutoff)
+    Dthetam = squeezing(r, theta - dtheta, cutoff)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+
+
+def test_grad_two_mode_squeezing():
+    """Tests the value of the analytic gradient for the S2gate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi / 8
+    T = two_mode_squeezing(r, theta, cutoff)
+    Dr, Dtheta = grad_two_mode_squeezing(T, r, theta)
+    dr = 0.001
+    dtheta = 0.001
+    Drp = two_mode_squeezing(r + dr, theta, cutoff)
+    Drm = two_mode_squeezing(r - dr, theta, cutoff)
+    Dthetap = two_mode_squeezing(r, theta + dtheta, cutoff)
+    Dthetam = two_mode_squeezing(r, theta - dtheta, cutoff)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+
+def test_grad_beamspitter():
+    """Tests the value of the analytic gradient for the S2gate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi / 8
+    T = beamsplitter(r, theta, cutoff)
+    Dr, Dtheta = grad_beamsplitter(T, r, theta)
+
+    dr = 0.001
+    dtheta = 0.001
+    Drp = beamsplitter(r + dr, theta, cutoff)
+    Drm = beamsplitter(r - dr, theta, cutoff)
+    Dthetap = beamsplitter(r, theta + dtheta, cutoff)
+    Dthetam = beamsplitter(r, theta - dtheta, cutoff)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
 
 
 def test_Dgate():
