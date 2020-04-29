@@ -37,11 +37,12 @@ from numba import jit
 
 
 @jit(nopython=True)
-def displacement(alpha, cutoff, dtype=np.complex128):  # pragma: no cover
+def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     r"""Calculate the matrix elements of the real or complex displacement gate using a recurrence relation.
 
     Args:
-        alpha (float or complex): value of the displacement.
+        r (float): displacement amplitude
+        phi (float): displacement phase
         cutoff (int): Fock ladder cutoff
         dtype (data type): Specifies the data type used for the calculation
 
@@ -50,9 +51,9 @@ def displacement(alpha, cutoff, dtype=np.complex128):  # pragma: no cover
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
-    mu = np.array([alpha, -np.conj(alpha)])
+    mu = np.array([r * np.exp(1j * phi), -r * np.exp(-1j * phi)])
 
-    D[0, 0] = np.exp(-0.5 * np.abs(mu[0]) ** 2)
+    D[0, 0] = np.exp(-0.5 * r ** 2)
     for m in range(1, cutoff):
         D[m, 0] = mu[0] / sqrt[m] * D[m - 1, 0]
 
@@ -64,29 +65,32 @@ def displacement(alpha, cutoff, dtype=np.complex128):  # pragma: no cover
 
 
 @jit(nopython=True)
-def grad_displacement(T, alpha, dtype=np.complex128):  # pragma: no cover
-    r"""Calculates the gradients of the Dgate with respect to alpha and the conjugate of alpha.
-
+def grad_displacement(T, r, phi, dtype=np.complex128):  # pragma: no cover
+    r"""Calculates the gradients of the Dgate with respect to r and phi.
     Args:
         T (array[complex]): array representing the gate
-        alpha (complex): displacement phase
+        r (float): displacement amplitude
+        phi (float): displacement phase
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        tuple[array[complex], array[complex]]: The gradient of the Dgate with respect to alpha and the conjugate of alpha
+        tuple[array[complex], array[complex]]: The gradient of the Dgate with respect to r and phi
     """
     cutoff = T.shape[0]
-    alphac = np.conj(alpha)
+    ei = np.exp(1j * phi)
+    eic = np.exp(-1j * phi)
+    alpha = r * ei
+    alphac = r * eic
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
-    grad_alpha = np.zeros((cutoff, cutoff), dtype=dtype)
-    grad_alphaconj = np.zeros((cutoff, cutoff), dtype=dtype)
+    grad_r = np.zeros((cutoff, cutoff), dtype=dtype)
+    grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
 
     for m in range(cutoff):
         for n in range(cutoff):
-            grad_alpha[m, n] = -0.5 * alphac * T[m, n] + sqrt[m] * T[m - 1, n]
-            grad_alphaconj[m, n] = -0.5 * alpha * T[m, n] - sqrt[n] * T[m, n - 1]
+            grad_r[m, n] = -r * T[m, n] + sqrt[m] * ei * T[m - 1, n] - sqrt[n] * eic * T[m, n - 1]
+            grad_phi[m, n] = sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
 
-    return grad_alpha, grad_alphaconj
+    return grad_r, grad_phi
 
 
 @jit(nopython=True)

@@ -40,17 +40,15 @@ def test_grad_displacement():
     cutoff = 4
     r = 1.0
     theta = np.pi / 8
-    T = displacement(r*np.exp(1j*theta), cutoff)
-    Dz, Dzconj = grad_displacement(T, r*np.exp(1j*theta))
-    Dr = Dz*np.exp(1j*theta) + Dzconj*np.exp(-1j*theta)
-    Dtheta = Dz*1j*r*np.exp(1j*theta) - Dzconj*1j*r*np.exp(-1j*theta)
+    T = displacement(r, theta, cutoff)
+    Dr, Dtheta = grad_displacement(T, r, theta)
 
     dr = 0.001
     dtheta = 0.001
-    Drp = displacement((r + dr)*np.exp(1j*theta), cutoff)
-    Drm = displacement((r - dr)*np.exp(1j*theta), cutoff)
-    Dthetap = displacement(r*np.exp(1j*(theta + dtheta)), cutoff)
-    Dthetam = displacement(r*np.exp(1j*(theta - dtheta)), cutoff)
+    Drp = displacement(r + dr, theta, cutoff)
+    Drm = displacement(r - dr, theta, cutoff)
+    Dthetap = displacement(r, theta + dtheta, cutoff)
+    Dthetam = displacement(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
@@ -228,6 +226,24 @@ def test_Dgate_values(tol):
     T = Dgate(np.abs(alpha), np.angle(alpha), cutoff)[0]
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
+def test_displacement_values(tol):
+    """Tests the correct construction of the single mode displacement operation"""
+    cutoff = 5
+    alpha = 0.3 + 0.5 * 1j
+    # This data is obtained by using qutip
+    # np.array(displace(40,alpha).data.todense())[0:5,0:5]
+    expected = np.array(
+        [
+            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j,],
+            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j,],
+            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j,],
+            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j,],
+            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j,],
+        ]
+    )
+    T = displacement(np.abs(alpha), np.angle(alpha), cutoff)
+    assert np.allclose(T, expected, atol=tol, rtol=0)
+
 
 def test_Sgate_values_complex(tol):
     """Tests the correct construction of the single mode squeezing operation"""
@@ -321,6 +337,27 @@ def test_BS_values(tol):
     U = np.array([[ct, -np.conj(st)], [st, ct]])
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
     T = BSgate(theta, phi, 3)[0]
+    U_rec = np.empty([nmodes, nmodes], dtype=complex)
+    for i, vec_i in enumerate(vec_list):
+        for j, vec_j in enumerate(vec_list):
+            U_rec[i, j] = T[tuple(vec_i + vec_j)]
+    assert np.allclose(U, U_rec, atol=tol, rtol=0)
+
+def test_beamsplitter_values(tol):
+    r"""Test that the representation of an interferometer in the single
+    excitation manifold is precisely the unitary matrix that represents it
+    mode in space. This test in particular checks that the BS gate is
+    consistent with strawberryfields
+    """
+    nmodes = 2
+    vec_list = np.identity(nmodes, dtype=int).tolist()
+    theta = 2 * np.pi * np.random.rand()
+    phi = 2 * np.pi * np.random.rand()
+    ct = np.cos(theta)
+    st = np.sin(theta) * np.exp(1j * phi)
+    U = np.array([[ct, -np.conj(st)], [st, ct]])
+    # Calculate the matrix \langle i | U | j \rangle = T[i+j]
+    T = beamsplitter(theta, phi, 3)
     U_rec = np.empty([nmodes, nmodes], dtype=complex)
     for i, vec_i in enumerate(vec_list):
         for j, vec_j in enumerate(vec_list):
