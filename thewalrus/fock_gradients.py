@@ -65,7 +65,7 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
 
 @jit(nopython=True)
-def grad_displacement(T, r, phi, dtype=np.complex128):  # pragma: no cover
+def grad_displacement(T, r, phi):  # pragma: no cover
     r"""Calculates the gradients of the Dgate with respect to r and phi.
     Args:
         T (array[complex]): array representing the gate
@@ -77,6 +77,7 @@ def grad_displacement(T, r, phi, dtype=np.complex128):  # pragma: no cover
         tuple[array[complex], array[complex]]: The gradient of the Dgate with respect to r and phi
     """
     cutoff = T.shape[0]
+    dtype = T.dtype
     ei = np.exp(1j * phi)
     eic = np.exp(-1j * phi)
     alpha = r * ei
@@ -125,7 +126,7 @@ def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
 
 
 @jit(nopython=True)
-def grad_squeezing(T, r, phi, dtype=np.complex128):  # pragma: no cover
+def grad_squeezing(T, r, phi):  # pragma: no cover
     r"""Calculates the gradients of the squeezing gate with respect to the squeezing amplitude and phase
 
     Args:
@@ -138,6 +139,7 @@ def grad_squeezing(T, r, phi, dtype=np.complex128):  # pragma: no cover
         tuple[array[complex], array[complex]]: The gradient of the squeezing gate with respect to the squeezing amplitude and phase
     """
     cutoff = T.shape[0]
+    dtype = T.dtype
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
     grad_r = np.zeros((cutoff, cutoff), dtype=dtype)
     grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
@@ -207,7 +209,7 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
 
 
 @jit(nopython=True)
-def grad_two_mode_squeezing(T, r, theta, dtype=np.complex128):  # pragma: no cover
+def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
     """Calculates the gradients of the two-mode squeezing gate with respect to the squeezing amplitude and phase
 
     Args:
@@ -221,6 +223,7 @@ def grad_two_mode_squeezing(T, r, theta, dtype=np.complex128):  # pragma: no cov
 
     """
     cutoff = T.shape[0]
+    dtype = T.dtype
     sechr = 1.0 / np.cosh(r)
     tanhr = np.tanh(r)
     ei = np.exp(1j * theta)
@@ -307,7 +310,7 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
 
 @jit(nopython=True)
-def grad_beamsplitter(T, theta, phi, dtype=np.complex128):  # pragma: no cover
+def grad_beamsplitter(T, theta, phi):  # pragma: no cover
     r"""Calculates the Fock representation of the beamsplitter.
 
     Args:
@@ -320,6 +323,7 @@ def grad_beamsplitter(T, theta, phi, dtype=np.complex128):  # pragma: no cover
         array[float]: The Fock representation of the gate
     """
     cutoff = T.shape[0]
+    dtype = T.dtype
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
     grad_theta = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
     grad_phi = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
