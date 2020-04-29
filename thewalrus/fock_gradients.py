@@ -404,8 +404,8 @@ def Dgate(r, theta, cutoff, grad=False, dtype=np.complex128):
         tuple[array[complex], array[complex], array[complex]]: The Fock representations of the gate and its gradients with sizes ``[cutoff]*2``
     """
     if not grad:
-        return displacement(r * np.exp(1j * theta), cutoff, dtype=dtype), None, None
-    T = displacement(r * np.exp(1j * theta), cutoff + 1)
+        return displacement(r, theta, cutoff, dtype=dtype), None, None
+    T = displacement(r, theta, cutoff + 1)
     (gradTr, gradTtheta) = grad_Dgate(T, theta, cutoff, dtype=dtype)
     return T[:cutoff, :cutoff], gradTr, gradTtheta
 
