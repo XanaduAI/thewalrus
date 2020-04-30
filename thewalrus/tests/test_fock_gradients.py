@@ -14,8 +14,6 @@
 """Tests for The Walrus fock_gradients functions"""
 
 from thewalrus.fock_gradients import (
-    Rgate,
-    Kgate,
     displacement,
     grad_displacement,
     squeezing,
