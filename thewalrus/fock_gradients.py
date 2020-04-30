@@ -17,18 +17,19 @@ Fock gradients of Gaussian gates
 
 .. currentmodule:: thewalrus.fock_gradients
 
-This module contains the Fock representation of the standard Gaussian gates and
-the Kerr gate, as well as their gradients.
+This module contains the Fock representation of the standard Gaussian gates as well as their gradients.
 
 .. autosummary::
     :toctree: api
 
-    Dgate
-    Sgate
-    Rgate
-    Kgate
-    S2gate
-    BSgate
+	displacement
+	squeezing
+	beamsplitter
+	two_mode_squeezing
+	grad_displacement
+	grad_squeezing
+	grad_beamsplitter
+	grad_two_mode_squeezing
 
 """
 import numpy as np
