@@ -255,6 +255,6 @@ def test_two_mode_squeezing_values(tol):
     r = 0.5
     theta = 0.7
     cutoff = 5
-    T = two_mode_squeezing(r, theta, cutoff)[0]
+    T = two_mode_squeezing(r, theta, cutoff)
     expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
