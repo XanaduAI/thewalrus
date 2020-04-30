@@ -134,7 +134,7 @@ def vacuum_state(modes, hbar=2.0, dtype=np.float64):
         modes (str): Returns the vector of means and the covariance matrix
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`
-        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
+        dtype (numpy.dtype): datatype to represent the covariance matrix and vector of means
     Returns:
         list[array]: the means vector and covariance matrix of the vacuum state
     """
