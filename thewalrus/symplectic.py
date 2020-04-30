@@ -67,8 +67,7 @@ def expand(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = len(S) // 2
-    Sdtype = S.dtype
-    S2 = np.identity(2 * N, dtype=Sdtype)
+    S2 = np.identity(2 * N, dtype=S.dtype)
     w = np.array(modes)
 
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
