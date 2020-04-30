@@ -289,7 +289,7 @@ def rotation(theta, dtype=np.float64):
 
     Args:
         theta (float): rotation angle
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: rotation matrix by angle theta
