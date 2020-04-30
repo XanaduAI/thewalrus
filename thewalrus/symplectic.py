@@ -172,7 +172,7 @@ def two_mode_squeezing(r, phi, dtype=np.float64):
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic transformation matrix
