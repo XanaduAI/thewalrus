@@ -1096,7 +1096,7 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
             compute_list.append(dask.delayed(density_matrix_element)(mu, cov, i, i, hbar=hbar))
 
         probs = np.maximum(
-            0.0, np.real_if_close(dask.compute(*compute_list, scheduler="threads"))
+            0.0, np.real_if_close(dask.compute(*compute_list, scheduler="processes"))
         ).reshape([cutoff] * num_modes)
         # The maximum is needed because every now and then a probability is very close to zero from below.
     else:
