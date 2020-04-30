@@ -328,8 +328,7 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     if n % 2 != 0:
         return False
     nmodes = n // 2
-    Sdtype = S.dtype
-    Omega = sympmat(nmodes, dtype=Sdtype)
+    Omega = sympmat(nmodes, dtype=S.dtype)
 
     return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
 
