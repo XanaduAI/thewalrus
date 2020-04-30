@@ -1073,6 +1073,14 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
 def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e-08):
     r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
 
+    .. note::
+
+        Parallization is already being done by OpenMP when calling ``density_matrix_element``.
+        To get a speed-up from using ``parallel=True`` it must be turned off by setting the
+        environment variable ``OMP_NUM_THREADS=1`` (forcing single threaded use). Remove the
+        environment variable or set it to ``OMP_NUM_THREADS=''`` to again use multithreading
+        with OpenMP.
+
     Args:
         mu (array): vector of means of length ``2*n_modes``
         cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
