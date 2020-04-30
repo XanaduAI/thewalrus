@@ -90,8 +90,8 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
-    #alpharealdtype = (alpha.real).dtype
-    # This one is problematic because alpha is not a numpy object
+    alpharealdtype = np.dtype(type(alpha))
+
     r = np.zeros(2 * N)
     r[mode] = np.sqrt(2 * hbar) * alpha.real
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
