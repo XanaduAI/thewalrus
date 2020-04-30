@@ -108,30 +108,6 @@ def test_grad_beamspitter():
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
 
 
-def test_Rgate():
-    """Tests the value of the analytic gradient for the Rgate against finite differences"""
-    theta = 1.0
-    cutoff = 9
-    _, dR = Rgate(theta, cutoff, grad=True)
-    dtheta = 0.0001
-    Rs, _ = Rgate(theta + dtheta, cutoff)
-    Rm, _ = Rgate(theta - dtheta, cutoff)
-    dRfd = (Rs - Rm) / (2 * dtheta)
-    assert np.allclose(dR, dRfd, atol=1e-5, rtol=0)
-
-
-def test_Kgate():
-    """Tests the value of the analytic gradient for the Kgate against finite differences"""
-    theta = 1.0
-    cutoff = 9
-    _, dR = Kgate(theta, cutoff, grad=True)
-    dtheta = 0.0001
-    Rs, _ = Kgate(theta + dtheta, cutoff)
-    Rm, _ = Kgate(theta - dtheta, cutoff)
-    dRfd = (Rs - Rm) / (2 * dtheta)
-    assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
-
-
 def test_displacement_values(tol):
     """Tests the correct construction of the single mode displacement operation"""
     cutoff = 5
