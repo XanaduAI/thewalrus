@@ -92,7 +92,7 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     """
     alpharealdtype = np.dtype(type(alpha))
 
-    r = np.zeros(2 * N)
+    r = np.zeros(2 * N, dtype=alpharealdtype)
     r[mode] = np.sqrt(2 * hbar) * alpha.real
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
