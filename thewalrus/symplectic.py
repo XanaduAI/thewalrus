@@ -302,7 +302,7 @@ def sympmat(N, dtype=np.float64):
 
     Args:
         N (int): positive integer
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: :math:`2N\times 2N` array
