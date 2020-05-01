@@ -67,8 +67,7 @@ def expand(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = len(S) // 2
-    Sdtype = S.dtype
-    S2 = np.identity(2 * N, dtype=Sdtype)
+    S2 = np.identity(2 * N, dtype=S.dtype)
     w = np.array(modes)
 
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
@@ -90,9 +89,9 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
-    #alpharealdtype = (alpha.real).dtype
-    # This one is problematic because alpha is not a numpy object
-    r = np.zeros(2 * N)
+    alpharealdtype = np.dtype(type(alpha))
+
+    r = np.zeros(2 * N, dtype=alpharealdtype)
     r[mode] = np.sqrt(2 * hbar) * alpha.real
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
@@ -135,7 +134,7 @@ def vacuum_state(modes, hbar=2.0, dtype=np.float64):
         modes (str): Returns the vector of means and the covariance matrix
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`
-        dtype (numpy.dtype): numpy datatype to represent the covariance matrix and vector of means
+        dtype (numpy.dtype): datatype to represent the covariance matrix and vector of means
     Returns:
         list[array]: the means vector and covariance matrix of the vacuum state
     """
@@ -151,7 +150,7 @@ def squeezing(r, phi, dtype=np.float64):
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
     Returns:
         array: symplectic transformation matrix
 
@@ -173,7 +172,7 @@ def two_mode_squeezing(r, phi, dtype=np.float64):
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic transformation matrix
@@ -267,7 +266,7 @@ def beam_splitter(theta, phi, dtype=np.float64):
     Args:
         theta (float): transmissivity parameter
         phi (float): phase parameter
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic-orthogonal transformation matrix of an interferometer with angles theta and phi
@@ -289,7 +288,7 @@ def rotation(theta, dtype=np.float64):
 
     Args:
         theta (float): rotation angle
-        dtype (numpy.dtype): numpy datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: rotation matrix by angle theta
@@ -329,8 +328,7 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     if n % 2 != 0:
         return False
     nmodes = n // 2
-    Sdtype = S.dtype
-    Omega = sympmat(nmodes, dtype=Sdtype)
+    Omega = sympmat(nmodes, dtype=S.dtype)
 
     return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
 
