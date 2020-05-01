@@ -39,16 +39,16 @@ from numba import jit
 
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
-    r"""Calculate the matrix elements of the real or complex displacement gate using a recurrence relation.
+    r"""Calculates the matrix elements of the displacement gate using a recurrence relation.
 
     Args:
-        r (float): displacement amplitude
-        phi (float): displacement phase
+        r (float): displacement magnitude
+        phi (float): displacement angle
         cutoff (int): Fock ladder cutoff
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        (array): matrix representing the displacement operation.
+        array[complex]: matrix representing the displacement operation.
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
@@ -67,15 +67,14 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
 @jit(nopython=True)
 def grad_displacement(T, r, phi):  # pragma: no cover
-    r"""Calculates the gradients of the Dgate with respect to r and phi.
+    r"""Calculates the gradients of the displacement gate with respect to the displacement magnitude and angle.
     Args:
         T (array[complex]): array representing the gate
-        r (float): displacement amplitude
-        phi (float): displacement phase
-        dtype (data type): Specifies the data type used for the calculation
+        r (float): displacement magnitude
+        phi (float): displacement angle
 
     Returns:
-        tuple[array[complex], array[complex]]: The gradient of the Dgate with respect to r and phi
+        tuple[array[complex], array[complex]]: The gradient of the displacement gate with respect to r and phi
     """
     cutoff = T.shape[0]
     dtype = T.dtype
@@ -97,16 +96,16 @@ def grad_displacement(T, r, phi):  # pragma: no cover
 
 @jit(nopython=True)
 def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
-    r"""Calculate the matrix elements of the real or complex squeezing gate using a recurrence relation.
+    r"""Calculates the matrix elements of the squeezing gate using a recurrence relation.
 
     Args:
-        r (float): squeezing amplitude
-        theta (float): squeezing phase
+        r (float): squeezing magnitude
+        theta (float): squeezing angle
         cutoff (int): Fock ladder cutoff
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        (array): matrix representing the squeezing operation.
+        array[complex]: matrix representing the squeezing gate.
     """
     S = np.zeros((cutoff, cutoff), dtype=dtype)
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
@@ -128,16 +127,15 @@ def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
 
 @jit(nopython=True)
 def grad_squeezing(T, r, phi):  # pragma: no cover
-    r"""Calculates the gradients of the squeezing gate with respect to the squeezing amplitude and phase
+    r"""Calculates the gradients of the squeezing gate with respect to the squeezing magnitude and angle
 
     Args:
         T (array[complex]): array representing the gate
-        r (float): squeezing amplitude
-        phi (float): squeezing phase
-        dtype (data type): Specifies the data type used for the calculation
+        r (float): squeezing magnitude
+        phi (float): squeezing angle
 
     Returns:
-        tuple[array[complex], array[complex]]: The gradient of the squeezing gate with respect to the squeezing amplitude and phase
+        tuple[array[complex], array[complex]]: The gradient of the squeezing gate with respect to the r and phi
     """
     cutoff = T.shape[0]
     dtype = T.dtype
@@ -171,7 +169,7 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
 
     Args:
         r (float): squeezing magnitude
-        theta (float): squeezing phase
+        theta (float): squeezing angle
         cutoff (int): Fock ladder cutoff
         dtype (data type): Specifies the data type used for the calculation
 
@@ -211,16 +209,15 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
 
 @jit(nopython=True)
 def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
-    """Calculates the gradients of the two-mode squeezing gate with respect to the squeezing amplitude and phase
+    """Calculates the gradients of the two-mode squeezing gate with respect to the squeezing magnitude and angle
 
     Args:
         T (array[complex]): array representing the gate
         r (float): squeezing magnitude
-        theta (float): squeezing phase
-        dtype (data type): Specifies the data type used for the calculation
+        theta (float): squeezing angle
 
     Returns:
-        tuple[array[complex], array[complex]]: The gradient of the two-mode squeezing gate with respect to the squeezing amplitude and phase
+        tuple[array[complex], array[complex]]: The gradient of the two-mode squeezing gate with respect to r and phi
 
     """
     cutoff = T.shape[0]
@@ -312,16 +309,15 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
 @jit(nopython=True)
 def grad_beamsplitter(T, theta, phi):  # pragma: no cover
-    r"""Calculates the Fock representation of the beamsplitter.
+    r"""Calculates the gradients of the beamsplitter gate with respect to the transmissivity angle and reflection phase
 
     Args:
+        T (array[complex]): array representing the gate
         theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=\cos(\theta)`
         phi (float): reflection phase of the beamsplitter
-        cutoff (int): Fock ladder cutoff
-        dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        array[float]: The Fock representation of the gate
+        tuple[array[complex], array[complex]]: The gradient of the beamsplitter gate with respect to theta and phi
     """
     cutoff = T.shape[0]
     dtype = T.dtype
