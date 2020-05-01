@@ -477,3 +477,28 @@ def Kgate(theta, cutoff, grad=False, dtype=np.complex128):
     if not grad:
         return np.diag(T), None
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
+
+
+def cubic_phase(gamma, hbar, cutoff, dtype=np.complex128):
+    mu = 1 / np.cbrt(gamma * np.sqrt(hbar))
+    eAi, eAip, _, _ = airye(mu ** 4)
+    V = np.zeros([cutoff, cutoff], dtype=dtype)
+    sqrt = np.sqrt(np.arange(cutoff + 5))
+    pref = np.sqrt(np.pi)
+    V[0, 0] = 2 * pref * mu * eAi
+    V[0, 1] = -2 * pref * 1j * sqrt[2] * (mu ** 2) * (mu ** 2 * eAi + eAip)
+    V[1, 0] = V[0, 1]
+    V[1, 1] = -8 * mu ** 5 * pref * (mu ** 2 * eAi + eAip)
+
+    for m in range(cutoff):
+        for n in range(cutoff - 2):
+            V[m, n + 2] = (
+                -(
+                    sqrt[2]
+                    * (sqrt[n - 1] * sqrt[n] * V[m, -2 + n] + (1 + 2 * n) * V[m, n])
+                )
+                + 4j * mu ** 3 * (sqrt[m] * V[-1 + m, n] - sqrt[1 + n] * V[m, 1 + n])
+            ) / (sqrt[2] * sqrt[n + 1] * sqrt[n + 2])
+        V[:, m] = V[m, :]
+
+    return V
