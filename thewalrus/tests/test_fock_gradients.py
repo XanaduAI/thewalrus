@@ -20,9 +20,10 @@ from thewalrus.fock_gradients import (
     S2gate,
     Rgate,
     Kgate,
+    cubic_phase
 )
 import numpy as np
-
+import pytest
 
 # make tests deterministic
 np.random.seed(137)
@@ -274,3 +275,28 @@ def test_sf_order_S2gate():
     assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
     assert np.allclose(T1.transpose((0, 2, 1, 3)), Tsf1)
     assert np.allclose(T2.transpose((0, 2, 1, 3)), Tsf2)
+
+
+
+
+@pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0/137])
+@pytest.mark.parametrize("cutoff", [10, 15, 20])
+@pytest.mark.parametrize("mu", [0.1, 1, 10])
+def test_cubic_is_symmetric(mu, cutoff, hbar):
+    """Tests the cubic phase gate is symmetric"""
+    V = cubic_phase(mu, cutoff, hbar=hbar)
+    assert np.allclose(V, V.T)
+
+@pytest.mark.parametrize("mu", [0.1, 1, 10])
+def test_cubic_parity(mu):
+    r"""Test that the matrix elements have the right parity V_{n,m}(\mu) = (-1)^{n+m} V_{n,m}(-\mu)"""
+    cutoff = 10
+    V = cubic_phase(mu, cutoff)
+    Vm = cubic_phase(-mu, cutoff)
+    for n in range(cutoff):
+        for m in range(cutoff):
+            if (m+n) % 2 == 0:
+                sign = 1
+            else:
+                sign = -1
+            assert np.allclose(V[m,n], sign*Vm[m,n], atol=1e-)

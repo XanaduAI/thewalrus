@@ -32,6 +32,7 @@ the Kerr gate, as well as their gradients.
 
 """
 import numpy as np
+from scipy.special import airye
 
 from numba import jit
 
@@ -479,17 +480,49 @@ def Kgate(theta, cutoff, grad=False, dtype=np.complex128):
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
 
 
-def cubic_phase(gamma, hbar, cutoff, dtype=np.complex128):
-    mu = 1 / np.cbrt(gamma * np.sqrt(hbar))
-    eAi, eAip, _, _ = airye(mu ** 4)
-    V = np.zeros([cutoff, cutoff], dtype=dtype)
+@jit(nopython=True)
+def _cubic_phase_iterate(mu, v00, v01, v11, cutoff, dtype=np.complex128):
     sqrt = np.sqrt(np.arange(cutoff + 5))
-    pref = np.sqrt(np.pi)
-    V[0, 0] = 2 * pref * mu * eAi
-    V[0, 1] = -2 * pref * 1j * sqrt[2] * (mu ** 2) * (mu ** 2 * eAi + eAip)
-    V[1, 0] = V[0, 1]
-    V[1, 1] = -8 * mu ** 5 * pref * (mu ** 2 * eAi + eAip)
+    V = np.zeros((cutoff, cutoff), dtype=dtype)
+    V[0,0] = v00
+    V[0,1] = v01
+    V[1,0] = v01
+    V[1,1] = v11
+    for m in range(cutoff):
+        for n in range(cutoff - 2):
+            V[m, n + 2] = (
+                -(
+                    sqrt[2]
+                    * (sqrt[n - 1] * sqrt[n] * V[m, -2 + n] + (1 + 2 * n) * V[m, n])
+                )
+                + 4j * mu ** 3 * (sqrt[m] * V[-1 + m, n] - sqrt[1 + n] * V[m, 1 + n])
+            ) / (sqrt[2] * sqrt[n + 1] * sqrt[n + 2])
+        V[:, m] = V[m, :]
+    return V
 
+def cubic_phase(gamma, cutoff, hbar=2, dtype=np.complex128):
+    r"""Calculates the Fock representation of the cubic phase gate.
+
+    Args:
+        gamma (float): amplitude of the gate
+        cutoff: Fock ladder cutoff
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array:  matrix representing the cubic phase operation.
+    """
+    mu = 1 / np.cbrt(np.abs(gamma * np.sqrt(hbar)))
+    eAi, eAip, _, _ = airye(mu ** 4)
+    #V = np.zeros([cutoff, cutoff], dtype=dtype)
+    pref = np.sqrt(np.pi)
+    v00 = 2 * pref * mu * eAi
+    v01 = -2 * pref * 1j * np.sqrt(2) * (mu ** 2) * (mu ** 2 * eAi + eAip) * np.sign(gamma)
+    #V[1, 0] = V[0, 1]
+    v11 = -8 * mu ** 5 * pref * (mu ** 2 * eAi + eAip)
+    return _cubic_phase_iterate(mu, v00, v01, v11, cutoff, dtype=dtype)
+    """
     for m in range(cutoff):
         for n in range(cutoff - 2):
             V[m, n + 2] = (
@@ -502,3 +535,4 @@ def cubic_phase(gamma, hbar, cutoff, dtype=np.complex128):
         V[:, m] = V[m, :]
 
     return V
+    """
