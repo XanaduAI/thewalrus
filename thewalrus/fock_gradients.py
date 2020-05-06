@@ -33,6 +33,7 @@ the Kerr gate, as well as their gradients.
 """
 import numpy as np
 from scipy.special import airye
+from scipy.integrate import quad
 
 from numba import jit
 
@@ -480,13 +481,45 @@ def Kgate(theta, cutoff, grad=False, dtype=np.complex128):
     return np.diag(T), np.diag(1j * (ns ** 2) * T)
 
 
+
+
+
 @jit(nopython=True)
-def _cubic_phase_iterate(mu, v00, v01, v11, cutoff, dtype=np.complex128):
-    sqrt = np.sqrt(np.arange(cutoff + 5))
+def _jitfunc00(x, mu):
+    return np.exp(-x**2)*np.cos((x/mu)**3/3)
+
+@jit(nopython=True)
+def _jitfunc11(x, mu):
+    return 4*x*x*np.exp(-x**2)*np.cos((x/mu)**3/3)
+
+def _npv00(mu):
+    func00 = lambda x: _jitfunc00(x,mu)
+    return quad(func00, -np.inf, np.inf)/np.sqrt(np.pi)
+
+def _npv11(mu):
+    func11 = lambda x: _jitfunc11(x,mu)
+    return quad(func11, -np.inf, np.inf)/np.sqrt(4*np.pi)
+
+
+def _init_vals_cubic(mu):
+    if mu>1e10:
+        return (1,1)
+    elif 1e10>=mu>1:
+        return (_npv00(mu)[0], _npv11(mu)[0])
+    else:
+        eAi, eAip, _, _ = airye(mu ** 4)
+        pref = np.sqrt(np.pi)
+        val00 = 2 * pref * np.abs(mu) * eAi
+        val11 = -8 * np.abs(mu) ** 5 * pref * (mu ** 2 * eAi + eAip)
+        return (val00, val11)
+
+@jit(nopython=True)
+def _cubic_phase_iterate(mu, v00, v11, cutoff, dtype=np.complex128):
+    sqrt = np.sqrt(np.arange(cutoff + 5, dtype=dtype))
     V = np.zeros((cutoff, cutoff), dtype=dtype)
     V[0,0] = v00
-    V[0,1] = v01
-    V[1,0] = v01
+    V[0,1] = v11/(-2*1j*np.sqrt(2)*mu**3)
+    V[1,0] = V[0,1]
     V[1,1] = v11
     for m in range(cutoff):
         for n in range(cutoff - 2):
@@ -500,7 +533,32 @@ def _cubic_phase_iterate(mu, v00, v01, v11, cutoff, dtype=np.complex128):
         V[:, m] = V[m, :]
     return V
 
-def cubic_phase(gamma, cutoff, hbar=2, dtype=np.complex128):
+#@jit(nopython=True)
+def _cubic_phase_iterate1(mu, v00, v11, cutoff, dtype=np.complex128):
+    sqrt = np.sqrt(np.arange(cutoff + 5, dtype=dtype))
+    V = np.zeros((cutoff, cutoff), dtype=dtype)
+    V[0,0] = v00
+    V[0,1] = v11/(-2*1j*np.sqrt(2)*mu**3)
+    V[1,0] = V[0,1]
+    V[1,1] = v11
+    tp = True
+    for m in range(cutoff):
+        for n in range(cutoff - 2):
+            den = sqrt[1 + n]*sqrt[2 + n]
+            t1 = -(sqrt[n]*sqrt[n-1])*V[m,-2 + n]/(den)
+            t2 = -(2*n+1)*V[m,n]/(den)
+            t3 = 2*1j*sqrt[2]*(sqrt[m]*V[m-1,n]-sqrt[n+1]*V[m,1+n])/(den)
+            V[m, n + 2] = t1+t2+t3*mu**3
+            if np.abs(V[m,n+2])>1 and tp:
+                print(m,n+2,V[m,n+2])
+                tp = False
+            #V[n+2, m] = V[m, n + 2]
+        V[:, m] = V[m, :]
+    return V
+
+
+
+def cubic_phase(gamma, cutoff, hbar=2, dtype=np.complex128,it=True):
     r"""Calculates the Fock representation of the cubic phase gate.
 
     Args:
@@ -513,15 +571,18 @@ def cubic_phase(gamma, cutoff, hbar=2, dtype=np.complex128):
     Returns:
         array:  matrix representing the cubic phase operation.
     """
-    mu = 1 / np.cbrt(np.abs(gamma * np.sqrt(hbar)))
-    eAi, eAip, _, _ = airye(mu ** 4)
+    mu = 1 / np.cbrt(gamma * np.sqrt(hbar))
+    #eAi, eAip, _, _ = airye(mu ** 4)
     #V = np.zeros([cutoff, cutoff], dtype=dtype)
-    pref = np.sqrt(np.pi)
-    v00 = 2 * pref * mu * eAi
-    v01 = -2 * pref * 1j * np.sqrt(2) * (mu ** 2) * (mu ** 2 * eAi + eAip) * np.sign(gamma)
+    v00, v11 = _init_vals_cubic(mu)
+    #v00 = 2 * pref * np.abs(mu) * eAi
+    #v01 = -2 * pref * 1j * np.sqrt(2) * (mu ** 2) * (mu ** 2 * eAi + eAip) * np.sign(gamma)
     #V[1, 0] = V[0, 1]
-    v11 = -8 * mu ** 5 * pref * (mu ** 2 * eAi + eAip)
-    return _cubic_phase_iterate(mu, v00, v01, v11, cutoff, dtype=dtype)
+    #v11 = -8 * np.abs(mu) ** 5 * pref * (mu ** 2 * eAi + eAip)
+    if it:
+        return _cubic_phase_iterate1(mu, v00, v11, cutoff, dtype=dtype)
+    else:
+        return _cubic_phase_iterate(mu, v00, v11, cutoff, dtype=dtype)
     """
     for m in range(cutoff):
         for n in range(cutoff - 2):

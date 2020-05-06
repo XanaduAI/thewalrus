@@ -299,4 +299,4 @@ def test_cubic_parity(mu):
                 sign = 1
             else:
                 sign = -1
-            assert np.allclose(V[m,n], sign*Vm[m,n], atol=1e-)
+            assert np.allclose(V[m,n], sign*Vm[m,n])
