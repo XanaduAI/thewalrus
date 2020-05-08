@@ -15,11 +15,11 @@
 Algorithms for hafnians of low-rank matrices.
 """
 
+from itertools import product
 import numpy as np
 from sympy import symbols, expand
 from scipy.special import factorial2
 from repoze.lru import lru_cache
-from itertools import product
 
 
 @lru_cache(maxsize=1000000)
@@ -35,13 +35,13 @@ def partitions(r, n):
     """
     if r == 1:
         return [[n]]
-    else:
-        new_combos = []
-        for first_val in range(n + 1):
-            rest = partitions(r - 1, n - first_val)
-            new = [p[0] + p[1] for p in product([[first_val]], rest)]
-            new_combos += new
-        return new_combos
+
+    new_combos = []
+    for first_val in range(n + 1):
+        rest = partitions(r - 1, n - first_val)
+        new = [p[0] + p[1] for p in product([[first_val]], rest)]
+        new_combos += new
+    return new_combos
 
 
 def low_rank_hafnian(G):
