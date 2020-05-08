@@ -45,7 +45,7 @@ def partitions(r, n):
 
 
 def low_rank_hafnian(G):
-    r"""Returns the hafnian of the low rank matrix A = G @ G.T where is rectangular of size n \times r
+    r"""Returns the hafnian of the low rank matrix A = G @ G.T where G is rectangular of size n \times r
     with r <= n. Note that the rank of A is precisely r.
     The hafnian is calculated using the algorithm described in Appendix C of
     A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
