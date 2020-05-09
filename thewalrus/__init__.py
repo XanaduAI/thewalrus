@@ -66,6 +66,7 @@ Python wrappers
     perm
     permanent_repeated
     hermite_multidimensional
+    low_rank_hafnian
     reduction
     version
 

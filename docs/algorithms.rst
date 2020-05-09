@@ -185,3 +185,14 @@ where :math:`\mathbb{E}` denotes the usual statistical expectation value, and :m
 .. tip::
 
    *Implemented as* :func:`thewalrus.hafnian` with ``approx=True``. Note that one needs to pass the number of samples used to estimate the expectation value in the formula above; this is specified with the argument ``num_samples``.
+
+
+
+Low-rank algorithm
+------------------
+If a symmetric matrix :math:`\bm{A} \in \mathbb{C}^{n \times n}` is of low rank it can be written as :math:`\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G} \in \mathbb{C}^{n \times r}` is rectangular matrix and :math:`r \leq n` is the rank of :math:`\bm{A}`. One can then calculate the hafnian of the matrix :math:`\bm{A}` in time and space :math:`{n+r-1 \choose r-1}`.
+
+
+.. tip::
+
+   *Implemented as* :func:`thewalrus.low_rank_hafnian`. This function takes as argument the matrix :math:`\bm{G} \in \mathbb{C}^{n \times r}` and returns the value of the hafnian of the matrix :math:`\bm{A} = \bm{G} \bm{G}^T`
