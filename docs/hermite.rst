@@ -71,7 +71,7 @@ Furthermore, this connection was later generalized to **mixed** Gaussian states 
 
 To obtain the standard or modified Hermite polynomials renormalized by the square root of the factorial of its index :math:`\sqrt{\bm{m}!}` one can pass the optional argument :code:`renorm=True`.
 
-Finally, by conecting the results in page 815 of Dodonov et al. :cite:`dodonov1994multidimensional` with the results in page 546 of Kan :cite:`kan2008moments` one obtains the following relation between the hafnian and the multidimensional Hermite polynomials
+Finally, by connecting the results in page 815 of Dodonov et al. :cite:`dodonov1994multidimensional` with the results in page 546 of Kan :cite:`kan2008moments` one obtains the following relation between the hafnian and the multidimensional Hermite polynomials
 
 .. math::
 	H_{\bm{m}}^{(-\bm{B})}(\bm{0}) = G_{\bm{m}}^{(-\bm{B})}(\bm{0})= \text{haf}(\bm{B}_{\bm{m}})
