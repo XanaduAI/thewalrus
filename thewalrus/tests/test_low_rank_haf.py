@@ -49,29 +49,10 @@ def test_odd_n(n, r):
 
 
 @pytest.mark.parametrize("n", [8, 10, 12])
-def test_rank_one(n):
+@pytest.mark.parametrize("r", [1, 2, 3])
+def test_rank_r(r,n):
     """Test rank-one matrices"""
-    G = np.random.rand(n, 1) + 1j * np.random.rand(n, 1)
-    A = G @ G.T
-    haf = low_rank_hafnian(G)
-    expected = hafnian(A)
-    assert np.allclose(haf, expected)
-
-
-@pytest.mark.parametrize("n", [8, 10, 12])
-def test_rank_two(n):
-    """Test rank-two matrices"""
-    G = np.random.rand(n, 2) + 1j * np.random.rand(n, 2)
-    A = G @ G.T
-    haf = low_rank_hafnian(G)
-    expected = hafnian(A)
-    assert np.allclose(haf, expected)
-
-
-@pytest.mark.parametrize("n", [8, 10, 12])
-def test_rank_three(n):
-    """Test rank-three matrices"""
-    G = np.random.rand(n, 3) + 1j * np.random.rand(n, 3)
+    G = np.random.rand(n, r) + 1j * np.random.rand(n, r)
     A = G @ G.T
     haf = low_rank_hafnian(G)
     expected = hafnian(A)
