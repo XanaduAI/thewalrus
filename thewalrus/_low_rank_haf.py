@@ -24,14 +24,17 @@ from repoze.lru import lru_cache
 
 @lru_cache(maxsize=1000000)
 def partitions(r, n):
-    r"""Returns a list of lists with the r-partitions of the integer n, i.e. the r-tuples of non-negative
-    integers such that their sum is precisely n. Note that there are n + r - 1 \choose r-1 such partitions.
-        Args:
-            r (int): number of partitions.
-            n (int): integer to be partitioned.
+    r"""Returns a list of lists with the r-partitions of the integer :math:`n`, i.e. the r-tuples of non-negative
+    integers such that their sum is precisely :math:`n`.
+    
+    Note that there are :math:`n + r - 1 \choose r-1` such partitions.
 
-        Returns:
-            list: r-partitions of n.
+    Args:
+        r (int): number of partitions.
+        n (int): integer to be partitioned.
+
+    Returns:
+        list: r-partitions of n.
     """
     if r == 1:
         return [[n]]
@@ -45,10 +48,13 @@ def partitions(r, n):
 
 
 def low_rank_hafnian(G):
-    r"""Returns the hafnian of the low rank matrix A = G @ G.T where G is rectangular of size n \times r
-    with r <= n. Note that the rank of A is precisely r.
+    r"""Returns the hafnian of the low rank matrix :math:`A = G G^T` where G is rectangular of size
+    :math:`n \times r`  with :math:`r <= n`.
+    
+    Note that the rank of :math:`A` is precisely :math:`r`.
+    
     The hafnian is calculated using the algorithm described in Appendix C of
-    A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
+    *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
     :cite:`bjorklund2018faster`.
 
     Args:
