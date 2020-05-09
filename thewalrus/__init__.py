@@ -26,7 +26,7 @@ Algorithm terminology
 
 Eigenvalue hafnian algorithm
     The algorithm described in
-    *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
+    *A faster hafnian formula for complex matrices and its benchmarking on a supercomputer*,
     :cite:`bjorklund2018faster`.
     This algorithm scales like :math:`\mathcal{O}(n^3 2^{n/2})`, and supports calculation of
     the loop hafnian.
@@ -52,8 +52,16 @@ Batched hafnian algorithm
     An algorithm that allows the calculation of hafnians of all reductions of
     a given matrix up to the cutoff (resolution) provided. Internally, this algorithm
     makes use of the multidimensional Hermite polynomials as per
-    *Multidimensional Hermite polynomials and photon distribution for polymode mixed light*
-    :cite:`dodonov1994multidimensional`.
+    *The calculation of multidimensional Hermite polynomials and Gram-Charlier coefficients*
+    :cite:`berkowitz1970calculation`.
+
+Low-rank hafnian algorithm
+    An algorithm that allows to calculate the hafnian of an :math:`r`-rank matrix :math:`\bm{A}` of size :math:`n \times n`
+    by factorizing it as :math:`\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G}` is of size :math:`n \times r`. The algorithm
+    is described in Appendix C of
+    *A faster hafnian formula for complex matrices and its benchmarking on a supercomputer*,
+    :cite:`bjorklund2018faster`.
+
 
 Python wrappers
 ---------------

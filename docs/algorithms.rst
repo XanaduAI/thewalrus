@@ -190,7 +190,7 @@ where :math:`\mathbb{E}` denotes the usual statistical expectation value, and :m
 
 Low-rank algorithm
 ------------------
-If a symmetric matrix :math:`\bm{A} \in \mathbb{C}^{n \times n}` is of low rank it can be written as :math:`\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G} \in \mathbb{C}^{n \times r}` is rectangular matrix and :math:`r \leq n` is the rank of :math:`\bm{A}`. One can then calculate the hafnian of the matrix :math:`\bm{A}` in time and space :math:`{n+r-1 \choose r-1}`.
+If a symmetric matrix :math:`\bm{A} \in \mathbb{C}^{n \times n}` is of low rank it can be written as :math:`\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G} \in \mathbb{C}^{n \times r}` is a rectangular matrix and :math:`r \leq n` is the rank of :math:`\bm{A}`. One can then calculate the hafnian of the matrix :math:`\bm{A}` in time and space :math:`{n+r-1 \choose r-1}` by generalizing the result derived Barvinok :cite:`barvinok1996two` for permanents to hafnians as derived in Appendix C of Björklund *et al* :cite:`bjorklund2018faster`.
 
 
 .. tip::

@@ -26,7 +26,7 @@ from repoze.lru import lru_cache
 def partitions(r, n):
     r"""Returns a list of lists with the r-partitions of the integer :math:`n`, i.e. the r-tuples of non-negative
     integers such that their sum is precisely :math:`n`.
-    
+
     Note that there are :math:`n + r - 1 \choose r-1` such partitions.
 
     Args:
@@ -48,13 +48,13 @@ def partitions(r, n):
 
 
 def low_rank_hafnian(G):
-    r"""Returns the hafnian of the low rank matrix :math:`A = G G^T` where G is rectangular of size
-    :math:`n \times r`  with :math:`r <= n`.
-    
-    Note that the rank of :math:`A` is precisely :math:`r`.
-    
+    r"""Returns the hafnian of the low rank matrix :math:`\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G}` is rectangular of size
+    :math:`n \times r`  with :math:`r \leq n`.
+
+    Note that the rank of :math:`\bm{A}` is precisely :math:`r`.
+
     The hafnian is calculated using the algorithm described in Appendix C of
-    *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*,
+    *A faster hafnian formula for complex matrices and its benchmarking on a supercomputer*,
     :cite:`bjorklund2018faster`.
 
     Args:
