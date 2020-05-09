@@ -74,10 +74,9 @@ Python wrappers
     perm
     permanent_repeated
     hermite_multidimensional
-    low_rank_hafnian
     reduction
     version
-
+    low_rank_hafnian
 """
 # pylint: disable=wrong-import-position
 import os

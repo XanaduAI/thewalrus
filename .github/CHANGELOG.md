@@ -2,6 +2,8 @@
 
 ### New features
 
+* Adds a new algorithm for hafnians of matrices with low rank. [#165](https://github.com/XanaduAI/thewalrus/pull/165)
+
 ### Improvements
 
 * Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
@@ -12,7 +14,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Theodor Isacsson
+Theodor Isacsson, Nicolas Quesada
 
 ---
 
