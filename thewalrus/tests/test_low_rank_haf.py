@@ -16,6 +16,27 @@
 import pytest
 import numpy as np
 from thewalrus import low_rank_hafnian, hafnian
+from thewalrus._low_rank_haf import partitions
+from scipy.special import binom
+
+np.random.seed(137)
+
+
+@pytest.mark.parametrize("n", [9, 11, 13])
+@pytest.mark.parametrize("r", [1, 2, 3])
+def test_number_of_partitions(n, r):
+    r"""Test that the number of r-partitions of n elements is {n + r - 1 \choose r - 1}"""
+    parts = partitions(r, n)
+    assert np.allclose(len(parts), binom(n + r - 1, r - 1))
+
+
+@pytest.mark.parametrize("n", [9, 11, 13])
+@pytest.mark.parametrize("r", [1, 2, 3])
+def test_partitions_correctness(n, r):
+    """Check that the r-partitions of n do sum up to n"""
+    part = partitions(r, n)
+    sums = list(map(sum, part))
+    assert np.allclose(sums, n)
 
 
 @pytest.mark.parametrize("n", [9, 11, 13])
