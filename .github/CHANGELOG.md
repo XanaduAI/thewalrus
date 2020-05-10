@@ -2,11 +2,15 @@
 
 ### New features
 
-* Adds a new algorithm for hafnians of matrices with low rank. [#165](https://github.com/XanaduAI/thewalrus/pull/165)
+* Adds a new algorithm for hafnians of matrices with low rank. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
 
 ### Improvements
 
 * Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
+
+* Improves documentation of the multidimensional Hermite polynomials. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
+
+* Improves speed of `fock_tensor` when the symplectic matrix passed is also orthogonal. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
 
 ### Bug fixes
 
