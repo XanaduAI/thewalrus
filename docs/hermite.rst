@@ -10,12 +10,12 @@ Multidimensional Hermite polynomials
 ====================================
 .. sectionauthor:: Nicolás Quesada <nicolas@xanadu.ai>
 
-In this section we study the multidimensional Hermite polynomials originally introduced by C. Hermite in 1865. See Mizrahi :cite:`mizrahi1975generalized`, Berkowitz et al. :cite:`berkowitz1970calculation` and Kok and Braunstein :cite:`kok2001multi` for a more details.
+In this section we study the multidimensional Hermite polynomials originally introduced by C. Hermite in 1865. See Mizrahi :cite:`mizrahi1975generalized`, Berkowitz et al. :cite:`berkowitz1970calculation` and Kok and Braunstein :cite:`kok2001multi` for more details.
 
 In the next section, where we discuss quantum Gaussian states, we will explain how these polynomials relate to hafnians and loop hafnians. For the moment just let us introduce them and study their formal properties.
 
-Generating function definition
-******************************
+Generating function
+*******************
 Given two complex vectors :math:`\alpha,\beta \in \mathbb{C}^\ell` and a symmetric matrix :math:`\bm{B} = \bm{B}^T \in \mathbb{C}^{\ell \times \ell}`,
 
 .. math::
@@ -71,12 +71,16 @@ Furthermore, this connection was later generalized to **mixed** Gaussian states 
 
 To obtain the standard or modified Hermite polynomials renormalized by the square root of the factorial of its index :math:`\sqrt{\bm{m}!}` one can pass the optional argument :code:`renorm=True`.
 
-Finally, by connecting the results in page 815 of Dodonov et al. :cite:`dodonov1994multidimensional` with the results in page 546 of Kan :cite:`kan2008moments` one obtains the following relation between the hafnian and the multidimensional Hermite polynomials
+
+
+Multidimensional Hermite polynomials and hafnians
+*************************************************
+By connecting the results in page 815 of Dodonov et al. :cite:`dodonov1994multidimensional` with the results in page 546 of Kan :cite:`kan2008moments` one obtains the following relation between the hafnian and the multidimensional Hermite polynomials
 
 .. math::
 	H_{\bm{m}}^{(-\bm{B})}(\bm{0}) = G_{\bm{m}}^{(-\bm{B})}(\bm{0})= \text{haf}(\bm{B}_{\bm{m}})
 
-and moreover one generalizes it to
+and moreover one can generalize it to
 
 .. math::
 	G_{\bm{m}}^{(-\bm{B})}(\alpha) = \text{lhaf}\left(\text{vid}(\bm{B}_{\bm{m}},\alpha_{\bm{m}})\right)
