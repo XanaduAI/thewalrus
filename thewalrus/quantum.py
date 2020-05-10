@@ -123,6 +123,7 @@ from scipy.stats import nbinom
 from numba import jit
 
 from thewalrus.symplectic import expand, sympmat, is_symplectic
+from thewalrus.libwalrus import interferometer, interferometer_real
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -1017,7 +1018,9 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
+def fock_tensor(
+    S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False
+):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -1040,27 +1043,48 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
 
     # And that S and alpha have compatible dimensions
     m, _ = S.shape
-    if m // 2 != len(alpha):
-        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
-
-    # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
     l = m // 2
-    ch = np.cosh(choi_r) * np.identity(l)
-    sh = np.sinh(choi_r) * np.identity(l)
-    zh = np.zeros([l, l])
-    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
-    # And then its Choi expanded symplectic
-    S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
-    # And this is the corresponding covariance matrix
-    cov = S_exp @ S_exp.T
-    alphat = np.array(list(alpha) + ([0] * l))
-    x = 2 * alphat.real
-    p = 2 * alphat.imag
-    mu = np.concatenate([x, p])
+    if l != len(alpha):
+        raise ValueError(
+            "The matrix S and the vector alpha do not have compatible dimensions"
+        )
+    # Check if S corresponds to an interferometer, if so use optimized routines
+    if np.allclose(S @ S.T, np.identity(m)) and np.allclose(alpha, 0):
+        reU = S[:l, :l]
+        imU = S[:l, l:]
+        if np.allclose(imU, 0):
+            Ub = np.block([[0 * reU, -reU], [-reU.T, 0 * reU]])
+            tensor = interferometer_real(Ub, cutoff)
+        else:
+            U = reU - 1j * imU
+            Ub = np.block([[0 * U, -U], [-U.T, 0 * U]])
+            tensor = interferometer(Ub, cutoff)
+    else:
+        # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
+        ch = np.cosh(choi_r) * np.identity(l)
+        sh = np.sinh(choi_r) * np.identity(l)
+        zh = np.zeros([l, l])
+        Schoi = np.block(
+            [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
+        )
+        # And then its Choi expanded symplectic
+        S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
+        # And this is the corresponding covariance matrix
+        cov = S_exp @ S_exp.T
+        alphat = np.array(list(alpha) + ([0] * l))
+        x = 2 * alphat.real
+        p = 2 * alphat.imag
+        mu = np.concatenate([x, p])
 
-    tensor = state_vector(
-        mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False, choi_r=choi_r
-    )
+        tensor = state_vector(
+            mu,
+            cov,
+            normalize=False,
+            cutoff=cutoff,
+            hbar=2,
+            check_purity=False,
+            choi_r=choi_r,
+        )
 
     if sf_order:
         sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
