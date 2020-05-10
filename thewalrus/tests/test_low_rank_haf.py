@@ -51,7 +51,7 @@ def test_odd_n(n, r):
 @pytest.mark.parametrize("n", [8, 10, 12])
 @pytest.mark.parametrize("r", [1, 2, 3])
 def test_rank_r(r, n):
-    """Test rank-one matrices"""
+    """Test rank-r matrices"""
     G = np.random.rand(n, r) + 1j * np.random.rand(n, r)
     A = G @ G.T
     haf = low_rank_hafnian(G)
