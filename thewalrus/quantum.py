@@ -1039,6 +1039,8 @@ def fock_tensor(
         choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
         sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
