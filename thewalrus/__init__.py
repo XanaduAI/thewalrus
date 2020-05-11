@@ -74,6 +74,11 @@ Python wrappers
     perm
     permanent_repeated
     hermite_multidimensional
+
+Pure Python functions
+---------------------
+
+.. autosummary::
     reduction
     version
     low_rank_hafnian
