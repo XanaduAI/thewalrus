@@ -67,7 +67,7 @@ The connection between the multidimensional Hermite polynomials and **pure** Gau
 Furthermore, this connection was later generalized to **mixed** Gaussian states by Dodonov, Man'ko and Man'ko :cite:`dodonov1994multidimensional`. These matrix elements have the form
 
 .. math::
-	C \times \frac{H_{\bm{m}}^{(\bm{B})}(\alpha)}{\sqrt{\bm{m}}!} = C \times \frac{G_{\bm{m}}^{(\bm{B})}(\alpha \bm{B})}{\sqrt{\bm{m}}!}.
+	C \times \frac{H_{\bm{m}}^{(\bm{B})}(\alpha)}{\sqrt{\bm{m}!}} = C \times \frac{G_{\bm{m}}^{(\bm{B})}(\alpha \bm{B})}{\sqrt{\bm{m}!}}.
 
 To obtain the standard or modified Hermite polynomials renormalized by the square root of the factorial of its index :math:`\sqrt{\bm{m}!}` one can pass the optional argument :code:`renorm=True`.
 
