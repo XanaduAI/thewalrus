@@ -78,11 +78,11 @@ Multidimensional Hermite polynomials and hafnians
 By connecting the results in page 815 of Dodonov et al. :cite:`dodonov1994multidimensional` with the results in page 546 of Kan :cite:`kan2008moments` one obtains the following relation between the hafnian and the multidimensional Hermite polynomials
 
 .. math::
-	H_{\bm{m}}^{(-\bm{B})}(\bm{0}) = G_{\bm{m}}^{(-\bm{B})}(\bm{0})= \text{haf}(\bm{B}_{\bm{m}})
+	H_{\bm{m}}^{(-\bm{B})}(\bm{0}) = G_{\bm{m}}^{(-\bm{B})}(\bm{0})= \text{haf}(\bm{B}_{\bm{m}}),
 
 and moreover one can generalize it to
 
 .. math::
-	G_{\bm{m}}^{(-\bm{B})}(\alpha) = \text{lhaf}\left(\text{vid}(\bm{B}_{\bm{m}},\alpha_{\bm{m}})\right)
+	G_{\bm{m}}^{(-\bm{B})}(\alpha) = \text{lhaf}\left(\text{vid}(\bm{B}_{\bm{m}},\alpha_{\bm{m}})\right),
 
 for loop hafnians. With these two identification one can use the recursion relations of the multidimensional Hermite polynomials to calculate all the hafnians of the reductions of a given matrix up to a given cutoff.
