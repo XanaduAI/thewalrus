@@ -1019,7 +1019,14 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
 
 
 def fock_tensor(
-    S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False
+    S,
+    alpha,
+    cutoff,
+    choi_r=np.arcsinh(1.0),
+    check_symplectic=True,
+    sf_order=False,
+    rtol=1e-05,
+    atol=1e-08,
 ):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
@@ -1038,7 +1045,7 @@ def fock_tensor(
     """
     # Check the matrix is symplectic
     if check_symplectic:
-        if not is_symplectic(S):
+        if not is_symplectic(S, rtol=rtol, atol=atol):
             raise ValueError("The matrix S is not symplectic")
 
     # And that S and alpha have compatible dimensions
@@ -1049,10 +1056,12 @@ def fock_tensor(
             "The matrix S and the vector alpha do not have compatible dimensions"
         )
     # Check if S corresponds to an interferometer, if so use optimized routines
-    if np.allclose(S @ S.T, np.identity(m)) and np.allclose(alpha, 0):
+    if np.allclose(S @ S.T, np.identity(m), rtol=rtol, atol=atol) and np.allclose(
+        alpha, 0, rtol=rtol, atol=atol
+    ):
         reU = S[:l, :l]
         imU = S[:l, l:]
-        if np.allclose(imU, 0):
+        if np.allclose(imU, 0, rtol=rtol, atol=atol):
             Ub = np.block([[0 * reU, -reU], [-reU.T, 0 * reU]])
             tensor = interferometer_real(Ub, cutoff)
         else:
@@ -1091,6 +1100,7 @@ def fock_tensor(
         return tensor.transpose(sf_indexing)
 
     return tensor
+
 
 
 def probabilities(mu, cov, cutoff, hbar=2.0, rtol=1e-05, atol=1e-08):
