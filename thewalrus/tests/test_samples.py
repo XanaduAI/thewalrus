@@ -493,6 +493,7 @@ def test_out_of_bounds_generate_hafnian_sample():
     r = np.arcsinh(np.sqrt(mean_n))
     sigma = np.array([[np.exp(2 * r), 0.0], [0.0, np.exp(-2 * r)]])
 
+    cutoff = 10
     max_photons = 5
     samples = [generate_hafnian_sample(sigma, cutoff=cutoff, max_photons=max_photons) for i in range(n_samples)]
     assert -1 in samples
@@ -506,7 +507,6 @@ def test_out_of_bounds_generate_torontonian_sample():
     r = np.arcsinh(np.sqrt(mean_n))
     sigma = TMS_cov(r, 0)
 
-    cutoff = 10
     max_photons = 1
     samples = [generate_torontonian_sample(sigma, max_photons=max_photons) for i in range(n_samples)]
     assert -1 in samples
