@@ -27,6 +27,7 @@ from thewalrus.samples import (
     torontonian_sample_classical_state,
     seed,
     photon_number_sampler,
+    generate_hafnian_sample,
 )
 from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
 seed(137)
@@ -481,3 +482,17 @@ def test_seed():
     second_sample_p = hafnian_sample_state(V, n_samples)
     assert np.array_equal(first_sample, first_sample_p)
     assert np.array_equal(second_sample, second_sample_p)
+
+
+def test_out_of_bounds_generate_hafnian_sample():
+    """Check that when the sampled goes beyond max_photons a -1 is returned.
+    """
+    n_samples = 1000
+    mean_n = 20
+    r = np.arcsinh(np.sqrt(mean_n))
+    sigma = np.array([[np.exp(2 * r), 0.0], [0.0, np.exp(-2 * r)]])
+
+    cutoff = 10
+    max_photons = 5
+    samples = [generate_hafnian_sample(sigma, cutoff=cutoff, max_photons=max_photons) for i in range(100)]
+    assert -1 in samples
