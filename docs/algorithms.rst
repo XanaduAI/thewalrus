@@ -185,3 +185,21 @@ where :math:`\mathbb{E}` denotes the usual statistical expectation value, and :m
 .. tip::
 
    *Implemented as* :func:`thewalrus.hafnian` with ``approx=True``. Note that one needs to pass the number of samples used to estimate the expectation value in the formula above; this is specified with the argument ``num_samples``.
+
+
+
+Low-rank algorithm
+------------------
+If a symmetric matrix :math:`\bm{A} \in \mathbb{C}^{n \times n}` is of low rank it can be written as :math:`\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G} \in \mathbb{C}^{n \times r}` is a rectangular matrix and :math:`r \leq n` is the rank of :math:`\bm{A}`. One can then calculate the hafnian of the matrix :math:`\bm{A}` in time and space complexity :math:`{n+r-1 \choose r-1}` by generalizing the result derived Barvinok :cite:`barvinok1996two` for permanents to hafnians as derived in Appendix C of Björklund *et al* :cite:`bjorklund2018faster`. The algorithm works by defining the following multivariate polynomial
+
+.. math::
+	q(x_0,\ldots,x_{r-1}) = \prod_{i=0}^{n-1} \sum_{j=0}^{r-1} G_{i,j} x_j.
+
+Consider now the :math:`r`-partitions of the integer :math:`n`, there are :math:`{n+r-1 \choose r-1}` of such partitions. Let :math:`e=(e_0,\ldots,e_{r-1})` be an even :math:`r`-partition (i.e. an :math:`r`-partition where each element is even), call :math:`\mathcal{E}_{n,r}` the set of all even :math:`r`-partitions, and define :math:`\lambda_e` to be the coefficient of :math:`x_0^{e_0}\ldots x_{r-1}^{e_{r-1}}` in the polynomial :math:`q(x_0,\ldots,x_{r-1})`. Then one can write the hafnian of :math:`\bm{A} = \bm{G} \bm{G}^T` as
+
+.. math::
+	\text{haf}(\bm{A}) = \sum_{e \in \mathcal{E}_{n,r}} \lambda_e  \prod_{i=0}^{r-1} (e_i - 1)!! .
+
+.. tip::
+
+   *Implemented as* :func:`thewalrus.low_rank_hafnian`. This function takes as argument the matrix :math:`\bm{G} \in \mathbb{C}^{n \times r}` and returns the value of the hafnian of the matrix :math:`\bm{A} = \bm{G} \bm{G}^T`
