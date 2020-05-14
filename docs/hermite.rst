@@ -85,4 +85,4 @@ and moreover one can generalize it to
 .. math::
 	G_{\bm{m}}^{(-\bm{B})}(\alpha) = \text{lhaf}\left(\text{vid}(\bm{B}_{\bm{m}},\alpha_{\bm{m}})\right),
 
-for loop hafnians. With these two identification one can use the recursion relations of the multidimensional Hermite polynomials to calculate all the hafnians of the reductions of a given matrix up to a given cutoff.
+for loop hafnians. With these two identifications one can use the recursion relations of the multidimensional Hermite polynomials to calculate all the hafnians of the reductions of a given matrix up to a given cutoff.
