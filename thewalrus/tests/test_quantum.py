@@ -22,7 +22,7 @@ from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
-from thewalrus.random import random_covariance
+from thewalrus.random import random_covariance, random_interferometer
 
 from thewalrus.quantum import (
     reduced_gaussian,
