@@ -1051,11 +1051,13 @@ def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
 @pytest.mark.parametrize("num_modes", np.arange(5,10))
 @pytest.mark.parametrize("hbar", [1/2, 1, 2, 1.6])
 def test_fidelity_coherent_state(num_modes, hbar):
-    means1 = np.random.rand(2 * num_modes) / np.sqrt(hbar)
-    means2 = np.random.rand(2 * num_modes) / np.sqrt(hbar)
+    beta1 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    beta2 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means1 = Means(np.concatenate([beta1, beta1.conj()]), hbar=hbar)
+    means2 = Means(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
     cov1 = hbar * np.identity(2 * num_modes) / 2
     cov2 = hbar * np.identity(2 * num_modes) / 2
     fid = fidelity(means1, means2, cov1, cov2)
-    beta = Beta(means1-means2, hbar=hbar)
-    expected = np.exp(-np.abs(beta[num_modes:] @ beta[:num_modes]))
+
+    expected = np.exp(-np.linalg.norm(beta1-beta2)**2)
     assert np.allclose(expected, fid)
