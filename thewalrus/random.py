@@ -12,9 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-This module defines and implements several functions to generate random objects in The Walrus
-"""
+Random matrices
+===============
 
+.. currentmodule:: thewalrus.random
+
+This submodule provides access to utility functions to generate random unitary, symplectic
+and covariance matrices.
+
+"""
 import numpy as np
 import scipy as sp
 
@@ -29,15 +35,17 @@ def randnc(*arg):
 
 def random_covariance(N, hbar=2, pure=False, block_diag=False):
     r"""Random covariance matrix.
+
     Args:
         N (int): number of modes
         hbar (float): the value of :math:`\hbar` to use in the definition
-            of the quadrature operators :math:`\x` and :math:`\p`
+            of the quadrature operators :math:`x` and :math:`p`
         pure (bool): If True, a random covariance matrix corresponding
             to a pure state is returned.
         block_diag (bool): If True, uses passive Gaussian transformations that are orthogonal
-            instead of unitary. This implies that the positions :math:`q` do not mix with
+            instead of unitary. This implies that the positions :math:`x` do not mix with
             the momenta :math:`p` and thus the covariance matrix is block diagonal.
+
     Returns:
         array: random :math:`2N\times 2N` covariance matrix
     """
@@ -58,6 +66,7 @@ def random_symplectic(N, passive=False, block_diag=False, scale=1.0):
     sampled from the standard normal distribution, while passive transformations
     are randomly sampled from the Haar measure. Note that for the Symplectic
     group there is no notion of Haar measure since this is group is not compact.
+
     Args:
         N (int): number of modes
         passive (bool): If True, returns a passive Gaussian transformation (i.e.,
@@ -68,6 +77,7 @@ def random_symplectic(N, passive=False, block_diag=False, scale=1.0):
             the momenta :math:`p` and thus the symplectic operator is block diagonal
         scale (float): Sets the scale of the random values used as squeezing parameters.
             They will range from 0 to :math:`\sqrt{2}\texttt{scale}`
+
     Returns:
         array: random :math:`2N\times 2N` symplectic matrix
     """
@@ -89,9 +99,11 @@ def random_symplectic(N, passive=False, block_diag=False, scale=1.0):
 def random_interferometer(N, real=False):
     r"""Random unitary matrix representing an interferometer.
     For more details, see :cite:`mezzadri2006`.
+
     Args:
         N (int): number of modes
         real (bool): return a random real orthogonal matrix
+
     Returns:
         array: random :math:`N\times N` unitary distributed with the Haar measure
     """

@@ -1040,7 +1040,7 @@ def test_fidelity_with_self(num_modes, hbar, pure, block_diag):
 @pytest.mark.parametrize("pure", [True, False])
 @pytest.mark.parametrize("block_diag", [True, False])
 def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
-    """Test that the fidelity is symmetric"""
+    """Test that the fidelity is symmetric and between 0 and 1"""
     cov1 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
     means1 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
     cov2 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)

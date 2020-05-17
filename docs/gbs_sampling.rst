@@ -74,15 +74,10 @@ Note the arguments presented in the previous section can also be generalized to 
 Sampling of classical states
 ****************************
 
-In the previous section it was mentioned that states whose covariance matrix satisfies :math:`\bm{V} \geq \frac{\hbar}{2}\mathbb{I}` are termed classical. These designation is due to the fact that for these states it is possible to obtain a polynomial (cubic) time algorithm to generate photon number or threshold samples :cite:`rahimi2015can`.
+In the previous section it was mentioned that states whose covariance matrix satisfies :math:`\bm{V} \geq \frac{\hbar}{2}\mathbb{I}` are termed classical. For some subsets of this set one can write classically efficient algorithms to generate photon number or threshold samples :cite:`rahimi2015can`.
+Note that one can use this observation to sample from a probability distribution that is proportional to the permanent of a positive semidefinite matrix, for details of how this is done cf. Ref. :cite:`jahangiri2020point`.
 
 .. tip::
 
-   To generate photon number or threshold samples from a classical gaussian state specified by a quadrature covariance matrix use :func:`thewalrus.samples.hafnian_sample_classical_state` or :func:`thewalrus.samples.torontonian_sample_classical_state`.
-
-Note that one can use this observation to sample from a probability distribution that is proportional to the permanent of positive semidefinite matrix, for detail of how this is done cf. Ref. :cite:`jahangiri2020point`.
-
-.. tip::
-
-   To generate photon number samples from thermal state parametrized by a positive semidefinite *real* matrix use the module :func:`thewalrus.csamples`.
+   To generate photon number samples from a thermal state parametrized by a positive semidefinite *real* matrix use the module :func:`thewalrus.csamples`.
 
