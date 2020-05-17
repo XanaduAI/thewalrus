@@ -23,6 +23,8 @@ from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
+from thewalrus.random import random_interferometer, random_symplectic, random_covariance
+
 from thewalrus.quantum import (
     reduced_gaussian,
     Xmat,
@@ -53,34 +55,12 @@ from thewalrus.quantum import (
     update_probabilities_with_loss,
     update_probabilities_with_noise,
     loss_mat,
+    fidelity,
 )
 
 
 # make tests deterministic
 np.random.seed(137)
-
-
-def random_interferometer(N, real=False):
-    r"""Random unitary matrix representing an interferometer.
-
-    For more details, see arXiv:math-ph/0609050
-
-    Args:
-        N (int): number of modes
-        real (bool): return a random real orthogonal matrix
-
-    Returns:
-        array: random :math:`N\times N` unitary distributed with the Haar measure
-    """
-    if real:
-        z = np.random.randn(N, N)
-    else:
-        z = (np.random.randn(N, N) + 1j * np.random.randn(N, N)) / np.sqrt(2.0)
-    q, r = qr(z)
-    d = np.diag(r)
-    ph = d / np.abs(d)
-    U = np.multiply(q, ph, q)
-    return U
 
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -1042,3 +1022,40 @@ def test_update_with_noise_coherent_value_error():
         match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions.",
     ):
         update_probabilities_with_noise(noise_dists, probs)
+
+@pytest.mark.parametrize("hbar", [1/2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5,10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_with_self(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity of two identical quantum states is 1"""
+    cov = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means = np.random.rand(2 * num_modes)
+    assert np.allclose(fidelity(means, means, cov, cov, hbar=hbar), 1)
+
+
+@pytest.mark.parametrize("hbar", [1/2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5,10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity is symmetric"""
+    cov1 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means1 = np.random.rand(2 * num_modes)
+    cov2 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means2 = np.random.rand(2 * num_modes)
+    f12 = fidelity(means1, means2, cov1, cov2, hbar=hbar)
+    f21 = fidelity(means2, means1, cov2, cov1, hbar=hbar)
+    assert np.allclose(f12, f21)
+
+@pytest.mark.parametrize("num_modes", np.arange(5,10))
+@pytest.mark.parametrize("hbar", [1/2, 1, 2, 1.6])
+def test_fidelity_coherent_state(num_modes, hbar):
+    means1 = np.random.rand(2 * num_modes) / np.sqrt(hbar)
+    means2 = np.random.rand(2 * num_modes) / np.sqrt(hbar)
+    cov1 = hbar * np.identity(2 * num_modes) / 2
+    cov2 = hbar * np.identity(2 * num_modes) / 2
+    fid = fidelity(means1, means2, cov1, cov2)
+    beta = Beta(means1-means2, hbar=hbar)
+    expected = np.exp(-np.abs(beta[num_modes:] @ beta[:num_modes]))
+    assert np.allclose(expected, fid)
