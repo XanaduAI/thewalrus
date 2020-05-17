@@ -18,12 +18,11 @@ from itertools import product
 import pytest
 
 import numpy as np
-from scipy.linalg import qr
 from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
 
-from thewalrus.random import random_interferometer, random_symplectic, random_covariance
+from thewalrus.random import random_covariance
 
 from thewalrus.quantum import (
     reduced_gaussian,
@@ -1087,6 +1086,7 @@ def test_fidelity_vac_to_displaced_squeezed(r, alpha, hbar):
 @pytest.mark.parametrize("r1", np.random.rand(3))
 @pytest.mark.parametrize("r2", np.random.rand(3))
 def test_fidelity_squeezed_vacuum(r1, r2, hbar):
+    """Tests fidelity between two squeezed states"""
     cov1 = np.diag([np.exp(2 * r1), np.exp(-2 * r1)]) * hbar / 2
     cov2 = np.diag([np.exp(2 * r2), np.exp(-2 * r2)]) * hbar / 2
     mu = np.zeros([2])
