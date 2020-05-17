@@ -31,29 +31,19 @@ from thewalrus.samples import (
     generate_torontonian_sample,
 )
 from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
+from thewalrus.symplectic import two_mode_squeezing
 seed(137)
 
 rel_tol = 3.0
 abs_tol = 1.0e-10
 
 
-def TMS_cov(r, phi):
+def TMS_cov(r, phi, hbar=2):
     """returns the covariance matrix of a TMS state"""
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
 
-    S = np.array(
-        [
-            [ch, cp * sh, 0, sp * sh],
-            [cp * sh, ch, sp * sh, 0],
-            [0, sp * sh, ch, -cp * sh],
-            [sp * sh, 0, -cp * sh, ch],
-        ]
-    )
+    S = two_mode_squeezing(r, phi)
 
-    return S @ S.T
+    return S @ S.T * hbar/2
 
 
 class TestHafnianSampling:

@@ -1266,9 +1266,9 @@ def fidelity(mu1, mu2, cov1, cov2, hbar=2, rtol=1e-05, atol=1e-08):
 
     v1 = cov1 / hbar
     v2 = cov2 / hbar
-    deltar = (mu1 - mu2)/np.sqrt(hbar)
-    n0,n1 = cov1.shape
-    n = n0//2
+    deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
+    n0, n1 = cov1.shape
+    n = n0 // 2
     W = sympmat(n)
 
     si12 = np.linalg.inv(v1 + v2)
@@ -1282,5 +1282,7 @@ def fidelity(mu1, mu2, cov1, cov2, hbar=2, rtol=1e-05, atol=1e-08):
         p1 = sqrtm(p1)
     p1 = 2 * (p1 + np.identity(2 * n))
     p1 = p1 @ vaux
-    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp( -0.5 * deltar @ si12 @ deltar )
+    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
+        -0.25 * deltar @ si12 @ deltar
+    )
     return f
