@@ -479,11 +479,11 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=Fals
     return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, parallel=parallel)
 
 
-
 # pylint: disable=unused-argument
 def hafnian_sample_classical_state(
     cov, samples, mean=None, hbar=2, atol=1e-08, cutoff=None
 ):  # add cutoff for consistency pylint: disable=unused-argument
+
     r"""Returns samples from a Gaussian state that has a positive :math:`P` function.
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -494,6 +494,7 @@ def hafnian_sample_classical_state(
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
+
     Returns:
         np.array[int]: photon number samples from the Gaussian state with covariance cov and vector means mean.
     """
@@ -516,6 +517,7 @@ def hafnian_sample_classical_state(
 
 def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
     r""" Returns threshold samples from a Gaussian state that has a positive P function.
+
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
@@ -525,12 +527,14 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         sigdigits (integer): precision to check that the covariance matrix is a true covariance matrix of a gaussian state.
+
     Returns:
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
     return np.where(
         hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
     )
+
 
 def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
     """Given a photon-number probability mass function(PMF) it returns samples according to said PMF.
