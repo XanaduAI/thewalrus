@@ -23,6 +23,8 @@ from thewalrus.samples import (
     hafnian_sample_graph,
     torontonian_sample_state,
     torontonian_sample_graph,
+    hafnian_sample_classical_state,
+    torontonian_sample_classical_state,
     seed,
     photon_number_sampler,
     generate_hafnian_sample,

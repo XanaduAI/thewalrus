@@ -62,6 +62,7 @@ from .quantum import (
     Qmat,
     Xmat,
     gen_Qmat_from_graph,
+    is_classical_cov,
     reduced_gaussian,
     density_matrix_element,
 )
