@@ -86,3 +86,10 @@ and moreover one can generalize it to
 	G_{\bm{m}}^{(-\bm{B})}(\alpha) = \text{lhaf}\left(\text{vid}(\bm{B}_{\bm{m}},\alpha_{\bm{m}})\right),
 
 for loop hafnians. With these two identifications one can use the recursion relations of the multidimensional Hermite polynomials to calculate all the hafnians of the reductions of a given matrix up to a given cutoff.
+
+With these observations, using the recursion relations for the Hermite polynomials and setting :math:`\bm{m}=\bm{1} - \bm{e}_i, \  \alpha = 0` one easily derives the well known Laplace expansion for the hafnian (cf. Sec. 4.1 of :cite:`barvinok2016combinatorics`)
+
+.. math::
+	\text{haf}(\bm{B}) = \sum_{j \neq i} B_{i,j} \text{haf}(\bm{B}_{-i-j}),
+
+where :math:`j` is a fixed index and :math:`\bm{B}_{-i-j}` is the matrix obtaned from :math:`\bm{B}` by removing rows and columns :math:`i` and :math:`j`.
