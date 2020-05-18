@@ -1240,9 +1240,7 @@ def fidelity(mu1, mu2, cov1, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     """Calculates the fidelity between two Gaussian quantum states.
     Note that if the covariance matrices correspond to pure states this
     function reduces to the modulus square of the overlap of their state vectors.
-    For the derivation see:
-
-    `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_
+    For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
 
     Args:
         mu1 (array): vector of means of the first state

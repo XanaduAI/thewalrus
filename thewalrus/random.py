@@ -62,6 +62,7 @@ def random_covariance(N, hbar=2, pure=False, block_diag=False):
 
 def random_symplectic(N, passive=False, block_diag=False, scale=1.0):
     r"""Random symplectic matrix representing a Gaussian transformation.
+
     The squeezing parameters :math:`r` for active transformations are randomly
     sampled from the standard normal distribution, while passive transformations
     are randomly sampled from the Haar measure. Note that for the Symplectic
@@ -70,7 +71,7 @@ def random_symplectic(N, passive=False, block_diag=False, scale=1.0):
     Args:
         N (int): number of modes
         passive (bool): If True, returns a passive Gaussian transformation (i.e.,
-            one that preserves photon number). If False (default), returns an active
+            one that preserves photon number). If False, returns an active
             transformation.
         block_diag (bool): If True, uses passive Gaussian transformations that are orthogonal
             instead of unitary. This implies that the positions :math:`q` do not mix with
