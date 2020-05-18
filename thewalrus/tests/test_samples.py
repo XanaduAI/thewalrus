@@ -172,7 +172,7 @@ class TestHafnianSampling:
             rel_freq, probs, rtol=rel_tol / np.sqrt(n_samples), atol=rel_tol / np.sqrt(n_samples)
         )
 
-    @pytest.mark.parametrize("sample_func", [hafnian_sample_state])
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
     def test_displaced_single_mode_state_hafnian(self, sample_func):
         """Test the sampling routines by comparing the photon number frequencies and the exact
         probability distribution of a single mode coherent state
@@ -193,7 +193,7 @@ class TestHafnianSampling:
             rel_freq, probs, rtol=rel_tol / np.sqrt(n_samples), atol=rel_tol / np.sqrt(n_samples)
         )
 
-    @pytest.mark.parametrize("sample_func", [hafnian_sample_state])
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
     def test_displaced_two_mode_state_hafnian(self, sample_func):
         """Test the sampling routines by comparing the photon number frequencies and the exact
         probability distribution of a two mode coherent state
@@ -281,7 +281,7 @@ class TestHafnianSampling:
 
         assert np.abs(prob0 - prob0_estimate) < delta
 
-    @pytest.mark.parametrize("sample_func", [hafnian_sample_state])
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
     def test_multimode_vacuum_state_hafnian(self, sample_func):
         """Test the sampling routines by checking the samples for pure vacuum
         using the sampler for classical states
@@ -296,7 +296,7 @@ class TestHafnianSampling:
         for i in range(n_samples):
             assert np.all(samples[i] == zeros)
 
-    @pytest.mark.parametrize("sample_func", [hafnian_sample_state])
+    @pytest.mark.parametrize("sample_func", [hafnian_sample_state, hafnian_sample_classical_state])
     def test_thermal_state_hafnian(self, sample_func):
         """Test the sampling routines by checking the samples for a single mode
         thermal state
@@ -404,7 +404,7 @@ class TestTorontonianSampling:
             assert np.all(samples[i] == zeros)
 
     @pytest.mark.parametrize(
-        "sample_func", [torontonian_sample_state]
+        "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
     )
     def test_thermal_state_torontonian(self, sample_func):
         """Test the sampling routines by checking the samples for a single mode
