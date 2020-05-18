@@ -1091,3 +1091,14 @@ def test_fidelity_squeezed_vacuum(r1, r2, hbar):
     cov2 = np.diag([np.exp(2 * r2), np.exp(-2 * r2)]) * hbar / 2
     mu = np.zeros([2])
     assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, mu, cov1, cov2, hbar=hbar))
+
+
+def test_fidelity_wrong_shape():
+    """Tests the correct error is raised"""
+    cov1 = np.identity(2)
+    cov2 = np.identity(4)
+    mu = np.zeros(2)
+    with pytest.raises(
+        ValueError, match="The inputs have incompatible shapes"
+    ):
+        fidelity(mu, mu, cov1, cov2)
