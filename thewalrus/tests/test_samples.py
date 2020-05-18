@@ -392,7 +392,7 @@ class TestTorontonianSampling:
         )
 
     @pytest.mark.parametrize(
-        "sample_func", [torontonian_sample_state]
+        "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
     )
     def test_multimode_vacuum_state_torontonian(self, sample_func):
         """Test the sampling routines by checking the samples for pure vacuum
