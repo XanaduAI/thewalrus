@@ -53,6 +53,7 @@ Fock states and tensors
     probabilities
     update_probabilities_with_loss
     update_probabilities_with_noise
+    fidelity
 
 Details
 ^^^^^^^
@@ -120,6 +121,7 @@ import numpy as np
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+from scipy.linalg import sqrtm
 from numba import jit
 
 from thewalrus.symplectic import expand, sympmat, is_symplectic
@@ -1232,3 +1234,54 @@ def update_probabilities_with_noise(probs_noise, probs):
         probs_masked = _update_1d(probs_masked, one_d, cutoff)
         probs = np.transpose(probs_masked, axes=perm)
     return probs
+
+
+def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
+    """Calculates the fidelity between two Gaussian quantum states.
+
+    Note that if the covariance matrices correspond to pure states this
+    function reduces to the modulus square of the overlap of their state vectors.
+    For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
+
+    Args:
+        mu1 (array): vector of means of the first state
+        cov1 (array): covariance matrix of the first state
+        mu2 (array): vector of means of the second state
+        cov2 (array): covariance matrix of the second state
+        hbar (float): value of hbar in the uncertainty relation
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
+
+    Returns:
+        (float): value of the fidelity between the two states
+    """
+
+    n0, n1 = cov1.shape
+    m0, m1 = cov2.shape
+    (l0,) = mu1.shape
+    (l1,) = mu1.shape
+    if not n0 == n1 == m0 == m1 == l0 == l1:
+        raise ValueError("The inputs have incompatible shapes")
+
+    v1 = cov1 / hbar
+    v2 = cov2 / hbar
+    deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
+    n0, n1 = cov1.shape
+    n = n0 // 2
+    W = sympmat(n)
+
+    si12 = np.linalg.inv(v1 + v2)
+    vaux = W.T @ si12 @ (0.25 * W + v2 @ W @ v1)
+    p1 = vaux @ W
+    p1 = p1 @ p1
+    p1 = np.identity(2 * n) + 0.25 * np.linalg.inv(p1)
+    if np.allclose(p1, 0, rtol=rtol, atol=atol):
+        p1 = np.zeros_like(p1)
+    else:
+        p1 = sqrtm(p1)
+    p1 = 2 * (p1 + np.identity(2 * n))
+    p1 = p1 @ vaux
+    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
+        -0.25 * deltar @ si12 @ deltar
+    )
+    return f

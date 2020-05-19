@@ -18,10 +18,11 @@ from itertools import product
 import pytest
 
 import numpy as np
-from scipy.linalg import qr
 from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
+
+from thewalrus.random import random_covariance, random_interferometer
 
 from thewalrus.quantum import (
     reduced_gaussian,
@@ -53,34 +54,12 @@ from thewalrus.quantum import (
     update_probabilities_with_loss,
     update_probabilities_with_noise,
     loss_mat,
+    fidelity,
 )
 
 
 # make tests deterministic
 np.random.seed(137)
-
-
-def random_interferometer(N, real=False):
-    r"""Random unitary matrix representing an interferometer.
-
-    For more details, see arXiv:math-ph/0609050
-
-    Args:
-        N (int): number of modes
-        real (bool): return a random real orthogonal matrix
-
-    Returns:
-        array: random :math:`N\times N` unitary distributed with the Haar measure
-    """
-    if real:
-        z = np.random.randn(N, N)
-    else:
-        z = (np.random.randn(N, N) + 1j * np.random.randn(N, N)) / np.sqrt(2.0)
-    q, r = qr(z)
-    d = np.diag(r)
-    ph = d / np.abs(d)
-    U = np.multiply(q, ph, q)
-    return U
 
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -1042,3 +1021,84 @@ def test_update_with_noise_coherent_value_error():
         match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions.",
     ):
         update_probabilities_with_noise(noise_dists, probs)
+
+
+@pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_with_self(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity of two identical quantum states is 1"""
+    cov = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means = np.random.rand(2 * num_modes)
+    assert np.allclose(fidelity(means, cov, means, cov, hbar=hbar), 1, atol=1e-4)
+
+
+@pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity is symmetric and between 0 and 1"""
+    cov1 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means1 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
+    cov2 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means2 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
+    f12 = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    f21 = fidelity(means2, cov2, means1, cov1, hbar=hbar)
+    assert np.allclose(f12, f21)
+    assert 0 <= np.real_if_close(f12) < 1.0
+
+
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_fidelity_coherent_state(num_modes, hbar):
+    """Test the fidelity of two multimode coherent states"""
+    beta1 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    beta2 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means1 = Means(np.concatenate([beta1, beta1.conj()]), hbar=hbar)
+    means2 = Means(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
+    cov1 = hbar * np.identity(2 * num_modes) / 2
+    cov2 = hbar * np.identity(2 * num_modes) / 2
+    fid = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    expected = np.exp(-np.linalg.norm(beta1 - beta2) ** 2)
+    assert np.allclose(expected, fid)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", [-2, 0, 2])
+@pytest.mark.parametrize("alpha", np.random.rand(10) + 1j * np.random.rand(10))
+def test_fidelity_vac_to_displaced_squeezed(r, alpha, hbar):
+    """Calculates the fidelity between a coherent squeezed state and vacuum"""
+    cov1 = np.diag([np.exp(2 * r), np.exp(-2 * r)]) * hbar / 2
+    means1 = Means(np.array([alpha, np.conj(alpha)]), hbar=hbar)
+    means2 = np.zeros([2])
+    cov2 = np.identity(2) * hbar / 2
+    expected = (
+        np.exp(-np.abs(alpha) ** 2)
+        * np.abs(np.exp(np.tanh(r) * np.conj(alpha) ** 2))
+        / np.cosh(r)
+    )
+    assert np.allclose(expected, fidelity(means1, cov1, means2, cov2, hbar=hbar))
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r1", np.random.rand(3))
+@pytest.mark.parametrize("r2", np.random.rand(3))
+def test_fidelity_squeezed_vacuum(r1, r2, hbar):
+    """Tests fidelity between two squeezed states"""
+    cov1 = np.diag([np.exp(2 * r1), np.exp(-2 * r1)]) * hbar / 2
+    cov2 = np.diag([np.exp(2 * r2), np.exp(-2 * r2)]) * hbar / 2
+    mu = np.zeros([2])
+    assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, cov1, mu, cov2, hbar=hbar))
+
+
+def test_fidelity_wrong_shape():
+    """Tests the correct error is raised"""
+    cov1 = np.identity(2)
+    cov2 = np.identity(4)
+    mu = np.zeros(2)
+    with pytest.raises(
+        ValueError, match="The inputs have incompatible shapes"
+    ):
+        fidelity(mu, cov1, mu, cov2)
