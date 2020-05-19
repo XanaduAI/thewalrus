@@ -92,4 +92,4 @@ With these observations and using the recursion relations for the Hermite polyno
 .. math::
 	\text{haf}(\bm{B}) = \sum_{j \neq i} B_{i,j} \text{haf}(\bm{B}_{-i-j}),
 
-where :math:`j` is a fixed index and :math:`\bm{B}_{-i-j}` is the matrix obtaned from :math:`\bm{B}` by removing rows and columns :math:`i` and :math:`j`.
+where :math:`j` is a fixed index and :math:`\bm{B}_{-i-j}` is the matrix obtained from :math:`\bm{B}` by removing rows and columns :math:`i` and :math:`j`.
