@@ -15,7 +15,6 @@
 
 * Improves speed of `fock_tensor` when the symplectic matrix passed is also orthogonal. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
 
-
 ### Bug fixes
 
 ### Breaking changes
