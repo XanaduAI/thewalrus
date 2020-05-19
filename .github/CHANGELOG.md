@@ -12,17 +12,26 @@
 
 * Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
 
+
+* Changes in the interface and speed ups in the functions in the `thewalrus.fock_gradients` module. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
+
 * Improves documentation of the multidimensional Hermite polynomials. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
 
 * Improves speed of `fock_tensor` when the symplectic matrix passed is also orthogonal. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
 
 ### Bug fixes
 
+### Breaking changes
+
+* The functions in `thewalrus.fock_gradients` are now separated into functions for the gradients and the gates. Moreover, they are renamed, for instance `Dgate` becomes `displacement` and its gradient is now  `grad_displacement`. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Theodor Isacsson, Nicolas Quesada
+
+Theodor Isacsson, Filippo Miatto, Nicolas Quesada
+
 
 ---
 
