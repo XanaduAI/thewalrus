@@ -1236,7 +1236,7 @@ def update_probabilities_with_noise(probs_noise, probs):
     return probs
 
 
-def fidelity(mu1, mu2, cov1, cov2, hbar=2, rtol=1e-05, atol=1e-08):
+def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     """Calculates the fidelity between two Gaussian quantum states.
 
     Note that if the covariance matrices correspond to pure states this
@@ -1245,8 +1245,8 @@ def fidelity(mu1, mu2, cov1, cov2, hbar=2, rtol=1e-05, atol=1e-08):
 
     Args:
         mu1 (array): vector of means of the first state
-        mu2 (array): vector of means of the second state
         cov1 (array): covariance matrix of the first state
+        mu2 (array): vector of means of the second state
         cov2 (array): covariance matrix of the second state
         hbar (float): value of hbar in the uncertainty relation
         rtol (float): the relative tolerance parameter used in `np.allclose`

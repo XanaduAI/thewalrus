@@ -1031,7 +1031,7 @@ def test_fidelity_with_self(num_modes, hbar, pure, block_diag):
     """Test that the fidelity of two identical quantum states is 1"""
     cov = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
     means = np.random.rand(2 * num_modes)
-    assert np.allclose(fidelity(means, means, cov, cov, hbar=hbar), 1, atol=1e-4)
+    assert np.allclose(fidelity(means, cov, means, cov, hbar=hbar), 1, atol=1e-4)
 
 
 @pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
@@ -1044,8 +1044,8 @@ def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
     means1 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
     cov2 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
     means2 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
-    f12 = fidelity(means1, means2, cov1, cov2, hbar=hbar)
-    f21 = fidelity(means2, means1, cov2, cov1, hbar=hbar)
+    f12 = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    f21 = fidelity(means2, cov2, means1, cov1, hbar=hbar)
     assert np.allclose(f12, f21)
     assert 0 <= np.real_if_close(f12) < 1.0
 
@@ -1060,7 +1060,7 @@ def test_fidelity_coherent_state(num_modes, hbar):
     means2 = Means(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
     cov1 = hbar * np.identity(2 * num_modes) / 2
     cov2 = hbar * np.identity(2 * num_modes) / 2
-    fid = fidelity(means1, means2, cov1, cov2, hbar=hbar)
+    fid = fidelity(means1, cov1, means2, cov2, hbar=hbar)
     expected = np.exp(-np.linalg.norm(beta1 - beta2) ** 2)
     assert np.allclose(expected, fid)
 
@@ -1079,7 +1079,7 @@ def test_fidelity_vac_to_displaced_squeezed(r, alpha, hbar):
         * np.abs(np.exp(np.tanh(r) * np.conj(alpha) ** 2))
         / np.cosh(r)
     )
-    assert np.allclose(expected, fidelity(means1, means2, cov1, cov2, hbar=hbar))
+    assert np.allclose(expected, fidelity(means1, cov1, means2, cov2, hbar=hbar))
 
 
 @pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
@@ -1090,7 +1090,7 @@ def test_fidelity_squeezed_vacuum(r1, r2, hbar):
     cov1 = np.diag([np.exp(2 * r1), np.exp(-2 * r1)]) * hbar / 2
     cov2 = np.diag([np.exp(2 * r2), np.exp(-2 * r2)]) * hbar / 2
     mu = np.zeros([2])
-    assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, mu, cov1, cov2, hbar=hbar))
+    assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, cov1, mu, cov2, hbar=hbar))
 
 
 def test_fidelity_wrong_shape():
@@ -1101,4 +1101,4 @@ def test_fidelity_wrong_shape():
     with pytest.raises(
         ValueError, match="The inputs have incompatible shapes"
     ):
-        fidelity(mu, mu, cov1, cov2)
+        fidelity(mu, cov1, mu, cov2)
