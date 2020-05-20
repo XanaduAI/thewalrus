@@ -114,6 +114,7 @@ Details
 ^^^^^^^
 """
 # pylint: disable=too-many-arguments
+import os
 from itertools import count, product, chain
 
 import numpy as np
@@ -1085,7 +1086,7 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
         mu (array): vector of means of length ``2*n_modes``
         cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
         cutoff (int): cutoff in Fock space
-        parallel (bool): if ``True``, uses ``dask`` for parallelization
+        parallel (bool): if ``True``, uses ``dask`` for parallelization instead of OpenMP
         hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
         rtol (float): the relative tolerance parameter used in `np.allclose`
         atol (float): the absolute tolerance parameter used in `np.allclose`
@@ -1098,22 +1099,32 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
     num_modes = len(mu) // 2
 
     if parallel:
+        # save old env variable (None if empty) and set single-thread use in OpenMP
+        OMP_NUM_THREADS = os.getenv("OMP_NUM_THREADS")
+        os.putenv("OMP_NUM_THREADS", "1")
+
         compute_list = []
-        # Create a list of parallelizable computations
+        # create a list of parallelizable computations
         for i in product(range(cutoff), repeat=num_modes):
             compute_list.append(dask.delayed(density_matrix_element)(mu, cov, i, i, hbar=hbar))
 
         probs = np.maximum(
             0.0, np.real_if_close(dask.compute(*compute_list, scheduler="processes"))
         ).reshape([cutoff] * num_modes)
-        # The maximum is needed because every now and then a probability is very close to zero from below.
+        # maximum is needed because sometimes a probability is very close to zero from below
+
+        # restore env variable to value before (or remove if it wasn't set)
+        if OMP_NUM_THREADS:
+            os.putenv("OMP_NUM_THREADS", OMP_NUM_THREADS)
+        else:
+            os.unsetenv("OMP_NUM_THREADS")
     else:
         probs = np.zeros([cutoff] * num_modes)
         for i in product(range(cutoff), repeat=num_modes):
             probs[i] = np.maximum(
                 0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
             )
-            # The maximum is needed because every now and then a probability is very close to zero from below.
+        # maximum is needed because sometimes a probability is very close to zero from below
     return probs
 
 
