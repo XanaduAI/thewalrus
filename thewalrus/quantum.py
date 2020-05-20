@@ -1138,7 +1138,7 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
     if parallel:
         # save old env variable (None if empty) and set single-thread use in OpenMP
         OMP_NUM_THREADS = os.getenv("OMP_NUM_THREADS")
-        os.putenv("OMP_NUM_THREADS", "1")
+        os.environ["OMP_NUM_THREADS"] = "1"
 
         compute_list = []
         # create a list of parallelizable computations
@@ -1152,9 +1152,10 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
 
         # restore env variable to value before (or remove if it wasn't set)
         if OMP_NUM_THREADS:
-            os.putenv("OMP_NUM_THREADS", OMP_NUM_THREADS)
+            os.environ["OMP_NUM_THREADS"] = OMP_NUM_THREADS
         else:
-            os.unsetenv("OMP_NUM_THREADS")
+            del os.environ["OMP_NUM_THREADS"]
+
     else:
         probs = np.zeros([cutoff] * num_modes)
         for i in product(range(cutoff), repeat=num_modes):
