@@ -53,6 +53,7 @@ Fock states and tensors
     probabilities
     update_probabilities_with_loss
     update_probabilities_with_noise
+    fidelity
 
 Details
 ^^^^^^^
@@ -122,9 +123,11 @@ import dask
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+from scipy.linalg import sqrtm
 from numba import jit
 
 from thewalrus.symplectic import expand, sympmat, is_symplectic
+from thewalrus.libwalrus import interferometer, interferometer_real
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -1019,7 +1022,16 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
+def fock_tensor(
+    S,
+    alpha,
+    cutoff,
+    choi_r=np.arcsinh(1.0),
+    check_symplectic=True,
+    sf_order=False,
+    rtol=1e-05,
+    atol=1e-08,
+):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -1031,38 +1043,63 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
         choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
         sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """
     # Check the matrix is symplectic
     if check_symplectic:
-        if not is_symplectic(S):
+        if not is_symplectic(S, rtol=rtol, atol=atol):
             raise ValueError("The matrix S is not symplectic")
 
     # And that S and alpha have compatible dimensions
     m, _ = S.shape
-    if m // 2 != len(alpha):
-        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
-
-    # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
     l = m // 2
-    ch = np.cosh(choi_r) * np.identity(l)
-    sh = np.sinh(choi_r) * np.identity(l)
-    zh = np.zeros([l, l])
-    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
-    # And then its Choi expanded symplectic
-    S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
-    # And this is the corresponding covariance matrix
-    cov = S_exp @ S_exp.T
-    alphat = np.array(list(alpha) + ([0] * l))
-    x = 2 * alphat.real
-    p = 2 * alphat.imag
-    mu = np.concatenate([x, p])
+    if l != len(alpha):
+        raise ValueError(
+            "The matrix S and the vector alpha do not have compatible dimensions"
+        )
+    # Check if S corresponds to an interferometer, if so use optimized routines
+    if np.allclose(S @ S.T, np.identity(m), rtol=rtol, atol=atol) and np.allclose(
+        alpha, 0, rtol=rtol, atol=atol
+    ):
+        reU = S[:l, :l]
+        imU = S[:l, l:]
+        if np.allclose(imU, 0, rtol=rtol, atol=atol):
+            Ub = np.block([[0 * reU, -reU], [-reU.T, 0 * reU]])
+            tensor = interferometer_real(Ub, cutoff)
+        else:
+            U = reU - 1j * imU
+            Ub = np.block([[0 * U, -U], [-U.T, 0 * U]])
+            tensor = interferometer(Ub, cutoff)
+    else:
+        # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
+        ch = np.cosh(choi_r) * np.identity(l)
+        sh = np.sinh(choi_r) * np.identity(l)
+        zh = np.zeros([l, l])
+        Schoi = np.block(
+            [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
+        )
+        # And then its Choi expanded symplectic
+        S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
+        # And this is the corresponding covariance matrix
+        cov = S_exp @ S_exp.T
+        alphat = np.array(list(alpha) + ([0] * l))
+        x = 2 * alphat.real
+        p = 2 * alphat.imag
+        mu = np.concatenate([x, p])
 
-    tensor = state_vector(
-        mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False, choi_r=choi_r
-    )
+        tensor = state_vector(
+            mu,
+            cov,
+            normalize=False,
+            cutoff=cutoff,
+            hbar=2,
+            check_purity=False,
+            choi_r=choi_r,
+        )
 
     if sf_order:
         sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
@@ -1229,3 +1266,54 @@ def update_probabilities_with_noise(probs_noise, probs):
         probs_masked = _update_1d(probs_masked, one_d, cutoff)
         probs = np.transpose(probs_masked, axes=perm)
     return probs
+
+
+def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
+    """Calculates the fidelity between two Gaussian quantum states.
+
+    Note that if the covariance matrices correspond to pure states this
+    function reduces to the modulus square of the overlap of their state vectors.
+    For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
+
+    Args:
+        mu1 (array): vector of means of the first state
+        cov1 (array): covariance matrix of the first state
+        mu2 (array): vector of means of the second state
+        cov2 (array): covariance matrix of the second state
+        hbar (float): value of hbar in the uncertainty relation
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
+
+    Returns:
+        (float): value of the fidelity between the two states
+    """
+
+    n0, n1 = cov1.shape
+    m0, m1 = cov2.shape
+    (l0,) = mu1.shape
+    (l1,) = mu1.shape
+    if not n0 == n1 == m0 == m1 == l0 == l1:
+        raise ValueError("The inputs have incompatible shapes")
+
+    v1 = cov1 / hbar
+    v2 = cov2 / hbar
+    deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
+    n0, n1 = cov1.shape
+    n = n0 // 2
+    W = sympmat(n)
+
+    si12 = np.linalg.inv(v1 + v2)
+    vaux = W.T @ si12 @ (0.25 * W + v2 @ W @ v1)
+    p1 = vaux @ W
+    p1 = p1 @ p1
+    p1 = np.identity(2 * n) + 0.25 * np.linalg.inv(p1)
+    if np.allclose(p1, 0, rtol=rtol, atol=atol):
+        p1 = np.zeros_like(p1)
+    else:
+        p1 = sqrtm(p1)
+    p1 = 2 * (p1 + np.identity(2 * n))
+    p1 = p1 @ vaux
+    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
+        -0.25 * deltar @ si12 @ deltar
+    )
+    return f
