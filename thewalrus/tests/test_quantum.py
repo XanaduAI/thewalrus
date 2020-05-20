@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for The Walrus quantum functions"""
 # pylint: disable=no-self-use,redefined-outer-name
+import os
 from itertools import product
 
 import pytest
