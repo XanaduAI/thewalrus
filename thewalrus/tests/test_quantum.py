@@ -1034,7 +1034,8 @@ def test_env_variable_with_probabilites(test_env_var):
     num_modes = 3
 
     means = np.random.random(2 * num_modes)
-    cov = 2 * np.identity(2 * num_modes) / 2
+    cov = np.random.random((2 * num_modes, 2 * num_modes))
+    cov += cov.conj().T
 
     OMP_NUM_THREADS = os.getenv("OMP_NUM_THREADS")
 
