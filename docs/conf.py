@@ -14,6 +14,8 @@
 # serve to show the default.
 
 import sys, os, re
+import inspect
+import numba
 from unittest.mock import MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -36,16 +38,16 @@ class TypeMock(type):
     pass
 
 MOCK_MODULES = [
-    'numpy',
-    'numpy.dtype',
+    # 'numpy',
+    # 'numpy.dtype',
     'scipy',
     'scipy.special',
     'scipy.optimize',
     'scipy.stats',
     'cython',
     'thewalrus.libwalrus',
-    'numba',
-    'numba.jit'
+    # 'numba',
+    # 'numba.jit'
     ]
 
 mock = Mock()
@@ -338,6 +340,23 @@ edit_on_github_branch = 'master/docs'
 
 from custom_directives import CustomGalleryItemDirective
 
+
+def process_numba_signature(app, what, name, obj, options, signature, return_annotation):
+    if isinstance(obj, numba.targets.registry.CPUDispatcher):
+        original = obj.py_func
+        orig_sig = inspect.signature(original)
+
+        if (orig_sig.return_annotation) is inspect._empty:
+            ret_ann = None
+        else:
+            ret_ann = orig_sig.return_annotation.__name__
+
+        return (str(orig_sig), ret_ann)
+
+    return (signature, return_annotation)
+
+
 def setup(app):
+    app.connect('autodoc-process-signature', process_numba_signature)
     app.add_directive('customgalleryitem', CustomGalleryItemDirective)
     app.add_stylesheet('xanadu_gallery.css')
