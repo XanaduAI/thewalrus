@@ -342,7 +342,7 @@ from custom_directives import CustomGalleryItemDirective
 
 
 def process_numba_signature(app, what, name, obj, options, signature, return_annotation):
-    if isinstance(obj, numba.targets.registry.CPUDispatcher):
+    if isinstance(obj, numba.core.registry.CPUDispatcher):
         original = obj.py_func
         orig_sig = inspect.signature(original)
 
