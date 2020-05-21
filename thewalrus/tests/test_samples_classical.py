@@ -24,8 +24,10 @@ rel_tol = 10
 
 def generate_positive_definite_matrix(n):
     r"""Generates a real positive definite matrix of size n
+
     Args:
         n (int) : Size of the matrix
+
     Returns:
         array: Positive definite matrix
     """
