@@ -1038,36 +1038,6 @@ def test_update_with_noise_coherent_value_error():
         update_probabilities_with_noise(noise_dists, probs)
 
 
-# @pytest.mark.parametrize("test_env_var", [None, "1", "2"])
-# def test_env_variable_with_probabilites(test_env_var):
-#     """Tests that OMP_NUM_THREADS is restored after running parallelization with Dask"""
-#     cutoff = 4
-#     num_modes = 3
-
-#     means = np.random.random(2 * num_modes)
-#     cov = np.random.random((2 * num_modes, 2 * num_modes))
-#     cov += cov.conj().T
-
-#     OMP_NUM_THREADS = os.getenv("OMP_NUM_THREADS")
-
-#     if test_env_var:
-#         os.environ["OMP_NUM_THREADS"] = test_env_var
-
-#     # will change OMP_NUM_THREADS to 1 and then back
-#     _ = probabilities(means, cov, cutoff, parallel=True)
-
-#     if test_env_var:
-#         assert os.environ["OMP_NUM_THREADS"] == test_env_var
-#     else:
-#         assert "OMP_NUM_THREADS" not in os.environ
-
-#     # restore env variable to value before the test-run (or remove if it wasn't set)
-#     if OMP_NUM_THREADS:
-#         os.environ["OMP_NUM_THREADS"] = OMP_NUM_THREADS
-#     elif test_env_var:
-#         del os.environ["OMP_NUM_THREADS"]
-
-
 @pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
 @pytest.mark.parametrize("num_modes", np.arange(5, 10))
 @pytest.mark.parametrize("pure", [True, False])
