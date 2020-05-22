@@ -10,6 +10,8 @@
 
 ### Improvements
 
+* Adds parallelization support using Dask for `quantum.probabilities`. [#161](https://github.com/XanaduAI/thewalrus/pull/161)
+
 * Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
 
 * Changes in the interface and speed ups in the functions in the `thewalrus.fock_gradients` module. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
@@ -19,6 +21,10 @@
 * Improves speed of `fock_tensor` when the symplectic matrix passed is also orthogonal. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
 
 ### Bug fixes
+
+* Fixes Numba decorated functions not rendering properly in the documentation. [#173] (https://github.com/XanaduAI/thewalrus/pull/173)
+
+* Solves the issue with `quantum` and `samples` not being rendered in the documentation or the TOC. [#173] (https://github.com/XanaduAI/thewalrus/pull/173)
 
 ### Breaking changes
 
