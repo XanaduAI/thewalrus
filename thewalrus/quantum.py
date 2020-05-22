@@ -1285,3 +1285,54 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
         -0.25 * deltar @ si12 @ deltar
     )
     return f
+
+def gen_normal_ordered_complex_cov(cov, hbar=2):
+    r"""Calculates the normal ordered covariance matrix in the complex basis.
+
+    Args:
+        cov (array): xp-covariance matrix.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (array): covariance matrix in the creation/annihilation operator basis.
+    """
+
+    n, _ = cov.shape
+    n_modes = n//2
+    cov = cov/(hbar/2)
+    A = cov[:n_modes, :n_modes]
+    B = cov[:n_modes, n_modes:]
+    C = cov[n_modes:, n_modes:]
+    N = 0.25 * (A + C + 1j * (B - B.T) - 2 * np.identity(n_modes))
+    M = 0.25 * (A - C + 1j * (B + B.T))
+    mat = np.block([[M.conj(), N], [N.T, M]])
+    return mat
+
+def normal_ordered_expectation(mu, cov, rpt, hbar=2):
+    r"""Calculates the expectation value of the normal ordered product
+    :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
+    where :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        rpt (list): integers specifying the terms to calculate.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the normal ordered product of operators
+    """
+    n, _ = cov.shape
+    n_modes = n//2
+    V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
+    alpha = Beta(mu, hbar=hbar)
+    rpt1 = rpt[:n_modes]
+    rpt2 = rpt[n_modes:]
+    V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
+    Amat = reduction(V, rpt)
+    if np.allclose(mu, 0):
+        res = np.conj(hafnian(Amat))
+    else:
+        np.fill_diagonal(Amat, reduction(alpha, rpt))
+        res = hafnian(Amat,loop=True)
+    return np.conj(res)
