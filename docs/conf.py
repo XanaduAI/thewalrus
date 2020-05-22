@@ -38,16 +38,8 @@ class TypeMock(type):
     pass
 
 MOCK_MODULES = [
-    # 'numpy',
-    # 'numpy.dtype',
-    # 'scipy',
-    # 'scipy.special',
-    # 'scipy.optimize',
-    # 'scipy.stats',
     'cython',
     'thewalrus.libwalrus',
-    # 'numba',
-    # 'numba.jit'
     ]
 
 mock = Mock()
