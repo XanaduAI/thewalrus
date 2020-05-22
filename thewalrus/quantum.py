@@ -1128,8 +1128,8 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
         cutoff (int): cutoff in Fock space
         parallel (bool): if ``True``, uses ``dask`` for parallelization instead of OpenMP
         hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
-        rtol (float): the relative tolerance parameter used in `np.allclose`
-        atol (float): the absolute tolerance parameter used in `np.allclose`
+        rtol (float): the relative tolerance parameter used in ``np.allclose``
+        atol (float): the absolute tolerance parameter used in ``np.allclose``
 
     Returns:
         (array): Fock space probabilities up to cutoff. The shape of this tensor is ``[cutoff]*num_modes``.
