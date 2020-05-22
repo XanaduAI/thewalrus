@@ -597,14 +597,13 @@ def _hafnian_sample_graph_rank_one(G, n_mean):
     Returns:
         (array): sample.
     """
-    r = 0.5
     s = np.arcsinh(np.sqrt(n_mean))
     q = 1.0 - np.tanh(s) ** 2
     total_photon_num = 2 * np.random.negative_binomial(0.5, q, 1)[0]
     sample = np.zeros(len(G))
     single_ph_ps = np.abs(G) ** 2
     single_ph_ps /= np.sum(single_ph_ps)
-    for i in range(total_photon_num):
+    for _ in range(total_photon_num):
         detector = np.random.choice(len(G), p=single_ph_ps)
         sample[detector] += 1
     return sample

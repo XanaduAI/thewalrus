@@ -524,4 +524,3 @@ def test_hafnian_sample_graph_rank_one():
     mode_means = samples.mean(axis=0)
     # Check that the mean photon number of each of the modes are correct
     assert np.allclose(mode_means, n_mean * ps, atol=10 / np.sqrt(n_samples))
-
