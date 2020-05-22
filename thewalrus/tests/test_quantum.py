@@ -919,8 +919,12 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("parallel", [True, False])
-def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar):
+def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypatch):
     """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
     cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
     cov2 = hbar * cov2 @ cov2.T / 2.0
     mean2 = np.zeros([4])
@@ -942,8 +946,12 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar):
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("parallel", [True, False])
-def test_update_with_loss_coherent_states(etas, etai, parallel, hbar):
+def test_update_with_loss_coherent_states(etas, etai, parallel, hbar, monkeypatch):
     """Checks probabilities are updated correctly for coherent states"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
     n_modes = 2
     cov = hbar * np.identity(2 * n_modes) / 2
     eta_vals = [etas, etai]
@@ -987,8 +995,12 @@ def test_loss_value_error(eta):
 
 @pytest.mark.parametrize("num_modes", [1, 2, 3])
 @pytest.mark.parametrize("parallel", [True, False])
-def test_update_with_noise_coherent(num_modes, parallel):
+def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
     """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
     cutoff = 15
     nbar_vals = np.random.rand(num_modes)
     noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
@@ -1027,34 +1039,34 @@ def test_update_with_noise_coherent_value_error():
         update_probabilities_with_noise(noise_dists, probs)
 
 
-@pytest.mark.parametrize("test_env_var", [None, "1", "2"])
-def test_env_variable_with_probabilites(test_env_var):
-    """Tests that OMP_NUM_THREADS is restored after running parallelization with Dask"""
-    cutoff = 4
-    num_modes = 3
+# @pytest.mark.parametrize("test_env_var", [None, "1", "2"])
+# def test_env_variable_with_probabilites(test_env_var):
+#     """Tests that OMP_NUM_THREADS is restored after running parallelization with Dask"""
+#     cutoff = 4
+#     num_modes = 3
 
-    means = np.random.random(2 * num_modes)
-    cov = np.random.random((2 * num_modes, 2 * num_modes))
-    cov += cov.conj().T
+#     means = np.random.random(2 * num_modes)
+#     cov = np.random.random((2 * num_modes, 2 * num_modes))
+#     cov += cov.conj().T
 
-    OMP_NUM_THREADS = os.getenv("OMP_NUM_THREADS")
+#     OMP_NUM_THREADS = os.getenv("OMP_NUM_THREADS")
 
-    if test_env_var:
-        os.environ["OMP_NUM_THREADS"] = test_env_var
+#     if test_env_var:
+#         os.environ["OMP_NUM_THREADS"] = test_env_var
 
-    # will change OMP_NUM_THREADS to 1 and then back
-    _ = probabilities(means, cov, cutoff, parallel=True)
+#     # will change OMP_NUM_THREADS to 1 and then back
+#     _ = probabilities(means, cov, cutoff, parallel=True)
 
-    if test_env_var:
-        assert os.environ["OMP_NUM_THREADS"] == test_env_var
-    else:
-        assert "OMP_NUM_THREADS" not in os.environ
+#     if test_env_var:
+#         assert os.environ["OMP_NUM_THREADS"] == test_env_var
+#     else:
+#         assert "OMP_NUM_THREADS" not in os.environ
 
-    # restore env variable to value before the test-run (or remove if it wasn't set)
-    if OMP_NUM_THREADS:
-        os.environ["OMP_NUM_THREADS"] = OMP_NUM_THREADS
-    elif test_env_var:
-        del os.environ["OMP_NUM_THREADS"]
+#     # restore env variable to value before the test-run (or remove if it wasn't set)
+#     if OMP_NUM_THREADS:
+#         os.environ["OMP_NUM_THREADS"] = OMP_NUM_THREADS
+#     elif test_env_var:
+#         del os.environ["OMP_NUM_THREADS"]
 
 
 @pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
