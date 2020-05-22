@@ -150,8 +150,6 @@ def squeezing(r, phi):
 
     Returns:
         array: symplectic transformation matrix
-
-
     """
     # pylint: disable=assignment-from-no-return
     cp = np.cos(phi)

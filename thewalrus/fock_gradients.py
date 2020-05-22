@@ -68,6 +68,7 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 @jit(nopython=True)
 def grad_displacement(T, r, phi):  # pragma: no cover
     r"""Calculates the gradients of the displacement gate with respect to the displacement magnitude and angle.
+
     Args:
         T (array[complex]): array representing the gate
         r (float): displacement magnitude

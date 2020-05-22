@@ -52,9 +52,10 @@ from scipy.optimize import root_scalar
 def rescale_adjacency_matrix_thermal(
     A, n_mean, check_positivity=True, check_symmetry=True, rtol=1e-05, atol=1e-08
 ):
-    r""" Returns the scaling parameter by which the adjacency matrix A
+    r"""Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that encodes it has
     a total mean photon number n_mean for thermal sampling.
+
     Args:
         A (array): Adjacency matrix, assumed to be positive semi-definite and real
         n_mean (float): Mean photon number of the Gaussian state
@@ -62,6 +63,7 @@ def rescale_adjacency_matrix_thermal(
         check_symmetry (bool): Checks if the matrix is symmetric
         rtol: relative tolerance for the checks
         atol: absolute tolerance for the checks
+
     Returns:
         tuple(array,array): rescaled eigenvalues and eigenvectors of the matrix A
     """
@@ -72,9 +74,10 @@ def rescale_adjacency_matrix_thermal(
 def rescale_adjacency_matrix(
     A, n_mean, scale, check_positivity=True, check_symmetry=True, rtol=1e-05, atol=1e-08
 ):
-    r""" Returns the scaling parameter by which the adjacency matrix A
+    r"""Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that encodes it has
     a total mean photon number n_mean.
+
     Args:
         A (array): Adjacency matrix, assumed to be positive semi-definite and real
         n_mean (float): Mean photon number of the Gaussian state
@@ -84,6 +87,7 @@ def rescale_adjacency_matrix(
         check_symmetry (bool): Checks if the matrix is symmetric
         rtol: relative tolerance for the checks
         atol: absolute tolerance for the checks
+
     Returns:
         tuple(array,array): rescaled eigenvalues and eigenvectors of the matrix A
     """
@@ -102,11 +106,13 @@ def rescale_adjacency_matrix(
     x_init = 0.5 * b_lim
 
     def mean_photon_number(x, vals):
-        r""" Returns the mean number of photons in the Gaussian state that
+        r"""Returns the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A where vals are the eigenvalues of positive semidefinite A
+
         Args:
             x (float): Scaling parameter
             vals (array): Eigenvalues of the matrix A
+
         Returns:
             n_mean: Mean photon number in the Gaussian state
         """
@@ -118,12 +124,14 @@ def rescale_adjacency_matrix(
 
     # The following function is implicitly tested in test_rescaling_thermal
     def grad_mean_photon_number(x, vals): # pragma: no cover
-        r""" Returns the gradient of the mean number of photons in the Gaussian state that
+        r"""Returns the gradient of the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
         vals are the eigenvalues of A
+
         Args:
             x (float): Scaling parameter
             vals (array): Eigenvalues of the matrix A
+
         Returns:
             d_n_mean: Derivative of the mean photon number in the Gaussian state
                 with respect to x
@@ -139,11 +147,13 @@ def rescale_adjacency_matrix(
     return res.root * ls, O
 
 def generate_thermal_samples(ls, O, num_samples=1):
-    r""" Generates samples of the Gaussian state in terms of the mean photon number parameter ls and the interferometer O.
+    r"""Generates samples of the Gaussian state in terms of the mean photon number parameter ls and the interferometer O.
+
         Args:
             ls (array): squashing parameters
             O (array): Orthogonal matrix representing the interferometer
             num_samples: Number of samples to generate
+
         Returns:
             list(array: samples
     """
