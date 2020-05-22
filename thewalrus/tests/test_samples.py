@@ -29,6 +29,7 @@ from thewalrus.samples import (
     photon_number_sampler,
     generate_hafnian_sample,
     generate_torontonian_sample,
+    hafnian_sample_graph_rank_one,
 )
 from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
 from thewalrus.symplectic import two_mode_squeezing
@@ -500,3 +501,27 @@ def test_out_of_bounds_generate_torontonian_sample():
     max_photons = 1
     samples = [generate_torontonian_sample(sigma, max_photons=max_photons) for i in range(n_samples)]
     assert -1 in samples
+
+
+def test_hafnian_sample_graph_rank_one():
+    """Test correct functioning of hafnian_sample_graph_rank_one"""
+    G = np.random.rand(10) + 1j * np.random.rand(10)
+    n_mean = 2
+    n_samples = 100000
+    samples = hafnian_sample_graph_rank_one(G, n_mean, n_samples)
+    # Check the total mean photon number is correct
+    assert np.allclose(
+        np.mean(samples.sum(axis=1)), n_mean, atol=10 / np.sqrt(n_samples)
+    )
+    # Check the standard deviation of the total mean photon number is correct
+    assert np.allclose(
+        np.std(samples.sum(axis=1)),
+        np.sqrt(2 * n_mean * (1 + n_mean)),
+        atol=10 / np.sqrt(n_samples),
+    )
+    ps = np.abs(G) ** 2
+    ps /= np.sum(ps)
+    mode_means = samples.mean(axis=0)
+    # Check that the mean photon number of each of the modes are correct
+    assert np.allclose(mode_means, n_mean * ps, atol=10 / np.sqrt(n_samples))
+
