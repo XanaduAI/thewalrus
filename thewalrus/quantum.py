@@ -1113,11 +1113,14 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
 
     .. note::
 
-        Parallization is already being done by OpenMP when calling ``density_matrix_element``.
-        To get a speed-up from using ``parallel=True`` it must be turned off by setting the
-        environment variable ``OMP_NUM_THREADS=1`` (forcing single threaded use). Remove the
-        environment variable or set it to ``OMP_NUM_THREADS=''`` to again use multithreading
-        with OpenMP.
+        Individual density matrix elements are computed using multithreading by OpenMP.
+        Setting ``parallel=True`` will further result in *multiple* density matrix elements
+        being computed in parallel.
+
+        When setting ``parallel=True``, OpenMP will be turned off by setting the
+        environment variable ``OMP_NUM_THREADS=1`` (forcing single threaded use for individual
+        matrix elements). It will then be either removed or restored to its former value to again
+        allow use of multithreading with OpenMP.
 
     Args:
         mu (array): vector of means of length ``2*n_modes``
