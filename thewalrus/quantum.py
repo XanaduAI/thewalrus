@@ -1333,6 +1333,6 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     if np.allclose(mu, 0):
         res = np.conj(hafnian(Amat))
     else:
-        np.fill_diagonal(Amat, reduction(alpha, rpt))
-        res = hafnian(Amat,loop=True)
+        np.fill_diagonal(Amat, reduction(np.conj(alpha), rpt))
+        res = np.conj(hafnian(Amat, loop=True))
     return np.conj(res)
