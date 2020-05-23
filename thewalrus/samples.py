@@ -29,7 +29,7 @@ Hafnian sampling
     hafnian_sample_state
     hafnian_sample_graph
     hafnian_sample_classical_state
-
+    hafnian_sample_graph_rank_one
 
 Torontonian sampling
 --------------------
