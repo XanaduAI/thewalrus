@@ -73,7 +73,7 @@ def test_dist_thermal():
     assert np.allclose(rel_freq, expected, atol=10 / np.sqrt(n_samples))
 
 
-@pytest.mark.parametrize("nmodes", [3, 4, 5, 6])
+@pytest.mark.parametrize("nmodes", [3, 4, 5])
 def test_number_moments_multimode_thermal(nmodes):
     r"""Test the correct values of the photon number means and covariances"""
     # This test requires nmodes > 1

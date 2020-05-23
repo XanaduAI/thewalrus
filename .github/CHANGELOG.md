@@ -10,6 +10,9 @@
 
 * Adds new function `normal_ordered_expectation` in `thewalrus.quantum` to calculate expectation values of products of normal ordered expressions. [#175](https://github.com/XanaduAI/thewalrus/pull/175)
 
+* Adds the function `hafnian_sample_graph_rank_one` in `thewalrus.samples` to sample from rank-one adjacency matrices. [#174](https://github.com/XanaduAI/thewalrus/pull/169)
+
+
 ### Improvements
 
 * Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
