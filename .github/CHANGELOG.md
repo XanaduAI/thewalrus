@@ -8,6 +8,8 @@
 
 * Adds a new module, `thewalrus.random`, to generate random unitary, symplectic and covariance matrices. [#169](https://github.com/XanaduAI/thewalrus/pull/169)
 
+* Adds new function `normal_ordered_expectation` to calculate expectation value of product of normal ordered expressions. [#175](https://github.com/XanaduAI/thewalrus/pull/175)
+
 ### Improvements
 
 * Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)

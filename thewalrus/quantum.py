@@ -53,6 +53,7 @@ Fock states and tensors
     probabilities
     update_probabilities_with_loss
     update_probabilities_with_noise
+    normal_ordered_expectation
     fidelity
 
 Details
@@ -109,6 +110,7 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
+    gen_normal_ordered_complex_cov
 
 
 Details
