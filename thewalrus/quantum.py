@@ -1335,3 +1335,48 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
         res = np.conj(hafnian(A, loop=True))
     return np.conj(res)
+
+def photon_number_expectation(mu, cov, modes, hbar=2):
+    r"""Calculates the expectation value of the product of the number operator of the modes in a Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the product of the number operators of the modes.
+    """
+    n, _ = cov.shape
+    n_modes = n // 2
+    rpt = np.zeros([n], dtype=int)
+    for i in modes:
+        rpt[i] = 1
+        rpt[i + n_modes] = 1
+
+    return normal_ordered_expectation(mu, cov, rpt, hbar=hbar)
+
+
+def photon_number_squared_expectation(mu, cov, modes, hbar=2):
+    r"""Calculates the expectation value of the square of the product of the number operator of the modes in
+    a Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the square of the product of the number operator of the modes.
+    """
+    n_modes = len(modes)
+
+    mu_red, cov_red = reduced_gaussian(mu, cov, modes)
+    result = 0
+    for item in product([1, 2], repeat=n_modes):
+        rpt = item + item
+        term = normal_ordered_expectation(mu_red, cov_red, rpt, hbar=hbar)
+        result += term
+    return result

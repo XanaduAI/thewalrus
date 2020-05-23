@@ -56,6 +56,8 @@ from thewalrus.quantum import (
     loss_mat,
     fidelity,
     normal_ordered_expectation,
+    photon_number_expectation,
+    photon_number_squared_expectation,
 )
 
 
@@ -1218,3 +1220,64 @@ def test_expt_two_mode_squeezed(r, phi):
     for pattern, value in zip(patterns, expected):
         result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
         assert np.allclose(result, value)
+
+@pytest.mark.parametrize("alpha", np.random.rand(3, 4) + 1j * np.random.rand(3, 4))
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_photon_number_expectation_displaced(alpha, hbar):
+    """Tests the correct photon number expectation for coherent states"""
+    beta = np.concatenate([alpha, np.conj(alpha)])
+    means = Means(beta, hbar=hbar)
+    cov = np.identity(len(beta)) * hbar / 2
+    val = photon_number_expectation(
+        means, cov, modes=list(range(len(alpha))), hbar=hbar
+    )
+    expected = np.prod(np.abs(alpha) ** 2)
+    assert np.allclose(val, expected)
+    val = photon_number_squared_expectation(
+        means, cov, modes=list(range(len(alpha))), hbar=hbar
+    )
+    expected = np.prod(np.abs(alpha) ** 4 + np.abs(alpha) ** 2)
+    assert np.allclose(val, expected)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_photon_number_expectation_squeezed(r, phi, hbar):
+    """Tests tthe correct photon number expectation of a single mode squeezed state"""
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([2])
+    val = photon_number_expectation(means, cov, modes=[0], hbar=hbar)
+    expected = np.sinh(r) ** 2
+    assert np.allclose(val, expected)
+    val = photon_number_squared_expectation(means, cov, modes=[0], hbar=hbar)
+    expected = np.sinh(r) ** 2 * 0.5 * (1 + 3 * np.cosh(2 * r))
+    assert np.allclose(val, expected)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_photon_number_expectation_two_mode_squeezed(r, phi, hbar):
+    """Tests tthe correct photon number expectation of a two-mode squeezed state"""
+    S = two_mode_squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([4])
+
+    mode_list = [[0], [1], [0, 1]]
+    na = np.sinh(r) ** 2
+    nanb = np.cosh(2 * r) * np.sinh(r) ** 2
+    expected_vals = [na, na, nanb]
+
+    for modes, expected in zip(mode_list, expected_vals):
+        val = photon_number_expectation(means, cov, modes=modes, hbar=hbar)
+        assert np.allclose(val, expected)
+
+    mode_list = [[0], [1], [0, 1]]
+    na2nb2 = 0.25 * (np.cosh(2 * r) + 3 * np.cosh(6 * r)) * np.sinh(r) ** 2
+    expected_vals = [nanb, nanb, na2nb2]
+
+    for modes, expected in zip(mode_list, expected_vals):
+        val = photon_number_squared_expectation(means, cov, modes=modes, hbar=hbar)
+        assert np.allclose(val, expected)
