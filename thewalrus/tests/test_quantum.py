@@ -1214,7 +1214,7 @@ def test_expt_two_mode_squeezed(r, phi):
         [2, 2, 0, 0],
         [0, 0, 2, 2],
     ]
-    expected = [1, 0, 0, adxa, adxa, a2, np.conj(a2), adxbdxab, ad2bd2, np.conj(ad2bd2)]
+    expected = [1, a, np.conj(a), adxa, adxa, a2, np.conj(a2), adxbdxab, ad2bd2, np.conj(ad2bd2)]
     for pattern, value in zip(patterns, expected):
         result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
         assert np.allclose(result, value)

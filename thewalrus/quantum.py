@@ -1327,13 +1327,11 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     n_modes = n // 2
     V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
     alpha = Beta(mu, hbar=hbar)
-    rpt1 = rpt[:n_modes]
-    rpt2 = rpt[n_modes:]
     V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
-    Amat = reduction(V, rpt)
+    A = reduction(V, rpt)
     if np.allclose(mu, 0):
-        res = np.conj(hafnian(Amat))
+        res = np.conj(hafnian(A))
     else:
-        np.fill_diagonal(Amat, reduction(np.conj(alpha), rpt))
-        res = np.conj(hafnian(Amat, loop=True))
+        np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
+        res = np.conj(hafnian(A, loop=True))
     return np.conj(res)
