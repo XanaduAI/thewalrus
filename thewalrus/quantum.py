@@ -1323,8 +1323,6 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     Returns:
         (float): expectation value of the normal ordered product of operators
     """
-    n, _ = cov.shape
-    n_modes = n // 2
     V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
     alpha = Beta(mu, hbar=hbar)
     V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
