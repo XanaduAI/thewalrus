@@ -1104,78 +1104,117 @@ def test_fidelity_wrong_shape():
     ):
         fidelity(mu, cov1, mu, cov2)
 
+
 @pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
-@pytest.mark.parametrize("alpha", np.random.rand(3,10) + 1j*np.random.rand(3,10))
+@pytest.mark.parametrize("alpha", np.random.rand(3, 10) + 1j * np.random.rand(3, 10))
 def test_expectation_normal_ordered_coherent(alpha, hbar):
     """Test the correct evaluation of the normal ordered expectation value for a product of coherent states"""
     beta = np.concatenate([alpha, np.conj(alpha)])
     means = Means(beta, hbar=hbar)
-    cov = np.identity(len(beta))*hbar/2
-    pattern = np.random.randint(low = 0, high = 3, size = len(beta))
+    cov = np.identity(len(beta)) * hbar / 2
+    pattern = np.random.randint(low=0, high=3, size=len(beta))
     result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
-    np.allclose(result, np.prod(np.conj(beta)**pattern))
+    np.allclose(result, np.prod(np.conj(beta) ** pattern))
+
 
 @pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
 @pytest.mark.parametrize("r", np.random.rand(5))
-@pytest.mark.parametrize("phi", 2*np.pi*np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
 def test_single_mode_squeezed(r, phi, hbar):
     """Tests the correct results are obtained for a single mode squeezed state"""
     S = squeezing(r, phi)
-    cov = 0.5*hbar*S@S.T
+    cov = 0.5 * hbar * S @ S.T
     means = np.zeros([2])
 
-    patterns = [[0,0], [1,1], [0,1], [1,0],[0,2],[2,0],[0,4],[4,0],[2,2],[3,1],[1,3]]
+    patterns = [
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [1, 0],
+        [0, 2],
+        [2, 0],
+        [0, 4],
+        [4, 0],
+        [2, 2],
+        [3, 1],
+        [1, 3],
+    ]
 
-    adxa = np.sinh(r)**2
+    adxa = np.sinh(r) ** 2
     a = 0
-    a2 = -0.5*np.exp(1j*phi)*np.sinh(2*r)
-    a4 = 3*np.exp(2j*phi)*(0.5*np.sinh(2*r))**2
-    ad2xa2 = (np.cosh(r)**2+2*np.sinh(r)**2)*np.sinh(r)**2
-    ad3xa = -3*np.exp(-1j*phi)*np.cosh(r)*np.sinh(r)**3
+    a2 = -0.5 * np.exp(1j * phi) * np.sinh(2 * r)
+    a4 = 3 * np.exp(2j * phi) * (0.5 * np.sinh(2 * r)) ** 2
+    ad2xa2 = (np.cosh(r) ** 2 + 2 * np.sinh(r) ** 2) * np.sinh(r) ** 2
+    ad3xa = -3 * np.exp(-1j * phi) * np.cosh(r) * np.sinh(r) ** 3
 
-    expected = [1, adxa, a, np.conj(a), a2, np.conj(a2), a4, np.conj(a4), ad2xa2, ad3xa, np.conj(ad3xa)]
+    expected = [
+        1,
+        adxa,
+        a,
+        np.conj(a),
+        a2,
+        np.conj(a2),
+        a4,
+        np.conj(a4),
+        ad2xa2,
+        ad3xa,
+        np.conj(ad3xa),
+    ]
 
     for pattern, value in zip(patterns, expected):
         result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
         assert np.allclose(result, value)
 
+
 @pytest.mark.parametrize("r", np.random.rand(4))
-@pytest.mark.parametrize("phi", 2*np.pi*np.random.rand(4))
-@pytest.mark.parametrize("x", np.random.rand(4)-0.5)
-@pytest.mark.parametrize("y", np.random.rand(4)-0.5)
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
+@pytest.mark.parametrize("x", np.random.rand(4) - 0.5)
+@pytest.mark.parametrize("y", np.random.rand(4) - 0.5)
 def test_single_mode_displaced_squeezed(r, phi, x, y):
     """Tests the correct results are obtained for a single mode displaced squeezed state"""
     hbar = 2
     S = squeezing(r, phi)
-    cov = 0.5*hbar*S@S.T
-    beta = np.array([x+1j*y, x-1j*y])
+    cov = 0.5 * hbar * S @ S.T
+    beta = np.array([x + 1j * y, x - 1j * y])
     alpha = beta[0]
     means = Means(beta, hbar=hbar)
     a = alpha
-    adxa = np.abs(alpha)**2+np.sinh(r)**2
-    a2 =alpha**2 -  np.exp(1j*phi)*0.5*np.sinh(2*r)
-    patterns = [[0,0], [1,1], [0,1], [1,0], [0,2], [2,0]]
+    adxa = np.abs(alpha) ** 2 + np.sinh(r) ** 2
+    a2 = alpha ** 2 - np.exp(1j * phi) * 0.5 * np.sinh(2 * r)
+    patterns = [[0, 0], [1, 1], [0, 1], [1, 0], [0, 2], [2, 0]]
     expected = [1, adxa, a, np.conj(a), a2, np.conj(a2)]
-
 
     for pattern, value in zip(patterns, expected):
         result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
         assert np.allclose(result, value)
 
+
 @pytest.mark.parametrize("r", np.random.rand(4))
-@pytest.mark.parametrize("phi", 2*np.pi*np.random.rand(4))
-def two_mode_squeezed(r, phi):
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
+def test_expt_two_mode_squeezed(r, phi):
+    """tests for two mode squeezing"""
     hbar = 2
     S = two_mode_squeezing(r, phi)
-    cov = 0.5*hbar*S@S.T
+    cov = 0.5 * hbar * S @ S.T
     means = np.zeros([4])
     a = 0
-    a2 = 0.5*np.exp(1j*phi)*np.sinh(2*r)
-    adxa = np.sinh(r)**2
-
-    patterns = [[0,0], [0,1], [1,0], [1,1], [0,2], [2,0]]
-    expected = [1, 0, 0,, adxa, a2, np.conj(a2)]
-
-
-
-
+    a2 = 0.5 * np.exp(1j * phi) * np.sinh(2 * r)
+    adxa = np.sinh(r) ** 2
+    adxbdxab = np.cosh(2 * r) * np.sinh(r) ** 2
+    ad2bd2 = 0.5 * np.exp(-2j * phi) * (np.sinh(2 * r)) ** 2
+    patterns = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+        [1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 1],
+        [1, 1, 0, 0],
+        [1, 1, 1, 1],
+        [2, 2, 0, 0],
+        [0, 0, 2, 2],
+    ]
+    expected = [1, 0, 0, adxa, adxa, a2, np.conj(a2), adxbdxab, ad2bd2, np.conj(ad2bd2)]
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)

@@ -1298,8 +1298,8 @@ def gen_normal_ordered_complex_cov(cov, hbar=2):
     """
 
     n, _ = cov.shape
-    n_modes = n//2
-    cov = cov/(hbar/2)
+    n_modes = n // 2
+    cov = cov / (hbar / 2)
     A = cov[:n_modes, :n_modes]
     B = cov[:n_modes, n_modes:]
     C = cov[n_modes:, n_modes:]
@@ -1307,6 +1307,7 @@ def gen_normal_ordered_complex_cov(cov, hbar=2):
     M = 0.25 * (A - C + 1j * (B + B.T))
     mat = np.block([[M.conj(), N], [N.T, M]])
     return mat
+
 
 def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     r"""Calculates the expectation value of the normal ordered product
@@ -1323,7 +1324,7 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         (float): expectation value of the normal ordered product of operators
     """
     n, _ = cov.shape
-    n_modes = n//2
+    n_modes = n // 2
     V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
     alpha = Beta(mu, hbar=hbar)
     rpt1 = rpt[:n_modes]
