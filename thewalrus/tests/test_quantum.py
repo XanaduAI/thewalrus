@@ -1194,7 +1194,8 @@ def test_single_mode_displaced_squeezed(r, phi, x, y):
 @pytest.mark.parametrize("r", np.random.rand(4))
 @pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
 def test_expt_two_mode_squeezed(r, phi):
-    """tests for two mode squeezing"""
+    """Tests that the correct results are obtained for a state created by two-mode squeezing"""
+
     hbar = 2
     S = two_mode_squeezing(r, phi)
     cov = 0.5 * hbar * S @ S.T
