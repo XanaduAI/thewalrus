@@ -1245,7 +1245,8 @@ def test_photon_number_expectation_displaced(alpha, hbar):
 @pytest.mark.parametrize("r", np.random.rand(5))
 @pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
 def test_photon_number_expectation_squeezed(r, phi, hbar):
-    """Tests tthe correct photon number expectation of a single mode squeezed state"""
+    """Tests the correct photon number expectation of a single mode squeezed state"""
+
     S = squeezing(r, phi)
     cov = 0.5 * hbar * S @ S.T
     means = np.zeros([2])
@@ -1261,7 +1262,8 @@ def test_photon_number_expectation_squeezed(r, phi, hbar):
 @pytest.mark.parametrize("r", np.random.rand(5))
 @pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
 def test_photon_number_expectation_two_mode_squeezed(r, phi, hbar):
-    """Tests tthe correct photon number expectation of a two-mode squeezed state"""
+    """Tests the correct photon number expectation of a two-mode squeezed state"""
+
     S = two_mode_squeezing(r, phi)
     cov = 0.5 * hbar * S @ S.T
     means = np.zeros([4])
