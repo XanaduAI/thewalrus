@@ -1325,7 +1325,6 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     Returns:
         (float): expectation value of the normal ordered product of operators
     """
-    V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
     alpha = Beta(mu, hbar=hbar)
     V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
     A = reduction(V, rpt)
