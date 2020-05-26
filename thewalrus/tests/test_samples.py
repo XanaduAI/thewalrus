@@ -27,31 +27,24 @@ from thewalrus.samples import (
     torontonian_sample_classical_state,
     seed,
     photon_number_sampler,
+    generate_hafnian_sample,
+    generate_torontonian_sample,
+    hafnian_sample_graph_rank_one,
 )
 from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
+from thewalrus.symplectic import two_mode_squeezing
 seed(137)
 
 rel_tol = 3.0
 abs_tol = 1.0e-10
 
 
-def TMS_cov(r, phi):
+def TMS_cov(r, phi, hbar=2):
     """returns the covariance matrix of a TMS state"""
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
 
-    S = np.array(
-        [
-            [ch, cp * sh, 0, sp * sh],
-            [cp * sh, ch, sp * sh, 0],
-            [0, sp * sh, ch, -cp * sh],
-            [sp * sh, 0, -cp * sh, ch],
-        ]
-    )
+    S = two_mode_squeezing(r, phi)
 
-    return S @ S.T
+    return S @ S.T * hbar/2
 
 
 class TestHafnianSampling:
@@ -481,3 +474,53 @@ def test_seed():
     second_sample_p = hafnian_sample_state(V, n_samples)
     assert np.array_equal(first_sample, first_sample_p)
     assert np.array_equal(second_sample, second_sample_p)
+
+
+def test_out_of_bounds_generate_hafnian_sample():
+    """Check that when the sampled goes beyond max_photons a -1 is returned.
+    """
+    n_samples = 100
+    mean_n = 20
+    r = np.arcsinh(np.sqrt(mean_n))
+    sigma = np.array([[np.exp(2 * r), 0.0], [0.0, np.exp(-2 * r)]])
+
+    cutoff = 10
+    max_photons = 5
+    samples = [generate_hafnian_sample(sigma, cutoff=cutoff, max_photons=max_photons) for i in range(n_samples)]
+    assert -1 in samples
+
+
+def test_out_of_bounds_generate_torontonian_sample():
+    """Check that when the sampled goes beyond max_photons a -1 is returned.
+    """
+    n_samples = 100
+    mean_n = 100
+    r = np.arcsinh(np.sqrt(mean_n))
+    sigma = TMS_cov(r, 0)
+
+    max_photons = 1
+    samples = [generate_torontonian_sample(sigma, max_photons=max_photons) for i in range(n_samples)]
+    assert -1 in samples
+
+
+def test_hafnian_sample_graph_rank_one():
+    """Test correct functioning of hafnian_sample_graph_rank_one"""
+    G = np.random.rand(10) + 1j * np.random.rand(10)
+    n_mean = 2
+    n_samples = 100000
+    samples = hafnian_sample_graph_rank_one(G, n_mean, n_samples)
+    # Check the total mean photon number is correct
+    assert np.allclose(
+        np.mean(samples.sum(axis=1)), n_mean, atol=10 / np.sqrt(n_samples)
+    )
+    # Check the standard deviation of the total mean photon number is correct
+    assert np.allclose(
+        np.std(samples.sum(axis=1)),
+        np.sqrt(2 * n_mean * (1 + n_mean)),
+        atol=10 / np.sqrt(n_samples),
+    )
+    ps = np.abs(G) ** 2
+    ps /= np.sum(ps)
+    mode_means = samples.mean(axis=0)
+    # Check that the mean photon number of each of the modes are correct
+    assert np.allclose(mode_means, n_mean * ps, atol=10 / np.sqrt(n_samples))

@@ -53,6 +53,8 @@ Fock states and tensors
     probabilities
     update_probabilities_with_loss
     update_probabilities_with_noise
+    normal_ordered_expectation
+    fidelity
 
 Details
 ^^^^^^^
@@ -81,6 +83,13 @@ Details
 .. autofunction::
     update_probabilities_with_noise
 
+.. autofunction::
+    normal_ordered_expectation
+
+.. autofunction::
+    fidelity
+
+
 Utility functions
 -----------------
 
@@ -108,6 +117,7 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
+    normal_ordered_complex_cov
 
 
 Details
@@ -117,12 +127,16 @@ Details
 from itertools import count, product, chain
 
 import numpy as np
+import dask
+
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
+from scipy.linalg import sqrtm
 from numba import jit
 
 from thewalrus.symplectic import expand, sympmat, is_symplectic
+from thewalrus.libwalrus import interferometer, interferometer_real
 
 from ._hafnian import hafnian, hafnian_repeated, reduction
 from ._hermite_multidimensional import hermite_multidimensional, hafnian_batched
@@ -1017,7 +1031,16 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
     raise ValueError("The Gaussian state is not pure")
 
 
-def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True, sf_order=False):
+def fock_tensor(
+    S,
+    alpha,
+    cutoff,
+    choi_r=np.arcsinh(1.0),
+    check_symplectic=True,
+    sf_order=False,
+    rtol=1e-05,
+    atol=1e-08,
+):
     r"""
     Calculates the Fock representation of a Gaussian unitary parametrized by
     the symplectic matrix S and the displacements alpha up to cutoff in Fock space.
@@ -1029,38 +1052,63 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
         choi_r (float): squeezing parameter used for the Choi expansion
         check_symplectic (boolean): checks whether the input matrix is symplectic
         sf_order (boolean): reshapes the tensor so that it follows the sf ordering of indices
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Return:
         (array): Tensor containing the Fock representation of the Gaussian unitary
     """
     # Check the matrix is symplectic
     if check_symplectic:
-        if not is_symplectic(S):
+        if not is_symplectic(S, rtol=rtol, atol=atol):
             raise ValueError("The matrix S is not symplectic")
 
     # And that S and alpha have compatible dimensions
     m, _ = S.shape
-    if m // 2 != len(alpha):
-        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
-
-    # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
     l = m // 2
-    ch = np.cosh(choi_r) * np.identity(l)
-    sh = np.sinh(choi_r) * np.identity(l)
-    zh = np.zeros([l, l])
-    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
-    # And then its Choi expanded symplectic
-    S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
-    # And this is the corresponding covariance matrix
-    cov = S_exp @ S_exp.T
-    alphat = np.array(list(alpha) + ([0] * l))
-    x = 2 * alphat.real
-    p = 2 * alphat.imag
-    mu = np.concatenate([x, p])
+    if l != len(alpha):
+        raise ValueError(
+            "The matrix S and the vector alpha do not have compatible dimensions"
+        )
+    # Check if S corresponds to an interferometer, if so use optimized routines
+    if np.allclose(S @ S.T, np.identity(m), rtol=rtol, atol=atol) and np.allclose(
+        alpha, 0, rtol=rtol, atol=atol
+    ):
+        reU = S[:l, :l]
+        imU = S[:l, l:]
+        if np.allclose(imU, 0, rtol=rtol, atol=atol):
+            Ub = np.block([[0 * reU, -reU], [-reU.T, 0 * reU]])
+            tensor = interferometer_real(Ub, cutoff)
+        else:
+            U = reU - 1j * imU
+            Ub = np.block([[0 * U, -U], [-U.T, 0 * U]])
+            tensor = interferometer(Ub, cutoff)
+    else:
+        # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
+        ch = np.cosh(choi_r) * np.identity(l)
+        sh = np.sinh(choi_r) * np.identity(l)
+        zh = np.zeros([l, l])
+        Schoi = np.block(
+            [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
+        )
+        # And then its Choi expanded symplectic
+        S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
+        # And this is the corresponding covariance matrix
+        cov = S_exp @ S_exp.T
+        alphat = np.array(list(alpha) + ([0] * l))
+        x = 2 * alphat.real
+        p = 2 * alphat.imag
+        mu = np.concatenate([x, p])
 
-    tensor = state_vector(
-        mu, cov, normalize=False, cutoff=cutoff, hbar=2, check_purity=False, choi_r=choi_r
-    )
+        tensor = state_vector(
+            mu,
+            cov,
+            normalize=False,
+            cutoff=cutoff,
+            hbar=2,
+            check_purity=False,
+            choi_r=choi_r,
+        )
 
     if sf_order:
         sf_indexing = tuple(chain.from_iterable([[i, i + l] for i in range(l)]))
@@ -1069,16 +1117,29 @@ def fock_tensor(S, alpha, cutoff, choi_r=np.arcsinh(1.0), check_symplectic=True,
     return tensor
 
 
-def probabilities(mu, cov, cutoff, hbar=2.0, rtol=1e-05, atol=1e-08):
+
+def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e-08):
     r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
+
+    .. note::
+
+        Individual density matrix elements are computed using multithreading by OpenMP.
+        Setting ``parallel=True`` will further result in *multiple* density matrix elements
+        being computed in parallel.
+
+        When setting ``parallel=True``, OpenMP will need to be turned off by setting the
+        environment variable ``OMP_NUM_THREADS=1`` (forcing single threaded use for individual
+        matrix elements). Remove the environment variable or set it to ``OMP_NUM_THREADS=''``
+        to again use multithreading with OpenMP.
 
     Args:
         mu (array): vector of means of length ``2*n_modes``
         cov (array): covariance matrix of shape ``[2*n_modes, 2*n_modes]``
         cutoff (int): cutoff in Fock space
+        parallel (bool): if ``True``, uses ``dask`` for parallelization instead of OpenMP
         hbar (float): value of :math:`\hbar` in the commutation relation :math;`[\hat{x}, \hat{p}]=i\hbar`
-        rtol (float): the relative tolerance parameter used in `np.allclose`
-        atol (float): the absolute tolerance parameter used in `np.allclose`
+        rtol (float): the relative tolerance parameter used in ``np.allclose``
+        atol (float): the absolute tolerance parameter used in ``np.allclose``
 
     Returns:
         (array): Fock space probabilities up to cutoff. The shape of this tensor is ``[cutoff]*num_modes``.
@@ -1086,13 +1147,26 @@ def probabilities(mu, cov, cutoff, hbar=2.0, rtol=1e-05, atol=1e-08):
     if is_pure_cov(cov, hbar=hbar, rtol=rtol, atol=atol):  # Check if the covariance matrix cov is pure
         return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
-    probs = np.zeros([cutoff] * num_modes)
-    for i in product(range(cutoff), repeat=num_modes):
-        probs[i] = np.maximum(
-            0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
-        )
-        # The maximum is needed because every now and then a probability is very close to zero from below.
+
+    if parallel:
+        compute_list = []
+        # create a list of parallelizable computations
+        for i in product(range(cutoff), repeat=num_modes):
+            compute_list.append(dask.delayed(density_matrix_element)(mu, cov, i, i, hbar=hbar))
+
+        probs = np.maximum(
+            0.0, np.real_if_close(dask.compute(*compute_list, scheduler="processes"))
+        ).reshape([cutoff] * num_modes)
+        # maximum is needed because sometimes a probability is very close to zero from below
+    else:
+        probs = np.zeros([cutoff] * num_modes)
+        for i in product(range(cutoff), repeat=num_modes):
+            probs[i] = np.maximum(
+                0.0, np.real_if_close(density_matrix_element(mu, cov, i, i, hbar=hbar))
+            )
+            # maximum is needed because sometimes a probability is very close to zero from below
     return probs
+
 
 
 @jit(nopython=True)
@@ -1196,3 +1270,146 @@ def update_probabilities_with_noise(probs_noise, probs):
         probs_masked = _update_1d(probs_masked, one_d, cutoff)
         probs = np.transpose(probs_masked, axes=perm)
     return probs
+
+
+def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
+    """Calculates the fidelity between two Gaussian quantum states.
+
+    Note that if the covariance matrices correspond to pure states this
+    function reduces to the modulus square of the overlap of their state vectors.
+    For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
+
+    Args:
+        mu1 (array): vector of means of the first state
+        cov1 (array): covariance matrix of the first state
+        mu2 (array): vector of means of the second state
+        cov2 (array): covariance matrix of the second state
+        hbar (float): value of hbar in the uncertainty relation
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
+
+    Returns:
+        (float): value of the fidelity between the two states
+    """
+
+    n0, n1 = cov1.shape
+    m0, m1 = cov2.shape
+    (l0,) = mu1.shape
+    (l1,) = mu1.shape
+    if not n0 == n1 == m0 == m1 == l0 == l1:
+        raise ValueError("The inputs have incompatible shapes")
+
+    v1 = cov1 / hbar
+    v2 = cov2 / hbar
+    deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
+    n0, n1 = cov1.shape
+    n = n0 // 2
+    W = sympmat(n)
+
+    si12 = np.linalg.inv(v1 + v2)
+    vaux = W.T @ si12 @ (0.25 * W + v2 @ W @ v1)
+    p1 = vaux @ W
+    p1 = p1 @ p1
+    p1 = np.identity(2 * n) + 0.25 * np.linalg.inv(p1)
+    if np.allclose(p1, 0, rtol=rtol, atol=atol):
+        p1 = np.zeros_like(p1)
+    else:
+        p1 = sqrtm(p1)
+    p1 = 2 * (p1 + np.identity(2 * n))
+    p1 = p1 @ vaux
+    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
+        -0.25 * deltar @ si12 @ deltar
+    )
+    return f
+
+def normal_ordered_complex_cov(cov, hbar=2):
+    r"""Calculates the normal ordered covariance matrix in the complex basis.
+
+    Args:
+        cov (array): xp-covariance matrix.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (array): covariance matrix in the creation/annihilation operator basis.
+    """
+
+    n, _ = cov.shape
+    n_modes = n // 2
+    cov = cov / (hbar / 2)
+    A = cov[:n_modes, :n_modes]
+    B = cov[:n_modes, n_modes:]
+    C = cov[n_modes:, n_modes:]
+    N = 0.25 * (A + C + 1j * (B - B.T) - 2 * np.identity(n_modes))
+    M = 0.25 * (A - C + 1j * (B + B.T))
+    mat = np.block([[M.conj(), N], [N.T, M]])
+    return mat
+
+
+def normal_ordered_expectation(mu, cov, rpt, hbar=2):
+    r"""Calculates the expectation value of the normal ordered product
+    :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
+    where :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        rpt (list): integers specifying the terms to calculate.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the normal ordered product of operators
+    """
+    alpha = Beta(mu, hbar=hbar)
+    V = normal_ordered_complex_cov(cov, hbar=hbar)
+    A = reduction(V, rpt)
+    if np.allclose(mu, 0):
+        res = np.conj(hafnian(A))
+    else:
+        np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
+        res = np.conj(hafnian(A, loop=True))
+    return np.conj(res)
+
+def photon_number_expectation(mu, cov, modes, hbar=2):
+    r"""Calculates the expectation value of the product of the number operator of the modes in a Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the product of the number operators of the modes.
+    """
+    n, _ = cov.shape
+    n_modes = n // 2
+    rpt = np.zeros([n], dtype=int)
+    for i in modes:
+        rpt[i] = 1
+        rpt[i + n_modes] = 1
+
+    return normal_ordered_expectation(mu, cov, rpt, hbar=hbar)
+
+
+def photon_number_squared_expectation(mu, cov, modes, hbar=2):
+    r"""Calculates the expectation value of the square of the product of the number operator of the modes in
+    a Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the square of the product of the number operator of the modes.
+    """
+    n_modes = len(modes)
+
+    mu_red, cov_red = reduced_gaussian(mu, cov, modes)
+    result = 0
+    for item in product([1, 2], repeat=n_modes):
+        rpt = item + item
+        term = normal_ordered_expectation(mu_red, cov_red, rpt, hbar=hbar)
+        result += term
+    return result

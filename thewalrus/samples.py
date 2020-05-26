@@ -29,7 +29,7 @@ Hafnian sampling
     hafnian_sample_state
     hafnian_sample_graph
     hafnian_sample_classical_state
-
+    hafnian_sample_graph_rank_one
 
 Torontonian sampling
 --------------------
@@ -583,3 +583,42 @@ def seed(seed_val=None):
         seed_val (int): Seed for RandomState. Must be convertible to 32 bit unsigned integers.
     """
     np.random.seed(seed_val)
+
+
+
+def _hafnian_sample_graph_rank_one(G, n_mean):
+    r"""Returns a sample from a rank one adjacency matrix `\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G}`
+    is a row vector.
+
+    Args:
+        G (array): factorization of the rank-one matrix A = G @ G.T.
+        nmean (float): Total mean photon number.
+
+    Returns:
+        (array): sample.
+    """
+    s = np.arcsinh(np.sqrt(n_mean))
+    q = 1.0 - np.tanh(s) ** 2
+    total_photon_num = 2 * np.random.negative_binomial(0.5, q, 1)[0]
+    sample = np.zeros(len(G))
+    single_ph_ps = np.abs(G) ** 2
+    single_ph_ps /= np.sum(single_ph_ps)
+    for _ in range(total_photon_num):
+        detector = np.random.choice(len(G), p=single_ph_ps)
+        sample[detector] += 1
+    return sample
+
+
+def hafnian_sample_graph_rank_one(G, n_mean, samples=1):
+    r"""Returns samples from a rank one adjacency matrix `\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G}`
+    is a row vector.
+
+    Args:
+        G (array): factorization of the rank-one matrix A = G @ G.T.
+        nmean (float): Total mean photon number.
+        samples (int): the number of samples to return.
+
+    Returns
+        (array): samples.
+    """
+    return np.array([_hafnian_sample_graph_rank_one(G, n_mean) for _ in range(samples)])

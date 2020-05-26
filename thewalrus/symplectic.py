@@ -153,8 +153,6 @@ def squeezing(r, phi, dtype=np.float64):
         dtype (numpy.dtype): datatype to represent the Symplectic matrix
     Returns:
         array: symplectic transformation matrix
-
-
     """
     # pylint: disable=assignment-from-no-return
     cp = np.cos(phi, dtype=dtype)

@@ -18,10 +18,11 @@ from itertools import product
 import pytest
 
 import numpy as np
-from scipy.linalg import qr
 from scipy.stats import poisson
 
 from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
+
+from thewalrus.random import random_covariance, random_interferometer
 
 from thewalrus.quantum import (
     reduced_gaussian,
@@ -53,34 +54,15 @@ from thewalrus.quantum import (
     update_probabilities_with_loss,
     update_probabilities_with_noise,
     loss_mat,
+    fidelity,
+    normal_ordered_expectation,
+    photon_number_expectation,
+    photon_number_squared_expectation,
 )
 
 
 # make tests deterministic
 np.random.seed(137)
-
-
-def random_interferometer(N, real=False):
-    r"""Random unitary matrix representing an interferometer.
-
-    For more details, see arXiv:math-ph/0609050
-
-    Args:
-        N (int): number of modes
-        real (bool): return a random real orthogonal matrix
-
-    Returns:
-        array: random :math:`N\times N` unitary distributed with the Haar measure
-    """
-    if real:
-        z = np.random.randn(N, N)
-    else:
-        z = (np.random.randn(N, N) + 1j * np.random.randn(N, N)) / np.sqrt(2.0)
-    q, r = qr(z)
-    d = np.diag(r)
-    ph = d / np.abs(d)
-    U = np.multiply(q, ph, q)
-    return U
 
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -938,8 +920,13 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
-def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypatch):
     """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
     cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
     cov2 = hbar * cov2 @ cov2.T / 2.0
     mean2 = np.zeros([4])
@@ -950,8 +937,8 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
         mean2, cov2l = loss(mean2, cov2l, eta, i, hbar=hbar)
 
     cutoff = 6
-    probs = probabilities(mean2, cov2l, cutoff, hbar=hbar)
-    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, hbar=hbar)
+    probs = probabilities(mean2, cov2l, cutoff, parallel=parallel, hbar=hbar)
+    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, parallel=parallel, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta2, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
@@ -960,17 +947,22 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, hbar):
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
-def test_update_with_loss_coherent_states(etas, etai, hbar):
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_loss_coherent_states(etas, etai, parallel, hbar, monkeypatch):
     """Checks probabilities are updated correctly for coherent states"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
     n_modes = 2
     cov = hbar * np.identity(2 * n_modes) / 2
     eta_vals = [etas, etai]
     means = 2 * np.random.rand(2 * n_modes)
     means_lossy = np.sqrt(np.array(eta_vals + eta_vals)) * means
     cutoff = 6
-    probs_lossless = probabilities(means, cov, 10 * cutoff, hbar=hbar)
+    probs_lossless = probabilities(means, cov, 10 * cutoff, parallel=parallel, hbar=hbar)
 
-    probs = probabilities(means_lossy, cov, cutoff, hbar=hbar)
+    probs = probabilities(means_lossy, cov, cutoff, parallel=parallel, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
 
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
@@ -1004,8 +996,13 @@ def test_loss_value_error(eta):
 
 
 @pytest.mark.parametrize("num_modes", [1, 2, 3])
-def test_update_with_noise_coherent(num_modes):
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
     """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
     cutoff = 15
     nbar_vals = np.random.rand(num_modes)
     noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
@@ -1015,13 +1012,13 @@ def test_update_with_noise_coherent(num_modes):
     cov = hbar * np.identity(2 * num_modes) / 2
     cutoff = 10
 
-    probs = probabilities(means, cov, cutoff, hbar=2)
+    probs = probabilities(means, cov, cutoff, parallel=parallel, hbar=2)
     updated_probs = update_probabilities_with_noise(noise_dists, probs)
     beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
     means_expected = Means(
         np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
     )
-    expected = probabilities(means_expected, cov, cutoff, hbar=2)
+    expected = probabilities(means_expected, cov, cutoff, parallel=parallel, hbar=2)
     assert np.allclose(updated_probs, expected)
 
 
@@ -1042,3 +1039,263 @@ def test_update_with_noise_coherent_value_error():
         match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions.",
     ):
         update_probabilities_with_noise(noise_dists, probs)
+
+
+@pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_with_self(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity of two identical quantum states is 1"""
+    cov = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means = np.random.rand(2 * num_modes)
+    assert np.allclose(fidelity(means, cov, means, cov, hbar=hbar), 1, atol=1e-4)
+
+
+@pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity is symmetric and between 0 and 1"""
+    cov1 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means1 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
+    cov2 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means2 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
+    f12 = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    f21 = fidelity(means2, cov2, means1, cov1, hbar=hbar)
+    assert np.allclose(f12, f21)
+    assert 0 <= np.real_if_close(f12) < 1.0
+
+
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_fidelity_coherent_state(num_modes, hbar):
+    """Test the fidelity of two multimode coherent states"""
+    beta1 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    beta2 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means1 = Means(np.concatenate([beta1, beta1.conj()]), hbar=hbar)
+    means2 = Means(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
+    cov1 = hbar * np.identity(2 * num_modes) / 2
+    cov2 = hbar * np.identity(2 * num_modes) / 2
+    fid = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    expected = np.exp(-np.linalg.norm(beta1 - beta2) ** 2)
+    assert np.allclose(expected, fid)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", [-2, 0, 2])
+@pytest.mark.parametrize("alpha", np.random.rand(10) + 1j * np.random.rand(10))
+def test_fidelity_vac_to_displaced_squeezed(r, alpha, hbar):
+    """Calculates the fidelity between a coherent squeezed state and vacuum"""
+    cov1 = np.diag([np.exp(2 * r), np.exp(-2 * r)]) * hbar / 2
+    means1 = Means(np.array([alpha, np.conj(alpha)]), hbar=hbar)
+    means2 = np.zeros([2])
+    cov2 = np.identity(2) * hbar / 2
+    expected = (
+        np.exp(-np.abs(alpha) ** 2)
+        * np.abs(np.exp(np.tanh(r) * np.conj(alpha) ** 2))
+        / np.cosh(r)
+    )
+    assert np.allclose(expected, fidelity(means1, cov1, means2, cov2, hbar=hbar))
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r1", np.random.rand(3))
+@pytest.mark.parametrize("r2", np.random.rand(3))
+def test_fidelity_squeezed_vacuum(r1, r2, hbar):
+    """Tests fidelity between two squeezed states"""
+    cov1 = np.diag([np.exp(2 * r1), np.exp(-2 * r1)]) * hbar / 2
+    cov2 = np.diag([np.exp(2 * r2), np.exp(-2 * r2)]) * hbar / 2
+    mu = np.zeros([2])
+    assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, cov1, mu, cov2, hbar=hbar))
+
+
+def test_fidelity_wrong_shape():
+    """Tests the correct error is raised"""
+    cov1 = np.identity(2)
+    cov2 = np.identity(4)
+    mu = np.zeros(2)
+    with pytest.raises(
+        ValueError, match="The inputs have incompatible shapes"
+    ):
+        fidelity(mu, cov1, mu, cov2)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("alpha", np.random.rand(3, 10) + 1j * np.random.rand(3, 10))
+def test_expectation_normal_ordered_coherent(alpha, hbar):
+    """Test the correct evaluation of the normal ordered expectation value for a product of coherent states"""
+    beta = np.concatenate([alpha, np.conj(alpha)])
+    means = Means(beta, hbar=hbar)
+    cov = np.identity(len(beta)) * hbar / 2
+    pattern = np.random.randint(low=0, high=3, size=len(beta))
+    result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+    np.allclose(result, np.prod(np.conj(beta) ** pattern))
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_single_mode_squeezed(r, phi, hbar):
+    """Tests the correct results are obtained for a single mode squeezed state"""
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([2])
+
+    patterns = [
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [1, 0],
+        [0, 2],
+        [2, 0],
+        [0, 4],
+        [4, 0],
+        [2, 2],
+        [3, 1],
+        [1, 3],
+    ]
+
+    adxa = np.sinh(r) ** 2
+    a = 0
+    a2 = -0.5 * np.exp(1j * phi) * np.sinh(2 * r)
+    a4 = 3 * np.exp(2j * phi) * (0.5 * np.sinh(2 * r)) ** 2
+    ad2xa2 = (np.cosh(r) ** 2 + 2 * np.sinh(r) ** 2) * np.sinh(r) ** 2
+    ad3xa = -3 * np.exp(-1j * phi) * np.cosh(r) * np.sinh(r) ** 3
+
+    expected = [
+        1,
+        adxa,
+        a,
+        np.conj(a),
+        a2,
+        np.conj(a2),
+        a4,
+        np.conj(a4),
+        ad2xa2,
+        ad3xa,
+        np.conj(ad3xa),
+    ]
+
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)
+
+
+@pytest.mark.parametrize("r", np.random.rand(4))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
+@pytest.mark.parametrize("x", np.random.rand(4) - 0.5)
+@pytest.mark.parametrize("y", np.random.rand(4) - 0.5)
+def test_single_mode_displaced_squeezed(r, phi, x, y):
+    """Tests the correct results are obtained for a single mode displaced squeezed state"""
+    hbar = 2
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    beta = np.array([x + 1j * y, x - 1j * y])
+    alpha = beta[0]
+    means = Means(beta, hbar=hbar)
+    a = alpha
+    adxa = np.abs(alpha) ** 2 + np.sinh(r) ** 2
+    a2 = alpha ** 2 - np.exp(1j * phi) * 0.5 * np.sinh(2 * r)
+    patterns = [[0, 0], [1, 1], [0, 1], [1, 0], [0, 2], [2, 0]]
+    expected = [1, adxa, a, np.conj(a), a2, np.conj(a2)]
+
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)
+
+
+@pytest.mark.parametrize("r", np.random.rand(4))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
+def test_expt_two_mode_squeezed(r, phi):
+    """Tests that the correct results are obtained for a state created by two-mode squeezing"""
+
+    hbar = 2
+    S = two_mode_squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([4])
+    a = 0
+    a2 = 0.5 * np.exp(1j * phi) * np.sinh(2 * r)
+    adxa = np.sinh(r) ** 2
+    adxbdxab = np.cosh(2 * r) * np.sinh(r) ** 2
+    ad2bd2 = 0.5 * np.exp(-2j * phi) * (np.sinh(2 * r)) ** 2
+    patterns = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+        [1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 1],
+        [1, 1, 0, 0],
+        [1, 1, 1, 1],
+        [2, 2, 0, 0],
+        [0, 0, 2, 2],
+    ]
+    expected = [1, a, np.conj(a), adxa, adxa, a2, np.conj(a2), adxbdxab, ad2bd2, np.conj(ad2bd2)]
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)
+
+@pytest.mark.parametrize("alpha", np.random.rand(3, 4) + 1j * np.random.rand(3, 4))
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_photon_number_expectation_displaced(alpha, hbar):
+    """Tests the correct photon number expectation for coherent states"""
+    beta = np.concatenate([alpha, np.conj(alpha)])
+    means = Means(beta, hbar=hbar)
+    cov = np.identity(len(beta)) * hbar / 2
+    val = photon_number_expectation(
+        means, cov, modes=list(range(len(alpha))), hbar=hbar
+    )
+    expected = np.prod(np.abs(alpha) ** 2)
+    assert np.allclose(val, expected)
+    val = photon_number_squared_expectation(
+        means, cov, modes=list(range(len(alpha))), hbar=hbar
+    )
+    expected = np.prod(np.abs(alpha) ** 4 + np.abs(alpha) ** 2)
+    assert np.allclose(val, expected)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_photon_number_expectation_squeezed(r, phi, hbar):
+    """Tests the correct photon number expectation of a single mode squeezed state"""
+
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([2])
+    val = photon_number_expectation(means, cov, modes=[0], hbar=hbar)
+    expected = np.sinh(r) ** 2
+    assert np.allclose(val, expected)
+    val = photon_number_squared_expectation(means, cov, modes=[0], hbar=hbar)
+    expected = np.sinh(r) ** 2 * 0.5 * (1 + 3 * np.cosh(2 * r))
+    assert np.allclose(val, expected)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_photon_number_expectation_two_mode_squeezed(r, phi, hbar):
+    """Tests the correct photon number expectation of a two-mode squeezed state"""
+
+    S = two_mode_squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([4])
+
+    mode_list = [[0], [1], [0, 1]]
+    na = np.sinh(r) ** 2
+    nanb = np.cosh(2 * r) * np.sinh(r) ** 2
+    expected_vals = [na, na, nanb]
+
+    for modes, expected in zip(mode_list, expected_vals):
+        val = photon_number_expectation(means, cov, modes=modes, hbar=hbar)
+        assert np.allclose(val, expected)
+
+    mode_list = [[0], [1], [0, 1]]
+    na2nb2 = 0.25 * (np.cosh(2 * r) + 3 * np.cosh(6 * r)) * np.sinh(r) ** 2
+    expected_vals = [nanb, nanb, na2nb2]
+
+    for modes, expected in zip(mode_list, expected_vals):
+        val = photon_number_squared_expectation(means, cov, modes=modes, hbar=hbar)
+        assert np.allclose(val, expected)

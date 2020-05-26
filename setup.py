@@ -28,7 +28,9 @@ requirements = [
     "numpy",
     "scipy>=1.2.1",
     "numba>=0.43.1",
-    "dask[delayed]"
+    "dask[delayed]",
+    "sympy>=1.5.1",
+    "repoze.lru>=0.7"
 ]
 
 
@@ -160,7 +162,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
