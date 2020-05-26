@@ -53,6 +53,7 @@ Fock states and tensors
     probabilities
     update_probabilities_with_loss
     update_probabilities_with_noise
+    normal_ordered_expectation
     fidelity
 
 Details
@@ -82,6 +83,13 @@ Details
 .. autofunction::
     update_probabilities_with_noise
 
+.. autofunction::
+    normal_ordered_expectation
+
+.. autofunction::
+    fidelity
+
+
 Utility functions
 -----------------
 
@@ -109,6 +117,7 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
+    normal_ordered_complex_cov
 
 
 Details
@@ -119,6 +128,7 @@ from itertools import count, product, chain
 
 import numpy as np
 import dask
+
 from scipy.optimize import root_scalar
 from scipy.special import factorial as fac
 from scipy.stats import nbinom
@@ -1107,6 +1117,7 @@ def fock_tensor(
     return tensor
 
 
+
 def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e-08):
     r"""Generate the Fock space probabilities of a Gaussian state up to a Fock space cutoff.
 
@@ -1155,6 +1166,7 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
             )
             # maximum is needed because sometimes a probability is very close to zero from below
     return probs
+
 
 
 @jit(nopython=True)
@@ -1309,3 +1321,95 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
         -0.25 * deltar @ si12 @ deltar
     )
     return f
+
+def normal_ordered_complex_cov(cov, hbar=2):
+    r"""Calculates the normal ordered covariance matrix in the complex basis.
+
+    Args:
+        cov (array): xp-covariance matrix.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (array): covariance matrix in the creation/annihilation operator basis.
+    """
+
+    n, _ = cov.shape
+    n_modes = n // 2
+    cov = cov / (hbar / 2)
+    A = cov[:n_modes, :n_modes]
+    B = cov[:n_modes, n_modes:]
+    C = cov[n_modes:, n_modes:]
+    N = 0.25 * (A + C + 1j * (B - B.T) - 2 * np.identity(n_modes))
+    M = 0.25 * (A - C + 1j * (B + B.T))
+    mat = np.block([[M.conj(), N], [N.T, M]])
+    return mat
+
+
+def normal_ordered_expectation(mu, cov, rpt, hbar=2):
+    r"""Calculates the expectation value of the normal ordered product
+    :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
+    where :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        rpt (list): integers specifying the terms to calculate.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the normal ordered product of operators
+    """
+    alpha = Beta(mu, hbar=hbar)
+    V = normal_ordered_complex_cov(cov, hbar=hbar)
+    A = reduction(V, rpt)
+    if np.allclose(mu, 0):
+        res = np.conj(hafnian(A))
+    else:
+        np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
+        res = np.conj(hafnian(A, loop=True))
+    return np.conj(res)
+
+def photon_number_expectation(mu, cov, modes, hbar=2):
+    r"""Calculates the expectation value of the product of the number operator of the modes in a Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the product of the number operators of the modes.
+    """
+    n, _ = cov.shape
+    n_modes = n // 2
+    rpt = np.zeros([n], dtype=int)
+    for i in modes:
+        rpt[i] = 1
+        rpt[i + n_modes] = 1
+
+    return normal_ordered_expectation(mu, cov, rpt, hbar=hbar)
+
+
+def photon_number_squared_expectation(mu, cov, modes, hbar=2):
+    r"""Calculates the expectation value of the square of the product of the number operator of the modes in
+    a Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the square of the product of the number operator of the modes.
+    """
+    n_modes = len(modes)
+
+    mu_red, cov_red = reduced_gaussian(mu, cov, modes)
+    result = 0
+    for item in product([1, 2], repeat=n_modes):
+        rpt = item + item
+        term = normal_ordered_expectation(mu_red, cov_red, rpt, hbar=hbar)
+        result += term
+    return result
