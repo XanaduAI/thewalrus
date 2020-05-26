@@ -1322,7 +1322,7 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     )
     return f
 
-def gen_normal_ordered_complex_cov(cov, hbar=2):
+def normal_ordered_complex_cov(cov, hbar=2):
     r"""Calculates the normal ordered covariance matrix in the complex basis.
 
     Args:
