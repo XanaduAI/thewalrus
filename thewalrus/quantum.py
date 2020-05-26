@@ -117,7 +117,7 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
-    gen_normal_ordered_complex_cov
+    normal_ordered_complex_cov
 
 
 Details
@@ -1360,7 +1360,7 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         (float): expectation value of the normal ordered product of operators
     """
     alpha = Beta(mu, hbar=hbar)
-    V = gen_normal_ordered_complex_cov(cov, hbar=hbar)
+    V = normal_ordered_complex_cov(cov, hbar=hbar)
     A = reduction(V, rpt)
     if np.allclose(mu, 0):
         res = np.conj(hafnian(A))
