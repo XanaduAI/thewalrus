@@ -3,7 +3,7 @@ sphinx==2.2.2
 ipykernel
 nbsphinx
 cython>=0.20
-numba
+numba>=0.49.1
 numpy>=1.9
 sympy>=1.5.1
 repoze.lru>=0.7
