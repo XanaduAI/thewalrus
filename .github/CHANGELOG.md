@@ -1,4 +1,4 @@
-# Version 0.13.0-dev
+# Version 0.13.0rc1
 
 ### New features
 
@@ -8,11 +8,9 @@
 
 * Adds a new module, `thewalrus.random`, to generate random unitary, symplectic and covariance matrices. [#169](https://github.com/XanaduAI/thewalrus/pull/169)
 
-
 * Adds new functions `normal_ordered_expectation`, ` photon_number_expectation` and `photon_number_squared_expectation` in `thewalrus.quantum` to calculate expectation values of products of normal ordered expressions and number operators and their squares. [#175](https://github.com/XanaduAI/thewalrus/pull/175)
 
 * Adds the function `hafnian_sample_graph_rank_one` in `thewalrus.samples` to sample from rank-one adjacency matrices. [#174](https://github.com/XanaduAI/thewalrus/pull/169)
-
 
 ### Improvements
 
@@ -28,13 +26,13 @@
 
 ### Bug fixes
 
-* Fixes Numba decorated functions not rendering properly in the documentation. [#173] (https://github.com/XanaduAI/thewalrus/pull/173)
+* Fixes Numba decorated functions not rendering properly in the documentation. [#173](https://github.com/XanaduAI/thewalrus/pull/173)
 
-* Solves the issue with `quantum` and `samples` not being rendered in the documentation or the TOC. [#173] (https://github.com/XanaduAI/thewalrus/pull/173)
+* Solves the issue with `quantum` and `samples` not being rendered in the documentation or the TOC. [#173](https://github.com/XanaduAI/thewalrus/pull/173)
 
 ### Breaking changes
 
-* The functions in `thewalrus.fock_gradients` are now separated into functions for the gradients and the gates. Moreover, they are renamed, for instance `Dgate` becomes `displacement` and its gradient is now  `grad_displacement`. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
+* The functions in `thewalrus.fock_gradients` are now separated into functions for the gradients and the gates. Moreover, they are renamed, for instance `Dgate` becomes `displacement` and its gradient is now `grad_displacement`. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
 
 ### Contributors
 
