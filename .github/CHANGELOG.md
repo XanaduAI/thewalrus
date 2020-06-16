@@ -32,7 +32,7 @@
 
 ### Breaking changes
 
-* The functions in `thewalrus.fock_gradients` are now separated into functions for the gradients and the gates. Moreover, they are renamed, for instance `Dgate` becomes `displacement` and its gradient is now  `grad_displacement`. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
+* The functions in `thewalrus.fock_gradients` are now separated into functions for the gradients and the gates. Moreover, they are renamed, for instance `Dgate` becomes `displacement` and its gradient is now `grad_displacement`. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
 
 ### Contributors
 
