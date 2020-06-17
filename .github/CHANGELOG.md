@@ -1,4 +1,4 @@
-# Version 0.13.0rc1
+# Version 0.13.0rc2
 
 ### New features
 
