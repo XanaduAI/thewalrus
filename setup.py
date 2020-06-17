@@ -27,7 +27,7 @@ with open("thewalrus/_version.py") as f:
 requirements = [
     "numpy",
     "scipy>=1.2.1",
-    "numba>=0.43.1",
+    "numba>=0.49.1",
     "dask[delayed]",
     "sympy>=1.5.1",
     "repoze.lru>=0.7"
