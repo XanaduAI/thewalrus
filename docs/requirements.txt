@@ -12,3 +12,4 @@ breathe==4.12.0
 exhale
 version_information
 sphinx-copybutton
+dask[delayed]
