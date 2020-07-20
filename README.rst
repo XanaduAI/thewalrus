@@ -152,6 +152,18 @@ will need to be installed. In Ubuntu-based distributions, this can be done as fo
 
     sudo apt-get install cmake libgtest-dev
 
+Alternatively, the latest Googletest release can be installed from source:
+
+.. code-block:: console
+
+    sudo apt install cmake
+    wget -qO - https://github.com/google/googletest/archive/release-1.8.1.tar.gz | tar -xz
+    cmake -D CMAKE_INSTALL_PREFIX:PATH=$HOME/googletest -D CMAKE_BUILD_TYPE=Release googletest-release-1.8.1
+    make install
+
+If installing Googletest from source, make sure that the included headers and
+libraries are available on your include/library paths.
+
 Documentation
 =============
 
