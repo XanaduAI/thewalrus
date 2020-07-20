@@ -80,18 +80,21 @@ In addition, to compile the C++ extension, the following dependencies are requir
 
 * A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
 * `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
+* `Cython <https://cython.org/>`_ an optimising static compiler for the Python programming language.
 
 On Debian-based systems, these can be installed via ``apt`` and ``curl``:
 
 .. code-block:: console
 
     $ sudo apt install g++ libeigen3-dev
+    $ pip install Cython
 
 or using Homebrew on MacOS:
 
 .. code-block:: console
 
     $ brew install gcc eigen
+    $ pip install Cython
 
 Alternatively, you can download the Eigen headers manually:
 
@@ -104,13 +107,7 @@ Alternatively, you can download the Eigen headers manually:
 
 Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
 
-Once all dependencies are installed, you can compile the latest stable version of the The Walrus library as follows:
-
-.. code-block:: console
-
-    $ python -m pip install thewalrus --no-binary :all:
-
-Alternatively, you can compile the latest development version by cloning the git repository, and installing using pip in development mode.
+You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
 
 .. code-block:: console
 
@@ -154,25 +151,6 @@ will need to be installed. In Ubuntu-based distributions, this can be done as fo
 .. code-block:: console
 
     sudo apt-get install cmake libgtest-dev
-    cd /usr/src/googletest/googletest
-    sudo cmake
-    sudo make
-    sudo cp libgtest* /usr/lib/
-    sudo mkdir /usr/local/lib/googletest
-    sudo ln -s /usr/lib/libgtest.a /usr/local/lib/googletest/libgtest.a
-    sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/googletest/libgtest_main.a
-
-Alternatively, the latest Googletest release can be installed from source:
-
-.. code-block:: console
-
-    sudo apt install cmake
-    wget -qO - https://github.com/google/googletest/archive/release-1.8.1.tar.gz | tar -xz
-    cmake -D CMAKE_INSTALL_PREFIX:PATH=$HOME/googletest -D CMAKE_BUILD_TYPE=Release googletest-release-1.8.1
-    make install
-
-If installing Googletest from source, make sure that the included headers and
-libraries are available on your include/library paths.
 
 Documentation
 =============
