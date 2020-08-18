@@ -10,7 +10,7 @@
 
 * Adds new functions `normal_ordered_expectation`, `photon_number_expectation` and `photon_number_squared_expectation` in `thewalrus.quantum` to calculate expectation values of products of normal ordered expressions and number operators and their squares. [#175](https://github.com/XanaduAI/thewalrus/pull/175)
 
-* Adds the function `hafnian_sample_graph_rank_one` in `thewalrus.samples` to sample from rank-one adjacency matrices. [#174](https://github.com/XanaduAI/thewalrus/pull/169)
+* Adds the function `hafnian_sample_graph_rank_one` in `thewalrus.samples` to sample from rank-one adjacency matrices. [#174](https://github.com/XanaduAI/thewalrus/pull/174)
 
 ### Improvements
 
