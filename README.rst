@@ -1,4 +1,4 @@
-The Walrus 
+The Walrus
 ##########
 
 .. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg&circle-token=209b57390082a2b2fe2cdc9ee49a301ddc29ca5b
@@ -26,8 +26,8 @@ The Walrus
     :target: https://pypi.org/project/thewalrus
 
 .. image:: https://joss.theoj.org/papers/10.21105/joss.01705/status.svg
-	:alt: JOSS - The Journal of Open Source Software
-	:target: https://doi.org/10.21105/joss.01705
+    :alt: JOSS - The Journal of Open Source Software
+    :target: https://doi.org/10.21105/joss.01705
 
 A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
 
@@ -101,7 +101,7 @@ Alternatively, you can download the Eigen headers manually:
 .. code-block:: console
 
     $ mkdir ~/.local/eigen3 && cd ~/.local/eigen3
-    $ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz -O eigen3.tar.gz
+    $ wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz -O eigen3.tar.gz
     $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
     $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
 

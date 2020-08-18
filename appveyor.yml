@@ -21,7 +21,7 @@ matrix:
 
 
 install:
-  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.7.zip -outfile eigen3.zip
+  - ps: wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip -outfile eigen3.zip
   - cmd: 7z x eigen3.zip -o"C:\" -y > nul
 
 build_script:
