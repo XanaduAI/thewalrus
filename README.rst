@@ -1,7 +1,7 @@
 The Walrus
 ##########
 
-.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg&circle-token=209b57390082a2b2fe2cdc9ee49a301ddc29ca5b
+.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg
     :alt: CircleCI
     :target: https://circleci.com/gh/XanaduAI/thewalrus/tree/master
 
