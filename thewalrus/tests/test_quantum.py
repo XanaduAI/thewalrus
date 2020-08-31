@@ -1335,4 +1335,3 @@ def test_find_classical_subsystem_thermal(hbar):
     cov = O @ cov @ O.T
     k = find_classical_subsystem(cov, hbar=hbar)
     assert k == nmodes
-

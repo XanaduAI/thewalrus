@@ -975,7 +975,7 @@ def find_classical_subsystem(cov, hbar=2, atol=1e-08):
     Returns:
         (int): the largest k so that modes `[0,1,...,k-1]` are in a classical state.
     """
-    n, m = cov.shape
+    n, _ = cov.shape
     nmodes = n // 2
     if is_classical_cov(cov, hbar=hbar, atol=atol):
         return nmodes
