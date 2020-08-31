@@ -114,6 +114,7 @@ Utility functions
     is_valid_cov
     is_pure_cov
     is_classical_cov
+    find_classical_subsystem
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
