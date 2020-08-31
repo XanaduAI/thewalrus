@@ -947,6 +947,7 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
     Args:
         cov (array): a covariance matrix
         hbar (float): value of hbar in the uncertainty relation
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         (bool): whether the given covariance matrix corresponds to a classical state
@@ -961,6 +962,30 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
             return True
     return False
 
+
+def find_classical_subsystem(cov, hbar=2, atol=1e-08):
+    """Find the largest integer `k` so that subsystem in modes `[0,1,...,k-1]` is a classical state.
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+        atol (float): the absolute tolerance parameter used in `np.allclose`
+
+    Returns:
+        (int): the largest k so that modes `[0,1,...,k-1]` are in a classical state.
+    """
+    n, m = cov.shape
+    nmodes = n // 2
+    if is_classical_cov(cov, hbar=hbar, atol=atol):
+        return nmodes
+    k = 0
+    mu = np.zeros(n)
+    is_classical = True
+    while is_classical:
+        _, Vk = reduced_gaussian(mu, cov, list(range(k + 1)))
+        is_classical = is_classical_cov(Vk, hbar=hbar, atol=atol)
+        k += 1
+    return k - 1
 
 def gen_single_mode_dist(s, cutoff=50, N=1):
     """Generate the photon number distribution of :math:`N` identical single mode squeezed states.

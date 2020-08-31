@@ -20,7 +20,7 @@ import pytest
 import numpy as np
 from scipy.stats import poisson
 
-from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss
+from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss, expand
 
 from thewalrus.random import random_covariance, random_interferometer
 
@@ -45,6 +45,7 @@ from thewalrus.quantum import (
     pure_state_amplitude,
     state_vector,
     is_classical_cov,
+    find_classical_subsystem,
     total_photon_num_dist_pure_state,
     gen_single_mode_dist,
     fock_tensor,
@@ -1299,3 +1300,39 @@ def test_photon_number_expectation_two_mode_squeezed(r, phi, hbar):
     for modes, expected in zip(mode_list, expected_vals):
         val = photon_number_squared_expectation(means, cov, modes=modes, hbar=hbar)
         assert np.allclose(val, expected)
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_find_classical_susbsytem_tmsq(hbar):
+    """Test that for a system of 2*n squeezed vacua the first n are in a classical state"""
+    n = 10
+    nmodes = 2 * n
+    S = np.identity(2 * nmodes)
+    for i in range(n):
+        S = expand(two_mode_squeezing(1.0, 0), [i, i + n], nmodes) @ S
+    cov = S @ S.T * hbar / 2
+    k = find_classical_subsystem(cov, hbar=hbar)
+    assert k == n
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_find_classical_subsystem_product_sq(hbar):
+    """Tests that for a product state of squeezed vacua the classical system size is 0"""
+    nmodes = 10
+    r = 1
+    vals = np.ones([nmodes]) * hbar / 2
+    cov = np.diag(np.concatenate([np.exp(2 * r) * vals, vals * np.exp(-2 * r)]))
+    k = find_classical_subsystem(cov, hbar=hbar)
+    assert k == 0
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_find_classical_subsystem_thermal(hbar):
+    """Tests that for a multimode thermal state the whole system is classical"""
+    nmodes = 20
+    diags = (2 * np.random.rand(nmodes) + 1) * hbar / 2
+    cov = np.diag(np.concatenate([diags, diags]))
+    O = interferometer(random_interferometer(nmodes))
+    cov = O @ cov @ O.T
+    k = find_classical_subsystem(cov, hbar=hbar)
+    assert k == nmodes
+
