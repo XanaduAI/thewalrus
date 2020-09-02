@@ -35,7 +35,7 @@ from thewalrus.quantum import (
     density_matrix,
     find_scaling_adjacency_matrix,
     find_scaling_adjacency_matrix_torontonian,
-    mean_number_of_clicks,
+    mean_number_of_clicks_graph,
     Covmat,
     gen_Qmat_from_graph,
     Means,
@@ -58,6 +58,8 @@ from thewalrus.quantum import (
     normal_ordered_expectation,
     photon_number_expectation,
     photon_number_squared_expectation,
+    variance_number_of_clicks,
+    mean_number_of_clicks,
 )
 
 
@@ -408,16 +410,38 @@ def test_find_scaling_adjacency_matrix_torontonian():
     A += A.T
     nc = 3.0
     x = find_scaling_adjacency_matrix_torontonian(A, nc)
-    assert np.allclose(mean_number_of_clicks(x * A), nc)
+    assert np.allclose(mean_number_of_clicks_graph(x * A), nc)
 
-def test_mean_number_of_clicks():
-    """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2 tanh(r)"""
+def test_mean_number_of_clicks_graph():
+    """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2*tanh(r)"""
     r = 3.0
     tr = np.tanh(r)
     A = np.array([[0, tr], [tr, 0]])
-    value = mean_number_of_clicks(A)
+    value = mean_number_of_clicks_graph(A)
     expected = 2 * tr**2
     assert np.allclose(expected, value)
+
+@pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
+@pytest.mark.parametrize("theta", [0, 1, 2, 3])
+@pytest.mark.parametrize("r", [0, 1, 2, 3])
+def test_variance_number_of_clicks(r, theta, hbar):
+    """Test one gets the correct variance of the number of clicks"""
+    r = np.arcsinh(1)
+    V = two_mode_squeezing(2 * r, theta) * hbar / 2
+    var = variance_number_of_clicks(V, hbar=hbar)
+    expected = (4 * np.tanh(r) ** 2) * (1 - np.tanh(r) ** 2)
+    assert np.allclose(var, expected)
+
+@pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
+@pytest.mark.parametrize("theta", [0, 1, 2, 3])
+@pytest.mark.parametrize("r", [0, 1, 2, 3])
+def test_mean_number_of_clicks(r, theta, hbar):
+    """Test one gets the correct mean of the number of clicks"""
+    r = np.arcsinh(1)
+    V = two_mode_squeezing(2 * r, theta) * hbar / 2
+    mean = mean_number_of_clicks(V, hbar=hbar)
+    expected = 2 * np.tanh(r) ** 2
+    assert np.allclose(mean, expected)
 
 def test_Covmat():
     """ Test the Covmat function by checking that its inverse function is Qmat """
