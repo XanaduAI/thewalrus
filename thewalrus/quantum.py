@@ -657,7 +657,7 @@ def variance_number_of_clicks(cov, hbar=2):
     for i in range(nmodes):
         for j in range(i):
             _, Qij = reduced_gaussian(means, Q, [i, j])
-            prob_vac_ij = np.linalg.det(Q).real
+            prob_vac_ij = np.linalg.det(Qij).real
             prob_vac_ij = 1.0 / np.sqrt(prob_vac_ij)
             term2 += prob_vac_ij - vac_probs[i] * vac_probs[j]
 
