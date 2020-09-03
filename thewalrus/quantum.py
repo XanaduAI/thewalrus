@@ -637,7 +637,7 @@ def variance_number_of_clicks(cov, hbar=2):
         hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`
 
     Returns
-        (float): variance in the total number of clicks
+        float: variance in the total number of clicks
     """
     n, _ = cov.shape
     means = np.zeros([n])
