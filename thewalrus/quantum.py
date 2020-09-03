@@ -965,7 +965,8 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
 
 
 def find_classical_subsystem(cov, hbar=2, atol=1e-08):
-    """Find the largest integer `k` so that subsystem in modes `[0,1,...,k-1]` is a classical state.
+    """Find the largest integer ``k`` so that subsystem in modes ``[0,1,...,k-1]`` is a classical state.
+
 
     Args:
         cov (array): a covariance matrix
