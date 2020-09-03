@@ -105,7 +105,6 @@ Utility functions
     prefactor
     find_scaling_adjacency_matrix
     mean_number_of_clicks
-    mean_number_of_clicks_graph
     find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
     photon_number_mean
@@ -120,6 +119,7 @@ Utility functions
     gen_single_mode_dist
     gen_multi_mode_dist
     variance_number_of_clicks
+    mean_number_of_clicks_graph
 
 Details
 ^^^^^^^
