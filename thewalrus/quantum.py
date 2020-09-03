@@ -115,10 +115,10 @@ Utility functions
     is_valid_cov
     is_pure_cov
     is_classical_cov
+    find_classical_subsystem
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
-    normal_ordered_complex_cov
     variance_number_of_clicks
 
 
@@ -1000,6 +1000,7 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
     Args:
         cov (array): a covariance matrix
         hbar (float): value of hbar in the uncertainty relation
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         (bool): whether the given covariance matrix corresponds to a classical state
@@ -1014,6 +1015,31 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
             return True
     return False
 
+
+def find_classical_subsystem(cov, hbar=2, atol=1e-08):
+    """Find the largest integer ``k`` so that subsystem in modes ``[0,1,...,k-1]`` is a classical state.
+
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+        atol (float): the absolute tolerance parameter used when determining if the state is classical
+
+    Returns:
+        int: the largest k so that modes ``[0,1,...,k-1]`` are in a classical state.
+    """
+    n, _ = cov.shape
+    nmodes = n // 2
+    if is_classical_cov(cov, hbar=hbar, atol=atol):
+        return nmodes
+    k = 0
+    mu = np.zeros(n)
+    is_classical = True
+    while is_classical:
+        _, Vk = reduced_gaussian(mu, cov, list(range(k + 1)))
+        is_classical = is_classical_cov(Vk, hbar=hbar, atol=atol)
+        k += 1
+    return k - 1
 
 def gen_single_mode_dist(s, cutoff=50, N=1):
     """Generate the photon number distribution of :math:`N` identical single mode squeezed states.
@@ -1375,29 +1401,6 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     )
     return f
 
-def normal_ordered_complex_cov(cov, hbar=2):
-    r"""Calculates the normal ordered covariance matrix in the complex basis.
-
-    Args:
-        cov (array): xp-covariance matrix.
-        hbar (float): value of hbar in the uncertainty relation.
-
-    Returns:
-        (array): covariance matrix in the creation/annihilation operator basis.
-    """
-
-    n, _ = cov.shape
-    n_modes = n // 2
-    cov = cov / (hbar / 2)
-    A = cov[:n_modes, :n_modes]
-    B = cov[:n_modes, n_modes:]
-    C = cov[n_modes:, n_modes:]
-    N = 0.25 * (A + C + 1j * (B - B.T) - 2 * np.identity(n_modes))
-    M = 0.25 * (A - C + 1j * (B + B.T))
-    mat = np.block([[M.conj(), N], [N.T, M]])
-    return mat
-
-
 def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     r"""Calculates the expectation value of the normal ordered product
     :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
@@ -1413,7 +1416,8 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         (float): expectation value of the normal ordered product of operators
     """
     alpha = Beta(mu, hbar=hbar)
-    V = normal_ordered_complex_cov(cov, hbar=hbar)
+    n = len(cov)
+    V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
     if np.allclose(mu, 0):
         res = np.conj(hafnian(A))
