@@ -974,7 +974,7 @@ def find_classical_subsystem(cov, hbar=2, atol=1e-08):
         atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
-        (int): the largest k so that modes `[0,1,...,k-1]` are in a classical state.
+        int: the largest k so that modes ``[0,1,...,k-1]`` are in a classical state.
     """
     n, _ = cov.shape
     nmodes = n // 2
