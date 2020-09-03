@@ -651,7 +651,6 @@ def variance_number_of_clicks(cov, hbar=2):
     )
     vac_probs = np.sqrt(vac_probs)
     vac_probs = 1 / vac_probs
-    helper_fun = lambda x: x * (1 - x)
     term1 = np.sum(vac_probs * (1 - vac_probs))
     term2 = 0
     for i in range(nmodes):
