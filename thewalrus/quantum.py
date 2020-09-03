@@ -971,7 +971,7 @@ def find_classical_subsystem(cov, hbar=2, atol=1e-08):
     Args:
         cov (array): a covariance matrix
         hbar (float): value of hbar in the uncertainty relation
-        atol (float): the absolute tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used when determining if the state is classical
 
     Returns:
         int: the largest k so that modes ``[0,1,...,k-1]`` are in a classical state.
