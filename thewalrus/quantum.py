@@ -121,7 +121,6 @@ Utility functions
     gen_multi_mode_dist
     variance_number_of_clicks
 
-
 Details
 ^^^^^^^
 """
