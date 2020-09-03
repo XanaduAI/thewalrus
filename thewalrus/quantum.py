@@ -717,7 +717,7 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
             return c_mean - n
         if x <= 0:
             return c_mean
-        return c_mean - mean_number_of_clicks(x * localA)
+        return c_mean - mean_number_of_clicks_graph(x * localA)
 
     res = root_scalar(cost, x0=0.5, bracket=(0.0, 1.0))  # Do the optimization
 
