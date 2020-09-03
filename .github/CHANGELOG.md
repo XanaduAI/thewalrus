@@ -20,6 +20,8 @@
 
 This release contains contributions from (in alphabetical order):
 
+Nicolas Quesada
+
 ---
 
 
