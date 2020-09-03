@@ -2,15 +2,25 @@
 
 ### New features
 
+* Adds the function `find_classical_subsystem` that tries to find a subset of the mode with a classical covariance matrix. [#193](https://github.com/XanaduAI/thewalrus/pull/193)
+
+* Adds the functions `mean_number_of_clicks` and `variance_number_of_clicks` that calculate the first and second statistical moments of the total number of clicks in a Gaussian state centered at the origin. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
+
 ### Improvements
 
 ### Bug fixes
 
 ### Breaking changes
 
+* Removes the function the redundant function `normal_ordered_complex_cov`. [#194](https://github.com/XanaduAI/thewalrus/pull/194)
+
+* Renames the function `mean_number_of_clicks` to be `mean_number_of_click_graph`. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Nicolas Quesada
 
 ---
 
