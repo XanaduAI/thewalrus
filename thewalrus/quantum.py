@@ -118,7 +118,6 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
-    normal_ordered_complex_cov
 
 
 Details
@@ -1349,29 +1348,6 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     )
     return f
 
-def normal_ordered_complex_cov(cov, hbar=2):
-    r"""Calculates the normal ordered covariance matrix in the complex basis.
-
-    Args:
-        cov (array): xp-covariance matrix.
-        hbar (float): value of hbar in the uncertainty relation.
-
-    Returns:
-        (array): covariance matrix in the creation/annihilation operator basis.
-    """
-
-    n, _ = cov.shape
-    n_modes = n // 2
-    cov = cov / (hbar / 2)
-    A = cov[:n_modes, :n_modes]
-    B = cov[:n_modes, n_modes:]
-    C = cov[n_modes:, n_modes:]
-    N = 0.25 * (A + C + 1j * (B - B.T) - 2 * np.identity(n_modes))
-    M = 0.25 * (A - C + 1j * (B + B.T))
-    mat = np.block([[M.conj(), N], [N.T, M]])
-    return mat
-
-
 def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     r"""Calculates the expectation value of the normal ordered product
     :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
@@ -1387,7 +1363,8 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         (float): expectation value of the normal ordered product of operators
     """
     alpha = Beta(mu, hbar=hbar)
-    V = normal_ordered_complex_cov(cov, hbar=hbar)
+    n = len(cov)
+    V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
     if np.allclose(mu, 0):
         res = np.conj(hafnian(A))
