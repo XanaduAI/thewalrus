@@ -15,6 +15,7 @@
 Set of functions for calculating various state representations, probabilites and
 fidelities of Gaussian states.
 """
+# pylint: disable=too-many-arguments
 
 from itertools import count, product, chain
 
