@@ -12,7 +12,7 @@
 
 ### Breaking changes
 
-* Removes the function the redundant function `normal_ordered_complex_cov`. [#194](https://github.com/XanaduAI/thewalrus/pull/194)
+* Removes the redundant function `normal_ordered_complex_cov`. [#194](https://github.com/XanaduAI/thewalrus/pull/194)
 
 * Renames the function `mean_number_of_clicks` to be `mean_number_of_click_graph`. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
 
