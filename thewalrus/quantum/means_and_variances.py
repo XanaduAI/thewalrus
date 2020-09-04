@@ -20,7 +20,7 @@ from itertools import product
 
 import numpy as np
 
-from .covariance_matrices import normal_ordered_expectation
+from .covariance_matrices import normal_ordered_expectation, reduced_gaussian
 
 
 ################################################################################
