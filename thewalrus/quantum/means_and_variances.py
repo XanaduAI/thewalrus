@@ -22,43 +22,6 @@ import numpy as np
 
 from .covariance_matrices import normal_ordered_expectation
 
-################################################################################
-# Construct the reduced means and cov of a Gaussian state
-################################################################################
-
-
-def reduced_gaussian(mu, cov, modes):
-    r""" Returns the vector of means and the covariance matrix of the specified modes.
-
-    Args:
-        mu (array): a length-:math:`2N` ``np.float64`` vector of means.
-        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state.
-        modes (int of Sequence[int]): indices of the requested modes
-
-    Returns:
-        tuple (means, cov): where means is an array containing the vector of means,
-        and cov is a square array containing the covariance matrix.
-    """
-    N = len(mu) // 2
-
-    # reduce rho down to specified subsystems
-    if isinstance(modes, int):
-        modes = [modes]
-
-    if np.any(np.array(modes) > N):
-        raise ValueError("Provided mode is larger than the number of subsystems.")
-
-    if len(modes) == N:
-        # reduced state is full state
-        return mu, cov
-
-    ind = np.concatenate([np.array(modes), np.array(modes) + N])
-    rows = ind.reshape(-1, 1)
-    cols = ind.reshape(1, -1)
-
-    return mu[ind], cov[rows, cols]
-
 
 ################################################################################
 # Calculate means or variances of photon number

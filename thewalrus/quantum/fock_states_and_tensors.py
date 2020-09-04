@@ -32,14 +32,15 @@ from .._hafnian import hafnian, hafnian_repeated, reduction
 from .._hermite_multidimensional import hermite_multidimensional, hafnian_batched
 
 from .covariance_matrices import (
+    is_classical_cov,
     is_pure_cov,
     Amat,
     Beta,
     Qmat,
+    reduced_gaussian,
 )
 
 
-# pylint: disable=too-many-arguments
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
     r"""Returns the :math:`\langle i | \psi\rangle` element of the state ket
     of a Gaussian state defined by covariance matrix cov.
@@ -453,7 +454,7 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
     return probs
 
 @jit(nopython=True)
-def _loss_mat(eta, cutoff): # pragma: no cover
+def loss_mat(eta, cutoff): # pragma: no cover
     r"""Constructs a binomial loss matrix with transmission eta up to n photons.
 
     Args:
@@ -502,7 +503,7 @@ def update_probabilities_with_loss(etas, probs):
         einstrings = "ij,{}i...->{}j...".format(alphabet[:i], alphabet[:i])
 
         qein = np.zeros_like(probs)
-        qein = np.einsum(einstrings, _loss_mat(eta, cutoff), probs)
+        qein = np.einsum(einstrings, loss_mat(eta, cutoff), probs)
         probs = np.copy(qein)
     return qein
 
@@ -603,6 +604,32 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
         -0.25 * deltar @ si12 @ deltar
     )
     return f
+
+
+def find_classical_subsystem(cov, hbar=2, atol=1e-08):
+    """Find the largest integer ``k`` so that subsystem in modes ``[0,1,...,k-1]`` is a classical state.
+
+
+    Args:
+        cov (array): a covariance matrix
+        hbar (float): value of hbar in the uncertainty relation
+        atol (float): the absolute tolerance parameter used when determining if the state is classical
+
+    Returns:
+        int: the largest k so that modes ``[0,1,...,k-1]`` are in a classical state.
+    """
+    n, _ = cov.shape
+    nmodes = n // 2
+    if is_classical_cov(cov, hbar=hbar, atol=atol):
+        return nmodes
+    k = 0
+    mu = np.zeros(n)
+    is_classical = True
+    while is_classical:
+        _, Vk = reduced_gaussian(mu, cov, list(range(k + 1)))
+        is_classical = is_classical_cov(Vk, hbar=hbar, atol=atol)
+        k += 1
+    return k - 1
 
 
 def prefactor(mu, cov, hbar=2):

@@ -21,6 +21,45 @@ import numpy as np
 from ..symplectic import sympmat
 from .._hafnian import hafnian, reduction
 
+
+################################################################################
+# Construct the reduced means and cov of a Gaussian state
+################################################################################
+
+
+def reduced_gaussian(mu, cov, modes):
+    r""" Returns the vector of means and the covariance matrix of the specified modes.
+
+    Args:
+        mu (array): a length-:math:`2N` ``np.float64`` vector of means.
+        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state.
+        modes (int of Sequence[int]): indices of the requested modes
+
+    Returns:
+        tuple (means, cov): where means is an array containing the vector of means,
+        and cov is a square array containing the covariance matrix.
+    """
+    N = len(mu) // 2
+
+    # reduce rho down to specified subsystems
+    if isinstance(modes, int):
+        modes = [modes]
+
+    if np.any(np.array(modes) > N):
+        raise ValueError("Provided mode is larger than the number of subsystems.")
+
+    if len(modes) == N:
+        # reduced state is full state
+        return mu, cov
+
+    ind = np.concatenate([np.array(modes), np.array(modes) + N])
+    rows = ind.reshape(-1, 1)
+    cols = ind.reshape(1, -1)
+
+    return mu[ind], cov[rows, cols]
+
+
 ################################################################################
 # Transform one type of covariance-matrix-like object into another
 ################################################################################
@@ -139,7 +178,8 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         (float): expectation value of the normal ordered product of operators
     """
     alpha = Beta(mu, hbar=hbar)
-    V = normal_ordered_complex_cov(cov, hbar=hbar)
+    n = len(cov)
+    V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
     if np.allclose(mu, 0):
         res = np.conj(hafnian(A))
@@ -147,29 +187,6 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
         res = np.conj(hafnian(A, loop=True))
     return np.conj(res)
-
-
-def normal_ordered_complex_cov(cov, hbar=2):
-    r"""Calculates the normal ordered covariance matrix in the complex basis.
-
-    Args:
-        cov (array): xp-covariance matrix.
-        hbar (float): value of hbar in the uncertainty relation.
-
-    Returns:
-        (array): covariance matrix in the creation/annihilation operator basis.
-    """
-
-    n, _ = cov.shape
-    n_modes = n // 2
-    cov = cov / (hbar / 2)
-    A = cov[:n_modes, :n_modes]
-    B = cov[:n_modes, n_modes:]
-    C = cov[n_modes:, n_modes:]
-    N = 0.25 * (A + C + 1j * (B - B.T) - 2 * np.identity(n_modes))
-    M = 0.25 * (A - C + 1j * (B + B.T))
-    mat = np.block([[M.conj(), N], [N.T, M]])
-    return mat
 
 
 def Beta(mu, hbar=2):
@@ -273,6 +290,7 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
     Args:
         cov (array): a covariance matrix
         hbar (float): value of hbar in the uncertainty relation
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         (bool): whether the given covariance matrix corresponds to a classical state

@@ -105,6 +105,7 @@ Utility functions
     prefactor
     find_scaling_adjacency_matrix
     mean_number_of_clicks
+    mean_number_of_clicks_graph
     find_scaling_adjacency_matrix_torontonian
     gen_Qmat_from_graph
     photon_number_mean
@@ -114,6 +115,7 @@ Utility functions
     is_valid_cov
     is_pure_cov
     is_classical_cov
+    find_classical_subsystem
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
@@ -134,23 +136,29 @@ from .fock_states_and_tensors import (
     update_probabilities_with_loss,
     update_probabilities_with_noise,
     fidelity,
+
+    find_classical_subsystem,
     prefactor,
+    loss_mat,
 )
 
 from .adjacency_matrices import (
     mean_number_of_clicks,
+    mean_number_of_clicks_graph,
+    variance_number_of_clicks,
     find_scaling_adjacency_matrix,
     find_scaling_adjacency_matrix_torontonian,
     gen_Qmat_from_graph,
 )
 
 from .covariance_matrices import (
+    reduced_gaussian,
+
     Xmat,
     Qmat,
     Covmat,
     Amat,
     normal_ordered_expectation,
-    normal_ordered_complex_cov,
     Beta,
     Means,
 
@@ -160,7 +168,6 @@ from .covariance_matrices import (
 )
 
 from .means_and_variances import (
-    reduced_gaussian,
     photon_number_mean,
     photon_number_mean_vector,
     photon_number_covar,
