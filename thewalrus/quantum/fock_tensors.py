@@ -13,7 +13,7 @@
 # limitations under the License.
 """
 Set of functions for calculating various state representations, probabilites and
-fidelities of Gaussian states.
+classical subsystems of Gaussian states.
 """
 # pylint: disable=too-many-arguments
 
@@ -23,22 +23,24 @@ import numpy as np
 import dask
 
 from scipy.special import factorial as fac
-from scipy.linalg import sqrtm
 from numba import jit
 
-from ..symplectic import expand, sympmat, is_symplectic
+from ..symplectic import expand, is_symplectic
 from ..libwalrus import interferometer, interferometer_real
 
 from .._hafnian import hafnian, hafnian_repeated, reduction
 from .._hermite_multidimensional import hermite_multidimensional, hafnian_batched
 
-from .covariance_matrices import (
-    is_classical_cov,
-    is_pure_cov,
+from .conversions import (
     Amat,
-    Beta,
     Qmat,
     reduced_gaussian,
+    complex_to_real_displacements,
+)
+
+from .gaussian_state_tests import (
+    is_classical_cov,
+    is_pure_cov,
 )
 
 
@@ -67,7 +69,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
-    beta = Beta(mu, hbar=hbar)
+    beta = complex_to_real_displacements(mu, hbar=hbar)
     Q = Qmat(cov, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     (n, _) = cov.shape
@@ -140,7 +142,7 @@ def state_vector(
         if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
             raise ValueError("The covariance matrix does not correspond to a pure state")
 
-    beta = Beta(mu, hbar=hbar)
+    beta = complex_to_real_displacements(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     Q = Qmat(cov, hbar=hbar)
 
@@ -211,7 +213,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
         complex: the density matrix element
     """
     rpt = i + j
-    beta = Beta(mu, hbar=hbar)
+    beta = complex_to_real_displacements(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
     if np.linalg.norm(beta) < tol:
         # no displacement
@@ -231,7 +233,7 @@ def density_matrix_element(mu, cov, i, j, include_prefactor=True, tol=1e-10, hba
             haf = hafnian_repeated(A, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        haf *= prefactor(mu, cov, hbar=hbar)
+        haf *= _prefactor(mu, cov, hbar=hbar)
 
     return haf / np.sqrt(np.prod(fac(rpt)))
 
@@ -270,7 +272,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         np.array[complex]: the density matrix of the Gaussian state
     """
     N = len(mu) // 2
-    pref = prefactor(mu, cov, hbar=hbar)
+    pref = _prefactor(mu, cov, hbar=hbar)
 
     if post_select is None:
         A = Amat(cov, hbar=hbar).conj()
@@ -281,7 +283,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
                 -A, cutoff, renorm=True, modified=True
             )
             return tensor.transpose(sf_order)
-        beta = Beta(mu, hbar=hbar)
+        beta = complex_to_real_displacements(mu, hbar=hbar)
         y = beta - A @ beta.conj()
         tensor = np.real_if_close(pref) * hermite_multidimensional(
             -A, cutoff, y=y, renorm=True, modified=True
@@ -556,57 +558,6 @@ def update_probabilities_with_noise(probs_noise, probs):
     return probs
 
 
-def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
-    """Calculates the fidelity between two Gaussian quantum states.
-
-    Note that if the covariance matrices correspond to pure states this
-    function reduces to the modulus square of the overlap of their state vectors.
-    For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
-
-    Args:
-        mu1 (array): vector of means of the first state
-        cov1 (array): covariance matrix of the first state
-        mu2 (array): vector of means of the second state
-        cov2 (array): covariance matrix of the second state
-        hbar (float): value of hbar in the uncertainty relation
-        rtol (float): the relative tolerance parameter used in `np.allclose`
-        atol (float): the absolute tolerance parameter used in `np.allclose`
-
-    Returns:
-        (float): value of the fidelity between the two states
-    """
-
-    n0, n1 = cov1.shape
-    m0, m1 = cov2.shape
-    (l0,) = mu1.shape
-    (l1,) = mu1.shape
-    if not n0 == n1 == m0 == m1 == l0 == l1:
-        raise ValueError("The inputs have incompatible shapes")
-
-    v1 = cov1 / hbar
-    v2 = cov2 / hbar
-    deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
-    n0, n1 = cov1.shape
-    n = n0 // 2
-    W = sympmat(n)
-
-    si12 = np.linalg.inv(v1 + v2)
-    vaux = W.T @ si12 @ (0.25 * W + v2 @ W @ v1)
-    p1 = vaux @ W
-    p1 = p1 @ p1
-    p1 = np.identity(2 * n) + 0.25 * np.linalg.inv(p1)
-    if np.allclose(p1, 0, rtol=rtol, atol=atol):
-        p1 = np.zeros_like(p1)
-    else:
-        p1 = sqrtm(p1)
-    p1 = 2 * (p1 + np.identity(2 * n))
-    p1 = p1 @ vaux
-    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
-        -0.25 * deltar @ si12 @ deltar
-    )
-    return f
-
-
 def find_classical_subsystem(cov, hbar=2, atol=1e-08):
     """Find the largest integer ``k`` so that subsystem in modes ``[0,1,...,k-1]`` is a classical state.
 
@@ -633,7 +584,7 @@ def find_classical_subsystem(cov, hbar=2, atol=1e-08):
     return k - 1
 
 
-def prefactor(mu, cov, hbar=2):
+def _prefactor(mu, cov, hbar=2):
     r"""Returns the prefactor.
 
     .. math:: prefactor = \frac{e^{-\beta Q^{-1}\beta^*/2}}{n_1!\cdots n_m! \sqrt{|Q|}}
@@ -646,6 +597,6 @@ def prefactor(mu, cov, hbar=2):
         float: the prefactor
     """
     Q = Qmat(cov, hbar=hbar)
-    beta = Beta(mu, hbar=hbar)
+    beta = complex_to_real_displacements(mu, hbar=hbar)
     Qinv = np.linalg.inv(Q)
     return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))

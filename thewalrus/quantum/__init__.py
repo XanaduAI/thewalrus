@@ -100,9 +100,8 @@ Utility functions
     Qmat
     Covmat
     Amat
-    Beta
-    Means
-    prefactor
+    complex_to_real_displacements
+    real_to_complex_displacements
     find_scaling_adjacency_matrix
     mean_number_of_clicks
     mean_number_of_clicks_graph
@@ -116,54 +115,49 @@ Utility functions
     is_pure_cov
     is_classical_cov
     find_classical_subsystem
-    total_photon_num_dist_pure_state
-    gen_single_mode_dist
-    gen_multi_mode_dist
+    pure_state_distribution
 
 
 Details
 ^^^^^^^
 """
 
-from .fock_states_and_tensors import (
+from .fock_tensors import (
     pure_state_amplitude,
     state_vector,
     density_matrix_element,
     density_matrix,
     fock_tensor,
     probabilities,
+    loss_mat,
     update_probabilities_with_loss,
     update_probabilities_with_noise,
-    fidelity,
-
     find_classical_subsystem,
-    prefactor,
-    loss_mat,
+    _prefactor,
 )
 
 from .adjacency_matrices import (
-    mean_number_of_clicks,
-    mean_number_of_clicks_graph,
-    variance_number_of_clicks,
     find_scaling_adjacency_matrix,
     find_scaling_adjacency_matrix_torontonian,
     gen_Qmat_from_graph,
 )
 
-from .covariance_matrices import (
+from .gaussian_state_tests import (
+    is_valid_cov,
+    is_pure_cov,
+    is_classical_cov,
+    fidelity,
+)
+
+from .conversions import (
     reduced_gaussian,
 
     Xmat,
     Qmat,
     Covmat,
     Amat,
-    normal_ordered_expectation,
-    Beta,
-    Means,
-
-    is_valid_cov,
-    is_pure_cov,
-    is_classical_cov
+    complex_to_real_displacements,
+    real_to_complex_displacements,
 )
 
 from .means_and_variances import (
@@ -173,12 +167,16 @@ from .means_and_variances import (
     photon_number_covmat,
     photon_number_expectation,
     photon_number_squared_expectation,
+    normal_ordered_expectation,
+    mean_number_of_clicks,
+    variance_number_of_clicks,
+    mean_number_of_clicks_graph,
 )
 
 from .photon_number_distributions import (
-    total_photon_num_dist_pure_state,
-    gen_single_mode_dist,
-    gen_multi_mode_dist,
+    pure_state_distribution,
+    _squeezed_state_distribution,
+    _convolve_squeezed_state_distribution,
 )
 
 __all__ = [
@@ -193,3 +191,12 @@ __all__ = [
     "normal_ordered_expectation",
     "fidelity",
 ]
+
+
+# old names for functions; remove in due time
+Means = real_to_complex_displacements
+Beta = complex_to_real_displacements
+prefactor = _prefactor
+gen_multi_mode_dist = _convolve_squeezed_state_distribution
+gen_single_mode_dist = _squeezed_state_distribution
+total_photon_num_dist_pure_state = pure_state_distribution

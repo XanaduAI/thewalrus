@@ -13,19 +13,23 @@
 # limitations under the License.
 """
 Functions for constructing/calculating the means, variances and covariances of
-Gaussian states and photon number distributions of Gaussian states.
+Gaussian states.
 """
 
 from itertools import product
 
 import numpy as np
 
-from .covariance_matrices import normal_ordered_expectation, reduced_gaussian
+from .._hafnian import hafnian, reduction
 
+from .conversions import (
+    reduced_gaussian,
+    Covmat,
+    Qmat,
+    Xmat,
+    complex_to_real_displacements
+)
 
-################################################################################
-# Calculate means or variances of photon number
-################################################################################
 
 def photon_number_mean(mu, cov, j, hbar=2):
     r""" Calculate the mean photon number of mode j of a Gaussian state.
@@ -197,3 +201,106 @@ def photon_number_squared_expectation(mu, cov, modes, hbar=2):
         term = normal_ordered_expectation(mu_red, cov_red, rpt, hbar=hbar)
         result += term
     return result
+
+
+def normal_ordered_expectation(mu, cov, rpt, hbar=2):
+    r"""Calculates the expectation value of the normal ordered product
+    :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
+    where :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        rpt (list): integers specifying the terms to calculate.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): expectation value of the normal ordered product of operators
+    """
+    alpha = complex_to_real_displacements(mu, hbar=hbar)
+    n = len(cov)
+    V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
+    A = reduction(V, rpt)
+    if np.allclose(mu, 0):
+        res = np.conj(hafnian(A))
+    else:
+        np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
+        res = np.conj(hafnian(A, loop=True))
+    return np.conj(res)
+
+
+def mean_number_of_clicks(cov, hbar=2):
+    r""" Calculates the total mean number of clicks when a zero-mean gaussian state
+    is measured using threshold detectors.
+
+    Args
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
+        hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`
+
+    Returns
+        float: mean number of clicks
+    """
+    n, _ = cov.shape
+    nmodes = n // 2
+    Q = Qmat(cov, hbar=hbar)
+    meanc = 1.0 * nmodes
+
+    for i in range(nmodes):
+        det_val = np.real(Q[i, i] * Q[i + nmodes, i + nmodes] - Q[i + nmodes, i] * Q[i, i + nmodes])
+        meanc -= 1.0 / np.sqrt(det_val)
+    return meanc
+
+
+def variance_number_of_clicks(cov, hbar=2):
+    r""" Calculates the variance of the total number of clicks when a zero-mean gaussian state
+    is measured using threshold detectors.
+
+    Args
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
+        hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`
+
+    Returns
+        float: variance in the total number of clicks
+    """
+    n, _ = cov.shape
+    means = np.zeros([n])
+    nmodes = n // 2
+    Q = Qmat(cov, hbar=hbar)
+    vac_probs = np.array(
+        [
+            np.real(Q[i, i] * Q[i + nmodes, i + nmodes] - Q[i + nmodes, i] * Q[i, i + nmodes])
+            for i in range(nmodes)
+        ]
+    )
+    vac_probs = np.sqrt(vac_probs)
+    vac_probs = 1 / vac_probs
+    term1 = np.sum(vac_probs * (1 - vac_probs))
+    term2 = 0
+    for i in range(nmodes):
+        for j in range(i):
+            _, Qij = reduced_gaussian(means, Q, [i, j])
+            prob_vac_ij = np.linalg.det(Qij).real
+            prob_vac_ij = 1.0 / np.sqrt(prob_vac_ij)
+            term2 += prob_vac_ij - vac_probs[i] * vac_probs[j]
+
+    return term1 + 2 * term2
+
+
+def mean_number_of_clicks_graph(A):
+    r""" Given an adjacency matrix this function calculates the mean number of clicks.
+    For this to make sense the user must provide a matrix with singular values
+    less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
+    by Banchi et al.
+
+    Args:
+        A (array): rescaled adjacency matrix
+
+    Returns:
+        float: mean number of clicks
+    """
+    n, _ = A.shape
+    idn = np.identity(n)
+    X = np.block([[0 * idn, idn], [idn, 0 * idn]])
+    B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
+    Q = np.linalg.inv(np.identity(2 * n) - X @ B)
+    return mean_number_of_clicks(Covmat(Q))

@@ -12,95 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Functions for rescaling adjacency matrices as well as for calculating the mean
-number of clicks for an adjacency matrix.
+Functions for rescaling adjacency matrices as well as calculating the Qmat
+covariance matrix from an adjacency matrix.
 """
 
 import numpy as np
 from scipy.optimize import root_scalar
 
-from .covariance_matrices import Xmat, Covmat, Qmat, reduced_gaussian
-
-def mean_number_of_clicks(cov, hbar=2):
-    r""" Calculates the total mean number of clicks when a zero-mean gaussian state
-    is measured using threshold detectors.
-
-    Args
-        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
-        hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`
-
-    Returns
-        float: mean number of clicks
-    """
-    n, _ = cov.shape
-    nmodes = n // 2
-    Q = Qmat(cov, hbar=hbar)
-    meanc = 1.0 * nmodes
-
-    for i in range(nmodes):
-        det_val = np.real(Q[i, i] * Q[i + nmodes, i + nmodes] - Q[i + nmodes, i] * Q[i, i + nmodes])
-        meanc -= 1.0 / np.sqrt(det_val)
-    return meanc
-
-
-def variance_number_of_clicks(cov, hbar=2):
-    r""" Calculates the variance of the total number of clicks when a zero-mean gaussian state
-    is measured using threshold detectors.
-
-    Args
-        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering
-        hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`
-
-    Returns
-        float: variance in the total number of clicks
-    """
-    n, _ = cov.shape
-    means = np.zeros([n])
-    nmodes = n // 2
-    Q = Qmat(cov, hbar=hbar)
-    vac_probs = np.array(
-        [
-            np.real(Q[i, i] * Q[i + nmodes, i + nmodes] - Q[i + nmodes, i] * Q[i, i + nmodes])
-            for i in range(nmodes)
-        ]
-    )
-    vac_probs = np.sqrt(vac_probs)
-    vac_probs = 1 / vac_probs
-    term1 = np.sum(vac_probs * (1 - vac_probs))
-    term2 = 0
-    for i in range(nmodes):
-        for j in range(i):
-            _, Qij = reduced_gaussian(means, Q, [i, j])
-            prob_vac_ij = np.linalg.det(Qij).real
-            prob_vac_ij = 1.0 / np.sqrt(prob_vac_ij)
-            term2 += prob_vac_ij - vac_probs[i] * vac_probs[j]
-
-    return term1 + 2 * term2
-
-
-def mean_number_of_clicks_graph(A):
-    r""" Given an adjacency matrix this function calculates the mean number of clicks.
-    For this to make sense the user must provide a matrix with singular values
-    less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
-    by Banchi et al.
-
-    Args:
-        A (array): rescaled adjacency matrix
-
-    Returns:
-        float: mean number of clicks
-    """
-    n, _ = A.shape
-    idn = np.identity(n)
-    X = np.block([[0 * idn, idn], [idn, 0 * idn]])
-    B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
-    Q = np.linalg.inv(np.identity(2 * n) - X @ B)
-    return mean_number_of_clicks(Covmat(Q))
-
-
-################################################################################
-# Rescale adjacency matrices
-################################################################################
+from .conversions import Xmat
+from .means_and_variances import mean_number_of_clicks_graph
 
 
 def find_scaling_adjacency_matrix_torontonian(A, c_mean):

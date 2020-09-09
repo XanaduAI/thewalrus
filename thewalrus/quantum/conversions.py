@@ -13,18 +13,10 @@
 # limitations under the License.
 """
 Functions for transforming one type of covariance-matrix-like object into
-another as well as various property tests for covariance matrices.
+another as well as reducing a gaussian state.
 """
 
 import numpy as np
-
-from ..symplectic import sympmat
-from .._hafnian import hafnian, reduction
-
-
-################################################################################
-# Construct the reduced means and cov of a Gaussian state
-################################################################################
 
 
 def reduced_gaussian(mu, cov, modes):
@@ -58,11 +50,6 @@ def reduced_gaussian(mu, cov, modes):
     cols = ind.reshape(1, -1)
 
     return mu[ind], cov[rows, cols]
-
-
-################################################################################
-# Transform one type of covariance-matrix-like object into another
-################################################################################
 
 
 def Xmat(N):
@@ -163,33 +150,7 @@ def Amat(cov, hbar=2, cov_is_qmat=False):
     return A
 
 
-def normal_ordered_expectation(mu, cov, rpt, hbar=2):
-    r"""Calculates the expectation value of the normal ordered product
-    :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
-    where :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
-
-    Args:
-        mu (array): length-:math:`2N` means vector in xp-ordering.
-        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
-        rpt (list): integers specifying the terms to calculate.
-        hbar (float): value of hbar in the uncertainty relation.
-
-    Returns:
-        (float): expectation value of the normal ordered product of operators
-    """
-    alpha = Beta(mu, hbar=hbar)
-    n = len(cov)
-    V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
-    A = reduction(V, rpt)
-    if np.allclose(mu, 0):
-        res = np.conj(hafnian(A))
-    else:
-        np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
-        res = np.conj(hafnian(A, loop=True))
-    return np.conj(res)
-
-
-def Beta(mu, hbar=2):
+def complex_to_real_displacements(mu, hbar=2):
     r"""Returns the vector of complex displacements and conjugate displacements.
 
     Args:
@@ -208,7 +169,7 @@ def Beta(mu, hbar=2):
     return np.concatenate([alpha, alpha.conj()])
 
 
-def Means(beta, hbar=2):
+def real_to_complex_displacements(beta, hbar=2):
     r"""Returns the vector of real quadrature displacements.
 
     Args:
@@ -224,83 +185,3 @@ def Means(beta, hbar=2):
     N = len(beta) // 2
     alpha = beta[0:N]
     return np.sqrt(2 * hbar) * np.concatenate([alpha.real, alpha.imag])
-
-################################################################################
-# Test properties of covariance matrices
-################################################################################
-
-
-def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
-    r""" Checks if the covariance matrix is a valid quantum covariance matrix.
-
-    Args:
-        cov (array): a covariance matrix
-        hbar (float): value of hbar in the uncertainty relation
-        rtol (float): the relative tolerance parameter used in `np.allclose`
-        atol (float): the absolute tolerance parameter used in `np.allclose`
-
-    Returns:
-        (bool): whether the given covariance matrix is a valid covariance matrix
-    """
-    (n, m) = cov.shape
-    if n != m:
-        # raise ValueError("The input matrix must be square")
-        return False
-    if not np.allclose(cov, np.transpose(cov), rtol=rtol, atol=atol):
-        # raise ValueError("The input matrix is not symmetric")
-        return False
-    if n % 2 != 0:
-        # raise ValueError("The input matrix is of even dimension")
-        return False
-
-    nmodes = n // 2
-    vals = np.linalg.eigvalsh(cov + 0.5j * hbar * sympmat(nmodes))
-    vals[np.abs(vals) < atol] = 0.0
-    if np.all(vals >= 0):
-        # raise ValueError("The input matrix violates the uncertainty relation")
-        return True
-
-    return False
-
-
-def is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
-    r""" Checks if the covariance matrix is a valid quantum covariance matrix
-    that corresponds to a quantum pure state
-
-    Args:
-        cov (array): a covariance matrix
-        hbar (float): value of hbar in the uncertainty relation
-        rtol (float): the relative tolerance parameter used in `np.allclose`
-        atol (float): the absolute tolerance parameter used in `np.allclose`
-
-    Returns:
-        (bool): whether the given covariance matrix corresponds to a pure state
-    """
-    if is_valid_cov(cov, hbar=hbar, rtol=rtol, atol=atol):
-        purity = 1 / np.sqrt(np.linalg.det(2 * cov / hbar))
-        if np.allclose(purity, 1.0, rtol=rtol, atol=atol):
-            return True
-
-    return False
-
-
-def is_classical_cov(cov, hbar=2, atol=1e-08):
-    r""" Checks if the covariance matrix can be efficiently sampled.
-
-    Args:
-        cov (array): a covariance matrix
-        hbar (float): value of hbar in the uncertainty relation
-        atol (float): the absolute tolerance parameter used in `np.allclose`
-
-    Returns:
-        (bool): whether the given covariance matrix corresponds to a classical state
-    """
-
-    if is_valid_cov(cov, hbar=hbar, atol=atol):
-        (n, _) = cov.shape
-        vals = np.linalg.eigvalsh(cov - 0.5 * hbar * np.identity(n))
-        vals[np.abs(vals) < atol] = 0.0
-
-        if np.all(vals >= 0):
-            return True
-    return False

@@ -18,14 +18,11 @@ Functions for calculating the photon number distributions of various states.
 import numpy as np
 from scipy.stats import nbinom
 
-from .covariance_matrices import Amat, is_pure_cov
-
-################################################################################
-# Calculate the total photon number distribution
-################################################################################
+from .conversions import Amat
+from .gaussian_state_tests import is_pure_cov
 
 
-def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
+def pure_state_distribution(cov, cutoff=50, hbar=2, padding_factor=2):
     r""" Calculates the total photon number distribution of a pure state
     with zero mean.
 
@@ -45,11 +42,11 @@ def total_photon_num_dist_pure_state(cov, cutoff=50, hbar=2, padding_factor=2):
         N = n // 2
         B = A[0:N, 0:N]
         rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
-        return gen_multi_mode_dist(rs, cutoff=cutoff, padding_factor=padding_factor)[0:cutoff]
+        return _convolve_squeezed_state_distribution(rs, cutoff=cutoff, padding_factor=padding_factor)[0:cutoff]
     raise ValueError("The Gaussian state is not pure")
 
 
-def gen_single_mode_dist(s, cutoff=50, N=1):
+def _squeezed_state_distribution(s, cutoff=50, N=1):
     """Generate the photon number distribution of :math:`N` identical single mode squeezed states.
 
     Args:
@@ -75,7 +72,7 @@ def gen_single_mode_dist(s, cutoff=50, N=1):
     return ps_tot
 
 
-def gen_multi_mode_dist(s, cutoff=50, padding_factor=2):
+def _convolve_squeezed_state_distribution(s, cutoff=50, padding_factor=2):
     """Generates the total photon number distribution of single mode squeezed states with different squeezing values.
 
     Args:
@@ -90,5 +87,5 @@ def gen_multi_mode_dist(s, cutoff=50, padding_factor=2):
     ps = np.zeros(cutoff_sc)
     ps[0] = 1.0
     for s_val in s:
-        ps = np.convolve(ps, gen_single_mode_dist(s_val, cutoff_sc))[0:cutoff_sc]
+        ps = np.convolve(ps, _squeezed_state_distribution(s_val, cutoff_sc))[0:cutoff_sc]
     return ps
