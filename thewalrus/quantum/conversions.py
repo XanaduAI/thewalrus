@@ -13,7 +13,7 @@
 # limitations under the License.
 """
 Functions for transforming one type of covariance-matrix-like object into
-another as well as reducing a gaussian state.
+another as well as reducing a Gaussian state.
 """
 
 import numpy as np

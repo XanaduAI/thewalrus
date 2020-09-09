@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Set of functions for calculating various state representations, probabilites and
+Set of functions for calculating various state representations, probabilities and
 classical subsystems of Gaussian states.
 """
 # pylint: disable=too-many-arguments

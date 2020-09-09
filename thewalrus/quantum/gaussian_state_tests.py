@@ -13,7 +13,7 @@
 # limitations under the License.
 """
 Tests for various properties of covariance matrices as well as fidelity
-calculations for gaussian states.
+calculations for Gaussian states.
 """
 
 import numpy as np
