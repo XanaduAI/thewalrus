@@ -119,7 +119,6 @@ Utility functions
     total_photon_num_dist_pure_state
     gen_single_mode_dist
     gen_multi_mode_dist
-    normal_ordered_complex_cov
 
 
 Details

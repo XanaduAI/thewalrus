@@ -81,7 +81,7 @@ def gen_multi_mode_dist(s, cutoff=50, padding_factor=2):
     Args:
         s (array): array of squeezing parameters
         cutoff (int): Fock cutoff
-
+        padding_factor (int): expanded size of the photon distribution to avoid accumulation of errors
     Returns:
         (array[int]): total photon number distribution
     """
