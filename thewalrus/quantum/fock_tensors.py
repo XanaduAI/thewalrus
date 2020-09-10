@@ -38,7 +38,7 @@ from .conversions import (
     complex_to_real_displacements,
 )
 
-from .gaussian_state_tests import (
+from .gaussian_checks import (
     is_classical_cov,
     is_pure_cov,
 )

@@ -24,7 +24,6 @@ from .._hafnian import hafnian, reduction
 
 from .conversions import (
     reduced_gaussian,
-    Covmat,
     Qmat,
     Xmat,
     complex_to_real_displacements
@@ -229,7 +228,7 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     return np.conj(res)
 
 
-def mean_number_of_clicks(cov, hbar=2):
+def mean_clicks(cov, hbar=2):
     r""" Calculates the total mean number of clicks when a zero-mean gaussian state
     is measured using threshold detectors.
 
@@ -251,7 +250,7 @@ def mean_number_of_clicks(cov, hbar=2):
     return meanc
 
 
-def variance_number_of_clicks(cov, hbar=2):
+def variance_clicks(cov, hbar=2):
     r""" Calculates the variance of the total number of clicks when a zero-mean gaussian state
     is measured using threshold detectors.
 
@@ -284,23 +283,3 @@ def variance_number_of_clicks(cov, hbar=2):
             term2 += prob_vac_ij - vac_probs[i] * vac_probs[j]
 
     return term1 + 2 * term2
-
-
-def mean_number_of_clicks_graph(A):
-    r""" Given an adjacency matrix this function calculates the mean number of clicks.
-    For this to make sense the user must provide a matrix with singular values
-    less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
-    by Banchi et al.
-
-    Args:
-        A (array): rescaled adjacency matrix
-
-    Returns:
-        float: mean number of clicks
-    """
-    n, _ = A.shape
-    idn = np.identity(n)
-    X = np.block([[0 * idn, idn], [idn, 0 * idn]])
-    B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
-    Q = np.linalg.inv(np.identity(2 * n) - X @ B)
-    return mean_number_of_clicks(Covmat(Q))

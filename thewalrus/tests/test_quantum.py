@@ -24,20 +24,21 @@ from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_s
 
 from thewalrus.random import random_covariance, random_interferometer
 
+from thewalrus.quantum.fock_tensors import _prefactor
+from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
+from thewalrus.quantum.adjacency_matrices import _mean_clicks_adj
 from thewalrus.quantum import (
     reduced_gaussian,
     Xmat,
     Qmat,
     Amat,
     complex_to_real_displacements,
-    _prefactor,
     density_matrix_element,
     density_matrix,
-    find_scaling_adjacency_matrix,
-    find_scaling_adjacency_matrix_torontonian,
-    mean_number_of_clicks_graph,
+    adj_scaling,
+    adj_scaling_torontonian,
     Covmat,
-    gen_Qmat_from_graph,
+    adj_to_qmat,
     real_to_complex_displacements,
     photon_number_covmat,
     is_valid_cov,
@@ -47,7 +48,6 @@ from thewalrus.quantum import (
     is_classical_cov,
     find_classical_subsystem,
     pure_state_distribution,
-    _squeezed_state_distribution,
     fock_tensor,
     photon_number_mean_vector,
     photon_number_mean,
@@ -59,8 +59,8 @@ from thewalrus.quantum import (
     normal_ordered_expectation,
     photon_number_expectation,
     photon_number_squared_expectation,
-    variance_number_of_clicks,
-    mean_number_of_clicks,
+    variance_clicks,
+    mean_clicks,
 )
 
 
@@ -393,54 +393,54 @@ def test_density_matrix_displaced_squeezed_postselect():
     assert np.allclose(res, expected)
 
 
-def test_find_scaling_adjacency_matrix():
+def test_adj_scaling():
     """Test the find_scaling_adjacency matrix for a the one mode case"""
     r = 0.75 + 0.9j
     rabs = np.abs(r)
     n_mean = 10.0
     A = r * np.identity(1)
     sc_exact = np.sqrt(n_mean / (1.0 + n_mean)) / rabs
-    sc_num = find_scaling_adjacency_matrix(A, n_mean)
+    sc_num = adj_scaling(A, n_mean)
     assert np.allclose(sc_exact, sc_num)
 
 
-def test_find_scaling_adjacency_matrix_torontonian():
-    """Test the find_scaling_adjacency_matrix_torontonian for a multimode problem"""
+def test_adj_scaling_torontonian():
+    """Test the adj_scaling_torontonian for a multimode problem"""
     n = 10
     A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     A += A.T
     nc = 3.0
-    x = find_scaling_adjacency_matrix_torontonian(A, nc)
-    assert np.allclose(mean_number_of_clicks_graph(x * A), nc)
+    x = adj_scaling_torontonian(A, nc)
+    assert np.allclose(_mean_clicks_adj(x * A), nc)
 
-def test_mean_number_of_clicks_graph():
+def test_mean_clicks_adj():
     """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2*tanh(r)"""
     r = 3.0
     tr = np.tanh(r)
     A = np.array([[0, tr], [tr, 0]])
-    value = mean_number_of_clicks_graph(A)
+    value = _mean_clicks_adj(A)
     expected = 2 * tr**2
     assert np.allclose(expected, value)
 
 @pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
 @pytest.mark.parametrize("theta", [0, 1, 2, 3])
 @pytest.mark.parametrize("r", [0, 1, 2, 3])
-def test_variance_number_of_clicks(r, theta, hbar):
+def test_variance_clicks(r, theta, hbar):
     """Test one gets the correct variance of the number of clicks"""
     r = np.arcsinh(1)
     V = two_mode_squeezing(2 * r, theta) * hbar / 2
-    var = variance_number_of_clicks(V, hbar=hbar)
+    var = variance_clicks(V, hbar=hbar)
     expected = (4 * np.tanh(r) ** 2) * (1 - np.tanh(r) ** 2)
     assert np.allclose(var, expected)
 
 @pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
 @pytest.mark.parametrize("theta", [0, 1, 2, 3])
 @pytest.mark.parametrize("r", [0, 1, 2, 3])
-def test_mean_number_of_clicks(r, theta, hbar):
+def test_mean_clicks(r, theta, hbar):
     """Test one gets the correct mean of the number of clicks"""
     r = np.arcsinh(1)
     V = two_mode_squeezing(2 * r, theta) * hbar / 2
-    mean = mean_number_of_clicks(V, hbar=hbar)
+    mean = mean_clicks(V, hbar=hbar)
     expected = 2 * np.tanh(r) ** 2
     assert np.allclose(mean, expected)
 
@@ -449,7 +449,7 @@ def test_Covmat():
     n = 1
     B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     B = B + B.T
-    sc = find_scaling_adjacency_matrix(B, 1)
+    sc = adj_scaling(B, 1)
     idm = np.identity(2 * n)
     X = Xmat(n)
     Bsc = sc * B
@@ -460,11 +460,11 @@ def test_Covmat():
     assert np.allclose(Q, Qrec)
 
 
-def test_gen_Qmat_from_graph():
-    """ Test the gen_Qmat_from_graph for the analytically solvable case of a single mode"""
+def test_adj_to_qmat():
+    """ Test the adj_to_qmat for the analytically solvable case of a single mode"""
     A = np.array([[10.0]])
     n_mean = 1.0
-    cov = Covmat(gen_Qmat_from_graph(A, n_mean))
+    cov = Covmat(adj_to_qmat(A, n_mean))
     r = np.arcsinh(np.sqrt(n_mean))
     cov_e = np.diag([(np.exp(2 * r)), (np.exp(-2 * r))])
     assert np.allclose(cov, cov_e)

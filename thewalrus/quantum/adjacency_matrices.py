@@ -19,11 +19,11 @@ covariance matrix from an adjacency matrix.
 import numpy as np
 from scipy.optimize import root_scalar
 
-from .conversions import Xmat
-from .means_and_variances import mean_number_of_clicks_graph
+from .conversions import Xmat, Covmat
+from .means_and_variances import mean_clicks
 
 
-def find_scaling_adjacency_matrix_torontonian(A, c_mean):
+def adj_scaling_torontonian(A, c_mean):
     r""" Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that encodes it has
     give a mean number of clicks equal to ``c_mean`` when measured with
@@ -58,7 +58,7 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
             return c_mean - n
         if x <= 0:
             return c_mean
-        return c_mean - mean_number_of_clicks_graph(x * localA)
+        return c_mean - _mean_clicks_adj(x * localA)
 
     res = root_scalar(cost, x0=0.5, bracket=(0.0, 1.0))  # Do the optimization
 
@@ -67,7 +67,27 @@ def find_scaling_adjacency_matrix_torontonian(A, c_mean):
     return res.root / vals[0]
 
 
-def find_scaling_adjacency_matrix(A, n_mean):
+def _mean_clicks_adj(A):
+    r""" Given an adjacency matrix this function calculates the mean number of clicks.
+    For this to make sense the user must provide a matrix with singular values
+    less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
+    by Banchi et al.
+
+    Args:
+        A (array): rescaled adjacency matrix
+
+    Returns:
+        float: mean number of clicks
+    """
+    n, _ = A.shape
+    idn = np.identity(n)
+    X = np.block([[0 * idn, idn], [idn, 0 * idn]])
+    B = np.block([[A, 0 * A], [0 * A, np.conj(A)]])
+    Q = np.linalg.inv(np.identity(2 * n) - X @ B)
+    return mean_clicks(Covmat(Q))
+
+
+def adj_scaling(A, n_mean):
     r""" Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that endodes it has
     a total mean photon number n_mean.
@@ -104,7 +124,7 @@ def find_scaling_adjacency_matrix(A, n_mean):
         n = np.sum(vals2 / (1.0 - vals2))
         return n
 
-    # The following function is implicitly tested in test_find_scaling_adjacency_matrix
+    # The following function is implicitly tested in test_adj_scaling
     def grad_mean_photon_number(x, vals):  # pragma: no cover
         r""" Returns the gradient od the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
@@ -132,7 +152,7 @@ def find_scaling_adjacency_matrix(A, n_mean):
     return res.root
 
 
-def gen_Qmat_from_graph(A, n_mean):
+def adj_to_qmat(A, n_mean):
     r""" Returns the Qmat xp-covariance matrix associated to a graph with
     adjacency matrix :math:`A` and with mean photon number :math:`n_{mean}`.
 
@@ -148,7 +168,7 @@ def gen_Qmat_from_graph(A, n_mean):
     if n != m:
         raise ValueError("Matrix must be square.")
 
-    sc = find_scaling_adjacency_matrix(A, n_mean)
+    sc = adj_scaling(A, n_mean)
     Asc = sc * A
     A = np.block([[Asc, 0 * Asc], [0 * Asc, Asc.conj()]])
     I = np.identity(2 * n)

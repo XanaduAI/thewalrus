@@ -102,11 +102,10 @@ Utility functions
     Amat
     complex_to_real_displacements
     real_to_complex_displacements
-    find_scaling_adjacency_matrix
-    mean_number_of_clicks
-    mean_number_of_clicks_graph
-    find_scaling_adjacency_matrix_torontonian
-    gen_Qmat_from_graph
+    adj_scaling
+    mean_clicks
+    adj_scaling_torontonian
+    adj_to_qmat
     photon_number_mean
     photon_number_mean_vector
     photon_number_covar
@@ -133,16 +132,15 @@ from .fock_tensors import (
     update_probabilities_with_loss,
     update_probabilities_with_noise,
     find_classical_subsystem,
-    _prefactor,
 )
 
 from .adjacency_matrices import (
-    find_scaling_adjacency_matrix,
-    find_scaling_adjacency_matrix_torontonian,
-    gen_Qmat_from_graph,
+    adj_scaling,
+    adj_scaling_torontonian,
+    adj_to_qmat,
 )
 
-from .gaussian_state_tests import (
+from .gaussian_checks import (
     is_valid_cov,
     is_pure_cov,
     is_classical_cov,
@@ -168,15 +166,12 @@ from .means_and_variances import (
     photon_number_expectation,
     photon_number_squared_expectation,
     normal_ordered_expectation,
-    mean_number_of_clicks,
-    variance_number_of_clicks,
-    mean_number_of_clicks_graph,
+    mean_clicks,
+    variance_clicks,
 )
 
 from .photon_number_distributions import (
     pure_state_distribution,
-    _squeezed_state_distribution,
-    _convolve_squeezed_state_distribution,
 )
 
 __all__ = [
@@ -196,7 +191,9 @@ __all__ = [
 # old names for functions; remove in due time
 Means = real_to_complex_displacements
 Beta = complex_to_real_displacements
-prefactor = _prefactor
-gen_multi_mode_dist = _convolve_squeezed_state_distribution
-gen_single_mode_dist = _squeezed_state_distribution
 total_photon_num_dist_pure_state = pure_state_distribution
+gen_Qmat_from_graph = adj_to_qmat
+find_scaling_adjacency_matrix = adj_scaling
+find_scaling_adjacency_matrix_torontonian = adj_scaling_torontonian
+mean_number_of_clicks = mean_clicks
+variance_number_of_clicks = variance_clicks

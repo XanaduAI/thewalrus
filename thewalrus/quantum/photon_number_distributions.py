@@ -19,7 +19,7 @@ import numpy as np
 from scipy.stats import nbinom
 
 from .conversions import Amat
-from .gaussian_state_tests import is_pure_cov
+from .gaussian_checks import is_pure_cov
 
 
 def pure_state_distribution(cov, cutoff=50, hbar=2, padding_factor=2):
