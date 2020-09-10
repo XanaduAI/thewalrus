@@ -41,7 +41,7 @@ states, see:
 
 
 Fock states and tensors
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
 
@@ -51,47 +51,32 @@ Fock states and tensors
     density_matrix
     fock_tensor
     probabilities
+    loss_mat
     update_probabilities_with_loss
     update_probabilities_with_noise
-    normal_ordered_expectation
+    find_classical_subsystem
+
+Adjacency matrices
+^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+    adj_scaling
+    adj_scaling_torontonian
+    adj_to_qmat
+
+Gaussian checks
+^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+    is_valid_cov
+    is_pure_cov
+    is_classical_cov
     fidelity
 
-Details
-^^^^^^^
-
-.. autofunction::
-    pure_state_amplitude
-
-.. autofunction::
-    state_vector
-
-.. autofunction::
-    density_matrix_element
-
-.. autofunction::
-    density_matrix
-
-.. autofunction::
-    fock_tensor
-
-.. autofunction::
-    probabilities
-
-.. autofunction::
-    update_probabilities_with_loss
-
-.. autofunction::
-    update_probabilities_with_noise
-
-.. autofunction::
-    normal_ordered_expectation
-
-.. autofunction::
-    fidelity
-
-
-Utility functions
------------------
+Conversions
+^^^^^^^^^^^
 
 .. autosummary::
 
@@ -102,20 +87,28 @@ Utility functions
     Amat
     complex_to_real_displacements
     real_to_complex_displacements
-    adj_scaling
-    mean_clicks
-    adj_scaling_torontonian
-    adj_to_qmat
+
+Means and variances
+^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
     photon_number_mean
     photon_number_mean_vector
     photon_number_covar
     photon_number_covmat
-    is_valid_cov
-    is_pure_cov
-    is_classical_cov
-    find_classical_subsystem
-    pure_state_distribution
+    photon_number_expectation
+    photon_number_squared_expectation
+    normal_ordered_expectation
+    mean_clicks
+    variance_clicks
 
+Photon number distributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+    pure_state_distribution
 
 Details
 ^^^^^^^
@@ -149,7 +142,6 @@ from .gaussian_checks import (
 
 from .conversions import (
     reduced_gaussian,
-
     Xmat,
     Qmat,
     Covmat,
@@ -181,10 +173,34 @@ __all__ = [
     "density_matrix",
     "fock_tensor",
     "probabilities",
+    "loss_mat",
     "update_probabilities_with_loss",
     "update_probabilities_with_noise",
-    "normal_ordered_expectation",
+    "find_classical_subsystem",
+    "adj_scaling",
+    "adj_scaling_torontonian",
+    "adj_to_qmat",
+    "is_valid_cov",
+    "is_pure_cov",
+    "is_classical_cov",
     "fidelity",
+    "reduced_gaussian",
+    "Xmat",
+    "Qmat",
+    "Covmat",
+    "Amat",
+    "complex_to_real_displacements",
+    "real_to_complex_displacements",
+    "photon_number_mean",
+    "photon_number_mean_vector",
+    "photon_number_covar",
+    "photon_number_covmat",
+    "photon_number_expectation",
+    "photon_number_squared_expectation",
+    "normal_ordered_expectation",
+    "mean_clicks",
+    "variance_clicks",
+    "pure_state_distribution",
 ]
 
 
