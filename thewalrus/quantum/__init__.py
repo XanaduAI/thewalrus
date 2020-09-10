@@ -113,6 +113,7 @@ Photon number distributions
 Details
 ^^^^^^^
 """
+import warnings
 
 from .fock_tensors import (
     pure_state_amplitude,
@@ -203,13 +204,23 @@ __all__ = [
     "pure_state_distribution",
 ]
 
+def deprecate(new_func):
+    """Wrapper for deprecated functions to raise warning"""
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            f"Use {new_func.__name__} instead.",
+            DeprecationWarning
+        )
+        return new_func(*args, **kwargs)
+    return wrapper
 
 # old names for functions; remove in due time
-Means = real_to_complex_displacements
-Beta = complex_to_real_displacements
-total_photon_num_dist_pure_state = pure_state_distribution
-gen_Qmat_from_graph = adj_to_qmat
-find_scaling_adjacency_matrix = adj_scaling
-find_scaling_adjacency_matrix_torontonian = adj_scaling_torontonian
-mean_number_of_clicks = mean_clicks
-variance_number_of_clicks = variance_clicks
+Means = deprecate(real_to_complex_displacements)
+Beta = deprecate(complex_to_real_displacements)
+total_photon_num_dist_pure_state = deprecate(pure_state_distribution)
+gen_Qmat_from_graph = deprecate(adj_to_qmat)
+find_scaling_adjacency_matrix = deprecate(adj_scaling)
+find_scaling_adjacency_matrix_torontonian = deprecate(adj_scaling_torontonian)
+mean_number_of_clicks = deprecate(mean_clicks)
+variance_number_of_clicks = deprecate(variance_clicks)
+
