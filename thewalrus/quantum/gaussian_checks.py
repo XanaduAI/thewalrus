@@ -15,6 +15,7 @@
 Tests for various properties of covariance matrices as well as fidelity
 calculations for Gaussian states.
 """
+# pylint: disable=too-many-arguments
 
 import numpy as np
 from scipy.linalg import sqrtm

@@ -223,4 +223,3 @@ find_scaling_adjacency_matrix = deprecate(adj_scaling)
 find_scaling_adjacency_matrix_torontonian = deprecate(adj_scaling_torontonian)
 mean_number_of_clicks = deprecate(mean_clicks)
 variance_number_of_clicks = deprecate(variance_clicks)
-
