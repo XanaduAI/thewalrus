@@ -210,7 +210,7 @@ def deprecate(new_func):
     @functools.wraps(new_func)
     def wrapper(*args, **kwargs):
         warnings.warn(
-            f"Use {new_func.__name__} instead.",
+            f"This function is deprecated and will be removed. Use {new_func.__name__} instead.",
             DeprecationWarning
         )
         return new_func(*args, **kwargs)
