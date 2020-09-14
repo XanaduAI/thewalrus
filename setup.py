@@ -17,7 +17,7 @@ import sys
 import os
 import platform
 
-import setuptools
+from setuptools import find_packages
 
 
 with open("thewalrus/_version.py") as f:
@@ -137,10 +137,7 @@ info = {
     'maintainer_email': 'nicolas@xanadu.ai',
     'url': 'https://github.com/XanaduAI/thewalrus',
     'license': 'Apache License 2.0',
-    'packages': [
-                    'thewalrus',
-                    'thewalrus.tests'
-                ],
+    'packages': find_packages(where="."),
     'description': 'Open source library for hafnian calculation',
     'long_description': open('README.rst').read(),
     'provides': ["thewalrus"],

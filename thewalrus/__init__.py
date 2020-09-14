@@ -89,6 +89,8 @@ import platform
 
 import numpy as np
 
+import thewalrus.quantum
+
 from ._hafnian import (
     haf_complex,
     haf_int,

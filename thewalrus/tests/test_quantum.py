@@ -24,21 +24,22 @@ from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_s
 
 from thewalrus.random import random_covariance, random_interferometer
 
+from thewalrus.quantum.fock_tensors import _prefactor
+from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
+from thewalrus.quantum.adjacency_matrices import _mean_clicks_adj
 from thewalrus.quantum import (
     reduced_gaussian,
     Xmat,
     Qmat,
     Amat,
-    Beta,
-    prefactor,
+    complex_to_real_displacements,
     density_matrix_element,
     density_matrix,
-    find_scaling_adjacency_matrix,
-    find_scaling_adjacency_matrix_torontonian,
-    mean_number_of_clicks_graph,
+    adj_scaling,
+    adj_scaling_torontonian,
     Covmat,
-    gen_Qmat_from_graph,
-    Means,
+    adj_to_qmat,
+    real_to_complex_displacements,
     photon_number_covmat,
     is_valid_cov,
     is_pure_cov,
@@ -46,8 +47,7 @@ from thewalrus.quantum import (
     state_vector,
     is_classical_cov,
     find_classical_subsystem,
-    total_photon_num_dist_pure_state,
-    gen_single_mode_dist,
+    pure_state_distribution,
     fock_tensor,
     photon_number_mean_vector,
     photon_number_mean,
@@ -59,8 +59,8 @@ from thewalrus.quantum import (
     normal_ordered_expectation,
     photon_number_expectation,
     photon_number_squared_expectation,
-    variance_number_of_clicks,
-    mean_number_of_clicks,
+    variance_clicks,
+    mean_clicks,
 )
 
 
@@ -180,7 +180,7 @@ def test_Amat_TMS_using_Q():
 def test_beta():
     """test the correct beta is returned"""
     mu = np.arange(4)
-    res = Beta(mu)
+    res = complex_to_real_displacements(mu)
 
     alpha = (mu[:2] + 1j * mu[2:]) / np.sqrt(2 * 2)
     ex = np.concatenate([alpha, alpha.conj()])
@@ -190,8 +190,8 @@ def test_beta():
 def test_Means():
     """test the correct beta is returned"""
     res = np.arange(4)
-    mu = Beta(res)
-    ex = Means(mu)
+    mu = complex_to_real_displacements(res)
+    ex = real_to_complex_displacements(mu)
     assert np.allclose(res, ex)
 
 
@@ -200,7 +200,7 @@ def test_prefactor_vacuum():
     Q = np.identity(2)
     beta = np.zeros([2])
 
-    res = prefactor(Means(beta), Covmat(Q))
+    res = _prefactor(real_to_complex_displacements(beta), Covmat(Q))
     ex = 1
     assert np.allclose(res, ex)
 
@@ -213,7 +213,7 @@ def test_prefactor_TMS():
 
     beta = np.zeros([4])
 
-    res = prefactor(Means(beta), Covmat(Q))
+    res = _prefactor(real_to_complex_displacements(beta), Covmat(Q))
     ex = 0.5
     assert np.allclose(res, ex)
 
@@ -228,7 +228,7 @@ def test_prefactor_with_displacement():
     vect = 1.2 * np.ones([2]) + 1j * np.ones(2)
     beta = np.concatenate([vect, vect.conj()])
 
-    res = prefactor(Means(beta), Covmat(Q), hbar=2)
+    res = _prefactor(real_to_complex_displacements(beta), Covmat(Q), hbar=2)
     ex = np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
     assert np.allclose(res, ex)
 
@@ -240,18 +240,18 @@ def test_density_matrix_element_vacuum():
 
     el = [[0], [0]]
     ex = 1
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
     assert np.allclose(ex, res)
 
     el = [[1], [1]]
     #    res = density_matrix_element(beta, A, Q, el[0], el[1])
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
 
     assert np.allclose(0, res)
 
     el = [[1], [0]]
     #    res = density_matrix_element(beta, A, Q, el[0], el[1])
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
 
     assert np.allclose(0, res)
 
@@ -282,12 +282,12 @@ mu = np.array([0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.3
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_disp(t):
     """Test density matrix elements for a state with displacement"""
-    beta = Beta(mu)
+    beta = complex_to_real_displacements(mu)
     Q = Qmat(V)
 
     el = t[0]
     ex = t[1]
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
     assert np.allclose(ex, res)
 
 
@@ -302,12 +302,12 @@ t4 = [[0, 2, 0], [0, 2, 3]], 0
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_no_disp(t):
     """Test density matrix elements for a state with no displacement"""
-    beta = Beta(np.zeros([6]))
+    beta = complex_to_real_displacements(np.zeros([6]))
     Q = Qmat(V)
 
     el = t[0]
     ex = t[1]
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
     assert np.allclose(ex, res)
 
 
@@ -393,54 +393,54 @@ def test_density_matrix_displaced_squeezed_postselect():
     assert np.allclose(res, expected)
 
 
-def test_find_scaling_adjacency_matrix():
+def test_adj_scaling():
     """Test the find_scaling_adjacency matrix for a the one mode case"""
     r = 0.75 + 0.9j
     rabs = np.abs(r)
     n_mean = 10.0
     A = r * np.identity(1)
     sc_exact = np.sqrt(n_mean / (1.0 + n_mean)) / rabs
-    sc_num = find_scaling_adjacency_matrix(A, n_mean)
+    sc_num = adj_scaling(A, n_mean)
     assert np.allclose(sc_exact, sc_num)
 
 
-def test_find_scaling_adjacency_matrix_torontonian():
-    """Test the find_scaling_adjacency_matrix_torontonian for a multimode problem"""
+def test_adj_scaling_torontonian():
+    """Test the adj_scaling_torontonian for a multimode problem"""
     n = 10
     A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     A += A.T
     nc = 3.0
-    x = find_scaling_adjacency_matrix_torontonian(A, nc)
-    assert np.allclose(mean_number_of_clicks_graph(x * A), nc)
+    x = adj_scaling_torontonian(A, nc)
+    assert np.allclose(_mean_clicks_adj(x * A), nc)
 
-def test_mean_number_of_clicks_graph():
+def test_mean_clicks_adj():
     """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2*tanh(r)"""
     r = 3.0
     tr = np.tanh(r)
     A = np.array([[0, tr], [tr, 0]])
-    value = mean_number_of_clicks_graph(A)
+    value = _mean_clicks_adj(A)
     expected = 2 * tr**2
     assert np.allclose(expected, value)
 
 @pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
 @pytest.mark.parametrize("theta", [0, 1, 2, 3])
 @pytest.mark.parametrize("r", [0, 1, 2, 3])
-def test_variance_number_of_clicks(r, theta, hbar):
+def test_variance_clicks(r, theta, hbar):
     """Test one gets the correct variance of the number of clicks"""
     r = np.arcsinh(1)
     V = two_mode_squeezing(2 * r, theta) * hbar / 2
-    var = variance_number_of_clicks(V, hbar=hbar)
+    var = variance_clicks(V, hbar=hbar)
     expected = (4 * np.tanh(r) ** 2) * (1 - np.tanh(r) ** 2)
     assert np.allclose(var, expected)
 
 @pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
 @pytest.mark.parametrize("theta", [0, 1, 2, 3])
 @pytest.mark.parametrize("r", [0, 1, 2, 3])
-def test_mean_number_of_clicks(r, theta, hbar):
+def test_mean_clicks(r, theta, hbar):
     """Test one gets the correct mean of the number of clicks"""
     r = np.arcsinh(1)
     V = two_mode_squeezing(2 * r, theta) * hbar / 2
-    mean = mean_number_of_clicks(V, hbar=hbar)
+    mean = mean_clicks(V, hbar=hbar)
     expected = 2 * np.tanh(r) ** 2
     assert np.allclose(mean, expected)
 
@@ -449,7 +449,7 @@ def test_Covmat():
     n = 1
     B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     B = B + B.T
-    sc = find_scaling_adjacency_matrix(B, 1)
+    sc = adj_scaling(B, 1)
     idm = np.identity(2 * n)
     X = Xmat(n)
     Bsc = sc * B
@@ -460,11 +460,11 @@ def test_Covmat():
     assert np.allclose(Q, Qrec)
 
 
-def test_gen_Qmat_from_graph():
-    """ Test the gen_Qmat_from_graph for the analytically solvable case of a single mode"""
+def test_adj_to_qmat():
+    """ Test the adj_to_qmat for the analytically solvable case of a single mode"""
     A = np.array([[10.0]])
     n_mean = 1.0
-    cov = Covmat(gen_Qmat_from_graph(A, n_mean))
+    cov = Covmat(adj_to_qmat(A, n_mean))
     r = np.arcsinh(np.sqrt(n_mean))
     cov_e = np.diag([(np.exp(2 * r)), (np.exp(-2 * r))])
     assert np.allclose(cov, cov_e)
@@ -565,7 +565,7 @@ def test_pure_state_amplitude_coherent(i):
     """ Tests pure state amplitude for a coherent state """
     cov = np.identity(2)
     mu = np.array([1.0, 2.0])
-    beta = Beta(mu)
+    beta = complex_to_real_displacements(mu)
     alpha = beta[0]
     exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))
     num = pure_state_amplitude(mu, cov, [i])
@@ -628,7 +628,7 @@ def test_state_vector_coherent():
     cutoff = 5
     cov = np.identity(2)
     mu = np.array([1.0, 2.0])
-    beta = Beta(mu)
+    beta = complex_to_real_displacements(mu)
     alpha = beta[0]
     exact = np.array([(np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))) for i in range(cutoff)])
     num = state_vector(mu, cov, cutoff=cutoff)
@@ -669,15 +669,15 @@ def test_is_classical_cov_thermal(nbar):
 
 
 @pytest.mark.parametrize("cutoff", [50, 51, 52, 53])
-def test_total_photon_num_dist_pure_state(cutoff):
+def test_pure_state_distribution(cutoff):
     """ Test the correct photon number distribution is obtained for n modes
     with nmean number of photons up to Fock cutoff nmax"""
     n = 3
     nmean = 1.0
     rs = np.arcsinh(np.sqrt(nmean)) * np.ones([n])
     cov = np.diag(np.concatenate([np.exp(2 * rs), np.exp(-2 * rs)]))
-    p1 = total_photon_num_dist_pure_state(cov, cutoff=cutoff)
-    p2 = gen_single_mode_dist(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
+    p1 = pure_state_distribution(cov, cutoff=cutoff)
+    p2 = _squeezed_state_distribution(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
     assert np.allclose(p1, p2)
 
 
@@ -1033,14 +1033,14 @@ def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
     noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
     hbar = 2
     beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
-    means = Means(np.concatenate((beta, beta.conj())), hbar=hbar)
+    means = real_to_complex_displacements(np.concatenate((beta, beta.conj())), hbar=hbar)
     cov = hbar * np.identity(2 * num_modes) / 2
     cutoff = 10
 
     probs = probabilities(means, cov, cutoff, parallel=parallel, hbar=2)
     updated_probs = update_probabilities_with_noise(noise_dists, probs)
     beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
-    means_expected = Means(
+    means_expected = real_to_complex_displacements(
         np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
     )
     expected = probabilities(means_expected, cov, cutoff, parallel=parallel, hbar=2)
@@ -1055,7 +1055,7 @@ def test_update_with_noise_coherent_value_error():
     noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
     hbar = 2
     beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
-    means = Means(np.concatenate((beta, beta.conj())), hbar=hbar)
+    means = real_to_complex_displacements(np.concatenate((beta, beta.conj())), hbar=hbar)
     cov = hbar * np.identity(2 * num_modes) / 2
     cutoff = 10
     probs = probabilities(means, cov, cutoff, hbar=2)
@@ -1099,8 +1099,8 @@ def test_fidelity_coherent_state(num_modes, hbar):
     """Test the fidelity of two multimode coherent states"""
     beta1 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
     beta2 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
-    means1 = Means(np.concatenate([beta1, beta1.conj()]), hbar=hbar)
-    means2 = Means(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
+    means1 = real_to_complex_displacements(np.concatenate([beta1, beta1.conj()]), hbar=hbar)
+    means2 = real_to_complex_displacements(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
     cov1 = hbar * np.identity(2 * num_modes) / 2
     cov2 = hbar * np.identity(2 * num_modes) / 2
     fid = fidelity(means1, cov1, means2, cov2, hbar=hbar)
@@ -1114,7 +1114,7 @@ def test_fidelity_coherent_state(num_modes, hbar):
 def test_fidelity_vac_to_displaced_squeezed(r, alpha, hbar):
     """Calculates the fidelity between a coherent squeezed state and vacuum"""
     cov1 = np.diag([np.exp(2 * r), np.exp(-2 * r)]) * hbar / 2
-    means1 = Means(np.array([alpha, np.conj(alpha)]), hbar=hbar)
+    means1 = real_to_complex_displacements(np.array([alpha, np.conj(alpha)]), hbar=hbar)
     means2 = np.zeros([2])
     cov2 = np.identity(2) * hbar / 2
     expected = (
@@ -1152,7 +1152,7 @@ def test_fidelity_wrong_shape():
 def test_expectation_normal_ordered_coherent(alpha, hbar):
     """Test the correct evaluation of the normal ordered expectation value for a product of coherent states"""
     beta = np.concatenate([alpha, np.conj(alpha)])
-    means = Means(beta, hbar=hbar)
+    means = real_to_complex_displacements(beta, hbar=hbar)
     cov = np.identity(len(beta)) * hbar / 2
     pattern = np.random.randint(low=0, high=3, size=len(beta))
     result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
@@ -1219,7 +1219,7 @@ def test_single_mode_displaced_squeezed(r, phi, x, y):
     cov = 0.5 * hbar * S @ S.T
     beta = np.array([x + 1j * y, x - 1j * y])
     alpha = beta[0]
-    means = Means(beta, hbar=hbar)
+    means = real_to_complex_displacements(beta, hbar=hbar)
     a = alpha
     adxa = np.abs(alpha) ** 2 + np.sinh(r) ** 2
     a2 = alpha ** 2 - np.exp(1j * phi) * 0.5 * np.sinh(2 * r)
@@ -1267,7 +1267,7 @@ def test_expt_two_mode_squeezed(r, phi):
 def test_photon_number_expectation_displaced(alpha, hbar):
     """Tests the correct photon number expectation for coherent states"""
     beta = np.concatenate([alpha, np.conj(alpha)])
-    means = Means(beta, hbar=hbar)
+    means = real_to_complex_displacements(beta, hbar=hbar)
     cov = np.identity(len(beta)) * hbar / 2
     val = photon_number_expectation(
         means, cov, modes=list(range(len(alpha))), hbar=hbar
