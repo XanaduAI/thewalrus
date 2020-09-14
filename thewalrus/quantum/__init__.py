@@ -206,6 +206,8 @@ __all__ = [
 
 def deprecate(new_func):
     """Wrapper for deprecated functions to raise warning"""
+    
+    @functools.wraps(new_func)
     def wrapper(*args, **kwargs):
         warnings.warn(
             f"Use {new_func.__name__} instead.",
