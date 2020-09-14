@@ -114,6 +114,7 @@ Details
 ^^^^^^^
 """
 import warnings
+import functools
 
 from .fock_tensors import (
     pure_state_amplitude,
@@ -206,7 +207,7 @@ __all__ = [
 
 def deprecate(new_func):
     """Wrapper for deprecated functions to raise warning"""
-    
+
     @functools.wraps(new_func)
     def wrapper(*args, **kwargs):
         warnings.warn(
