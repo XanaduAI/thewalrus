@@ -163,7 +163,9 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    code/thewalrus
    code/quantum
    code/samples
+   code/csamples
    code/symplectic
+   code/random
    code/fock_gradients
    code/reference
    code/libwalrus

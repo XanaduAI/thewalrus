@@ -29,7 +29,7 @@ Hafnian sampling
     hafnian_sample_state
     hafnian_sample_graph
     hafnian_sample_classical_state
-
+    hafnian_sample_graph_rank_one
 
 Torontonian sampling
 --------------------
@@ -40,13 +40,17 @@ Torontonian sampling
     torontonian_sample_graph
     torontonian_sample_classical_state
 
+Brute force sampling
+--------------------
+
+.. autosummary::
+    photon_number_sampler
+
 Code details
 ------------
 """
 # pylint: disable=too-many-arguments
-import multiprocessing
-from multiprocessing import Pool
-
+import dask
 import numpy as np
 from scipy.special import factorial as fac
 
@@ -142,7 +146,7 @@ def generate_hafnian_sample(
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
         if result[-1] == cutoff:
             return -1
-        if sum(result) > max_photons:
+        if np.sum(result) > max_photons:
             return -1
         prev_prob = probs1[result[-1]]
 
@@ -233,7 +237,7 @@ def hafnian_sample_state(
     max_photons=30,
     approx=False,
     approx_samples=1e5,
-    pool=False,
+    parallel=False,
 ):
     r"""Returns samples from the Hafnian of a Gaussian state.
 
@@ -252,42 +256,28 @@ def hafnian_sample_state(
             to approximate the hafnian. Note that this can only be used for
             real, non-negative matrices.
         approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
-        pool (bool): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
-    if not pool:
-        params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
-        return _hafnian_sample(params)
+    if parallel:
+        params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
+        compute_list = []
+        for p in params:
+            compute_list.append(dask.delayed(_hafnian_sample)(p))
 
-    pool = Pool()
-    nprocs = multiprocessing.cpu_count()
-    localsamps = samples // nprocs
+        results = dask.compute(*compute_list, scheduler="threads")
 
-    params = [[cov, localsamps, mean, hbar, cutoff, max_photons, approx, approx_samples]] * (nprocs - 1)
-    params.append(
-        [
-            cov,
-            samples - localsamps * (nprocs - 1),
-            mean,
-            hbar,
-            cutoff,
-            max_photons,
-            approx,
-            approx_samples,
-        ]
-    )
+        return np.vstack(results)
 
-    result = np.vstack(pool.map(_hafnian_sample, params))
-    pool.close()  # no more tasks
-    pool.join()  # wrap up current tasks
+    params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
+    return _hafnian_sample(params)
 
-    return result
 
 
 def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, pool=False
+    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
 ):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
@@ -301,13 +291,13 @@ def hafnian_sample_graph(
         approx (bool): if ``True``, the approximate hafnian algorithm is used.
             Note that this can only be used for real, non-negative matrices.
         approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
-        pool (bool): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
     Q = gen_Qmat_from_graph(A, n_mean)
-    cov = Covmat(Q)
+    cov = Covmat(Q, hbar=2)
     return hafnian_sample_state(
         cov,
         samples,
@@ -317,7 +307,7 @@ def hafnian_sample_graph(
         max_photons=max_photons,
         approx=approx,
         approx_samples=approx_samples,
-        pool=pool,
+        parallel=parallel,
     )
 
 
@@ -380,7 +370,7 @@ def generate_torontonian_sample(cov, hbar=2, max_photons=30):
 
         prev_prob = probs1a[result[-1]]
 
-        if np.sum(result) >= max_photons:
+        if np.sum(result) > max_photons:
             return -1
 
     return result
@@ -439,7 +429,7 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, pool=False):
+def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=False):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -450,30 +440,27 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, pool=False):
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         max_photons (int): specifies the maximum number of clicks that can be counted.
-        pool (boolean): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
-    if not pool:
-        params = [cov, samples, hbar, max_photons]
-        return _torontonian_sample(params)
+    if parallel:
+        params = [[cov, 1, hbar, max_photons]] * samples
+        compute_list = []
+        for p in params:
+            compute_list.append(dask.delayed(_torontonian_sample)(p))
 
-    pool = Pool()
-    nprocs = multiprocessing.cpu_count()
-    localsamps = samples // nprocs
+        results = dask.compute(*compute_list, scheduler="threads")
 
-    params = [[cov, localsamps, hbar, max_photons]] * (nprocs - 1)
-    params.append([cov, samples - localsamps * (nprocs - 1), hbar, max_photons])
+        return np.vstack(results)
 
-    result = np.vstack(pool.map(_torontonian_sample, params))
-    pool.close()  # no more tasks
-    pool.join()  # wrap up current tasks
-
-    return result
+    params = [cov, samples, hbar, max_photons]
+    return _torontonian_sample(params)
 
 
-def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
+
+def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=False):
     r"""Returns samples from the Torontonian of a Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -482,14 +469,14 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, pool=False):
         n_mean (float): mean photon number of the Gaussian state
         samples (int): the number of samples to return.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        pool (boolean): if ``True``, uses ``multiprocessor.Pool`` for parallelization of samples
+        parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Torontonian of the Gaussian state
     """
     Q = gen_Qmat_from_graph(A, n_mean)
-    cov = Covmat(Q)
-    return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, pool=pool)
+    cov = Covmat(Q, hbar=2)
+    return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, parallel=parallel)
 
 
 # pylint: disable=unused-argument
@@ -549,6 +536,43 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
     )
 
 
+def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
+    """Given a photon-number probability mass function(PMF) it returns samples according to said PMF.
+
+    Args:
+        probabilities (array): probability tensor of the modes, has shape ``[cutoff]*num_modes``
+        num_samples (int): number of samples requested
+        out_of_bounds (boolean): if ``False`` the probability distribution is renormalized. If not ``False``, the value of
+            ``out_of_bounds`` is used as a placeholder for samples where more than the cutoff of probabilities are detected.
+
+    Returns:
+        (array): Samples, with shape [num_sample, num_modes]
+    """
+    num_modes = len(probabilities.shape)
+    cutoff = probabilities.shape[0]
+    sum_p = np.sum(probabilities)
+
+    if out_of_bounds is False:
+        probabilities = probabilities.flatten() / sum_p
+        vals = np.arange(cutoff**num_modes, dtype=int)
+        return [
+            np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
+            for _ in range(num_samples)
+            ]
+
+    upper_limit = cutoff ** num_modes
+
+    def sorter(index):
+        if index == upper_limit:
+            return out_of_bounds
+
+        return np.unravel_index(index, [cutoff] * num_modes)
+
+    vals = np.arange(1 + cutoff**num_modes, dtype=int)
+    probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
+    return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
+
+
 def seed(seed_val=None):
     r""" Seeds the random number generator used in the sampling algorithms.
 
@@ -559,3 +583,42 @@ def seed(seed_val=None):
         seed_val (int): Seed for RandomState. Must be convertible to 32 bit unsigned integers.
     """
     np.random.seed(seed_val)
+
+
+
+def _hafnian_sample_graph_rank_one(G, n_mean):
+    r"""Returns a sample from a rank one adjacency matrix `\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G}`
+    is a row vector.
+
+    Args:
+        G (array): factorization of the rank-one matrix A = G @ G.T.
+        nmean (float): Total mean photon number.
+
+    Returns:
+        (array): sample.
+    """
+    s = np.arcsinh(np.sqrt(n_mean))
+    q = 1.0 - np.tanh(s) ** 2
+    total_photon_num = 2 * np.random.negative_binomial(0.5, q, 1)[0]
+    sample = np.zeros(len(G))
+    single_ph_ps = np.abs(G) ** 2
+    single_ph_ps /= np.sum(single_ph_ps)
+    for _ in range(total_photon_num):
+        detector = np.random.choice(len(G), p=single_ph_ps)
+        sample[detector] += 1
+    return sample
+
+
+def hafnian_sample_graph_rank_one(G, n_mean, samples=1):
+    r"""Returns samples from a rank one adjacency matrix `\bm{A} = \bm{G} \bm{G}^T` where :math:`\bm{G}`
+    is a row vector.
+
+    Args:
+        G (array): factorization of the rank-one matrix A = G @ G.T.
+        nmean (float): Total mean photon number.
+        samples (int): the number of samples to return.
+
+    Returns
+        (array): samples.
+    """
+    return np.array([_hafnian_sample_graph_rank_one(G, n_mean) for _ in range(samples)])

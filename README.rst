@@ -1,7 +1,7 @@
 The Walrus
 ##########
 
-.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg&circle-token=209b57390082a2b2fe2cdc9ee49a301ddc29ca5b
+.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg
     :alt: CircleCI
     :target: https://circleci.com/gh/XanaduAI/thewalrus/tree/master
 
@@ -26,8 +26,8 @@ The Walrus
     :target: https://pypi.org/project/thewalrus
 
 .. image:: https://joss.theoj.org/papers/10.21105/joss.01705/status.svg
-	:alt: JOSS - The Journal of Open Source Software
-	:target: https://doi.org/10.21105/joss.01705
+    :alt: JOSS - The Journal of Open Source Software
+    :target: https://doi.org/10.21105/joss.01705
 
 A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
 
@@ -53,11 +53,11 @@ Pre-built binary wheels are available for the following platforms:
 +------------+-------------+------------------+---------------+
 |            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |
 +============+=============+==================+===============+
-| Python 3.5 |  ✅         |  ✅              |   ✅          |
+| Python 3.6 |      X      |        X         |       X       |
 +------------+-------------+------------------+---------------+
-| Python 3.6 |  ✅         |  ✅              |   ✅          |
+| Python 3.7 |      X      |        X         |       X       |
 +------------+-------------+------------------+---------------+
-| Python 3.7 |  ✅         |  ✅              |   ✅          |
+| Python 3.8 |      X      |        X         |       X       |
 +------------+-------------+------------------+---------------+
 
 To install, simply run
@@ -72,45 +72,42 @@ Compiling from source
 
 The Walrus depends on the following Python packages:
 
-* `Python <http://python.org/>`_ >=3.5
-* `NumPy <http://numpy.org/>`_  >=1.13.3
-* `Numba <https://numba.pydata.org/>`_ >=0.43.1
+* `Python <http://python.org/>`_ >= 3.6
+* `NumPy <http://numpy.org/>`_  >= 1.13.3
+* `Numba <https://numba.pydata.org/>`_ >= 0.43.1
 
 In addition, to compile the C++ extension, the following dependencies are required:
 
 * A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
 * `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
+* `Cython <https://cython.org/>`_ an optimising static compiler for the Python programming language.
 
 On Debian-based systems, these can be installed via ``apt`` and ``curl``:
 
 .. code-block:: console
 
     $ sudo apt install g++ libeigen3-dev
+    $ pip install Cython
 
 or using Homebrew on MacOS:
 
 .. code-block:: console
 
     $ brew install gcc eigen
+    $ pip install Cython
 
 Alternatively, you can download the Eigen headers manually:
 
 .. code-block:: console
 
     $ mkdir ~/.local/eigen3 && cd ~/.local/eigen3
-    $ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz -O eigen3.tar.gz
+    $ wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz -O eigen3.tar.gz
     $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
     $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
 
 Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
 
-Once all dependencies are installed, you can compile the latest stable version of the The Walrus library as follows:
-
-.. code-block:: console
-
-    $ python -m pip install thewalrus --no-binary :all:
-
-Alternatively, you can compile the latest development version by cloning the git repository, and installing using pip in development mode.
+You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
 
 .. code-block:: console
 
@@ -154,13 +151,6 @@ will need to be installed. In Ubuntu-based distributions, this can be done as fo
 .. code-block:: console
 
     sudo apt-get install cmake libgtest-dev
-    cd /usr/src/googletest/googletest
-    sudo cmake
-    sudo make
-    sudo cp libgtest* /usr/lib/
-    sudo mkdir /usr/local/lib/googletest
-    sudo ln -s /usr/lib/libgtest.a /usr/local/lib/googletest/libgtest.a
-    sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/googletest/libgtest_main.a
 
 Alternatively, the latest Googletest release can be installed from source:
 
@@ -181,11 +171,11 @@ The Walrus documentation is available online on `Read the Docs <https://the-walr
 
 To build it locally, you need to have the following packages installed:
 
-* `Sphinx <http://sphinx-doc.org/>`_ >=1.5
-* `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >=0.3.6
+* `Sphinx <http://sphinx-doc.org/>`_ >= 1.5
+* `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >= 0.3.6
 * `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_
 * `Pandoc <https://pandoc.org/>`_
-* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >=4.12.0
+* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >= 4.12.0
 * `exhale <https://exhale.readthedocs.io/en/latest/>`_
 * `Doxygen <http://www.doxygen.nl/>`_
 
@@ -213,13 +203,13 @@ We also encourage bug reports, suggestions for new features and enhancements, an
 Authors
 =======
 
-Brajesh Gupt, Josh Izaac and Nicolás Quesada.
+Brajesh Gupt, Josh Izaac and Nicolas Quesada.
 
 All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
 If you are doing research using The Walrus, please cite `our paper <https://joss.theoj.org/papers/10.21105/joss.01705>`_:
 
- Brajesh Gupt, Josh Izaac and Nicolás Quesada. The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. Journal of Open Source Software, 4(44), 1705 (2019)
+ Brajesh Gupt, Josh Izaac and Nicolas Quesada. The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. Journal of Open Source Software, 4(44), 1705 (2019)
 
 
 Support

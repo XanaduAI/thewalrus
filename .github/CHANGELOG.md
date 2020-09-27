@@ -1,8 +1,124 @@
-# Version 0.11.0-dev
+# Version 0.14.0-dev
+
+### New features
+
+* Adds the function `find_classical_subsystem` that tries to find a subset of the mode with a classical covariance matrix. [#193](https://github.com/XanaduAI/thewalrus/pull/193)
+
+* Adds the functions `mean_number_of_clicks` and `variance_number_of_clicks` that calculate the first and second statistical moments of the total number of clicks in a Gaussian state centered at the origin. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
+
+### Improvements
+
+### Bug fixes
+
+### Breaking changes
+
+* Removes the redundant function `normal_ordered_complex_cov`. [#194](https://github.com/XanaduAI/thewalrus/pull/194)
+
+* Renames the function `mean_number_of_clicks` to be `mean_number_of_click_graph`. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Nicolas Quesada
+
+---
+
+
+# Version 0.13.0
+
+### New features
+
+* Adds a new algorithm for hafnians of matrices with low rank. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
+
+* Adds a function to calculate the fidelity between two Gaussian quantum states. [#169](https://github.com/XanaduAI/thewalrus/pull/169)
+
+* Adds a new module, `thewalrus.random`, to generate random unitary, symplectic and covariance matrices. [#169](https://github.com/XanaduAI/thewalrus/pull/169)
+
+* Adds new functions `normal_ordered_expectation`, `photon_number_expectation` and `photon_number_squared_expectation` in `thewalrus.quantum` to calculate expectation values of products of normal ordered expressions and number operators and their squares. [#175](https://github.com/XanaduAI/thewalrus/pull/175)
+
+* Adds the function `hafnian_sample_graph_rank_one` in `thewalrus.samples` to sample from rank-one adjacency matrices. [#174](https://github.com/XanaduAI/thewalrus/pull/174)
+
+### Improvements
+
+* Adds parallelization support using Dask for `quantum.probabilities`. [#161](https://github.com/XanaduAI/thewalrus/pull/161)
+
+* Removes support for Python 3.5. [#163](https://github.com/XanaduAI/thewalrus/pull/163)
+
+* Changes in the interface and speed ups in the functions in the `thewalrus.fock_gradients` module. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
+
+* Improves documentation of the multidimensional Hermite polynomials. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
+
+* Improves speed of `fock_tensor` when the symplectic matrix passed is also orthogonal. [#166](https://github.com/XanaduAI/thewalrus/pull/166)
+
+### Bug fixes
+
+* Fixes Numba decorated functions not rendering properly in the documentation. [#173](https://github.com/XanaduAI/thewalrus/pull/173)
+
+* Solves the issue with `quantum` and `samples` not being rendered in the documentation or the TOC. [#173](https://github.com/XanaduAI/thewalrus/pull/173)
+
+* Fix bug where quantum and samples were not showing up in the documentation. [#182](https://github.com/XanaduAI/thewalrus/pull/182)
+
+### Breaking changes
+
+* The functions in `thewalrus.fock_gradients` are now separated into functions for the gradients and the gates. Moreover, they are renamed, for instance `Dgate` becomes `displacement` and its gradient is now `grad_displacement`. [#164](https://github.com/XanaduAI/thewalrus/pull/164/files)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Theodor Isacsson, Josh Izaac, Filippo Miatto, Nicolas Quesada
+
+---
+
+
+# Version 0.12.0
+
+### New features
+
+* Adds the ability to calculate the mean number of photons in a given mode of a Gaussian state. [#148](https://github.com/XanaduAI/thewalrus/pull/148)
+
+* Adds the ability to calculate the photon number distribution of a pure or mixed state using `generate_probabilities`. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
+
+* Allows to update the photon number distribution when undergoing loss by using `update_probabilities_with_loss`. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
+
+* Allows to update the photon number distribution when undergoing noise `update_probabilities_with_noise`. [#153](https://github.com/XanaduAI/thewalrus/pull/153)
+
+* Adds a brute force sampler `photon_number_sampler` that given a (multi-)mode photon number distribution generates photon number samples. [#152](https://github.com/XanaduAI/thewalrus/pull/152)
+
+* Adds the ability to perform the Autonne-Takagi decomposition of a complex-symmetric matrix using `autonne` from the `symplectic` module. [#154](https://github.com/XanaduAI/thewalrus/pull/154)
+
+### Improvements
+
+
+* Improves the efficiency of Hermite polynomial calculation in `hermite_multidimensional.hpp`. [#141](https://github.com/XanaduAI/thewalrus/pull/141)
+
+* Implements parallelization with Dask for sampling from the Hafnian/Torontonian of a Gaussian state. [#145](https://github.com/XanaduAI/thewalrus/pull/145)
+
+### Bug fixes
+
+* Corrects the issue with hbar taking a default value when calling `state_vector`, `pure_state_amplitude`, and `density_matrix_element` [#149](https://github.com/XanaduAI/thewalrus/pull/149)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+
+Theodor Isacsson, Nicolas Quesada, Kieran Wilkinson
+
+
+---
+
+
+# Version 0.11.0
 
 ### New features
 
 * Introduces the renormalized hermite polynomials. These new polynomials improve the speed and accuracy of `thewalrus.quantum.state_vector` and `thewalrus.quantum.density_matrix` and also `hafnian_batched` and `hermite_multimensional` when called with the optional argument `renorm=True`. [#108](https://github.com/XanaduAI/thewalrus/pull/108)
+
+* Adds functions for calculating the covariance for the photon number distribution of a Gaussian state including a function for the full covariance matrix. [#137](https://github.com/XanaduAI/thewalrus/pull/137)
+
+* Adds support for Python 3.8. [#138](https://github.com/XanaduAI/thewalrus/pull/138)
 
 ### Improvements
 
@@ -18,6 +134,8 @@
 
 * Further improves speed of the functions `thewalrus.fock_gradients` by writing explicit recursion relations for a given number of modes. [#129](https://github.com/XanaduAI/thewalrus/pull/129)
 
+* Adds the functions `find_scaling_adjacency_matrix_torontonian` and `mean_number_of_clicks` that allow to fix the mean number of clicks when doing threshold detection sampling and allow to calculate the mean of clicks generated by a scaled adjacency matrix. [#136](https://github.com/XanaduAI/thewalrus/pull/136/)
+
 
 ### Bug fixes
 
@@ -29,11 +147,13 @@
 
 * Updates the S2gate to use the correct definition. [#130](https://github.com/XanaduAI/thewalrus/pull/130)
 
+* Corrects the issue with hbar taking a default value when calculating mu in the density matrix function [#134] (https://github.com/XanaduAI/thewalrus/pull/134)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Theodor Isacsson, Josh Izaac, Filippo Miatto, Nicolas Quesada, Trevor Vincent
+Theodor Isacsson, Josh Izaac, Filippo Miatto, Nicolas Quesada, Trevor Vincent, Kieran Wilkinson
 
 
 ---

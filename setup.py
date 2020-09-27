@@ -17,7 +17,7 @@ import sys
 import os
 import platform
 
-import setuptools
+from setuptools import find_packages
 
 
 with open("thewalrus/_version.py") as f:
@@ -27,7 +27,10 @@ with open("thewalrus/_version.py") as f:
 requirements = [
     "numpy",
     "scipy>=1.2.1",
-    "numba>=0.43.1"
+    "numba>=0.49.1",
+    "dask[delayed]",
+    "sympy>=1.5.1",
+    "repoze.lru>=0.7"
 ]
 
 
@@ -134,10 +137,7 @@ info = {
     'maintainer_email': 'nicolas@xanadu.ai',
     'url': 'https://github.com/XanaduAI/thewalrus',
     'license': 'Apache License 2.0',
-    'packages': [
-                    'thewalrus',
-                    'thewalrus.tests'
-                ],
+    'packages': find_packages(where="."),
     'description': 'Open source library for hafnian calculation',
     'long_description': open('README.rst').read(),
     'provides': ["thewalrus"],
@@ -159,9 +159,9 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3 :: Only',
     "Topic :: Scientific/Engineering :: Physics"
 ]

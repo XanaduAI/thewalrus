@@ -67,7 +67,7 @@ def expand(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = len(S) // 2
-    S2 = np.identity(2 * N)
+    S2 = np.identity(2 * N, dtype=S.dtype)
     w = np.array(modes)
 
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
@@ -89,7 +89,9 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
-    r = np.zeros(2 * N)
+    alpharealdtype = np.dtype(type(alpha))
+
+    r = np.zeros(2 * N, dtype=alpharealdtype)
     r[mode] = np.sqrt(2 * hbar) * alpha.real
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
@@ -125,59 +127,59 @@ def reduced_state(mu, cov, modes):
     return mu.copy()[ind], cov.copy()[rows, cols]
 
 
-def vacuum_state(modes, hbar=2.0):
+def vacuum_state(modes, hbar=2.0, dtype=np.float64):
     r"""Returns the vacuum state.
 
     Args:
         modes (str): Returns the vector of means and the covariance matrix
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`
+        dtype (numpy.dtype): datatype to represent the covariance matrix and vector of means
     Returns:
         list[array]: the means vector and covariance matrix of the vacuum state
     """
-    means = np.zeros((2 * modes))
-    cov = np.identity(2 * modes) * hbar / 2
+    means = np.zeros((2 * modes), dtype=dtype)
+    cov = np.identity(2 * modes, dtype=dtype) * hbar / 2
     state = [means, cov]
     return state
 
 
-def squeezing(r, phi):
+def squeezing(r, phi, dtype=np.float64):
     r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
 
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
-
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
     Returns:
         array: symplectic transformation matrix
-
-
     """
     # pylint: disable=assignment-from-no-return
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
+    cp = np.cos(phi, dtype=dtype)
+    sp = np.sin(phi, dtype=dtype)
+    ch = np.cosh(r, dtype=dtype)
+    sh = np.sinh(r, dtype=dtype)
     S = np.array([[ch - cp * sh, -sp * sh], [-sp * sh, ch + cp * sh]])
 
     return S
 
 
-def two_mode_squeezing(r, phi):
+def two_mode_squeezing(r, phi, dtype=np.float64):
     """Two-mode squeezing.
 
     Args:
         r (float): squeezing magnitude
         phi (float): rotation parameter
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
+    cp = np.cos(phi, dtype=dtype)
+    sp = np.sin(phi, dtype=dtype)
+    ch = np.cosh(r, dtype=dtype)
+    sh = np.sinh(r, dtype=dtype)
 
     S = np.array(
         [
@@ -202,7 +204,7 @@ def interferometer(U):
     """
     X = U.real
     Y = U.imag
-    S = np.vstack([np.hstack([X, -Y]), np.hstack([Y, X])])
+    S = np.block([[X, -Y], [Y, X]])
 
     return S
 
@@ -237,7 +239,8 @@ def loss(mu, cov, T, mode, nbar=0, hbar=2):
 
     return mu_res, cov_res
 
-
+### Comment: This function strongly overlaps with `quantum.photon_number_mean`
+### Wonder if it is worth removing it.
 def mean_photon_number(mu, cov, hbar=2):
     r"""Calculates the mean photon number for a given one-mode state.
 
@@ -255,49 +258,55 @@ def mean_photon_number(mu, cov, hbar=2):
     return ex, var
 
 
-def beam_splitter(theta, phi):
+def beam_splitter(theta, phi, dtype=np.float64):
     """Beam-splitter.
 
     Args:
         theta (float): transmissivity parameter
         phi (float): phase parameter
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: symplectic-orthogonal transformation matrix of an interferometer with angles theta and phi
     """
+    ct = np.cos(theta, dtype=dtype)
+    st = np.sin(theta, dtype=dtype)
+    eip = np.cos(phi, dtype=dtype) + 1j * np.sin(phi, dtype=dtype)
     U = np.array(
         [
-            [np.cos(theta), -np.exp(-1j * phi) * np.sin(theta)],
-            [np.exp(1j * phi) * np.sin(theta), np.cos(theta)],
+            [ct, -eip.conj() * st],
+            [eip * st, ct],
         ]
     )
     return interferometer(U)
 
 
-def rotation(theta):
+def rotation(theta, dtype=np.float64):
     """Rotation gate.
 
     Args:
         theta (float): rotation angle
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: rotation matrix by angle theta
     """
-    V = np.identity(1) * np.exp(1j * theta)
+    V = np.identity(1) * (np.cos(theta, dtype=dtype) + 1j * np.sin(theta, dtype=dtype))
     return interferometer(V)
 
 
-def sympmat(N):
+def sympmat(N, dtype=np.float64):
     r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
 
     Args:
         N (int): positive integer
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix
 
     Returns:
         array: :math:`2N\times 2N` array
     """
-    I = np.identity(N)
-    O = np.zeros_like(I)
+    I = np.identity(N, dtype=dtype)
+    O = np.zeros_like(I, dtype=dtype)
     S = np.block([[O, I], [-I, O]])
     return S
 
@@ -317,7 +326,38 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     if n % 2 != 0:
         return False
     nmodes = n // 2
-
-    Omega = sympmat(nmodes)
+    Omega = sympmat(nmodes, dtype=S.dtype)
 
     return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
+
+def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
+    r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
+
+    Args:
+        A (array): square, symmetric matrix
+        rtol (float): the relative tolerance parameter between ``A`` and ``A.T``
+        atol (float): the absolute tolerance parameter between ``A`` and ``A.T``
+        svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or asceding (``False``) order.
+
+    Returns:
+        tuple[array, array]: (r, U), where r are the singular values,
+        and U is the Autonne-Takagi unitary, such that :math:`A = U \diag(r) U^T`.
+    """
+    n, m = A.shape
+    if n != m:
+        raise ValueError("The input matrix is not square")
+    if not np.allclose(A, A.T, rtol=rtol, atol=atol):
+        raise ValueError("The input matrix is not symmetric")
+    Areal = A.real
+    Aimag = A.imag
+
+    B = np.empty((2 * n, 2 * n))
+    B[:n, :n] = Areal
+    B[n : 2 * n, :n] = Aimag
+    B[:n, n : 2 * n] = Aimag
+    B[n : 2 * n, n : 2 * n] = -Areal
+    vals, vects = np.linalg.eigh(B)
+    U = vects[:n, n : 2 * n] + 1j * vects[n : 2 * n, n : 2 * n]
+    if svd_order:
+        return (vals[n : 2 * n])[::-1], U[:, ::-1]
+    return vals[n : 2 * n], U

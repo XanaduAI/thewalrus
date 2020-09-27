@@ -18,59 +18,54 @@ from itertools import product
 import pytest
 
 import numpy as np
-from scipy.linalg import qr
+from scipy.stats import poisson
 
-from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter
+from thewalrus.symplectic import rotation, squeezing, interferometer, two_mode_squeezing, beam_splitter, loss, expand
 
+from thewalrus.random import random_covariance, random_interferometer
+
+from thewalrus.quantum.fock_tensors import _prefactor
+from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
+from thewalrus.quantum.adjacency_matrices import _mean_clicks_adj
 from thewalrus.quantum import (
     reduced_gaussian,
     Xmat,
     Qmat,
     Amat,
-    Beta,
-    prefactor,
+    complex_to_real_displacements,
     density_matrix_element,
     density_matrix,
-    find_scaling_adjacency_matrix,
+    adj_scaling,
+    adj_scaling_torontonian,
     Covmat,
-    gen_Qmat_from_graph,
-    Means,
+    adj_to_qmat,
+    real_to_complex_displacements,
+    photon_number_covmat,
     is_valid_cov,
     is_pure_cov,
     pure_state_amplitude,
     state_vector,
     is_classical_cov,
-    total_photon_num_dist_pure_state,
-    gen_single_mode_dist,
+    find_classical_subsystem,
+    pure_state_distribution,
     fock_tensor,
+    photon_number_mean_vector,
+    photon_number_mean,
+    probabilities,
+    update_probabilities_with_loss,
+    update_probabilities_with_noise,
+    loss_mat,
+    fidelity,
+    normal_ordered_expectation,
+    photon_number_expectation,
+    photon_number_squared_expectation,
+    variance_clicks,
+    mean_clicks,
 )
 
 
 # make tests deterministic
 np.random.seed(137)
-
-
-def random_interferometer(N, real=False):
-    r"""Random unitary matrix representing an interferometer.
-
-    For more details, see arXiv:math-ph/0609050
-
-    Args:
-        N (int): number of modes
-        real (bool): return a random real orthogonal matrix
-
-    Returns:
-        array: random :math:`N\times N` unitary distributed with the Haar measure
-    """
-    if real:
-        z = np.random.randn(N, N)
-    else:
-        z = (np.random.randn(N, N) + 1j * np.random.randn(N, N)) / np.sqrt(2.0)
-    q, r = qr(z)
-    d = np.diag(r)
-    ph = d / np.abs(d)
-    U = np.multiply(q, ph, q)
-    return U
 
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -185,7 +180,7 @@ def test_Amat_TMS_using_Q():
 def test_beta():
     """test the correct beta is returned"""
     mu = np.arange(4)
-    res = Beta(mu)
+    res = complex_to_real_displacements(mu)
 
     alpha = (mu[:2] + 1j * mu[2:]) / np.sqrt(2 * 2)
     ex = np.concatenate([alpha, alpha.conj()])
@@ -195,8 +190,8 @@ def test_beta():
 def test_Means():
     """test the correct beta is returned"""
     res = np.arange(4)
-    mu = Beta(res)
-    ex = Means(mu)
+    mu = complex_to_real_displacements(res)
+    ex = real_to_complex_displacements(mu)
     assert np.allclose(res, ex)
 
 
@@ -205,7 +200,7 @@ def test_prefactor_vacuum():
     Q = np.identity(2)
     beta = np.zeros([2])
 
-    res = prefactor(Means(beta), Covmat(Q))
+    res = _prefactor(real_to_complex_displacements(beta), Covmat(Q))
     ex = 1
     assert np.allclose(res, ex)
 
@@ -218,7 +213,7 @@ def test_prefactor_TMS():
 
     beta = np.zeros([4])
 
-    res = prefactor(Means(beta), Covmat(Q))
+    res = _prefactor(real_to_complex_displacements(beta), Covmat(Q))
     ex = 0.5
     assert np.allclose(res, ex)
 
@@ -233,7 +228,7 @@ def test_prefactor_with_displacement():
     vect = 1.2 * np.ones([2]) + 1j * np.ones(2)
     beta = np.concatenate([vect, vect.conj()])
 
-    res = prefactor(Means(beta), Covmat(Q), hbar=2)
+    res = _prefactor(real_to_complex_displacements(beta), Covmat(Q), hbar=2)
     ex = np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
     assert np.allclose(res, ex)
 
@@ -245,18 +240,18 @@ def test_density_matrix_element_vacuum():
 
     el = [[0], [0]]
     ex = 1
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
     assert np.allclose(ex, res)
 
     el = [[1], [1]]
     #    res = density_matrix_element(beta, A, Q, el[0], el[1])
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
 
     assert np.allclose(0, res)
 
     el = [[1], [0]]
     #    res = density_matrix_element(beta, A, Q, el[0], el[1])
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
 
     assert np.allclose(0, res)
 
@@ -287,12 +282,12 @@ mu = np.array([0.04948628, -0.55738964, 0.71298259, 0.17728629, -0.14381673, 0.3
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_disp(t):
     """Test density matrix elements for a state with displacement"""
-    beta = Beta(mu)
+    beta = complex_to_real_displacements(mu)
     Q = Qmat(V)
 
     el = t[0]
     ex = t[1]
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
     assert np.allclose(ex, res)
 
 
@@ -307,12 +302,12 @@ t4 = [[0, 2, 0], [0, 2, 3]], 0
 @pytest.mark.parametrize("t", [t0, t1, t2, t3, t4])
 def test_density_matrix_element_no_disp(t):
     """Test density matrix elements for a state with no displacement"""
-    beta = Beta(np.zeros([6]))
+    beta = complex_to_real_displacements(np.zeros([6]))
     Q = Qmat(V)
 
     el = t[0]
     ex = t[1]
-    res = density_matrix_element(Means(beta), Covmat(Q), el[0], el[1])
+    res = density_matrix_element(real_to_complex_displacements(beta), Covmat(Q), el[0], el[1])
     assert np.allclose(ex, res)
 
 
@@ -338,7 +333,7 @@ def test_density_matrix_squeezed():
 
     res = density_matrix(mu, V)
 
-    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
+    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248],])
 
     assert np.allclose(res, expected)
 
@@ -373,7 +368,7 @@ def test_density_matrix_squeezed_postselect():
 
     res = density_matrix(mu, V, post_select={0: 0}, cutoff=15, normalize=True)[:5, :5]
 
-    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248]])
+    expected = np.array([[0.91417429, 0, -0.26200733, 0, 0.09196943], [0, 0, 0, 0, 0], [-0.26200733, 0, 0.07509273, 0, -0.02635894], [0, 0, 0, 0, 0], [0.09196943, 0, -0.02635894, 0, 0.00925248],])
 
     assert np.allclose(res, expected)
 
@@ -398,23 +393,63 @@ def test_density_matrix_displaced_squeezed_postselect():
     assert np.allclose(res, expected)
 
 
-def test_find_scaling_adjacency_matrix():
+def test_adj_scaling():
     """Test the find_scaling_adjacency matrix for a the one mode case"""
     r = 0.75 + 0.9j
     rabs = np.abs(r)
     n_mean = 10.0
     A = r * np.identity(1)
     sc_exact = np.sqrt(n_mean / (1.0 + n_mean)) / rabs
-    sc_num = find_scaling_adjacency_matrix(A, n_mean)
+    sc_num = adj_scaling(A, n_mean)
     assert np.allclose(sc_exact, sc_num)
 
+
+def test_adj_scaling_torontonian():
+    """Test the adj_scaling_torontonian for a multimode problem"""
+    n = 10
+    A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    A += A.T
+    nc = 3.0
+    x = adj_scaling_torontonian(A, nc)
+    assert np.allclose(_mean_clicks_adj(x * A), nc)
+
+def test_mean_clicks_adj():
+    """Test that a two mode squeezed vacuum with parameter r has mean number of clicks equal to 2*tanh(r)"""
+    r = 3.0
+    tr = np.tanh(r)
+    A = np.array([[0, tr], [tr, 0]])
+    value = _mean_clicks_adj(A)
+    expected = 2 * tr**2
+    assert np.allclose(expected, value)
+
+@pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
+@pytest.mark.parametrize("theta", [0, 1, 2, 3])
+@pytest.mark.parametrize("r", [0, 1, 2, 3])
+def test_variance_clicks(r, theta, hbar):
+    """Test one gets the correct variance of the number of clicks"""
+    r = np.arcsinh(1)
+    V = two_mode_squeezing(2 * r, theta) * hbar / 2
+    var = variance_clicks(V, hbar=hbar)
+    expected = (4 * np.tanh(r) ** 2) * (1 - np.tanh(r) ** 2)
+    assert np.allclose(var, expected)
+
+@pytest.mark.parametrize("hbar", [1.0 / 137, 1, 2, 0.5])
+@pytest.mark.parametrize("theta", [0, 1, 2, 3])
+@pytest.mark.parametrize("r", [0, 1, 2, 3])
+def test_mean_clicks(r, theta, hbar):
+    """Test one gets the correct mean of the number of clicks"""
+    r = np.arcsinh(1)
+    V = two_mode_squeezing(2 * r, theta) * hbar / 2
+    mean = mean_clicks(V, hbar=hbar)
+    expected = 2 * np.tanh(r) ** 2
+    assert np.allclose(mean, expected)
 
 def test_Covmat():
     """ Test the Covmat function by checking that its inverse function is Qmat """
     n = 1
     B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     B = B + B.T
-    sc = find_scaling_adjacency_matrix(B, 1)
+    sc = adj_scaling(B, 1)
     idm = np.identity(2 * n)
     X = Xmat(n)
     Bsc = sc * B
@@ -425,11 +460,11 @@ def test_Covmat():
     assert np.allclose(Q, Qrec)
 
 
-def test_gen_Qmat_from_graph():
-    """ Test the gen_Qmat_from_graph for the analytically solvable case of a single mode"""
+def test_adj_to_qmat():
+    """ Test the adj_to_qmat for the analytically solvable case of a single mode"""
     A = np.array([[10.0]])
     n_mean = 1.0
-    cov = Covmat(gen_Qmat_from_graph(A, n_mean))
+    cov = Covmat(adj_to_qmat(A, n_mean))
     r = np.arcsinh(np.sqrt(n_mean))
     cov_e = np.diag([(np.exp(2 * r)), (np.exp(-2 * r))])
     assert np.allclose(cov, cov_e)
@@ -530,7 +565,7 @@ def test_pure_state_amplitude_coherent(i):
     """ Tests pure state amplitude for a coherent state """
     cov = np.identity(2)
     mu = np.array([1.0, 2.0])
-    beta = Beta(mu)
+    beta = complex_to_real_displacements(mu)
     alpha = beta[0]
     exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))
     num = pure_state_amplitude(mu, cov, [i])
@@ -593,7 +628,7 @@ def test_state_vector_coherent():
     cutoff = 5
     cov = np.identity(2)
     mu = np.array([1.0, 2.0])
-    beta = Beta(mu)
+    beta = complex_to_real_displacements(mu)
     alpha = beta[0]
     exact = np.array([(np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))) for i in range(cutoff)])
     num = state_vector(mu, cov, cutoff=cutoff)
@@ -634,15 +669,15 @@ def test_is_classical_cov_thermal(nbar):
 
 
 @pytest.mark.parametrize("cutoff", [50, 51, 52, 53])
-def test_total_photon_num_dist_pure_state(cutoff):
+def test_pure_state_distribution(cutoff):
     """ Test the correct photon number distribution is obtained for n modes
     with nmean number of photons up to Fock cutoff nmax"""
     n = 3
     nmean = 1.0
     rs = np.arcsinh(np.sqrt(nmean)) * np.ones([n])
     cov = np.diag(np.concatenate([np.exp(2 * rs), np.exp(-2 * rs)]))
-    p1 = total_photon_num_dist_pure_state(cov, cutoff=cutoff)
-    p2 = gen_single_mode_dist(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
+    p1 = pure_state_distribution(cov, cutoff=cutoff)
+    p2 = _squeezed_state_distribution(np.arcsinh(np.sqrt(nmean)), N=n, cutoff=cutoff)
     assert np.allclose(p1, p2)
 
 
@@ -682,11 +717,11 @@ def test_single_mode_displacement(choi_r, tol):
     # np.array(displace(40,alpha).data.todense())[0:5,0:5]
     expected = np.array(
         [
-            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j],
-            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j],
-            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j],
-            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j],
-            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j],
+            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j,],
+            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j,],
+            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j,],
+            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j,],
+            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j,],
         ]
     )
     T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
@@ -833,3 +868,494 @@ def test_sf_ordering_in_fock_tensor(tol):
     T = fock_tensor(S, alphas, cutoff)
     Tsf = fock_tensor(S, alphas, cutoff, sf_order=True)
     assert np.allclose(T.transpose([0, 2, 1, 3]), Tsf, atol=tol, rtol=0)
+
+
+LIST_FUNCS = [np.zeros, np.ones, np.arange]
+
+@pytest.mark.parametrize("list_func", LIST_FUNCS)
+@pytest.mark.parametrize("N", [1, 2, 4])
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_coherent_state(tol, list_func, N, hbar):
+    r"""Test the photon number mean and covariance of coherent states"""
+    cov = np.eye(2 * N) * hbar / 2
+    mu = list_func(2 * N)
+
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+    alpha = (mu[:N] ** 2 + mu[N:] ** 2) / (2 * hbar)
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
+    assert np.allclose(pnd_cov, np.diag(alpha), atol=tol, rtol=0)
+    assert np.allclose(pnd_mean, alpha, atol=tol, rtol=0)
+
+
+
+@pytest.mark.parametrize("r", np.linspace(0, 2, 4))
+@pytest.mark.parametrize("phi", np.linspace(0, np.pi, 4))
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_two_mode_squeeze_vacuum(tol, r, phi, hbar):
+    """Test the photon number mean and covariance of the two-mode squeezed vacuum"""
+    S = two_mode_squeezing(r, phi)
+    mu = np.zeros(4)
+
+    cov = hbar / 2 * (S @ S.T)
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+    n = np.sinh(r) ** 2
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
+    assert np.allclose(pnd_cov, np.full((2, 2), n ** 2 + n), atol=tol, rtol=0)
+    assert np.allclose(pnd_mean, np.array([n, n]), atol=tol, rtol=0)
+
+@pytest.mark.parametrize("n", np.linspace(0, 10, 4))
+@pytest.mark.parametrize("N", [1, 2, 4])
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_thermal(tol, n, N, hbar):
+    """Test the photon number mean and covariance of thermal states"""
+    cov = (2 * n + 1) * np.eye(2 * N) * hbar / 2
+    mu = np.zeros(2 * N)
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+    pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
+    assert np.allclose(pnd_cov, np.diag([n ** 2 + n] * N), atol=tol, rtol=0)
+    mean_expected = n * np.ones([N])
+    assert np.allclose(pnd_mean, mean_expected, atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("r", np.linspace(0, 2, 4))
+@pytest.mark.parametrize("phi", np.linspace(0, np.pi, 4))
+@pytest.mark.parametrize("alpha", [0, 1.0, 1j, 1.0 + 1j])
+@pytest.mark.parametrize("hbar", [1, 2])
+def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
+    """Test the photon number number mean and covariance of the squeezed displaced state
+
+    Eq. (17) in 'Benchmarking of Gaussian boson sampling using two-point correlators',
+    Phillips et al. (https://ris.utwente.nl/ws/files/122721825/PhysRevA.99.023836.pdf).
+    """
+    S = squeezing(r, phi)
+    mu = [np.sqrt(2 * hbar) * np.real(alpha), np.sqrt(2 * hbar) * np.imag(alpha)]
+
+    cov = hbar / 2 * (S @ S.T)
+    pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
+
+    pnd_cov_analytic = np.sinh(r) ** 2 * np.cosh(r) ** 2 + np.sinh(r) ** 4 \
+        + np.sinh(r) ** 2 + np.abs(alpha) ** 2 * (1 + 2 * np.sinh(r) ** 2) \
+        - 2 * np.real(alpha ** 2 * np.exp(-1j * phi) * np.sinh(r) * np.cosh(r))
+
+    mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
+    assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
+    assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic, atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+@pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypatch):
+    """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
+    cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
+    cov2 = hbar * cov2 @ cov2.T / 2.0
+    mean2 = np.zeros([4])
+    eta2 = [etas, etai]
+    cov2l = np.copy(cov2)
+
+    for i, eta in enumerate(eta2):
+        mean2, cov2l = loss(mean2, cov2l, eta, i, hbar=hbar)
+
+    cutoff = 6
+    probs = probabilities(mean2, cov2l, cutoff, parallel=parallel, hbar=hbar)
+    probs_lossless = probabilities(mean2, cov2, 3 * cutoff, parallel=parallel, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(eta2, probs_lossless)
+
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
+
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+@pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_loss_coherent_states(etas, etai, parallel, hbar, monkeypatch):
+    """Checks probabilities are updated correctly for coherent states"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
+    n_modes = 2
+    cov = hbar * np.identity(2 * n_modes) / 2
+    eta_vals = [etas, etai]
+    means = 2 * np.random.rand(2 * n_modes)
+    means_lossy = np.sqrt(np.array(eta_vals + eta_vals)) * means
+    cutoff = 6
+    probs_lossless = probabilities(means, cov, 10 * cutoff, parallel=parallel, hbar=hbar)
+
+    probs = probabilities(means_lossy, cov, cutoff, parallel=parallel, hbar=hbar)
+    probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
+
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
+
+
+@pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
+def test_loss_is_stochastic_matrix(eta):
+    """Test the loss matrix is an stochastic matrix, implying that the sum
+    of the entries a long the rows is 1"""
+    n = 50
+    M = loss_mat(eta, n)
+    assert np.allclose(np.sum(M, axis=1), np.ones([n]))
+
+
+@pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
+def test_loss_is_nonnegative_matrix(eta):
+    """Test the loss matrix is a nonnegative matrix"""
+    n = 50
+    M = loss_mat(eta, n)
+    assert np.alltrue(M >= 0.0)
+
+
+@pytest.mark.parametrize("eta", [-1.0, 2.0])
+def test_loss_value_error(eta):
+    """Tests the correct error is raised"""
+    n = 50
+    with pytest.raises(
+        ValueError, match="The transmission parameter eta should be a number between 0 and 1."
+    ):
+        loss_mat(eta, n)
+
+
+@pytest.mark.parametrize("num_modes", [1, 2, 3])
+@pytest.mark.parametrize("parallel", [True, False])
+def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
+    """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
+
+    if parallel: # set single-thread use in OpenMP
+        monkeypatch.setenv("OMP_NUM_THREADS", "1")
+
+    cutoff = 15
+    nbar_vals = np.random.rand(num_modes)
+    noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
+    hbar = 2
+    beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means = real_to_complex_displacements(np.concatenate((beta, beta.conj())), hbar=hbar)
+    cov = hbar * np.identity(2 * num_modes) / 2
+    cutoff = 10
+
+    probs = probabilities(means, cov, cutoff, parallel=parallel, hbar=2)
+    updated_probs = update_probabilities_with_noise(noise_dists, probs)
+    beta_expected = np.sqrt(nbar_vals + np.abs(beta) ** 2)
+    means_expected = real_to_complex_displacements(
+        np.concatenate((beta_expected, beta_expected.conj())), hbar=hbar
+    )
+    expected = probabilities(means_expected, cov, cutoff, parallel=parallel, hbar=2)
+    assert np.allclose(updated_probs, expected)
+
+
+def test_update_with_noise_coherent_value_error():
+    """Tests the correct error is raised"""
+    cutoff = 15
+    num_modes = 3
+    nbar_vals = np.random.rand(num_modes - 1)
+    noise_dists = np.array([poisson.pmf(np.arange(cutoff), nbar) for nbar in nbar_vals])
+    hbar = 2
+    beta = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means = real_to_complex_displacements(np.concatenate((beta, beta.conj())), hbar=hbar)
+    cov = hbar * np.identity(2 * num_modes) / 2
+    cutoff = 10
+    probs = probabilities(means, cov, cutoff, hbar=2)
+    with pytest.raises(
+        ValueError,
+        match="The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions.",
+    ):
+        update_probabilities_with_noise(noise_dists, probs)
+
+
+@pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_with_self(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity of two identical quantum states is 1"""
+    cov = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means = np.random.rand(2 * num_modes)
+    assert np.allclose(fidelity(means, cov, means, cov, hbar=hbar), 1, atol=1e-4)
+
+
+@pytest.mark.parametrize("hbar", [1 / 2, 1, 2, 1.6])
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("pure", [True, False])
+@pytest.mark.parametrize("block_diag", [True, False])
+def test_fidelity_is_symmetric(num_modes, hbar, pure, block_diag):
+    """Test that the fidelity is symmetric and between 0 and 1"""
+    cov1 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means1 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
+    cov2 = random_covariance(num_modes, hbar=hbar, pure=pure, block_diag=block_diag)
+    means2 = np.sqrt(2 * hbar) * np.random.rand(2 * num_modes)
+    f12 = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    f21 = fidelity(means2, cov2, means1, cov1, hbar=hbar)
+    assert np.allclose(f12, f21)
+    assert 0 <= np.real_if_close(f12) < 1.0
+
+
+@pytest.mark.parametrize("num_modes", np.arange(5, 10))
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_fidelity_coherent_state(num_modes, hbar):
+    """Test the fidelity of two multimode coherent states"""
+    beta1 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    beta2 = np.random.rand(num_modes) + 1j * np.random.rand(num_modes)
+    means1 = real_to_complex_displacements(np.concatenate([beta1, beta1.conj()]), hbar=hbar)
+    means2 = real_to_complex_displacements(np.concatenate([beta2, beta2.conj()]), hbar=hbar)
+    cov1 = hbar * np.identity(2 * num_modes) / 2
+    cov2 = hbar * np.identity(2 * num_modes) / 2
+    fid = fidelity(means1, cov1, means2, cov2, hbar=hbar)
+    expected = np.exp(-np.linalg.norm(beta1 - beta2) ** 2)
+    assert np.allclose(expected, fid)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", [-2, 0, 2])
+@pytest.mark.parametrize("alpha", np.random.rand(10) + 1j * np.random.rand(10))
+def test_fidelity_vac_to_displaced_squeezed(r, alpha, hbar):
+    """Calculates the fidelity between a coherent squeezed state and vacuum"""
+    cov1 = np.diag([np.exp(2 * r), np.exp(-2 * r)]) * hbar / 2
+    means1 = real_to_complex_displacements(np.array([alpha, np.conj(alpha)]), hbar=hbar)
+    means2 = np.zeros([2])
+    cov2 = np.identity(2) * hbar / 2
+    expected = (
+        np.exp(-np.abs(alpha) ** 2)
+        * np.abs(np.exp(np.tanh(r) * np.conj(alpha) ** 2))
+        / np.cosh(r)
+    )
+    assert np.allclose(expected, fidelity(means1, cov1, means2, cov2, hbar=hbar))
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r1", np.random.rand(3))
+@pytest.mark.parametrize("r2", np.random.rand(3))
+def test_fidelity_squeezed_vacuum(r1, r2, hbar):
+    """Tests fidelity between two squeezed states"""
+    cov1 = np.diag([np.exp(2 * r1), np.exp(-2 * r1)]) * hbar / 2
+    cov2 = np.diag([np.exp(2 * r2), np.exp(-2 * r2)]) * hbar / 2
+    mu = np.zeros([2])
+    assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, cov1, mu, cov2, hbar=hbar))
+
+
+def test_fidelity_wrong_shape():
+    """Tests the correct error is raised"""
+    cov1 = np.identity(2)
+    cov2 = np.identity(4)
+    mu = np.zeros(2)
+    with pytest.raises(
+        ValueError, match="The inputs have incompatible shapes"
+    ):
+        fidelity(mu, cov1, mu, cov2)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("alpha", np.random.rand(3, 10) + 1j * np.random.rand(3, 10))
+def test_expectation_normal_ordered_coherent(alpha, hbar):
+    """Test the correct evaluation of the normal ordered expectation value for a product of coherent states"""
+    beta = np.concatenate([alpha, np.conj(alpha)])
+    means = real_to_complex_displacements(beta, hbar=hbar)
+    cov = np.identity(len(beta)) * hbar / 2
+    pattern = np.random.randint(low=0, high=3, size=len(beta))
+    result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+    np.allclose(result, np.prod(np.conj(beta) ** pattern))
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_single_mode_squeezed(r, phi, hbar):
+    """Tests the correct results are obtained for a single mode squeezed state"""
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([2])
+
+    patterns = [
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [1, 0],
+        [0, 2],
+        [2, 0],
+        [0, 4],
+        [4, 0],
+        [2, 2],
+        [3, 1],
+        [1, 3],
+    ]
+
+    adxa = np.sinh(r) ** 2
+    a = 0
+    a2 = -0.5 * np.exp(1j * phi) * np.sinh(2 * r)
+    a4 = 3 * np.exp(2j * phi) * (0.5 * np.sinh(2 * r)) ** 2
+    ad2xa2 = (np.cosh(r) ** 2 + 2 * np.sinh(r) ** 2) * np.sinh(r) ** 2
+    ad3xa = -3 * np.exp(-1j * phi) * np.cosh(r) * np.sinh(r) ** 3
+
+    expected = [
+        1,
+        adxa,
+        a,
+        np.conj(a),
+        a2,
+        np.conj(a2),
+        a4,
+        np.conj(a4),
+        ad2xa2,
+        ad3xa,
+        np.conj(ad3xa),
+    ]
+
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)
+
+
+@pytest.mark.parametrize("r", np.random.rand(4))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
+@pytest.mark.parametrize("x", np.random.rand(4) - 0.5)
+@pytest.mark.parametrize("y", np.random.rand(4) - 0.5)
+def test_single_mode_displaced_squeezed(r, phi, x, y):
+    """Tests the correct results are obtained for a single mode displaced squeezed state"""
+    hbar = 2
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    beta = np.array([x + 1j * y, x - 1j * y])
+    alpha = beta[0]
+    means = real_to_complex_displacements(beta, hbar=hbar)
+    a = alpha
+    adxa = np.abs(alpha) ** 2 + np.sinh(r) ** 2
+    a2 = alpha ** 2 - np.exp(1j * phi) * 0.5 * np.sinh(2 * r)
+    patterns = [[0, 0], [1, 1], [0, 1], [1, 0], [0, 2], [2, 0]]
+    expected = [1, adxa, a, np.conj(a), a2, np.conj(a2)]
+
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)
+
+
+@pytest.mark.parametrize("r", np.random.rand(4))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(4))
+def test_expt_two_mode_squeezed(r, phi):
+    """Tests that the correct results are obtained for a state created by two-mode squeezing"""
+
+    hbar = 2
+    S = two_mode_squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([4])
+    a = 0
+    a2 = 0.5 * np.exp(1j * phi) * np.sinh(2 * r)
+    adxa = np.sinh(r) ** 2
+    adxbdxab = np.cosh(2 * r) * np.sinh(r) ** 2
+    ad2bd2 = 0.5 * np.exp(-2j * phi) * (np.sinh(2 * r)) ** 2
+    patterns = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+        [1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 1],
+        [1, 1, 0, 0],
+        [1, 1, 1, 1],
+        [2, 2, 0, 0],
+        [0, 0, 2, 2],
+    ]
+    expected = [1, a, np.conj(a), adxa, adxa, a2, np.conj(a2), adxbdxab, ad2bd2, np.conj(ad2bd2)]
+    for pattern, value in zip(patterns, expected):
+        result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
+        assert np.allclose(result, value)
+
+@pytest.mark.parametrize("alpha", np.random.rand(3, 4) + 1j * np.random.rand(3, 4))
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_photon_number_expectation_displaced(alpha, hbar):
+    """Tests the correct photon number expectation for coherent states"""
+    beta = np.concatenate([alpha, np.conj(alpha)])
+    means = real_to_complex_displacements(beta, hbar=hbar)
+    cov = np.identity(len(beta)) * hbar / 2
+    val = photon_number_expectation(
+        means, cov, modes=list(range(len(alpha))), hbar=hbar
+    )
+    expected = np.prod(np.abs(alpha) ** 2)
+    assert np.allclose(val, expected)
+    val = photon_number_squared_expectation(
+        means, cov, modes=list(range(len(alpha))), hbar=hbar
+    )
+    expected = np.prod(np.abs(alpha) ** 4 + np.abs(alpha) ** 2)
+    assert np.allclose(val, expected)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_photon_number_expectation_squeezed(r, phi, hbar):
+    """Tests the correct photon number expectation of a single mode squeezed state"""
+
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([2])
+    val = photon_number_expectation(means, cov, modes=[0], hbar=hbar)
+    expected = np.sinh(r) ** 2
+    assert np.allclose(val, expected)
+    val = photon_number_squared_expectation(means, cov, modes=[0], hbar=hbar)
+    expected = np.sinh(r) ** 2 * 0.5 * (1 + 3 * np.cosh(2 * r))
+    assert np.allclose(val, expected)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("r", np.random.rand(5))
+@pytest.mark.parametrize("phi", 2 * np.pi * np.random.rand(5))
+def test_photon_number_expectation_two_mode_squeezed(r, phi, hbar):
+    """Tests the correct photon number expectation of a two-mode squeezed state"""
+
+    S = two_mode_squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    means = np.zeros([4])
+
+    mode_list = [[0], [1], [0, 1]]
+    na = np.sinh(r) ** 2
+    nanb = np.cosh(2 * r) * np.sinh(r) ** 2
+    expected_vals = [na, na, nanb]
+
+    for modes, expected in zip(mode_list, expected_vals):
+        val = photon_number_expectation(means, cov, modes=modes, hbar=hbar)
+        assert np.allclose(val, expected)
+
+    mode_list = [[0], [1], [0, 1]]
+    na2nb2 = 0.25 * (np.cosh(2 * r) + 3 * np.cosh(6 * r)) * np.sinh(r) ** 2
+    expected_vals = [nanb, nanb, na2nb2]
+
+    for modes, expected in zip(mode_list, expected_vals):
+        val = photon_number_squared_expectation(means, cov, modes=modes, hbar=hbar)
+        assert np.allclose(val, expected)
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_find_classical_susbsytem_tmsq(hbar):
+    """Test that for a system of 2*n squeezed vacua the first n are in a classical state"""
+    n = 10
+    nmodes = 2 * n
+    S = np.identity(2 * nmodes)
+    for i in range(n):
+        S = expand(two_mode_squeezing(1.0, 0), [i, i + n], nmodes) @ S
+    cov = S @ S.T * hbar / 2
+    k = find_classical_subsystem(cov, hbar=hbar)
+    assert k == n
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_find_classical_subsystem_product_sq(hbar):
+    """Tests that for a product state of squeezed vacua the classical system size is 0"""
+    nmodes = 10
+    r = 1
+    vals = np.ones([nmodes]) * hbar / 2
+    cov = np.diag(np.concatenate([np.exp(2 * r) * vals, vals * np.exp(-2 * r)]))
+    k = find_classical_subsystem(cov, hbar=hbar)
+    assert k == 0
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
+def test_find_classical_subsystem_thermal(hbar):
+    """Tests that for a multimode thermal state the whole system is classical"""
+    nmodes = 20
+    diags = (2 * np.random.rand(nmodes) + 1) * hbar / 2
+    cov = np.diag(np.concatenate([diags, diags]))
+    O = interferometer(random_interferometer(nmodes))
+    cov = O @ cov @ O.T
+    k = find_classical_subsystem(cov, hbar=hbar)
+    assert k == nmodes

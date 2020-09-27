@@ -26,36 +26,38 @@ from thewalrus.samples import (
     hafnian_sample_classical_state,
     torontonian_sample_classical_state,
     seed,
+    photon_number_sampler,
+    generate_hafnian_sample,
+    generate_torontonian_sample,
+    hafnian_sample_graph_rank_one,
 )
-from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element
-
+from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
+from thewalrus.symplectic import two_mode_squeezing
 seed(137)
 
 rel_tol = 3.0
 abs_tol = 1.0e-10
 
 
-def TMS_cov(r, phi):
+def TMS_cov(r, phi, hbar=2):
     """returns the covariance matrix of a TMS state"""
-    cp = np.cos(phi)
-    sp = np.sin(phi)
-    ch = np.cosh(r)
-    sh = np.sinh(r)
 
-    S = np.array(
-        [
-            [ch, cp * sh, 0, sp * sh],
-            [cp * sh, ch, sp * sh, 0],
-            [0, sp * sh, ch, -cp * sh],
-            [sp * sh, 0, -cp * sh, ch],
-        ]
-    )
+    S = two_mode_squeezing(r, phi)
 
-    return S @ S.T
+    return S @ S.T * hbar/2
 
 
 class TestHafnianSampling:
     """Tests for hafnian sampling"""
+
+    @pytest.mark.parametrize("max_photons", [10, 2, 0])
+    def test_hafnian_state_lowmax(self, max_photons):
+        """test sampling never exceeds max photons for hafnian"""
+        m = 0.432
+        phi = 0.546
+        V = TMS_cov(np.arcsinh(m), phi)
+        res = hafnian_sample_state(V, samples=10, max_photons=max_photons)
+        assert np.max(res) <= max_photons
 
     def test_TMS_hafnian_sample_states(self):
         """test sampling from TMS hafnians is correlated"""
@@ -229,7 +231,8 @@ class TestHafnianSampling:
         approx_mean_n = np.sum(samples) / n_samples
         assert np.allclose(mean_n, approx_mean_n, rtol=2e-1)
 
-    def test_single_pm_graphs(self):
+    @pytest.mark.parametrize("parallel", [True, False])
+    def test_single_pm_graphs(self, parallel):
         """Tests that the number of photons is the same for modes i and n-i
         in the special case of a graph with one single perfect matching
         """
@@ -238,9 +241,8 @@ class TestHafnianSampling:
         A = np.eye(n)[::-1]
         n_mean = 2
         nr_samples = 10
-        pool = False
         samples = hafnian_sample_graph(
-            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples, pool=pool
+            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples, parallel=parallel
         )
 
         test_passed = True
@@ -316,6 +318,15 @@ class TestHafnianSampling:
 
 class TestTorontonianSampling:
     """Tests for torontonian sampling"""
+
+    @pytest.mark.parametrize("max_photons", [10, 2, 0])
+    def test_torontonian_state_lowmax(self, max_photons):
+        """test sampling never exceeds max photons for torontonian"""
+        m = 0.432
+        phi = 0.546
+        V = TMS_cov(np.arcsinh(m), phi)
+        res = torontonian_sample_state(V, samples=10, max_photons=max_photons)
+        assert np.max(res) <= max_photons
 
     def test_torontonian_samples_nonnumpy(self):
         """test exception is raised if not a numpy array"""
@@ -415,15 +426,38 @@ class TestTorontonianSampling:
         probs[1] = 1 - probs[0]
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
-    def test_torontonian_sample_graph(self):
+    @pytest.mark.parametrize("parallel", [True, False])
+    def test_torontonian_sample_graph(self, parallel):
         """Test torontonian sampling from a graph"""
-        # Pool does not play nicely with pytest when all the test are run together
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
         n_samples = 1000
         mean_n = 0.5
-        pool = False
-        samples = torontonian_sample_graph(A, mean_n, samples=n_samples, pool=pool)
+        samples = torontonian_sample_graph(A, mean_n, samples=n_samples, parallel=parallel)
         assert np.all(samples[:, 0] == samples[:, 1])
+
+
+def test_photon_number_sampler_two_mode_squeezed():
+    """Test the brute force sampler when one truncates the probability distribution """
+    hbar = 2.0
+    r = np.arcsinh(1.0)
+    cov = TMS_cov(r, 0.0)
+    cutoff = 10
+    probs = probabilities(np.zeros([4]), cov, cutoff, hbar=hbar)
+    samples = np.array(photon_number_sampler(probs, 1000))
+    assert np.allclose(samples[:, 0], samples[:, 1])
+
+
+def test_photon_number_sampler_out_of_bounds():
+    """Test the brute force sampler when one use 'Coo coo ca choo' as the string for out_of_bounds"""
+    hbar = 2.0
+    r = np.arcsinh(np.sqrt(100))
+    cov = TMS_cov(r, 0.0)
+    cutoff = 5
+    probs = probabilities(np.zeros([4]), cov, cutoff, hbar=hbar)
+    samples = photon_number_sampler(probs, 1000, out_of_bounds='Coo coo ca choo')
+    assert 'Coo coo ca choo' in samples
+    numerical_samples = np.array([x for x in samples if x != "Coo coo ca choo"])
+    assert np.allclose(numerical_samples[:, 0], numerical_samples[:, 1])
 
 
 def test_seed():
@@ -440,3 +474,53 @@ def test_seed():
     second_sample_p = hafnian_sample_state(V, n_samples)
     assert np.array_equal(first_sample, first_sample_p)
     assert np.array_equal(second_sample, second_sample_p)
+
+
+def test_out_of_bounds_generate_hafnian_sample():
+    """Check that when the sampled goes beyond max_photons a -1 is returned.
+    """
+    n_samples = 100
+    mean_n = 20
+    r = np.arcsinh(np.sqrt(mean_n))
+    sigma = np.array([[np.exp(2 * r), 0.0], [0.0, np.exp(-2 * r)]])
+
+    cutoff = 10
+    max_photons = 5
+    samples = [generate_hafnian_sample(sigma, cutoff=cutoff, max_photons=max_photons) for i in range(n_samples)]
+    assert -1 in samples
+
+
+def test_out_of_bounds_generate_torontonian_sample():
+    """Check that when the sampled goes beyond max_photons a -1 is returned.
+    """
+    n_samples = 100
+    mean_n = 100
+    r = np.arcsinh(np.sqrt(mean_n))
+    sigma = TMS_cov(r, 0)
+
+    max_photons = 1
+    samples = [generate_torontonian_sample(sigma, max_photons=max_photons) for i in range(n_samples)]
+    assert -1 in samples
+
+
+def test_hafnian_sample_graph_rank_one():
+    """Test correct functioning of hafnian_sample_graph_rank_one"""
+    G = np.random.rand(10) + 1j * np.random.rand(10)
+    n_mean = 2
+    n_samples = 100000
+    samples = hafnian_sample_graph_rank_one(G, n_mean, n_samples)
+    # Check the total mean photon number is correct
+    assert np.allclose(
+        np.mean(samples.sum(axis=1)), n_mean, atol=10 / np.sqrt(n_samples)
+    )
+    # Check the standard deviation of the total mean photon number is correct
+    assert np.allclose(
+        np.std(samples.sum(axis=1)),
+        np.sqrt(2 * n_mean * (1 + n_mean)),
+        atol=10 / np.sqrt(n_samples),
+    )
+    ps = np.abs(G) ** 2
+    ps /= np.sum(ps)
+    mode_means = samples.mean(axis=0)
+    # Check that the mean photon number of each of the modes are correct
+    assert np.allclose(mode_means, n_mean * ps, atol=10 / np.sqrt(n_samples))

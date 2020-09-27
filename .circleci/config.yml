@@ -74,8 +74,8 @@ jobs:
     docker:
       - image: circleci/python:3.6.8-stretch
     environment:
-      CIBW_SKIP: "cp27-* cp34-* *i686"
-      CIBW_BEFORE_BUILD_LINUX: curl -OsL https://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz && tar xzf 3.3.7.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1 && cp -rf Eigen {project}/include && pip install numpy scipy cython
+      CIBW_SKIP: "cp27-* cp34-* cp35-* *i686"
+      CIBW_BEFORE_BUILD_LINUX: curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen --strip-components 1 && cp -rf Eigen {project}/include && pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
       CIBW_TEST_COMMAND: python -m pytest {project}/thewalrus
     steps:
@@ -84,7 +84,7 @@ jobs:
       - run:
           name: Build the Linux wheels.
           command: |
-            pip install --user cibuildwheel==0.10.2
+            pip install --user cibuildwheel==1.1.0
             python -m cibuildwheel --output-dir wheelhouse
       - run:
           name: Upload Linux wheels.
@@ -107,7 +107,8 @@ jobs:
     macos:
       xcode: "10.0.0"
     environment:
-      CIBW_SKIP: "cp27-* cp34-* cp38-* *i686"
+      CIBW_SKIP: "cp27-* cp34-* cp35-* *i686"
+      CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=10.9"
       CIBW_BEFORE_BUILD_MACOS: brew cask uninstall --force oclint && brew install gcc eigen libomp || true; brew install gcc eigen libomp && pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov
       CIBW_TEST_COMMAND: python -m pytest {project}/thewalrus

@@ -14,12 +14,14 @@
 """Tests for The Walrus fock_gradients functions"""
 
 from thewalrus.fock_gradients import (
-    Dgate,
-    BSgate,
-    Sgate,
-    S2gate,
-    Rgate,
-    Kgate,
+    displacement,
+    grad_displacement,
+    squeezing,
+    grad_squeezing,
+    two_mode_squeezing,
+    grad_two_mode_squeezing,
+    beamsplitter,
+    grad_beamsplitter
 )
 import numpy as np
 
@@ -27,104 +29,84 @@ import numpy as np
 # make tests deterministic
 np.random.seed(137)
 
-
-def test_Dgate():
+def test_grad_displacement():
     """Tests the value of the analytic gradient for the Dgate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi / 8
-    _, Dr, Dtheta = Dgate(r, theta, cutoff, grad=True)
+    T = displacement(r, theta, cutoff)
+    Dr, Dtheta = grad_displacement(T, r, theta)
+
     dr = 0.001
     dtheta = 0.001
-    Drp, _, _ = Dgate(r + dr, theta, cutoff, grad=False)
-    Drm, _, _ = Dgate(r - dr, theta, cutoff, grad=False)
-    Dthetap, _, _ = Dgate(r, theta + dtheta, cutoff, grad=False)
-    Dthetam, _, _ = Dgate(r, theta - dtheta, cutoff, grad=False)
+    Drp = displacement(r + dr, theta, cutoff)
+    Drm = displacement(r - dr, theta, cutoff)
+    Dthetap = displacement(r, theta + dtheta, cutoff)
+    Dthetam = displacement(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
-
-def test_Sgate():
+def test_grad_squeezing():
     """Tests the value of the analytic gradient for the Sgate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi / 8
-    _, Dr, Dtheta = Sgate(r, theta, cutoff, grad=True)
+    T = squeezing(r, theta, cutoff)
+    Dr, Dtheta = grad_squeezing(T, r, theta)
+
     dr = 0.001
     dtheta = 0.001
-    Drp, _, _ = Sgate(r + dr, theta, cutoff, grad=False)
-    Drm, _, _ = Sgate(r - dr, theta, cutoff, grad=False)
-    Dthetap, _, _ = Sgate(r, theta + dtheta, cutoff, grad=False)
-    Dthetam, _, _ = Sgate(r, theta - dtheta, cutoff, grad=False)
+    Drp = squeezing((r + dr), theta, cutoff)
+    Drm = squeezing((r - dr), theta, cutoff)
+    Dthetap = squeezing(r, theta + dtheta, cutoff)
+    Dthetam = squeezing(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
 
-def test_S2gate():
+def test_grad_two_mode_squeezing():
     """Tests the value of the analytic gradient for the S2gate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi / 8
-    _, Dr, Dtheta = S2gate(r, theta, cutoff, grad=True)
+    T = two_mode_squeezing(r, theta, cutoff)
+    Dr, Dtheta = grad_two_mode_squeezing(T, r, theta)
     dr = 0.001
     dtheta = 0.001
-    Drp, _, _ = S2gate(r + dr, theta, cutoff, grad=False)
-    Drm, _, _ = S2gate(r - dr, theta, cutoff, grad=False)
-    Dthetap, _, _ = S2gate(r, theta + dtheta, cutoff, grad=False)
-    Dthetam, _, _ = S2gate(r, theta - dtheta, cutoff, grad=False)
+    Drp = two_mode_squeezing(r + dr, theta, cutoff)
+    Drm = two_mode_squeezing(r - dr, theta, cutoff)
+    Dthetap = two_mode_squeezing(r, theta + dtheta, cutoff)
+    Dthetam = two_mode_squeezing(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
-
-def test_BSgate():
-    """Tests the value of the analytic gradient for the BSgate against finite differences"""
+def test_grad_beamspitter():
+    """Tests the value of the analytic gradient for the S2gate against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi / 8
-    _, Dr, Dtheta = BSgate(r, theta, cutoff, grad=True)
+    T = beamsplitter(r, theta, cutoff)
+    Dr, Dtheta = grad_beamsplitter(T, r, theta)
+
     dr = 0.001
     dtheta = 0.001
-    Drp, _, _ = BSgate(r + dr, theta, cutoff, grad=False)
-    Drm, _, _ = BSgate(r - dr, theta, cutoff, grad=False)
-    Dthetap, _, _ = BSgate(r, theta + dtheta, cutoff, grad=False)
-    Dthetam, _, _ = BSgate(r, theta - dtheta, cutoff, grad=False)
+    Drp = beamsplitter(r + dr, theta, cutoff)
+    Drm = beamsplitter(r - dr, theta, cutoff)
+    Dthetap = beamsplitter(r, theta + dtheta, cutoff)
+    Dthetam = beamsplitter(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
 
 
-def test_Rgate():
-    """Tests the value of the analytic gradient for the Rgate against finite differences"""
-    theta = 1.0
-    cutoff = 9
-    _, dR = Rgate(theta, cutoff, grad=True)
-    dtheta = 0.0001
-    Rs, _ = Rgate(theta + dtheta, cutoff)
-    Rm, _ = Rgate(theta - dtheta, cutoff)
-    dRfd = (Rs - Rm) / (2 * dtheta)
-    assert np.allclose(dR, dRfd, atol=1e-5, rtol=0)
-
-
-def test_Kgate():
-    """Tests the value of the analytic gradient for the Kgate against finite differences"""
-    theta = 1.0
-    cutoff = 9
-    _, dR = Kgate(theta, cutoff, grad=True)
-    dtheta = 0.0001
-    Rs, _ = Kgate(theta + dtheta, cutoff)
-    Rm, _ = Kgate(theta - dtheta, cutoff)
-    dRfd = (Rs - Rm) / (2 * dtheta)
-    assert np.allclose(dR, dRfd, atol=5e-4, rtol=0)
-
-
-def test_Dgate_values(tol):
+def test_displacement_values(tol):
     """Tests the correct construction of the single mode displacement operation"""
     cutoff = 5
     alpha = 0.3 + 0.5 * 1j
@@ -139,11 +121,11 @@ def test_Dgate_values(tol):
             [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j,],
         ]
     )
-    T = Dgate(np.abs(alpha), np.angle(alpha), cutoff)[0]
+    T = displacement(np.abs(alpha), np.angle(alpha), cutoff)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-def test_Sgate_values_complex(tol):
+def test_squeezing_values(tol):
     """Tests the correct construction of the single mode squeezing operation"""
     r = 0.5
     theta = 0.7
@@ -159,7 +141,7 @@ def test_Sgate_values_complex(tol):
             [0.02093159 + 0.12135894j, 0.0 + 0.0j, -0.42261153 - 0.35596078j, 0.0 + 0.0j, 0.12407853 + 0.0j,],
         ]
     )
-    T = Sgate(r, theta, cutoff)[0]
+    T = squeezing(r, theta, cutoff)
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
@@ -171,7 +153,7 @@ def test_BS_selection_rules(tol):
     that this selection rule holds.
     """
     cutoff = 4
-    T = BSgate(np.random.rand(), np.random.rand(), cutoff)[0]
+    T = beamsplitter(np.random.rand(), np.random.rand(), cutoff)
     m = np.arange(cutoff).reshape(-1, 1, 1, 1)
     n = np.arange(cutoff).reshape(1, -1, 1, 1)
     k = np.arange(cutoff).reshape(1, 1, -1, 1)
@@ -192,7 +174,7 @@ def test_BS_hong_ou_mandel_interference(tol):
     """
     cutoff = 2
     phi = 2 * np.pi * np.random.rand()
-    T = BSgate(np.pi / 4, phi, cutoff)[0]  # a 50-50 beamsplitter with phase phi
+    T = beamsplitter(np.pi / 4, phi, cutoff)  # a 50-50 beamsplitter with phase phi
     assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
 
 
@@ -206,7 +188,7 @@ def test_S2_selection_rules(tol):
     cutoff = 5
     s = np.arcsinh(1.0)
     phi = np.pi / 6
-    T = S2gate(s, phi, cutoff)[0]
+    T = two_mode_squeezing(s, phi, cutoff)
     m = np.arange(cutoff).reshape(-1, 1, 1, 1)
     n = np.arange(cutoff).reshape(1, -1, 1, 1)
     k = np.arange(cutoff).reshape(1, 1, -1, 1)
@@ -220,7 +202,7 @@ def test_S2_selection_rules(tol):
     assert np.allclose(S, T, atol=tol, rtol=0)
 
 
-def test_BS_values(tol):
+def test_beamsplitter_values(tol):
     r"""Test that the representation of an interferometer in the single
     excitation manifold is precisely the unitary matrix that represents it
     mode in space. This test in particular checks that the BS gate is
@@ -234,7 +216,7 @@ def test_BS_values(tol):
     st = np.sin(theta) * np.exp(1j * phi)
     U = np.array([[ct, -np.conj(st)], [st, ct]])
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
-    T = BSgate(theta, phi, 3)[0]
+    T = beamsplitter(theta, phi, 3)
     U_rec = np.empty([nmodes, nmodes], dtype=complex)
     for i, vec_i in enumerate(vec_list):
         for j, vec_j in enumerate(vec_list):
@@ -242,35 +224,11 @@ def test_BS_values(tol):
     assert np.allclose(U, U_rec, atol=tol, rtol=0)
 
 
-def test_S2gate_values(tol):
+def test_two_mode_squeezing_values(tol):
     """Tests the correct construction of the single mode squeezing operation"""
     r = 0.5
     theta = 0.7
     cutoff = 5
-    T = S2gate(r, theta, cutoff)[0]
+    T = two_mode_squeezing(r, theta, cutoff)
     expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
-
-
-def test_sf_order_BSgate():
-    """Test the correct sf ordering for BSgate"""
-    T = BSgate(1.0, 0.5, 10)[0]
-    Tsf = BSgate(1.0, 0.5, 10, sf_order=True)[0]
-    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
-    T, T1, T2 = BSgate(1.0, 0.5, 10, grad=True)
-    Tsf, Tsf1, Tsf2 = BSgate(1.0, 0.5, 10, grad=True, sf_order=True)
-    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
-    assert np.allclose(T1.transpose((0, 2, 1, 3)), Tsf1)
-    assert np.allclose(T2.transpose((0, 2, 1, 3)), Tsf2)
-
-
-def test_sf_order_S2gate():
-    """Test the correct sf ordering for S2gate"""
-    T = S2gate(1.0, 0.5, 10)[0]
-    Tsf = S2gate(1.0, 0.5, 10, sf_order=True)[0]
-    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
-    T, T1, T2 = S2gate(1.0, 0.5, 10, grad=True)
-    Tsf, Tsf1, Tsf2 = S2gate(1.0, 0.5, 10, grad=True, sf_order=True)
-    assert np.allclose(T.transpose((0, 2, 1, 3)), Tsf)
-    assert np.allclose(T1.transpose((0, 2, 1, 3)), Tsf1)
-    assert np.allclose(T2.transpose((0, 2, 1, 3)), Tsf2)
