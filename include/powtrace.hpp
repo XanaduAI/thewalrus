@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 namespace libwalrus {
 
 // definition of enable_if_t for std=c++11
