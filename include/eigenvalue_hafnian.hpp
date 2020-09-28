@@ -257,7 +257,7 @@ inline T hafnian(std::vector<T> &mat) {
 
 
 /**
- * Returns the loop hafnian of a matrix using the algorithm described in
+* Returns the loop hafnian of a matrix using the algorithm described in
  * *A faster hafnian formula for complex matrices and its benchmarking
  * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
  *
