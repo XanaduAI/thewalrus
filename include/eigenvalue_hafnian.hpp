@@ -228,14 +228,14 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
 
 
 /**
- * Returns the hafnian of a matrix using the algorithm described in
- * *A faster hafnian formula for complex matrices and its benchmarking
- * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
- *
- * @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
- *       row-ordered symmetric matrix.
- * @return hafnian of the input matrix
- */
+* Returns the hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
 template <typename T>
 inline T hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -258,13 +258,13 @@ inline T hafnian(std::vector<T> &mat) {
 
 /**
 * Returns the loop hafnian of a matrix using the algorithm described in
- * *A faster hafnian formula for complex matrices and its benchmarking
- * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
- *
- * @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
- *       row-ordered symmetric matrix.
- * @return hafnian of the input matrix
- */
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
 template <typename T>
 inline T loop_hafnian(std::vector<T> &mat) {
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -297,18 +297,18 @@ inline T loop_hafnian(std::vector<T> &mat) {
 
 
 /**
- * Returns the hafnian of a matrix using the algorithm described in
- * *A faster hafnian formula for complex matrices and its benchmarking
- * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
- *
- * This is a wrapper around the templated function hafnian() for Python
- * integration. It accepts and returns complex double numeric types, and
- * returns sensible values for empty and non-even matrices.
- *
- * @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
- *       row-ordered symmetric matrix.
- * @return hafnian of the input matrix
- */
+* Returns the hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function hafnian() for Python
+* integration. It accepts and returns complex double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
 std::complex<double> hafnian_eigen(std::vector<std::complex<double>> &mat) {
     std::vector<std::complex<double>> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -326,18 +326,18 @@ std::complex<double> hafnian_eigen(std::vector<std::complex<double>> &mat) {
 
 
 /**
- * Returns the hafnian of a matrix using the algorithm described in
- * *A faster hafnian formula for complex matrices and its benchmarking
- * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
- *
- * This is a wrapper around the templated function hafnian() for Python
- * integration. It accepts and returns double numeric types, and
- * returns sensible values for empty and non-even matrices.
- *
- * @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
- *       row-ordered symmetric matrix.
- * @return hafnian of the input matrix
- */
+* Returns the hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function hafnian() for Python
+* integration. It accepts and returns double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return hafnian of the input matrix
+*/
 double hafnian_eigen(std::vector<double> &mat) {
     std::vector<double> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -355,18 +355,18 @@ double hafnian_eigen(std::vector<double> &mat) {
 
 
 /**
- * Returns the loop hafnian of a matrix using the algorithm described in
- * *A faster hafnian formula for complex matrices and its benchmarking
- * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
- *
- * This is a wrapper around the templated function libwalrus::loop_hafnian() for Python
- * integration. It accepts and returns complex double numeric types, and
- * returns sensible values for empty and non-even matrices.
- *
- * @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
- *       row-ordered symmetric matrix.
- * @return loop hafnian of the input matrix
- */
+* Returns the loop hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function libwalrus::loop_hafnian() for Python
+* integration. It accepts and returns complex double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return loop hafnian of the input matrix
+*/
 std::complex<double> loop_hafnian_eigen(std::vector<std::complex<double>> &mat) {
     std::vector<std::complex<double>> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
@@ -394,18 +394,18 @@ std::complex<double> loop_hafnian_eigen(std::vector<std::complex<double>> &mat) 
 
 
 /**
- * Returns the loop hafnian of a matrix using the algorithm described in
- * *A faster hafnian formula for complex matrices and its benchmarking
- * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
- *
- * This is a wrapper around the templated function loop_hafnian() for Python
- * integration. It accepts and returns double numeric types, and
- * returns sensible values for empty and non-even matrices.
- *
- * @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
- *       row-ordered symmetric matrix.
- * @return loop hafnian of the input matrix
- */
+* Returns the loop hafnian of a matrix using the algorithm described in
+* *A faster hafnian formula for complex matrices and its benchmarking
+* on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498>).
+*
+* This is a wrapper around the templated function loop_hafnian() for Python
+* integration. It accepts and returns double numeric types, and
+* returns sensible values for empty and non-even matrices.
+*
+* @param mat a flattened vector of size \f$n^2\f$, representing an \f$n\times n\f$
+*       row-ordered symmetric matrix.
+* @return loop hafnian of the input matrix
+*/
 double loop_hafnian_eigen(std::vector<double> &mat) {
     std::vector<double> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
