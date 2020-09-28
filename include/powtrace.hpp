@@ -163,7 +163,7 @@ inline T hij(const std::vector<T> &H, size_t i, size_t j, size_t size) {
  * @param j column
  * @param size size of matrix
  *
- * @return element of upper triangle of matrix H
+ * @return linear matrix index lowered by 1
  */
 inline size_t mlo(size_t i, size_t j, size_t size) {
   return (i - 1) * size + j - 1;
