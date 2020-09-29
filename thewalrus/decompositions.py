@@ -21,25 +21,6 @@ import numpy as np
 from scipy.linalg import block_diag, sqrtm, schur
 from thewalrus.symplectic import sympmat
 
-@functools.lru_cache()
-def changebasis(n):
-    r"""Change of basis matrix between the two Gaussian representation orderings.
-
-    This is the matrix necessary to transform covariances matrices written
-    in the (x_1,...,x_n,p_1,...,p_n) to the (x_1,p_1,...,x_n,p_n) ordering
-
-    Args:
-        n (int): number of modes
-    Returns:
-        array: :math:`2n\times 2n` matrix
-    """
-    m = np.zeros((2 * n, 2 * n))
-    for i in range(n):
-        m[2 * i, i] = 1
-        m[2 * i + 1, i + n] = 1
-    return m
-
-
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
@@ -90,20 +71,21 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     # In what follows I construct a permutation matrix p  so that the Schur matrix has
     # only positive elements above the diagonal
-    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus I use rotmat to
-    # go to the ordering x_1, ..., x_n, p_1, ... , p_n
+    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus I permute using perm
+    # to go to the ordering x_1, ..., x_n, p_1, ... , p_n
 
     for i in range(n):
         if s1[2 * i, 2 * i + 1] > 0:
             seq.append(I)
         else:
             seq.append(X)
-
+    perm = np.array([2*i for i in range(n)] + [2*i+1 for i in range(n)])
     p = block_diag(*seq)
     Kt = K @ p
+    Ktt = Kt[:,perm]
     s1t = p @ s1 @ p
     dd = np.transpose(rotmat) @ s1t @ rotmat
-    Ktt = Kt @ rotmat
-    Db = np.diag([1 / dd[i, i + n] for i in range(n)] + [1 / dd[i, i + n] for i in range(n)])
+    dd = [1/s1t[2 * i, 2 * i + 1] for i in range(n)]
+    Db = np.diag(dd+dd)
     S = Mm12 @ Ktt @ sqrtm(Db)
     return Db, np.linalg.inv(S).T
