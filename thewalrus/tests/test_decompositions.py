@@ -105,7 +105,7 @@ class TestWilliamsonDecomposition:
         with pytest.raises(ValueError, match="matrix is not positive definite"):
             williamson(A)
 
-    def test_vacuum_state(self, tol, hbar):
+    def test_vacuum_state(self, tol):
         """Test vacuum state"""
         V = np.identity(4)
         Db, S = williamson(V)
