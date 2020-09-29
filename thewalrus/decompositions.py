@@ -15,7 +15,6 @@
 This module implements common shared matrix decompositions that are
 used to perform gate decompositions.
 """
-import functools
 import numpy as np
 
 from scipy.linalg import block_diag, sqrtm, schur
@@ -55,7 +54,6 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     n = n // 2
     omega = sympmat(n)
-    rotmat = changebasis(n)
     vals = np.linalg.eigvalsh(V)
 
     for val in vals:
