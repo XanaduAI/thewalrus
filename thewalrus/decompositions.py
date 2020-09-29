@@ -82,7 +82,6 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     Kt = K @ p
     Ktt = Kt[:,perm]
     s1t = p @ s1 @ p
-    dd = np.transpose(rotmat) @ s1t @ rotmat
     dd = [1/s1t[2 * i, 2 * i + 1] for i in range(n)]
     Db = np.diag(dd+dd)
     S = Mm12 @ Ktt @ sqrtm(Db)
