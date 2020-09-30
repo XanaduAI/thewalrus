@@ -35,7 +35,8 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     Args:
         V (array[float]): positive definite symmetric (real) matrix
-        tol (float): the tolerance used when checking if the matrix is symmetric: :math:`|V-V^T| \leq` tol
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         tuple[array,array]: ``(Db, S)`` where ``Db`` is a diagonal matrix
