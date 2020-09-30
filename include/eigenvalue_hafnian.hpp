@@ -439,7 +439,7 @@ double loop_hafnian_eigen(std::vector<double> &mat) {
  *
  * \endrst
  *
- * This is a wrapper around the templated function `libwalrus::hafnian_recursive` for Python
+ * This is a wrapper around the templated function `libwalrus::loop_hafnian` for Python
  * integration. It accepts and returns complex double numeric types, and
  * returns sensible values for empty and non-even matrices.
  *
@@ -458,13 +458,43 @@ std::complex<double> loop_hafnian_quad(std::vector<std::complex<double>> &mat) {
 
     if (n == 0)
         haf = std::complex<double>(1.0, 0.0);
-    else if (n % 2 != 0)
-        haf = std::complex<double>(0.0, 0.0);
     else
         haf = loop_hafnian(matq);
 
     return static_cast<std::complex<double>>(haf);
 }
 
+/**
+ * \rst
+ *
+ * Returns the loop hafnian of a matrix using the trace algorithm described in
+ * *A faster hafnian formula and its benchmarking in a supercomputer* :cite:`bjorklund2019faster`,
+ *
+ * \endrst
+ *
+ * This is a wrapper around the templated function `libwalrus::loop_hafnian` for Python
+ * integration. It accepts and returns complex double numeric types, and
+ * returns sensible values for empty and non-even matrices.
+ *
+ * In addition, this wrapper function automatically casts all matrices
+ * to type `complex<long double>`, allowing for greater precision than supported
+ * by Python and NumPy.
+ *
+ * @param mat vector representing the flattened matrix
+ * @return the hafnian
+ */
+
+double loop_hafnian_quad(std::vector<double> &mat) {
+    std::vector<long double> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    long double haf;
+
+    if (n == 0)
+        haf = 1.0;
+    else
+        haf = loop_hafnian(matq);
+
+    return static_cast<double>(haf);
+}
 
 }

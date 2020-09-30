@@ -129,7 +129,8 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
 
-    double complex loop_hafnian_quad(vector[double complex] &mat)    
+    double loop_hafnian_quad(vector[double] &mat)
+    double complex loop_hafnian_quad(vector[double complex] &mat)
 
     double hafnian_rpt_quad(vector[double] &mat, vector[int] &nud)
     double complex hafnian_rpt_quad(vector[double complex] &mat, vector[int] &nu)
@@ -354,8 +355,8 @@ def haf_complex(double complex[:, :] A, bint loop=False, bint recursive=True, qu
     # Exposes a c function to python
     if loop:
         if quad:
-            return loop_hafnian_quad(mat) # This function is no yet imported
-        return loop_hafnian(mat) # <--- Where is this one?
+            return loop_hafnian_quad(mat)
+        return loop_hafnian(mat)
 
     if recursive:
         if quad:
@@ -392,6 +393,8 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True, bi
 
     # Exposes a c function to python
     if loop:
+        if quad:
+            return loop_hafnian_quad(mat)
         return loop_hafnian(mat)
 
     if approx:
