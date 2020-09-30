@@ -81,7 +81,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
         comb[0] = 1.0;
 
         for (i = 1; i <= n / 2; i++) {
-            factor = traces[i - 1] / (2.0 * i);
+            factor = traces[i - 1] / static_cast<T>(2.0 * i);
             powfactor = 1.0;
 
             cnt = -cnt;
@@ -171,14 +171,14 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
         comb[0] = 1.0;
 
         for (i = 1; i <= n / 2; i++) {
-            factor = traces[i - 1] / (2.0 * i);
+            factor = traces[i - 1] / static_cast<T> (2.0 * i);
             T tmpn = 0.0;
 
             for (int i = 0; i < sum; i++) {
                 tmpn += C1[i] * D1[i];
             }
 
-            factor += 0.5 * tmpn;
+            factor += static_cast<T> (0.5) * tmpn;
             std::vector<T> tmp_c1(sum, 0.0);
 
             T tmp = 0.0;
@@ -206,7 +206,7 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
             }
 
             for (j = 1; j <= (n / (2 * i)); j++) {
-                powfactor = powfactor * factor / (1.0 * j);
+                powfactor = powfactor * factor / static_cast<T> (1.0 * j);
                 for (k = i * j + 1; k <= n / 2 + 1; k++) {
                     comb[(m + 1) * (1 - cntindex) + k - 1] = comb[(m + 1) * (1 - cntindex) + k - 1] + comb[(m + 1) * cntindex + k - i * j - 1] * powfactor;
                 }
@@ -429,6 +429,72 @@ double loop_hafnian_eigen(std::vector<double> &mat) {
         haf = static_cast<double>(loop_hafnian(matq));
 
     return haf;
+}
+
+/**
+ * \rst
+ *
+ * Returns the loop hafnian of a matrix using the trace algorithm described in
+ * *A faster hafnian formula and its benchmarking in a supercomputer* :cite:`bjorklund2019faster`,
+ *
+ * \endrst
+ *
+ * This is a wrapper around the templated function `libwalrus::loop_hafnian` for Python
+ * integration. It accepts and returns complex double numeric types, and
+ * returns sensible values for empty and non-even matrices.
+ *
+ * In addition, this wrapper function automatically casts all matrices
+ * to type `complex<long double>`, allowing for greater precision than supported
+ * by Python and NumPy.
+ *
+ * @param mat vector representing the flattened matrix
+ * @return the hafnian
+ */
+
+std::complex<double> loop_hafnian_quad(std::vector<std::complex<double>> &mat) {
+    std::vector<std::complex<long double>> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    std::complex<long double> haf;
+
+    if (n == 0)
+        haf = std::complex<double>(1.0, 0.0);
+    else
+        haf = loop_hafnian(matq);
+
+    return static_cast<std::complex<double>>(haf);
+}
+
+/**
+ * \rst
+ *
+ * Returns the loop hafnian of a matrix using the trace algorithm described in
+ * *A faster hafnian formula and its benchmarking in a supercomputer* :cite:`bjorklund2019faster`,
+ *
+ * \endrst
+ *
+ * This is a wrapper around the templated function `libwalrus::loop_hafnian` for Python
+ * integration. It accepts and returns double numeric types, and
+ * returns sensible values for empty and non-even matrices.
+ *
+ * In addition, this wrapper function automatically casts all matrices
+ * to type `long double`, allowing for greater precision than supported
+ * by Python and NumPy.
+ *
+ * @param mat vector representing the flattened matrix
+ * @return the hafnian
+ */
+
+double loop_hafnian_quad(std::vector<double> &mat) {
+    std::vector<long double> matq(mat.begin(), mat.end());
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    long double haf;
+
+    if (n == 0)
+        haf = 1.0;
+    else
+        haf = loop_hafnian(matq);
+
+    return static_cast<double>(haf);
 }
 
 }
