@@ -81,7 +81,7 @@ inline T do_chunk(std::vector<T> &mat, int n, unsigned long long int X, unsigned
         comb[0] = 1.0;
 
         for (i = 1; i <= n / 2; i++) {
-            factor = traces[i - 1] / (2.0 * i);
+            factor = traces[i - 1] / static_cast<T>(2.0 * i);
             powfactor = 1.0;
 
             cnt = -cnt;
@@ -171,14 +171,14 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
         comb[0] = 1.0;
 
         for (i = 1; i <= n / 2; i++) {
-            factor = traces[i - 1] / (2.0 * i);
+            factor = traces[i - 1] / static_cast<T> (2.0 * i);
             T tmpn = 0.0;
 
             for (int i = 0; i < sum; i++) {
                 tmpn += C1[i] * D1[i];
             }
 
-            factor += 0.5 * tmpn;
+            factor += static_cast<T> (0.5) * tmpn;
             std::vector<T> tmp_c1(sum, 0.0);
 
             T tmp = 0.0;
@@ -206,7 +206,7 @@ inline T do_chunk_loops(std::vector<T> &mat, std::vector<T> &C, std::vector<T> &
             }
 
             for (j = 1; j <= (n / (2 * i)); j++) {
-                powfactor = powfactor * factor / (1.0 * j);
+                powfactor = powfactor * factor / static_cast<T> (1.0 * j);
                 for (k = i * j + 1; k <= n / 2 + 1; k++) {
                     comb[(m + 1) * (1 - cntindex) + k - 1] = comb[(m + 1) * (1 - cntindex) + k - 1] + comb[(m + 1) * cntindex + k - i * j - 1] * powfactor;
                 }

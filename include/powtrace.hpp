@@ -290,7 +290,7 @@ std::vector<T> get_reflection_vector(std::vector<T> &matrix, size_t size,
   }
 
   T sigma = norm(matrix_column);
-  if (matrix_column[0] != 0.)
+  if (matrix_column[0] != static_cast<T> (0.))
     sigma *= matrix_column[0] / std::abs(matrix_column[0]);
 
   for (size_t i = 0; i < sizeH; i++) {
@@ -318,7 +318,7 @@ void apply_householder(std::vector<T> &A, std::vector<T> &v, size_t size_A,
   size_t sizeH = v.size();
 
   auto norm_v_sqr = norm_sqr(v);
-  if (norm_v_sqr == 0.)
+  if (norm_v_sqr == static_cast<T>(0.))
     return;
 
   std::vector<T> vHA(size_A - k + 1, 0.);
@@ -330,7 +330,7 @@ void apply_householder(std::vector<T> &A, std::vector<T> &v, size_t size_A,
   }
   for (size_t i = 0; i < sizeH; i++) {
     for (size_t j = 0; j < size_A - k + 1; j++) {
-      A[(k + i) * size_A + k - 1 + j] -= 2. * v[i] * vHA[j] / norm_v_sqr;
+      A[(k + i) * size_A + k - 1 + j] -= static_cast<T>(2.) * v[i] * vHA[j] / norm_v_sqr;
     }
   }
   for (size_t i = 0; i < size_A; i++) {
@@ -340,7 +340,7 @@ void apply_householder(std::vector<T> &A, std::vector<T> &v, size_t size_A,
   }
   for (size_t i = 0; i < size_A; i++) {
     for (size_t j = 0; j < sizeH; j++) {
-      A[(i)*size_A + k + j] -= 2. * Av[i] * conjugate(v[j]) / norm_v_sqr;
+      A[(i)*size_A + k + j] -= static_cast<T>(2.) * Av[i] * conjugate(v[j]) / norm_v_sqr;
     }
   }
 }
