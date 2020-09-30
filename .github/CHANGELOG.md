@@ -8,6 +8,8 @@
 
 ### Improvements
 
+* Introduces a new faster and significantly more accurate algorithm to calculate power traces allowing to speed up the calculation of loop hafnians [#199](https://github.com/XanaduAI/thewalrus/pull/199)
+
 ### Bug fixes
 
 ### Breaking changes
@@ -20,7 +22,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Nicolas Quesada
+Nicolas Quesada, Trevor Vincent
 
 ---
 
