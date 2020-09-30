@@ -473,11 +473,11 @@ std::complex<double> loop_hafnian_quad(std::vector<std::complex<double>> &mat) {
  * \endrst
  *
  * This is a wrapper around the templated function `libwalrus::loop_hafnian` for Python
- * integration. It accepts and returns complex double numeric types, and
+ * integration. It accepts and returns double numeric types, and
  * returns sensible values for empty and non-even matrices.
  *
  * In addition, this wrapper function automatically casts all matrices
- * to type `complex<long double>`, allowing for greater precision than supported
+ * to type `long double`, allowing for greater precision than supported
  * by Python and NumPy.
  *
  * @param mat vector representing the flattened matrix
