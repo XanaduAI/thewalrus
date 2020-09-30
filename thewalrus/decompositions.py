@@ -23,14 +23,6 @@ from thewalrus.symplectic import sympmat
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
-    See :ref:`williamson`.
-
-    Note that it is assumed that the symplectic form is
-
-    .. math:: \Omega = \begin{bmatrix}0&I\\-I&0\end{bmatrix}
-
-    where :math:`I` is the identity matrix and :math:`0` is the zero matrix.
-
     See https://math.stackexchange.com/questions/1171842/finding-the-symplectic-matrix-in-williamsons-theorem/2682630#2682630
 
     Args:
