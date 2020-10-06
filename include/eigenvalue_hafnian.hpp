@@ -18,7 +18,6 @@
  * on the Titan supercomputer*, [arxiv:1805.12498](https://arxiv.org/abs/1805.12498)
  */
 
-// #include <Eigen/Eigenvalues>
 
 #include "stdafx.h"
 #include "powtrace.hpp"
