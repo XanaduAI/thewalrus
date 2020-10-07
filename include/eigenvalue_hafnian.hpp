@@ -370,11 +370,11 @@ std::complex<double> loop_hafnian_eigen(std::vector<std::complex<double>> &mat) 
     std::vector<std::complex<double>> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
     std::complex<double> haf;
-    std::vector<std::complex<double>> matq2((n + 1) * (n + 1), std::complex<double>(0.0, 0.0));
 
     if (n == 0)
         haf = std::complex<double>(1.0, 0.0);
     else if (n % 2 != 0) {
+    	std::vector<std::complex<double>> matq2((n + 1) * (n + 1), std::complex<double>(0.0, 0.0));
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 matq2[i * (n + 1) + j] = matq[i * n + j];
@@ -409,11 +409,11 @@ double loop_hafnian_eigen(std::vector<double> &mat) {
     std::vector<double> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
     double haf;
-    std::vector<double> matq2((n + 1) * (n + 1), 0.0);
 
     if (n == 0)
         haf = 1.0;
     else if (n % 2 != 0) {
+    	std::vector<double> matq2((n + 1) * (n + 1), 0.0);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 matq2[i * (n + 1) + j] = mat[i * n + j];
@@ -457,6 +457,18 @@ std::complex<double> loop_hafnian_quad(std::vector<std::complex<double>> &mat) {
 
     if (n == 0)
         haf = std::complex<double>(1.0, 0.0);
+    else if (n % 2 != 0) {
+    	std::vector<std::complex<long double>> matq2((n + 1) * (n + 1), std::complex<long double>(0.0, 0.0));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matq2[i * (n + 1) + j] = matq[i * n + j];
+            }
+        }
+        matq2[(n + 1) * (n + 1) - 1] = std::complex<long double>(1.0, 0.0);
+
+
+        haf = loop_hafnian(matq2);
+    }
     else
         haf = loop_hafnian(matq);
 
@@ -490,6 +502,18 @@ double loop_hafnian_quad(std::vector<double> &mat) {
 
     if (n == 0)
         haf = 1.0;
+    else if (n % 2 != 0) {
+    	std::vector<long double> matq2((n + 1) * (n + 1), 0.0);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matq2[i * (n + 1) + j] = mat[i * n + j];
+            }
+        }
+        matq2[(n + 1) * (n + 1) - 1] = 1.0;
+
+
+        haf = loop_hafnian(matq2);
+    }
     else
         haf = loop_hafnian(matq);
 
