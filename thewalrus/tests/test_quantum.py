@@ -65,7 +65,7 @@ from thewalrus.quantum import (
 
 
 # make tests deterministic
-np.random.seed(137)
+np.random.seed(138)
 
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -990,7 +990,7 @@ def test_update_with_loss_coherent_states(etas, etai, parallel, hbar, monkeypatc
     probs = probabilities(means_lossy, cov, cutoff, parallel=parallel, hbar=hbar)
     probs_updated = update_probabilities_with_loss(eta_vals, probs_lossless)
 
-    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-4)
+    assert np.allclose(probs, probs_updated[:cutoff, :cutoff], atol=1.0e-5)
 
 
 @pytest.mark.parametrize("eta", [0.1, 0.5, 1.0])
