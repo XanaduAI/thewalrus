@@ -19,6 +19,7 @@ cache:
 matrix:
   fast_finish: false
 
+image: Visual Studio 2017
 
 install:
   - ps: wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip -outfile eigen3.zip

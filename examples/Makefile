@@ -14,7 +14,7 @@
 EIGEN_INCLUDE_DIR?=/usr/include/eigen3
 
 CC=g++
-CFLAGS=-std=c++11 -O3 -Wall -I/usr/include -I../include -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native
+CFLAGS=-std=c++14 -O3 -Wall -I/usr/include -I../include -I$(EIGEN_INCLUDE_DIR) -fopenmp -march=native
 LFLAGS=-L/usr/lib -lm -fopenmp
 
 all: example-cpp
