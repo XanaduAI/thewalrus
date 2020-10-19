@@ -123,7 +123,7 @@ if BUILD_EXT:
                 library_dirs=['/usr/lib', '/usr/local/lib'] + LD_LIBRARY_PATH,
                 libraries=libraries,
                 language="c++",
-                extra_compile_args=["-std=c++14"] + CFLAGS,
+                extra_compile_args=["-std=c++11"] + CFLAGS,
                 extra_link_args=extra_link_args_CPP)
     ], compile_time_env={'_OPENMP': USE_OPENMP, 'LAPACKE': USE_LAPACK})
 else:
