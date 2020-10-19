@@ -26,9 +26,6 @@ from thewalrus.fock_gradients import (
 import numpy as np
 
 
-# make tests deterministic
-np.random.seed(137)
-
 def test_grad_displacement():
     """Tests the value of the analytic gradient for the Dgate against finite differences"""
     cutoff = 4

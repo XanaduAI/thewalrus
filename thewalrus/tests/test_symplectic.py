@@ -21,9 +21,6 @@ from scipy.linalg import block_diag
 from thewalrus import symplectic
 
 
-# make test deterministic
-np.random.seed(137)
-
 # pylint: disable=too-few-public-methods
 class TestVacuum:
     """Tests for the vacuum_state function"""
