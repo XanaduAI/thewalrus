@@ -1,16 +1,24 @@
-# Version 0.14.0-dev
+# Version 0.14.0
 
 ### New features
 
-* Adds the function `find_classical_subsystem` that tries to find a subset of the mode with a classical covariance matrix. [#193](https://github.com/XanaduAI/thewalrus/pull/193)
+* Adds the function `find_classical_subsystem` that tries to find a subset of the modes with a classical covariance matrix. [#193](https://github.com/XanaduAI/thewalrus/pull/193)
 
 * Adds the functions `mean_number_of_clicks` and `variance_number_of_clicks` that calculate the first and second statistical moments of the total number of clicks in a Gaussian state centered at the origin. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
 
 * Adds the module `decompositions` with the function `williamson` to find the Williamson decomposition of an even-size positive-semidefinite matrix. [#200](https://github.com/XanaduAI/thewalrus/pull/200)
 
+* Adds the `loop_hafnian_quad` function to the Python interface for converting double into quad, do the calculations in quad and then return a double. [#201](https://github.com/XanaduAI/thewalrus/pull/201)
+
 ### Improvements
 
 * Introduces a new faster and significantly more accurate algorithm to calculate power traces allowing to speed up the calculation of loop hafnians [#199](https://github.com/XanaduAI/thewalrus/pull/199)
+
+* The `quantum` module has been refactored and organized into sub-modules. Several functions have been renamed, while the old names are being deprecated. [#197](https://github.com/XanaduAI/thewalrus/pull/197)
+
+* Adds support for C++14 [#202](https://github.com/XanaduAI/thewalrus/pull/202)
+
+* `pytest-randomly` is added to the test suite to improve testing and avoid stochastically failing tests. [#205](https://github.com/XanaduAI/thewalrus/pull/205)
 
 ### Bug fixes
 
@@ -24,7 +32,8 @@
 
 This release contains contributions from (in alphabetical order):
 
-Nicolas Quesada, Trevor Vincent
+Theodor Isacsson, Nicolas Quesada, Trevor Vincent
+
 
 ---
 
