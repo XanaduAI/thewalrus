@@ -74,7 +74,7 @@ def reduction(A, rpt):
 
     return A[:, rows][rows]
 
-
+# pylint: disable=too-many-arguments
 def hafnian(
     A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, quad=True, approx=False, num_samples=1000
 ):  # pylint: disable=too-many-arguments
@@ -112,7 +112,7 @@ def hafnian(
         return 0.0
 
     if loop and np.allclose(np.diag(np.diag(A)), A, rtol=rtol, atol=atol):
-    	return np.prod(np.diag(A))
+        return np.prod(np.diag(A))
 
     if matshape[0] % 2 != 0 and loop:
         A = np.pad(A, pad_width=((0, 1), (0, 1)), mode="constant")
