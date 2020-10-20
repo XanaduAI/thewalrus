@@ -7,7 +7,7 @@ environment:
       CIBW_BEFORE_BUILD: pip install numpy scipy cython
       CIBW_SKIP: "cp27-* cp33-* cp34-* cp35-* *win32"
       CIBW_TEST_REQUIRES: "numpy scipy pytest pytest-cov pytest-randomly"
-      CIBW_TEST_COMMAND: "python -m pytest --randomly-seed=41 {project}/thewalrus"
+      CIBW_TEST_COMMAND: "python -m pytest --randomly-seed=137 {project}/thewalrus"
       CIBW_BUILD_VERBOSITY: 3
       WHEELHOUSE_UPLOADER_USERNAME: AKIAJOU6ECM5Q7T6UUQQ
       WHEELHOUSE_UPLOADER_SECRET:

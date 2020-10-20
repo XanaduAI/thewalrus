@@ -3,7 +3,7 @@ COVERAGE3 := $(shell which coverage3 2>/dev/null)
 
 PYTHON := python3
 COVERAGE := --cov=thewalrus --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
-TESTRUNNER := -m pytest --randomly-seed=41 thewalrus
+TESTRUNNER := -m pytest --randomly-seed=137 thewalrus
 
 .PHONY: help
 help:
