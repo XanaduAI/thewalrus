@@ -20,7 +20,6 @@ from scipy.special import factorial2, factorial as fac
 
 from thewalrus import hafnian, haf_real
 
-np.random.seed(137)
 
 @pytest.mark.parametrize("n", [6, 8, 10])
 def test_rank_one(n):
