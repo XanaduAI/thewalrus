@@ -16,6 +16,7 @@
 import pytest
 import numpy as np
 
+np.random.seed(137)
 
 # defaults
 TOL = 1e-3
