@@ -741,6 +741,63 @@ TEST(LoopHafnianEigenComplex, Odd) {
   EXPECT_NEAR(0, std::imag(haf5), tol);
 }
 
+
+// Check loop hafnian with eigenvalues for random complex matrices with even dims
+// using directly the function, i.e., without pre-padding.
+TEST(LoopHafnianComplex, OddNoPadding) {
+  std::vector<std::complex<double>> mat3(9, 0.0);
+
+  std::default_random_engine generator;
+  generator.seed(20);
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j <= i; j++) {
+      double randnum1 = distribution(generator);
+      double randnum2 = distribution(generator);
+      mat3[i * 3 + j] = std::complex<double>(randnum1, randnum2);
+      mat3[j * 3 + i] = mat3[i * 3 + j];
+    }
+  }
+
+  std::complex<double> haf3 = libwalrus::loop_hafnian_eigen(mat3);
+  std::complex<double> hafq3 = libwalrus::loop_hafnian_quad(mat3);
+  std::complex<double> expected3 = mat3[0] * mat3[4] * mat3[8] + mat3[2] * mat3[4] + mat3[1] * mat3[8] + mat3[5] * mat3[0];
+
+  EXPECT_NEAR(std::real(expected3), std::real(haf3), tol);
+  EXPECT_NEAR(std::imag(expected3), std::imag(haf3), tol);
+  EXPECT_NEAR(std::real(expected3), std::real(hafq3), tol);
+  EXPECT_NEAR(std::imag(expected3), std::imag(hafq3), tol);
+}
+
+// Check loop hafnian with eigenvalues for random real matrices with even dims
+// using directly the function, i.e., withour pre-padding.
+
+TEST(LoopHafnianDouble, EvenNoPadding) {
+  std::vector<double> mat3(9, 0.0);
+
+  std::default_random_engine generator;
+  generator.seed(20);
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j <= i; j++) {
+      double randnum1 = distribution(generator);
+      mat3[i * 3 + j] = randnum1;
+      mat3[j * 3 + i] = mat3[i * 3 + j];
+    }
+  }
+
+  double haf3 = libwalrus::loop_hafnian_eigen(mat3);
+  double hafq3 = libwalrus::loop_hafnian_quad(mat3);
+  double expected3 = mat3[0] * mat3[4] * mat3[8] + mat3[2] * mat3[4] + mat3[1] * mat3[8] + mat3[5] * mat3[0];
+
+  EXPECT_NEAR(expected3, haf3, tol);
+  EXPECT_NEAR(expected3, hafq3, tol);
+}
+
+
+
 }  // namespace loophafnian_eigen
 
 namespace loophafnian_repeated {
