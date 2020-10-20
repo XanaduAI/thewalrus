@@ -742,7 +742,7 @@ TEST(LoopHafnianEigenComplex, Odd) {
 }
 
 
-// Check loop hafnian with eigenvalues for random complex matrices with even dims
+// Check loop hafnian with power-traces for random complex matrices with even dims
 // using directly the function, i.e., without pre-padding.
 TEST(LoopHafnianComplex, OddNoPadding) {
   std::vector<std::complex<double>> mat3(9, 0.0);
@@ -770,8 +770,8 @@ TEST(LoopHafnianComplex, OddNoPadding) {
   EXPECT_NEAR(std::imag(expected3), std::imag(hafq3), tol);
 }
 
-// Check loop hafnian with eigenvalues for random real matrices with even dims
-// using directly the function, i.e., withour pre-padding.
+// Check loop hafnian with power-traces for random real matrices with even dims
+// using directly the function, i.e., without pre-padding.
 
 TEST(LoopHafnianDouble, EvenNoPadding) {
   std::vector<double> mat3(9, 0.0);
