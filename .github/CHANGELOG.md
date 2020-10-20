@@ -6,6 +6,8 @@
 
 * Adds the functions `mean_number_of_clicks` and `variance_number_of_clicks` that calculate the first and second statistical moments of the total number of clicks in a Gaussian state centered at the origin. [#195](https://github.com/XanaduAI/thewalrus/pull/195)
 
+* Adds the module `decompositions` with the function `williamson` to find the Williamson decomposition of an even-size positive-semidefinite matrix. [#200](https://github.com/XanaduAI/thewalrus/pull/200)
+
 ### Improvements
 
 * Introduces a new faster and significantly more accurate algorithm to calculate power traces allowing to speed up the calculation of loop hafnians [#199](https://github.com/XanaduAI/thewalrus/pull/199)
