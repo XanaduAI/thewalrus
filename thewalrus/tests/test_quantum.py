@@ -64,10 +64,6 @@ from thewalrus.quantum import (
 )
 
 
-# make tests deterministic
-np.random.seed(138)
-
-
 @pytest.mark.parametrize("n", [0, 1, 2])
 def test_reduced_gaussian(n):
     """test that reduced gaussian returns the correct result"""
