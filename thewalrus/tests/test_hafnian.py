@@ -268,3 +268,12 @@ class TestLoopHafnian:
         haf = hafnian(A, loop=True)
         expected = T[n]
         assert np.allclose(haf, expected)
+
+    @pytest.mark.parametrize("n", [6, 7, 8])
+    def test_diag(self, n):
+        """Check loophafnian of diagonal matrix is product of diagonals"""
+        v = np.random.rand(n)
+        A = np.diag(v)
+        haf = hafnian(A, loop=True)
+        expected = np.prod(v)
+        assert np.allclose(haf, expected)
