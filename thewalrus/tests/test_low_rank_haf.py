@@ -19,8 +19,6 @@ from thewalrus import low_rank_hafnian, hafnian
 from thewalrus._low_rank_haf import partitions
 from scipy.special import binom
 
-np.random.seed(137)
-
 
 @pytest.mark.parametrize("n", [9, 11, 13])
 @pytest.mark.parametrize("r", [1, 2, 3])
