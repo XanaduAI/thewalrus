@@ -19,7 +19,7 @@ import numpy as np
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
 
 
-def input_validation(A, tol=1e-12):
+def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
 
     These include:
@@ -31,8 +31,8 @@ def input_validation(A, tol=1e-12):
 
     Args:
         A (array): a NumPy array.
-        tol (float): the tolerance when checking that the matrix is
-            symmetric. Default tolerance is 1e-12.
+        rtol (float): the relative tolerance parameter used in ``np.allclose``.
+        atol (float): the absolute tolerance parameter used in ``np.allclose``.
 
     Returns:
         bool: returns True if the matrix satisfies all requirements.
@@ -49,7 +49,7 @@ def input_validation(A, tol=1e-12):
     if np.isnan(A).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
-    if np.linalg.norm(A - A.T) >= tol:
+    if not np.allclose(A, A.T, rtol=rtol, atol=atol):
         raise ValueError("Input matrix must be symmetric.")
 
     return True
@@ -76,7 +76,7 @@ def reduction(A, rpt):
 
 
 def hafnian(
-    A, loop=False, recursive=True, tol=1e-12, quad=True, approx=False, num_samples=1000
+    A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, quad=True, approx=False, num_samples=1000
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
 
@@ -89,8 +89,8 @@ def hafnian(
         recursive (bool): If ``True``, the recursive algorithm is used. Note:
             the recursive algorithm does not currently support the loop hafnian.
             If ``loop=True``, then this keyword argument is ignored.
-        tol (float): the tolerance when checking that the matrix is
-            symmetric. Default tolerance is 1e-12.
+        rtol (float): the relative tolerance parameter used in ``np.allclose``.
+        atol (float): the absolute tolerance parameter used in ``np.allclose``.
         quad (bool): If ``True``, the hafnian algorithm is performed with quadruple precision.
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note that
             the approximation algorithm can only be applied to matrices ``A`` that only have non-negative entries.
@@ -101,7 +101,7 @@ def hafnian(
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
     """
     # pylint: disable=too-many-return-statements,too-many-branches
-    input_validation(A, tol=tol)
+    input_validation(A, rtol=rtol, atol=atol)
 
     matshape = A.shape
 
@@ -110,6 +110,9 @@ def hafnian(
 
     if matshape[0] % 2 != 0 and not loop:
         return 0.0
+
+    if loop and np.allclose(np.diag(np.diag(A)), A, rtol=rtol, atol=atol):
+    	return np.prod(np.diag(A))
 
     if matshape[0] % 2 != 0 and loop:
         A = np.pad(A, pad_width=((0, 1), (0, 1)), mode="constant")
@@ -173,7 +176,7 @@ def hafnian(
     )
 
 
-def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
+def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 
     The :func:`reduction` function may be used to show the resulting matrix
@@ -208,14 +211,14 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, tol=1e-12):
         use_eigen (bool): if True (default), the Eigen linear algebra library
             is used for matrix multiplication. If the hafnian library was compiled
             with BLAS/Lapack support, then BLAS will be used for matrix multiplication.
-        tol (float): the tolerance when checking that the matrix is
-            symmetric. Default tolerance is 1e-12.
+        rtol (float): the relative tolerance parameter used in ``np.allclose``.
+        atol (float): the absolute tolerance parameter used in ``np.allclose``.
 
     Returns:
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
     """
     # pylint: disable=too-many-return-statements,too-many-branches
-    input_validation(A, tol=tol)
+    input_validation(A, atol=atol, rtol=rtol)
 
     if len(rpt) != len(A):
         raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")
