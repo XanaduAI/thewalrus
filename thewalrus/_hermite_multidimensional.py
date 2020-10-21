@@ -25,7 +25,7 @@ from .libwalrus import renorm_hermite_multidimensional_real as rhmr
 from ._hafnian import input_validation
 
 # pylint: disable=too-many-arguments
-def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, modified=False):
+def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, modified=False, rtol=1e-05, atol=1e-08):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
     Here :math:`R` is an :math:`n \times n` square matrix, and
@@ -53,12 +53,13 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
         make_tensor (bool): If ``False``, returns a flattened one dimensional array
             containing the values of the polynomial
         modified (bool): whether to return the modified multidimensional Hermite polynomials or the standard ones
-
+        rtol (float): the relative tolerance parameter used in ``np.allclose``
+        atol (float): the absolute tolerance parameter used in ``np.allclose``
     Returns:
         (array): the multidimensional Hermite polynomials
     """
 
-    input_validation(R)
+    input_validation(R, atol=atol, rtol=rtol)
     n, _ = R.shape
 
     if (modified is False) and (y is not None):
@@ -99,7 +100,7 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
 
 
 # pylint: disable=too-many-arguments
-def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=True):
+def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, make_tensor=True):
     r"""Calculates the hafnian of :func:`reduction(A, k) <hafnian.reduction>`
     for all possible values of vector ``k`` below the specified cutoff.
 
@@ -128,11 +129,12 @@ def hafnian_batched(A, cutoff, mu=None, tol=1e-12, renorm=False, make_tensor=Tru
             ``mu`` is not None)
         make_tensor: If ``False``, returns a flattened one dimensional array instead
             of a tensor with the values of the hafnians.
-
+        rtol (float): the relative tolerance parameter used in ``np.allclose``.
+        atol (float): the absolute tolerance parameter used in ``np.allclose``.
     Returns:
         (array): the values of the hafnians for each value of :math:`k` up to the cutoff
     """
-    input_validation(A, tol=tol)
+    input_validation(A, atol=atol, rtol=rtol)
     n, _ = A.shape
 
     if mu is None:
