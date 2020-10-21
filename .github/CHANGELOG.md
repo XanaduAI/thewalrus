@@ -2,6 +2,8 @@
 
 ### New features
 
+* Adds the functions `random_banded_interferometer` to generate unitary matrices with a given bandwidth. [#208](https://github.com/XanaduAI/thewalrus/pull/208)
+
 ### Improvements
 
 ### Bug fixes
