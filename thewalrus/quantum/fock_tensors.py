@@ -25,7 +25,7 @@ import dask
 from scipy.special import factorial as fac
 from numba import jit
 
-from ..symplectic import expand, is_symplectic
+from ..symplectic import expand, is_symplectic, reduced_state
 from ..libwalrus import interferometer, interferometer_real
 
 from .._hafnian import hafnian, hafnian_repeated, reduction
@@ -41,6 +41,7 @@ from .conversions import (
 from .gaussian_checks import (
     is_classical_cov,
     is_pure_cov,
+    is_valid_cov
 )
 
 
@@ -600,3 +601,33 @@ def _prefactor(mu, cov, hbar=2):
     beta = complex_to_real_displacements(mu, hbar=hbar)
     Qinv = np.linalg.inv(Q)
     return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
+
+def tvd_cutoff_bound(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-05, atol=1e-08):
+    r""" Gives a bound of the total variation instance between the exact Gaussian Boson Sampling
+    distribution extending to infinity in Fock space and the one truncated up to a certain cutoff.
+
+    For the derivation see Appendix 2 of `'Exact simulation of Gaussian boson sampling in polynomial space and exponential time',
+    Quesada and Arrazola et al. <10.1103/PhysRevResearch.2.023005>`_.
+
+    Args:
+        mu (array): vector of means of the Gaussian state
+        cov (array): covariance matrix of the Gaussian state
+        cutoff (int): cutoff in Fock space
+        check_is_valid_cov (bool): verify that the covariance matrix is physical
+        hbar (float): value of hbar in the uncertainty relation
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
+
+    Returns:
+        (array): values of the bound for different local Fock space dimensions up to cutoff
+    """
+    if check_is_valid_cov:
+        if not is_valid_cov(cov, hbar=hbar, rtol=rtol, atol=atol):
+            raise ValueError("The input covariance matrix violates the uncertainty relation")
+    nmodes = cov.shape[0] // 2
+    bounds = np.zeros([cutoff])
+    for i in range(nmodes):
+        mu_red, cov_red = reduced_state(mu, cov, [i])
+        ps = np.real_if_close(np.diag(density_matrix(mu_red, cov_red, cutoff=cutoff, hbar=hbar)))
+        bounds += 1 - np.cumsum(ps)
+    return bounds

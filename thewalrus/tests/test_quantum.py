@@ -61,6 +61,7 @@ from thewalrus.quantum import (
     photon_number_squared_expectation,
     variance_clicks,
     mean_clicks,
+    tvd_cutoff_bound
 )
 
 
@@ -1355,3 +1356,16 @@ def test_find_classical_subsystem_thermal(hbar):
     cov = O @ cov @ O.T
     k = find_classical_subsystem(cov, hbar=hbar)
     assert k == nmodes
+
+
+def test_tvd_cutoff_bound():
+    """Test that the cutoff bound is correct when applied to TMSV"""
+    nmean = 1
+    cutoff = 10
+    r = np.arcsinh(np.sqrt(nmean))
+    V = two_mode_squeezing(2 * r, 0)
+    mu = np.zeros([4])
+    probs = 1 / (1 + nmean) * np.array([((nmean) / (1 + nmean)) ** i for i in range(cutoff)])
+    bound = tvd_cutoff_bound(mu, V, cutoff)
+    expected = np.array([2 * (1 - np.sum(probs[: i + 1])) for i in range(cutoff)])
+    assert np.allclose(bound, expected)
