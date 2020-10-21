@@ -1,4 +1,20 @@
-# Version 0.14.0-dev
+# Version 0.15.0-dev
+
+### New features
+
+### Improvements
+
+### Bug fixes
+
+### Breaking changes
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+---
+
+# Version 0.14.0
 
 ### New features
 
@@ -23,8 +39,6 @@
 * Modifies the function `input_validation` to use `np.allclose` for checking the symmetry of the input matrices. [#206](https://github.com/XanaduAI/thewalrus/pull/205)
 
 * Modifies the function `_hafnian` to calculate efficiently loop hafnians of diagonal matrices. [#206](https://github.com/XanaduAI/thewalrus/pull/205)
-
-### Bug fixes
 
 ### Breaking changes
 
