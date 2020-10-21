@@ -140,12 +140,11 @@ def random_block_interferometer(N, top_one=True, real=False):
         u2s = [random_interferometer(2, real=real) for i in range(N // 2)]
         return sp.linalg.block_diag(*u2s)
 
-    else:
-        u2s = [random_interferometer(2, real=real) for i in range((N - 1) // 2)]
-        u0 = random_interferometer(1, real=real)
-        if top_one is True:
-            return sp.linalg.block_diag(u0, *u2s)
-        return sp.linalg.block_diag(*u2s, u0)
+    u2s = [random_interferometer(2, real=real) for i in range((N - 1) // 2)]
+    u0 = random_interferometer(1, real=real)
+    if top_one is True:
+        return sp.linalg.block_diag(u0, *u2s)
+    return sp.linalg.block_diag(*u2s, u0)
 
 def random_banded_interferometer(N, w, top_one_init=True, real=False):
     r"""Generates a banded unitary matrix
