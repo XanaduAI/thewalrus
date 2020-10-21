@@ -14,6 +14,8 @@
 
 This release contains contributions from (in alphabetical order):
 
+Nicolas Quesada
+
 ---
 
 # Version 0.14.0
