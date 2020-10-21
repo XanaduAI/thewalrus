@@ -58,7 +58,7 @@ def test_random_banded(n, top_one_init, real):
         assert w == bandwidth(U)
 
 def test_wrong_bandwidth():
-    """Test tha the correct error is raised if w > n-1"""
+    """Test that the correct error is raised if w > n-1"""
     n = 10
     w = 10
     with pytest.raises(ValueError, match="The bandwidth can be at most one minus the size of the matrix."):
