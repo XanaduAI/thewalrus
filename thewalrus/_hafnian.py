@@ -111,8 +111,10 @@ def hafnian(
     if matshape[0] % 2 != 0 and not loop:
         return 0.0
 
-    if loop and np.allclose(np.diag(np.diag(A)), A, rtol=rtol, atol=atol):
-        return np.prod(np.diag(A))
+    if np.allclose(np.diag(np.diag(A)), A, rtol=rtol, atol=atol):
+    	if loop:
+        	return np.prod(np.diag(A))
+        return 0
 
     if matshape[0] % 2 != 0 and loop:
         A = np.pad(A, pad_width=((0, 1), (0, 1)), mode="constant")
