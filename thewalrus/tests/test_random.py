@@ -56,6 +56,9 @@ def test_random_banded(n, top_one_init, real):
         U = random_banded_interferometer(n, w, top_one_init=top_one_init, real=real)
         assert np.allclose(U @ U.T.conj(), np.identity(n))
         assert w == bandwidth(U)
+```suggestion
+
+
 
 def test_wrong_bandwidth():
     """Test that the correct error is raised if w > n-1"""
