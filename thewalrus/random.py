@@ -117,3 +117,53 @@ def random_interferometer(N, real=False):
     ph = d / np.abs(d)
     U = np.multiply(q, ph, q)
     return U
+
+
+def random_block_interferometer(N, top_one=True, real=False):
+    r"""Generates a random interferometer with blocks of at most size 2.
+
+    Args:
+        N (int): number of modes
+        top_one (bool): if True places a `1\times1` interferometer in the top-left most block
+        real (bool): return a random real orthogonal matrix
+
+    Returns:
+        array: random :math:`N\times N` unitary with the specified block structure
+    """
+    if N % 2 == 0:
+        if top_one:
+            u2s = [random_interferometer(2, real=real) for i in range(((N // 2) - 1))]
+            u0 = random_interferometer(1, real=real)
+            u1 = random_interferometer(1, real=real)
+            return sp.linalg.block_diag(u0, *u2s, u1)
+
+        u2s = [random_interferometer(2, real=real) for i in range(N // 2)]
+        return sp.linalg.block_diag(*u2s)
+
+    u2s = [random_interferometer(2, real=real) for i in range((N - 1) // 2)]
+    u0 = random_interferometer(1, real=real)
+    if top_one:
+        return sp.linalg.block_diag(u0, *u2s)
+    return sp.linalg.block_diag(*u2s, u0)
+
+def random_banded_interferometer(N, w, top_one_init=True, real=False):
+    r"""Generates a banded unitary matrix.
+
+    Args:
+        N (int): number of modes
+        w (int): bandwidth
+        top_one_init (bool): if True places a `1\times1` interferometer in the top-left-most block of the first matrix in the product
+        real (bool): return a random real orthogonal matrix
+
+    Returns:
+        array: random :math:`N\times N` unitary with the specified block structure
+    """
+    if N < w + 1:
+        raise ValueError("The bandwidth can be at most one minus the size of the matrix.")
+    if N == w + 1:
+        return random_interferometer(N, real=real)
+    U = sp.linalg.block_diag(*[random_interferometer(1, real=real) for _ in range(N)])
+    for _ in range(w):
+        U = U @ random_block_interferometer(N, top_one=top_one_init, real=real)
+        top_one_init = not top_one_init
+    return U
