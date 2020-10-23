@@ -6,6 +6,8 @@
 
 ### Improvements
 
+* The hafnians and loop hafnians of diagonal matrices are now calculated in polynomial time. [#212](https://github.com/XanaduAI/thewalrus/pull/212)
+
 ### Bug fixes
 
 ### Breaking changes
