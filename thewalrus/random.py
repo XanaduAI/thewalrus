@@ -120,18 +120,18 @@ def random_interferometer(N, real=False):
 
 
 def random_block_interferometer(N, top_one=True, real=False):
-    r"""Random interferometer with blocks of at most size 2.
+    r"""Generates a random interferometer with blocks of at most size 2.
 
     Args:
         N (int): number of modes
-        top_one (bool): if true places a `1\times1` interferometer in the top-left most block
+        top_one (bool): if True places a `1\times1` interferometer in the top-left most block
         real (bool): return a random real orthogonal matrix
 
     Returns:
         array: random :math:`N\times N` unitary with the specified block structure
     """
     if N % 2 == 0:
-        if top_one is True:
+        if top_one:
             u2s = [random_interferometer(2, real=real) for i in range(((N // 2) - 1))]
             u0 = random_interferometer(1, real=real)
             u1 = random_interferometer(1, real=real)
@@ -142,17 +142,17 @@ def random_block_interferometer(N, top_one=True, real=False):
 
     u2s = [random_interferometer(2, real=real) for i in range((N - 1) // 2)]
     u0 = random_interferometer(1, real=real)
-    if top_one is True:
+    if top_one:
         return sp.linalg.block_diag(u0, *u2s)
     return sp.linalg.block_diag(*u2s, u0)
 
 def random_banded_interferometer(N, w, top_one_init=True, real=False):
-    r"""Generates a banded unitary matrix
+    r"""Generates a banded unitary matrix.
 
     Args:
         N (int): number of modes
         w (int): bandwidth
-        top_one_init (bool): if true places a `1\times1` interferometer in the top-left-most block of the first matrix in the product
+        top_one_init (bool): if True places a `1\times1` interferometer in the top-left-most block of the first matrix in the product
         real (bool): return a random real orthogonal matrix
 
     Returns:

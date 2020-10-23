@@ -19,7 +19,7 @@ from thewalrus.random import random_block_interferometer, random_banded_interfer
 
 
 def bandwidth(A):
-    """Calculates the upper bandwidth of the matrix A
+    """Calculates the upper bandwidth of the matrix A.
 
     Args:
         A (array): input matrix
@@ -39,7 +39,7 @@ def bandwidth(A):
 @pytest.mark.parametrize("top_one", [True, False])
 @pytest.mark.parametrize("real", [True, False])
 def test_random_block(n, top_one, real):
-    """Test that random_block_interferometer produces a unitary with the right structure"""
+    """Test that random_block_interferometer produces a unitary with the right structure."""
     U = random_block_interferometer(n, top_one=top_one, real=real)
     assert np.allclose(U @ U.T.conj(), np.identity(n))
     if top_one:
@@ -51,14 +51,14 @@ def test_random_block(n, top_one, real):
 @pytest.mark.parametrize("top_one_init", [True, False])
 @pytest.mark.parametrize("real", [True, False])
 def test_random_banded(n, top_one_init, real):
-    """Test that random_banded_interferometer produces a unitary with the right structure"""
+    """Test that random_banded_interferometer produces a unitary with the right structure."""
     for w in range(n):
         U = random_banded_interferometer(n, w, top_one_init=top_one_init, real=real)
         assert np.allclose(U @ U.T.conj(), np.identity(n))
-        assert w == bandwidth(U)
+        assert bandwidth(U) == w
 
 def test_wrong_bandwidth():
-    """Test that the correct error is raised if w > n-1"""
+    """Test that the correct error is raised if w > n-1."""
     n = 10
     w = 10
     with pytest.raises(ValueError, match="The bandwidth can be at most one minus the size of the matrix."):
