@@ -112,8 +112,8 @@ def hafnian(
         return 0.0
 
     if np.allclose(np.diag(np.diag(A)), A, rtol=rtol, atol=atol):
-    	if loop:
-        	return np.prod(np.diag(A))
+        if loop:
+            return np.prod(np.diag(A))
         return 0
 
     if matshape[0] % 2 != 0 and loop:
@@ -238,6 +238,11 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
 
     if mu is None:
         mu = A.diagonal().copy()
+
+    if np.allclose(A, 0, rtol=rtol, atol=atol):
+        if loop:
+            return np.prod(mu ** rpt)
+        return 0
 
     if len(mu) != len(A):
         raise ValueError("Length of means vector must be the same length as the matrix A.")
