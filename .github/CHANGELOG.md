@@ -2,6 +2,8 @@
 
 ### New features
 
+* Adds the function `random_banded_interferometer` to generate unitary matrices with a given bandwidth. [#208](https://github.com/XanaduAI/thewalrus/pull/208)
+
 ### Improvements
 
 * The hafnians and loop hafnians of diagonal matrices are now calculated in polynomial time. [#212](https://github.com/XanaduAI/thewalrus/pull/212)
