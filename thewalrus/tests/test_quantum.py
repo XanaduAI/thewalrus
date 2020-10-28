@@ -1369,3 +1369,9 @@ def test_tvd_cutoff_bound():
     bound = tvd_cutoff_bound(mu, V, cutoff)
     expected = np.array([2 * (1 - np.sum(probs[: i + 1])) for i in range(cutoff)])
     assert np.allclose(bound, expected)
+
+def test_non_physical_cov_in_tvd():
+    """Test the correct error is raised when an unphysical covariance matrix is passed to tvd_cutoff_bound"""
+    A = np.array([[1, 2], [3, 4]])
+    with pytest.raises(ValueError, match="The input covariance matrix violates the uncertainty relation."):
+        tvd_cutoff_bound(np.zeros(2), A, 10)

@@ -603,8 +603,9 @@ def _prefactor(mu, cov, hbar=2):
     return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
 
 def tvd_cutoff_bound(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-05, atol=1e-08):
-    r""" Gives a bound of the total variation distance between the exact Gaussian Boson Sampling
-    distribution extending to infinity in Fock space and the one truncated up to a certain cutoff.
+    r""" Gives a bounds of the total variation distance between the exact Gaussian Boson Sampling
+    distribution extending to infinity in Fock space and the one truncated up to for all local Fock space
+    truncations between 0 and cutoff.
 
     For the derivation see Appendix B of `'Exact simulation of Gaussian boson sampling in polynomial space and exponential time',
     Quesada and Arrazola et al. <10.1103/PhysRevResearch.2.023005>`_.
@@ -623,7 +624,7 @@ def tvd_cutoff_bound(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-0
     """
     if check_is_valid_cov:
         if not is_valid_cov(cov, hbar=hbar, rtol=rtol, atol=atol):
-            raise ValueError("The input covariance matrix violates the uncertainty relation")
+            raise ValueError("The input covariance matrix violates the uncertainty relation.")
     nmodes = cov.shape[0] // 2
     bounds = np.zeros([cutoff])
     for i in range(nmodes):
