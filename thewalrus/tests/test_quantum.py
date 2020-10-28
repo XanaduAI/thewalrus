@@ -61,7 +61,7 @@ from thewalrus.quantum import (
     photon_number_squared_expectation,
     variance_clicks,
     mean_clicks,
-    tvd_cutoff_bound
+    tvd_cutoff_bounds
 )
 
 
@@ -1358,15 +1358,15 @@ def test_find_classical_subsystem_thermal(hbar):
     assert k == nmodes
 
 
-def test_tvd_cutoff_bound():
-    """Test that the cutoff bound is correct when applied to TMSV"""
+def test_tvd_cutoff_bounds():
+    """Test that the cutoff bounds are correct when applied to TMSV"""
     nmean = 1
     cutoff = 10
     r = np.arcsinh(np.sqrt(nmean))
     V = two_mode_squeezing(2 * r, 0)
     mu = np.zeros([4])
     probs = 1 / (1 + nmean) * np.array([((nmean) / (1 + nmean)) ** i for i in range(cutoff)])
-    bound = tvd_cutoff_bound(mu, V, cutoff)
+    bound = tvd_cutoff_bounds(mu, V, cutoff)
     expected = np.array([2 * (1 - np.sum(probs[: i + 1])) for i in range(cutoff)])
     assert np.allclose(bound, expected)
 
@@ -1374,4 +1374,4 @@ def test_non_physical_cov_in_tvd():
     """Test the correct error is raised when an unphysical covariance matrix is passed to tvd_cutoff_bound"""
     A = np.array([[1, 2], [3, 4]])
     with pytest.raises(ValueError, match="The input covariance matrix violates the uncertainty relation."):
-        tvd_cutoff_bound(np.zeros(2), A, 10)
+        tvd_cutoff_bounds(np.zeros(2), A, 10)

@@ -55,7 +55,7 @@ Fock states and tensors
     update_probabilities_with_loss
     update_probabilities_with_noise
     find_classical_subsystem
-    tvd_cutoff_bound
+    tvd_cutoff_bounds
 
 Adjacency matrices
 ^^^^^^^^^^^^^^^^^^
@@ -128,7 +128,7 @@ from .fock_tensors import (
     update_probabilities_with_loss,
     update_probabilities_with_noise,
     find_classical_subsystem,
-    tvd_cutoff_bound,
+    tvd_cutoff_bounds,
 )
 
 from .adjacency_matrices import (

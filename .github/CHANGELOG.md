@@ -4,7 +4,7 @@
 
 * Adds the function `random_banded_interferometer` to generate unitary matrices with a given bandwidth. [#208](https://github.com/XanaduAI/thewalrus/pull/208)
 
-* Adds the function `tvd_cutoff_bound` to calculate bounds in the total variation distance between a Fock-truncated and an ideal GBS distribution. [#210](https://github.com/XanaduAI/thewalrus/pull/210)
+* Adds the function `tvd_cutoff_bounds` to calculate bounds in the total variation distance between a Fock-truncated and an ideal GBS distribution. [#210](https://github.com/XanaduAI/thewalrus/pull/210)
 
 ### Improvements
 
