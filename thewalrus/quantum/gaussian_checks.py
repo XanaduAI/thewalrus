@@ -22,7 +22,6 @@ from scipy.linalg import sqrtm
 
 from ..symplectic import sympmat
 
-
 def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
     r""" Checks if the covariance matrix is a valid quantum covariance matrix.
 
