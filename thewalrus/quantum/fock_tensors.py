@@ -603,10 +603,10 @@ def _prefactor(mu, cov, hbar=2):
     return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
 
 def tvd_cutoff_bound(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-05, atol=1e-08):
-    r""" Gives a bound of the total variation instance between the exact Gaussian Boson Sampling
+    r""" Gives a bound of the total variation distance between the exact Gaussian Boson Sampling
     distribution extending to infinity in Fock space and the one truncated up to a certain cutoff.
 
-    For the derivation see Appendix 2 of `'Exact simulation of Gaussian boson sampling in polynomial space and exponential time',
+    For the derivation see Appendix B of `'Exact simulation of Gaussian boson sampling in polynomial space and exponential time',
     Quesada and Arrazola et al. <10.1103/PhysRevResearch.2.023005>`_.
 
     Args:
