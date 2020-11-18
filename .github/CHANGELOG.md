@@ -12,7 +12,7 @@
 
 ### Bug fixes
 
-* Removes unnecesary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized.
+* Removes unnecessary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized.
 
 ### Breaking changes
 
