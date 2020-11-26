@@ -128,7 +128,6 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     v1 = cov1 / hbar
     v2 = cov2 / hbar
     deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
-    n0, n1 = cov1.shape
     n = n0 // 2
     W = sympmat(n)
 
