@@ -19,7 +19,7 @@ Sampling algorithms
 
 This submodule provides access to algorithms to sample from the
 hafnian or the torontonian of Gaussian quantum states.
-
+ 
 
 Hafnian sampling
 ----------------
