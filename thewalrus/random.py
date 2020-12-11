@@ -109,8 +109,8 @@ def random_interferometer(N, real=False):
         array: random :math:`N\times N` unitary distributed with the Haar measure
     """
     if real:
-        return sp.stats.ortho_group(N)
-    return sp.stats.unitary_group(N)
+        return sp.stats.ortho_group.rvs(N)
+    return sp.stats.unitary_group.rvs(N)
 
 
 def random_block_interferometer(N, top_one=True, real=False):
