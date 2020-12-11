@@ -137,7 +137,7 @@ By mapping the calculation of moments of the multinormal distribution to the cal
 
 where we used the reduction and vector in diagonal (:math:`\text{vid}`) operations introduced in the  :ref:`notation <notation>` section.
 
-Note that if we pick :math:`m_i=1 \ \forall i` and :math:`\bm{v} = \text{diag}(\bm{A})` we recover the loop hafnian of :math:`\bm{A}`. In this case, the calculation of the loop hafnian requires :math:`O(n 2^n)` operations, which is quadratically worse than Björklund's algorithms. This formula is however useful when calculating hafnians and loop hafnians of matrices with repeated rows and columns for which column and row :math:`i` are repeated :math:`m_i` times; taking only :math:`O(n A G^n)` operations to calculate the loop hafnian, where
+Note that if we pick :math:`m_i=1 \ \forall i` and :math:`\bm{u} = \text{diag}(\bm{A})` we recover the loop hafnian of :math:`\bm{A}`. In this case, the calculation of the loop hafnian requires :math:`O(n 2^n)` operations, which is quadratically worse than Björklund's algorithms. This formula is however useful when calculating hafnians and loop hafnians of matrices with repeated rows and columns for which column and row :math:`i` are repeated :math:`m_i` times; taking only :math:`O(n A G^n)` operations to calculate the loop hafnian, where
 
 .. math::
 	A &= \frac{1}{n} \sum_{i=0}^{n-1} (m_i+1), \\
