@@ -37,8 +37,7 @@ jobs:
 
       - name: Install The Walrus
         run: |
-          python setup.py bdist_wheel
-          pip install dist/thewalrus*.whl
+          pip install -e .
 
       - name: Run tests
         run: python3 -m pytest --randomly-seed=137 thewalrus --cov=thewalrus --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
