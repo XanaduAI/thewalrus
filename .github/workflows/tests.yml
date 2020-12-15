@@ -25,7 +25,7 @@ jobs:
       - name: Before install
         run: |
           sudo apt-get -qq update;
-          sudo add-apt-repository ppa:ubuntu-toolchain-r-test;
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test;
           sudo apt-get install gcc-4.8;
           sudo apt-get install -y libeigen3-dev;
 
