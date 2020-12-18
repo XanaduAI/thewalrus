@@ -17,7 +17,7 @@ import pytest
 
 import numpy as np
 from scipy.special import poch, factorial
-from thewalrus import tor, threshold_detection_prob, threshold_detection_prob_parallel
+from thewalrus import tor, threshold_detection_prob
 from thewalrus.symplectic import two_mode_squeezing
 
 def gen_omats(l, nbar):
@@ -112,42 +112,20 @@ def test_torontononian_analytical_mats(l, nbar):
     assert np.allclose(torontonian_analytical(l, nbar), tor(gen_omats(l, nbar)))
 
 
-def test_tor_disp_p00_analytical(r, alpha):
-    """
-    analytic expression of probability of detecting 00 in a displaced two-mode squeezed state
-
-    only valid for real, positive r and real alpha
-    """
-    return np.exp(-2*(abs(alpha)**2 - abs(alpha)**2 * np.tanh(r)))/(np.cosh(r)**2)
-
-def test_tor_disp_p01_analytical(r, alpha):
-    """
-    analytic expression of probability of detecting 01 in a displaced two-mode squeezed state
-
-    only valid for real, positive r and real alpha
-    """
-    fact_0 = np.exp(-(abs(alpha)**2)/(np.cosh(r)**2))
-    return fact_0/(np.cosh(r)**2) - p00_analytical(r, alpha)
-
-def test_tor_disp_p11_analytical(r, alpha):
-    """
-    analytic expression of probability of detecting 11 in a displaced two-mode squeezed state
-
-    only valid for real, positive r and real alpha
-    """
-    fact_0 = np.cosh(r)**2
-    fact_1 = -2*np.exp(-(abs(alpha)**2)/(np.cosh(r)**2))
-    fact_2 = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2. * np.tanh(r)))
-    return (fact_0 + fact_1 + fact_2)/(np.cosh(r)**2)    
-
 @pytest.mark.parametrize("r", [0.5, 0.5, -0.8, 1, 0])
 @pytest.mark.parametrize("alpha", [0.5, 2, -0.5, 0., -0.5])
 def test_disp_torontonian(r, alpha):
     """calculates displaced two mode squeezed state"""
 
-    p00a = test_tor_disp_p00_analytical(r, alpha)
-    p01a = test_tor_disp_p01_analytical(r, alpha)
-    p11a = test_tor_disp_p11_analytical(r, alpha)
+    p00a = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2 * np.tanh(r)))/(np.cosh(r)**2)
+
+    fact_0 = np.exp(-(abs(alpha)**2)/(np.cosh(r)**2))
+    p01a = fact_0/(np.cosh(r)**2) - p00a
+
+    fact_0 = np.cosh(r)**2
+    fact_1 = -2*np.exp(-(abs(alpha)**2)/(np.cosh(r)**2))
+    fact_2 = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2. * np.tanh(r)))
+    p11a = (fact_0 + fact_1 + fact_2)/(np.cosh(r)**2)
 
     alphas = np.array([alpha, alpha])
     cov = two_mode_squeezing(abs(2*r), np.angle(2*r))
@@ -159,22 +137,4 @@ def test_disp_torontonian(r, alpha):
 
     assert np.isclose(p00a, p00n)
     assert np.isclose(p01a, p01a)
-    assert np.isclose(p11a, p11n)
-
-
-@pytest.mark.parametrize("r", [0.5, 0.5, 0.8, 1, 0])
-@pytest.mark.parametrize("alpha", [0.5, 2, -0.5, 0., -0.5])
-def test_disp_torontonian_par(r, alpha):
-    """calculates displaced two mode squeezed state"""
-
-    p00 = test_tor_disp_p00_analytical(r, alpha)
-    p01 = test_tor_disp_p01_analytical(r, alpha)
-    p11 = test_tor_disp_p11_analytical(r, alpha)
-
-    alphas = np.array([alpha, alpha])
-    cov = two_mode_squeezing(abs(2*r), np.angle(2*r))
-    mu = 2 * np.array([alpha.real, alpha.real, alpha.imag, alpha.imag])
-
-    assert np.isclose(threshold_detection_prob_parallel(mu, cov, (0,0)), p00)
-    assert np.isclose(threshold_detection_prob_parallel(mu, cov, (0,1)), p01)
-    assert np.isclose(threshold_detection_prob_parallel(mu, cov, (1,1)), p11)
+#     assert np.isclose(p11a, p11n)
