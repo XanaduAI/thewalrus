@@ -127,7 +127,6 @@ def test_disp_torontonian(r, alpha):
     fact_2 = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2. * np.tanh(r)))
     p11a = (fact_0 + fact_1 + fact_2)/(np.cosh(r)**2)
 
-    alphas = np.array([alpha, alpha])
     cov = two_mode_squeezing(abs(2*r), np.angle(2*r))
     mu = 2 * np.array([alpha.real, alpha.real, alpha.imag, alpha.imag])
 
@@ -136,5 +135,5 @@ def test_disp_torontonian(r, alpha):
     p11n = threshold_detection_prob(mu, cov, (1,1))
 
     assert np.isclose(p00a, p00n)
-    assert np.isclose(p01a, p01a)
-#     assert np.isclose(p11a, p11n)
+    assert np.isclose(p01a, p01n)
+    assert np.isclose(p11a, p11n)

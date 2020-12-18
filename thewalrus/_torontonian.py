@@ -16,7 +16,6 @@ Torontonian Python interface
 """
 import numpy as np
 import numba 
-
 from .libwalrus import torontonian_complex as tor_complex
 from .libwalrus import torontonian_real as tor_real
 
@@ -193,8 +192,8 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
     det_pattern = np.asarray(det_pattern)
 
     m = len(cov)
-    assert (cov.shape == (m, m))
-    assert (m % 2 == 0)
+    assert cov.shape == (m, m)
+    assert m % 2 == 0
     n = m // 2
 
     means_x = mu[:n]
@@ -204,7 +203,8 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
     Q = Qmat_numba(cov, hbar=hbar)
 
     if max(det_pattern) > 1:
-        raise ValueError("When using threshold detectors, the detection pattern can contain only 1s or 0s.")
+        raise ValueError(
+            "When using threshold detectors, the detection pattern can contain only 1s or 0s.")
 
     nonzero_idxs = np.where(det_pattern == 1)[0]
     zero_idxs = np.where(det_pattern == 0)[0]
