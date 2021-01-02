@@ -16,7 +16,6 @@ Torontonian Python interface
 """
 import numpy as np
 import numba 
-
 from .libwalrus import torontonian_complex as tor_complex
 from .libwalrus import torontonian_real as tor_real
 
@@ -193,8 +192,8 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
     det_pattern = np.asarray(det_pattern)
 
     m = len(cov)
-    assert (cov.shape == (m, m))
-    assert (m % 2 == 0)
+    assert cov.shape == (m, m)
+    assert m % 2 == 0
     n = m // 2
 
     means_x = mu[:n]
@@ -204,7 +203,8 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
     Q = Qmat_numba(cov, hbar=hbar)
 
     if max(det_pattern) > 1:
-        raise ValueError("When using threshold detectors, the detection pattern can contain only 1s or 0s.")
+        raise ValueError(
+            "When using threshold detectors, the detection pattern can contain only 1s or 0s.")
 
     nonzero_idxs = np.where(det_pattern == 1)[0]
     zero_idxs = np.where(det_pattern == 0)[0]
@@ -242,104 +242,5 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
         fact_det = np.sqrt(np.linalg.det(Q0).real)
 
         p_sum += ((-1) ** len(Z)) * fact_exp / fact_det
-
-    return p0a * p_sum
-
-
-@numba.jit(nopython=True, parallel=True)
-def threshold_detection_prob_parallel(mu, cov, det_pattern, hbar=2, chunk_size=1000):
-    r"""
-    parallel version of thershold detection probabilities for Gaussian states with displacement
-
-    formula from Jake Bulmer and Stefano Paesani 
-
-    Args:
-        mu (1d array) : means of xp Gaussian Wigner function 
-        cov (2d array) : : xp Wigner covariance matrix
-        det_pattern (1d array) : array of {0,1} to describe the threshold detection outcome
-        hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
-        chunk_size (int) : how many sets of the sum to store in memory during parallel loops
-
-    Returns:
-        np.float64 : probability of detection pattern
-    """
-    det_pattern = np.asarray(det_pattern)
-
-    m = len(cov)
-    assert (cov.shape == (m, m))
-    assert (m % 2 == 0)
-    n = m // 2
-
-    means_x = mu[:n]
-    means_p = mu[n:]
-    avec = np.concatenate((means_x + 1j * means_p, means_x - 1j * means_p), axis=0) / np.sqrt(2 * hbar)
-
-    Q = Qmat_numba(cov, hbar=hbar)
-
-    if max(det_pattern) > 1:
-        raise ValueError("When using threshold detectors, the detection pattern can contain only 1s or 0s.")
-
-    nonzero_idxs = np.where(det_pattern == 1)[0]
-    zero_idxs = np.where(det_pattern == 0)[0]
-
-    ii1 = np.concatenate((nonzero_idxs, nonzero_idxs + n), axis=0)
-    ii0 = np.concatenate((zero_idxs, zero_idxs + n), axis=0)
-
-    Qaa = numba_ix(Q, ii0, ii0)
-    Qab = numba_ix(Q, ii0, ii1)
-    Qba = numba_ix(Q, ii1, ii0)
-    Qbb = numba_ix(Q, ii1, ii1)
-
-    Qaa_inv = np.linalg.inv(Qaa)
-    Qcond = Qbb - Qba @ Qaa_inv @ Qab
-
-    avec_a = avec[ii0]
-    avec_b = avec[ii1]
-    avec_cond = avec_b - Qba @ Qaa_inv @ avec_a
-
-    p0a_fact_exp = np.exp(avec_a @ Qaa_inv @ avec_a.conj() * (-0.5)).real
-    p0a_fact_det = np.sqrt(np.linalg.det(Qaa).real)
-    p0a = p0a_fact_exp / p0a_fact_det
-
-    n_det = len(nonzero_idxs)
-
-    powset = powerset(np.arange(n_det))
-    looping = True
-    powset_size = 2 ** n_det - 1
-
-    j = 0
-    p_sum = 1  # empty set is not included in the powerset function so we start at 1
-
-    # break loops into chunks where sets are stored in memory
-    # and can be computed in parallel
-    while looping:
-        # generate some sets for the chunk
-        i = 0
-        chunk_sets = []
-        while i < chunk_size and j < powset_size:
-            chunk_sets.append(next(powset))
-            i += 1
-            j += 1
-
-        if j == powset_size:
-            chunk_size = len(chunk_sets)
-            looping = False
-
-        # loop over the sets in the chunk
-        ps = np.zeros(chunk_size)
-        for i in numba.prange(chunk_size):
-            Z = np.asarray(chunk_sets[i])
-            ZZ = np.concatenate((Z, Z + n_det), axis=0)
-
-            avec0 = avec_cond[ZZ]
-            Q0 = numba_ix(Qcond, ZZ, ZZ)
-            Q0inv = np.linalg.inv(Q0)
-
-            fact_exp = np.exp(avec0 @ Q0inv @ avec0.conj() * (-0.5)).real
-            fact_det = np.sqrt(np.linalg.det(Q0).real)
-
-            ps[i] = ((-1) ** len(Z)) * fact_exp / fact_det
-        p_sum += ps.sum()
 
     return p0a * p_sum
