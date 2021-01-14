@@ -64,6 +64,8 @@ def generate_hafnian_sample(
     assert n == m
     assert n % 2 == 0
     nmodes = n // 2
+    # The next two lines permute randomly the ordering of the modes
+    # in the covariance matrix
     perm = np.random.permutation(nmodes)
     eperm = np.concatenate([perm, nmodes + perm])
     cov = cov1[eperm][:, eperm]
@@ -91,5 +93,7 @@ def generate_hafnian_sample(
         probs /= np.sum(probs)
         var = np.random.choice(np.arange(cutoff), p=probs)
         sample = sample + [var]
+    # Since the covariance matrix had its mode permuted
+    # we unpermute the sample with the inverse permutation.
     iperm = invert_perm(perm)
     return np.array(sample)[iperm]
