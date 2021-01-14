@@ -24,7 +24,8 @@ number distribution of Gaussian states
 Hafnian sampling
 ----------------
 """
-from thewalrus.quantum import pure_state_amplitude
+import numpy as np
+from thewalrus.quantum import pure_state_amplitude, reduced_gaussian
 from strawberryfields.decompositions import williamson
 
 
@@ -34,8 +35,9 @@ def invert_perm(p):
         s[p[i]] = i
     return s
 
+
 def generate_hafnian_sample(
-    cov, mean=None, hbar=2, cutoff=6, max_photons=30
+    cov1, mean=None, hbar=2, cutoff=6, max_photons=30
 ):  # pylint: disable=too-many-branches
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
@@ -56,29 +58,38 @@ def generate_hafnian_sample(
     Returns:
         np.array[int]: a photon number sample from the Gaussian states.
     """
-    n,m = cov1.shape
-    assert n==m
-    assert n%2 ==0
-    nmodes = n//2
+    ### TODO: the code below assumed hbar=2, mean=0
+    ### The total photon number cutoff provided by max_photons is not implemented
+    n, m = cov1.shape
+    assert n == m
+    assert n % 2 == 0
+    nmodes = n // 2
     perm = np.random.permutation(nmodes)
-    eperm = np.concatenate([perm,nmodes+perm])
-    cov = cov1[eperm][:,eperm]
+    eperm = np.concatenate([perm, nmodes + perm])
+    cov = cov1[eperm][:, eperm]
     mu = np.zeros([n])
     sample = []
     for mode in range(nmodes):
-        modes = list(range(mode+1))
+        modes = list(range(mode + 1))
         mured, covred = reduced_gaussian(mu, cov, modes)
         d, S = williamson(covred)
-        vnoise = S@(d-np.identity(len(d)))@S.T
-        vpure = S@S.T
+        vnoise = S @ (d - np.identity(len(d))) @ S.T
+        vpure = S @ S.T
         rand_dist = np.random.multivariate_normal(mured, vnoise)
         probs = np.zeros([cutoff])
         for i in range(cutoff):
             local_sample = sample
-            pat = local_sample+[i]
-            probs[i] = np.abs(pure_state_amplitude(rand_dist, vpure, pat, check_purity=False, include_prefactor=False))**2
+            pat = local_sample + [i]
+            probs[i] = (
+                np.abs(
+                    pure_state_amplitude(
+                        rand_dist, vpure, pat, check_purity=False, include_prefactor=False
+                    )
+                )
+                ** 2
+            )
         probs /= np.sum(probs)
-        var = np.random.choice(np.arange(cutoff),p=probs)
-        sample = sample+[var]
+        var = np.random.choice(np.arange(cutoff), p=probs)
+        sample = sample + [var]
     iperm = invert_perm(perm)
     return np.array(sample)[iperm]
