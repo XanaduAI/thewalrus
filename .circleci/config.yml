@@ -109,7 +109,7 @@ jobs:
     environment:
       CIBW_SKIP: "cp27-* cp34-* cp35-* *i686"
       CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=10.9"
-      CIBW_BEFORE_BUILD_MACOS: brew install gcc@9; brew install --build-from-source eigen; brew install libomp; pip install numpy scipy cython
+      CIBW_BEFORE_BUILD_MACOS: curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen && mv eigen-3.3.7/Eigen {project}/include; brew install libomp; pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
     steps:
