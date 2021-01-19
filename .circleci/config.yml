@@ -118,6 +118,7 @@ jobs:
           name: Build the OS X wheels.
           command: |
             pip3 install --user cibuildwheel
+            export PATH=$PATH:/Users/distiller/Library/Python/3.9/bin
             cibuildwheel --output-dir wheelhouse
       - run:
           name: Upload OS X wheels.
