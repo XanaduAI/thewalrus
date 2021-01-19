@@ -105,11 +105,11 @@ jobs:
   osx-wheels:
     working_directory: ~/osx-wheels
     macos:
-      xcode: "12.3.0"
+      xcode: "10.0.0"
     environment:
       CIBW_SKIP: "cp27-* cp34-* cp35-* *i686"
       CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=10.9"
-      CIBW_BEFORE_BUILD_MACOS: brew install gcc; curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen && mv eigen-3.3.7/Eigen {project}/include; brew install libomp; pip3 install numpy scipy cython
+      CIBW_BEFORE_BUILD_MACOS: brew install gcc; curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen && mv eigen-3.3.7/Eigen {project}/include; brew install libomp; pip install numpy scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
     steps:
@@ -117,7 +117,7 @@ jobs:
       - run:
           name: Build the OS X wheels.
           command: |
-            pip3 install --user cibuildwheel
+            pip install --user cibuildwheel
             export PATH=$PATH:/Users/distiller/Library/Python/2.7/bin
             cibuildwheel --output-dir wheelhouse
       - run:
@@ -128,7 +128,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               echo "Uploading wheels..."
-              pip3 install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+              pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
               python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
             else
               echo "Not on master, not deploying."
