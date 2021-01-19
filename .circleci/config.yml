@@ -105,7 +105,7 @@ jobs:
   osx-wheels:
     working_directory: ~/osx-wheels
     macos:
-      xcode: "10.0.0"
+      xcode: "12.3.0"
     environment:
       CIBW_SKIP: "cp27-* cp34-* cp35-* *i686"
       CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=10.9"
