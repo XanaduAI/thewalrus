@@ -142,7 +142,7 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
         p1 = sqrtm(p1)
     p1 = 2 * (p1 + np.identity(2 * n))
     p1 = p1 @ vaux
-    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
+    f = np.sqrt(np.sqrt(np.linalg.det(si12) * np.linalg.det(p1))) * np.exp(
         -0.25 * deltar @ si12 @ deltar
     )
     return f
