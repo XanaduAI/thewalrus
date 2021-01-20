@@ -129,7 +129,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               echo "Uploading wheels..."
-              pip3 install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+              pip3 install wheelhouse-uploader
               python3 -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
             else
               echo "Not on master, not deploying."
