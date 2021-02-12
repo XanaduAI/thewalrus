@@ -147,6 +147,7 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
         mat_sqrtm = np.zeros_like(sqrtm_arg)
     else:
         mat_sqrtm = sqrtm(sqrtm_arg)
+
     det_arg = 2 * (mat_sqrtm + np.identity(n0)) @ Vaux
     f = np.sqrt(np.linalg.det(Sigma_inv) * np.linalg.det(det_arg)) * np.exp(
         -0.5 * deltar @ Sigma_inv @ deltar
