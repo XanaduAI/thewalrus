@@ -1254,15 +1254,12 @@ def test_fidelity_squeezed_vacuum(r1, r2, hbar):
     mu = np.zeros([2])
     assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, cov1, mu, cov2, hbar=hbar))
 
-@pytest.mark.parametrize("beta1", [0.5, 1, 2, 1.6])
-@pytest.mark.parametrize("beta2", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("n1", [0.5, 1, 2, 1.6])
+@pytest.mark.parametrize("n2", [0.5, 1, 2, 1.6])
 @pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
-def test_fidelity_thermal(beta1, beta2, hbar):
+def test_fidelity_thermal(n1, n2, hbar):
     """Test fidelity between two thermal states"""
-    n1 = 1 / (np.exp(beta1) - 1)
-    n2 = 1 / (np.exp(beta2) - 1)
-    mu = np.exp(-0.5 * (beta1 + beta2))
-    expected = 1 / ((1 + n1) * (1 + n2) * (1 - mu) ** 2)
+    expected = 1 / (1 + n1 + n2 + 2 * n1 * n2 - 2 * np.sqrt(n1 * n2 * (n1 + 1) * (n2 + 1)))
     cov1 = hbar * (n1 + 0.5) * np.identity(2)
     cov2 = hbar * (n2 + 0.5) * np.identity(2)
     mu1 = np.zeros([2])
