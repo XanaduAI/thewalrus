@@ -135,12 +135,12 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     sigma2 = cov2 / hbar
     deltar = (mu1 - mu2) / np.sqrt(hbar)
 
-    Omega = sympmat(n0 // 2)  # The symplectic matrix
+    omega = sympmat(n0 // 2)  # The symplectic matrix
 
-    Sigma = sigma1 + sigma2
-    Sigma_inv = np.linalg.inv(Sigma)
-    Vaux = Omega.T @ Sigma_inv @ (0.25 * Omega + sigma2 @ Omega @ sigma1)
-    sqrtm_arg = np.identity(n0) + 0.25 * np.linalg.inv(Vaux @ Omega @ Vaux @ Omega)
+    sigma = sigma1 + sigma2
+    sigma_inv = np.linalg.inv(sigma)
+    vaux = omega.T @ sigma_inv @ (0.25 * omega + sigma2 @ omega @ sigma1)
+    sqrtm_arg = np.identity(n0) + 0.25 * np.linalg.inv(vaux @ omega @ vaux @ omega)
 
     # The sqrtm function has issues with matrices that are close to zero, hence we branch
     if np.allclose(sqrtm_arg, 0, rtol=rtol, atol=atol):
@@ -148,9 +148,9 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     else:
         mat_sqrtm = sqrtm(sqrtm_arg)
 
-    det_arg = 2 * (mat_sqrtm + np.identity(n0)) @ Vaux
-    f = np.sqrt(np.linalg.det(Sigma_inv) * np.linalg.det(det_arg)) * np.exp(
-        -0.5 * deltar @ Sigma_inv @ deltar
+    det_arg = 2 * (mat_sqrtm + np.identity(n0)) @ vaux
+    f = np.sqrt(np.linalg.det(sigma_inv) * np.linalg.det(det_arg)) * np.exp(
+        -0.5 * deltar @ sigma_inv @ deltar
     )
     # Note that we only take the square root and that we have a prefactor of 0.5
     # as opposed to 0.25 in Brask. This is because this function returns the square
