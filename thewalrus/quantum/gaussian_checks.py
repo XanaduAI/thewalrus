@@ -99,11 +99,16 @@ def is_classical_cov(cov, hbar=2, atol=1e-08):
 
 
 def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
-    """Calculates the fidelity between two Gaussian quantum states.
+    r"""Calculates the fidelity between two Gaussian quantum states.
+    For two pure states :math:`|\psi_1 \rangle,  \  |\psi_2 \rangle`
+    the fidelity is given by :math:`|\langle \psi_1|\psi_2 \rangle|^2`
 
     Note that if the covariance matrices correspond to pure states this
     function reduces to the modulus square of the overlap of their state vectors.
     For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
+
+    The actual implementation used here corresponds to the *square* of Eq. 96 of
+    `'Gaussian states and operations - a quick reference', Brask <https://arxiv.org/abs/2102.05748>`_.
 
     Args:
         mu1 (array): vector of means of the first state
@@ -125,24 +130,27 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     if not n0 == n1 == m0 == m1 == l0 == l1:
         raise ValueError("The inputs have incompatible shapes")
 
-    v1 = cov1 / hbar
-    v2 = cov2 / hbar
-    deltar = (mu1 - mu2) / np.sqrt(hbar / 2)
-    n = n0 // 2
-    W = sympmat(n)
+    # We first convert all the inputs to quantities where hbar = 1
+    sigma1 = cov1 / hbar
+    sigma2 = cov2 / hbar
+    deltar = (mu1 - mu2) / np.sqrt(hbar)
 
-    si12 = np.linalg.inv(v1 + v2)
-    vaux = W.T @ si12 @ (0.25 * W + v2 @ W @ v1)
-    p1 = vaux @ W
-    p1 = p1 @ p1
-    p1 = np.identity(2 * n) + 0.25 * np.linalg.inv(p1)
-    if np.allclose(p1, 0, rtol=rtol, atol=atol):
-        p1 = np.zeros_like(p1)
+    Omega = sympmat(n0 // 2)  # The symplectic matrix
+
+    Sigma = sigma1 + sigma2
+    Sigma_inv = np.linalg.inv(Sigma)
+    Vaux = Omega.T @ Sigma_inv @ (0.25 * Omega + sigma2 @ Omega @ sigma1)
+    sqrtm_arg = np.identity(n0) + 0.25 * np.linalg.inv(Vaux @ Omega @ Vaux @ Omega)
+    # The sqrtm function has issues with matrices that are close to zero, hence we branch
+    if np.allclose(sqrtm_arg, 0, rtol=rtol, atol=atol):
+        mat_sqrtm = np.zeros_like(sqrtm_arg)
     else:
-        p1 = sqrtm(p1)
-    p1 = 2 * (p1 + np.identity(2 * n))
-    p1 = p1 @ vaux
-    f = np.sqrt(np.linalg.det(si12) * np.linalg.det(p1)) * np.exp(
-        -0.25 * deltar @ si12 @ deltar
+        mat_sqrtm = sqrtm(sqrtm_arg)
+    det_arg = 2 * (mat_sqrtm + np.identity(n0)) @ Vaux
+    f = np.sqrt(np.linalg.det(Sigma_inv) * np.linalg.det(det_arg)) * np.exp(
+        -0.5 * deltar @ Sigma_inv @ deltar
     )
+    # Note that we only take the square root and that we have a prefactor of 0.5
+    # as opposed to 0.25 in Brask. This is because this function returns the square
+    # of their fidelities.
     return f
