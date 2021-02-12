@@ -141,6 +141,7 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     Sigma_inv = np.linalg.inv(Sigma)
     Vaux = Omega.T @ Sigma_inv @ (0.25 * Omega + sigma2 @ Omega @ sigma1)
     sqrtm_arg = np.identity(n0) + 0.25 * np.linalg.inv(Vaux @ Omega @ Vaux @ Omega)
+
     # The sqrtm function has issues with matrices that are close to zero, hence we branch
     if np.allclose(sqrtm_arg, 0, rtol=rtol, atol=atol):
         mat_sqrtm = np.zeros_like(sqrtm_arg)
