@@ -1,5 +1,5 @@
 %  Sample implementation of the Hafnian computation algorithm.
-%  The matrix is assumed to have zero on the diagonal (these entries are not used) and being symmetric.
+%  The matrix is assumed to be symmetric.
 %  Author: Andreas Björklund
 function [res]=hafnian(A)
 n=size(A,1);
