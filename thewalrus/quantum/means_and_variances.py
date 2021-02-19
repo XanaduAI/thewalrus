@@ -220,6 +220,7 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     n = len(cov)
     V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
+
     if np.allclose(mu, 0):
         return hafnian(A)
 
