@@ -221,11 +221,11 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
     if np.allclose(mu, 0):
-        res = np.conj(hafnian(A))
-    else:
-        np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
-        res = np.conj(hafnian(A, loop=True))
-    return np.conj(res)
+        return hafnian(A)
+
+    np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
+    return hafnian(A, loop=True)
+
 
 
 def mean_clicks(cov, hbar=2):
