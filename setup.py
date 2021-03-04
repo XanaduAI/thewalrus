@@ -13,7 +13,6 @@
 # limitations under the License.
 
 #!/usr/bin/env python3
-import sys
 import os
 import platform
 
@@ -50,78 +49,83 @@ except ImportError:
         "\n\npip install numpy"
     )
 
-EXTENSIONS = []
+extensions = []
 if BUILD_EXT:
 
     import pkgconfig
     from Cython.Build import cythonize
 
-    CFLAGS = os.environ.get("CFLAGS", "-Wall -O3")
+    CFLAGS = os.environ.get("CFLAGS", "-O3 -Wall")
 
     USE_OPENBLAS = bool(os.environ.get("USE_OPENBLAS"))
     USE_LAPACK = bool(os.environ.get("USE_LAPACK")) or USE_OPENBLAS
     USE_OPENMP = platform.system() != "Windows"
     EIGEN_INCLUDE_DIR = os.environ.get("EIGEN_INCLUDE_DIR", "")
 
-    CONFIG = {
-        "sources": ["thewalrus/libwalrus.pyx"],
+    config = {
+        "sources": ["./thewalrus/libwalrus.pyx"],
         "depends": [
-            "include/libwalrus.hpp",
-            "include/eigenvalue_hafnian.hpp",
-            "include/recursive_hafnian.hpp",
-            "include/repeated_hafnian.hpp",
-            "include/hafnian_approx.hpp",
-            "include/torontonian.hpp",
-            "include/permanent.hpp",
-            "include/hermite_multidimensional.hpp",
-            "include/stdafx.h",
-            "include/fsum.hpp",
+            "./include/libwalrus.hpp",
+            "./include/eigenvalue_hafnian.hpp",
+            "./include/recursive_hafnian.hpp",
+            "./include/repeated_hafnian.hpp",
+            "./include/hafnian_approx.hpp",
+            "./include/torontonian.hpp",
+            "./include/permanent.hpp",
+            "./include/hermite_multidimensional.hpp",
+            "./include/stdafx.h",
+            "./include/fsum.hpp",
         ],
         "extra_compile_args": [*{"-fPIC", "-std=c++14", *CFLAGS.split(" ")}],
         "extra_link_args": [],
-        "include_dirs": ['./include'],
+        "include_dirs": ["./include", np.get_include()],
         "language": "c++",
-        "libraries": ["eigen3"],
-        "library_dirs": [np.get_include()],
     }
 
+    libraries = []
+
     if platform.system() == "Windows":
-        CONFIG["extra_compile_args"].extend(("-static",))
-        CONFIG["extra_link_args"].extend(
+        config["extra_compile_args"].extend(("-static",))
+        config["extra_link_args"].extend(
             ("-static", "-static-libgfortran", "-static-libgcc")
         )
     elif platform.system() == "Darwin":
-        CONFIG["extra_compile_args"].extend(
+        config["extra_compile_args"].extend(
             ("-Xpreprocessor", "-fopenmp", "-mmacosx-version-min=10.9", "-shared")
         )
-        CONFIG["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp"))
-        CONFIG["library_dirs"].append(
+        config["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp"))
+        config["include_dirs"].append(
             "/Applications/Xcode.app/Contents/Developer/Toolchains/"
             "XcodeDefault.xctoolchain/usr/include/c++/v1/"
         )
+        libraries.append("omp")
     else:
-        CONFIG["extra_compile_args"].extend(("-fopenmp", "-shared"))
-        CONFIG["extra_link_args"].extend(("-fopenmp",))
+        config["extra_compile_args"].extend(("-fopenmp", "-shared"))
+        config["extra_link_args"].extend(("-fopenmp",))
 
     if EIGEN_INCLUDE_DIR:
-        CONFIG["library_dirs"].append(EIGEN_INCLUDE_DIR)
+        config["include_dirs"].append(EIGEN_INCLUDE_DIR)
+    else:
+        libraries.append("eigen3")
 
     if USE_OPENBLAS:
-        CONFIG["libraries"].append("openblas")
+        libraries.append("openblas")
 
     if USE_LAPACK:
-        CONFIG["libraries"].append("lapacke")
-        CONFIG["extra_compile_args"].append("-DLAPACKE=1")
+        libraries.append("lapack")
+        config["extra_compile_args"].append("-DLAPACKE=1")
 
-    for k, v in pkgconfig.parse(" ".join(CONFIG["libraries"])).items():
-        if k in CONFIG:
-            CONFIG[k].extend(v)
+    # Use pkgconfig to resolve include, link flags
+    for extension_arg, val in pkgconfig.parse(" ".join(libraries)).items():
+        if extension_arg in config:
+            config[extension_arg].extend(val)
         else:
-            CONFIG[k] = v
+            config[extension_arg] = val
 
-    EXTENSIONS = cythonize(
-        [Extension("libwalrus", **CONFIG)],
-        compile_time_env={"_OPENMP": USE_OPENMP, "LAPACKE": USE_LAPACK})
+    extensions = cythonize(
+        [Extension("libwalrus", **config)],
+        compile_time_env={"_OPENMP": USE_OPENMP, "LAPACKE": USE_LAPACK},
+    )
 
 info = {
     "name": "thewalrus",
@@ -136,7 +140,7 @@ info = {
     "provides": ["thewalrus"],
     "install_requires": requirements,
     "setup_requires": setup_requirements,
-    "ext_modules": EXTENSIONS,
+    "ext_modules": extensions,
     "ext_package": "thewalrus",
 }
 

@@ -79,6 +79,7 @@ The Walrus depends on the following Python packages:
 In addition, to compile the C++ extension, the following dependencies are required:
 
 * A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
+* `pkg-config <https://www.freedesktop.org/wiki/Software/pkg-config>`_ - a tool for resolving C++ build dependencies
 * `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
 * `Cython <https://cython.org/>`_ an optimising static compiler for the Python programming language.
 
@@ -86,15 +87,15 @@ On Debian-based systems, these can be installed via ``apt`` and ``curl``:
 
 .. code-block:: console
 
-    $ sudo apt install g++ libeigen3-dev
-    $ pip install Cython
+    $ sudo apt install g++ libeigen3-dev pkg-config
+    $ pip install Cython pkgconfig
 
 or using Homebrew on MacOS:
 
 .. code-block:: console
 
-    $ brew install gcc eigen
-    $ pip install Cython
+    $ brew install gcc eigen pkg-config
+    $ pip install Cython pkgconfig
 
 Alternatively, you can download the Eigen headers manually:
 
@@ -105,8 +106,7 @@ Alternatively, you can download the Eigen headers manually:
     $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
     $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
 
-Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
-
+Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will use pkg-config to locate the headers)
 You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
 
 .. code-block:: console
