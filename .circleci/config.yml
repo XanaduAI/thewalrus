@@ -17,7 +17,7 @@ jobs:
           name: Install Dependencies
           command: |
             apt-get -y -q update
-            apt-get -y -q install cmake gcc libomp-dev libeigen3-dev
+            apt-get -y -q install cmake gcc libomp-dev libeigen3-dev pkg-config
       - run:
           name: Install Google Test
           working_directory: ~/googletest
@@ -50,7 +50,7 @@ jobs:
           name: install dependencies
           command: |
             sudo apt-get -qq update;
-            sudo apt-get install -y gcc libeigen3-dev;
+            sudo apt-get install -y gcc libeigen3-dev pkg-config;
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
@@ -110,7 +110,7 @@ jobs:
       CIBW_SKIP: "pp* cp27-* cp34-* cp35-* cp39-* *i686"
       CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=10.9"
 
-      CIBW_BEFORE_BUILD_MACOS: brew install gcc eigen libomp; pip install numpy scipy cython
+      CIBW_BEFORE_BUILD_MACOS: brew install gcc eigen libomp pkg-config; pip install numpy scipy cython pkgconfig
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
     steps:
