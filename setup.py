@@ -89,7 +89,7 @@ if BUILD_EXT:
         config["extra_compile_args"].extend(
             ("-Xpreprocessor", "-fopenmp", "-mmacosx-version-min=10.9", "-shared")
         )
-        config["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp"))
+        config["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp", "-lomp"))
         config["include_dirs"].append(
             "/Applications/Xcode.app/Contents/Developer/Toolchains/"
             "XcodeDefault.xctoolchain/usr/include/c++/v1/"
