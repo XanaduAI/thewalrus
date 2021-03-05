@@ -33,8 +33,7 @@ requirements = [
 ]
 
 
-setup_requirements = ["numpy", "pkgconfig"]
-
+setup_requirements = ["numpy"]
 
 BUILD_EXT = True
 
@@ -52,7 +51,6 @@ except ImportError:
 extensions = []
 if BUILD_EXT:
 
-    import pkgconfig
     from Cython.Build import cythonize
 
     CFLAGS = os.environ.get("CFLAGS", "-O3 -Wall")
@@ -76,13 +74,11 @@ if BUILD_EXT:
             "./include/stdafx.h",
             "./include/fsum.hpp",
         ],
-        "extra_compile_args": [*{"-fPIC", "-std=c++14", *CFLAGS.split(" ")}],
+        "extra_compile_args": [*{"-fPIC", "-std=c++11", *CFLAGS.split(" ")}],
         "extra_link_args": [],
         "include_dirs": ["./include", np.get_include()],
         "language": "c++",
     }
-
-    libraries = []
 
     if platform.system() == "Windows":
         config["extra_compile_args"].extend(("-static",))
@@ -98,7 +94,6 @@ if BUILD_EXT:
             "/Applications/Xcode.app/Contents/Developer/Toolchains/"
             "XcodeDefault.xctoolchain/usr/include/c++/v1/"
         )
-        libraries.append("omp")
     else:
         config["extra_compile_args"].extend(("-fopenmp", "-shared"))
         config["extra_link_args"].extend(("-fopenmp",))
@@ -106,21 +101,15 @@ if BUILD_EXT:
     if EIGEN_INCLUDE_DIR:
         config["include_dirs"].append(EIGEN_INCLUDE_DIR)
     else:
-        libraries.append("eigen3")
+        config["include_dirs"].extend(
+            ("/usr/include/eigen3", "/usr/local/include/eigen3")
+        )
 
     if USE_OPENBLAS:
-        libraries.append("openblas")
+        config["extra_compile_args"].append("-lopenblas")
 
     if USE_LAPACK:
-        libraries.append("lapack")
-        config["extra_compile_args"].append("-DLAPACKE=1")
-
-    # Use pkgconfig to resolve include, link flags
-    for extension_arg, val in pkgconfig.parse(" ".join(libraries)).items():
-        if extension_arg in config:
-            config[extension_arg].extend(val)
-        else:
-            config[extension_arg] = val
+        config["extra_compile_args"].extend(("-DLAPACKE=1", "-llapack"))
 
     extensions = cythonize(
         [Extension("libwalrus", **config)],
