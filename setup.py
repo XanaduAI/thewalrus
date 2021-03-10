@@ -18,40 +18,34 @@ import platform
 
 from setuptools import find_packages
 
-
-with open("thewalrus/_version.py") as f:
-    version = f.readlines()[-1].split()[-1].strip("\"'")
-
-
-requirements = [
-    "numpy",
-    "scipy>=1.2.1",
-    "numba>=0.49.1",
-    "dask[delayed]",
-    "sympy>=1.5.1",
-    "repoze.lru>=0.7",
-]
-
-
-setup_requirements = ["numpy"]
-
-BUILD_EXT = True
-
 try:
     import numpy as np
     from numpy.distutils.core import setup
     from numpy.distutils.extension import Extension
-except ImportError:
+except ImportError as exc:
     raise ImportError(
-        "ERROR: NumPy needs to be installed first. "
+        "Numpy must be installed to build The Walrus."
         "You can install it with pip:"
         "\n\npip install numpy"
-    )
+    ) from exc
 
-extensions = []
-if BUILD_EXT:
 
-    from Cython.Build import cythonize
+BUILD_EXT = True
+
+
+def build_extensions():
+
+    if not BUILD_EXT:
+        return []
+
+    try:
+        from Cython.Build import cythonize
+    except ImportError as exc:
+        raise ImportError(
+            "Cython must be installed to build the extension."
+            "You can install it with pip"
+            "\n\npip install cython"
+        ) from exc
 
     CFLAGS = os.environ.get("CFLAGS", "-O3 -Wall")
 
@@ -111,14 +105,20 @@ if BUILD_EXT:
     if USE_LAPACK:
         config["extra_compile_args"].extend(("-DLAPACKE=1", "-llapack"))
 
-    extensions = cythonize(
+    return cythonize(
         [Extension("libwalrus", **config)],
         compile_time_env={"_OPENMP": USE_OPENMP, "LAPACKE": USE_LAPACK},
     )
 
+
+def get_version():
+    with open("thewalrus/_version.py") as f:
+        return f.readlines()[-1].split()[-1].strip("\"'")
+
+
 info = {
     "name": "thewalrus",
-    "version": version,
+    "version": get_version(),
     "maintainer": "Xanadu Inc.",
     "maintainer_email": "nicolas@xanadu.ai",
     "url": "https://github.com/XanaduAI/thewalrus",
@@ -127,9 +127,15 @@ info = {
     "description": "Open source library for hafnian calculation",
     "long_description": open("README.rst").read(),
     "provides": ["thewalrus"],
-    "install_requires": requirements,
-    "setup_requires": setup_requirements,
-    "ext_modules": extensions,
+    "install_requires": [
+        "dask[delayed]",
+        "numba>=0.49.1",
+        "scipy>=1.2.1",
+        "sympy>=1.5.1",
+        "repoze.lru>=0.7",
+    ],
+    "setup_requires": ["cython", "numpy"],
+    "ext_modules": build_extensions(),
     "ext_package": "thewalrus",
 }
 
