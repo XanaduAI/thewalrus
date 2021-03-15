@@ -112,8 +112,7 @@ Photon number distributions
     pure_state_distribution
     total_photon_number_distribution
     characteristic_function
-    total_photon_number_distribution,
-    characteristic_function
+
 
 Details
 ^^^^^^^
