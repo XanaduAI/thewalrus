@@ -7,6 +7,7 @@
 * Adds the function `tvd_cutoff_bounds` to calculate bounds in the total variation distance between a Fock-truncated and an ideal GBS distribution. [#210](https://github.com/XanaduAI/thewalrus/pull/210)
 
 * Adds function for calculating threshold detection probabilities for Gaussian states with displacement
+  [#220](https://github.com/XanaduAI/thewalrus/pull/220)
 
 ### Improvements
 
