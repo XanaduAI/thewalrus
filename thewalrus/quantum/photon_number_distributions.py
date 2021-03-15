@@ -94,7 +94,7 @@ def _convolve_squeezed_state_distribution(s, cutoff=50, padding_factor=2):
 
 def total_photon_number_distribution(n, k, s, eta, pref=1.0):
     r"""Probability of observing a total of :math:`n` photons when :math:`k` identical
-    single-mode squeezed vacua with squeezing parameter s undergo loss by transmission :math:`\eta`.
+    single-mode squeezed vacua with squeezing parameter :math:`s` undergo loss by transmission :math:`\eta`.
 
     For the derivation see Appendix E of `'Quantum Computational Supremacy via High-Dimensional Gaussian Boson Sampling',
     Deshpande et al. <https://arxiv.org/abs/2102.12474>`_.
@@ -129,7 +129,10 @@ def total_photon_number_distribution(n, k, s, eta, pref=1.0):
     )
     return podd
 
-def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_corr=None): # pylint: disable=too-many-arguments
+
+def characteristic_function(
+    k, s, eta, mu, max_iter=10000, delta=1e-14, poly_corr=None
+):  # pylint: disable=too-many-arguments
 
     r"""Calculates the expectation value of the characteristic function
     :math:`\langle n^m \exp(mu n) \rangle` where :math:`n` is the total photon number of :math:`k` identical
@@ -148,7 +151,6 @@ def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_cor
     Returns:
         (float): the expected value of the moment generation function
     """
-
 
     if poly_corr is None or poly_corr == 0:
         f = lambda x: 1
