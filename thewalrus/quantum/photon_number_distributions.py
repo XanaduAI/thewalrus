@@ -105,9 +105,9 @@ def total_photon_number_distribution(n, k, s, eta, pref=1.0):
         k (int): number of squeezed modes
         s (float): squeezing parameter
         eta (float): transmission parameter, between 0 and 1 inclusive
-        pref (float): use to return the probability times pref**n
+        pref (float): use to return the probability times ``pref**n``
     Returns:
-        (float): probability of observing a total of n photons or the probability times `pref ** n`.
+        (float): probability of observing a total of ``n`` photons or the probability times ``pref ** n``.
     """
     if n % 2 == 0:
         peven = (
@@ -133,7 +133,6 @@ def total_photon_number_distribution(n, k, s, eta, pref=1.0):
 def characteristic_function(
     k, s, eta, mu, max_iter=10000, delta=1e-14, poly_corr=None
 ):  # pylint: disable=too-many-arguments
-
     r"""Calculates the expectation value of the characteristic function
     :math:`\langle n^m \exp(mu n) \rangle` where :math:`n` is the total photon number of :math:`k` identical
     single-mode squeezed vacua with squeezing parameter :math:`s` undergoing loss by
