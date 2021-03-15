@@ -15,7 +15,7 @@
 Torontonian Python interface
 """
 import numpy as np
-import numba 
+import numba
 from .libwalrus import torontonian_complex as tor_complex
 from .libwalrus import torontonian_real as tor_real
 
@@ -57,7 +57,7 @@ def tor(A, fsum=False):
 
 
 @numba.jit(nopython=True)
-def combinations(pool, r):
+def combinations(pool, r): # pragma: no cover 
     """
     numba implementation of itertools.combinations
     taken from: https://stackoverflow.com/a/61393666
@@ -92,11 +92,11 @@ def combinations(pool, r):
 
 
 @numba.jit(nopython=True)
-def powerset(S):
+def powerset(S): # pragma: no cover 
     """
     generates the powerset of S
 
-    does not include the empty set 
+    does not include the empty set
 
     Args:
         S (array/iterable) : set to take powerset from
@@ -110,8 +110,8 @@ def powerset(S):
 
 
 @numba.jit(nopython=True)
-def nb_block(X):
-    """ 
+def nb_block(X): # pragma: no cover 
+    """
     numba implementation of np.block
     taken from: https://stackoverflow.com/a/57562911
 
@@ -126,7 +126,7 @@ def nb_block(X):
 
 
 @numba.jit(nopython=True)
-def numba_ix(arr, rows, cols):
+def numba_ix(arr, rows, cols): # pragma: no cover 
     """
     numba implementation of np.ix_
 
@@ -135,14 +135,14 @@ def numba_ix(arr, rows, cols):
         rows (array) : rows to be selected in submatrix
         cols (array) : columns to be selected in submatrix
 
-    Return: 
+    Return:
         len(rows) * len(cols) array : selected submatrix of arr
     """
     return arr[rows][:, cols]
 
 
 @numba.jit(nopython=True)
-def Qmat_numba(cov, hbar=2):
+def Qmat_numba(cov, hbar=2): # pragma: no cover 
     r"""
     numba compatible version of thewalrus.quantum Qmat
 
@@ -173,14 +173,14 @@ def Qmat_numba(cov, hbar=2):
 
 
 @numba.jit(nopython=True)
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2): # pragma: no cover 
     r"""
     thershold detection probabilities for Gaussian states with displacement
 
-    formula from Jake Bulmer and Stefano Paesani 
+    formula from Jake Bulmer and Stefano Paesani
 
     Args:
-        mu (1d array) : means of xp Gaussian Wigner function 
+        mu (1d array) : means of xp Gaussian Wigner function
         cov (2d array) : : xp Wigner covariance matrix
         det_pattern (1d array) : array of {0,1} to describe the threshold detection outcome
         hbar (float): the value of :math:`\hbar` in the commutation
