@@ -74,8 +74,6 @@ from thewalrus.quantum import (
     characteristic_function,
 )
 
-from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
-
 @pytest.mark.parametrize("n", [0, 1, 2])
 def test_reduced_gaussian(n):
     """test that reduced gaussian returns the correct result"""
@@ -1540,9 +1538,6 @@ def test_total_photon_number_distribution_values(s, k):
 @pytest.mark.parametrize("eta", [0, 0.1, 0.5, 1])
 def test_total_photon_number_distribution_moments(s, k, eta):
     """Test that the total photon number distribution has the correct mean and variance"""
-    cutoff = 300
-    probs = np.array([total_photon_number_distribution(i, k, s, eta) for i in range(cutoff)])
-    n = np.arange(cutoff)
     expectation_n = characteristic_function(s = s, k = k, eta = eta, poly_corr=1, mu = 0)
     expectation_n2 = characteristic_function(s = s, k = k, eta = eta, poly_corr=2, mu = 0)
     var_n =expectation_n2 - expectation_n ** 2

@@ -129,7 +129,8 @@ def total_photon_number_distribution(n, k, s, eta, pref=1.0):
     )
     return podd
 
-def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_corr=None):
+def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_corr=None): # pylint: disable=too-many-arguments
+
     r"""Calculates the expectation value of the characteristic function
     :math:`\langle n^m \exp(mu n) \rangle` where :math:`n` is the total photon number of :math:`k` identical
     single-mode squeezed vacua with squeezing parameter :math:`s` undergoing loss by
@@ -176,5 +177,3 @@ def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_cor
             converged = True
         prev_addend = addend
     return tot_sum
-
-
