@@ -149,12 +149,12 @@ def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_cor
     """
 
 
-    if poly_corr is None:
+    if poly_corr is None or poly_corr == 0:
         f = lambda x: 1
     else:
         f = lambda x: x ** poly_corr
 
-    if s==0 or eta==0:
+    if s == 0 or eta == 0:
         return f(0)
 
     pref = np.exp(mu)
