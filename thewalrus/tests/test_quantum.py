@@ -1561,7 +1561,8 @@ def test_characteristic_function_is_normalized(s, k, eta):
 @pytest.mark.parametrize("k", [4, 6, 10, 12])
 def test_charactetistic_function_no_loss(s, k):
     """Check the values of the characteristic function when there is no loss"""
-    mu = mu = 0.5 * np.log(2)
+    mu = 0.5 * np.log(2)
+
     # Note that s must be less than np.arctanh(np.sqrt(0.5)) ~= 0.88
     p = np.tanh(s) ** 2
     val = characteristic_function(k=k, s=s, eta=1.0, mu=mu)
