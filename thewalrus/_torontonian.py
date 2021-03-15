@@ -57,7 +57,7 @@ def tor(A, fsum=False):
 
 
 @numba.jit(nopython=True)
-def combinations(pool, r): # pragma: no cover 
+def combinations(pool, r): # pragma: no cover
     """
     numba implementation of itertools.combinations
     taken from: https://stackoverflow.com/a/61393666
@@ -92,7 +92,7 @@ def combinations(pool, r): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def powerset(S): # pragma: no cover 
+def powerset(S): # pragma: no cover
     """
     generates the powerset of S
 
@@ -110,7 +110,7 @@ def powerset(S): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def nb_block(X): # pragma: no cover 
+def nb_block(X): # pragma: no cover
     """
     numba implementation of np.block
     taken from: https://stackoverflow.com/a/57562911
@@ -126,7 +126,7 @@ def nb_block(X): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def numba_ix(arr, rows, cols): # pragma: no cover 
+def numba_ix(arr, rows, cols): # pragma: no cover
     """
     numba implementation of np.ix_
 
@@ -142,7 +142,7 @@ def numba_ix(arr, rows, cols): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def Qmat_numba(cov, hbar=2): # pragma: no cover 
+def Qmat_numba(cov, hbar=2): # pragma: no cover
     r"""
     numba compatible version of thewalrus.quantum Qmat
 
@@ -173,7 +173,7 @@ def Qmat_numba(cov, hbar=2): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2): # pragma: no cover 
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
     r"""
     thershold detection probabilities for Gaussian states with displacement
 
