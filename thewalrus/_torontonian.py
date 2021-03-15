@@ -173,7 +173,8 @@ def Qmat_numba(cov, hbar=2): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2):
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2): # pragma: no cover
+
     r"""
     thershold detection probabilities for Gaussian states with displacement
 
