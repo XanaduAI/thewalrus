@@ -22,11 +22,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer
-
-Stefano Paesani
-
-Nicolas Quesada
+Jake Bulmer, Stefano Paesani and Nicolas Quesada
 
 ---
 
