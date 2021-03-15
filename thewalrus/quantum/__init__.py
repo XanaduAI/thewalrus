@@ -110,6 +110,10 @@ Photon number distributions
 .. autosummary::
 
     pure_state_distribution
+    total_photon_number_distribution
+    characteristic_function
+    total_photon_number_distribution,
+    characteristic_function
 
 Details
 ^^^^^^^
@@ -168,6 +172,8 @@ from .means_and_variances import (
 
 from .photon_number_distributions import (
     pure_state_distribution,
+    total_photon_number_distribution,
+    characteristic_function,
 )
 
 __all__ = [

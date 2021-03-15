@@ -608,7 +608,7 @@ def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-
     and the user provided cutoff.
 
     For the derivation see Appendix B of `'Exact simulation of Gaussian boson sampling in polynomial space and exponential time',
-    Quesada and Arrazola et al. <10.1103/PhysRevResearch.2.023005>`_.
+    Quesada and Arrazola <10.1103/PhysRevResearch.2.023005>`_.
 
     Args:
         mu (array): vector of means of the Gaussian state

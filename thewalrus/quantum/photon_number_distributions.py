@@ -17,6 +17,7 @@ Functions for calculating the photon number distributions of various states.
 
 import numpy as np
 from scipy.stats import nbinom
+from scipy.special import binom, hyp2f1
 
 from .conversions import Amat
 from .gaussian_checks import is_pure_cov
@@ -89,3 +90,84 @@ def _convolve_squeezed_state_distribution(s, cutoff=50, padding_factor=2):
     for s_val in s:
         ps = np.convolve(ps, _squeezed_state_distribution(s_val, cutoff_sc))[0:cutoff_sc]
     return ps
+
+
+def total_photon_number_distribution(n, k, s, eta, pref=1.0):
+    r"""Probability of observing a total of :math:`n` photons when :math:`k` identical
+    single-mode squeezed vacua with squeezing parameter s undergo loss by transmission :math:`\eta`.
+
+    For the derivation see Appendix E of `'Quantum Computational Supremacy via High-Dimensional Gaussian Boson Sampling',
+    Deshpande et al. <https://arxiv.org/abs/2102.12474>`_.
+
+
+    Args:
+        n (int): number of photons
+        k (int): number of squeezed modes
+        s (float): squeezing parameter
+        eta (float): transmission parameter, between 0 and 1 inclusive
+        pref (float): use to return the probability times pref**n
+    Returns:
+        (float): probability of observing a total of n photons or the probability times `pref ** n`.
+    """
+    if n % 2 == 0:
+        peven = (
+            binom(-1 + k / 2.0 + n / 2.0, n / 2.0)
+            * hyp2f1(0.5 + n / 2.0, k / 2.0 + n / 2.0, 0.5, (1 - eta) ** 2 * np.tanh(s) ** 2)
+            * (1 / np.cosh(s)) ** k
+            * (pref * eta * np.tanh(s)) ** n
+        )
+        return peven
+
+    podd = (
+        (1 + n)
+        * (1 - eta)
+        * binom((-1 + k + n) / 2.0, (1 + n) / 2.0)
+        * hyp2f1((2 + n) / 2.0, (1 + k + n) / 2.0, 1.5, (1 - eta) ** 2 * np.tanh(s) ** 2)
+        * (1 / np.cosh(s)) ** k
+        * np.tanh(s)
+        * (pref * eta * np.tanh(s)) ** n
+    )
+    return podd
+
+def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_corr=None):
+    r"""Calculates the expectation value of the characteristic function
+    :math:`\langle n^m \exp(mu n) \rangle` where :math:`n` is the total photon number of :math:`k` identical
+    single-mode squeezed vacua with squeezing parameter :math:`s` undergoing loss by
+    transmission :math:`\eta`.
+
+    Args:
+        k (int): number of squeezed modes
+        s (float): squeezing parameter
+        eta (float): transmission parameter, between 0 and 1 inclusive
+        mu (float): value at which to evaluate the characteristic function
+        max_iter (int): maximum number of terms allowed in the sum
+        delta (float): fractional change in the sum after which the sum is stopped
+        poly_corr (int): give the value of the exponent :math:`m` of the polynomial correction
+
+    Returns:
+        (float): the expected value of the moment generation function
+    """
+    pref = np.exp(mu)
+    tot_sum = total_photon_number_distribution(0, k, s, eta, pref=pref)
+    converged = False
+
+    if poly_corr is None:
+        f = lambda x: 1
+    else:
+        f = lambda x: x ** poly_corr
+
+    i = 1
+    prev_addend = tot_sum
+    while converged is False and i < max_iter:
+        old_tot_sum = tot_sum
+        addend = f(i) * total_photon_number_distribution(i, k, s, eta, pref=pref)
+        tot_sum += addend
+        i += 1
+        # Note that we check that the sum of the last *two* values does not change the net
+        # sum much, this is because for eta=0 the distrobution does not have support over
+        # the odd integers.
+        ratio = (addend + prev_addend) / old_tot_sum
+        if ratio < delta:
+            converged = True
+        prev_addend = addend
+    return tot_sum
