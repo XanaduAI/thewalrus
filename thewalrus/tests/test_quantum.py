@@ -1543,8 +1543,8 @@ def test_total_photon_number_distribution_moments(s, k, eta):
     cutoff = 300
     probs = np.array([total_photon_number_distribution(i, k, s, eta) for i in range(cutoff)])
     n = np.arange(cutoff)
-    expectation_n = probs @ n
-    expectation_n2 = probs @ (n ** 2)
+    expectation_n = characteristic_function(s = s, k = k, eta = eta, poly_corr=1, mu = 0)
+    expectation_n2 = characteristic_function(s = s, k = k, eta = eta, poly_corr=2, mu = 0)
     var_n =expectation_n2 - expectation_n ** 2
     expected_n = eta * k * np.sinh(s) ** 2
     expected_var = expected_n * (1 + eta * (1 + 2 * np.sinh(s) ** 2))

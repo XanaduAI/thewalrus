@@ -147,14 +147,19 @@ def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_cor
     Returns:
         (float): the expected value of the moment generation function
     """
-    pref = np.exp(mu)
-    tot_sum = total_photon_number_distribution(0, k, s, eta, pref=pref)
-    converged = False
+
 
     if poly_corr is None:
         f = lambda x: 1
     else:
         f = lambda x: x ** poly_corr
+
+    if s==0 or eta==0:
+        return f(0)
+
+    pref = np.exp(mu)
+    tot_sum = f(0) * total_photon_number_distribution(0, k, s, eta, pref=pref)
+    converged = False
 
     i = 1
     prev_addend = tot_sum
@@ -171,3 +176,5 @@ def characteristic_function(k, s, eta, mu, max_iter=10000, delta=1e-14, poly_cor
             converged = True
         prev_addend = addend
     return tot_sum
+
+
