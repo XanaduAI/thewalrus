@@ -137,4 +137,3 @@ def test_disp_torontonian(r, alpha):
     assert np.isclose(p00a, p00n)
     assert np.isclose(p01a, p01n)
     assert np.isclose(p11a, p11n)
-    
