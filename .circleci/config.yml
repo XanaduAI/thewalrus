@@ -72,7 +72,7 @@ jobs:
   linux-wheels:
     working_directory: ~/linux-wheels
     docker:
-      - image: circleci/python:3.6.8-stretch
+      - image: circleci/python:3.6.12-stretch
     environment:
       CIBW_SKIP: "cp27-* cp34-* cp35-* *i686"
       CIBW_BEFORE_BUILD_LINUX: curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen --strip-components 1 && cp -rf Eigen {project}/include && pip install numpy scipy cython
