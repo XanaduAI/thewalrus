@@ -9,6 +9,9 @@
 * Adds function for calculating threshold detection probabilities for Gaussian states with displacement
   [#220](https://github.com/XanaduAI/thewalrus/pull/220)
 
+* Adds new functions `total_photon_number_distribution` and `characteristic_function` to study properties of the total photon number distribution of a `k` identical lossy squeezers. [#230](https://github.com/XanaduAI/thewalrus/pull/230/)
+
+
 ### Improvements
 
 * The hafnians and loop hafnians of diagonal matrices are now calculated in polynomial time. [#212](https://github.com/XanaduAI/thewalrus/pull/212)
