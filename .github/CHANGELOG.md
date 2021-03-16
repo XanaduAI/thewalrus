@@ -6,6 +6,8 @@
 
 * Adds the function `tvd_cutoff_bounds` to calculate bounds in the total variation distance between a Fock-truncated and an ideal GBS distribution. [#210](https://github.com/XanaduAI/thewalrus/pull/210)
 
+* Adds new functions `total_photon_number_distribution` and `characteristic_function` to study properties of the total photon number distribution of a `k` identical lossy squeezers. [#230](https://github.com/XanaduAI/thewalrus/pull/230/)
+
 ### Improvements
 
 * The hafnians and loop hafnians of diagonal matrices are now calculated in polynomial time. [#212](https://github.com/XanaduAI/thewalrus/pull/212)
