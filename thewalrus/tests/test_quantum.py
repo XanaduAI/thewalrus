@@ -669,7 +669,7 @@ def test_state_vector_pure_amplitude():
     assert np.allclose(amps1, amps2)
 
 
-def test_state_vector_pure_amplitude():
+def test_state_vector_pure_amplitude_complex():
     """Tests that state_vector and pure_state_amplitude agree"""
     r = 1
     phi = 0.456
@@ -680,7 +680,6 @@ def test_state_vector_pure_amplitude():
     S = squeezing(r, phi)
     cov = 0.5 * hbar * S @ S.T
     beta = np.array([x + 1j * y, x - 1j * y])
-    alpha = beta[0]
     means = real_to_complex_displacements(beta, hbar=hbar)
     cutoff = 10
     amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
