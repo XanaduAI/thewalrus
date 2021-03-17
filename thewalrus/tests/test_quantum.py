@@ -640,7 +640,8 @@ def test_pure_amplitude_tms_complex_displacement():
     mu = np.array([q, q, p, p])
     amp1 = pure_state_amplitude(mu, cov, [n,n], hbar=hbar)
     # The following equation is taken from "Photon statistics of two-mode squeezed states
-    # and interference in four-dimensional phase space, CM Caves et al"
+    # and interference in four-dimensional phase space, CM Caves et al."
+
     hyperbolic_pref = (-np.tanh(r)) ** n / np.cosh(r)
     laguerre_part = np.polynomial.Laguerre([0] * n + [1])((alpha + alpha_c * np.tanh(r)) ** 2 / np.tanh(r))
     exp_part = np.exp(-(alpha * alpha_c + alpha_c ** 2 * np.tanh(r)))
