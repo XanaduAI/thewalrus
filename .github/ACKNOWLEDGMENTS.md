@@ -37,7 +37,10 @@
 * [Filippo Miatto](https://github.com/ziofil) (Télécom Paris) - 🧝‍♂️ Lord of recursion
 
 * [Theodor Isacsson](https://github.com/thisac) (Xanadu) - :postal_horn: Jarl of contractions
+
+* [Rachel Chadwick](https://github.com/rachelchadwick) (University of Bristol) - :princess: Queen of complex conjugates
  
 * [Stefano Paesani](https://scholar.google.com/citations?user=u41vIV0AAAAJ&hl=it) (University of Bristol) - :crossed_swords: Emperor of phase space
 
 * [Jake Bulmer](https://scholar.google.com/citations?hl=it&user=gwklyzwAAAAJ) (University of Bristol) - :shield: Commander of clicks
+

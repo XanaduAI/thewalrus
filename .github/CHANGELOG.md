@@ -16,9 +16,13 @@
 
 * The hafnians and loop hafnians of diagonal matrices are now calculated in polynomial time. [#212](https://github.com/XanaduAI/thewalrus/pull/212)
 
+* Refactors `setup.py` to avoid issues with `CFLAGS`. [#229](https://github.com/XanaduAI/thewalrus/pull/229)
+
 ### Bug fixes
 
-* Removes unnecessary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized.
+* Removes unnecessary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized. [#215](https://github.com/XanaduAI/thewalrus/pull/215)
+
+* Fixes the prefactor in `pure_state_amplitude`. [#231](https://github.com/XanaduAI/thewalrus/pull/231)
 
 ### Breaking changes
 
@@ -26,7 +30,8 @@
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Stefano Paesani and Nicolas Quesada
+Jack Brown, Jake Bulmer, Rachel Chadwick, Stefano Paesani, Nicolas Quesada
+
 
 ---
 
