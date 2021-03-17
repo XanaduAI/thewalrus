@@ -17,7 +17,9 @@ import pytest
 
 import numpy as np
 from scipy.special import poch, factorial
-from thewalrus import tor, threshold_detection_prob
+from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
+from thewalrus.random import random_covariance
+from thewalrus import tor, threshold_detection_prob_displacement
 from thewalrus.symplectic import two_mode_squeezing
 
 def gen_omats(l, nbar):
@@ -107,33 +109,69 @@ def test_torontonian_vacuum():
 
 @pytest.mark.parametrize("l", [1, 2, 3, 4, 5])
 @pytest.mark.parametrize("nbar", np.arange(0.25, 3, 0.25))
-def test_torontononian_analytical_mats(l, nbar):
+def test_torontonian_analytical_mats(l, nbar):
     """Checks the correct value of the torontonian for the analytical family described by gen_omats"""
     assert np.allclose(torontonian_analytical(l, nbar), tor(gen_omats(l, nbar)))
-
-
 @pytest.mark.parametrize("r", [0.5, 0.5, -0.8, 1, 0])
-@pytest.mark.parametrize("alpha", [0.5, 2, -0.5, 0., -0.5])
+@pytest.mark.parametrize("alpha", [0.5, 2, -0.5, 0.0, -0.5])
 def test_disp_torontonian(r, alpha):
     """Calculates click probabilities of displaced two mode squeezed state"""
 
-    p00a = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2 * np.tanh(r)))/(np.cosh(r)**2)
+    p00a = np.exp(-2 * (abs(alpha) ** 2 - abs(alpha) ** 2 * np.tanh(r))) / (np.cosh(r) ** 2)
 
-    fact_0 = np.exp(-(abs(alpha)**2)/(np.cosh(r)**2))
-    p01a = fact_0/(np.cosh(r)**2) - p00a
+    fact_0 = np.exp(-(abs(alpha) ** 2) / (np.cosh(r) ** 2))
+    p01a = fact_0 / (np.cosh(r) ** 2) - p00a
 
-    fact_0 = np.cosh(r)**2
-    fact_1 = -2*np.exp(-(abs(alpha)**2)/(np.cosh(r)**2))
-    fact_2 = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2. * np.tanh(r)))
-    p11a = (fact_0 + fact_1 + fact_2)/(np.cosh(r)**2)
+    fact_0 = np.cosh(r) ** 2
+    fact_1 = -2 * np.exp(-(abs(alpha) ** 2) / (np.cosh(r) ** 2))
+    fact_2 = np.exp(-2 * (abs(alpha) ** 2 - abs(alpha) ** 2.0 * np.tanh(r)))
+    p11a = (fact_0 + fact_1 + fact_2) / (np.cosh(r) ** 2)
 
-    cov = two_mode_squeezing(abs(2*r), np.angle(2*r))
+    cov = two_mode_squeezing(abs(2 * r), np.angle(2 * r))
     mu = 2 * np.array([alpha.real, alpha.real, alpha.imag, alpha.imag])
 
-    p00n = threshold_detection_prob(mu, cov, (0,0))
-    p01n = threshold_detection_prob(mu, cov, (0,1))
-    p11n = threshold_detection_prob(mu, cov, (1,1))
+    p00n = threshold_detection_prob_displacement(mu, cov, (0, 0))
+    p01n = threshold_detection_prob_displacement(mu, cov, (0, 1))
+    p11n = threshold_detection_prob_displacement(mu, cov, (1, 1))
 
     assert np.isclose(p00a, p00n)
     assert np.isclose(p01a, p01n)
     assert np.isclose(p11a, p11n)
+
+
+@pytest.mark.parametrize("scale", [0, 1, 2, 3])
+def test_disp_torontonian_single_mode(scale):
+    """Calculates the probability of clicking for a single mode state"""
+    cv = random_covariance(1)
+    mu = scale * (2 * np.random.rand(2) - 1)
+    prob_click = threshold_detection_prob_displacement(mu, cv, [1])
+    expected = 1 - density_matrix_element(mu, cv, [0], [0])
+    assert np.allclose(prob_click, expected)
+
+
+@pytest.mark.parametrize("scale", [0, 1, 2, 3])
+def test_disp_torontonian_two_mode(scale):
+    """Calculates the probability of clicking for a two mode state"""
+    cv = random_covariance(2)
+    mu = scale * (2 * np.random.rand(4) - 1)
+    prob_click = threshold_detection_prob_displacement(mu, cv, [1, 1])
+    mu0, cv0 = reduced_gaussian(mu, cv, [0])
+    mu1, cv1 = reduced_gaussian(mu, cv, [1])
+    expected = (
+        1
+        - density_matrix_element(mu0, cv0, [0], [0])
+        - density_matrix_element(mu1, cv1, [0], [0])
+        + density_matrix_element(mu, cv, [0, 0], [0, 0])
+    )
+    assert np.allclose(expected, prob_click)
+
+
+@pytest.mark.parametrize("n_modes", range(1, 10))
+def test_tor_and_threshold_prob_agree(n_modes):
+    cv = random_covariance(n_modes)
+    mu = np.zeros([2 * n_modes])
+    Q = Qmat(cv)
+    O = Xmat(n_modes) @ Amat(cv)
+    expected = tor(O) / np.sqrt(np.linalg.det(Q))
+    prob = threshold_detection_prob_displacement(mu, cv, [1] * n_modes)
+    assert np.allclose(expected, prob)

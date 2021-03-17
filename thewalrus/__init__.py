@@ -104,7 +104,7 @@ from ._hafnian import (
 from ._low_rank_haf import low_rank_hafnian
 from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional
 from ._permanent import perm, perm_complex, perm_real, permanent_repeated
-from ._torontonian import tor, threshold_detection_prob
+from ._torontonian import tor, threshold_detection_prob_displacement
 from ._version import __version__
 
 
