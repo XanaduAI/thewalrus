@@ -37,3 +37,5 @@
 * [Filippo Miatto](https://github.com/ziofil) (Télécom Paris) - 🧝‍♂️ Lord of recursion
 
 * [Theodor Isacsson](https://github.com/thisac) (Xanadu) - :postal_horn: Jarl of contractions
+
+* [Rachel Chadwick](https://github.com/rachelchadwick) (University of Bristol) - :princess: Queen of complex conjugates
