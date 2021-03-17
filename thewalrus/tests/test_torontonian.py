@@ -115,7 +115,7 @@ def test_torontononian_analytical_mats(l, nbar):
 @pytest.mark.parametrize("r", [0.5, 0.5, -0.8, 1, 0])
 @pytest.mark.parametrize("alpha", [0.5, 2, -0.5, 0., -0.5])
 def test_disp_torontonian(r, alpha):
-    """calculates displaced two mode squeezed state"""
+    """Calculates click probabilities of displaced two mode squeezed state"""
 
     p00a = np.exp(-2*(abs(alpha)**2 - abs(alpha)**2 * np.tanh(r)))/(np.cosh(r)**2)
 

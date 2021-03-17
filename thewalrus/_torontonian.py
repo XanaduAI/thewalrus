@@ -59,7 +59,8 @@ def tor(A, fsum=False):
 @numba.jit(nopython=True)
 def combinations(pool, r): # pragma: no cover
     """
-    numba implementation of itertools.combinations
+    Numba implementation of `itertools.combinations`.
+
     taken from: https://stackoverflow.com/a/61393666
 
     Args:
@@ -94,9 +95,8 @@ def combinations(pool, r): # pragma: no cover
 @numba.jit(nopython=True)
 def powerset(S): # pragma: no cover
     """
-    generates the powerset of S
+    Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
 
-    does not include the empty set
 
     Args:
         S (array/iterable) : set to take powerset from
@@ -112,7 +112,8 @@ def powerset(S): # pragma: no cover
 @numba.jit(nopython=True)
 def nb_block(X): # pragma: no cover
     """
-    numba implementation of np.block
+    Numba implementation of `np.block`.
+
     taken from: https://stackoverflow.com/a/57562911
 
     Args:
@@ -128,7 +129,8 @@ def nb_block(X): # pragma: no cover
 @numba.jit(nopython=True)
 def numba_ix(arr, rows, cols): # pragma: no cover
     """
-    numba implementation of np.ix_
+    Numba implementation of `np.ix_`.
+
 
     Args:
         arr (2d array) : matrix to take submatrix of
@@ -144,7 +146,8 @@ def numba_ix(arr, rows, cols): # pragma: no cover
 @numba.jit(nopython=True)
 def Qmat_numba(cov, hbar=2): # pragma: no cover
     r"""
-    numba compatible version of thewalrus.quantum Qmat
+    Numba compatible version of `thewalrus.quantum.Qmat`
+
 
     Returns the :math:`Q` Husimi matrix of the Gaussian state.
     Args:
@@ -167,18 +170,16 @@ def Qmat_numba(cov, hbar=2): # pragma: no cover
     aiaj = (x - p + 1j * (xp + xp.T)) / 4
 
     # calculate the covariance matrix sigma_Q appearing in the Q function:
-    # Q(alpha) = exp[-(alpha-beta).sigma_Q^{-1}.(alpha-beta)/2]/|sigma_Q|
     Q = nb_block(((aidaj, aiaj.conj()), (aiaj, aidaj.conj()))) + np.identity(2 * N)
     return Q
 
 
 @numba.jit(nopython=True)
 def threshold_detection_prob(mu, cov, det_pattern, hbar=2): # pragma: no cover
-
     r"""
-    thershold detection probabilities for Gaussian states with displacement
+    Threshold detection probabilities for Gaussian states with displacement. 
+    Formula from Jake Bulmer and Stefano Paesani.
 
-    formula from Jake Bulmer and Stefano Paesani
 
     Args:
         mu (1d array) : means of xp Gaussian Wigner function
