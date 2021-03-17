@@ -70,8 +70,9 @@ from thewalrus.quantum import (
     variance_clicks,
     mean_clicks,
     tvd_cutoff_bounds,
+    total_photon_number_distribution,
+    characteristic_function,
 )
-
 
 @pytest.mark.parametrize("n", [0, 1, 2])
 def test_reduced_gaussian(n):
@@ -1565,3 +1566,49 @@ def test_big_displaced_squeezed_matelem():
     cutoff = 100
     probs_displaced_squeezed = probabilities(mu, cov, cutoff, hbar=1.0)
     assert np.allclose(np.sum(probs_displaced_squeezed), 1.0)
+
+@pytest.mark.parametrize("s", [0.5, 0.7, 0.9, 1.1])
+@pytest.mark.parametrize("k", [4, 6, 10, 12])
+def test_total_photon_number_distribution_values(s, k):
+    """Test that the total photon number distribution is correct when there are no losses"""
+    cutoff = 300
+    eta = 1.0
+    expected_probs = _squeezed_state_distribution(s, cutoff, N=k)
+    probs = np.array([total_photon_number_distribution(i, k, s, eta) for i in range(cutoff)])
+    assert np.allclose(expected_probs, probs)
+
+
+@pytest.mark.parametrize("s", [0.5, 0.7, 0.9, 1.1])
+@pytest.mark.parametrize("k", [4, 6, 10, 12])
+@pytest.mark.parametrize("eta", [0, 0.1, 0.5, 1])
+def test_total_photon_number_distribution_moments(s, k, eta):
+    """Test that the total photon number distribution has the correct mean and variance"""
+    expectation_n = characteristic_function(s=s, k=k, eta=eta, poly_corr=1, mu=0)
+    expectation_n2 = characteristic_function(s=s, k=k, eta=eta, poly_corr=2, mu=0)
+    var_n = expectation_n2 - expectation_n ** 2
+    expected_n = eta * k * np.sinh(s) ** 2
+    expected_var = expected_n * (1 + eta * (1 + 2 * np.sinh(s) ** 2))
+    assert np.allclose(expectation_n, expected_n)
+    assert np.allclose(expected_var, var_n)
+
+
+@pytest.mark.parametrize("s", [0.5, 0.7, 0.9, 1.1])
+@pytest.mark.parametrize("k", [4, 6, 10, 12])
+@pytest.mark.parametrize("eta", [0, 0.1, 0.5, 1])
+def test_characteristic_function_is_normalized(s, k, eta):
+    r"""Check that when evaluated at \mu=0 the characteristic function gives 1"""
+    val = characteristic_function(k=k, s=s, eta=eta, mu=0)
+    assert np.allclose(val, 1.0)
+
+
+@pytest.mark.parametrize("s", [0.5, 0.6, 0.7, 0.8])
+@pytest.mark.parametrize("k", [4, 6, 10, 12])
+def test_charactetistic_function_no_loss(s, k):
+    """Check the values of the characteristic function when there is no loss"""
+    mu = 0.5 * np.log(2)
+
+    # Note that s must be less than np.arctanh(np.sqrt(0.5)) ~= 0.88
+    p = np.tanh(s) ** 2
+    val = characteristic_function(k=k, s=s, eta=1.0, mu=mu)
+    expected = ((1 - p) / (1 - 2 * p)) ** (k / 2)
+    assert np.allclose(val, expected)
