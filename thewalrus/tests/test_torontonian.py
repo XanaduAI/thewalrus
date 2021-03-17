@@ -168,6 +168,8 @@ def test_disp_torontonian_two_mode(scale):
 
 @pytest.mark.parametrize("n_modes", range(1, 10))
 def test_tor_and_threshold_prob_agree(n_modes):
+    """Tests that threshold_detection_prob_displacement and the usual tor expression agree
+    when displacements are zero"""
     cv = random_covariance(n_modes)
     mu = np.zeros([2 * n_modes])
     Q = Qmat(cv)

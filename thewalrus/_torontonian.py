@@ -58,10 +58,9 @@ def tor(A, fsum=False):
 
 @numba.jit(nopython=True)
 def combinations(pool, r): # pragma: no cover
-    """
-    Numba implementation of `itertools.combinations`.
+    """Numba implementation of `itertools.combinations`.
 
-    taken from: https://stackoverflow.com/a/61393666
+    Taken from: https://stackoverflow.com/a/61393666
 
     Args:
         pool (iterable/array) : array/iterable to take combinations from
@@ -94,9 +93,7 @@ def combinations(pool, r): # pragma: no cover
 
 @numba.jit(nopython=True)
 def powerset(S): # pragma: no cover
-    """
-    Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
-
+    """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
 
     Args:
         S (array/iterable) : set to take powerset from
@@ -111,10 +108,9 @@ def powerset(S): # pragma: no cover
 
 @numba.jit(nopython=True)
 def nb_block(X): # pragma: no cover
-    """
-    Numba implementation of `np.block`.
+    """Numba implementation of `np.block`.
 
-    taken from: https://stackoverflow.com/a/57562911
+    Taken from: https://stackoverflow.com/a/57562911
 
     Args:
         X (tuple of arrays) : arrays for blocks of matrix
@@ -128,12 +124,10 @@ def nb_block(X): # pragma: no cover
 
 @numba.jit(nopython=True)
 def numba_ix(arr, rows, cols): # pragma: no cover
-    """
-    Numba implementation of `np.ix_`.
-
+    """Numba implementation of `np.ix_`.
 
     Args:
-        arr (2d array) : matrix to take submatrix of
+        arr (array) : matrix to take submatrix of
         rows (array) : rows to be selected in submatrix
         cols (array) : columns to be selected in submatrix
 
@@ -145,9 +139,7 @@ def numba_ix(arr, rows, cols): # pragma: no cover
 
 @numba.jit(nopython=True)
 def Qmat_numba(cov, hbar=2): # pragma: no cover
-    r"""
-    Numba compatible version of `thewalrus.quantum.Qmat`
-
+    r"""Numba compatible version of `thewalrus.quantum.Qmat`
 
     Returns the :math:`Q` Husimi matrix of the Gaussian state.
     Args:
@@ -176,8 +168,7 @@ def Qmat_numba(cov, hbar=2): # pragma: no cover
 
 @numba.jit(nopython=True)
 def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragma: no cover
-    r"""
-    Threshold detection probabilities for Gaussian states with displacement. 
+    r"""Threshold detection probabilities for Gaussian states with displacement.
     Formula from Jake Bulmer and Stefano Paesani.
 
 
@@ -185,8 +176,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
         mu (1d array) : means of xp Gaussian Wigner function
         cov (2d array) : : xp Wigner covariance matrix
         det_pattern (1d array) : array of {0,1} to describe the threshold detection outcome
-        hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
+        hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
         np.float64 : probability of detection pattern
