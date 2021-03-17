@@ -634,7 +634,6 @@ def test_pure_amplitude_tms_complex_displacement():
     alpha_c = np.conjugate(alpha)
     n = 3
     # Calculate the amplitude for outcome [n,n]
-    
     S = two_mode_squeezing(-r, 0)
     # The minus sign arises due to differences in convention
     cov = hbar / 2 * S @ S.T
@@ -660,14 +659,14 @@ def test_state_vector_pure_amplitude():
     S = squeezing(r, phi)
     cov = 0.5 * hbar * S @ S.T
     beta = np.array([x + 1j * y, x - 1j * y])
-    alpha = beta[0]
+
+
     means = real_to_complex_displacements(beta, hbar=hbar)
     cutoff = 10
     amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
     amps2 = state_vector(means, cov, cutoff  = cutoff)
     assert np.allclose(amps1, amps2)
 
-    
 def test_state_vector_two_mode_squeezed():
     """ Tests state_vector for a two mode squeezed vacuum state """
     nbar = 1.0
