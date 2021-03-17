@@ -624,6 +624,69 @@ def test_pure_state_amplitude_squeezed_coherent():
     assert np.allclose(expected, numerical)
 
 
+def test_pure_amplitude_tms_complex_displacement():
+    """Tests that the pure state amplitude is correct for two-mode squeezed states with displacement"""
+    r = 0.8
+    q = 0.6
+    p = -1.4
+    hbar = 2
+    alpha = 1 / np.sqrt(2*hbar) * (q + 1j * p)
+    alpha_c = np.conjugate(alpha)
+    n = 3
+    # Calculate the amplitude for outcome [n,n]
+    S = two_mode_squeezing(-r, 0)
+    # The minus sign arises due to differences in convention
+    cov = hbar / 2 * S @ S.T
+    mu = np.array([q, q, p, p])
+    amp1 = pure_state_amplitude(mu, cov, [n,n], hbar=hbar)
+    # The following equation is taken from "Photon statistics of two-mode squeezed states
+    # and interference in four-dimensional phase space, CM Caves et al."
+
+    hyperbolic_pref = (-np.tanh(r)) ** n / np.cosh(r)
+    laguerre_part = np.polynomial.Laguerre([0] * n + [1])((alpha + alpha_c * np.tanh(r)) ** 2 / np.tanh(r))
+    exp_part = np.exp(-(alpha * alpha_c + alpha_c ** 2 * np.tanh(r)))
+    amp2 = hyperbolic_pref * laguerre_part * exp_part
+    assert np.allclose(amp1, amp2)
+
+
+def test_state_vector_pure_amplitude():
+    """Tests that state_vector and pure_state_amplitude agree"""
+    r = 1
+    phi = 0.456
+    x = 0.4
+    y = 0.7
+
+    hbar = 2
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    beta = np.array([x + 1j * y, x - 1j * y])
+
+
+    means = real_to_complex_displacements(beta, hbar=hbar)
+    cutoff = 10
+    amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
+    amps2 = state_vector(means, cov, cutoff  = cutoff)
+    assert np.allclose(amps1, amps2)
+
+
+def test_state_vector_pure_amplitude_complex():
+    """Tests that state_vector and pure_state_amplitude agree"""
+    r = 1
+    phi = 0.456
+    x = 0.4
+    y = 0.7
+
+    hbar = 2
+    S = squeezing(r, phi)
+    cov = 0.5 * hbar * S @ S.T
+    beta = np.array([x + 1j * y, x - 1j * y])
+    means = real_to_complex_displacements(beta, hbar=hbar)
+    cutoff = 10
+    amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
+    amps2 = state_vector(means, cov, cutoff  = cutoff)
+    assert np.allclose(amps1, amps2)
+
+
 def test_state_vector_two_mode_squeezed():
     """ Tests state_vector for a two mode squeezed vacuum state """
     nbar = 1.0

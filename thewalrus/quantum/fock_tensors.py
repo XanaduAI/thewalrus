@@ -95,7 +95,7 @@ def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, 
             haf = hafnian_repeated(B, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha @ B @ alpha))
+        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
         haf *= pref
 
     return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
