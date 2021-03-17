@@ -629,7 +629,7 @@ def test_pure_amplitude_tms_complex_displacement():
     q = 0.6
     p = -1.4
     hbar = 2
-    alpha =1 / np.sqrt(2*hbar) * (q + 1j * p)
+    alpha = 1 / np.sqrt(2*hbar) * (q + 1j * p)
     alpha_c = np.conjugate(alpha)
     n = 3
     # Calculate the amplitude for outcome [n,n]
