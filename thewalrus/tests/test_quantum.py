@@ -686,6 +686,9 @@ def test_state_vector_pure_amplitude():
 	amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
 	amps2 = state_vector(means, cov, cutoff  = cutoff)
 	assert np.allclose(amps1, amps2)
+
+
+
 def test_state_vector_two_mode_squeezed():
     """ Tests state_vector for a two mode squeezed vacuum state """
     nbar = 1.0
