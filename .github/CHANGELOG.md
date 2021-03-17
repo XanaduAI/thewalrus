@@ -14,7 +14,9 @@
 
 ### Bug fixes
 
-* Removes unnecessary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized.
+* Removes unnecessary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized. [#215](https://github.com/XanaduAI/thewalrus/pull/215)
+
+* Fixes the prefactor in `pure_state_amplitude`. [#231](https://github.com/XanaduAI/thewalrus/pull/231)
 
 ### Breaking changes
 
@@ -22,7 +24,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Nicolas Quesada
+Rachel Chadwick, Nicolas Quesada
 
 ---
 
