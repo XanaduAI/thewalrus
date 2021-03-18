@@ -154,7 +154,7 @@ def test_disp_torontonian_two_mode(scale):
     """Calculates the probability of clicking for a two mode state"""
     cv = random_covariance(2)
     mu = scale * (2 * np.random.rand(4) - 1)
-    prob_click = threshold_detection_prob_displacement(mu, cv, [1, 1])
+    prob_click = threshold_detection_prob(mu, cv, [1, 1])
     mu0, cv0 = reduced_gaussian(mu, cv, [0])
     mu1, cv1 = reduced_gaussian(mu, cv, [1])
     expected = (
@@ -165,6 +165,17 @@ def test_disp_torontonian_two_mode(scale):
     )
     assert np.allclose(expected, prob_click)
 
+@pytest.mark.parametrize("n_modes", range(1, 10))
+def test_tor_and_threshold_displacement_prob_agree(n_modes):
+    """Tests that threshold_detection_prob_displacement and the usual tor expression agree
+    when displacements are zero"""
+    cv = random_covariance(n_modes)
+    mu = np.zeros([2 * n_modes])
+    Q = Qmat(cv)
+    O = Xmat(n_modes) @ Amat(cv)
+    expected = tor(O) / np.sqrt(np.linalg.det(Q))
+    prob = threshold_detection_prob_displacement(mu, cv, [1] * n_modes)
+    assert np.allclose(expected, prob)
 
 @pytest.mark.parametrize("n_modes", range(1, 10))
 def test_tor_and_threshold_prob_agree(n_modes):
@@ -175,5 +186,5 @@ def test_tor_and_threshold_prob_agree(n_modes):
     Q = Qmat(cv)
     O = Xmat(n_modes) @ Amat(cv)
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
-    prob = threshold_detection_prob_displacement(mu, cv, [1] * n_modes)
+    prob = threshold_detection_prob(mu, cv, [1] * n_modes)
     assert np.allclose(expected, prob)
