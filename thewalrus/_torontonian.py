@@ -19,6 +19,7 @@ import numba
 from .libwalrus import torontonian_complex as tor_complex
 from .libwalrus import torontonian_real as tor_real
 from .quantum import Qmat, Xmat, Amat
+from . import reduction
 
 
 def tor(A, fsum=False):
@@ -255,16 +256,14 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
         np.float64 : probability of detection pattern
     """
 
-    if False:
-        pass
-        # np.allclose(mu, 0, atol=atol, rtol=rtol):
-        # # no displacement
-        # n_modes = cov.shape[0] // 2
-        # Q = Qmat(cov, hbar)
-        # O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
-        # rpt2 = np.concatenate((det_pattern, det_pattern))
-        # Os = O[np.ix_(rpt2, rpt2)]
-        # return tor(Os) / np.sqrt(np.linalg.det(Q))
+    if np.allclose(mu, 0, atol=atol, rtol=rtol):
+        # no displacement
+        n_modes = cov.shape[0] // 2
+        Q = Qmat(cov, hbar)
+        O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
+        rpt2 = np.concatenate((det_pattern, det_pattern))
+        Os = reduction(O, rpt2)
+        return tor(Os) / np.sqrt(np.linalg.det(Q))
     else:
         det_pattrn = np.asarray(det_pattern).astype(np.int8)
         return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
