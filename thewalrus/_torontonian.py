@@ -18,6 +18,7 @@ import numpy as np
 import numba
 from .libwalrus import torontonian_complex as tor_complex
 from .libwalrus import torontonian_real as tor_real
+from .quantum import Qmat, Xmat, Amat
 
 
 def tor(A, fsum=False):
@@ -48,7 +49,7 @@ def tor(A, fsum=False):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
-    if A.dtype == np.complex:
+    if A.dtype == np.complex128:
         if np.any(np.iscomplex(A)):
             return tor_complex(A, fsum=fsum)
         return tor_real(np.float64(A.real), fsum=fsum)
@@ -181,7 +182,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
     Returns:
         np.float64 : probability of detection pattern
     """
-    det_pattern = np.asarray(det_pattern)
+    det_pattern = np.asarray(det_pattern).astype(np.int8)
 
     m = len(cov)
     assert cov.shape == (m, m)
@@ -237,7 +238,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
 
     return p0a * p_sum
 
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2, tol=1e-10): 
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10): 
     r"""Threshold detection probabilities for Gaussian states.
     Formula from Jake Bulmer and Stefano Paesani.
     When state is displaced, threshold_detection_prob_displacement is called.
@@ -254,14 +255,16 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, tol=1e-10):
         np.float64 : probability of detection pattern
     """
 
-    if np.linalg.norm(mu) < tol:
-        # no displacement
-        n_modes = cov.shape[0] // 2
-        Q = Qmat(cov)
-        O = Xmat(n_modes) @ Amat(cov)
-        rpt2 = np.array(pattern + pattern)
-        Os = O[np.ix_(rpt2, rpt2)]
-        return tor(Os) / np.sqrt(np.linalg.det(Q))
+    if False:
+        pass
+        # np.allclose(mu, 0, atol=atol, rtol=rtol):
+        # # no displacement
+        # n_modes = cov.shape[0] // 2
+        # Q = Qmat(cov, hbar)
+        # O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
+        # rpt2 = np.concatenate((det_pattern, det_pattern))
+        # Os = O[np.ix_(rpt2, rpt2)]
+        # return tor(Os) / np.sqrt(np.linalg.det(Q))
     else:
-        det_pattrn = np.asarray(det_pattern)
+        det_pattrn = np.asarray(det_pattern).astype(np.int8)
         return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
