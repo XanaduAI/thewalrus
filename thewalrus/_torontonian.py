@@ -239,7 +239,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
 
     return p0a * p_sum
 
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10): 
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10):
     r"""Threshold detection probabilities for Gaussian states.
     Formula from Jake Bulmer and Stefano Paesani.
     When state is displaced, threshold_detection_prob_displacement is called.
@@ -250,7 +250,8 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
         cov (2d array) : : xp Wigner covariance matrix
         det_pattern (1d array) : array of {0,1} to describe the threshold detection outcome
         hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`.
-        tol (float): tolerance for determining if displacement is negligible
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
 
     Returns:
         np.float64 : probability of detection pattern
@@ -264,6 +265,6 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)
         return tor(Os) / np.sqrt(np.linalg.det(Q))
-    else:
-        det_pattrn = np.asarray(det_pattern).astype(np.int8)
-        return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
+    det_pattern = np.asarray(det_pattern).astype(np.int8)
+    return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
+    

@@ -188,3 +188,4 @@ def test_tor_and_threshold_prob_agree(n_modes):
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
     prob = threshold_detection_prob(mu, cv, [1] * n_modes)
     assert np.allclose(expected, prob)
+    
