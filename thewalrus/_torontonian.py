@@ -267,4 +267,34 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
         return tor(Os) / np.sqrt(np.linalg.det(Q))
     det_pattern = np.asarray(det_pattern).astype(np.int8)
     return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
+
+@numba.jit(nopython=True)
+def numba_tor(A):
+    """Returns the Torontonian of a matrix using numba.
+
+    For more direct control, you may wish to call :func:`tor_real` or
+    :func:`tor_complex` directly.
+
+    The input matrix is cast to quadruple precision
+    internally for a quadruple precision torontonian computation.
+
+    Args:
+        A (array): a square, symmetric array of even dimensions.
+
+    Returns:
+        np.float64 or np.complex128: the torontonian of matrix A.
+    """
     
+    n_det = A.shape[0] // 2
+    p_sum = 1.  # empty set is not included in the powerset function so we start at 1
+    for z in powerset(np.arange(n_det)):
+        Z = np.asarray(z)
+        ZZ = np.concatenate((Z, Z + n_det), axis=0)
+        
+        A_ZZ = numba_ix(A, ZZ, ZZ)
+        
+        n = len(Z)
+
+        p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2*n) - A_ZZ))
+
+    return p_sum * (-1) ** (n_det)

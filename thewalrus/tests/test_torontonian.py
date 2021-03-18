@@ -19,7 +19,7 @@ import numpy as np
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
-from thewalrus import tor, threshold_detection_prob_displacement, threshold_detection_prob
+from thewalrus import tor, threshold_detection_prob_displacement, threshold_detection_prob, numba_tor
 from thewalrus.symplectic import two_mode_squeezing
 
 def gen_omats(l, nbar):
@@ -188,4 +188,11 @@ def test_tor_and_threshold_prob_agree(n_modes):
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
     prob = threshold_detection_prob(mu, cv, [1] * n_modes)
     assert np.allclose(expected, prob)
-    
+
+@pytest.mark.parametrize("N", range(1, 10))
+def test_numba_tor(N):
+    cov = random_covariance(N)
+    O = Xmat(N) @ Amat(cov)
+    t1 = tor(O)
+    t2 = numba_tor(O)
+    assert np.isclose(t1, t2)
