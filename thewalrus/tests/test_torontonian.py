@@ -19,7 +19,7 @@ import numpy as np
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
-from thewalrus import tor, threshold_detection_prob_displacement
+from thewalrus import tor, threshold_detection_prob_displacement, threshold_detection_prob
 from thewalrus.symplectic import two_mode_squeezing
 
 def gen_omats(l, nbar):
