@@ -239,7 +239,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
 
     return p0a * p_sum
 
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10):
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10): 
     r"""Threshold detection probabilities for Gaussian states.
     Formula from Jake Bulmer and Stefano Paesani.
     When state is displaced, threshold_detection_prob_displacement is called.
@@ -284,17 +284,13 @@ def numba_tor(A):
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
     """
-    
     n_det = A.shape[0] // 2
     p_sum = 1.  # empty set is not included in the powerset function so we start at 1
     for z in powerset(np.arange(n_det)):
         Z = np.asarray(z)
         ZZ = np.concatenate((Z, Z + n_det), axis=0)
-        
         A_ZZ = numba_ix(A, ZZ, ZZ)
-        
         n = len(Z)
-
         p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2*n) - A_ZZ))
 
     return p_sum * (-1) ** (n_det)
