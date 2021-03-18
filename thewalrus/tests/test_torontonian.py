@@ -130,9 +130,9 @@ def test_disp_torontonian(r, alpha):
     cov = two_mode_squeezing(abs(2 * r), np.angle(2 * r))
     mu = 2 * np.array([alpha.real, alpha.real, alpha.imag, alpha.imag])
 
-    p00n = threshold_detection_prob_displacement(mu, cov, (0, 0))
-    p01n = threshold_detection_prob_displacement(mu, cov, (0, 1))
-    p11n = threshold_detection_prob_displacement(mu, cov, (1, 1))
+    p00n = threshold_detection_prob_displacement(mu, cov, np.array([0, 0]))
+    p01n = threshold_detection_prob_displacement(mu, cov, np.array([0, 1]))
+    p11n = threshold_detection_prob_displacement(mu, cov, np.array([1, 1]))
 
     assert np.isclose(p00a, p00n)
     assert np.isclose(p01a, p01n)
@@ -144,7 +144,7 @@ def test_disp_torontonian_single_mode(scale):
     """Calculates the probability of clicking for a single mode state"""
     cv = random_covariance(1)
     mu = scale * (2 * np.random.rand(2) - 1)
-    prob_click = threshold_detection_prob_displacement(mu, cv, [1])
+    prob_click = threshold_detection_prob_displacement(mu, cv, np.array([1]))
     expected = 1 - density_matrix_element(mu, cv, [0], [0])
     assert np.allclose(prob_click, expected)
 
@@ -174,7 +174,7 @@ def test_tor_and_threshold_displacement_prob_agree(n_modes):
     Q = Qmat(cv)
     O = Xmat(n_modes) @ Amat(cv)
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
-    prob = threshold_detection_prob_displacement(mu, cv, [1] * n_modes)
+    prob = threshold_detection_prob_displacement(mu, cv, np.array([1] * n_modes))
     assert np.allclose(expected, prob)
 
 @pytest.mark.parametrize("n_modes", range(1, 10))

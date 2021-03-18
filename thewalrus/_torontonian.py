@@ -175,7 +175,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
     Args:
         mu (1d array) : means of xp Gaussian Wigner function
         cov (2d array) : : xp Wigner covariance matrix
-        det_pattern (1d array) : array of {0,1} to describe the threshold detection outcome
+        det_pattern (1d numpy array) : array of {0,1} to describe the threshold detection outcome
         hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
