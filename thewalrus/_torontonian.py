@@ -239,7 +239,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
 
     return p0a * p_sum
 
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10): 
+def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10): # pylint: disable=too-many-arguments
     r"""Threshold detection probabilities for Gaussian states.
     Formula from Jake Bulmer and Stefano Paesani.
     When state is displaced, threshold_detection_prob_displacement is called.
