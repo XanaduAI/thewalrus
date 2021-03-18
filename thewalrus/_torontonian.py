@@ -269,7 +269,7 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
     return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
 
 @numba.jit(nopython=True)
-def numba_tor(A):
+def numba_tor(A): # pragma: no cover
     """Returns the Torontonian of a matrix using numba.
 
     For more direct control, you may wish to call :func:`tor_real` or
