@@ -42,5 +42,4 @@
  
 * [Stefano Paesani](https://scholar.google.com/citations?user=u41vIV0AAAAJ&hl=it) (University of Bristol) - :crossed_swords: Emperor of phase space
 
-* [Jake Bulmer](https://scholar.google.com/citations?hl=it&user=gwklyzwAAAAJ) (University of Bristol) - :shield: Commander of clicks
-
+* [Jake Bulmer](https://scholar.google.com/citations?hl=it&user=gwklyzwAAAAJ) (University of Bristol) - :shield: Commander of clicks 
