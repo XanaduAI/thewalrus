@@ -65,7 +65,8 @@ def combinations(pool, r): # pragma: no cover
     Taken from: https://stackoverflow.com/a/61393666
 
     Args:
-        pool (iterable/array) : array/iterable to take combinations from
+        pool (Sequence): sequence to take combinations from
+
         r (int) : number of elements of combination
     Yields:
         results (list) : length r combination from pool
