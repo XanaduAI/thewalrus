@@ -113,6 +113,7 @@ def powerset(parent_set): # pragma: no cover
 @numba.jit(nopython=True)
 def nb_block(X): # pragma: no cover
     """Numba implementation of `np.block`.
+    Only suitable for 2x2 blocks.
 
     Taken from: https://stackoverflow.com/a/57562911
 
@@ -129,6 +130,7 @@ def nb_block(X): # pragma: no cover
 @numba.jit(nopython=True)
 def numba_ix(arr, rows, cols): # pragma: no cover
     """Numba implementation of `np.ix_`.
+    Required due to numba lacking support for advanced numpy indexing.
 
     Args:
         arr (array) : matrix to take submatrix of
