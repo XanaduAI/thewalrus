@@ -66,7 +66,8 @@ def combinations(pool, r): # pragma: no cover
     Taken from: https://stackoverflow.com/a/61393666
 
     Args:
-        pool (iterable/array) : array/iterable to take combinations from
+        pool (Sequence): sequence to take combinations from
+
         r (int) : number of elements of combination
     Yields:
         results (list) : length r combination from pool
@@ -99,8 +100,8 @@ def powerset(parent_set): # pragma: no cover
     """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
 
     Args:
-        parent_set (array/iterable) : set to take powerset from
-    Yields:
+        parent_set (Sequence) : sequence to take powerset from
+    Return:
         subset (tuple) : subset of parent_set
     """
     n = len(parent_set)
@@ -135,7 +136,8 @@ def numba_ix(arr, rows, cols): # pragma: no cover
         cols (array) : columns to be selected in submatrix
 
     Return:
-        len(rows) * len(cols) array : selected submatrix of arr
+        array: selected submatrix of arr, of shape `(len(rows), len(cols))`
+
     """
     return arr[rows][:, cols]
 
