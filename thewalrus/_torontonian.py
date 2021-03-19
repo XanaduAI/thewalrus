@@ -136,7 +136,8 @@ def numba_ix(arr, rows, cols): # pragma: no cover
         cols (array) : columns to be selected in submatrix
 
     Return:
-        len(rows) * len(cols) array : selected submatrix of arr
+        array: selected submatrix of arr, of shape `(len(rows), len(cols))`
+
     """
     return arr[rows][:, cols]
 
