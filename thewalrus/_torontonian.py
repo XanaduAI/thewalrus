@@ -99,7 +99,8 @@ def powerset(S): # pragma: no cover
     """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
 
     Args:
-        S (array/iterable) : set to take powerset from
+        S (Sequence) : sequence to take powerset from
+
     Yields:
         s (list) : subset of S
     """
