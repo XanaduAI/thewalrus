@@ -61,6 +61,7 @@ def tor(A, fsum=False):
 @numba.jit(nopython=True)
 def combinations(pool, r): # pragma: no cover
     """Numba implementation of `itertools.combinations`.
+    As itertools.combinations not callable from numba decorated functions.
 
     Taken from: https://stackoverflow.com/a/61393666
 
@@ -94,18 +95,18 @@ def combinations(pool, r): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def powerset(S): # pragma: no cover
+def powerset(parent_set): # pragma: no cover
     """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
 
     Args:
-        S (array/iterable) : set to take powerset from
+        parent_set (array/iterable) : set to take powerset from
     Yields:
-        s (list) : subset of S
+        subset (tuple) : subset of parent_set
     """
-    n = len(S)
+    n = len(parent_set)
     for i in range(n + 1):
-        for s in combinations(S, i):
-            yield s
+        for subset in combinations(parent_set, i):
+            yield subset
 
 
 @numba.jit(nopython=True)
@@ -115,7 +116,7 @@ def nb_block(X): # pragma: no cover
     Taken from: https://stackoverflow.com/a/57562911
 
     Args:
-        X (tuple of arrays) : arrays for blocks of matrix
+        X (array) : arrays for blocks of matrix
     Return:
         array : the block matrix from X
     """
