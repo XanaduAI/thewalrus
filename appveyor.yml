@@ -27,7 +27,7 @@ install:
 
 build_script:
   - set PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
-  - pip install numpy scipy cython cibuildwheel==1.1.0
+  - pip install numpy scipy cython cibuildwheel==1.10
   - cibuildwheel --output-dir wheelhouse
 
 artifacts:
