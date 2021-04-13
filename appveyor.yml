@@ -5,9 +5,9 @@ environment:
       EIGEN_INCLUDE_DIR: C:\eigen-3.3.7\
       TEST_TIMEOUT: 1000
       CIBW_BEFORE_BUILD: pip install numpy scipy cython
-      CIBW_SKIP: "cp27-* cp33-* cp34-* cp35-* *win32"
+      CIBW_SKIP: "cp27-* cp33-* cp34-* cp35-* cp36-* *win32"
       CIBW_TEST_REQUIRES: "numpy scipy pytest pytest-cov pytest-randomly"
-      CIBW_TEST_COMMAND: "python -m pytest --randomly-seed=137 {project}/thewalrus"
+      CIBW_TEST_COMMAND: "python3 -m pytest --randomly-seed=137 {project}/thewalrus"
       CIBW_BUILD_VERBOSITY: 3
       WHEELHOUSE_UPLOADER_USERNAME: AKIAJOU6ECM5Q7T6UUQQ
       WHEELHOUSE_UPLOADER_SECRET:
@@ -27,7 +27,7 @@ install:
 
 build_script:
   - set PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
-  - pip install numpy scipy cython cibuildwheel==1.10
+  - pip3 install numpy scipy cython cibuildwheel==1.10
   - cibuildwheel --output-dir wheelhouse
 
 artifacts:
@@ -49,6 +49,6 @@ for:
   configuration: Release
 
   after_build:
-    - pip install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
-    - pip install wheelhouse-uploader
-    - python -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
+    - pip3 install https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip
+    - pip3 install wheelhouse-uploader
+    - python3 -m wheelhouse_uploader upload --provider-name S3 --local-folder wheelhouse/ xanadu-wheels
