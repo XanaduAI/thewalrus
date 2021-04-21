@@ -1,4 +1,4 @@
-# Version 0.15.0-dev
+# Version 0.15.0
 
 ### New features
 
@@ -6,10 +6,9 @@
 
 * Adds the function `tvd_cutoff_bounds` to calculate bounds in the total variation distance between a Fock-truncated and an ideal GBS distribution. [#210](https://github.com/XanaduAI/thewalrus/pull/210)
 
-* Adds function for calculating threshold detection probabilities for Gaussian states with displacement
-  [#220](https://github.com/XanaduAI/thewalrus/pull/220)
+* Adds function for calculating threshold detection probabilities for Gaussian states with displacement. [#220](https://github.com/XanaduAI/thewalrus/pull/220)
 
-* Adds new functions `total_photon_number_distribution` and `characteristic_function` to study properties of the total photon number distribution of a `k` identical lossy squeezers. [#230](https://github.com/XanaduAI/thewalrus/pull/230/)
+* Adds new functions `total_photon_number_distribution` and `characteristic_function` to study properties of the total photon number distribution of a `k` identical lossy squeezers. [#230](https://github.com/XanaduAI/thewalrus/pull/230)
 
 
 ### Improvements
@@ -18,13 +17,15 @@
 
 * Refactors `setup.py` to avoid issues with `CFLAGS`. [#229](https://github.com/XanaduAI/thewalrus/pull/229)
 
+* The `fidelity` function in `quantum/gaussian_checks.py` is rewritten to add clarity. [#226](https://github.com/XanaduAI/thewalrus/pull/226)
+
+* Simplifies logic of `normal_ordered_expectation` by removing mutually cancelling `np.conj`. [#228](https://github.com/XanaduAI/thewalrus/pull/228)
+
 ### Bug fixes
 
 * Removes unnecessary `np.real_if_close` statements in `quantum/fock_tensors.py` causing the `probabilities` to not be normalized. [#215](https://github.com/XanaduAI/thewalrus/pull/215)
 
 * Fixes the prefactor in `pure_state_amplitude`. [#231](https://github.com/XanaduAI/thewalrus/pull/231)
-
-### Breaking changes
 
 ### Contributors
 
