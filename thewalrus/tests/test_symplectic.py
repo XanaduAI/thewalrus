@@ -699,7 +699,7 @@ class TestPhaseSpaceFunctions:
         """Test correct error is raised when a non-even-dimensional array is passed"""
         size = (5,) * dim
         A = np.random.rand(*size)
-        with pytest.raises(ValueError, match="The input array is not even dimensional"):
+        with pytest.raises(ValueError, match="The input array is not even-dimensional"):
             fun(A)
 
     @pytest.mark.parametrize("dim", [2, 4, 6, 8])

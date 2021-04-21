@@ -377,7 +377,7 @@ def xxpp_to_xpxp(S):
     n = shape[0]
 
     if n % 2 != 0:
-        raise ValueError("The input array is not even dimensional")
+        raise ValueError("The input array is not even-dimensional")
 
     n = n // 2
     ind = list(np.array([[i, i + n] for i in range(n)]).flatten())
@@ -402,7 +402,7 @@ def xpxp_to_xxpp(S):
     n = shape[0]
 
     if n % 2 != 0:
-        raise ValueError("The input array is not even dimensional")
+        raise ValueError("The input array is not even-dimensional")
 
     n = n // 2
     ind = [2 * i for i in range(n)] + [2 * i + 1 for i in range(n)]
