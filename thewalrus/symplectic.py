@@ -380,7 +380,7 @@ def xxpp_to_xpxp(S):
         raise ValueError("The input array is not even-dimensional")
 
     n = n // 2
-    ind = list(np.arange(2 * n).reshape(2, -1).T.flatten())
+    ind = np.arange(2 * n).reshape(2, -1).T.flatten()
 
     if len(shape) == 2:
         if shape[0] != shape[1]:
