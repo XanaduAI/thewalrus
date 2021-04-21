@@ -156,10 +156,10 @@ def squeezing(r:float, phi:float, dtype=tf.float64):
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = tf.math.cos(phi, dtype=dtype)
-    sp = tf.math.sin(phi, dtype=dtype)
-    ch = tf.math.cosh(r, dtype=dtype)
-    sh = tf.math.sinh(r, dtype=dtype)
+    cp = tf.math.cos(phi)
+    sp = tf.math.sin(phi)
+    ch = tf.math.cosh(r)
+    sh = tf.math.sinh(r)
     S = tf.convert_to_tensor([[ch - cp * sh, -sp * sh], [-sp * sh, ch + cp * sh]])
 
     return S
@@ -177,10 +177,10 @@ def two_mode_squeezing(r:float, phi:float, dtype=tf.float64):
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = tf.math.cos(phi, dtype=dtype)
-    sp = tf.math.sin(phi, dtype=dtype)
-    ch = tf.math.cosh(r, dtype=dtype)
-    sh = tf.math.sinh(r, dtype=dtype)
+    cp = tf.math.cos(phi)
+    sp = tf.math.sin(phi)
+    ch = tf.math.cosh(r)
+    sh = tf.math.sinh(r)
 
     S = tf.convert_to_tensor(
         [
@@ -265,9 +265,9 @@ def beam_splitter(theta:float, phi:float, dtype=tf.float64):
     Returns:
         array: symplectic-orthogonal transformation matrix of an interferometer with angles theta and phi
     """
-    ct = tf.math.cos(theta, dtype=dtype)
-    st = tf.math.sin(theta, dtype=dtype)
-    eip = tf.math.cos(phi, dtype=dtype) + 1j * tf.math.sin(phi, dtype=dtype)
+    ct = tf.math.cos(theta)
+    st = tf.math.sin(theta)
+    eip = tf.math.cos(phi) + 1j * tf.math.sin(phi)
     U = tf.convert_to_tensor(
         [
             [ct, -eip.conj() * st],
@@ -287,7 +287,7 @@ def rotation(theta:float, dtype=tf.float64):
     Returns:
         array: rotation matrix by angle theta
     """
-    V = tf.eye(1) * (tf.math.cos(theta, dtype=dtype) + 1j * tf.math.sin(theta, dtype=dtype))
+    V = tf.eye(1) * (tf.math.cos(theta) + 1j * tf.math.sin(theta))
     return interferometer(V)
 
 
