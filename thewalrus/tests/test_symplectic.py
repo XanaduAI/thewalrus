@@ -688,6 +688,7 @@ class TestPhaseSpaceFunctions:
 
     @pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
     def test_change_basis_raises_not_square(self, fun):
+        """Test correct error is raised when a non-square matrix is passed"""
         A = np.random.rand(4,6)
         with pytest.raises(ValueError, match="The input matrix is not square"):
             fun(A)
@@ -695,6 +696,7 @@ class TestPhaseSpaceFunctions:
     @pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
     @pytest.mark.parametrize("dim", [1, 2])
     def test_change_basis_raises_not_even(self, fun, dim):
+        """Test correct error is raised when a non-even-dimensional array is passed"""
         size = (5,) * dim
         A = np.random.rand(*size)
         with pytest.raises(ValueError, match="The input array is not even dimensional"):
