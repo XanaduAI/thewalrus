@@ -30,6 +30,8 @@ Auxiliary functions
     reduced_state
     is_symplectic
     sympmat
+    qqpp_to_qpqp
+    qpqp_to_qqpp
 
 Gaussian states
 ---------------
@@ -361,3 +363,53 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
     if svd_order:
         return (vals[n : 2 * n])[::-1], U[:, ::-1]
     return vals[n : 2 * n], U
+
+def xxpp_to_xpxp(S):
+    """Permutes the entries of the input from xxpp otdering to xpxp ordering.
+
+    Args:
+        S (array): input even dimensional square matrix or array
+
+    Returns:
+        (array): permuted matrix or array
+    """
+    shape = S.shape
+    n = shape[0]
+
+    if n % 2 != 0:
+        raise ValueError("The input array is not even dimensional")
+
+    n = n // 2
+    ind = list(np.array([[i, i + n] for i in range(n)]).flatten())
+
+    if len(shape) == 2:
+        if shape[0] != shape[1]:
+            raise ValueError("The input matrix is not square")
+        return S[:, ind][ind]
+
+    return S[ind]
+
+def xpxp_to_xxpp(S):
+    """Permutes the entries of the input from xpxp ordering to xxpp ordering.
+
+    Args:
+        S (array): input even dimensional square matrix or vector
+
+    Returns:
+        (array): permuted matrix or vector
+    """
+    shape = S.shape
+    n = shape[0]
+
+    if n % 2 != 0:
+        raise ValueError("The input array is not even dimensional")
+
+    n = n // 2
+    ind = [2 * i for i in range(n)] + [2 * i + 1 for i in range(n)]
+
+    if len(shape) == 2:
+        if shape[0] != shape[1]:
+            raise ValueError("The input matrix is not square")
+        return S[:, ind][ind]
+
+    return S[ind]
