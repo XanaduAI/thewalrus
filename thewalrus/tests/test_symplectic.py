@@ -659,20 +659,6 @@ def test_autonne_error():
     with pytest.raises(ValueError, match="The input matrix is not symmetric"):
         symplectic.autonne(A)
 
-@pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
-def test_change_basis_raises_not_square(fun):
-    A = np.random.rand(4,6)
-    with pytest.raises(ValueError, match="The input matrix is not square"):
-        fun(A)
-
-@pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
-@pytest.mark.parametrize("dim", [1, 2])
-def test_change_basis_raises_not_even(fun, dim):
-    size = (5,) * dim
-    A = np.random.rand(*size)
-    with pytest.raises(ValueError, match="The input array is not even dimensional"):
-        fun(A)
-
 
 class TestPhaseSpaceFunctions:
     """Tests for the shared phase space operations"""
@@ -699,3 +685,17 @@ class TestPhaseSpaceFunctions:
 
         assert np.all(symplectic.xxpp_to_xpxp(cov_xp) == cov_symmetric)
         assert np.all(symplectic.xpxp_to_xxpp(cov_symmetric) == cov_xp)
+
+    @pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
+    def test_change_basis_raises_not_square(self, fun):
+        A = np.random.rand(4,6)
+        with pytest.raises(ValueError, match="The input matrix is not square"):
+            fun(A)
+
+    @pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
+    @pytest.mark.parametrize("dim", [1, 2])
+    def test_change_basis_raises_not_even(self, fun, dim):
+        size = (5,) * dim
+        A = np.random.rand(*size)
+        with pytest.raises(ValueError, match="The input array is not even dimensional"):
+            fun(A)

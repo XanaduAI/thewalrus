@@ -365,7 +365,7 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
     return vals[n : 2 * n], U
 
 def xxpp_to_xpxp(S):
-    """Permutes the entries of the input from xxpp otdering to xpxp ordering.
+    """Permutes the entries of the input from xxpp ordering to xpxp ordering.
 
     Args:
         S (array): input even dimensional square matrix or array
