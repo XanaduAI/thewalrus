@@ -701,3 +701,14 @@ class TestPhaseSpaceFunctions:
         A = np.random.rand(*size)
         with pytest.raises(ValueError, match="The input array is not even dimensional"):
             fun(A)
+
+    @pytest.mark.parametrize("dim", [2, 4, 6, 8])
+    def test_functional_inverse(self, dim):
+        """Check that xxpp_to_xpxp is the inverse of xpxp_to_xxpp and viceversa"""
+        M = np.random.rand(dim, dim)
+        assert np.all(M == symplectic.xxpp_to_xpxp(symplectic.xpxp_to_xxpp(M)))
+        assert np.all(M == symplectic.xpxp_to_xxpp(symplectic.xxpp_to_xpxp(M)))
+
+        v = np.random.rand(dim)
+        assert np.all(v == symplectic.xxpp_to_xpxp(symplectic.xpxp_to_xxpp(v)))
+        assert np.all(v == symplectic.xpxp_to_xxpp(symplectic.xxpp_to_xpxp(v)))
