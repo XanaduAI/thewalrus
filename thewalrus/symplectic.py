@@ -30,8 +30,8 @@ Auxiliary functions
     reduced_state
     is_symplectic
     sympmat
-    qqpp_to_qpqp
-    qpqp_to_qqpp
+    xxpp_to_xpxp
+    xpxp_to_xxpp
 
 Gaussian states
 ---------------
