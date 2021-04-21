@@ -54,9 +54,9 @@ Code details
 """
 import numpy as np
 import tensorflow as tf
+from typing import Sequence
 
-
-def expand(S, modes, N):
+def expand(S, modes:Sequence[int], N:int):
     r"""Expands a Symplectic matrix S to act on the entire subsystem.
 
     Args:
@@ -80,7 +80,7 @@ def expand(S, modes, N):
     return tf.gather(tf.gather(S2, pick, axis=0), pick, axis=1)
 
 
-def expand_vector(alpha, mode, N, hbar=2.0):
+def expand_vector(alpha:complex, mode:int, N:int, hbar=2.0):
     """Returns the phase-space displacement vector associated to a displacement.
 
     Args:
@@ -98,10 +98,12 @@ def expand_vector(alpha, mode, N, hbar=2.0):
 
 
 
-def reduced_state(mu, cov, modes):
+def reduced_state(mu, cov, modes:Sequence[int]):
     r""" Returns the vector of means and the covariance matrix of the specified modes.
 
     Args:
+        mu
+        cov
         modes (int of Sequence[int]): indices of the requested modes
 
     Returns:
@@ -126,11 +128,11 @@ def reduced_state(mu, cov, modes):
     return tf.gather(mu,ind), tf.gather(tf.gather(cov, ind, axis=0), ind, axis=1)
 
 
-def vacuum_state(modes, hbar=2.0, dtype=tf.float64):
+def vacuum_state(modes:int, hbar=2.0, dtype=tf.float64):
     r"""Returns the vacuum state.
 
     Args:
-        modes (str): Returns the vector of means and the covariance matrix
+        modes (int): number of modes
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`
         dtype (numpy.dtype): datatype to represent the covariance matrix and vector of means
@@ -143,7 +145,7 @@ def vacuum_state(modes, hbar=2.0, dtype=tf.float64):
     return state
 
 
-def squeezing(r, phi, dtype=tf.float64):
+def squeezing(r:float, phi:float, dtype=tf.float64):
     r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
 
     Args:
@@ -163,7 +165,7 @@ def squeezing(r, phi, dtype=tf.float64):
     return S
 
 
-def two_mode_squeezing(r, phi, dtype=tf.float64):
+def two_mode_squeezing(r:float, phi:float, dtype=tf.float64):
     """Two-mode squeezing.
 
     Args:
@@ -209,7 +211,7 @@ def interferometer(U):
 
 
 # pylint: disable=too-many-arguments
-def loss_tf(mu, cov, T, mode, nbar=0, hbar=2):
+def loss(mu, cov, T, mode, nbar=0, hbar=2):
     r"""Loss channel acting on a Gaussian state.
 
     Args:
@@ -252,7 +254,7 @@ def mean_photon_number(mu, cov, hbar=2):
     return ex, var
 
 
-def beam_splitter(theta, phi, dtype=tf.float64):
+def beam_splitter(theta:float, phi:float, dtype=tf.float64):
     """Beam-splitter.
 
     Args:
@@ -275,7 +277,7 @@ def beam_splitter(theta, phi, dtype=tf.float64):
     return interferometer(U)
 
 
-def rotation(theta, dtype=tf.float64):
+def rotation(theta:float, dtype=tf.float64):
     """Rotation gate.
 
     Args:
@@ -289,7 +291,7 @@ def rotation(theta, dtype=tf.float64):
     return interferometer(V)
 
 
-def sympmat(N, dtype=tf.float64):
+def sympmat(N:int, dtype=tf.float64):
     r"""Returns the matrix :math:`\Omega_n = \begin{bmatrix}0 & I_n\\ -I_n & 0\end{bmatrix}`
 
     Args:
