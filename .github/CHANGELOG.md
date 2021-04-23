@@ -10,6 +10,8 @@
 
 * Adds new functions `total_photon_number_distribution` and `characteristic_function` to study properties of the total photon number distribution of a `k` identical lossy squeezers. [#230](https://github.com/XanaduAI/thewalrus/pull/230)
 
+* Adds new functions `xxpp_to_xpxp` and `xpxp_to_xxpp` in the `symplectic` module to swap the ordering of the quadrature operators in vectors and matrices. [#237](https://github.com/XanaduAI/thewalrus/pull/237/)
+
 
 ### Improvements
 
