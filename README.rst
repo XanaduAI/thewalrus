@@ -72,7 +72,7 @@ Compiling from source
 
 The Walrus depends on the following Python packages:
 
-* `Python <http://python.org/>`_ >= 3.6
+* `Python <http://python.org/>`_ >= 3.7
 * `NumPy <http://numpy.org/>`_  >= 1.13.3
 * `Numba <https://numba.pydata.org/>`_ >= 0.43.1
 
