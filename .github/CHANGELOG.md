@@ -1,16 +1,16 @@
-# Version 0.16.0-dev
-
-### New features
-
-### Improvements
+# Version 0.15.1
 
 ### Bug fixes
 
-### Breaking changes
+* Builds The Walrus binaries against an older version of NumPy, to avoid
+  a breaking ABI change in NumPy 1.20.
+  [#240](https://github.com/XanaduAI/thewalrus/pull/240)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Josh Izaac
 
 ---
 
