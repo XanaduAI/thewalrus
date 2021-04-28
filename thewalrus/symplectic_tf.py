@@ -55,6 +55,7 @@ Code details
 import numpy as np
 import tensorflow as tf
 from typing import Sequence
+from functools import lru_cache
 
 def expand(S, modes:Sequence[int], N:int):
     r"""Expands a Symplectic matrix S to act on the entire subsystem.
@@ -205,7 +206,7 @@ def interferometer(U):
     """
     X = tf.math.real(U)
     Y = tf.math.imag(U)
-    S = tf.concat([tf.concat([X, -Y], axis=1), tf.concat([Y, X], axis=1)])
+    S = tf.concat([tf.concat([X, -Y], axis=1), tf.concat([Y, X], axis=1)], axis=0)
 
     return S
 
@@ -228,9 +229,10 @@ def loss(mu, cov, T, mode, nbar=0, hbar=2):
         tuple[array]: the means vector and covariance matrix of the resulting state
     """
     N = len(cov) // 2
-    mu = tf.tensor_scatter_nd_update(mu, [[mode], [mode+N]], [mu[mode]*tf.math.sqrt(T), mu[mode+N]*tf.math.sqrt(T)])
-    cov = tf.tensor_scatter_nd_update(cov, [[mode], [mode+N]], [cov[mode]*tf.math.sqrt(T), cov[mode+N]*tf.math.sqrt(T)])
-    cov = tf.transpose(tf.tensor_scatter_nd_update(tf.transpose(cov), [[mode], [mode+N]], [cov[:,mode]*tf.math.sqrt(T), cov[:,mode+N]*tf.math.sqrt(T)]))
+    sqrtT = tf.cast(tf.math.sqrt(T), dtype=mu.dtype)
+    mu = tf.tensor_scatter_nd_update(mu, [[mode], [mode+N]], [mu[mode]*sqrtT, mu[mode+N]*sqrtT])
+    cov = tf.tensor_scatter_nd_update(cov, [[mode], [mode+N]], [cov[mode]*sqrtT, cov[mode+N]*sqrtT])
+    cov = tf.transpose(tf.tensor_scatter_nd_update(tf.transpose(cov), [[mode], [mode+N]], [cov[:,mode]*sqrtT, cov[:,mode+N]*sqrtT]))
     cov = tf.tensor_scatter_nd_add(cov, [[mode,mode], [mode+N,mode+N]], [(1 - T) * (2 * nbar + 1) * hbar / 2, (1 - T) * (2 * nbar + 1) * hbar / 2])
 
     return mu, cov
@@ -265,12 +267,13 @@ def beam_splitter(theta:float, phi:float, dtype=tf.float64):
     Returns:
         array: symplectic-orthogonal transformation matrix of an interferometer with angles theta and phi
     """
-    ct = tf.math.cos(theta)
-    st = tf.math.sin(theta)
-    eip = tf.math.cos(phi) + 1j * tf.math.sin(phi)
+    cdtype = {tf.float64:tf.complex128, tf.float32:tf.complex64}
+    ct = tf.cast(tf.math.cos(theta), dtype=cdtype[dtype])
+    st = tf.cast(tf.math.sin(theta), dtype=cdtype[dtype])
+    eip = tf.complex(tf.math.cos(phi),tf.math.sin(phi))
     U = tf.convert_to_tensor(
         [
-            [ct, -eip.conj() * st],
+            [ct, -tf.math.conj(eip) * st],
             [eip * st, ct],
         ]
     )
@@ -287,7 +290,7 @@ def rotation(theta:float, dtype=tf.float64):
     Returns:
         array: rotation matrix by angle theta
     """
-    V = tf.eye(1) * (tf.math.cos(theta) + 1j * tf.math.sin(theta))
+    V = tf.eye(1, dtype=dtype) * tf.complex(tf.math.cos(theta), tf.math.sin(theta))
     return interferometer(V)
 
 
@@ -354,3 +357,44 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
     if svd_order:
         return (vals[n : 2 * n])[::-1], U[:, ::-1]
     return vals[n : 2 * n], U
+
+@lru_cache()
+def rotmat(l):
+    """Rotation matrix from quadratures to complex amplitudes
+    Args:
+        l (int): size
+    Returns:
+        (array): rotation matrix
+    """
+    idl = np.identity(l)
+    R = np.sqrt(0.5) * np.block([[idl, 1j * idl], [idl, -1j * idl]])
+    return tf.convert_to_tensor(R)
+
+
+@lru_cache()
+def Xmat(N):
+    r"""Returns the matrix :math:`X_n = \begin{bmatrix}0 & I_n\\ I_n & 0\end{bmatrix}`
+    Args:
+        N (int): positive integer
+    Returns:
+        array: :math:`2N\times 2N` array
+    """
+    I = np.identity(N)
+    O = np.zeros((N,N))
+    X = np.block([[O, I], [I, O]])
+    return tf.convert_to_tensor(X+0.0j)
+
+
+def Amat_states(cov, choi_r=np.arcsinh(1.0), hbar=2):
+    """Generate the double adjacency matrix of a (in general) mixed Gaussian state
+    Args:
+        cov (array): covariance matrix
+    Returns:
+        (array): adjacency matrix of the Gaussian state
+    """
+    l, l = cov.shape
+    R = rotmat(l)
+    sigma = (1 / hbar) * R @ tf.cast(cov, dtype=R.dtype) @ tf.math.conj(tf.transpose(R))
+    I = tf.eye(2*l, dtype=R.dtype)
+    A = tf.matmul(Xmat(l), (I - tf.linalg.inv(sigma + 0.5 * I)))
+    return A
