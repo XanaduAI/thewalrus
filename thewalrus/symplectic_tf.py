@@ -267,10 +267,14 @@ def beam_splitter(theta:float, phi:float, dtype=tf.float64):
     Returns:
         array: symplectic-orthogonal transformation matrix of an interferometer with angles theta and phi
     """
-    cdtype = {tf.float64:tf.complex128, tf.float32:tf.complex64}
+    cdtype = {tf.float64:tf.complex128,
+              np.float64:tf.complex128,
+              tf.float32:tf.complex64,
+              np.float32:tf.complex64,
+              float:tf.complex128}
     ct = tf.cast(tf.math.cos(theta), dtype=cdtype[dtype])
     st = tf.cast(tf.math.sin(theta), dtype=cdtype[dtype])
-    eip = tf.complex(tf.math.cos(phi),tf.math.sin(phi))
+    eip = tf.complex(tf.cast(tf.math.cos(phi),cdtype[dtype]), tf.cast(tf.math.sin(phi), cdtype[dtype]))
     U = tf.convert_to_tensor(
         [
             [ct, -tf.math.conj(eip) * st],
