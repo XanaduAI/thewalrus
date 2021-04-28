@@ -92,10 +92,6 @@ def expand_vector(alpha:complex, mode:int, N:int, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
-    cdtype = {tf.float64:tf.complex128,
-          np.float64:tf.complex128,
-          tf.float32:tf.complex64,
-          np.float32:tf.complex64}
     indices = [[mode], [mode+N]]
     updates = [np.sqrt(2 * hbar) * tf.math.real(alpha), np.sqrt(2 * hbar) * tf.math.imag(alpha)]
     Z = tf.zeros(2*N, dtype=tf.math.real(alpha).dtype)
