@@ -296,7 +296,7 @@ def rotation(theta:float, dtype=tf.float64):
     Returns:
         array: rotation matrix by angle theta
     """
-    cdtype = {tf.float32:tf.float64, tf.float64:tf.float128}
+    cdtype = {tf.float32:tf.complex64, tf.float64:tf.complex128}
     x = tf.cast(tf.math.cos(theta), dtype)
     y = tf.cast(tf.math.sin(theta), dtype)
     V = tf.eye(1, dtype=cdtype[dtype]) * tf.complex(x, y)
