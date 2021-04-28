@@ -92,9 +92,13 @@ def expand_vector(alpha:complex, mode:int, N:int, hbar=2.0):
     Returns:
         array: phase-space displacement vector of size 2*N
     """
+    cdtype = {tf.float64:tf.complex128,
+          np.float64:tf.complex128,
+          tf.float32:tf.complex64,
+          np.float32:tf.complex64}
     indices = [[mode], [mode+N]]
     updates = [np.sqrt(2 * hbar) * tf.math.real(alpha), np.sqrt(2 * hbar) * tf.math.imag(alpha)]
-    Z = tf.zeros(2*N, dtype=alpha.dtype.real_dtype)
+    Z = tf.zeros(2*N, dtype=tf.math.real(alpha).dtype)
     return tf.tensor_scatter_nd_add(Z,indices, updates)
 
 
@@ -236,24 +240,6 @@ def loss(mu, cov, T, mode, nbar=0, hbar=2):
     cov = tf.tensor_scatter_nd_add(cov, [[mode,mode], [mode+N,mode+N]], [(1 - T) * (2 * nbar + 1) * hbar / 2, (1 - T) * (2 * nbar + 1) * hbar / 2])
 
     return mu, cov
-
-### Comment: This function strongly overlaps with `quantum.photon_number_mean`
-### Wonder if it is worth removing it.
-def mean_photon_number(mu, cov, hbar=2):
-    r"""Calculates the mean photon number for a given one-mode state.
-
-    Args:
-        mu (array): length-2 vector of means
-        cov (array): :math:`2\times 2` covariance matrix
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`
-
-    Returns:
-        tuple: the photon number expectation and variance
-    """
-    ex = (tf.linalg.trace(cov) + tf.transpose(mu) @ mu) / (2 * hbar) - 1 / 2
-    var = (tf.linalg.trace(cov @ cov) + 2 * tf.transpose(mu) @ cov @ mu) / (2 * hbar ** 2) - 1 / 4
-    return ex, var
 
 
 def beam_splitter(theta:float, phi:float, dtype=tf.float64):
