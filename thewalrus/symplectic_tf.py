@@ -290,7 +290,9 @@ def rotation(theta:float, dtype=tf.float64):
     Returns:
         array: rotation matrix by angle theta
     """
-    V = tf.eye(1, dtype=dtype) * tf.complex(tf.math.cos(theta), tf.math.sin(theta))
+    x = tf.cast(tf.math.cos(theta), dtype)
+    y = tf.cast(tf.math.sin(theta), dtype)
+    V = tf.eye(1, dtype=dtype) * tf.complex(x, y)
     return interferometer(V)
 
 
