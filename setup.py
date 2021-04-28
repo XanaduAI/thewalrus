@@ -133,6 +133,7 @@ info = {
         "scipy>=1.2.1",
         "sympy>=1.5.1",
         "repoze.lru>=0.7",
+        "tensorflow>=2.4",
     ],
     "setup_requires": ["cython", "numpy"],
     "ext_modules": build_extensions(),

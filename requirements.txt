@@ -6,3 +6,4 @@ sympy>=1.5.1
 repoze.lru>=0.7
 cython
 dask[delayed]
+tensorflow>=2.4
