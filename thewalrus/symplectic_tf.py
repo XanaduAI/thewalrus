@@ -270,13 +270,12 @@ def beam_splitter(theta:float, phi:float, dtype=tf.float64):
     cdtype = {tf.float64:tf.complex128,
               np.float64:tf.complex128,
               tf.float32:tf.complex64,
-              np.float32:tf.complex64,
-              float:tf.complex64}
-    dtype = cdtype[dtype]
+              np.float32:tf.complex64}
 
-    ct = tf.cast(tf.math.cos(theta), dtype)
-    st = tf.cast(tf.math.sin(theta), dtype)
-    eip = tf.complex(tf.cast(tf.math.cos(phi), dtype), tf.cast(tf.math.sin(phi), dtype))
+    ct = tf.cast(tf.math.cos(theta), cdtype[dtype])
+    st = tf.cast(tf.math.sin(theta), cdtype[dtype])
+    eip = tf.cast(tf.complex(tf.math.cos(phi), tf.math.sin(phi)), cdtype[dtype])
+
     U = tf.convert_to_tensor(
         [
             [ct, -tf.math.conj(eip) * st],
