@@ -157,10 +157,10 @@ def squeezing(r:float, phi:float, dtype=tf.float64):
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = tf.math.cos(phi)
-    sp = tf.math.sin(phi)
-    ch = tf.math.cosh(r)
-    sh = tf.math.sinh(r)
+    cp = tf.cast(tf.math.cos(phi), dtype)
+    sp = tf.cast(tf.math.sin(phi), dtype)
+    ch = tf.cast(tf.math.cosh(r), dtype)
+    sh = tf.cast(tf.math.sinh(r), dtype)
     S = tf.convert_to_tensor([[ch - cp * sh, -sp * sh], [-sp * sh, ch + cp * sh]])
 
     return S
@@ -178,10 +178,10 @@ def two_mode_squeezing(r:float, phi:float, dtype=tf.float64):
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = tf.math.cos(phi)
-    sp = tf.math.sin(phi)
-    ch = tf.math.cosh(r)
-    sh = tf.math.sinh(r)
+    cp = tf.cast(tf.math.cos(phi), dtype)
+    sp = tf.cast(tf.math.sin(phi), dtype)
+    ch = tf.cast(tf.math.cosh(r), dtype)
+    sh = tf.cast(tf.math.sinh(r), dtype)
 
     S = tf.convert_to_tensor(
         [
