@@ -53,11 +53,11 @@ Pre-built binary wheels are available for the following platforms:
 +------------+-------------+------------------+---------------+
 |            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |
 +============+=============+==================+===============+
-| Python 3.6 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
 | Python 3.7 |      X      |        X         |       X       |
 +------------+-------------+------------------+---------------+
 | Python 3.8 |      X      |        X         |       X       |
++------------+-------------+------------------+---------------+
+| Python 3.9 |      X      |        X         |       X       |
 +------------+-------------+------------------+---------------+
 
 To install, simply run
@@ -72,7 +72,7 @@ Compiling from source
 
 The Walrus depends on the following Python packages:
 
-* `Python <http://python.org/>`_ >= 3.6
+* `Python <http://python.org/>`_ >= 3.7
 * `NumPy <http://numpy.org/>`_  >= 1.13.3
 * `Numba <https://numba.pydata.org/>`_ >= 0.43.1
 

@@ -75,7 +75,7 @@ jobs:
       - image: circleci/python:3.6.12-stretch
     environment:
       CIBW_SKIP: "pp* cp27-* cp34-* cp35-* cp36-* *i686"
-      CIBW_BEFORE_BUILD_LINUX: curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen --strip-components 1 && cp -rf Eigen {project}/include && pip install numpy scipy cython
+      CIBW_BEFORE_BUILD_LINUX: curl -OsL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && tar xzf eigen-3.3.7.tar.gz eigen-3.3.7/Eigen --strip-components 1 && cp -rf Eigen {project}/include && pip install numpy==1.19.5 scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
     steps:
@@ -110,7 +110,7 @@ jobs:
       CIBW_SKIP: "pp* cp27-* cp34-* cp35-* cp36-* *i686"
       CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=10.9"
 
-      CIBW_BEFORE_BUILD_MACOS: brew install gmp gcc eigen libomp; pip install numpy scipy cython
+      CIBW_BEFORE_BUILD_MACOS: brew install gmp gcc eigen libomp; pip install numpy==1.19.5 scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
     steps:
