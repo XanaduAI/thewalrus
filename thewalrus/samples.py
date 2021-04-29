@@ -39,6 +39,8 @@ Torontonian sampling
     torontonian_sample_state
     torontonian_sample_graph
     torontonian_sample_classical_state
+    threshold_detection_prob
+    threshold_detection_prob_displacement
 
 Brute force sampling
 --------------------
@@ -55,7 +57,7 @@ import numpy as np
 from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, reduction
-from ._torontonian import tor
+from ._torontonian import tor, threshold_detection_prob, threshold_detection_prob_displacement
 from .quantum import (
     Amat,
     Covmat,
@@ -66,6 +68,21 @@ from .quantum import (
     reduced_gaussian,
     density_matrix_element,
 )
+
+__all__ = [
+    "generate_hafnian_sample",
+    "hafnian_sample_state",
+    "hafnian_sample_graph",
+    "hafnian_sample_classical_state",
+    "hafnian_sample_graph_rank_one",
+    "generate_torontonian_sample",
+    "torontonian_sample_state",
+    "torontonian_sample_graph",
+    "torontonian_sample_classical_state",
+    "threshold_detection_prob",
+    "threshold_detection_prob_displacement",
+    "photon_number_sampler",
+]
 
 # ===============================================================================================
 # Hafnian sampling
