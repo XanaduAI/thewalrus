@@ -16,9 +16,10 @@
 import pytest
 
 import numpy as np
+import tensorflow as tf
 from scipy.linalg import block_diag
 
-from thewalrus import symplectic
+from thewalrus import symplectic_tf as symplectic
 
 
 # pylint: disable=too-few-public-methods
@@ -45,18 +46,18 @@ class TestSqueezing:
         # the symplectic matrix
         O = np.array([[0, 1], [-1, 0]])
 
-        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+        assert np.allclose(S @ O @ tf.transpose(S), O, atol=tol, rtol=0)
 
     def test_squeezing(self, tol):
         """Test the squeezing symplectic transform."""
         r = 0.543
         phi = 0.123
         S = symplectic.squeezing(r, phi)
-        out = S @ S.T
+        out = S @ tf.transpose(S)
 
         # apply to an identity covariance matrix
         rotation = np.array([[np.cos(phi/2), -np.sin(phi/2)], [np.sin(phi/2), np.cos(phi/2)]])
-        expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
+        expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ tf.transpose(rotation)
         assert np.allclose(out, expected, atol=tol, rtol=0)
 
 
@@ -72,7 +73,7 @@ class TestTwoModeSqueezing:
         # the symplectic matrix
         O = np.block([[np.zeros([4, 4]), np.identity(4)], [-np.identity(4), np.zeros([4, 4])]])
 
-        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+        assert np.allclose(S @ O @ tf.transpose(S), O, atol=tol, rtol=0)
 
     def test_decompose(self, tol):
         """Test the two mode squeezing symplectic transform decomposes correctly."""
@@ -92,7 +93,7 @@ class TestTwoModeSqueezing:
         # fmt: on
 
         Sz = block_diag(Sq1, Sq2)[:, [0, 2, 1, 3]][[0, 2, 1, 3]]
-        expected = B.conj().T @ Sz @ B
+        expected = tf.transpose(tf.math.conj(B)) @ Sz @ B
         assert np.allclose(S, expected, atol=tol, rtol=0)
 
     def test_coherent(self, hbar, tol):
@@ -105,7 +106,7 @@ class TestTwoModeSqueezing:
         # test that S |a1, a2> = |ta1+ra2, ta2+ra1>
         a1 = 0.23 + 0.12j
         a2 = 0.23 + 0.12j
-        out = S @ np.array([a1.real, a2.real, a1.imag, a2.imag]) * np.sqrt(2 * hbar)
+        out = S.numpy() @ np.array([a1.real, a2.real, a1.imag, a2.imag]) * np.sqrt(2 * hbar)
 
         T = np.cosh(r)
         R = np.exp(1j * phi) * np.sinh(r)
@@ -124,7 +125,7 @@ class TestInterferometer:
         """Test that an interferometer returns correct symplectic"""
         # fmt:off
         U = np.array([[0.83645892-0.40533293j, -0.20215326+0.30850569j],
-                      [-0.23889780-0.28101519j, -0.88031770-0.29832709j]])
+                      [-0.23889780-0.28101519j, -0.88031770-0.29832709j]], dtype=np.complex64)
         # fmt:on
 
         S = symplectic.interferometer(U)
@@ -146,7 +147,7 @@ class TestInterferometer:
         # the symplectic matrix
         O = np.block([[np.zeros([4, 4]), np.identity(4)], [-np.identity(4), np.zeros([4, 4])]])
 
-        assert np.allclose(U @ O @ U.T, O, atol=tol, rtol=0)
+        assert np.allclose(U @ O @ tf.transpose(U), O, atol=tol, rtol=0)
 
     def test_50_50_beamsplitter(self, tol):
         """Test that an interferometer returns correct symplectic for a 50-50 beamsplitter"""
@@ -164,7 +165,7 @@ class TestInterferometer:
         phi = 0.41
         U = symplectic.beam_splitter(theta, phi)
         S = symplectic.interferometer(U)
-        expected = np.block([[U.real, -U.imag], [U.imag, U.real]])
+        expected = np.block([[tf.math.real(U), -tf.math.imag(U)], [tf.math.imag(U), tf.math.real(U)]])
         np.allclose(S, expected, atol=tol, rtol=0)
 
 
@@ -209,7 +210,7 @@ class TestReducedState:
 
         S = symplectic.two_mode_squeezing(r, phi)
         mu = np.zeros([4])
-        cov = S @ S.T * (hbar / 2)
+        cov = S @ tf.transpose(S) * (hbar / 2)
 
         res = symplectic.reduced_state(mu, cov, 0)
 
@@ -232,7 +233,7 @@ class TestLossChannel:
         T = 0.812
 
         S = symplectic.two_mode_squeezing(r, phi)
-        cov = S @ S.T * (hbar / 2)
+        cov = S @ tf.transpose(S) * (hbar / 2)
 
         # perform loss
         _, cov_res = symplectic.loss(np.zeros([4]), cov, T, mode=0, hbar=hbar)
@@ -253,7 +254,7 @@ class TestLossChannel:
         cov_expand[3:5, 3:5] = cov[2:, 2:]
 
         # apply the beamsplitter to modes 0 and 2
-        cov_expand = B @ cov_expand @ B.T
+        cov_expand = B @ cov_expand @ tf.transpose(B)
 
         # compare loss function result to an interferometer mixing mode 0 with the vacuum
         _, cov_expected = symplectic.reduced_state(np.zeros([6]), cov_expand, modes=[0, 1])
@@ -268,7 +269,7 @@ class TestLossChannel:
         mu = np.concatenate([alpha.real, alpha.imag])
 
         # perform loss
-        mu_res, _ = symplectic.loss(mu, np.identity(4), T, mode=0, hbar=hbar)
+        mu_res, dummy_1 = symplectic.loss(mu, np.identity(4), T, mode=0, hbar=hbar)
 
         # create a two mode beamsplitter acting on modes 0 and 2
         B = np.array([[np.sqrt(T), -np.sqrt(1-T), 0, 0],
@@ -281,7 +282,7 @@ class TestLossChannel:
         # apply the beamsplitter to modes 0 and 2
         mu_expand = np.zeros([6])
         mu_expand[np.array([0, 1, 3, 4])] = mu
-        mu_expected, _ = symplectic.reduced_state(B @ mu_expand, np.identity(6), modes=[0, 1])
+        mu_expected, dummy_2 = symplectic.reduced_state(tf.linalg.matvec(B,  mu_expand), np.identity(6), modes=[0, 1])
 
         # compare loss function result to an interferometer mixing mode 0 with the vacuum
         assert np.allclose(mu_expected, mu_res, atol=tol, rtol=0)
@@ -290,11 +291,11 @@ class TestLossChannel:
         """Test full loss on half a TMS"""
         r = 0.543
         phi = 0.432
-        T = 0
+        T = 0.0
 
         S = symplectic.two_mode_squeezing(r, phi)
         mu = np.zeros([4])
-        cov = S @ S.T * (hbar / 2)
+        cov = S @ tf.transpose(S) * (hbar / 2)
 
         mu, cov = symplectic.loss(mu, cov, T, mode=0, hbar=hbar)
 
@@ -317,11 +318,11 @@ class TestLossChannel:
         """Test no loss on half a TMS leaves state unchanged"""
         r = 0.543
         phi = 0.432
-        T = 1
+        T = 1.0
 
         S = symplectic.two_mode_squeezing(r, phi)
         mu = np.zeros([4])
-        cov = S @ S.T * (hbar / 2)
+        cov = S @ tf.transpose(S) * (hbar / 2)
 
         res = symplectic.loss(mu, cov, T, mode=0, hbar=hbar)
         expected = mu, cov
@@ -348,7 +349,7 @@ class TestLossChannel:
 
     def test_loss_complete_random(self, hbar, tol):
         """Test loss on random state"""
-        T = 0
+        T = 0.0
 
         mu = np.random.random(size=[4])
         cov = np.array(
@@ -378,78 +379,6 @@ class TestLossChannel:
         assert np.allclose(res[1], cov_exp, atol=tol, rtol=0)
         assert np.allclose(res[0], mu_exp, atol=tol, rtol=0)
 
-
-class TestMeanPhotonNumber:
-    """Tests for the mean photon number function"""
-
-    def test_coherent(self, hbar, tol):
-        """Test that E(n) = |a|^2 and var(n) = |a|^2 for a coherent state"""
-        a = 0.23 + 0.12j
-        mu = np.array([a.real, a.imag]) * np.sqrt(2 * hbar)
-        cov = np.identity(2) * hbar / 2
-
-        mean_photon, var = symplectic.mean_photon_number(mu, cov, hbar=hbar)
-
-        assert np.allclose(mean_photon, np.abs(a) ** 2, atol=tol, rtol=0)
-        assert np.allclose(var, np.abs(a) ** 2, atol=tol, rtol=0)
-
-    def test_squeezed(self, hbar, tol):
-        """Test that E(n)=sinh^2(r) and var(n)=2(sinh^2(r)+sinh^4(r)) for a squeezed state"""
-        r = 0.1
-        phi = 0.423
-
-        S = np.array(
-            [
-                [np.cosh(r) - np.cos(phi) * np.sinh(r), -np.sin(phi) * np.sinh(r)],
-                [-np.sin(phi) * np.sinh(r), np.cosh(r) + np.cos(phi) * np.sinh(r)],
-            ]
-        )
-
-        mu = np.zeros([2])
-        cov = S @ S.T * hbar / 2
-
-        mean_photon, var = symplectic.mean_photon_number(mu, cov, hbar=hbar)
-
-        assert np.allclose(mean_photon, np.sinh(r) ** 2, atol=tol, rtol=0)
-        assert np.allclose(var, 2 * (np.sinh(r) ** 2 + np.sinh(r) ** 4), atol=tol, rtol=0)
-
-    def test_displaced_squeezed(self, hbar, tol):
-        """Test that E(n) = sinh^2(r)+|a|^2 for a displaced squeezed state"""
-        a = 0.12 - 0.05j
-        r = 0.1
-        phi = 0.423
-
-        S = np.array(
-            [
-                [np.cosh(r) - np.cos(phi) * np.sinh(r), -np.sin(phi) * np.sinh(r)],
-                [-np.sin(phi) * np.sinh(r), np.cosh(r) + np.cos(phi) * np.sinh(r)],
-            ]
-        )
-
-        mu = np.array([a.real, a.imag]) * np.sqrt(2 * hbar)
-        cov = S @ S.T * hbar / 2
-
-        mean_photon, _ = symplectic.mean_photon_number(mu, cov, hbar=hbar)
-
-        mean_ex = np.abs(a) ** 2 + np.sinh(r) ** 2
-        assert np.allclose(mean_photon, mean_ex, atol=tol, rtol=0)
-
-    def test_displaced_thermal(self, hbar, tol):
-        """Test that E(n)=|a|^2+nbar and var(n)=var_th+|a|^2(1+2nbar)"""
-
-        a = 0.12 - 0.05j
-        nbar = 0.123
-
-        mu = np.array([a.real, a.imag]) * np.sqrt(2 * hbar)
-        cov = np.diag(2 * np.tile(nbar, 2) + 1) * (hbar / 2)
-
-        mean_photon, var = symplectic.mean_photon_number(mu, cov, hbar=hbar)
-
-        mean_ex = np.abs(a) ** 2 + nbar
-        var_ex = nbar ** 2 + nbar + np.abs(a) ** 2 * (1 + 2 * nbar)
-
-        assert np.allclose(mean_photon, mean_ex, atol=tol, rtol=0)
-        assert np.allclose(var, var_ex, atol=tol, rtol=0)
 # pylint: disable=too-few-public-methods
 class TestVectorExpansion:
     """Tests for expanding a displacement operation into a phase-space displacement vector"""
@@ -482,7 +411,7 @@ class TestSymplecticExpansion:
             ]
         )
 
-        res = symplectic.expand(S, modes=mode, N=N)
+        res = symplectic.expand(S, modes=[mode], N=N)
 
         expected = np.identity(2 * N)
         expected[mode, mode] = S[0, 0]
@@ -547,7 +476,7 @@ class TestIntegration:
         alpha = np.random.random(size=[4]) + np.random.random(size=[4]) * 1j
         D = np.concatenate([alpha.real, alpha.imag])
         mu = mu_init + D
-        cov = cov_init.copy()
+        dummy1, cov = symplectic.vacuum_state(4, hbar=hbar)
 
         # random squeezing
         r = np.random.random()
@@ -555,7 +484,7 @@ class TestIntegration:
         S = symplectic.expand(symplectic.two_mode_squeezing(r, phi), modes=[0, 1], N=4)
 
         # check symplectic
-        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+        assert np.allclose(S @ O @ tf.transpose(S), O, atol=tol, rtol=0)
 
         # random interferometer
         # fmt:off
@@ -567,13 +496,13 @@ class TestIntegration:
         U = symplectic.interferometer(u)
 
         # check unitary
-        assert np.allclose(u @ u.conj().T, np.identity(4), atol=tol, rtol=0)
+        assert np.allclose(u @ tf.transpose(tf.math.conj(u)), np.identity(4), atol=tol, rtol=0)
         # check symplectic
-        assert np.allclose(U @ O @ U.T, O, atol=tol, rtol=0)
+        assert np.allclose(U @ O @ tf.transpose(U), O, atol=tol, rtol=0)
 
         # apply squeezing and interferometer
-        cov = U @ S @ cov @ S.T @ U.T
-        mu = U @ S @ mu
+        cov = U @ S @ cov @ tf.transpose(S) @ tf.transpose(U)
+        mu = tf.linalg.matvec(U @ S, mu)
 
         # check we are no longer in the vacuum state
         assert not np.allclose(mu, mu_init, atol=tol, rtol=0)
@@ -581,15 +510,15 @@ class TestIntegration:
 
         # return the inverse operations
         Sinv = symplectic.expand(symplectic.two_mode_squeezing(-r, phi), modes=[0, 1], N=4)
-        Uinv = symplectic.interferometer(u.conj().T)
+        Uinv = symplectic.interferometer(tf.transpose(tf.math.conj(u)))
 
         # check inverses
         assert np.allclose(Uinv, np.linalg.inv(U), atol=tol, rtol=0)
         assert np.allclose(Sinv, np.linalg.inv(S), atol=tol, rtol=0)
 
         # apply the inverse operations
-        cov = Sinv @ Uinv @ cov @ Uinv.T @ Sinv.T
-        mu = Sinv @ Uinv @ mu
+        cov = Sinv @ Uinv @ cov @ tf.transpose(Uinv) @ tf.transpose(Sinv)
+        mu = tf.linalg.matvec(Sinv @ Uinv, mu)
 
         # inverse displacement
         mu -= D
@@ -626,89 +555,3 @@ def test_sympmat(n):
     X = np.block([[O, I], [-I, O]])
     res = symplectic.sympmat(n)
     assert np.all(X == res)
-
-@pytest.mark.parametrize("n", [5, 10, 50])
-@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
-@pytest.mark.parametrize("svd_order", [True, False])
-def test_autonne(n, datatype, svd_order):
-    """Checks the correctness of the Autonne decomposition function"""
-    if datatype is np.complex128:
-        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
-    if datatype is np.float64:
-        A = np.random.rand(n, n)
-    A += A.T
-    r, U = symplectic.autonne(A, svd_order=svd_order)
-    assert np.allclose(A, U @ np.diag(r) @ U.T)
-    assert np.all(r >= 0)
-    if svd_order is True:
-        assert np.all(np.diff(r) <= 0)
-    else:
-        assert np.all(np.diff(r) >= 0)
-
-
-def test_autonne_error():
-    """Tests the value errors of autonne"""
-    n = 10
-    m = 20
-    A = np.random.rand(n, m)
-    with pytest.raises(ValueError, match="The input matrix is not square"):
-        symplectic.autonne(A)
-    n = 10
-    m = 10
-    A = np.random.rand(n, m)
-    with pytest.raises(ValueError, match="The input matrix is not symmetric"):
-        symplectic.autonne(A)
-
-
-class TestPhaseSpaceFunctions:
-    """Tests for the shared phase space operations"""
-
-    def test_means_changebasis(self):
-        """Test the change of basis function applied to vectors. This function
-        converts from xp to symmetric ordering, and vice versa."""
-        means_xp = np.array([1, 2, 3, 4, 5, 6])
-        means_symmetric = np.array([1, 4, 2, 5, 3, 6])
-
-        assert np.all(symplectic.xxpp_to_xpxp(means_xp) == means_symmetric)
-        assert np.all(symplectic.xpxp_to_xxpp(means_symmetric) == means_xp)
-
-    def test_cov_changebasis(self):
-        """Test the change of basis function applied to matrices. This function
-        converts from xp to symmetric ordering, and vice versa."""
-        cov_xp = np.array(
-            [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
-        )
-
-        cov_symmetric = np.array(
-            [[0, 2, 1, 3], [8, 10, 9, 11], [4, 6, 5, 7], [12, 14, 13, 15]]
-        )
-
-        assert np.all(symplectic.xxpp_to_xpxp(cov_xp) == cov_symmetric)
-        assert np.all(symplectic.xpxp_to_xxpp(cov_symmetric) == cov_xp)
-
-    @pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
-    def test_change_basis_raises_not_square(self, fun):
-        """Test correct error is raised when a non-square matrix is passed"""
-        A = np.random.rand(4,6)
-        with pytest.raises(ValueError, match="The input matrix is not square"):
-            fun(A)
-
-    @pytest.mark.parametrize("fun", [symplectic.xxpp_to_xpxp, symplectic.xpxp_to_xxpp])
-    @pytest.mark.parametrize("dim", [1, 2])
-    def test_change_basis_raises_not_even(self, fun, dim):
-        """Test correct error is raised when a non-even-dimensional array is passed"""
-        size = (5,) * dim
-        A = np.random.rand(*size)
-        with pytest.raises(ValueError, match="The input array is not even-dimensional"):
-            fun(A)
-
-    @pytest.mark.parametrize("dim", [2, 4, 6, 8])
-    def test_functional_inverse(self, dim):
-        """Check that xxpp_to_xpxp is the inverse of xpxp_to_xxpp and viceversa"""
-        M = np.random.rand(dim, dim)
-        assert np.all(M == symplectic.xxpp_to_xpxp(symplectic.xpxp_to_xxpp(M)))
-        assert np.all(M == symplectic.xpxp_to_xxpp(symplectic.xxpp_to_xpxp(M)))
-
-        v = np.random.rand(dim)
-        assert np.all(v == symplectic.xxpp_to_xpxp(symplectic.xpxp_to_xxpp(v)))
-        assert np.all(v == symplectic.xpxp_to_xxpp(symplectic.xxpp_to_xpxp(v)))
