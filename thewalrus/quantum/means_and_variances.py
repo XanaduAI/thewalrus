@@ -108,29 +108,22 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     Returns:
         float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
     """
-    # renormalise the covariance matrix
-    cov = cov / hbar
-
-    N = len(mu) // 2
-    mu = np.array(mu) / np.sqrt(hbar)
-
-    lambda_1 = np.zeros((2 * N, 2 * N))
-    lambda_1[j, j] = lambda_1[j + N, j + N] = 1
-
-    lambda_2 = np.zeros((2 * N, 2 * N))
-    lambda_2[k, k] = lambda_2[k + N, k + N] = 1
-
     if j == k:
-        idxs = ((j, j, j + N, j + N), (j, j + N, j, j + N))
-        M = (lambda_1 @ cov @ lambda_2)[idxs].reshape(2, 2)
+        mu, cov = reduced_gaussian(mu, cov, [j])
+        term_1 = (np.trace(cov) ** 2 - 2 * np.linalg.det(cov) - 0.5) / 2
+        term_2 = mu @ cov @ mu
+        return (term_1 + term_2) / hbar ** 2
 
-        term_1 = (np.trace(M) ** 2 - 2 * np.linalg.det(M) - 0.5) / 2
-        term_2 = mu[[j, j + N]] @ M @ mu[[j, j + N]]
-    else:
-        term_1 = np.trace(lambda_1 @ cov @ lambda_2 @ cov) / 2
-        term_2 = (mu @ lambda_1 @ cov @ lambda_2 @ mu) / 2
+    mu, cov = reduced_gaussian(mu, cov, [j, k])
+    r_cov = np.zeros_like(cov)
+    r_cov[0, 1] = cov[0, 1]
+    r_cov[0, 3] = cov[0, 3]
+    r_cov[2, 1] = cov[2, 1]
+    r_cov[2, 3] = cov[2, 3]
+    term_1 = np.trace(r_cov @ cov) / 2
+    term_2 = (mu @ r_cov @ mu) / 2
 
-    return term_1 + term_2
+    return (term_1 + term_2) / hbar ** 2
 
 
 def photon_number_covmat(mu, cov, hbar=2):
