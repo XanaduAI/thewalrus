@@ -110,9 +110,9 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     """
     if j == k:
         mu, cov = reduced_gaussian(mu, cov, [j])
-        term_1 = (np.trace(cov) ** 2 - 2 * np.linalg.det(cov) - 0.5) / 2
+        term_1 = (np.trace(cov) ** 2 - 2 * np.linalg.det(cov)) / 2
         term_2 = mu @ cov @ mu
-        return (term_1 + term_2) / hbar ** 2
+        return ((term_1 + term_2) / hbar ** 2) - 0.25
 
     mu, cov = reduced_gaussian(mu, cov, [j, k])
     r_cov = np.zeros_like(cov)
