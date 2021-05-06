@@ -4,6 +4,8 @@
 
 ### Improvements
 
+* Speeds up the calculation of photon number variances/covariances [#224](https://github.com/XanaduAI/thewalrus/pull/224)
+
 ### Bug fixes
 
 ### Breaking changes
@@ -11,6 +13,8 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Nicolas Quesada
 
 ---
 
