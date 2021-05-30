@@ -178,6 +178,39 @@ def hafnian(
     )
 
 
+def hafnian_sparse(A, D: set = None):
+    r"""Returns the hafnian of a sparse symmetric matrix.
+    This pure python implementation is very slow on full matrices, but faster the sparser a matrix is.
+    As a rule of thumb, the crossover in runtime with respect to hafnian() happens around 50% sparsity.
+
+    Args:
+        A (array): the symmetric matrix of which we want to compute the hafnian
+        D (set): set of indices that identify a submatrix. If None (default) it computes
+        the hafnian of the whole matrix.
+
+    Returns:
+        (float) hafnian of A or of the submatrix of A defined by the set of indices D.
+    """
+    if D is None:
+        D = frozenset([i for i in range(len(A)) if not np.isclose(A[i, i], 0)])
+    else:
+        D = frozenset(D)
+
+    @lru_cache(maxsize=2 ** len(D))
+    def indices(d, k):
+        return d.intersection(set(np.nonzero(A[k])[0]))
+
+    @lru_cache(maxsize=2 ** len(D))
+    def lhaf(d: frozenset) -> float:
+        if not d:
+            return 1
+        d_ = set(d)
+        k = d_.pop()
+        return sum(A[i, k] * lhaf(frozenset(d_).difference({i})) for i in indices(d, k))
+
+    return lhaf(D)
+
+
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 
