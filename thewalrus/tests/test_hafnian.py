@@ -284,4 +284,5 @@ class TestLoopHafnian:
 def test_valid_output(random_matrix, n, fill):
     "tests that sparse loop hafnian matches full implementation"
     A = random_matrix(n, fill_factor=fill)
+    assert np.allclose(hafnian_sparse(A), hafnian_sparse(A, D=set(range(len(A)))))
     assert np.allclose(hafnian(A, loop=True), hafnian_sparse(A))
