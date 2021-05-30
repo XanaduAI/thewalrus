@@ -15,8 +15,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Filippo Miatto
-Nicolas Quesada
+Filippo Miatto, Nicolas Quesada
 
 ---
 
