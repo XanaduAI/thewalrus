@@ -15,9 +15,9 @@
 Hafnian Python interface
 """
 import numpy as np
-
+from functools import lru_cache
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
-
+from collections import Counter
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
@@ -192,15 +192,21 @@ def hafnian_sparse(A, D: set = None):
         (float) hafnian of A or of the submatrix of A defined by the set of indices D.
     """
     if D is None:
-        D = frozenset([i for i in range(len(A)) if not np.isclose(A[i, i], 0)])
+        D = frozenset([i for i in range(len(A))])
     else:
         D = frozenset(D)
 
-    @lru_cache(maxsize=2 ** len(D))
+    if np.allclose(A, np.zeros_like(A)):
+        return 0.0
+
+    r, _ = np.nonzero(A)
+    m = max(Counter(r).values())  # max nonzero values per row/column
+
+    @lru_cache(maxsize=2 ** m)
     def indices(d, k):
         return d.intersection(set(np.nonzero(A[k])[0]))
 
-    @lru_cache(maxsize=2 ** len(D))
+    @lru_cache(maxsize=2 ** m)
     def lhaf(d: frozenset) -> float:
         if not d:
             return 1

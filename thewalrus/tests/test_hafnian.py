@@ -19,7 +19,7 @@ import numpy as np
 from scipy.special import factorial as fac
 
 import thewalrus as hf
-from thewalrus import hafnian, reduction
+from thewalrus import hafnian, reduction, hafnian_sparse
 from thewalrus.libwalrus import haf_complex, haf_real, haf_int
 
 
@@ -277,3 +277,15 @@ class TestLoopHafnian:
         haf = hafnian(A, loop=True)
         expected = np.prod(v)
         assert np.allclose(haf, expected)
+
+
+@pytest.mark.parametrize("n", [2, 3, 5, 10, 15, 20])
+@pytest.mark.parametrize("fill", [0.5, 0.2, 0.1, 0.05])
+class TestHafnianSparse:
+    """Tests that the loop hafnian sparse code gives
+    the same results as the full loop hafnian
+    """
+
+    def test_valid_output(self, random_matrix, n, fill):
+        A = random_matrix(n, fill_factor=fill)
+        assert np.allclose(hafnian(A, loop=True), hafnian_sparse(A))

@@ -100,6 +100,7 @@ from ._hafnian import (
     hafnian,
     hafnian_repeated,
     reduction,
+    hafnian_sparse,
 )
 from ._low_rank_haf import low_rank_hafnian
 from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional
@@ -112,6 +113,7 @@ __all__ = [
     "hafnian",
     "hafnian_repeated",
     "hafnian_batched",
+    "hafnian_sparse",
     "tor",
     "perm",
     "permanent_repeated",
