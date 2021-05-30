@@ -14,10 +14,12 @@
 """
 Hafnian Python interface
 """
-import numpy as np
 from functools import lru_cache
-from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
 from collections import Counter
+import numpy as np
+
+from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
+
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
@@ -192,7 +194,7 @@ def hafnian_sparse(A, D: set = None):
         (float) hafnian of A or of the submatrix of A defined by the set of indices D.
     """
     if D is None:
-        D = frozenset([i for i in range(len(A))])
+        D = frozenset(range(len(A)))
     else:
         D = frozenset(D)
 
