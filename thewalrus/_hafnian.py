@@ -73,7 +73,12 @@ def bandwidth(A):
 
 
 def powerset(iterable):
-    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    """Calculates the powerset of a list.
+    Args:
+        iterable (list): input list
+    Returns:
+        (chain): chain of all subsets of input list
+    """
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
@@ -283,7 +288,7 @@ def banded_loophaf(A):
         A (array): a square, symmetric array of even dimensions.
 
     Returns:
-        np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
+        np.int64 or np.float64 or np.complex128: the loop hafnian of matrix A.
     """
     (n,_) = A.shape
     w = bandwidth(A)
@@ -300,4 +305,5 @@ def banded_loophaf(A):
         for D in ps:
             if lower_end+D not in loop_haf:
                 loop_haf[lower_end+D] = sum([A[i-1,t-1]*loop_haf[tuple(set(lower_end+D) - set((i,t)))] for i in D])
+
     return loop_haf[tuple(range(1,n+1))]
