@@ -14,6 +14,8 @@
 """
 Hafnian Python interface
 """
+from itertools import chain, combinations
+
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
@@ -53,6 +55,27 @@ def input_validation(A, rtol=1e-05, atol=1e-08):
         raise ValueError("Input matrix must be symmetric.")
 
     return True
+
+
+def bandwidth(A):
+    """Calculates the upper bandwidth of the matrix A.
+    Args:
+        A (array): input matrix
+    Returns:
+        (int): bandwidth of matrix
+    """
+    n, _ = A.shape
+    for i in range(n):
+        vali = np.diag(A, i)
+        if np.allclose(vali, 0):
+            return i - 1
+    return n - 1
+
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
 
 
 def reduction(A, rpt):
@@ -251,3 +274,30 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
+
+
+def banded_loophaf(A):
+    """Returns the loop hafnian of a banded matrix.
+
+    Args:
+        A (array): a square, symmetric array of even dimensions.
+
+    Returns:
+        np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
+    """
+    (n,_) = A.shape
+    w = bandwidth(A)
+    loop_haf = {():1, (1,):A[0,0]}
+    for t in range(1,n+1):
+        if t-2*w-1>0:
+            lower_end = set(range(1,t-2*w))
+        else:
+            lower_end = set()
+        upper_end = set(range(1,t+1))
+        diff = upper_end - lower_end
+        ps = powerset(diff)
+        lower_end = tuple(lower_end)
+        for D in ps:
+            if lower_end+D not in loop_haf:
+                loop_haf[lower_end+D] = sum([A[i-1,t-1]*loop_haf[tuple(set(lower_end+D) - set((i,t)))] for i in D])
+    return loop_haf[tuple(range(1,n+1))]
