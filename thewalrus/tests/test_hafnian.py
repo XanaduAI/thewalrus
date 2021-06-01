@@ -19,12 +19,30 @@ import numpy as np
 from scipy.special import factorial as fac
 
 import thewalrus as hf
-from thewalrus import hafnian, reduction
+from thewalrus import hafnian, reduction, banded_loophaf
 from thewalrus.libwalrus import haf_complex, haf_real, haf_int
 
 
 # the first 11 telephone numbers
 T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
+
+
+def random_banded(n, bw):
+    """ Generates a random matrix of a given size and bandwidth.
+
+    Args:
+      n (int): Size of the matrix
+      bw (int): Bandwidth of the matrix
+
+    Returns:
+      (array): a matrix with the given properties
+    """
+
+    M = np.zeros([n,n], dtype=np.complex128)
+    for j in range(bw):
+        M +=  np.diag(np.random.rand(n-j) + 1j*np.random.rand(n-j),k=j)
+    M += M.T
+    return M
 
 
 class TestReduction:
@@ -277,3 +295,13 @@ class TestLoopHafnian:
         haf = hafnian(A, loop=True)
         expected = np.prod(v)
         assert np.allclose(haf, expected)
+
+
+@pytest.mark.parametrize("n", [6, 7, 8])
+@pytest.mark.parametrize("w", [2, 3, 4])
+def test_bandedhaf(n, w):
+    """Check banded loop hafnian is correct"""
+    M = random_banded(n,w)
+    result = banded_loophaf(M)
+    expected = hafnian(M, loop=True)
+    assert np.allclose(result, expected)
