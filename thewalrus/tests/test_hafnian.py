@@ -39,8 +39,8 @@ def random_banded(n, bw):
     """
 
     M = np.zeros([n,n], dtype=np.complex128)
-    for j in range(bw):
-        M +=  np.diag(np.random.rand(n-j) + 1j*np.random.rand(n-j),k=j)
+    for j in range(bw+1):
+        M += np.diag(np.random.rand(n-j) + 1j*np.random.rand(n-j),k=j)
     M += M.T
     return M
 
@@ -297,8 +297,8 @@ class TestLoopHafnian:
         assert np.allclose(haf, expected)
 
 
-@pytest.mark.parametrize("n", [6, 7, 8, 9])
-@pytest.mark.parametrize("w", [1, 2, 3, 4])
+@pytest.mark.parametrize("n", [7, 8, 9, 10, 11, 12])
+@pytest.mark.parametrize("w", [1, 2, 3, 4, 5, 6])
 def test_bandedhaf(n, w):
     """Check banded loop hafnian is correct"""
     M = random_banded(n,w)

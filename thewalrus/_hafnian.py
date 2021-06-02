@@ -80,7 +80,7 @@ def powerset(iterable):
         (chain): chain of all subsets of input list
     """
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 
 def reduction(A, rpt):
@@ -101,6 +101,7 @@ def reduction(A, rpt):
         return A[rows]
 
     return A[:, rows][rows]
+
 
 # pylint: disable=too-many-arguments
 def hafnian(
@@ -290,20 +291,30 @@ def banded_loophaf(A):
     Returns:
         np.int64 or np.float64 or np.complex128: the loop hafnian of matrix A.
     """
-    (n,_) = A.shape
+    (n, _) = A.shape
     w = bandwidth(A)
-    loop_haf = {():1, (1,):A[0,0]}
-    for t in range(1,n+1):
-        if t-2*w-1>0:
-            lower_end = set(range(1,t-2*w))
+    loop_haf = {(): 1, (1,): A[0, 0]}
+    for t in range(1, n + 1):
+        if t - 2 * w - 1 > 0:
+            lower_end = set(range(1, t - 2 * w))
         else:
             lower_end = set()
-        upper_end = set(range(1,t+1))
-        diff = upper_end - lower_end
+        upper_end = set(range(1, t + 1))
+        diff = [item for item in upper_end if item not in lower_end]
+        # Makes sure set ordering is preserved when the difference of two sets is taken
+        # This is also used in the if statement below
         ps = powerset(diff)
         lower_end = tuple(lower_end)
         for D in ps:
-            if lower_end+D not in loop_haf:
-                loop_haf[lower_end+D] = sum([A[i-1,t-1]*loop_haf[tuple(set(lower_end+D) - set((i,t)))] for i in D])
+            if lower_end + D not in loop_haf:
+                loop_haf[lower_end + D] = sum(
+                    [
+                        A[i - 1, t - 1]
+                        * loop_haf[
+                            tuple([item for item in lower_end + D if item not in set((i, t))])
+                        ]
+                        for i in D
+                    ]
+                )
 
-    return loop_haf[tuple(range(1,n+1))]
+    return loop_haf[tuple(range(1, n + 1))]
