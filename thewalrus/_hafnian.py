@@ -307,6 +307,7 @@ def banded_loophaf(A):
         lower_end = tuple(lower_end)
         for D in ps:
             if lower_end + D not in loop_haf:
+                # pylint: disable=consider-using-generator
                 loop_haf[lower_end + D] = sum(
                     [
                         A[i - 1, t - 1]
