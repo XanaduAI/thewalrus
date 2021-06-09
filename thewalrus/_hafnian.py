@@ -282,8 +282,11 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
 
 
-def banded_loophaf(A):
+def banded_loophaf(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
+
+    For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions',
+    Qi et al. <https://arxiv.org/abs/2009.11824>`_.
 
     Args:
         A (array): a square, symmetric array of even dimensions.
@@ -291,8 +294,11 @@ def banded_loophaf(A):
     Returns:
         np.int64 or np.float64 or np.complex128: the loop hafnian of matrix A.
     """
+    input_validation(A, atol=atol, rtol=rtol)
     (n, _) = A.shape
     w = bandwidth(A)
+    if loop is False:
+        A = A - np.diag(np.diag(A))
     loop_haf = {(): 1, (1,): A[0, 0]}
     for t in range(1, n + 1):
         if t - 2 * w - 1 > 0:

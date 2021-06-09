@@ -299,9 +299,10 @@ class TestLoopHafnian:
 
 @pytest.mark.parametrize("n", [7, 8, 9, 10, 11, 12])
 @pytest.mark.parametrize("w", [1, 2, 3, 4, 5, 6])
-def test_bandedhaf(n, w):
+@pytest.mark.parametrize("loop", [True, False])
+def test_bandedhaf(n, w, loop):
     """Check banded loop hafnian is correct"""
     M = random_banded(n,w)
-    result = banded_loophaf(M)
-    expected = hafnian(M, loop=True)
+    result = banded_loophaf(M, loop=loop)
+    expected = hafnian(M, loop=loop)
     assert np.allclose(result, expected)
