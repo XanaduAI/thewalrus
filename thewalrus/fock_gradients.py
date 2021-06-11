@@ -26,10 +26,12 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	squeezing
 	beamsplitter
 	two_mode_squeezing
+    n_mode_gaussian_gate
 	grad_displacement
 	grad_squeezing
 	grad_beamsplitter
 	grad_two_mode_squeezing
+    grad_n_mode_gaussian_gate
 
 """
 import numpy as np
@@ -355,3 +357,47 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                     )
 
     return grad_theta, grad_phi
+    
+def choi_trick(S, d, m):
+    # m: num of modes
+    choi_r = np.arcsing(1.0)
+    ch = np.cosh(choi_r) * np.identity(m)
+    sh = np.sinh(choi_r) * np.identity(m)
+    zh = np.zeros([m, m])
+    Schoi = np.block(
+        [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
+    )
+    Sxx = S[:m, :m]
+    Sxp = S[:m, m:]
+    Spx = S[m:, :m]
+    Spp = S[m:, m:]
+    idl = np.identity(m)
+    S_exp = (
+        np.block(
+            [
+                [Sxx, zh, Sxp, zh],
+                [zh, idl, zh, zh],
+                [Spx, zh, Spp, zh],
+                [zh, zh, zh, idl],
+            ]
+        )
+        @ Schoi
+    )
+    choi_cov = 0.5 * S_exp @ S_exp.T
+    R = np.sqrt(0.5) * np.block([[idl, 1j * idl], [idl, -1j * idl]])
+    sigma = R @ choi_cov @ R.conj().T
+    X = np.block([[zh, 1j * idl], [idl, zh]])
+    A_mat = X @ (np.identity(2 * l) - np.linalg.inv(sigma + 0.5 * np.identity(2 * l)))
+    beta_vector = d.T @ np.linalg.inv(sigma + 0.5 * np.identity(2 * l))
+    
+    T = np.expm(- 0.5 * beta_vector.T @ np.linalg.inv(sigma + 0.5 * np.identity(2 * l)) @ beta_vector) / np.sqrt(sigma + 0.5 * np.identity(2 * l))
+    C = np.sqrt(np.abs(T))
+    ##TODO: mu?
+    E = np.diag(np.concatenate([np.ones([m]), np.ones([m]) / np.tanh(choi_r)]))
+    Sigma = -(E @ A_mat[:2*m, :2*m] @ E).conj()
+
+def n_mode_gaussian_gate(S, d, dtype=np.complex128):
+    num_modes = S.shape[0]//2
+    C, mu, Sigma = choi_trick(S, d, num_modes)
+    
+def grad_n_mode_gaussian_gate(G, S, d):
