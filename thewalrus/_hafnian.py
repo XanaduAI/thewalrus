@@ -191,7 +191,7 @@ def hafnian_sparse(A, D = None):
             the hafnian of the whole matrix.
 
     Returns:
-        (float) hafnian of A or of the submatrix of A defined by the set of indices D.
+        (float) hafnian of ``A`` or of the submatrix of ``A`` defined by the set of indices ``D``.
     """
     if D is None:
         D = frozenset(range(len(A)))
