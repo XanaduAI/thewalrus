@@ -188,7 +188,7 @@ def hafnian_sparse(A, D = None):
     Args:
         A (array): the symmetric matrix of which we want to compute the hafnian
         D (set): set of indices that identify a submatrix. If None (default) it computes
-        the hafnian of the whole matrix.
+            the hafnian of the whole matrix.
 
     Returns:
         (float) hafnian of A or of the submatrix of A defined by the set of indices D.
