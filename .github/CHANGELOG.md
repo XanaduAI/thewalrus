@@ -2,7 +2,8 @@
 
 ### New features
 
-* Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure python implementation).
+* Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
+
 ### Improvements
 
 * Speeds up the calculation of photon number variances/covariances [#245](https://github.com/XanaduAI/thewalrus/pull/245)
