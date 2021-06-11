@@ -182,6 +182,7 @@ def hafnian(
 
 def hafnian_sparse(A, D = None):
     r"""Returns the hafnian of a sparse symmetric matrix.
+
     This pure python implementation is very slow on full matrices, but faster the sparser a matrix is.
     As a rule of thumb, the crossover in runtime with respect to :func:`~.hafnian` happens around 50% sparsity.
 
