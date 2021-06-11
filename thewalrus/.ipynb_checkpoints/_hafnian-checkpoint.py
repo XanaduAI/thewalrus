@@ -200,9 +200,6 @@ def hafnian_sparse(A, D=None, loop=False):
     else:
         D = frozenset(D)
 
-    if not loop:
-        A = A - np.diag(np.diag(A))
-
     if np.allclose(A, np.zeros_like(A)):
         return 0.0
 
