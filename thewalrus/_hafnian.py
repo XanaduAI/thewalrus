@@ -180,7 +180,7 @@ def hafnian(
     )
 
 
-def hafnian_sparse(A, D = None):
+def hafnian_sparse(A, D=None, loop=False):
     r"""Returns the hafnian of a sparse symmetric matrix.
 
     This pure python implementation is very slow on full matrices, but faster the sparser a matrix is.
@@ -190,6 +190,7 @@ def hafnian_sparse(A, D = None):
         A (array): the symmetric matrix of which we want to compute the hafnian
         D (set): set of indices that identify a submatrix. If ``None`` (default) it computes
             the hafnian of the whole matrix.
+        loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
 
     Returns:
         (float) hafnian of ``A`` or of the submatrix of ``A`` defined by the set of indices ``D``.
