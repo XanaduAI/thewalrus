@@ -384,20 +384,71 @@ def choi_trick(S, d, m):
         @ Schoi
     )
     choi_cov = 0.5 * S_exp @ S_exp.T
+    idl = np.identity(2 * m)
     R = np.sqrt(0.5) * np.block([[idl, 1j * idl], [idl, -1j * idl]])
     sigma = R @ choi_cov @ R.conj().T
+    zh = np.zeros([2 * m, 2 * m])
     X = np.block([[zh, 1j * idl], [idl, zh]])
-    A_mat = X @ (np.identity(2 * l) - np.linalg.inv(sigma + 0.5 * np.identity(2 * l)))
-    beta_vector = d.T @ np.linalg.inv(sigma + 0.5 * np.identity(2 * l))
-    
-    T = np.expm(- 0.5 * beta_vector.T @ np.linalg.inv(sigma + 0.5 * np.identity(2 * l)) @ beta_vector) / np.sqrt(sigma + 0.5 * np.identity(2 * l))
-    C = np.sqrt(np.abs(T))
-    ##TODO: mu?
+    sigma_Q = sigma + 0.5 * np.identity(4 * m)
+    A_mat = X @ (np.identity(4 * m) - np.linalg.inv(sigma_Q))
+    #TODO: expand d
+    d = np.block([d,np.zeros(l//2),d.conj(),np.zeros(l//2)])
+    beta_vector = d.T @ np.linalg.inv(sigma_Q)
+    T = np.expm(- 0.5 * beta_vector.T @ np.linalg.inv(sigma_Q) @ beta_vector) / np.sqrt(np.linalg.det(sigma_Q))
+    C = np.sqrt(T)
+    ##TODO: C desentagle the choi_r?
     E = np.diag(np.concatenate([np.ones([m]), np.ones([m]) / np.tanh(choi_r)]))
     Sigma = -(E @ A_mat[:2*m, :2*m] @ E).conj()
+    mu = np.concatenate([d.conj().T@Sigma[:m,:m]+d.T, d.conj().T@Sigma[m:,:m]])
+    return C, mu, Sigma
 
-def n_mode_gaussian_gate(S, d, dtype=np.complex128):
+
+@lru_cache()
+def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ...], ...]:
+    return [
+        (0,)*(2*num_modes - n_current) + comb for comb in product(*(range(cutoff) for _ in range(n_current)))
+    ]
+    
+@njit
+def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
+    "returns a copy of the given tuple of integers where the ith element has been decreased by 1"
+    copy = tup[:]
+    return tuple_setitem(copy, i, tup[i] - 1)
+    
+@njit
+def remove(
+    pattern: Tuple[int, ...]
+) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
+    "returns a generator for all the possible ways to decrease elements of the given tuple by 1"
+    for p, n in enumerate(pattern):
+        if n > 0:
+            yield p, dec(pattern, p)
+
+SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
+
+def n_mode_gaussian_gate(array, S, d, dtype=np.complex128):
     num_modes = S.shape[0]//2
+    cutoff = array.shape[0]
     C, mu, Sigma = choi_trick(S, d, num_modes)
+    for n_current in range(1, num_modes+1):
+        for idx in partition(num_modes, n_current, cutoff):
+            array = fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma)
+    return array
+
+def fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma):
+    if idx == (0,)*(2*num_modes):
+        array[idx] = C
+    else:
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        u = mu[i] * array[ki]
+        for l, kl in remove(ki):
+            u -= SQRT[ki[l]] * Sigma[i, l] * array[kl]
+        array[idx] = u / SQRT[idx[i]]
+    return array
+    
     
 def grad_n_mode_gaussian_gate(G, S, d):
+    
