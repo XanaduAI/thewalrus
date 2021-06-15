@@ -78,13 +78,12 @@ def powerset(iterable):
     """Calculates the powerset of a list.
 
     Args:
-        iterable (list): input list
+        iterable (iterable): input list
 
     Returns:
         (chain): chain of all subsets of input list
     """
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
 
 
 def reduction(A, rpt):
@@ -286,7 +285,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
 
 
-def banded_loophaf(A, loop=False, rtol=1e-05, atol=1e-08):
+def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
 
     For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions',
