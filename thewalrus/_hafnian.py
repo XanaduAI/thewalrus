@@ -59,8 +59,10 @@ def input_validation(A, rtol=1e-05, atol=1e-08):
 
 def bandwidth(A):
     """Calculates the upper bandwidth of the matrix A.
+
     Args:
         A (array): input matrix
+
     Returns:
         (int): bandwidth of matrix
     """
@@ -74,8 +76,10 @@ def bandwidth(A):
 
 def powerset(iterable):
     """Calculates the powerset of a list.
+
     Args:
         iterable (list): input list
+
     Returns:
         (chain): chain of all subsets of input list
     """
@@ -292,12 +296,12 @@ def banded_loophaf(A, loop=False, rtol=1e-05, atol=1e-08):
         A (array): a square, symmetric array of even dimensions.
 
     Returns:
-        np.int64 or np.float64 or np.complex128: the loop hafnian of matrix A.
+        np.int64 or np.float64 or np.complex128: the loop hafnian of matrix ``A``.
     """
     input_validation(A, atol=atol, rtol=rtol)
     (n, _) = A.shape
     w = bandwidth(A)
-    if loop is False:
+    if not loop:
         A = A - np.diag(np.diag(A))
     loop_haf = {(): 1, (1,): A[0, 0]}
     for t in range(1, n + 1):
