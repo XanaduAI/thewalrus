@@ -292,7 +292,6 @@ def hafnian_sample_state(
     return _hafnian_sample(params)
 
 
-
 def hafnian_sample_graph(
     A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
 ):
@@ -341,7 +340,7 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         mu (array): a :math:`2N` ``np.float64`` displacement vector
-            representing an :math:`N` mode quantum state. This can be obtained 
+            representing an :math:`N` mode quantum state. This can be obtained
             via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -404,7 +403,7 @@ def _torontonian_sample(args):
 
             mu (array)
                 a :math:`2N` ``np.float64`` displacement vector
-                representing an :math:`N` mode quantum state. This can be obtained 
+                representing an :math:`N` mode quantum state. This can be obtained
                 via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
 
             hbar (float)
@@ -451,7 +450,7 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): number of samples to generate
         mu (array): a :math:`2N` ``np.float64`` displacement vector
-            representing an :math:`N` mode quantum state. This can be obtained 
+            representing an :math:`N` mode quantum state. This can be obtained
             via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -463,11 +462,10 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
     """
 
     if type(cov) is not np.ndarray:
-        raise TypeError('cov must be a numpy array')
-
+        raise TypeError("cov must be a numpy array")
 
     if mu is None:
-        M = cov.shape[0] // 2 
+        M = cov.shape[0] // 2
         mu = np.zeros(2 * M, dtype=np.float64)
 
     if parallel:
@@ -482,7 +480,6 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
 
     params = [cov, samples, mu, hbar, max_photons]
     return _torontonian_sample(params)
-
 
 
 def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=False):
@@ -501,7 +498,9 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=Fals
     """
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
-    return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, parallel=parallel)
+    return torontonian_sample_state(
+        cov, samples, hbar=2, max_photons=max_photons, parallel=parallel
+    )
 
 
 # pylint: disable=unused-argument
@@ -541,7 +540,7 @@ def hafnian_sample_classical_state(
 
 
 def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
-    r""" Returns threshold samples from a Gaussian state that has a positive P function.
+    r"""Returns threshold samples from a Gaussian state that has a positive P function.
 
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -579,11 +578,11 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
     if out_of_bounds is False:
         probabilities = probabilities.flatten() / sum_p
-        vals = np.arange(cutoff**num_modes, dtype=int)
+        vals = np.arange(cutoff ** num_modes, dtype=int)
         return [
             np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
             for _ in range(num_samples)
-            ]
+        ]
 
     upper_limit = cutoff ** num_modes
 
@@ -593,12 +592,13 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
         return np.unravel_index(index, [cutoff] * num_modes)
 
-    vals = np.arange(1 + cutoff**num_modes, dtype=int)
+    vals = np.arange(1 + cutoff ** num_modes, dtype=int)
     probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
     return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 
+
 def seed(seed_val=None):
-    r""" Seeds the random number generator used in the sampling algorithms.
+    r"""Seeds the random number generator used in the sampling algorithms.
 
     This function is a wrapper around ``numpy.random.seed()``. By setting the seed
     to a specific integer, the sampling algorithms will exhibit deterministic behaviour.
@@ -607,7 +607,6 @@ def seed(seed_val=None):
         seed_val (int): Seed for RandomState. Must be convertible to 32 bit unsigned integers.
     """
     np.random.seed(seed_val)
-
 
 
 def _hafnian_sample_graph_rank_one(G, n_mean):
