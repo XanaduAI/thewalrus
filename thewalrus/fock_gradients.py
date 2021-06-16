@@ -429,10 +429,8 @@ def remove(
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
-def n_mode_gaussian_gate(array, S, d, dtype=np.complex128):
-    num_modes = S.shape[0]//2
-    cutoff = array.shape[0]
-    C, mu, Sigma = choi_trick(S, d, num_modes)
+def n_mode_gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+    array = np.zeros(((cutoff,)*(2*num_modes)),dtype = dtype)
     for n_current in range(1, num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
             array = fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma)
@@ -451,7 +449,29 @@ def fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma):
             u -= SQRT[ki[l]] * Sigma[i, l] * array[kl]
         array[idx] = u / SQRT[idx[i]]
     return array
-    
-    
-def grad_n_mode_gaussian_gate(G, S, d):
-    
+
+def grad_n_mode_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes dtype=np.complex128):
+    dG_dC = np.ones(gate, dtype = dtype)
+    dG_dmu = np.zeros(gate, dtype = dtype)
+    dG_dSigma = np.zeros(gate, dtype = dtype)
+    for n_current in range(1, num_modes+1):
+        for idx in partition(num_modes, n_current, cutoff):
+                dG_dmu, dG_dSigma = fill_grad_n_mode_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma)
+    return dG_dC, dG_dmu, dG_dSigma
+
+def fill_grad_n_mode_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma):
+    if idx == (0,)*(2*num_modes):
+        dG_dmu[idx] = 1
+        dG_dSigma[idx] = 1
+    else:
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        dG_dmu[idx] = (mu[i] * dG_dmu[ki] + gate[ki])/ SQRT[idx[i]]
+        dSigma = 0
+        for l, kl in remove(ki):
+            #TODO: maybe wrong?
+            dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + gate[kl])
+        dG_dSigma[idx] = dSigma / SQRT[idx[i]]
+    return dG_dC, dG_dmu, dG_dSigma
