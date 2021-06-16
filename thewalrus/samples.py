@@ -79,7 +79,6 @@ __all__ = [
     "torontonian_sample_graph",
     "torontonian_sample_classical_state",
     "threshold_detection_prob",
-    "threshold_detection_prob_displacement",
     "photon_number_sampler",
 ]
 
@@ -460,8 +459,8 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
         np.array[int]:  threshold samples from the Gaussian state.
     """
 
-    if type(cov) is not np.ndarray:
-        raise TypeError("cov must be a numpy array")
+    if not isinstance(cov, np.ndarray):
+        raise TypeError("Covariance matrix must be a NumPy array.")
 
     if mu is None:
         M = cov.shape[0] // 2
