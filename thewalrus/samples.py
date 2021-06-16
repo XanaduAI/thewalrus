@@ -371,7 +371,7 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
         probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar)
 
         probs = np.real_if_close(probs)
-        probs = np.round(probs, 16)
+        probs[np.where(probs < 1e-11)] = 0.
         result = np.random.choice(range(2), p=probs / prev_prob)
 
         results.append(result)
