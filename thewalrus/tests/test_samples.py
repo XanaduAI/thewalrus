@@ -368,17 +368,15 @@ class TestTorontonianSampling:
         probability distribution of a single mode squeezed vacuum state
         """
         n_samples = 10000
-        mean_n = 1.0
-        alpha = np.sqrt(mean_n)
+
         sigma = np.array([[1., 0.], [0., 1.]])
-        mu = np.array([1., 0.])
+        mu = np.array([1., 1.])
         samples = torontonian_sample_state(sigma, samples=n_samples, mu=mu)
 
         samples_list = list(samples)
 
         rel_freq = np.array([samples_list.count(0), samples_list.count(1)]) / n_samples
-
-        x2 = np.array([np.exp(-1), 1 - np.exp(-1)])
+        x2 = np.array([np.exp(-0.5), 1 - np.exp(-0.5)])
         assert np.allclose(
             rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
         )

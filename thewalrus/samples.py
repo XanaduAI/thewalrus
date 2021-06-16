@@ -333,7 +333,7 @@ def hafnian_sample_graph(
 # ===============================================================================================
 
 
-def generate_torontonian_sample(cov, mu, hbar=2, max_clicks=30):
+def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -345,7 +345,7 @@ def generate_torontonian_sample(cov, mu, hbar=2, max_clicks=30):
             via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
-        max_clicks (int): specifies the maximum number of clicks that can be counted.
+        max_photons (int): specifies the maximum number of clicks that can be counted.
 
     Returns:
         np.array[int]: a threshold sample from the Gaussian state.
@@ -353,12 +353,14 @@ def generate_torontonian_sample(cov, mu, hbar=2, max_clicks=30):
     results = []
     n1, n2 = cov.shape
 
+    if mu is None:
+        mu = np.zeros(n1, dtype=np.float64)
+
     if n1 != n2:
         raise ValueError("Covariance matrix must be square.")
 
     nmodes = n1 // 2
     prev_prob = 1.0
-    mu = np.zeros(n1)
 
     for k in range(nmodes):
         probs = np.zeros([2], dtype=np.float64)
@@ -376,7 +378,7 @@ def generate_torontonian_sample(cov, mu, hbar=2, max_clicks=30):
         results.append(result)
         prev_prob = probs[result]
 
-        if np.sum(results) > max_clicks:
+        if np.sum(results) > max_photons:
             return -1
 
     return results
@@ -432,7 +434,7 @@ def _torontonian_sample(args):
     j = 0
 
     while j < samples:
-        result = generate_torontonian_sample(cov, hbar=hbar, max_photons=max_photons)
+        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons)
         if result != -1:
             samples_array.append(result)
             j = j + 1
@@ -460,12 +462,16 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
         np.array[int]:  threshold samples from the Gaussian state.
     """
 
+    if type(cov) is not np.ndarray:
+        raise TypeError('cov must be a numpy array')
+
+
     if mu is None:
         M = cov.shape[0] // 2 
         mu = np.zeros(2 * M, dtype=np.float64)
 
     if parallel:
-        params = [[cov, 1, hbar, max_photons]] * samples
+        params = [[cov, 1, mu, hbar, max_photons]] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_torontonian_sample)(p))
