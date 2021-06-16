@@ -57,12 +57,11 @@ import numpy as np
 from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, reduction
-from ._torontonian import tor, threshold_detection_prob, threshold_detection_prob_displacement
+from ._torontonian import threshold_detection_prob
 from .quantum import (
     Amat,
     Covmat,
     Qmat,
-    Xmat,
     gen_Qmat_from_graph,
     is_classical_cov,
     reduced_gaussian,
@@ -367,10 +366,10 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
         mu_red, V_red = reduced_gaussian(mu, cov, kk)
 
         indices0 = results + [0]
-        probs[0] = threshold_detection_prob(mu_red, V_red, indices0).real
+        probs[0] = threshold_detection_prob(mu_red, V_red, indices0, hbar=hbar).real
 
         indices1 = results + [1]
-        probs[1] = threshold_detection_prob(mu_red, V_red, indices1).real
+        probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar).real
 
         result = np.random.choice(range(2), p=probs / prev_prob)
 
