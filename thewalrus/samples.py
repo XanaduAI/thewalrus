@@ -365,10 +365,10 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
         mu_red, V_red = reduced_gaussian(mu, cov, kk)
 
         indices0 = results + [0]
-        probs[0] = threshold_detection_prob(mu_red, V_red, indices0, hbar=hbar).real
+        probs[0] = threshold_detection_prob(mu_red, V_red, indices0, hbar=hbar)
 
         indices1 = results + [1]
-        probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar).real
+        probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar)
 
         probs = np.real_if_close(probs)
         probs = np.round(probs, 16)
