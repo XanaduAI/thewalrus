@@ -405,7 +405,6 @@ def choi_trick(S, d, m):
     C = np.exp(- 0.5 * (np.sum((np.abs(d)) **2) + d.conj().T@Sigma[:m,:m]@d.conj()))/np.sqrt(cosh_term)
     return C, mu, Sigma
 
-
 @lru_cache()
 def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ...], ...]:
     return [

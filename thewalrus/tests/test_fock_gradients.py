@@ -21,9 +21,13 @@ from thewalrus.fock_gradients import (
     two_mode_squeezing,
     grad_two_mode_squeezing,
     beamsplitter,
-    grad_beamsplitter
+    grad_beamsplitter,
+    choi_trick,
+    n_mode_gaussian_gate,
+    grad_n_mode_gaussian_gate
 )
 import numpy as np
+from scipy.stats import unitary_group
 
 
 def test_grad_displacement():
@@ -229,3 +233,26 @@ def test_two_mode_squeezing_values(tol):
     T = two_mode_squeezing(r, theta, cutoff)
     expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
+
+def test_choi_trick(tol):
+    """Test if we can get correct C, mu, Sigma from S, d"""
+    num_mode = 4
+    W = unitary_group.rvs(num_mode)
+    V = unitary_group.rvs(num_mode)
+    r = np.random.random(num_mode) # r needs to be real
+    alpha = np.random.random(num_mode) + 1j * np.random.random(num_mode)
+    _C = np.exp(-0.5 * np.sum(np.abs(alpha) ** 2) - 0.5 * np.conj(alpha).T @ W @ np.diag(np.tanh(r)) @ W.T @ np.conj(alpha)) / np.sqrt(np.prod(np.cosh(r)))
+    _mu = np.block([ np.conj(alpha).T @ W @ np.diag(np.tanh(r)) @ W.T + alpha.T, -np.conj(alpha).T @ W @ np.diag(1/np.cosh(r)) @ V])
+    _Sigma = np.block(
+        [[W @ tanhr @ W.T, -W @ sechr @ V], [-V.T @ sechr @ W.T, -V.T @ tanhr @ V]]
+    expected_C, expected_mu, expected_Sigma = choi_trick(S, d, num_mode)
+    assert np.allclose(_C, expected_C, atol=tol, rtol=0)
+    assert np.allclose(_mu, expected_mu, atol=tol, rtol=0)
+    assert np.allclose(_Sigma, expected_Sigma, atol=tol, rtol=0)
+
+def test_n_mode_gaussian_gate(tol):
+
+def test_grad_n_mode_gaussian_gate(tol):
+
+
+
