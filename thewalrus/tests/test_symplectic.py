@@ -60,6 +60,18 @@ class TestSqueezing:
         expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
         assert np.allclose(out, expected, atol=tol, rtol=0)
 
+    def test_squeezing_no_phi(self, tol):
+        """Test the squeezing symplectic transform without specifying phi"""
+        r = 0.543
+        phi = 0.
+        S = symplectic.squeezing(r)
+        out = S @ S.T
+
+        # apply to an identity covariance matrix
+        rotation = np.array([[np.cos(phi/2), -np.sin(phi/2)], [np.sin(phi/2), np.cos(phi/2)]])
+        expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
+        assert np.allclose(out, expected, atol=tol, rtol=0)
+
     def test_symplectic_multimode(self, tol):
         """Test multimode version gives symplectic matrix"""
         r = [0.543] * 4
