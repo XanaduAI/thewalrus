@@ -2,6 +2,8 @@
 
 ### New features
 
+* Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix [#246](https://github.com/XanaduAI/thewalrus/pull/246)
+
 ### Improvements
 
 * Speeds up the calculation of photon number variances/covariances [#224](https://github.com/XanaduAI/thewalrus/pull/224)
@@ -14,7 +16,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Nicolas Quesada
+Timjan Kalajdzievski, Nicolas Quesada
 
 ---
 
