@@ -60,6 +60,15 @@ class TestSqueezing:
         expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
         assert np.allclose(out, expected, atol=tol, rtol=0)
 
+    def test_symplectic_multimode(self, tol):
+        r = [0.543] * 4
+        phi = [0.123] * 4
+        S = symplectic.squeezing(r, phi)
+
+        # the symplectic matrix
+        O = symplectic.sympmat(4)
+
+        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
 
 class TestTwoModeSqueezing:
     """Tests for the TMS symplectic"""
@@ -177,7 +186,7 @@ class TestInterferometer:
         np.allclose(S, expected, atol=tol, rtol=0)
 
 
-class TestLinearTransformation:
+class TestPassiveTransformation:
     """ tests for linear transformation """ 
 
     def test_transformation(self, tol):
@@ -189,7 +198,7 @@ class TestLinearTransformation:
 
         T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
 
-        mu_out, cov_out = symplectic.linear_transformation(mu, cov, T)
+        mu_out, cov_out = symplectic.passive_transformation(mu, cov, T)
         # fmt:off
         expected_mu = np.array([ 2.84604989,  2.84604989,  2.84604989,  2.84604989,  2.84604989,
                                  2.84604989, 10.43551628, 10.43551628, 10.43551628, 10.43551628,
@@ -221,8 +230,10 @@ class TestLinearTransformation:
 
         T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
 
-        mu_out, cov_out = symplectic.linear_transformation(mu, cov, T)
+        mu_out, cov_out = symplectic.passive_transformation(mu, cov, T)
 
+        assert cov_out.shape == (12, 12)
+        assert len(mu_out) == 12
         assert is_valid_cov(cov_out, atol=tol, rtol=0)
 
     @pytest.mark.parametrize("M", range(1,6))
@@ -238,7 +249,7 @@ class TestLinearTransformation:
         cov_U = S_U @ cov @ S_U.T 
         mu_U = S_U @ mu
 
-        mu_T, cov_T = symplectic.linear_transformation(mu, cov, U)
+        mu_T, cov_T = symplectic.passive_transformation(mu, cov, U)
 
         assert np.allclose(mu_U, mu_T, atol=tol, rtol=0)
         assert np.allclose(cov_U, cov_T, atol=tol, rtol=0)
