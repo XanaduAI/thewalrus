@@ -153,10 +153,9 @@ def generate_hafnian_sample(
         if ssum < 1.0:
             probs3[-1] = 1.0 - ssum
 
-        # The following normalization of probabilities is needed when approx=True
-        if approx:
-            if ssum > 1.0:
-                probs3 = probs3 / ssum
+        # The following normalization of probabilities is needed to prevent np.random.choice error
+        if ssum > 1.0:
+            probs3 = probs3 / ssum
 
         result.append(np.random.choice(a=range(len(probs3)), p=probs3))
         if result[-1] == cutoff:
