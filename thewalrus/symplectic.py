@@ -210,6 +210,26 @@ def interferometer(U):
 
     return S
 
+def linear_transformation(mu, cov, T, hbar=2):
+    r"""
+    covariance matrix transformation for arbitrary linear optical channel
+    mapping an :math:`N` modes state to an :math:`M` mode state
+    Args:
+        mu (array): :math:`2N`-length means vector
+        cov (array): :math:`2N \times 2N` covariance matrix
+        T (array): :math:`M \times N` linear optical transformation
+    Returns:
+        mu (array): :math:`2M`-length transformed means vector
+        cov (array): :math:`2M \times 2M` tranformed covariance matrix
+    """
+
+    P = interferometer(T) 
+    L = (hbar / 2) * (np.eye(P.shape[0]) - P @ P.T)
+
+    cov = P @ cov @ P.T + L 
+    mu = P @ mu 
+
+    return mu, cov
 
 # pylint: disable=too-many-arguments
 def loss(mu, cov, T, mode, nbar=0, hbar=2):

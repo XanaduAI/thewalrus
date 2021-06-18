@@ -19,6 +19,7 @@ import numpy as np
 from scipy.linalg import block_diag
 
 from thewalrus import symplectic
+from thewalrus.quantum import is_valid_cov
 
 
 # pylint: disable=too-few-public-methods
@@ -174,6 +175,73 @@ class TestInterferometer:
         S = symplectic.rotation(theta)
         expected = np.block([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
         np.allclose(S, expected, atol=tol, rtol=0)
+
+
+class TestLinearTransformation:
+    """ tests for linear transformation """ 
+
+    def test_transformation(self, tol):
+        """Test that an transformation returns the correct state"""
+
+        M = 4 
+        cov = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
+
+        mu_out, cov_out = symplectic.linear_transformation(mu, cov, T)
+        # fmt:off
+        expected_mu = np.array([ 2.84604989,  2.84604989,  2.84604989,  2.84604989,  2.84604989,
+                                 2.84604989, 10.43551628, 10.43551628, 10.43551628, 10.43551628,
+                                 10.43551628, 10.43551628])
+        expected_cov = np.array([
+            [ 48.7,  47.7,  47.7,  47.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  48.7,  47.7,  47.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  48.7,  47.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  47.7,  48.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  47.7,  47.7,  48.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  47.7,  47.7,  47.7,  48.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 178.3, 177.3, 177.3, 177.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 178.3, 177.3, 177.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 178.3, 177.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 177.3, 178.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 177.3, 177.3, 178.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 177.3, 177.3, 177.3, 178.3]])
+        # fmt:on
+
+        assert np.allclose(mu_out, expected_mu, atol=tol, rtol=0)
+        assert np.allclose(cov_out, expected_cov, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("M", range(1,10))
+    def test_valid_cov(self, M, tol):
+
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        cov = a @ a.T + np.eye(2*M)
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
+
+        mu_out, cov_out = symplectic.linear_transformation(mu, cov, T)
+
+        assert is_valid_cov(cov_out, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("M", range(1,6))
+    def test_unitary(self, M, tol):
+
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        cov = a @ a.T + np.eye(2*M)
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        U = M ** (-0.5) * np.fft.fft(np.eye(M))
+        S_U = symplectic.interferometer(U)
+
+        cov_U = S_U @ cov @ S_U.T 
+        mu_U = S_U @ mu
+
+        mu_T, cov_T = symplectic.linear_transformation(mu, cov, U)
+
+        assert np.allclose(mu_U, mu_T, atol=tol, rtol=0)
+        assert np.allclose(cov_U, cov_T, atol=tol, rtol=0)
 
 
 class TestReducedState:
