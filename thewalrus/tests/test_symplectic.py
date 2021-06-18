@@ -546,6 +546,30 @@ class TestVectorExpansion:
         expected[mode + N] = np.sqrt(2 * hbar) * alpha.imag
         assert np.allclose(r, expected, atol=tol, rtol=0)
 
+class TestExpandPassive:
+    """Tests for expanding a displacement operation into a phase-space displacement vector"""
+
+    def test_expand_one(self, tol):
+        """Test that a 1x1 matrix is expanded correctly"""
+        T = np.array([[0.5]])
+
+        T_expand = symplectic.expand_passive(T, [1], 3)
+
+        expected = np.array([[1,0,0],[0,0.5,0],[0,0,1]])
+
+        assert np.allclose(T_expand, expected, atol=tol, rtol=0)
+
+    def test_expend_not_square(self, tol):
+        """ test that error is raised for non square input"""
+        with pytest.raises(ValueError, match="The input matrix is not square"):
+            symplectic.expand_passive(np.ones((3,2)), [0,1,2], 5)
+
+    def test_modes_length(self, tol):
+        """ test that error is raised when length of modes array is incorrect"""
+        with pytest.raises(ValueError, match="length of modes must match the shape of T"):
+            symplectic.expand_passive(np.ones((3,3)), [0,1,2,3,4], 8)
+
+
 class TestSymplecticExpansion:
     """Tests for the expanding a symplectic matrix"""
 

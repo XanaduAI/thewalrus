@@ -99,6 +99,30 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
 
+def expand_passive(T, modes, N):
+    r"""Returns and expanded linear optical transformation
+    acting on specified modes, with identity acting on all other modes
+
+    Args:
+        T (array): square :math:`M \times M` matrix of linear optical transformation
+        modes (array): :math:`M` modes of the tranformation
+        N (int): number of modes
+
+    Returns:
+        array: phase-space displacement vector of size 2*N
+    """
+
+    if T.shape[0] != T.shape[1]:
+        raise ValueError('The input matrix is not square')
+
+    if len(modes) != T.shape[0]:
+        raise ValueError('length of modes must match the shape of T')
+
+    T_expand = np.eye(N, dtype=T.dtype)
+    T_expand[np.ix_(modes, modes)] = T 
+
+    return T_expand
+
 
 def reduced_state(mu, cov, modes):
     r"""Returns the vector of means and the covariance matrix of the specified modes.
@@ -152,7 +176,7 @@ def squeezing(r, phi=None, dtype=np.float64):
 
     Args:
         r (array): squeezing magnitude
-        phi (arrays): rotation parameter
+        phi (array): rotation parameter
         dtype (numpy.dtype): datatype to represent the Symplectic matrix
     Returns:
         array: symplectic transformation matrix
