@@ -246,6 +246,7 @@ def passive_transformation(mu, cov, T, hbar=2):
 
     return mu, cov
 
+
 # pylint: disable=too-many-arguments
 def loss(mu, cov, T, mode, nbar=0, hbar=2):
     r"""Loss channel acting on a Gaussian state.
