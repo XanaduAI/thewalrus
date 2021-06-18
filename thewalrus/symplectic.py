@@ -179,7 +179,6 @@ def squeezing(r, phi=None, dtype=np.float64):
 
     return S
 
-
 def two_mode_squeezing(r, phi, dtype=np.float64):
     """Two-mode squeezing.
 

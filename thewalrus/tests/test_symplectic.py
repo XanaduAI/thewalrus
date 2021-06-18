@@ -187,12 +187,11 @@ class TestInterferometer:
 
 
 class TestPassiveTransformation:
-    """ tests for linear transformation """ 
-
+    """ tests for linear transformation """
     def test_transformation(self, tol):
         """Test that an transformation returns the correct state"""
 
-        M = 4 
+        M = 4
         cov = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
         mu = np.arange(2 * M, dtype=np.float64)
 
@@ -223,7 +222,7 @@ class TestPassiveTransformation:
 
     @pytest.mark.parametrize("M", range(1,10))
     def test_valid_cov(self, M, tol):
-
+        """test that the output is a valid covariance matrix, even when not square"""
         a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
         cov = a @ a.T + np.eye(2*M)
         mu = np.arange(2 * M, dtype=np.float64)
@@ -238,7 +237,10 @@ class TestPassiveTransformation:
 
     @pytest.mark.parametrize("M", range(1,6))
     def test_unitary(self, M, tol):
-
+        """ 
+        test that the outputs agree with the interferometer class when 
+        transformation is unitary
+        """
         a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
         cov = a @ a.T + np.eye(2*M)
         mu = np.arange(2 * M, dtype=np.float64)
