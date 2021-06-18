@@ -236,19 +236,19 @@ class TestPassiveTransformation:
         assert len(mu_out) == 12
         assert is_valid_cov(cov_out, atol=tol, rtol=0)
 
-    @pytest.mark.parametrize("M", range(1,6))
+    @pytest.mark.parametrize("M", range(1, 6))
     def test_unitary(self, M, tol):
         """
         test that the outputs agree with the interferometer class when
         transformation is unitary
         """
-        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
-        cov = a @ a.T + np.eye(2*M)
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2 * M, 2 * M))
+        cov = a @ a.T + np.eye(2 * M)
         mu = np.arange(2 * M, dtype=np.float64)
 
         U = M ** (-0.5) * np.fft.fft(np.eye(M))
         S_U = symplectic.interferometer(U)
-        cov_U = S_U @ cov @ S_U.T 
+        cov_U = S_U @ cov @ S_U.T
         mu_U = S_U @ mu
 
         mu_T, cov_T = symplectic.passive_transformation(mu, cov, U)
