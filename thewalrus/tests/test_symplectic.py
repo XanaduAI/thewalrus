@@ -61,6 +61,7 @@ class TestSqueezing:
         assert np.allclose(out, expected, atol=tol, rtol=0)
 
     def test_symplectic_multimode(self, tol):
+        """Test multimode version gives symplectic matrix"""
         r = [0.543] * 4
         phi = [0.123] * 4
         S = symplectic.squeezing(r, phi)
@@ -237,8 +238,8 @@ class TestPassiveTransformation:
 
     @pytest.mark.parametrize("M", range(1,6))
     def test_unitary(self, M, tol):
-        """ 
-        test that the outputs agree with the interferometer class when 
+        """
+        test that the outputs agree with the interferometer class when
         transformation is unitary
         """
         a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
@@ -247,7 +248,6 @@ class TestPassiveTransformation:
 
         U = M ** (-0.5) * np.fft.fft(np.eye(M))
         S_U = symplectic.interferometer(U)
-
         cov_U = S_U @ cov @ S_U.T 
         mu_U = S_U @ mu
 
@@ -559,12 +559,12 @@ class TestExpandPassive:
 
         assert np.allclose(T_expand, expected, atol=tol, rtol=0)
 
-    def test_expend_not_square(self, tol):
+    def test_expend_not_square(self):
         """ test that error is raised for non square input"""
         with pytest.raises(ValueError, match="The input matrix is not square"):
             symplectic.expand_passive(np.ones((3,2)), [0,1,2], 5)
 
-    def test_modes_length(self, tol):
+    def test_modes_length(self):
         """ test that error is raised when length of modes array is incorrect"""
         with pytest.raises(ValueError, match="length of modes must match the shape of T"):
             symplectic.expand_passive(np.ones((3,3)), [0,1,2,3,4], 8)

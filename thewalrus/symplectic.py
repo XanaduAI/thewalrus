@@ -99,6 +99,7 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     r[N + mode] = np.sqrt(2 * hbar) * alpha.imag
     return r
 
+
 def expand_passive(T, modes, N):
     r"""Returns and expanded linear optical transformation
     acting on specified modes, with identity acting on all other modes
@@ -113,13 +114,13 @@ def expand_passive(T, modes, N):
     """
 
     if T.shape[0] != T.shape[1]:
-        raise ValueError('The input matrix is not square')
+        raise ValueError("The input matrix is not square")
 
     if len(modes) != T.shape[0]:
-        raise ValueError('length of modes must match the shape of T')
+        raise ValueError("length of modes must match the shape of T")
 
     T_expand = np.eye(N, dtype=T.dtype)
-    T_expand[np.ix_(modes, modes)] = T 
+    T_expand[np.ix_(modes, modes)] = T
 
     return T_expand
 
@@ -202,6 +203,7 @@ def squeezing(r, phi=None, dtype=np.float64):
         S[i + M, i + M] = np.cosh(r_i) + np.sinh(r_i) * np.cos(phi_i)
 
     return S
+
 
 def two_mode_squeezing(r, phi, dtype=np.float64):
     """Two-mode squeezing.
