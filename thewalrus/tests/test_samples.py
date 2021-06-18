@@ -453,7 +453,6 @@ class TestTorontonianSampling:
     @pytest.mark.parametrize("parallel", [True, False])
     def test_torontonian_sample_graph(self, parallel):
         """Test torontonian sampling from a graph"""
-        np.random.seed(42)
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
         n_samples = 1000
         mean_n = 0.5
