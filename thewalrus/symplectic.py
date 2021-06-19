@@ -175,6 +175,8 @@ def vacuum_state(modes, hbar=2.0, dtype=np.float64):
 def squeezing(r, phi=None, dtype=np.float64):
     r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
 
+    By passing an array of squeezing parameters and phases, it applies a tensor product of squeezing operations.
+
     Args:
         r (array): squeezing magnitude
         phi (array): rotation parameter
