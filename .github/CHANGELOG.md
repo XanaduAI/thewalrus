@@ -3,7 +3,9 @@
 ### New features
 
 * ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+
 * adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+
 * ``torontonian_sample_state`` now can sample displaced Gaussian states [#248](https://github.com/XanaduAI/thewalrus/pull/248)
 
 ### Improvements
