@@ -110,7 +110,7 @@ def expand_passive(T, modes, N):
         N (int): number of modes
 
     Returns:
-        array: phase-space displacement vector of size 2*N
+        array: :math:`N \times N` array of expanded passive transformation
     """
 
     if T.shape[0] != T.shape[1]:
