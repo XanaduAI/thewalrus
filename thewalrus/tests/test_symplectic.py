@@ -304,7 +304,7 @@ class TestPassiveTransformation:
 
         T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
 
-        mu_out, cov_out = symplectic.passive_transformation(mu, cov, T, hbar=hbar)
+        _, cov_out = symplectic.passive_transformation(mu, cov, T, hbar=hbar)
 
         assert is_valid_cov(cov_out, hbar=hbar, atol=tol, rtol=0)
 
