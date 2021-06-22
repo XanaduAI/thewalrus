@@ -107,7 +107,7 @@ def expand_passive(T, modes, N):
     Args:
         T (array): square :math:`M \times M` matrix of linear optical transformation
         modes (array): the :math:`M` modes of the transformation
-        N (int): number of modes
+        N (int): number of modes in the new expanded transformation
 
     Returns:
         array: :math:`N \times N` array of expanded passive transformation
