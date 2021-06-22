@@ -184,8 +184,8 @@ def squeezing(r, phi=None, dtype=np.float64):
     By passing an array of squeezing parameters and phases, it applies a tensor product of squeezing operations.
 
     Args:
-        r (array): squeezing magnitude
-        phi (array): rotation parameter
+        r (Union[array, float]): squeezing magnitude
+        phi (Union[array, float]): rotation parameter. If ``None``, then the function uses zeros of the same shape as ``r``. 
         dtype (numpy.dtype): datatype to represent the Symplectic matrix.  Defaults to ``numpy.float64``.
     Returns:
         array: symplectic transformation matrix
