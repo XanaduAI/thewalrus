@@ -19,12 +19,31 @@ import numpy as np
 from scipy.special import factorial as fac
 
 import thewalrus as hf
-from thewalrus import hafnian, reduction
+from thewalrus import hafnian, reduction, hafnian_banded
 from thewalrus.libwalrus import haf_complex, haf_real, haf_int
+from thewalrus._hafnian import bandwidth
 
 
 # the first 11 telephone numbers
 T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
+
+
+def random_banded(n, bw):
+    """ Generates a random matrix of a given size and bandwidth.
+
+    Args:
+      n (int): Size of the matrix
+      bw (int): Bandwidth of the matrix
+
+    Returns:
+      (array): a matrix with the given properties
+    """
+
+    M = np.zeros([n,n], dtype=np.complex128)
+    for j in range(bw+1):
+        M += np.diag(np.random.rand(n-j) + 1j*np.random.rand(n-j),k=j)
+    M += M.T
+    return M
 
 
 class TestReduction:
@@ -277,3 +296,36 @@ class TestLoopHafnian:
         haf = hafnian(A, loop=True)
         expected = np.prod(v)
         assert np.allclose(haf, expected)
+
+
+@pytest.mark.parametrize("n", [7, 8, 9, 10, 11, 12])
+@pytest.mark.parametrize("w", [1, 2, 3, 4, 5, 6])
+@pytest.mark.parametrize("loop", [True, False])
+def test_hafnian_banded(n, w, loop):
+    """Check banded loop hafnian is correct"""
+    M = random_banded(n,w)
+    result = hafnian_banded(M, loop=loop)
+    expected = hafnian(M, loop=loop)
+    assert np.allclose(result, expected)
+
+
+@pytest.mark.parametrize("N", [19, 20])
+@pytest.mark.parametrize("bw", [18, 17, 16])
+def test_bandwidth(N, bw):
+    """Check bandwidth is correct"""
+    A = random_banded(N,3)
+    A[0, bw] = 1.0
+    A[bw, 0] = 1.0
+    result = bandwidth(A)
+    expected = bw
+    assert np.allclose(result, expected)
+
+
+@pytest.mark.parametrize("N", [19, 20])
+def test_bandwidth_zero(N):
+    """Check bandwidth is correct for zero matrix"""
+    A = np.zeros([N, N])
+    result = bandwidth(A)
+    expected = 0
+    assert np.allclose(result, expected)
+
