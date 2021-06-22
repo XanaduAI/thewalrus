@@ -185,7 +185,7 @@ def squeezing(r, phi=None, dtype=np.float64):
     Args:
         r (array): squeezing magnitude
         phi (array): rotation parameter
-        dtype (numpy.dtype): datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix.  Defaults to ``numpy.float64``.
     Returns:
         array: symplectic transformation matrix
     """
