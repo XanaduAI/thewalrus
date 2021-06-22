@@ -175,11 +175,11 @@ def vacuum_state(modes, hbar=2.0, dtype=np.float64):
 
 def squeezing(r, phi=None, dtype=np.float64):
     r"""Squeezing. In fock space this corresponds to:
-    
+
     .. math::
-    
+
          \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
-         
+
 
     By passing an array of squeezing parameters and phases, it applies a tensor product of squeezing operations.
 
@@ -259,15 +259,15 @@ def interferometer(U):
 def passive_transformation(mu, cov, T, hbar=2):
     r"""Perform a covariance matrix transformation for an arbitrary linear optical channel
     on an :math:`N` modes state mapping it to a to an :math:`M` modes state.
-    
+
     Args:
         mu (array): :math:`2N`-length means vector
         cov (array): :math:`2N \times 2N` covariance matrix
         T (array): :math:`M \times N` linear optical transformation
-        
+
     Keyword Args:
         hbar (float)=2: the value to use for hbar
-        
+
     Returns:
         array: :math:`2M`-length transformed means vector
         array :math:`2M \times 2M` tranformed covariance matrix
