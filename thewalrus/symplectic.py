@@ -256,16 +256,20 @@ def interferometer(U):
 
 
 def passive_transformation(mu, cov, T, hbar=2):
-    r"""
-    covariance matrix transformation for arbitrary linear optical channel
-    mapping an :math:`N` modes state to an :math:`M` mode state
+    r"""Perform a covariance matrix transformation for an arbitrary linear optical channel
+    on an :math:`N` modes state mapping it to a to an :math:`M` modes state.
+    
     Args:
         mu (array): :math:`2N`-length means vector
         cov (array): :math:`2N \times 2N` covariance matrix
         T (array): :math:`M \times N` linear optical transformation
+        
+    Keyword Args:
+        hbar (float)=2: the value to use for hbar
+        
     Returns:
-        mu (array): :math:`2M`-length transformed means vector
-        cov (array): :math:`2M \times 2M` tranformed covariance matrix
+        array: :math:`2M`-length transformed means vector
+        array :math:`2M \times 2M` tranformed covariance matrix
     """
 
     P = interferometer(T)
