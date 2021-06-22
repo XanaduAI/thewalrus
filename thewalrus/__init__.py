@@ -108,7 +108,6 @@ from ._hafnian import (
     hafnian,
     hafnian_repeated,
     reduction,
-    sparse_hafnian
     hafnian_sparse,
     hafnian_banded,
 )
