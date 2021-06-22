@@ -107,6 +107,7 @@ class TestSqueezing:
         assert np.allclose(S32_bit @ O @ S32_bit.T, O, atol=tol, rtol=0)
         assert np.allclose(S, S32_bit, atol=tol, rtol=0)
 
+
 class TestTwoModeSqueezing:
     """Tests for the TMS symplectic"""
 
@@ -292,6 +293,20 @@ class TestPassiveTransformation:
         assert np.allclose(mu_U, mu_T, atol=tol, rtol=0)
         assert np.allclose(cov_U, cov_T, atol=tol, rtol=0)
 
+    @pytest.mark.parametrize("hbar", [1,2, 1.05e-34])
+    def test_hbar(self, hbar, tol):
+        """test that the output is a valid covariance matrix, even when not square"""
+
+        M = 4
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        cov = a @ a.T + np.eye(2*M)
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
+
+        mu_out, cov_out = symplectic.passive_transformation(mu, cov, T, hbar=hbar)
+
+        assert is_valid_cov(cov_out, hbar=hbar, atol=tol, rtol=0)
 
 class TestReducedState:
     """Tests for the reduced state function"""
