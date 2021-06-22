@@ -357,53 +357,6 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                     )
 
     return grad_theta, grad_phi
-    
-def choi_trick(S, d, m):
-    # m: num of modes
-    choi_r = np.arcsing(1.0)
-    ch = np.cosh(choi_r) * np.identity(m)
-    sh = np.sinh(choi_r) * np.identity(m)
-    zh = np.zeros([m, m])
-    Schoi = np.block(
-        [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
-    )
-    Sxx = S[:m, :m]
-    Sxp = S[:m, m:]
-    Spx = S[m:, :m]
-    Spp = S[m:, m:]
-    idl = np.identity(m)
-    S_exp = (
-        np.block(
-            [
-                [Sxx, zh, Sxp, zh],
-                [zh, idl, zh, zh],
-                [Spx, zh, Spp, zh],
-                [zh, zh, zh, idl],
-            ]
-        )
-        @ Schoi
-    )
-    choi_cov = 0.5 * S_exp @ S_exp.T
-    idl = np.identity(2 * m)
-    R = np.sqrt(0.5) * np.block([[idl, 1j * idl], [idl, -1j * idl]])
-    sigma = R @ choi_cov @ R.conj().T
-    zh = np.zeros([2 * m, 2 * m])
-    X = np.block([[zh, 1j * idl], [idl, zh]])
-    sigma_Q = sigma + 0.5 * np.identity(4 * m)
-    A_mat = X @ (np.identity(4 * m) - np.linalg.inv(sigma_Q))
-#    #TODO: get C from T maybe?
-#    d = np.block([d,np.zeros(l//2),d.conj(),np.zeros(l//2)])
-#    beta_vector = d.T @ np.linalg.inv(sigma_Q)
-#    T = np.expm(- 0.5 * beta_vector.T @ np.linalg.inv(sigma_Q) @ beta_vector) / np.sqrt(np.linalg.det(sigma_Q))
-#    C = np.sqrt(T)
-    E = np.diag(np.concatenate([np.ones([m]), np.ones([m]) / np.tanh(choi_r)]))
-    Sigma = -(E @ A_mat[:2*m, :2*m] @ E).conj()
-    mu = np.concatenate([d.conj().T@Sigma[:m,:m]+d.T, d.conj().T@Sigma[m:,:m]])
-    cosh_term =1
-    for ind in range(0,m+1,2):
-        cosh_term = np.cosh(-np.log(np.linalg.svd(S)[1][ind]))*cosh_term
-    C = np.exp(- 0.5 * (np.sum((np.abs(d)) **2) + d.conj().T@Sigma[:m,:m]@d.conj()))/np.sqrt(cosh_term)
-    return C, mu, Sigma
 
 @lru_cache()
 def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ...], ...]:
