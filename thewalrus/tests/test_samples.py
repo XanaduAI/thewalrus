@@ -33,6 +33,7 @@ from thewalrus.samples import (
 )
 from thewalrus.quantum import gen_Qmat_from_graph, density_matrix_element, probabilities
 from thewalrus.symplectic import two_mode_squeezing
+
 seed(137)
 
 rel_tol = 3.0
@@ -44,7 +45,7 @@ def TMS_cov(r, phi, hbar=2):
 
     S = two_mode_squeezing(r, phi)
 
-    return S @ S.T * hbar/2
+    return S @ S.T * hbar / 2
 
 
 class TestHafnianSampling:
@@ -242,7 +243,13 @@ class TestHafnianSampling:
         n_mean = 2
         nr_samples = 10
         samples = hafnian_sample_graph(
-            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples, parallel=parallel
+            A,
+            n_mean,
+            cutoff=5,
+            approx=True,
+            approx_samples=approx_samples,
+            samples=nr_samples,
+            parallel=parallel,
         )
 
         test_passed = True
@@ -363,6 +370,24 @@ class TestTorontonianSampling:
             rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
         )
 
+    def test_single_coherent_state_torontonian(self):
+        """Test the sampling routines by comparing the photon number frequencies and the exact
+        probability distribution of a single mode squeezed vacuum state
+        """
+        n_samples = 10000
+
+        sigma = np.array([[1.0, 0.0], [0.0, 1.0]])
+        mu = np.array([1.0, 1.0])
+        samples = torontonian_sample_state(sigma, samples=n_samples, mu=mu)
+
+        samples_list = list(samples)
+
+        rel_freq = np.array([samples_list.count(0), samples_list.count(1)]) / n_samples
+        x2 = np.array([np.exp(-0.5), 1 - np.exp(-0.5)])
+        assert np.allclose(
+            rel_freq, x2, atol=rel_tol / np.sqrt(n_samples), rtol=rel_tol / np.sqrt(n_samples)
+        )
+
     def test_two_mode_squeezed_state_torontonian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
         probability distribution of a two mode squeezed vacuum state
@@ -396,8 +421,7 @@ class TestTorontonianSampling:
         "sample_func", [torontonian_sample_state, torontonian_sample_classical_state]
     )
     def test_multimode_vacuum_state_torontonian(self, sample_func):
-        """Test the sampling routines by checking the samples for pure vacuum
-        """
+        """Test the sampling routines by checking the samples for pure vacuum"""
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
@@ -437,7 +461,7 @@ class TestTorontonianSampling:
 
 
 def test_photon_number_sampler_two_mode_squeezed():
-    """Test the brute force sampler when one truncates the probability distribution """
+    """Test the brute force sampler when one truncates the probability distribution"""
     hbar = 2.0
     r = np.arcsinh(1.0)
     cov = TMS_cov(r, 0.0)
@@ -454,8 +478,8 @@ def test_photon_number_sampler_out_of_bounds():
     cov = TMS_cov(r, 0.0)
     cutoff = 5
     probs = probabilities(np.zeros([4]), cov, cutoff, hbar=hbar)
-    samples = photon_number_sampler(probs, 1000, out_of_bounds='Coo coo ca choo')
-    assert 'Coo coo ca choo' in samples
+    samples = photon_number_sampler(probs, 1000, out_of_bounds="Coo coo ca choo")
+    assert "Coo coo ca choo" in samples
     numerical_samples = np.array([x for x in samples if x != "Coo coo ca choo"])
     assert np.allclose(numerical_samples[:, 0], numerical_samples[:, 1])
 
@@ -477,8 +501,7 @@ def test_seed():
 
 
 def test_out_of_bounds_generate_hafnian_sample():
-    """Check that when the sampled goes beyond max_photons a -1 is returned.
-    """
+    """Check that when the sampled goes beyond max_photons a -1 is returned."""
     n_samples = 100
     mean_n = 20
     r = np.arcsinh(np.sqrt(mean_n))
@@ -486,20 +509,24 @@ def test_out_of_bounds_generate_hafnian_sample():
 
     cutoff = 10
     max_photons = 5
-    samples = [generate_hafnian_sample(sigma, cutoff=cutoff, max_photons=max_photons) for i in range(n_samples)]
+    samples = [
+        generate_hafnian_sample(sigma, cutoff=cutoff, max_photons=max_photons)
+        for i in range(n_samples)
+    ]
     assert -1 in samples
 
 
 def test_out_of_bounds_generate_torontonian_sample():
-    """Check that when the sampled goes beyond max_photons a -1 is returned.
-    """
+    """Check that when the sampled goes beyond max_photons a -1 is returned."""
     n_samples = 100
     mean_n = 100
     r = np.arcsinh(np.sqrt(mean_n))
     sigma = TMS_cov(r, 0)
 
     max_photons = 1
-    samples = [generate_torontonian_sample(sigma, max_photons=max_photons) for i in range(n_samples)]
+    samples = [
+        generate_torontonian_sample(sigma, max_photons=max_photons) for i in range(n_samples)
+    ]
     assert -1 in samples
 
 
@@ -510,9 +537,7 @@ def test_hafnian_sample_graph_rank_one():
     n_samples = 100000
     samples = hafnian_sample_graph_rank_one(G, n_mean, n_samples)
     # Check the total mean photon number is correct
-    assert np.allclose(
-        np.mean(samples.sum(axis=1)), n_mean, atol=10 / np.sqrt(n_samples)
-    )
+    assert np.allclose(np.mean(samples.sum(axis=1)), n_mean, atol=10 / np.sqrt(n_samples))
     # Check the standard deviation of the total mean photon number is correct
     assert np.allclose(
         np.std(samples.sum(axis=1)),

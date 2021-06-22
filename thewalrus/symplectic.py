@@ -27,6 +27,7 @@ Auxiliary functions
 .. autosummary::
     expand
     expand_vector
+    expand_passive
     reduced_state
     is_symplectic
     sympmat
@@ -45,6 +46,7 @@ Gates and operations
 
 .. autosummary::
     two_mode_squeezing
+    squeezing
     interferometer
     loss
     mean_photon_number
@@ -99,8 +101,33 @@ def expand_vector(alpha, mode, N, hbar=2.0):
     return r
 
 
+def expand_passive(T, modes, N):
+    r"""Returns the expanded linear optical transformation
+    acting on specified modes, with identity acting on all other modes
+
+    Args:
+        T (array): square :math:`M \times M` matrix of linear optical transformation
+        modes (array): the :math:`M` modes of the transformation
+        N (int): number of modes in the new expanded transformation
+
+    Returns:
+        array: :math:`N \times N` array of expanded passive transformation
+    """
+
+    if T.shape[0] != T.shape[1]:
+        raise ValueError("The input matrix is not square")
+
+    if len(modes) != T.shape[0]:
+        raise ValueError("length of modes must match the shape of T")
+
+    T_expand = np.eye(N, dtype=T.dtype)
+    T_expand[np.ix_(modes, modes)] = T
+
+    return T_expand
+
+
 def reduced_state(mu, cov, modes):
-    r""" Returns the vector of means and the covariance matrix of the specified modes.
+    r"""Returns the vector of means and the covariance matrix of the specified modes.
 
     Args:
         modes (int of Sequence[int]): indices of the requested modes
@@ -146,22 +173,40 @@ def vacuum_state(modes, hbar=2.0, dtype=np.float64):
     return state
 
 
-def squeezing(r, phi, dtype=np.float64):
-    r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
+def squeezing(r, phi=None, dtype=np.float64):
+    r"""Squeezing. In fock space this corresponds to:
+
+    .. math::
+
+         \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
+
+
+    By passing an array of squeezing parameters and phases, it applies a tensor product of squeezing operations.
 
     Args:
-        r (float): squeezing magnitude
-        phi (float): rotation parameter
-        dtype (numpy.dtype): datatype to represent the Symplectic matrix
+        r (Union[array, float]): squeezing magnitude
+        phi (Union[array, float]): rotation parameter. If ``None``, then the function uses zeros of the same shape as ``r``.
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix.  Defaults to ``numpy.float64``.
     Returns:
         array: symplectic transformation matrix
     """
     # pylint: disable=assignment-from-no-return
-    cp = np.cos(phi, dtype=dtype)
-    sp = np.sin(phi, dtype=dtype)
-    ch = np.cosh(r, dtype=dtype)
-    sh = np.sinh(r, dtype=dtype)
-    S = np.array([[ch - cp * sh, -sp * sh], [-sp * sh, ch + cp * sh]])
+
+    r = np.atleast_1d(r)
+
+    if phi is None:
+        phi = np.zeros_like(r)
+
+    phi = np.atleast_1d(phi)
+
+    M = len(r)
+    S = np.identity(2 * M, dtype=dtype)
+
+    for i, (r_i, phi_i) in enumerate(zip(r, phi)):
+        S[i, i] = np.cosh(r_i) - np.sinh(r_i) * np.cos(phi_i)
+        S[i, i + M] = -np.sinh(r_i) * np.sin(phi_i)
+        S[i + M, i] = -np.sinh(r_i) * np.sin(phi_i)
+        S[i + M, i + M] = np.cosh(r_i) + np.sinh(r_i) * np.cos(phi_i)
 
     return S
 
@@ -211,6 +256,32 @@ def interferometer(U):
     return S
 
 
+def passive_transformation(mu, cov, T, hbar=2):
+    r"""Perform a covariance matrix transformation for an arbitrary linear optical channel
+    on an :math:`N` modes state mapping it to a to an :math:`M` modes state.
+
+    Args:
+        mu (array): :math:`2N`-length means vector
+        cov (array): :math:`2N \times 2N` covariance matrix
+        T (array): :math:`M \times N` linear optical transformation
+
+    Keyword Args:
+        hbar (float)=2: the value to use for hbar
+
+    Returns:
+        array: :math:`2M`-length transformed means vector
+        array :math:`2M \times 2M` tranformed covariance matrix
+    """
+
+    P = interferometer(T)
+    L = (hbar / 2) * (np.eye(P.shape[0]) - P @ P.T)
+
+    cov = P @ cov @ P.T + L
+    mu = P @ mu
+
+    return mu, cov
+
+
 # pylint: disable=too-many-arguments
 def loss(mu, cov, T, mode, nbar=0, hbar=2):
     r"""Loss channel acting on a Gaussian state.
@@ -240,6 +311,7 @@ def loss(mu, cov, T, mode, nbar=0, hbar=2):
         cov_res[m, m] += (1 - T) * (2 * nbar + 1) * hbar / 2
 
     return mu_res, cov_res
+
 
 ### Comment: This function strongly overlaps with `quantum.photon_number_mean`
 ### Wonder if it is worth removing it.
@@ -314,7 +386,7 @@ def sympmat(N, dtype=np.float64):
 
 
 def is_symplectic(S, rtol=1e-05, atol=1e-08):
-    r""" Checks if matrix S is a symplectic matrix
+    r"""Checks if matrix S is a symplectic matrix
 
     Args:
         S (array): a square matrix
@@ -331,6 +403,7 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     Omega = sympmat(nmodes, dtype=S.dtype)
 
     return np.allclose(S.T @ Omega @ S, Omega, rtol=rtol, atol=atol)
+
 
 def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
@@ -364,6 +437,7 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
         return (vals[n : 2 * n])[::-1], U[:, ::-1]
     return vals[n : 2 * n], U
 
+
 def xxpp_to_xpxp(S):
     """Permutes the entries of the input from xxpp ordering to xpxp ordering.
 
@@ -388,6 +462,7 @@ def xxpp_to_xpxp(S):
         return S[:, ind][ind]
 
     return S[ind]
+
 
 def xpxp_to_xxpp(S):
     """Permutes the entries of the input from xpxp ordering to xxpp ordering.

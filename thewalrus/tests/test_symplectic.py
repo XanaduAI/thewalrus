@@ -19,6 +19,7 @@ import numpy as np
 from scipy.linalg import block_diag
 
 from thewalrus import symplectic
+from thewalrus.quantum import is_valid_cov
 
 
 # pylint: disable=too-few-public-methods
@@ -58,6 +59,53 @@ class TestSqueezing:
         rotation = np.array([[np.cos(phi/2), -np.sin(phi/2)], [np.sin(phi/2), np.cos(phi/2)]])
         expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
         assert np.allclose(out, expected, atol=tol, rtol=0)
+
+    def test_squeezing_no_phi(self, tol):
+        """Test the squeezing symplectic transform without specifying phi"""
+        r = 0.543
+        phi = 0.
+        S = symplectic.squeezing(r)
+        out = S @ S.T
+
+        # apply to an identity covariance matrix
+        rotation = np.array([[np.cos(phi/2), -np.sin(phi/2)], [np.sin(phi/2), np.cos(phi/2)]])
+        expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
+        assert np.allclose(out, expected, atol=tol, rtol=0)
+
+    def test_squeezing_no_phi_array(self, tol):
+        """Test multimode squeezing symplectic transform without specifying phi"""
+        r = np.random.randn(6)
+        phi = np.zeros_like(r)
+
+        S = symplectic.squeezing(r)
+        S_phi = symplectic.squeezing(r, phi)
+
+        assert np.allclose(S, S_phi, atol=tol, rtol=0)
+
+    def test_symplectic_multimode(self, tol):
+        """Test multimode version gives symplectic matrix"""
+        r = [0.543] * 4
+        phi = [0.123] * 4
+        S = symplectic.squeezing(r, phi)
+
+        # the symplectic matrix
+        O = symplectic.sympmat(4)
+
+        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+
+    def test_dtype(self, tol):
+        """Test multimode version gives symplectic matrix"""
+        r = [0.543] * 4
+        phi = [0.123] * 4
+        S = symplectic.squeezing(r, phi)
+
+        S32_bit = symplectic.squeezing(r, phi, dtype=np.float32)
+
+        # the symplectic matrix
+        O = symplectic.sympmat(4)
+
+        assert np.allclose(S32_bit @ O @ S32_bit.T, O, atol=tol, rtol=0)
+        assert np.allclose(S, S32_bit, atol=tol, rtol=0)
 
 
 class TestTwoModeSqueezing:
@@ -175,6 +223,90 @@ class TestInterferometer:
         expected = np.block([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
         np.allclose(S, expected, atol=tol, rtol=0)
 
+
+class TestPassiveTransformation:
+    """ tests for linear transformation """
+    def test_transformation(self, tol):
+        """Test that an transformation returns the correct state"""
+
+        M = 4
+        cov = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
+
+        mu_out, cov_out = symplectic.passive_transformation(mu, cov, T)
+        # fmt:off
+        expected_mu = np.array([ 2.84604989,  2.84604989,  2.84604989,  2.84604989,  2.84604989,
+                                 2.84604989, 10.43551628, 10.43551628, 10.43551628, 10.43551628,
+                                 10.43551628, 10.43551628])
+        expected_cov = np.array([
+            [ 48.7,  47.7,  47.7,  47.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  48.7,  47.7,  47.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  48.7,  47.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  47.7,  48.7,  47.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  47.7,  47.7,  48.7,  47.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [ 47.7,  47.7,  47.7,  47.7,  47.7,  48.7,  63. ,  63. ,  63. , 63. ,  63. ,  63. ],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 178.3, 177.3, 177.3, 177.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 178.3, 177.3, 177.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 178.3, 177.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 177.3, 178.3, 177.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 177.3, 177.3, 178.3, 177.3],
+            [163.8, 163.8, 163.8, 163.8, 163.8, 163.8, 177.3, 177.3, 177.3, 177.3, 177.3, 178.3]])
+        # fmt:on
+
+        assert np.allclose(mu_out, expected_mu, atol=tol, rtol=0)
+        assert np.allclose(cov_out, expected_cov, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("M", range(1,10))
+    def test_valid_cov(self, M, tol):
+        """test that the output is a valid covariance matrix, even when not square"""
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        cov = a @ a.T + np.eye(2*M)
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
+
+        mu_out, cov_out = symplectic.passive_transformation(mu, cov, T)
+
+        assert cov_out.shape == (12, 12)
+        assert len(mu_out) == 12
+        assert is_valid_cov(cov_out, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("M", range(1, 6))
+    def test_unitary(self, M, tol):
+        """
+        test that the outputs agree with the interferometer class when
+        transformation is unitary
+        """
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2 * M, 2 * M))
+        cov = a @ a.T + np.eye(2 * M)
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        U = M ** (-0.5) * np.fft.fft(np.eye(M))
+        S_U = symplectic.interferometer(U)
+        cov_U = S_U @ cov @ S_U.T
+        mu_U = S_U @ mu
+
+        mu_T, cov_T = symplectic.passive_transformation(mu, cov, U)
+
+        assert np.allclose(mu_U, mu_T, atol=tol, rtol=0)
+        assert np.allclose(cov_U, cov_T, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("hbar", [1,2, 1.05e-34])
+    def test_hbar(self, hbar, tol):
+        """test that the output is a valid covariance matrix, even when not square"""
+
+        M = 4
+        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2*M, 2*M))
+        cov = a @ a.T + np.eye(2*M)
+        mu = np.arange(2 * M, dtype=np.float64)
+
+        T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6,M), dtype=np.float64)
+
+        _, cov_out = symplectic.passive_transformation(mu, cov, T, hbar=hbar)
+
+        assert is_valid_cov(cov_out, hbar=hbar, atol=tol, rtol=0)
 
 class TestReducedState:
     """Tests for the reduced state function"""
@@ -464,6 +596,30 @@ class TestVectorExpansion:
         expected[mode] = np.sqrt(2 * hbar) * alpha.real
         expected[mode + N] = np.sqrt(2 * hbar) * alpha.imag
         assert np.allclose(r, expected, atol=tol, rtol=0)
+
+class TestExpandPassive:
+    """Tests for expanding a displacement operation into a phase-space displacement vector"""
+
+    def test_expand_one(self, tol):
+        """Test that a 1x1 matrix is expanded correctly"""
+        T = np.array([[0.5]])
+
+        T_expand = symplectic.expand_passive(T, [1], 3)
+
+        expected = np.array([[1,0,0],[0,0.5,0],[0,0,1]])
+
+        assert np.allclose(T_expand, expected, atol=tol, rtol=0)
+
+    def test_expend_not_square(self):
+        """ test that error is raised for non square input"""
+        with pytest.raises(ValueError, match="The input matrix is not square"):
+            symplectic.expand_passive(np.ones((3,2)), [0,1,2], 5)
+
+    def test_modes_length(self):
+        """ test that error is raised when length of modes array is incorrect"""
+        with pytest.raises(ValueError, match="length of modes must match the shape of T"):
+            symplectic.expand_passive(np.ones((3,3)), [0,1,2,3,4], 8)
+
 
 class TestSymplecticExpansion:
     """Tests for the expanding a symplectic matrix"""

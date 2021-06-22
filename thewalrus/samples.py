@@ -57,12 +57,11 @@ import numpy as np
 from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, reduction
-from ._torontonian import tor, threshold_detection_prob, threshold_detection_prob_displacement
+from ._torontonian import threshold_detection_prob
 from .quantum import (
     Amat,
     Covmat,
     Qmat,
-    Xmat,
     gen_Qmat_from_graph,
     is_classical_cov,
     reduced_gaussian,
@@ -80,7 +79,6 @@ __all__ = [
     "torontonian_sample_graph",
     "torontonian_sample_classical_state",
     "threshold_detection_prob",
-    "threshold_detection_prob_displacement",
     "photon_number_sampler",
 ]
 
@@ -292,7 +290,6 @@ def hafnian_sample_state(
     return _hafnian_sample(params)
 
 
-
 def hafnian_sample_graph(
     A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
 ):
@@ -333,13 +330,16 @@ def hafnian_sample_graph(
 # ===============================================================================================
 
 
-def generate_torontonian_sample(cov, hbar=2, max_photons=30):
+def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+        mu (array): a :math:`2N` ``np.float64`` displacement vector
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         max_photons (int): specifies the maximum number of clicks that can be counted.
@@ -347,50 +347,40 @@ def generate_torontonian_sample(cov, hbar=2, max_photons=30):
     Returns:
         np.array[int]: a threshold sample from the Gaussian state.
     """
-    result = []
+    results = []
     n1, n2 = cov.shape
+
+    if mu is None:
+        mu = np.zeros(n1, dtype=np.float64)
 
     if n1 != n2:
         raise ValueError("Covariance matrix must be square.")
 
     nmodes = n1 // 2
     prev_prob = 1.0
-    mu = np.zeros(n1)
 
     for k in range(nmodes):
-        probs1 = np.zeros([2], dtype=np.float64)
+        probs = np.zeros([2], dtype=np.float64)
         kk = np.arange(k + 1)
-        _, V_red = reduced_gaussian(mu, cov, kk)
+        mu_red, V_red = reduced_gaussian(mu, cov, kk)
 
-        Q = Qmat(V_red, hbar=hbar)
-        A = Amat(Q, hbar=hbar, cov_is_qmat=True)
-        O = Xmat(k + 1) @ A
+        indices0 = results + [0]
+        probs[0] = threshold_detection_prob(mu_red, V_red, indices0, hbar=hbar)
 
-        indices = result + [0]
-        ind2 = indices + indices
+        indices1 = results + [1]
+        probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar)
 
-        probs1[0] = tor(np.complex128(reduction(O, ind2))).real
+        probs = np.real_if_close(probs)
+        probs = np.maximum(probs, 0)
+        result = np.random.choice(range(2), p=probs / prev_prob)
 
-        indices = result + [1]
-        ind2 = indices + indices
-        pref = np.sqrt(np.linalg.det(Q).real)
-        probs1a = probs1 / pref
+        results.append(result)
+        prev_prob = probs[result]
 
-        probs2 = probs1a / prev_prob
-        probs2[1] = 1.0 - probs2[0]
-        probs1a[1] = probs2[1] * prev_prob
-        probs3 = np.maximum(
-            probs2, np.zeros_like(probs2)
-        )  # pylint: disable=assignment-from-no-return
-        probs3 /= np.sum(probs3)
-        result.append(np.random.choice(a=range(len(probs3)), p=probs3))
-
-        prev_prob = probs1a[result[-1]]
-
-        if np.sum(result) > max_photons:
+        if np.sum(results) > max_photons:
             return -1
 
-    return result
+    return results
 
 
 def _torontonian_sample(args):
@@ -411,6 +401,11 @@ def _torontonian_sample(args):
             samples (int)
                 number of samples to generate
 
+            mu (array)
+                a :math:`2N` ``np.float64`` displacement vector
+                representing an :math:`N` mode quantum state. This can be obtained
+                via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
+
             hbar (float)
                 the value of :math:`\hbar` in the commutation
                 relation :math:`[\x,\p]=i\hbar`.
@@ -421,7 +416,7 @@ def _torontonian_sample(args):
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
-    cov, samples, hbar, max_photons = args
+    cov, samples, mu, hbar, max_photons = args
 
     if not isinstance(cov, np.ndarray):
         raise TypeError("Covariance matrix must be a NumPy array.")
@@ -438,7 +433,7 @@ def _torontonian_sample(args):
     j = 0
 
     while j < samples:
-        result = generate_torontonian_sample(cov, hbar=hbar, max_photons=max_photons)
+        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons)
         if result != -1:
             samples_array.append(result)
             j = j + 1
@@ -446,7 +441,7 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=False):
+def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, parallel=False):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -454,6 +449,9 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=Fals
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): number of samples to generate
+        mu (array): a :math:`2N` ``np.float64`` displacement vector
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``smeanxp`` method of the Gaussian backend of Strawberry Fields.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         max_photons (int): specifies the maximum number of clicks that can be counted.
@@ -462,8 +460,16 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=Fals
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
+
+    if not isinstance(cov, np.ndarray):
+        raise TypeError("Covariance matrix must be a NumPy array.")
+
+    if mu is None:
+        M = cov.shape[0] // 2
+        mu = np.zeros(2 * M, dtype=np.float64)
+
     if parallel:
-        params = [[cov, 1, hbar, max_photons]] * samples
+        params = [[cov, 1, mu, hbar, max_photons]] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_torontonian_sample)(p))
@@ -472,9 +478,8 @@ def torontonian_sample_state(cov, samples, hbar=2, max_photons=30, parallel=Fals
 
         return np.vstack(results)
 
-    params = [cov, samples, hbar, max_photons]
+    params = [cov, samples, mu, hbar, max_photons]
     return _torontonian_sample(params)
-
 
 
 def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=False):
@@ -493,7 +498,9 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=Fals
     """
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
-    return torontonian_sample_state(cov, samples, hbar=2, max_photons=max_photons, parallel=parallel)
+    return torontonian_sample_state(
+        cov, samples, hbar=2, max_photons=max_photons, parallel=parallel
+    )
 
 
 # pylint: disable=unused-argument
@@ -533,7 +540,7 @@ def hafnian_sample_classical_state(
 
 
 def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-08):
-    r""" Returns threshold samples from a Gaussian state that has a positive P function.
+    r"""Returns threshold samples from a Gaussian state that has a positive P function.
 
     Args:
         cov(array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -571,11 +578,11 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
     if out_of_bounds is False:
         probabilities = probabilities.flatten() / sum_p
-        vals = np.arange(cutoff**num_modes, dtype=int)
+        vals = np.arange(cutoff ** num_modes, dtype=int)
         return [
             np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
             for _ in range(num_samples)
-            ]
+        ]
 
     upper_limit = cutoff ** num_modes
 
@@ -585,13 +592,13 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
         return np.unravel_index(index, [cutoff] * num_modes)
 
-    vals = np.arange(1 + cutoff**num_modes, dtype=int)
+    vals = np.arange(1 + cutoff ** num_modes, dtype=int)
     probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
     return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 
 
 def seed(seed_val=None):
-    r""" Seeds the random number generator used in the sampling algorithms.
+    r"""Seeds the random number generator used in the sampling algorithms.
 
     This function is a wrapper around ``numpy.random.seed()``. By setting the seed
     to a specific integer, the sampling algorithms will exhibit deterministic behaviour.
@@ -600,7 +607,6 @@ def seed(seed_val=None):
         seed_val (int): Seed for RandomState. Must be convertible to 32 bit unsigned integers.
     """
     np.random.seed(seed_val)
-
 
 
 def _hafnian_sample_graph_rank_one(G, n_mean):
