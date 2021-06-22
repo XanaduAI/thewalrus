@@ -101,7 +101,7 @@ def expand_vector(alpha, mode, N, hbar=2.0):
 
 
 def expand_passive(T, modes, N):
-    r"""Returns and expanded linear optical transformation
+    r"""Returns the expanded linear optical transformation
     acting on specified modes, with identity acting on all other modes
 
     Args:
