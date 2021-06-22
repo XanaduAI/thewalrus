@@ -72,6 +72,16 @@ class TestSqueezing:
         expected = rotation @ np.diag(np.exp([-2*r, 2*r])) @ rotation.T
         assert np.allclose(out, expected, atol=tol, rtol=0)
 
+    def test_squeezing_no_phi_array(self, tol):
+        """Test multimode squeezing symplectic transform without specifying phi"""
+        r = np.random.randn(6)
+        phi = np.zeros_like(r)
+
+        S = symplectic.squeezing(r)
+        S_phi = symplectic.squeezing(r, phi)
+
+        assert np.allclose(S, S_phi, atol=tol, rtol=0)
+
     def test_symplectic_multimode(self, tol):
         """Test multimode version gives symplectic matrix"""
         r = [0.543] * 4
@@ -82,6 +92,20 @@ class TestSqueezing:
         O = symplectic.sympmat(4)
 
         assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+
+    def test_dtype(self, tol):
+        """Test multimode version gives symplectic matrix"""
+        r = [0.543] * 4
+        phi = [0.123] * 4
+        S = symplectic.squeezing(r, phi)
+
+        S32_bit = symplectic.squeezing(r, phi, dtype=np.float32)
+
+        # the symplectic matrix
+        O = symplectic.sympmat(4)
+
+        assert np.allclose(S32_bit @ O @ S32_bit.T, O, atol=tol, rtol=0)
+        assert np.allclose(S, S32_bit, atol=tol, rtol=0)
 
 class TestTwoModeSqueezing:
     """Tests for the TMS symplectic"""

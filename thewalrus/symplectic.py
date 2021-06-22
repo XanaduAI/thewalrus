@@ -27,6 +27,7 @@ Auxiliary functions
 .. autosummary::
     expand
     expand_vector
+    expand_passive
     reduced_state
     is_symplectic
     sympmat
