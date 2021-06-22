@@ -14,6 +14,8 @@
 """
 Hafnian Python interface
 """
+from itertools import chain, combinations
+
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
@@ -55,6 +57,35 @@ def input_validation(A, rtol=1e-05, atol=1e-08):
     return True
 
 
+def bandwidth(A):
+    """Calculates the upper bandwidth of the matrix A.
+
+    Args:
+        A (array): input matrix
+
+    Returns:
+        (int): bandwidth of matrix
+    """
+    n, _ = A.shape
+    for i in range(n - 1, 0, -1):
+        vali = np.diag(A, i)
+        if not np.allclose(vali, 0):
+            return i
+    return 0
+
+
+def powerset(iterable):
+    """Calculates the powerset of a list.
+
+    Args:
+        iterable (iterable): input list
+
+    Returns:
+        (chain): chain of all subsets of input list
+    """
+    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
+
+
 def reduction(A, rpt):
     r"""Calculates the reduction of an array by a vector of indices.
 
@@ -73,6 +104,7 @@ def reduction(A, rpt):
         return A[rows]
 
     return A[:, rows][rows]
+
 
 # pylint: disable=too-many-arguments
 def hafnian(
@@ -251,3 +283,48 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
+
+
+def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
+    """Returns the loop hafnian of a banded matrix.
+
+    For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions',
+    Qi et al. <https://arxiv.org/abs/2009.11824>`_.
+
+    Args:
+        A (array): a square, symmetric array of even dimensions.
+
+    Returns:
+        np.int64 or np.float64 or np.complex128: the loop hafnian of matrix ``A``.
+    """
+    input_validation(A, atol=atol, rtol=rtol)
+    (n, _) = A.shape
+    w = bandwidth(A)
+    if not loop:
+        A = A - np.diag(np.diag(A))
+    loop_haf = {(): 1, (1,): A[0, 0]}
+    for t in range(1, n + 1):
+        if t - 2 * w - 1 > 0:
+            lower_end = set(range(1, t - 2 * w))
+        else:
+            lower_end = set()
+        upper_end = set(range(1, t + 1))
+        diff = [item for item in upper_end if item not in lower_end]
+        # Makes sure set ordering is preserved when the difference of two sets is taken
+        # This is also used in the if statement below
+        ps = powerset(diff)
+        lower_end = tuple(lower_end)
+        for D in ps:
+            if lower_end + D not in loop_haf:
+                # pylint: disable=consider-using-generator
+                loop_haf[lower_end + D] = sum(
+                    [
+                        A[i - 1, t - 1]
+                        * loop_haf[
+                            tuple([item for item in lower_end + D if item not in set((i, t))])
+                        ]
+                        for i in D
+                    ]
+                )
+
+    return loop_haf[tuple(range(1, n + 1))]

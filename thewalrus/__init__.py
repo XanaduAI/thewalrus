@@ -62,6 +62,13 @@ Low-rank hafnian algorithm
     *A faster hafnian formula for complex matrices and its benchmarking on a supercomputer*,
     :cite:`bjorklund2018faster`.
 
+Banded hafnian algorithm
+    An algorithm that calculates the hafnian of a matrix :math:`\bm{A}` of size :math:`n \times n` with bandwidth
+    :math:`w` by calculating and storing certain subhafnians dictated by the bandwidth. The algorithm
+    is described in Section V of
+    *Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions*,
+    :cite:`qi2020efficient`.
+
 
 Python wrappers
 ---------------
@@ -74,6 +81,7 @@ Python wrappers
     perm
     permanent_repeated
     hermite_multidimensional
+    hafnian_banded
 
 Pure Python functions
 ---------------------
@@ -100,6 +108,7 @@ from ._hafnian import (
     hafnian,
     hafnian_repeated,
     reduction,
+    hafnian_banded,
 )
 from ._low_rank_haf import low_rank_hafnian
 from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional
@@ -112,6 +121,7 @@ __all__ = [
     "hafnian",
     "hafnian_repeated",
     "hafnian_batched",
+    "hafnian_banded",
     "tor",
     "perm",
     "permanent_repeated",
