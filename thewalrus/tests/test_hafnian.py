@@ -21,6 +21,7 @@ from scipy.special import factorial as fac
 import thewalrus as hf
 from thewalrus import hafnian, reduction, hafnian_banded
 from thewalrus.libwalrus import haf_complex, haf_real, haf_int
+from thewalrus._hafnian import bandwidth
 
 
 # the first 11 telephone numbers
@@ -306,3 +307,25 @@ def test_hafnian_banded(n, w, loop):
     result = hafnian_banded(M, loop=loop)
     expected = hafnian(M, loop=loop)
     assert np.allclose(result, expected)
+
+
+@pytest.mark.parametrize("N", [19, 20])
+@pytest.mark.parametrize("bw", [18, 17, 16])
+def test_bandwidth(N, bw):
+    """Check bandwidth is correct"""
+    A = random_banded(N,3)
+    A[0, bw] = 1.0
+    A[bw, 0] = 1.0
+    result = bandwidth(A)
+    expected = bw
+    assert np.allclose(result, expected)
+
+
+@pytest.mark.parametrize("N", [19, 20])
+def test_bandwidth_zero(N):
+    """Check bandwidth is correct for zero matrix"""
+    A = np.zeros([N, N])
+    result = bandwidth(A)
+    expected = 0
+    assert np.allclose(result, expected)
+

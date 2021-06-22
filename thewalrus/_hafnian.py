@@ -67,11 +67,11 @@ def bandwidth(A):
         (int): bandwidth of matrix
     """
     n, _ = A.shape
-    for i in range(n):
+    for i in range(n - 1, 0, -1):
         vali = np.diag(A, i)
-        if np.allclose(vali, 0):
-            return i - 1
-    return n - 1
+        if not np.allclose(vali, 0):
+            return i
+    return 0
 
 
 def powerset(iterable):
