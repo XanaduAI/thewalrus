@@ -201,9 +201,7 @@ def squeezing(r, phi=None, dtype=np.float64):
     M = len(r)
     S = np.identity(2 * M, dtype=dtype)
 
-    for i in range(M):
-        r_i = r[i]
-        phi_i = phi[i]
+    for i, (r_i, phi_i) in enumerate(zip(r, phi)):
         S[i, i] = np.cosh(r_i) - np.sinh(r_i) * np.cos(phi_i)
         S[i, i + M] = -np.sinh(r_i) * np.sin(phi_i)
         S[i + M, i] = -np.sinh(r_i) * np.sin(phi_i)
