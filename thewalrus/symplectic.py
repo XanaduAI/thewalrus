@@ -102,13 +102,13 @@ def expand_vector(alpha, mode, N, hbar=2.0):
 
 
 def expand_passive(T, modes, N):
-    r"""Returns and expanded linear optical transformation
+    r"""Returns the expanded linear optical transformation
     acting on specified modes, with identity acting on all other modes
 
     Args:
         T (array): square :math:`M \times M` matrix of linear optical transformation
-        modes (array): :math:`M` modes of the tranformation
-        N (int): number of modes
+        modes (array): the :math:`M` modes of the transformation
+        N (int): number of modes in the new expanded transformation
 
     Returns:
         array: :math:`N \times N` array of expanded passive transformation
@@ -174,14 +174,19 @@ def vacuum_state(modes, hbar=2.0, dtype=np.float64):
 
 
 def squeezing(r, phi=None, dtype=np.float64):
-    r"""Squeezing. In fock space this corresponds to \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
+    r"""Squeezing. In fock space this corresponds to:
+    
+    .. math::
+    
+         \exp(\tfrac{1}{2}r e^{i \phi} (a^2 - a^{\dagger 2}) ).
+         
 
     By passing an array of squeezing parameters and phases, it applies a tensor product of squeezing operations.
 
     Args:
         r (array): squeezing magnitude
         phi (array): rotation parameter
-        dtype (numpy.dtype): datatype to represent the Symplectic matrix
+        dtype (numpy.dtype): datatype to represent the Symplectic matrix.  Defaults to ``numpy.float64``.
     Returns:
         array: symplectic transformation matrix
     """
@@ -197,9 +202,7 @@ def squeezing(r, phi=None, dtype=np.float64):
     M = len(r)
     S = np.identity(2 * M, dtype=dtype)
 
-    for i in range(M):
-        r_i = r[i]
-        phi_i = phi[i]
+    for i, (r_i, phi_i) in enumerate(zip(r, phi)):
         S[i, i] = np.cosh(r_i) - np.sinh(r_i) * np.cos(phi_i)
         S[i, i + M] = -np.sinh(r_i) * np.sin(phi_i)
         S[i + M, i] = -np.sinh(r_i) * np.sin(phi_i)
@@ -254,16 +257,20 @@ def interferometer(U):
 
 
 def passive_transformation(mu, cov, T, hbar=2):
-    r"""
-    covariance matrix transformation for arbitrary linear optical channel
-    mapping an :math:`N` modes state to an :math:`M` mode state
+    r"""Perform a covariance matrix transformation for an arbitrary linear optical channel
+    on an :math:`N` modes state mapping it to a to an :math:`M` modes state.
+    
     Args:
         mu (array): :math:`2N`-length means vector
         cov (array): :math:`2N \times 2N` covariance matrix
         T (array): :math:`M \times N` linear optical transformation
+        
+    Keyword Args:
+        hbar (float)=2: the value to use for hbar
+        
     Returns:
-        mu (array): :math:`2M`-length transformed means vector
-        cov (array): :math:`2M \times 2M` tranformed covariance matrix
+        array: :math:`2M`-length transformed means vector
+        array :math:`2M \times 2M` tranformed covariance matrix
     """
 
     P = interferometer(T)
