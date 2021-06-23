@@ -235,7 +235,7 @@ def hafnian_sparse(A, D=None, loop=False):
     if not loop:
         A = A - np.diag(np.diag(A))
 
-    if np.allclose(A, np.zeros_like(A)):
+    if np.allclose(A, 0):
         return 0.0
 
     r, _ = np.nonzero(A)
