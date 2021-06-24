@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2021 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ Recursive hafnian algorithm
     This algorithm scales like :math:`\mathcal{O}(n^4 2^{n/2})`. This algorithm does not
     currently support the loop hafnian.
 
-Repeating hafnian algorithm
+Repeated hafnian algorithm
     The algorithm described in *From moments of sum to moments of product*, :cite:`kan2008moments`.
-    This method is more efficient for matrices with repeated rows and columns, and supports caclulation of
+    This method is more efficient for matrices with repeated rows and columns, and supports calculation of
     the loop hafnian.
 
 Approximate hafnian algorithm
@@ -68,6 +68,11 @@ Banded hafnian algorithm
     is described in Section V of
     *Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions*,
     :cite:`qi2020efficient`.
+
+Sparse hafnian algorithm
+    An algorithm that calculates the hafnian of a sparse matrix by taking advantage of the Laplace expansion and memoization, to store
+    only the relevant paths that contribute non-zero values to the final calculation.
+
 
 
 Python wrappers
@@ -108,8 +113,10 @@ from ._hafnian import (
     hafnian,
     hafnian_repeated,
     reduction,
+    hafnian_sparse,
     hafnian_banded,
 )
+
 from ._low_rank_haf import low_rank_hafnian
 from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional
 from ._permanent import perm, perm_complex, perm_real, permanent_repeated
@@ -121,6 +128,7 @@ __all__ = [
     "hafnian",
     "hafnian_repeated",
     "hafnian_batched",
+    "hafnian_sparse",
     "hafnian_banded",
     "tor",
     "perm",

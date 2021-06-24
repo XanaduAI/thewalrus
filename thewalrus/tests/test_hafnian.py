@@ -19,7 +19,8 @@ import numpy as np
 from scipy.special import factorial as fac
 
 import thewalrus as hf
-from thewalrus import hafnian, reduction, hafnian_banded
+from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded
+
 from thewalrus.libwalrus import haf_complex, haf_real, haf_int
 from thewalrus._hafnian import bandwidth
 
@@ -298,6 +299,17 @@ class TestLoopHafnian:
         assert np.allclose(haf, expected)
 
 
+    @pytest.mark.parametrize("n", [2, 3, 5, 10, 15, 20])
+    @pytest.mark.parametrize("fill", [0.5, 0.2, 0.1, 0.05])
+    def test_valid_output(self, random_matrix, n, fill):
+        """Tests that sparse loop hafnian matches full implementation"""
+        A = random_matrix(n, fill_factor=fill)
+        assert np.allclose(hafnian_sparse(A, loop=True), hafnian_sparse(A, D=set(range(len(A))), loop=True))
+        assert np.allclose(hafnian_sparse(A, loop=False), hafnian_sparse(A, D=set(range(len(A))), loop=False))
+        assert np.allclose(hafnian(A, loop=True), hafnian_sparse(A, loop=True))
+        assert np.allclose(hafnian(A, loop=False), hafnian_sparse(A, loop=False))
+
+
 @pytest.mark.parametrize("n", [7, 8, 9, 10, 11, 12])
 @pytest.mark.parametrize("w", [1, 2, 3, 4, 5, 6])
 @pytest.mark.parametrize("loop", [True, False])
@@ -328,4 +340,3 @@ def test_bandwidth_zero(N):
     result = bandwidth(A)
     expected = 0
     assert np.allclose(result, expected)
-
