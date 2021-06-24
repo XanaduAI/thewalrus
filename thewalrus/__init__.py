@@ -36,9 +36,9 @@ Recursive hafnian algorithm
     This algorithm scales like :math:`\mathcal{O}(n^4 2^{n/2})`. This algorithm does not
     currently support the loop hafnian.
 
-Repeating hafnian algorithm
+Repeated hafnian algorithm
     The algorithm described in *From moments of sum to moments of product*, :cite:`kan2008moments`.
-    This method is more efficient for matrices with repeated rows and columns, and supports caclulation of
+    This method is more efficient for matrices with repeated rows and columns, and supports calculation of
     the loop hafnian.
 
 Approximate hafnian algorithm
