@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2021 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,6 +68,11 @@ Banded hafnian algorithm
     is described in Section V of
     *Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions*,
     :cite:`qi2020efficient`.
+
+Sparse hafnian algorithm
+    An algorithm that calculates the hafnian of a sparse matrix by taking advantage of the Laplace expansion and memoization, to store
+    only the relevant paths that contribute non-zero values to the final calculation.
+
 
 
 Python wrappers

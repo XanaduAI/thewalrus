@@ -203,3 +203,16 @@ Consider now the :math:`r`-partitions of the integer :math:`n`, there are :math:
 .. tip::
 
    *Implemented as* :func:`thewalrus.low_rank_hafnian`. This function takes as argument the matrix :math:`\bm{G} \in \mathbb{C}^{n \times r}` and returns the value of the hafnian of the matrix :math:`\bm{A} = \bm{G} \bm{G}^T`
+
+Sparse and banded algorithms
+----------------------------
+These algorithms take advantage of the Laplace expansion of the hafnian to calculate hafnians of matrices with many zeros. These matrices can be either banded or sparse. The Laplace expansion of the hafnian is given by
+
+.. math::
+	\text{haf}(\bm{B}) = \sum_{j \neq i} B_{i,j} \text{haf}(\bm{B}_{-i-j}),
+
+where :math:`j` is a fixed index and :math:`\bm{B}_{-i-j}` is the matrix obtained from :math:`\bm{B}` by removing rows and columns :math:`i` and :math:`j`. The banded algorithm was introduced in Sec. V of Qi *et al* :cite:`qi2020efficient`.
+
+.. tip::
+
+   *Implemented as* :func:`thewalrus.hafnian_sparse` and :func:`thewalrus.hafnian_banded`.  The loop hafnian calculation can be done by setting the option ``loop=True``.
