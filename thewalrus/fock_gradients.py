@@ -26,17 +26,22 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	squeezing
 	beamsplitter
 	two_mode_squeezing
-    n_mode_gaussian_gate
+    gaussian_gate
 	grad_displacement
 	grad_squeezing
 	grad_beamsplitter
 	grad_two_mode_squeezing
-    grad_n_mode_gaussian_gate
+    grad_gaussian_gate
 
 """
 import numpy as np
 
 from numba import jit
+
+from numba.cpython.unsafe.tuple import tuple_setitem
+from functools import lru_cache
+from itertools import product
+from typing import Tuple, Generator
 
 
 @jit(nopython=True)
@@ -381,14 +386,14 @@ def remove(
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
-def n_mode_gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     array = np.zeros(((cutoff,)*(2*num_modes)),dtype = dtype)
     for n_current in range(1, num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
             array = fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma)
     return array
 
-def fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma):
+def fill_gaussian_gate_loop(array, idx, C, mu, Sigma):
     if idx == (0,)*(2*num_modes):
         array[idx] = C
     else:
@@ -402,16 +407,16 @@ def fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma):
         array[idx] = u / SQRT[idx[i]]
     return array
 
-def grad_n_mode_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes dtype=np.complex128):
+def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes dtype=np.complex128):
     dG_dC = np.ones(gate, dtype = dtype)
     dG_dmu = np.zeros(gate, dtype = dtype)
     dG_dSigma = np.zeros(gate, dtype = dtype)
-    for n_current in range(1, num_modes+1):
+    for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
                 dG_dmu, dG_dSigma = fill_grad_n_mode_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma)
     return dG_dC, dG_dmu, dG_dSigma
 
-def fill_grad_n_mode_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma):
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma):
     if idx == (0,)*(2*num_modes):
         dG_dmu[idx] = 1
         dG_dSigma[idx] = 1

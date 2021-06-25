@@ -23,8 +23,8 @@ from thewalrus.fock_gradients import (
     beamsplitter,
     grad_beamsplitter,
     choi_trick,
-    n_mode_gaussian_gate,
-    grad_n_mode_gaussian_gate
+    gaussian_gate,
+    grad_gaussian_gate
 )
 import numpy as np
 from scipy.stats import unitary_group
@@ -234,25 +234,50 @@ def test_two_mode_squeezing_values(tol):
     expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
 
-def test_choi_trick(tol):
-    """Test if we can get correct C, mu, Sigma from S, d"""
-    num_mode = 4
-    W = unitary_group.rvs(num_mode)
-    V = unitary_group.rvs(num_mode)
-    r = np.random.random(num_mode) # r needs to be real
-    alpha = np.random.random(num_mode) + 1j * np.random.random(num_mode)
-    _C = np.exp(-0.5 * np.sum(np.abs(alpha) ** 2) - 0.5 * np.conj(alpha).T @ W @ np.diag(np.tanh(r)) @ W.T @ np.conj(alpha)) / np.sqrt(np.prod(np.cosh(r)))
-    _mu = np.block([ np.conj(alpha).T @ W @ np.diag(np.tanh(r)) @ W.T + alpha.T, -np.conj(alpha).T @ W @ np.diag(1/np.cosh(r)) @ V])
-    _Sigma = np.block(
-        [[W @ tanhr @ W.T, -W @ sechr @ V], [-V.T @ sechr @ W.T, -V.T @ tanhr @ V]]
-    expected_C, expected_mu, expected_Sigma = choi_trick(S, d, num_mode)
-    assert np.allclose(_C, expected_C, atol=tol, rtol=0)
-    assert np.allclose(_mu, expected_mu, atol=tol, rtol=0)
-    assert np.allclose(_Sigma, expected_Sigma, atol=tol, rtol=0)
+def test_gaussian_gate_values(tol):
+    """Tests the transforamtion matrix of gaussian gate """
+    #Single-mode test
+    #Special case: single-mode squeezing (zeta, gamma=0, phi=0)
+    cutoff = 5
+    zeta = 0.3 + 1j*0.2
+    gamma = 0
+    phi = 0
+    r = np.abs(zeta)
+    delta = np.angle(zeta)
+    expected = squeezing(r, delta, cutoff)
+    tanhr = np.tanh(r)
+    sechr = 1/np.cosh(r)
+    C = np.sqrt(sechr)
+    mu = np.zeros(2).T
+    Sigma = np.array([[np.exp(1j*delta)*tanhr, -sechr], [-sechr, -np.exp(-1j*delta)*tanhr]])
+    T = gaussian_gate(C, mu, Sigma, cutoff, 1)
+    assert np.allclose(T, expected, atol=tol, rtol=0)
+    #Special case: single-mode displacement (gamma, zeta=0, phi=0)
+    cutoff = 4
+    gamma = 0.2 - 1j*0.8
+    zeta = 0
+    phi = 0
+    expected = displacement(np.abs(gamma), np.angle(gamma), cutoff)
+    C = np.exp(-0.5*np.abs(gamma)**2)
+    mu = np.array([gamma,-np.conj(gamma)]).T
+    Sigma = np.array([[0, -1], [-1, 0]])
+    T = gaussian_gate(C, mu, Sigma, cutoff, 1)
+    assert np.allclose(T, expected, atol=tol, rtol=0)
+    #Special case: BS
+    cutoff = 4
+    theta = np.pi / 4
+    phi = np.pi/2
+    expected = beamsplitter(theta, phi, cutoff)
+    ct = np.cos(theta)
+    st = np.sin(theta) * np.exp(1j * phi)
+    V = np.array([[ct, -np.conj(st)], [st, ct]])
+    C = 1
+    mu = np.zeros(4).T
+    Sigma = - np.block([[np.zeros((2,2)), V], [V.T, np.zeros((2,2))]])
+    T = gaussian_gate(C, mu, Sigma, cutoff, 2)
+    assert np.allclose(T, expected, atol=tol, rtol=0)
 
-def test_n_mode_gaussian_gate(tol):
-
-def test_grad_n_mode_gaussian_gate(tol):
-
+def test_grad_gaussian_gate(tol):
+    """Tests the gradients of the transforamtion matrix of gaussian gate """
 
 
