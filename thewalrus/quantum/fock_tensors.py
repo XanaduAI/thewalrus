@@ -648,7 +648,7 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
             relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
-        list(array): List with arrays containing the :math:`1,..,n` body marginal 
+        list(array): List with arrays containing the :math:`1,..,n` body marginal
             distributions of the modes
     """
     M = len(mean)
