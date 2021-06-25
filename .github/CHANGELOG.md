@@ -2,6 +2,7 @@
 
 ### New features
 
+* Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
 
 * ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
@@ -11,10 +12,9 @@
 
 * Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix [#246](https://github.com/XanaduAI/thewalrus/pull/246)
 
-
 ### Improvements
 
-* Speeds up the calculation of photon number variances/covariances [#224](https://github.com/XanaduAI/thewalrus/pull/224)
+* Speeds up the calculation of photon number variances/covariances [#244](https://github.com/XanaduAI/thewalrus/pull/244)
 
 ### Bug fixes
 
@@ -24,8 +24,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Timjan Kalajdzievski, Nicolas Quesada
-
+Jake Bulmer, Timjan Kalajdzievski, Filippo Miatto, Nicolas Quesada
 
 ---
 

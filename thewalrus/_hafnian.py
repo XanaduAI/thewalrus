@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2021 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 """
 Hafnian Python interface
 """
-from itertools import chain, combinations
 
+from functools import lru_cache
+from collections import Counter
+from itertools import chain, combinations
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
@@ -208,6 +210,50 @@ def hafnian(
     return haf_real(
         A, loop=loop, recursive=recursive, quad=quad, approx=approx, nsamples=num_samples
     )
+
+
+def hafnian_sparse(A, D=None, loop=False):
+    r"""Returns the hafnian of a sparse symmetric matrix.
+
+    This pure python implementation is very slow on full matrices, but faster the sparser a matrix is.
+    As a rule of thumb, the crossover in runtime with respect to :func:`~.hafnian` happens around 50% sparsity.
+
+    Args:
+        A (array): the symmetric matrix of which we want to compute the hafnian
+        D (set): set of indices that identify a submatrix. If ``None`` (default) it computes
+            the hafnian of the whole matrix.
+        loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
+
+    Returns:
+        (float) hafnian of ``A`` or of the submatrix of ``A`` defined by the set of indices ``D``.
+    """
+    if D is None:
+        D = frozenset(range(len(A)))
+    else:
+        D = frozenset(D)
+
+    if not loop:
+        A = A - np.diag(np.diag(A))
+
+    if np.allclose(A, 0):
+        return 0.0
+
+    r, _ = np.nonzero(A)
+    m = max(Counter(r).values())  # max nonzero values per row/column
+
+    @lru_cache(maxsize=2 ** m)
+    def indices(d, k):
+        return d.intersection(set(np.nonzero(A[k])[0]))
+
+    @lru_cache(maxsize=2 ** m)
+    def lhaf(d: frozenset) -> float:
+        if not d:
+            return 1
+        d_ = set(d)
+        k = d_.pop()
+        return sum(A[i, k] * lhaf(frozenset(d_).difference({i})) for i in indices(d, k))
+
+    return lhaf(D)
 
 
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
