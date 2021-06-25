@@ -19,6 +19,8 @@ classical subsystems of Gaussian states.
 
 from itertools import count, product, chain
 
+from collections import OrderedDict
+
 import numpy as np
 import dask
 
@@ -43,6 +45,7 @@ from .gaussian_checks import (
     is_pure_cov,
     is_valid_cov
 )
+
 
 
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
@@ -632,3 +635,42 @@ def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-
         ps = np.real_if_close(np.diag(density_matrix(mu_red, cov_red, cutoff=cutoff, hbar=hbar)))
         bounds += 1 - np.cumsum(ps)
     return bounds
+
+def n_body_marginals(mean, cov, cutoff, n, hbar=2):
+    r"""Calculates the first n-body marginals of a Gaussian state.
+    
+    Args:
+        mean (array): length-:math:`2N` quadrature displacement vector
+        cov (array): length-:math:`2N` covariance matrix
+        cutoff (int): cutoff in Fock space
+        n (int): order of the correlations
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+    
+    Returns:
+        list(array): List with arrays containing the :math:`1,..,n` body marginal 
+            distributions of the modes
+    """
+    M = len(mean)
+    if (M, M) != cov.shape:
+        raise ValueError("The covariance matrix and vector of means have incompatible dimensions")
+    if M % 2 != 0:
+        raise ValueError("The covariance matrix or vector of means are not of even dimensions")
+    M = M // 2
+    if M < n:
+        raise ValueError("The order of the correlations is higher than the number of modes")
+
+    marginal = [np.zeros(([M] * i) + ([cutoff] * i)) for i in range(1, n + 1)]
+
+    for ind in product(range(M), repeat=n):
+        modes = list(set(ind))
+        num_modes = len(modes)
+        acc = len(modes) - 1
+        if list(ind) == sorted(ind):
+            sub_mean, sub_cov = reduced_state(mean, cov, modes)  # this happens in phase space
+            marginal[acc][tuple(modes)] = probabilities(sub_mean, sub_cov, cutoff, hbar=hbar)
+        else:
+            modes_usrt = list(OrderedDict.fromkeys(ind))
+            perm = np.argsort(modes_usrt)
+            marginal[acc][tuple(modes_usrt)] = marginal[acc][tuple(modes)].transpose(perm)
+    return marginal
