@@ -1679,7 +1679,6 @@ def test_correct_indexing_n_body_marginals():
     r1 = np.arcsinh(1)
     r2 = np.arcsinh(np.sqrt(2))
     cov3 = squeezing([2 * r1, 0, 2 * r2])
-    mu3 = np.zeros(len(cov3))
     marg = n_body_marginals(np.zeros(len(cov3)), cov3, 4, 3)
     assert np.allclose(marg[1][2, 0][0, 2], marg[0][2][0] * marg[0][0][2])
     assert np.allclose(marg[2][0, 1, 2][:, 0, :], marg[2][1, 0, 2][0, :, :])

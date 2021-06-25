@@ -638,7 +638,7 @@ def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-
 
 def n_body_marginals(mean, cov, cutoff, n, hbar=2):
     r"""Calculates the first n-body marginals of a Gaussian state.
-    
+
     Args:
         mean (array): length-:math:`2N` quadrature displacement vector
         cov (array): length-:math:`2N` covariance matrix
@@ -646,7 +646,7 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
         n (int): order of the correlations
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
-    
+
     Returns:
         list(array): List with arrays containing the :math:`1,..,n` body marginal 
             distributions of the modes
@@ -664,7 +664,6 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
 
     for ind in product(range(M), repeat=n):
         modes = list(set(ind))
-        num_modes = len(modes)
         acc = len(modes) - 1
         if list(ind) == sorted(ind):
             sub_mean, sub_cov = reduced_state(mean, cov, modes)  # this happens in phase space
