@@ -41,10 +41,12 @@ def random_matrix(dtype):
     """Returns a random symmetric matrix of type dtype
     and of size n x n"""
 
-    def _wrapper(n):
+    def _wrapper(n, fill_factor=1.0):
         """wrapper function"""
         A = np.complex128(np.random.random([n, n]))
         A += 1j * np.random.random([n, n])
+        mask = np.random.binomial(1, p=fill_factor, size=(n, n))
+        A *= mask
         A += A.T
 
         if not np.issubdtype(dtype, np.complexfloating):

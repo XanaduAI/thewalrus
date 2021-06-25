@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2021 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
 """
 Hafnian Python interface
 """
+
+from functools import lru_cache
+from collections import Counter
+from itertools import chain, combinations
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
@@ -55,6 +59,35 @@ def input_validation(A, rtol=1e-05, atol=1e-08):
     return True
 
 
+def bandwidth(A):
+    """Calculates the upper bandwidth of the matrix A.
+
+    Args:
+        A (array): input matrix
+
+    Returns:
+        (int): bandwidth of matrix
+    """
+    n, _ = A.shape
+    for i in range(n - 1, 0, -1):
+        vali = np.diag(A, i)
+        if not np.allclose(vali, 0):
+            return i
+    return 0
+
+
+def powerset(iterable):
+    """Calculates the powerset of a list.
+
+    Args:
+        iterable (iterable): input list
+
+    Returns:
+        (chain): chain of all subsets of input list
+    """
+    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
+
+
 def reduction(A, rpt):
     r"""Calculates the reduction of an array by a vector of indices.
 
@@ -73,6 +106,7 @@ def reduction(A, rpt):
         return A[rows]
 
     return A[:, rows][rows]
+
 
 # pylint: disable=too-many-arguments
 def hafnian(
@@ -178,6 +212,50 @@ def hafnian(
     )
 
 
+def hafnian_sparse(A, D=None, loop=False):
+    r"""Returns the hafnian of a sparse symmetric matrix.
+
+    This pure python implementation is very slow on full matrices, but faster the sparser a matrix is.
+    As a rule of thumb, the crossover in runtime with respect to :func:`~.hafnian` happens around 50% sparsity.
+
+    Args:
+        A (array): the symmetric matrix of which we want to compute the hafnian
+        D (set): set of indices that identify a submatrix. If ``None`` (default) it computes
+            the hafnian of the whole matrix.
+        loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
+
+    Returns:
+        (float) hafnian of ``A`` or of the submatrix of ``A`` defined by the set of indices ``D``.
+    """
+    if D is None:
+        D = frozenset(range(len(A)))
+    else:
+        D = frozenset(D)
+
+    if not loop:
+        A = A - np.diag(np.diag(A))
+
+    if np.allclose(A, 0):
+        return 0.0
+
+    r, _ = np.nonzero(A)
+    m = max(Counter(r).values())  # max nonzero values per row/column
+
+    @lru_cache(maxsize=2 ** m)
+    def indices(d, k):
+        return d.intersection(set(np.nonzero(A[k])[0]))
+
+    @lru_cache(maxsize=2 ** m)
+    def lhaf(d: frozenset) -> float:
+        if not d:
+            return 1
+        d_ = set(d)
+        k = d_.pop()
+        return sum(A[i, k] * lhaf(frozenset(d_).difference({i})) for i in indices(d, k))
+
+    return lhaf(D)
+
+
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 
@@ -251,3 +329,48 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
+
+
+def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
+    """Returns the loop hafnian of a banded matrix.
+
+    For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical circuits with local interactions',
+    Qi et al. <https://arxiv.org/abs/2009.11824>`_.
+
+    Args:
+        A (array): a square, symmetric array of even dimensions.
+
+    Returns:
+        np.int64 or np.float64 or np.complex128: the loop hafnian of matrix ``A``.
+    """
+    input_validation(A, atol=atol, rtol=rtol)
+    (n, _) = A.shape
+    w = bandwidth(A)
+    if not loop:
+        A = A - np.diag(np.diag(A))
+    loop_haf = {(): 1, (1,): A[0, 0]}
+    for t in range(1, n + 1):
+        if t - 2 * w - 1 > 0:
+            lower_end = set(range(1, t - 2 * w))
+        else:
+            lower_end = set()
+        upper_end = set(range(1, t + 1))
+        diff = [item for item in upper_end if item not in lower_end]
+        # Makes sure set ordering is preserved when the difference of two sets is taken
+        # This is also used in the if statement below
+        ps = powerset(diff)
+        lower_end = tuple(lower_end)
+        for D in ps:
+            if lower_end + D not in loop_haf:
+                # pylint: disable=consider-using-generator
+                loop_haf[lower_end + D] = sum(
+                    [
+                        A[i - 1, t - 1]
+                        * loop_haf[
+                            tuple([item for item in lower_end + D if item not in set((i, t))])
+                        ]
+                        for i in D
+                    ]
+                )
+
+    return loop_haf[tuple(range(1, n + 1))]
