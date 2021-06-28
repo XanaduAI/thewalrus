@@ -388,12 +388,12 @@ SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     array = np.zeros(((cutoff,)*(2*num_modes)),dtype = dtype)
-    for n_current in range(1, num_modes+1):
+    for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
-            array = fill_n_mode_gaussian_gate_loop(array, idx, C, mu, Sigma)
+            array = fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes)
     return array
 
-def fill_gaussian_gate_loop(array, idx, C, mu, Sigma):
+def fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes):
     if idx == (0,)*(2*num_modes):
         array[idx] = C
     else:
@@ -407,16 +407,16 @@ def fill_gaussian_gate_loop(array, idx, C, mu, Sigma):
         array[idx] = u / SQRT[idx[i]]
     return array
 
-def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes dtype=np.complex128):
-    dG_dC = np.ones(gate, dtype = dtype)
-    dG_dmu = np.zeros(gate, dtype = dtype)
-    dG_dSigma = np.zeros(gate, dtype = dtype)
+def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+    dG_dC = np.ones_like(gate, dtype = dtype)
+    dG_dmu = np.zeros_like(gate, dtype = dtype)
+    dG_dSigma = np.zeros_like(gate, dtype = dtype)
     for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
-                dG_dmu, dG_dSigma = fill_grad_n_mode_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma)
+                dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma, num_modes)
     return dG_dC, dG_dmu, dG_dSigma
 
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma):
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma, num_modes):
     if idx == (0,)*(2*num_modes):
         dG_dmu[idx] = 1
         dG_dSigma[idx] = 1
@@ -431,4 +431,4 @@ def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma):
             #TODO: maybe wrong?
             dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + gate[kl])
         dG_dSigma[idx] = dSigma / SQRT[idx[i]]
-    return dG_dC, dG_dmu, dG_dSigma
+    return dG_dmu, dG_dSigma
