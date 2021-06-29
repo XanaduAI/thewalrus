@@ -279,5 +279,48 @@ def test_gaussian_gate_values(tol):
 
 def test_grad_gaussian_gate(tol):
     """Tests the gradients of the transforamtion matrix of gaussian gate """
+    #Special case: single-mode squeezing (zeta, gamma=0, phi=0)
+    num_mode = 1
+    cutoff = 6
+    zeta = 0.6 - 1j*0.2
+    gamma = 0
+    phi = 0
+    r = np.abs(zeta)
+    delta = np.angle(zeta)
+    expected = squeezing(r, delta, cutoff)
+    tanhr = np.tanh(r)
+    sechr = 1/np.cosh(r)
+    C = np.sqrt(sechr)
+    mu = np.zeros(2).T
+    Sigma = np.array([[np.exp(1j*delta)*tanhr, -sechr], [-sechr, -np.exp(-1j*delta)*tanhr]])
+    T = gaussian_gate(C, mu, Sigma, cutoff, num_mode)
+    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(T, C, mu, Sigma, cutoff, num_mode, dtype=np.complex128)
+    delta_plus = 0.00001 + 1j*0.00001
+    expected_grad_C = (gaussian_gate(C+delta_plus, mu, Sigma, cutoff, num_mode) - gaussian_gate(C-delta_plus, mu, Sigma, cutoff, num_mode))/(2*delta_plus)
+    assert np.allclose(grad_C, expected_grad_C, atol= tol, rtol=0)
+    expected_grad_mu = (gaussian_gate(C, mu+delta_plus, Sigma, cutoff, num_mode) - gaussian_gate(C, mu-delta_plus, Sigma, cutoff, num_mode))/(2*delta_plus)
+    assert np.allclose(grad_mu, expected_grad_mu, atol= tol, rtol=0)
+    expected_grad_Sigma = (gaussian_gate(C, mu, Sigma+delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma-delta_plus, cutoff, num_mode))/(2*delta_plus)
+    assert np.allclose(grad_Sigma, expected_grad_Sigma, atol= tol, rtol=0)
 
-
+    #Special case: BS
+    num_mode = 2
+    cutoff = 5
+    theta = np.pi / 4
+    phi = np.pi/2
+    expected = beamsplitter(theta, phi, cutoff)
+    ct = np.cos(theta)
+    st = np.sin(theta) * np.exp(1j * phi)
+    V = np.array([[ct, -np.conj(st)], [st, ct]])
+    C = 1
+    mu = np.zeros(4).T
+    Sigma = - np.block([[np.zeros((2,2)), V], [V.T, np.zeros((2,2))]])
+    T = gaussian_gate(C, mu, Sigma, cutoff, 2)
+    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(T, C, mu, Sigma, cutoff, num_mode, dtype=np.complex128)
+    delta_plus = 0.00001 + 1j*0.00001
+    expected_grad_C = (gaussian_gate(C+delta_plus, mu, Sigma, cutoff, num_mode) - gaussian_gate(C-delta_plus, mu, Sigma, cutoff, num_mode))/(2*delta_plus)
+    assert np.allclose(grad_C, expected_grad_C, atol= tol, rtol=0)
+    expected_grad_mu = (gaussian_gate(C, mu+delta_plus, Sigma, cutoff, num_mode) - gaussian_gate(C, mu-delta_plus, Sigma, cutoff, num_mode))/(2*delta_plus)
+    assert np.allclose(grad_mu, expected_grad_mu, atol= tol, rtol=0)
+    expected_grad_Sigma = (gaussian_gate(C, mu, Sigma+delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma-delta_plus, cutoff, num_mode))/(2*delta_plus)
+    assert np.allclose(grad_Sigma, expected_grad_Sigma, atol= tol, rtol=0)

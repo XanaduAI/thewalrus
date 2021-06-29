@@ -408,27 +408,28 @@ def fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes):
     return array
 
 def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
-    dG_dC = np.ones_like(gate, dtype = dtype)
+    dG_dC = gate/C
     dG_dmu = np.zeros_like(gate, dtype = dtype)
     dG_dSigma = np.zeros_like(gate, dtype = dtype)
     for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
-                dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma, num_modes)
+                dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma)
     return dG_dC, dG_dmu, dG_dSigma
 
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, C, mu, Sigma, num_modes):
-    if idx == (0,)*(2*num_modes):
-        dG_dmu[idx] = 1
-        dG_dSigma[idx] = 1
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):
+    if idx == (0,)*(len(gate.shape)):
+        dG_dSigma[idx] = 0
+        dG_dmu[idx] = 0
     else:
         for i, val in enumerate(idx):
             if val > 0:
                 break
         ki = dec(idx, i)
-        dG_dmu[idx] = (mu[i] * dG_dmu[ki] + gate[ki])/ SQRT[idx[i]]
-        dSigma = 0
+        dmu = mu[i] * dG_dmu[ki] + gate[ki]
+        dSigma = mu[i] * dG_dSigma[ki]
         for l, kl in remove(ki):
-            #TODO: maybe wrong?
+            dmu -= SQRT[ki[l]] * dG_dmu[kl] * Sigma[i,l]
             dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + gate[kl])
         dG_dSigma[idx] = dSigma / SQRT[idx[i]]
+        dG_dmu[idx] = dmu / SQRT[idx[i]]
     return dG_dmu, dG_dSigma
