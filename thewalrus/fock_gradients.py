@@ -369,13 +369,13 @@ def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ..
         (0,)*(2*num_modes - n_current) + comb for comb in product(*(range(cutoff) for _ in range(n_current)))
     ]
     
-@njit
+@jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     "returns a copy of the given tuple of integers where the ith element has been decreased by 1"
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
     
-@njit
+@jit(nopython=True)
 def remove(
     pattern: Tuple[int, ...]
 ) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
@@ -393,6 +393,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
             array = fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes)
     return array
 
+@jit(nopython=True)
 def fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes):
     if idx == (0,)*(2*num_modes):
         array[idx] = C
@@ -416,6 +417,7 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
                 dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma)
     return dG_dC, dG_dmu, dG_dSigma
 
+@jit(nopython=True)
 def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):
     if idx == (0,)*(len(gate.shape)):
         dG_dSigma[idx] = 0
