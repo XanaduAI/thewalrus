@@ -37,7 +37,7 @@ This module contains the Fock representation of the standard Gaussian gates as w
 import numpy as np
 
 from numba import jit
-
+from numba import njit
 from numba.cpython.unsafe.tuple import tuple_setitem
 from functools import lru_cache
 from itertools import product
@@ -393,7 +393,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
             array = fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes)
     return array
 
-@jit(nopython=True)
+@njit
 def fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes):
     if idx == (0,)*(2*num_modes):
         array[idx] = C
@@ -417,7 +417,7 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
                 dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma)
     return dG_dC, dG_dmu, dG_dSigma
 
-@jit(nopython=True)
+@njit
 def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):
     if idx == (0,)*(len(gate.shape)):
         dG_dSigma[idx] = 0
