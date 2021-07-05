@@ -37,7 +37,6 @@ This module contains the Fock representation of the standard Gaussian gates as w
 import numpy as np
 
 from numba import jit
-from numba import njit
 from numba.cpython.unsafe.tuple import tuple_setitem
 from functools import lru_cache
 from itertools import product
