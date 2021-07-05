@@ -34,15 +34,12 @@ This module contains the Fock representation of the standard Gaussian gates as w
     grad_gaussian_gate
 
 """
-import numpy as np
-
 from numba import jit
-from numba import njit
 from numba.cpython.unsafe.tuple import tuple_setitem
 from functools import lru_cache
 from itertools import product
 from typing import Tuple, Generator
-
+import numpy as np
 
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
@@ -368,7 +365,7 @@ def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ..
     return [
         (0,)*(2*num_modes - n_current) + comb for comb in product(*(range(cutoff) for _ in range(n_current)))
     ]
-    
+
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     "returns a copy of the given tuple of integers where the ith element has been decreased by 1"
@@ -376,9 +373,7 @@ def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     return tuple_setitem(copy, i, tup[i] - 1)
     
 @jit(nopython=True)
-def remove(
-    pattern: Tuple[int, ...]
-) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
+def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     "returns a generator for all the possible ways to decrease elements of the given tuple by 1"
     for p, n in enumerate(pattern):
         if n > 0:
@@ -393,11 +388,11 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
             if idx == (0,)*(2*num_modes):
                 array[idx] = C
             else:
-                array = fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes)
+                array = fill_gaussian_gate_loop(array, idx, mu, Sigma, num_modes)
     return array
 
 @jit(nopython=True)
-def fill_gaussian_gate_loop(array, idx, C, mu, Sigma, num_modes):
+def fill_gaussian_gate_loop(array, idx, mu, Sigma):
     for i, val in enumerate(idx):
         if val > 0:
             break
