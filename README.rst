@@ -203,9 +203,7 @@ We also encourage bug reports, suggestions for new features and enhancements, an
 Authors
 =======
 
-Brajesh Gupt, Josh Izaac and Nicolas Quesada.
-
-All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
+The Walrus is the work of `many contributors <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
 
 If you are doing research using The Walrus, please cite `our paper <https://joss.theoj.org/papers/10.21105/joss.01705>`_:
 

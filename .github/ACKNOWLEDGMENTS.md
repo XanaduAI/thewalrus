@@ -1,12 +1,10 @@
-# Developers
+# Contributors
 
 * [Brajesh Gupt](https://github.com/bgupt) (Xanadu)
 
 * [Josh Izaac](https://github.com/josh146) (Xanadu)
 
 * [Nicolás Quesada](https://github.com/nquesada) (Xanadu)
-
-# Acknowledgements
 
 * [achan001](https://github.com/achan001) - ➕ summation expert
 
