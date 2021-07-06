@@ -372,8 +372,9 @@ def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         array[float]: The Fock representation of the gate
     """
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
-    et = 1j*np.exp(1j * (theta + phi))
-    R = np.array([[0, 0, 0, et], [0, 0, et, 0], [0, et, 0, 0], [et, 0, 0, 0],])
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+    R = 0.5*np.array([[0, 0, u*(v-1), 1j*(1+v)], [0, 0, 1j*u*(1+v), 1-v], [u*(v-1), 1j*u*(1+v), 0, 0], [e1j*(1+v), 1-v, 0, 0],])
 
     Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
     Z[0, 0, 0, 0] = 1.0
