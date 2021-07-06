@@ -26,6 +26,7 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	squeezing
 	beamsplitter
 	two_mode_squeezing
+	mzgate
 	grad_displacement
 	grad_squeezing
 	grad_beamsplitter
@@ -355,3 +356,40 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                     )
 
     return grad_theta, grad_phi
+
+
+@jit(nopython=True)
+def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
+    r"""Calculates the Fock representation of the beamsplitter.
+
+    Args:
+        theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=\cos(\theta)`
+        phi (float): reflection phase of the beamsplitter
+        cutoff (int): Fock ladder cutoff
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array[float]: The Fock representation of the gate
+    """
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    et = 1j*np.exp(1j * (theta + phi))
+    R = np.array([[0, 0, 0, et], [0, 0, et, 0], [0, et, 0, 0], [et, 0, 0, 0],])
+
+    Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    Z[0, 0, 0, 0] = 1.0
+
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff - m):
+            p = m + n
+            if 0 < p < cutoff:
+                Z[m, n, p, 0] = R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0] + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+
+    # rank 4
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                q = m + n - p
+                if 0 < q < cutoff:
+                    Z[m, n, p, q] = R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1] + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+    return Z
