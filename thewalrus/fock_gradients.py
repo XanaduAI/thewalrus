@@ -396,13 +396,13 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128): #pylint
     Returns:
         array[complex]: The Fock representation of the gate
     """
-    array = np.zeros(((cutoff,)*(2*num_modes)),dtype = dtype)
+    array = np.zeros(((cutoff,)*(2*num_modes)), dtype=dtype)
     for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
             if idx == (0,)*(2*num_modes):
                 array[idx] = C
             else:
-                array = fill_gaussian_gate_loop(array, idx, mu, Sigma, num_modes)
+                array = fill_gaussian_gate_loop(array, idx, mu, Sigma)
     return array
 
 @jit(nopython=True)
