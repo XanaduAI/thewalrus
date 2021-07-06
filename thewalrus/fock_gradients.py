@@ -34,11 +34,11 @@ This module contains the Fock representation of the standard Gaussian gates as w
     grad_gaussian_gate
 
 """
-from numba import jit
-from numba.cpython.unsafe.tuple import tuple_setitem
 from functools import lru_cache
 from itertools import product
 from typing import Tuple, Generator
+from numba import jit
+from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
 
 @jit(nopython=True)
@@ -382,6 +382,19 @@ def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], N
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+    r"""Calculates the Fock representation of the gaussian gate.
+
+    Args:
+        C (complex): parameter for the gaussian gate
+        mu (vector[complex]): parameter for the gaussian gate
+        Sigma (array[complex]): parameter for the gaussian gate
+        cutoff (int): Fock ladder cutoff
+        num_modes (int): number of modes in the gaussian gate
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array[complex]: The Fock representation of the gate
+    """
     array = np.zeros(((cutoff,)*(2*num_modes)),dtype = dtype)
     for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
@@ -404,6 +417,20 @@ def fill_gaussian_gate_loop(array, idx, mu, Sigma):
     return array
 
 def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+    r"""Calculates the gradients of the gaussian gate.
+
+    Args:
+        gate (array[complex]): array representing the gate
+        C (complex): parameter for the gaussian gate
+        mu (vector[complex]): parameter for the gaussian gate
+        Sigma (array[complex]): parameter for the gaussian gate
+        cutoff (int): Fock ladder cutoff
+        num_modes (int): number of modes in the gaussian gate
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array[complex]: The Fock representation of the gate
+    """
     dG_dC = gate/C
     dG_dmu = np.zeros_like(gate, dtype = dtype)
     dG_dSigma = np.zeros_like(gate, dtype = dtype)
