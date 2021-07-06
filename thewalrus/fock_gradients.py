@@ -362,6 +362,7 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
 
 @lru_cache()
 def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ...], ...]:
+    "returns a list of tuples which has a fixed length and arbitraty combination up to the cutoff"
     return [
         (0,)*(2*num_modes - n_current) + comb for comb in product(*(range(cutoff) for _ in range(n_current)))
     ]
@@ -371,7 +372,7 @@ def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     "returns a copy of the given tuple of integers where the ith element has been decreased by 1"
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
-    
+
 @jit(nopython=True)
 def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     "returns a generator for all the possible ways to decrease elements of the given tuple by 1"
@@ -381,7 +382,7 @@ def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], N
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
-def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128): #pylint: disable=too-many-arguments
     r"""Calculates the Fock representation of the gaussian gate.
 
     Args:
@@ -405,7 +406,8 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     return array
 
 @jit(nopython=True)
-def fill_gaussian_gate_loop(array, idx, mu, Sigma):
+def fill_gaussian_gate_loop(array, idx, mu, Sigma): #pylint: disable=undefined-loop-variable
+    "numba code to fill the gaussian gate according to the index given"
     for i, val in enumerate(idx):
         if val > 0:
             break
@@ -416,7 +418,7 @@ def fill_gaussian_gate_loop(array, idx, mu, Sigma):
     array[idx] = u / SQRT[idx[i]]
     return array
 
-def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128): #pylint: disable=too-many-arguments
     r"""Calculates the gradients of the gaussian gate.
 
     Args:
@@ -441,7 +443,8 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
     return dG_dC, dG_dmu, dG_dSigma
 
 @jit(nopython=True)
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): #pylint: disable=undefined-loop-variable
+    "numba code to fill the gradients of the gaussian gate according to the index given"
     for i, val in enumerate(idx):
         if val > 0:
             break
