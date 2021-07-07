@@ -383,6 +383,7 @@ def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], N
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+    #pylint: disable=too-many-arguments
     r"""Calculates the Fock representation of the gaussian gate.
 
     Args:
@@ -406,7 +407,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     return array
 
 @jit(nopython=True)
-def fill_gaussian_gate_loop(array, idx, mu, Sigma): # pragma: no cover #pylint: disable=undefined-loop-variable
+def fill_gaussian_gate_loop(array, idx, mu, Sigma): # pragma: no cover
     "numba code to fill the gaussian gate according to the index given"
     i = 0
     for i, val in enumerate(idx):
@@ -420,6 +421,7 @@ def fill_gaussian_gate_loop(array, idx, mu, Sigma): # pragma: no cover #pylint: 
     return array
 
 def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+    #pylint: disable=too-many-arguments
     r"""Calculates the gradients of the gaussian gate.
 
     Args:
@@ -444,7 +446,8 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
     return dG_dC, dG_dmu, dG_dSigma
 
 @jit(nopython=True)
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): # pragma: no cover #pylint: disable=undefined-loop-variable
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): # pragma: no cover
+    #pylint: disable=too-many-arguments
     "numba code to fill the gradients of the gaussian gate according to the index given"
     i = 0
     for i, val in enumerate(idx):
