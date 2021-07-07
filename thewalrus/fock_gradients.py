@@ -396,7 +396,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     Returns:
         array[complex]: The Fock representation of the gate
     """
-    array = np.zeros(((cutoff,)*(2*num_modes)),dtype = dtype)
+    array = np.zeros(((cutoff,)*(2*num_modes)), dtype=dtype)
     for n_current in range(1, 2*num_modes+1):
         for idx in partition(num_modes, n_current, cutoff):
             if idx == (0,)*(2*num_modes):
@@ -406,7 +406,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     return array
 
 @jit(nopython=True)
-def fill_gaussian_gate_loop(array, idx, mu, Sigma): #pylint: disable=undefined-loop-variable
+def fill_gaussian_gate_loop(array, idx, mu, Sigma): # pragma: no cover #pylint: disable=undefined-loop-variable
     "numba code to fill the gaussian gate according to the index given"
     i = 0
     for i, val in enumerate(idx):
@@ -444,7 +444,7 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
     return dG_dC, dG_dmu, dG_dSigma
 
 @jit(nopython=True)
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): #pylint: disable=undefined-loop-variable
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): # pragma: no cover #pylint: disable=undefined-loop-variable
     "numba code to fill the gradients of the gaussian gate according to the index given"
     i = 0
     for i, val in enumerate(idx):
