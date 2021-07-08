@@ -655,7 +655,7 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
     if (M, M) != cov.shape:
         raise ValueError("The covariance matrix and vector of means have incompatible dimensions")
     if M % 2 != 0:
-        raise ValueError("The covariance matrix or vector of means are not of even dimensions")
+        raise ValueError("The vector of means is not of even dimensions")
     M = M // 2
     if M < n:
         raise ValueError("The order of the correlations is higher than the number of modes")
