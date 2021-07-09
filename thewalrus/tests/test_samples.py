@@ -265,7 +265,7 @@ class TestHafnianSampling:
         """Tests that the probability of zero photons is correct"""
 
         n = 4  # n is the size of the graph
-        approx_samples = 1e3  # number of samples in the hafnian approximation
+        approx_samples = 1000  # number of samples in the hafnian approximation
         A = np.random.binomial(1, 0.5, (n, n))
 
         A = np.triu(A)
