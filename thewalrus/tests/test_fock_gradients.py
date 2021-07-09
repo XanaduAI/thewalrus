@@ -237,8 +237,6 @@ def test_gaussian_gate_values_with_single_mode_squeezing(tol):
     """Tests the transforamtion matrix of gaussian gate. This test is particular for the single mode squeezing gate (S(zeta)) and other parameters are 0s here."""
     cutoff = 5
     zeta = 0.3 + 1j * 0.2
-    gamma = 0
-    phi = 0
     r = np.abs(zeta)
     delta = np.angle(zeta)
     expected = squeezing(r, delta, cutoff)
@@ -249,14 +247,12 @@ def test_gaussian_gate_values_with_single_mode_squeezing(tol):
     Sigma = np.array([[np.exp(1j * delta) * tanhr, -sechr], [-sechr, -np.exp(-1j * delta) * tanhr]])
     T = gaussian_gate(C, mu, Sigma, cutoff, 1)
     assert np.allclose(T, expected, atol=tol, rtol=0)
-    
+
 
 def test_gaussian_gate_values_with_single_mode_displacement(tol):
     """Tests the transforamtion matrix of gaussian gate. This test is particular for the single mode displacement gate (D(gamma)) and other parameters are 0s here."""
     cutoff = 4
     gamma = 0.2 - 1j * 0.8
-    zeta = 0
-    phi = 0
     expected = displacement(np.abs(gamma), np.angle(gamma), cutoff)
     C = np.exp(-0.5 * np.abs(gamma) ** 2)
     mu = np.array([gamma, -np.conj(gamma)]).T
