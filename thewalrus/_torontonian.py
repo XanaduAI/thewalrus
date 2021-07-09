@@ -52,10 +52,10 @@ def tor(A, fsum=False):
 
     if A.dtype == np.complex128:
         if np.any(np.iscomplex(A)):
-            return tor_complex(A, fsum=fsum)
-        return tor_real(np.float64(A.real), fsum=fsum)
+            return numba_tor(A)
+        return numba_tor(np.float64(A.real))
 
-    return tor_real(A, fsum=fsum)
+    return numba_tor(A)
 
 
 @numba.jit(nopython=True)

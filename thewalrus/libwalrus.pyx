@@ -138,8 +138,6 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     double loop_hafnian_rpt_quad(vector[double] &mat, vector[double] &mu, vector[int] &nud)
     double complex loop_hafnian_rpt_quad(vector[double complex] &mat, vector[double complex] &mu, vector[int] &nud)
 
-    double hafnian_approx(vector[double] &mat, int &nsamples)
-
     double torontonian_quad(vector[double] &mat)
     double complex torontonian_quad(vector[double complex] &mat)
     double torontonian_fsum[T](vector[T] &mat)
@@ -396,9 +394,6 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True, bi
         if quad:
             return loop_hafnian_quad(mat)
         return loop_hafnian(mat)
-
-    if approx:
-        return hafnian_approx(mat, nsamples)
 
     if recursive:
         if quad:
