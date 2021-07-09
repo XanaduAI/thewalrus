@@ -26,8 +26,8 @@ from thewalrus.fock_gradients import (
     grad_gaussian_gate
 )
 from thewalrus.quantum.fock_tensors import fock_tensor
+from thewalrus.symplectic import sympmat
 import numpy as np
-from scipy.stats import unitary_group
 
 
 def test_grad_displacement():
@@ -327,6 +327,7 @@ def test_grad_gaussian_gate_with_beamsplitter(tol):
     expected_grad_Sigma = (gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)) / (2 * delta_plus)
     assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
 
+
 def choi_trick(S, d):
     """Function to help the test of gaussian gate with symplectic matrix, to get the parameter C, mu, Sigma of gaussian gate from S, d"""
     num_mode = S.shape[0]//2
@@ -378,7 +379,7 @@ def test_gaussian_gate_with_Symplectic_matrix(tol):
     """Tests of the gaussian gate. This test is for arbitraty symplectic matrix and displacement vector as input and compare the gate with fock_tensor function"""
     num_mode = 2
     cutoff = 6
-    S = unitary_group.rvs(2 * num_mode)
+    S = sympmat(2 * num_mode)
     d = np.random.random(num_mode) + 1j * np.random.random(num_mode)
     _gaussian_gate = fock_tensor(S, d, cutoff)
     C, mu, Sigma = choi_trick(S, d)
