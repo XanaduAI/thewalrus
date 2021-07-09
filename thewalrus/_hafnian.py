@@ -381,7 +381,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
 
 
 @jit(nopython=True)
-def one_det(B):
+def one_det(B): # pragma: no cover
     """ Calculates the determinant of an antisymmetric matrix with entries distributed
     according to a normal distribution with scale equal to the entries of the symmetric matrix
     given as input.
@@ -401,7 +401,7 @@ def one_det(B):
     return np.linalg.det(mat)
 
 @jit(nopython=True)
-def hafnian_approx(A, num_samples = 1000):
+def hafnian_approx(A, num_samples = 1000): # pragma: no cover
     """ Calculates Barvinok's approximation of the hafnian for a non-negative symmetric matrix.
 
     Args:
