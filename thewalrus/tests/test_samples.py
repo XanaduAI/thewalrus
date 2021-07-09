@@ -232,8 +232,7 @@ class TestHafnianSampling:
         approx_mean_n = np.sum(samples) / n_samples
         assert np.allclose(mean_n, approx_mean_n, rtol=2e-1)
 
-    @pytest.mark.parametrize("parallel", [True, False])
-    def test_single_pm_graphs(self, parallel):
+    def test_single_pm_graphs(self):
         """Tests that the number of photons is the same for modes i and n-i
         in the special case of a graph with one single perfect matching
         """
@@ -249,7 +248,6 @@ class TestHafnianSampling:
             approx=True,
             approx_samples=approx_samples,
             samples=nr_samples,
-            parallel=parallel,
         )
 
         test_passed = True
