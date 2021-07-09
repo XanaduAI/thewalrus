@@ -381,7 +381,7 @@ def test_gaussian_gate_with_Symplectic_matrix(tol):
     cutoff = 6
     S = sympmat(2 * num_mode)
     d = np.random.random(num_mode) + 1j * np.random.random(num_mode)
-    _gaussian_gate = fock_tensor(S, d, cutoff)
+    _gaussian_gate = fock_tensor(S, np.concatenate([d, np.zeros(num_mode)]), cutoff)
     C, mu, Sigma = choi_trick(S, d)
     expected_gaussian_gate = gaussian_gate(C, mu, Sigma, cutoff, num_mode)
     assert np.allclose(_gaussian_gate, expected_gaussian_gate, atol=tol, rtol=0)
