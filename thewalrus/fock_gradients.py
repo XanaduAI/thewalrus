@@ -448,11 +448,11 @@ def fill_gaussian_gate_loop(gate, idx, mu, Sigma): # pragma: no cover
         if val > 0:
             break
     ki = dec(idx, i)
-    u = mu[i] * array[ki]
+    u = mu[i] * gate[ki]
     for l, kl in remove(ki):
-        u -= SQRT[ki[l]] * Sigma[i, l] * array[kl]
-    array[idx] = u / SQRT[idx[i]]
-    return array
+        u -= SQRT[ki[l]] * Sigma[i, l] * gate[kl]
+    gate[idx] = u / SQRT[idx[i]]
+    return gate
 
 def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     #pylint: disable=too-many-arguments

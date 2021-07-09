@@ -372,7 +372,7 @@ def choi_trick(S, d):
         )
     ) * np.exp(-0.5 * np.sum(np.conj(alpha) * zeta))
     return C, mu, Sigma
-    
+
 
 def test_gaussian_gate_with_Symplectic_matrix(tol):
     """Tests of the gaussian gate. This test is for arbitraty symplectic matrix and displacement vector as input and compare the gate with fock_tensor function"""
