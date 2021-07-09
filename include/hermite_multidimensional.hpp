@@ -22,7 +22,7 @@
 #include <stdafx.h>
 #include <assert.h>
 #include <algorithm>
-
+#include <cstring>
 
 
 typedef unsigned long long int ullint;
