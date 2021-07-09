@@ -61,8 +61,6 @@ def build_extensions():
             "./include/eigenvalue_hafnian.hpp",
             "./include/recursive_hafnian.hpp",
             "./include/repeated_hafnian.hpp",
-            "./include/hafnian_approx.hpp",
-            "./include/torontonian.hpp",
             "./include/permanent.hpp",
             "./include/hermite_multidimensional.hpp",
             "./include/stdafx.h",
