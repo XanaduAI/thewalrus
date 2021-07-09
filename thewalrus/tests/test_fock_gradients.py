@@ -25,7 +25,9 @@ from thewalrus.fock_gradients import (
     gaussian_gate,
     grad_gaussian_gate
 )
+from thewalrus.quantum.fock_tensors import fock_tensor
 import numpy as np
+from scipy.stats import unitary_group
 
 
 def test_grad_displacement():
@@ -324,3 +326,61 @@ def test_grad_gaussian_gate_with_beamsplitter(tol):
     assert np.allclose(grad_mu, expected_grad_mu, atol=tol, rtol=0)
     expected_grad_Sigma = (gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)) / (2 * delta_plus)
     assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
+
+def choi_trick(S, d):
+    """Function to help the test of gaussian gate with symplectic matrix, to get the parameter C, mu, Sigma of gaussian gate from S, d"""
+    num_mode = S.shape[0]//2
+    choi_r = np.arcsinh(1.0)
+    ch = np.cosh(choi_r) * np.identity(num_mode)
+    sh = np.sinh(choi_r) * np.identity(num_mode)
+    zh = np.zeros([num_mode, num_mode])
+    Schoi = np.block(
+     [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
+    )
+    Sxx = S[:num_mode, :num_mode]
+    Sxp = S[:num_mode, num_mode:]
+    Spx = S[num_mode:, :num_mode]
+    Spp = S[num_mode:, num_mode:]
+    idl = np.identity(num_mode)
+    S_exp = (
+     np.block(
+         [
+             [Sxx, zh, Sxp, zh],
+             [zh, idl, zh, zh],
+             [Spx, zh, Spp, zh],
+             [zh, zh, zh, idl],
+         ]
+     )
+     @ Schoi
+    )
+    choi_cov = 0.5 * S_exp @ S_exp.T
+    idl = np.identity(2 * num_mode)
+    R = np.sqrt(0.5) * np.block([[idl, 1j * idl], [idl, -1j * idl]])
+    sigma = R @ choi_cov @ R.conj().T
+    zh = np.zeros([2 * num_mode, 2 * num_mode])
+    X = np.block([[zh, idl], [idl, zh]])
+    sigma_Q = sigma + 0.5 * np.identity(4 * num_mode)
+    A_mat = X @ (np.identity(4 * num_mode) - np.linalg.inv(sigma_Q))
+    E = np.diag(np.concatenate([np.ones([num_mode]), np.ones([num_mode]) / np.tanh(choi_r)]))
+    Sigma = -(E @ A_mat[:2*num_mode, :2*num_mode] @ E).conj()
+    mu = np.concatenate([Sigma[:num_mode,:num_mode]@d.conj()+d.T, Sigma[num_mode:,:num_mode]@d.conj()])
+    alpha = np.concatenate([d, np.zeros(num_mode)])
+    zeta = alpha + Sigma @ np.conj(alpha)
+    C = np.sqrt(
+        np.sqrt(
+            np.linalg.det(np.eye(num_mode) - Sigma[:num_mode, :num_mode] @ np.conj(Sigma[:num_mode, :num_mode]))
+        )
+    ) * np.exp(-0.5 * np.sum(np.conj(alpha) * zeta))
+    return C, mu, Sigma
+    
+
+def test_gaussian_gate_with_Symplectic_matrix(tol):
+    """Tests of the gaussian gate. This test is for arbitraty symplectic matrix and displacement vector as input and compare the gate with fock_tensor function"""
+    num_mode = 2
+    cutoff = 6
+    S = unitary_group.rvs(2 * num_mode)
+    d = np.random.random(num_mode) + 1j * np.random.random(num_mode)
+    _gaussian_gate = fock_tensor(S, d, cutoff)
+    C, mu, Sigma = choi_trick(S, d)
+    expected_gaussian_gate = gaussian_gate(C, mu, Sigma, cutoff, num_mode)
+    assert np.allclose(_gaussian_gate, expected_gaussian_gate, atol=tol, rtol=0)

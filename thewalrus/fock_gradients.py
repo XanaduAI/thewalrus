@@ -393,7 +393,7 @@ def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
 @jit(nopython=True)
 def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
-    
+
     Args:
         pattern (Tuple[int, ...]): the pattern given to be decreased
 
@@ -431,8 +431,18 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     return array
 
 @jit(nopython=True)
-def fill_gaussian_gate_loop(array, idx, mu, Sigma): # pragma: no cover
-    "numba code to fill the gaussian gate according to the index given"
+def fill_gaussian_gate_loop(gate, idx, mu, Sigma): # pragma: no cover
+    r"""Calculates the Fock representing of the gaussian gate for a given index.
+
+    Args:
+        gate (array[complex]): array representing the gaussian gate
+        idx (tuple): index of the gradients to be filled
+        mu (vector[complex]): parameter for the gaussian gate
+        Sigma (array[complex]): parameter for the gaussian gate
+
+    Returns:
+        array[complex]: The Fock representing of the gaussian gate for a given index
+    """
     i = 0
     for i, val in enumerate(idx):
         if val > 0:
@@ -458,7 +468,7 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        array[complex]: The Fock representation of the gate
+        array[complex], array[complex], array[complex]: the gradients of the gaussian gate with respect to C, mu and Sigma
     """
     dG_dC = gate/C
     dG_dmu = np.zeros_like(gate, dtype = dtype)
@@ -472,7 +482,19 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
 @jit(nopython=True)
 def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): # pragma: no cover
     #pylint: disable=too-many-arguments
-    "numba code to fill the gradients of the gaussian gate according to the index given"
+    r"""Calculates the gradients of the gaussian gate for a given index.
+
+    Args:
+        dG_dmu (array[complex]): array representing the gradients of the gaussian gate with respect to mu
+        dG_dSigma (array[complex]): array representing the gradients of the gaussian gate with respect to Sigma
+        gate (array[complex]): array representing the gaussian gate
+        idx (tuple): index of the gradients to be filled
+        mu (vector[complex]): parameter for the gaussian gate
+        Sigma (array[complex]): parameter for the gaussian gate
+
+    Returns:
+        array[complex], array[complex]: the gradients of the gaussian gate with respect to mu and Sigma for a given index
+    """
     i = 0
     for i, val in enumerate(idx):
         if val > 0:
