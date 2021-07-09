@@ -66,7 +66,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
     'edit_on_github',
-    'nbsphinx',
+    'nbsphinx==0.7',
     'breathe',
     'exhale',
     'sphinx_copybutton'
