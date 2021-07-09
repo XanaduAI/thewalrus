@@ -2,7 +2,7 @@ docutils==0.16
 sphinxcontrib-bibtex
 sphinx==1.8.5
 ipykernel
-nbsphinx
+nbsphinx==0.8
 cython>=0.20
 numba>=0.49.1
 numpy>=1.9
