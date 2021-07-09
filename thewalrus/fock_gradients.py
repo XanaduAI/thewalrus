@@ -362,20 +362,44 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
 
 @lru_cache()
 def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ...], ...]:
-    "returns a list of tuples which has a fixed length and arbitraty combination up to the cutoff"
+    r"""returns a list of possible combination of index. The length is fixed to 2*num_modes, last n_current bits are filled with all possible combinations of numbers where the max of number is up to the cutoff
+
+    Args:
+        num_modes (int): number of modes in the gaussian gate
+        n_current (int): up to which index is calculated
+        cutoff (int): Fock ladder cutoff
+
+    Returns:
+        tuple[tuple[int,...], ...]: the partition of possible index
+    """
     return [
         (0,)*(2*num_modes - n_current) + comb for comb in product(*(range(cutoff) for _ in range(n_current)))
     ]
 
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
-    "returns a copy of the given tuple of integers where the ith element has been decreased by 1"
+    r"""returns a copy of the given tuple of integers where the ith element has been decreased by 1
+
+    Args:
+        tup (Tuple[int]): the given tuple
+        i (int): the position of the element to be decreased
+
+    Returns:
+        Tuple[int,...]: the new tuple with the decrease on i-th element by 1
+    """
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
 
 @jit(nopython=True)
 def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
-    "returns a generator for all the possible ways to decrease elements of the given tuple by 1"
+    r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
+    
+    Args:
+        pattern (Tuple[int, ...]): the pattern given to be decreased
+
+    Returns:
+        Generator[Tuple[int, Tuple[int, ...]], None, None]: the generator
+    """
     for p, n in enumerate(pattern):
         if n > 0:
             yield p, dec(pattern, p)

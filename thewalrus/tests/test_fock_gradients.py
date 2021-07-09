@@ -232,10 +232,9 @@ def test_two_mode_squeezing_values(tol):
     expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
 
-def test_gaussian_gate_values(tol):
-    """Tests the transforamtion matrix of gaussian gate"""
-    # Single-mode test
-    # Special case: single-mode squeezing (zeta, gamma=0, phi=0)
+
+def test_gaussian_gate_values_with_single_mode_squeezing(tol):
+    """Tests the transforamtion matrix of gaussian gate. This test is particular for the single mode squeezing gate (S(zeta)) and other parameters are 0s here."""
     cutoff = 5
     zeta = 0.3 + 1j * 0.2
     gamma = 0
@@ -250,7 +249,10 @@ def test_gaussian_gate_values(tol):
     Sigma = np.array([[np.exp(1j * delta) * tanhr, -sechr], [-sechr, -np.exp(-1j * delta) * tanhr]])
     T = gaussian_gate(C, mu, Sigma, cutoff, 1)
     assert np.allclose(T, expected, atol=tol, rtol=0)
-    # Special case: single-mode displacement (gamma, zeta=0, phi=0)
+    
+
+def test_gaussian_gate_values_with_single_mode_displacement(tol):
+    """Tests the transforamtion matrix of gaussian gate. This test is particular for the single mode displacement gate (D(gamma)) and other parameters are 0s here."""
     cutoff = 4
     gamma = 0.2 - 1j * 0.8
     zeta = 0
@@ -261,6 +263,10 @@ def test_gaussian_gate_values(tol):
     Sigma = np.array([[0, -1], [-1, 0]])
     T = gaussian_gate(C, mu, Sigma, cutoff, 1)
     assert np.allclose(T, expected, atol=tol, rtol=0)
+
+
+def test_gaussian_gate_values_with_beamsplitter(tol):
+    """Tests the transforamtion matrix of gaussian gate. This test is particular for two-mode beamsplitter (BS(theta, phi)) and other parameters are 0s here."""
     # Special case: BS
     cutoff = 4
     theta = np.pi / 4
@@ -276,8 +282,8 @@ def test_gaussian_gate_values(tol):
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-def test_grad_gaussian_gate(tol):
-    """Tests the gradients of the transforamtion matrix of gaussian gate"""
+def test_grad_gaussian_gate_with_single_mode_squeezing(tol):
+    """Tests the gradients of gaussian gate. This test is particular for the single mode squeezing gate (S(zeta)) and other parameters are 0s here. The gradients of parameters are tested by finite differences"""
     # Special case: single-mode squeezing (zeta, gamma=0, phi=0)
     num_mode = 1
     cutoff = 6
@@ -299,6 +305,9 @@ def test_grad_gaussian_gate(tol):
     expected_grad_Sigma = (gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)) / (2 * delta_plus)
     assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
 
+
+def test_grad_gaussian_gate_with_beamsplitter(tol):
+    """Tests the gradients of gaussian gate. This test is particular for two-mode beamsplitter (BS(theta, phi)) and other parameters are 0s here. The gradients of parameters are tested by finite differences"""
     # Special case: BS
     num_mode = 2
     cutoff = 5
