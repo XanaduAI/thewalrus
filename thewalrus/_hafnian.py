@@ -18,6 +18,8 @@ Hafnian Python interface
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
+from numba import jit
+
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
@@ -185,6 +187,8 @@ def hafnian(
 
         if np.any(A < 0):
             raise ValueError("Input matrix must not have negative entries")
+
+        return hafnian_approx(A, num_samples=num_samples)
 
     if A.dtype == np.complex:
         # array data is complex type
@@ -374,3 +378,38 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
                 )
 
     return loop_haf[tuple(range(1, n + 1))]
+
+
+@jit(nopython=True)
+def one_det(B):
+    """ Calculates the determinant of an antisymmetric matrix with entries distributed
+    according to a normal distribution with scale equal to the entries of the symmetric matrix
+    given as input.
+
+    Args:
+        B (array): symmetric matrix
+
+    Returns:
+        (float): determinant of the samples antisymmetric matrix
+    """
+    mat = np.empty_like(B,dtype=np.float64)
+    n,m = B.shape
+    for i in range(n):
+        for j in range(m):
+            mat[i,j] = B[i,j]*np.random.normal()
+            mat[j,i] = -mat[i,j]
+    return np.linalg.det(mat)
+
+@jit(nopython=True)
+def hafnian_approx(A, num_samples = 1000):
+    """ Calculates Barvinok's approximation of the hafnian for a non-negative symmetric matrix.
+
+    Args:
+        B (array): symmetric matrix
+
+    Returns:
+        (float): approximate hafnian of the input
+    """
+
+    sqrtA = np.sqrt(A)
+    return np.array([one_det(sqrtA) for _ in range(num_samples)]).mean()
