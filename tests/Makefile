@@ -14,7 +14,7 @@
 EIGEN_INCLUDE_DIR ?= /usr/include/eigen3
 CC = g++
 CFLAGS = -std=c++14 -O3 -g -Wall -fopenmp -fPIC -I/usr/include \
-	-I../include -I$(EIGEN_INCLUDE_DIR) -I$(GOOGLETEST_DIR)/include \
+	-I../include -I$(GOOGLETEST_DIR)/include \
 	-march=native
 
 LFLAGS = -fopenmp -L$(GOOGLETEST_DIR)/lib -lgtest
