@@ -21,6 +21,9 @@
 #pragma once
 #include <stdafx.h>
 #include <assert.h>
+#include <algorithm>
+
+
 
 typedef unsigned long long int ullint;
 
