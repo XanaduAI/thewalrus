@@ -26,7 +26,7 @@ from thewalrus.fock_gradients import (
     grad_gaussian_gate
 )
 from thewalrus.quantum.fock_tensors import fock_tensor
-from thewalrus.symplectic import sympmat
+from thewalrus.random import random_symplectic
 import numpy as np
 
 
@@ -379,7 +379,7 @@ def test_gaussian_gate_with_Symplectic_matrix(tol):
     """Tests of the gaussian gate. This test is for arbitraty symplectic matrix and displacement vector as input and compare the gate with fock_tensor function"""
     num_mode = 4
     cutoff = 10
-    S = sympmat(num_mode)
+    S = random_symplectic(num_mode)
     d = np.random.random(num_mode) + 1j * np.random.random(num_mode)
     _gaussian_gate = fock_tensor(S, d, cutoff)
     C, mu, Sigma = choi_trick(S, d)
