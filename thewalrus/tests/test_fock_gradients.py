@@ -377,11 +377,11 @@ def choi_trick(S, d):
 
 def test_gaussian_gate_with_Symplectic_matrix(tol):
     """Tests of the gaussian gate. This test is for arbitraty symplectic matrix and displacement vector as input and compare the gate with fock_tensor function"""
-    num_mode = 2
-    cutoff = 6
-    S = sympmat(2 * num_mode)
+    num_mode = 4
+    cutoff = 10
+    S = sympmat(num_mode)
     d = np.random.random(num_mode) + 1j * np.random.random(num_mode)
-    _gaussian_gate = fock_tensor(S, np.concatenate([d, np.zeros(num_mode)]), cutoff)
+    _gaussian_gate = fock_tensor(S, d, cutoff)
     C, mu, Sigma = choi_trick(S, d)
     expected_gaussian_gate = gaussian_gate(C, mu, Sigma, cutoff, num_mode)
     assert np.allclose(_gaussian_gate, expected_gaussian_gate, atol=tol, rtol=0)
