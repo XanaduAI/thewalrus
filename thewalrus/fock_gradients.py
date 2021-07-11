@@ -41,6 +41,7 @@ from numba import jit
 from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
 
+
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     r"""Calculates the matrix elements of the displacement gate using a recurrence relation.
@@ -94,7 +95,9 @@ def grad_displacement(T, r, phi):  # pragma: no cover
     for m in range(cutoff):
         for n in range(cutoff):
             grad_r[m, n] = -r * T[m, n] + sqrt[m] * ei * T[m - 1, n] - sqrt[n] * eic * T[m, n - 1]
-            grad_phi[m, n] = sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
+            grad_phi[m, n] = (
+                sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
+            )
 
     return grad_r, grad_phi
 
@@ -117,7 +120,12 @@ def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
 
     eitheta_tanhr = np.exp(1j * theta) * np.tanh(r)
     sechr = 1.0 / np.cosh(r)
-    R = np.array([[-eitheta_tanhr, sechr], [sechr, np.conj(eitheta_tanhr)],])
+    R = np.array(
+        [
+            [-eitheta_tanhr, sechr],
+            [sechr, np.conj(eitheta_tanhr)],
+        ]
+    )
 
     S[0, 0] = np.sqrt(sechr)
     for m in range(2, cutoff, 2):
@@ -126,7 +134,10 @@ def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
     for m in range(0, cutoff):
         for n in range(1, cutoff):
             if (m + n) % 2 == 0:
-                S[m, n] = sqrt[n - 1] / sqrt[n] * R[1, 1] * S[m, n - 2] + sqrt[m] / sqrt[n] * R[0, 1] * S[m - 1, n - 1]
+                S[m, n] = (
+                    sqrt[n - 1] / sqrt[n] * R[1, 1] * S[m, n - 2]
+                    + sqrt[m] / sqrt[n] * R[0, 1] * S[m - 1, n - 1]
+                )
     return S
 
 
@@ -162,7 +173,8 @@ def grad_squeezing(T, r, phi):  # pragma: no cover
                 + 0.5 * eiphiconj * sechr ** 2 * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
             )
             grad_phi[m, n] = (
-                -0.5j * eiphi * tanhr * sqrt[m] * sqrt[m - 1] * T[m - 2, n] - 0.5j * eiphiconj * tanhr * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
+                -0.5j * eiphi * tanhr * sqrt[m] * sqrt[m - 1] * T[m - 2, n]
+                - 0.5j * eiphiconj * tanhr * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
             )
 
     return grad_r, grad_phi
@@ -187,7 +199,14 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
 
     sc = 1.0 / np.cosh(r)
     eiptr = np.exp(-1j * theta) * np.tanh(r)
-    R = -np.array([[0, -np.conj(eiptr), -sc, 0], [-np.conj(eiptr), 0, 0, -sc], [-sc, 0, 0, eiptr], [0, -sc, eiptr, 0],])
+    R = -np.array(
+        [
+            [0, -np.conj(eiptr), -sc, 0],
+            [-np.conj(eiptr), 0, 0, -sc],
+            [-sc, 0, 0, eiptr],
+            [0, -sc, eiptr, 0],
+        ]
+    )
 
     Z[0, 0, 0, 0] = sc
 
@@ -208,7 +227,10 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
             for p in range(cutoff):
                 q = p - (m - n)
                 if 0 < q < cutoff:
-                    Z[m, n, p, q] = R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1] + R[2, 3] * sqrt[p] / sqrt[q] * Z[m, n, p - 1, q - 1]
+                    Z[m, n, p, q] = (
+                        R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                        + R[2, 3] * sqrt[p] / sqrt[q] * Z[m, n, p - 1, q - 1]
+                    )
     return Z
 
 
@@ -240,7 +262,9 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
 
     # rank 2
     for n in range(1, cutoff):
-        grad_r[n, n, 0, 0] = -tanhr * T[n, n, 0, 0] + sqrt[n] * sqrt[n] * ei * sechr ** 2 * T[n - 1, n - 1, 0, 0]
+        grad_r[n, n, 0, 0] = (
+            -tanhr * T[n, n, 0, 0] + sqrt[n] * sqrt[n] * ei * sechr ** 2 * T[n - 1, n - 1, 0, 0]
+        )
         grad_theta[n, n, 0, 0] = 1j * ei * tanhr * sqrt[n] * sqrt[n] * T[n - 1, n - 1, 0, 0]
 
     # rank 3
@@ -268,7 +292,8 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
                         - sqrt[p] * sqrt[q] * eic * sechr ** 2 * T[m, n, p - 1, q - 1]
                     )
                     grad_theta[m, n, p, q] = (
-                        1j * ei * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1, p, q] + 1j * eic * tanhr * sqrt[p] * sqrt[q] * T[m, n, p - 1, q - 1]
+                        1j * ei * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1, p, q]
+                        + 1j * eic * tanhr * sqrt[p] * sqrt[q] * T[m, n, p - 1, q - 1]
                     )
 
     return grad_r, grad_theta
@@ -290,7 +315,14 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
     ct = np.cos(theta)
     st = np.sin(theta) * np.exp(1j * phi)
-    R = np.array([[0, 0, ct, -np.conj(st)], [0, 0, st, ct], [ct, st, 0, 0], [-np.conj(st), ct, 0, 0],])
+    R = np.array(
+        [
+            [0, 0, ct, -np.conj(st)],
+            [0, 0, st, ct],
+            [ct, st, 0, 0],
+            [-np.conj(st), ct, 0, 0],
+        ]
+    )
 
     Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
     Z[0, 0, 0, 0] = 1.0
@@ -300,7 +332,10 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         for n in range(cutoff - m):
             p = m + n
             if 0 < p < cutoff:
-                Z[m, n, p, 0] = R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0] + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+                Z[m, n, p, 0] = (
+                    R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0]
+                    + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+                )
 
     # rank 4
     for m in range(cutoff):
@@ -308,7 +343,10 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
             for p in range(cutoff):
                 q = m + n - p
                 if 0 < q < cutoff:
-                    Z[m, n, p, q] = R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1] + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                    Z[m, n, p, q] = (
+                        R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1]
+                        + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                    )
     return Z
 
 
@@ -340,7 +378,10 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
         for n in range(cutoff - m):
             p = m + n
             if 0 < p < cutoff:
-                grad_theta[m, n, p, 0] = -sqrt[m] * sqrt[p] * st * T[m - 1, n, p - 1, 0] + sqrt[n] * sqrt[p] * ei * ct * T[m, n - 1, p - 1, 0]
+                grad_theta[m, n, p, 0] = (
+                    -sqrt[m] * sqrt[p] * st * T[m - 1, n, p - 1, 0]
+                    + sqrt[n] * sqrt[p] * ei * ct * T[m, n - 1, p - 1, 0]
+                )
                 grad_phi[m, n, p, 0] = 1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, 0]
 
     for m in range(cutoff):
@@ -355,13 +396,15 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                         - sqrt[m] * sqrt[q] * eic * ct * T[m - 1, n, p, q - 1]
                     )
                     grad_phi[m, n, p, q] = (
-                        1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, q] + 1j * sqrt[m] * sqrt[q] * eic * st * T[m - 1, n, p, q - 1]
+                        1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, q]
+                        + 1j * sqrt[m] * sqrt[q] * eic * st * T[m - 1, n, p, q - 1]
                     )
 
     return grad_theta, grad_phi
 
+
 @lru_cache()
-def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ...], ...]:
+def partition(num_modes: int, n_current: int, cutoff: int) -> Tuple[Tuple[int, ...], ...]:
     r"""returns a list of possible combination of index. The length is fixed to 2*num_modes, last n_current bits are filled with all possible combinations of numbers where the max of number is up to the cutoff
 
     Args:
@@ -373,8 +416,10 @@ def partition(num_modes: int, n_current: int, cutoff: int)-> Tuple[Tuple[int, ..
         tuple[tuple[int,...], ...]: the partition of possible index
     """
     return [
-        (0,)*(2*num_modes - n_current) + comb for comb in product(*(range(cutoff) for _ in range(n_current)))
+        (0,) * (2 * num_modes - n_current) + comb
+        for comb in product(*(range(cutoff) for _ in range(n_current)))
     ]
+
 
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
@@ -390,8 +435,11 @@ def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
 
+
 @jit(nopython=True)
-def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
+def remove(
+    pattern: Tuple[int, ...]
+) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
 
     Args:
@@ -404,10 +452,12 @@ def remove(pattern: Tuple[int, ...]) -> Generator[Tuple[int, Tuple[int, ...]], N
         if n > 0:
             yield p, dec(pattern, p)
 
+
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
+
 def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
-    #pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
     r"""Calculates the Fock representation of the gaussian gate.
 
     Args:
@@ -421,17 +471,18 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     Returns:
         array[complex]: The Fock representation of the gate
     """
-    array = np.zeros(((cutoff,)*(2*num_modes)), dtype=dtype)
-    for n_current in range(1, 2*num_modes+1):
+    array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
+    for n_current in range(1, 2 * num_modes + 1):
         for idx in partition(num_modes, n_current, cutoff):
-            if idx == (0,)*(2*num_modes):
+            if idx == (0,) * (2 * num_modes):
                 array[idx] = C
             else:
                 array = fill_gaussian_gate_loop(array, idx, mu, Sigma)
     return array
 
+
 @jit(nopython=True)
-def fill_gaussian_gate_loop(gate, idx, mu, Sigma): # pragma: no cover
+def fill_gaussian_gate_loop(gate, idx, mu, Sigma):  # pragma: no cover
     r"""Calculates the Fock representing of the gaussian gate for a given index.
 
     Args:
@@ -454,8 +505,9 @@ def fill_gaussian_gate_loop(gate, idx, mu, Sigma): # pragma: no cover
     gate[idx] = u / SQRT[idx[i]]
     return gate
 
+
 def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
-    #pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the gaussian gate.
 
     Args:
@@ -470,18 +522,21 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
     Returns:
         array[complex], array[complex], array[complex]: the gradients of the gaussian gate with respect to C, mu and Sigma
     """
-    dG_dC = gate/C
-    dG_dmu = np.zeros_like(gate, dtype = dtype)
-    dG_dSigma = np.zeros_like(gate, dtype = dtype)
-    for n_current in range(1, 2*num_modes+1):
+    dG_dC = gate / C
+    dG_dmu = np.zeros_like(gate, dtype=dtype)
+    dG_dSigma = np.zeros_like(gate, dtype=dtype)
+    for n_current in range(1, 2 * num_modes + 1):
         for idx in partition(num_modes, n_current, cutoff):
-            if not idx == (0,)*(len(gate.shape)):
-                dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma)
+            if not idx == (0,) * (len(gate.shape)):
+                dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(
+                    dG_dmu, dG_dSigma, gate, idx, mu, Sigma
+                )
     return dG_dC, dG_dmu, dG_dSigma
 
+
 @jit(nopython=True)
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): # pragma: no cover
-    #pylint: disable=too-many-arguments
+def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):  # pragma: no cover
+    # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the gaussian gate for a given index.
 
     Args:
@@ -503,7 +558,7 @@ def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma): # pra
     dmu = mu[i] * dG_dmu[ki] + gate[ki]
     dSigma = mu[i] * dG_dSigma[ki]
     for l, kl in remove(ki):
-        dmu -= SQRT[ki[l]] * dG_dmu[kl] * Sigma[i,l]
+        dmu -= SQRT[ki[l]] * dG_dmu[kl] * Sigma[i, l]
         dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + gate[kl])
     dG_dSigma[idx] = dSigma / SQRT[idx[i]]
     dG_dmu[idx] = dmu / SQRT[idx[i]]

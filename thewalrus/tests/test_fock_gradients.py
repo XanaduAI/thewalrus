@@ -23,7 +23,7 @@ from thewalrus.fock_gradients import (
     beamsplitter,
     grad_beamsplitter,
     gaussian_gate,
-    grad_gaussian_gate
+    grad_gaussian_gate,
 )
 from thewalrus.quantum.fock_tensors import fock_tensor
 from thewalrus.random import random_symplectic
@@ -48,6 +48,7 @@ def test_grad_displacement():
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
+
 
 def test_grad_squeezing():
     """Tests the value of the analytic gradient for the Sgate against finite differences"""
@@ -87,6 +88,7 @@ def test_grad_two_mode_squeezing():
     assert np.allclose(Dr, Drapprox, atol=1e-5, rtol=0)
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
+
 def test_grad_beamspitter():
     """Tests the value of the analytic gradient for the S2gate against finite differences"""
     cutoff = 4
@@ -115,11 +117,41 @@ def test_displacement_values(tol):
     # np.array(displace(40,alpha).data.todense())[0:5,0:5]
     expected = np.array(
         [
-            [0.84366482 + 0.00000000e00j, -0.25309944 + 4.21832408e-01j, -0.09544978 - 1.78968334e-01j, 0.06819609 + 3.44424719e-03j, -0.01109048 + 1.65323865e-02j,],
-            [0.25309944 + 4.21832408e-01j, 0.55681878 + 0.00000000e00j, -0.29708743 + 4.95145724e-01j, -0.14658716 - 2.74850926e-01j, 0.12479885 + 6.30297236e-03j,],
-            [-0.09544978 + 1.78968334e-01j, 0.29708743 + 4.95145724e-01j, 0.31873657 + 0.00000000e00j, -0.29777767 + 4.96296112e-01j, -0.18306015 - 3.43237787e-01j,],
-            [-0.06819609 + 3.44424719e-03j, -0.14658716 + 2.74850926e-01j, 0.29777767 + 4.96296112e-01j, 0.12389162 + 1.10385981e-17j, -0.27646677 + 4.60777945e-01j,],
-            [-0.01109048 - 1.65323865e-02j, -0.12479885 + 6.30297236e-03j, -0.18306015 + 3.43237787e-01j, 0.27646677 + 4.60777945e-01j, -0.03277289 + 1.88440656e-17j,],
+            [
+                0.84366482 + 0.00000000e00j,
+                -0.25309944 + 4.21832408e-01j,
+                -0.09544978 - 1.78968334e-01j,
+                0.06819609 + 3.44424719e-03j,
+                -0.01109048 + 1.65323865e-02j,
+            ],
+            [
+                0.25309944 + 4.21832408e-01j,
+                0.55681878 + 0.00000000e00j,
+                -0.29708743 + 4.95145724e-01j,
+                -0.14658716 - 2.74850926e-01j,
+                0.12479885 + 6.30297236e-03j,
+            ],
+            [
+                -0.09544978 + 1.78968334e-01j,
+                0.29708743 + 4.95145724e-01j,
+                0.31873657 + 0.00000000e00j,
+                -0.29777767 + 4.96296112e-01j,
+                -0.18306015 - 3.43237787e-01j,
+            ],
+            [
+                -0.06819609 + 3.44424719e-03j,
+                -0.14658716 + 2.74850926e-01j,
+                0.29777767 + 4.96296112e-01j,
+                0.12389162 + 1.10385981e-17j,
+                -0.27646677 + 4.60777945e-01j,
+            ],
+            [
+                -0.01109048 - 1.65323865e-02j,
+                -0.12479885 + 6.30297236e-03j,
+                -0.18306015 + 3.43237787e-01j,
+                0.27646677 + 4.60777945e-01j,
+                -0.03277289 + 1.88440656e-17j,
+            ],
         ]
     )
     T = displacement(np.abs(alpha), np.angle(alpha), cutoff)
@@ -135,11 +167,29 @@ def test_squeezing_values(tol):
     # np.array(squeeze(40,0.5*np.exp(1j*0.7)).data.todense())[0:5,0:5]
     expected = np.array(
         [
-            [0.94171062 + 0.0j, 0.0 + 0.0j, 0.23535661 - 0.19823814j, 0.0 + 0.0j, 0.02093159 - 0.12135894j,],
+            [
+                0.94171062 + 0.0j,
+                0.0 + 0.0j,
+                0.23535661 - 0.19823814j,
+                0.0 + 0.0j,
+                0.02093159 - 0.12135894j,
+            ],
             [0.0 + 0.0j, 0.83512676 + 0.0j, 0.0 + 0.0j, 0.36151137 - 0.30449682j, 0.0 + 0.0j],
-            [-0.23535661 - 0.19823814j, 0.0 + 0.0j, 0.64005396 + 0.0j, 0.0 + 0.0j, 0.42261153 - 0.35596078j,],
+            [
+                -0.23535661 - 0.19823814j,
+                0.0 + 0.0j,
+                0.64005396 + 0.0j,
+                0.0 + 0.0j,
+                0.42261153 - 0.35596078j,
+            ],
             [0.0 + 0.0j, -0.36151137 - 0.30449682j, 0.0 + 0.0j, 0.38926873 + 0.0j, 0.0 + 0.0j],
-            [0.02093159 + 0.12135894j, 0.0 + 0.0j, -0.42261153 - 0.35596078j, 0.0 + 0.0j, 0.12407853 + 0.0j,],
+            [
+                0.02093159 + 0.12135894j,
+                0.0 + 0.0j,
+                -0.42261153 - 0.35596078j,
+                0.0 + 0.0j,
+                0.12407853 + 0.0j,
+            ],
         ]
     )
     T = squeezing(r, theta, cutoff)
@@ -294,13 +344,24 @@ def test_grad_gaussian_gate_with_single_mode_squeezing(tol):
     C = np.sqrt(sechr)
     mu = np.zeros(2).T
     Sigma = np.array([[np.exp(1j * delta) * tanhr, -sechr], [-sechr, -np.exp(-1j * delta) * tanhr]])
-    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(T, C, mu, Sigma, cutoff, num_mode, dtype=np.complex128)
+    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(
+        T, C, mu, Sigma, cutoff, num_mode, dtype=np.complex128
+    )
     delta_plus = 0.00001 + 1j * 0.00001
-    expected_grad_C = (gaussian_gate(C + delta_plus, mu, Sigma, cutoff, num_mode) - gaussian_gate(C - delta_plus, mu, Sigma, cutoff, num_mode)) / (2 * delta_plus)
+    expected_grad_C = (
+        gaussian_gate(C + delta_plus, mu, Sigma, cutoff, num_mode)
+        - gaussian_gate(C - delta_plus, mu, Sigma, cutoff, num_mode)
+    ) / (2 * delta_plus)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
-    expected_grad_mu = (gaussian_gate(C, mu + delta_plus, Sigma, cutoff, num_mode) - gaussian_gate(C, mu - delta_plus, Sigma, cutoff, num_mode)) / (2 * delta_plus)
+    expected_grad_mu = (
+        gaussian_gate(C, mu + delta_plus, Sigma, cutoff, num_mode)
+        - gaussian_gate(C, mu - delta_plus, Sigma, cutoff, num_mode)
+    ) / (2 * delta_plus)
     assert np.allclose(grad_mu, expected_grad_mu, atol=tol, rtol=0)
-    expected_grad_Sigma = (gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)) / (2 * delta_plus)
+    expected_grad_Sigma = (
+        gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode)
+        - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)
+    ) / (2 * delta_plus)
     assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
 
 
@@ -318,41 +379,50 @@ def test_grad_gaussian_gate_with_beamsplitter(tol):
     C = 1
     mu = np.zeros(4).T
     Sigma = -np.block([[np.zeros((2, 2)), V], [V.T, np.zeros((2, 2))]])
-    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(T, C, mu, Sigma, cutoff, num_mode, dtype=np.complex128)
+    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(
+        T, C, mu, Sigma, cutoff, num_mode, dtype=np.complex128
+    )
     delta_plus = 0.00001 + 1j * 0.00001
-    expected_grad_C = (gaussian_gate(C + delta_plus, mu, Sigma, cutoff, num_mode) - gaussian_gate(C - delta_plus, mu, Sigma, cutoff, num_mode)) / (2 * delta_plus)
+    expected_grad_C = (
+        gaussian_gate(C + delta_plus, mu, Sigma, cutoff, num_mode)
+        - gaussian_gate(C - delta_plus, mu, Sigma, cutoff, num_mode)
+    ) / (2 * delta_plus)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
-    expected_grad_mu = (gaussian_gate(C, mu + delta_plus, Sigma, cutoff, num_mode) - gaussian_gate(C, mu - delta_plus, Sigma, cutoff, num_mode)) / (2 * delta_plus)
+    expected_grad_mu = (
+        gaussian_gate(C, mu + delta_plus, Sigma, cutoff, num_mode)
+        - gaussian_gate(C, mu - delta_plus, Sigma, cutoff, num_mode)
+    ) / (2 * delta_plus)
     assert np.allclose(grad_mu, expected_grad_mu, atol=tol, rtol=0)
-    expected_grad_Sigma = (gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode) - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)) / (2 * delta_plus)
+    expected_grad_Sigma = (
+        gaussian_gate(C, mu, Sigma + delta_plus, cutoff, num_mode)
+        - gaussian_gate(C, mu, Sigma - delta_plus, cutoff, num_mode)
+    ) / (2 * delta_plus)
     assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
 
 
 def choi_trick(S, d):
     """Function to help the test of gaussian gate with symplectic matrix, to get the parameter C, mu, Sigma of gaussian gate from S, d"""
-    num_mode = S.shape[0]//2
+    num_mode = S.shape[0] // 2
     choi_r = np.arcsinh(1.0)
     ch = np.cosh(choi_r) * np.identity(num_mode)
     sh = np.sinh(choi_r) * np.identity(num_mode)
     zh = np.zeros([num_mode, num_mode])
-    Schoi = np.block(
-     [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
-    )
+    Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
     Sxx = S[:num_mode, :num_mode]
     Sxp = S[:num_mode, num_mode:]
     Spx = S[num_mode:, :num_mode]
     Spp = S[num_mode:, num_mode:]
     idl = np.identity(num_mode)
     S_exp = (
-     np.block(
-         [
-             [Sxx, zh, Sxp, zh],
-             [zh, idl, zh, zh],
-             [Spx, zh, Spp, zh],
-             [zh, zh, zh, idl],
-         ]
-     )
-     @ Schoi
+        np.block(
+            [
+                [Sxx, zh, Sxp, zh],
+                [zh, idl, zh, zh],
+                [Spx, zh, Spp, zh],
+                [zh, zh, zh, idl],
+            ]
+        )
+        @ Schoi
     )
     choi_cov = 0.5 * S_exp @ S_exp.T
     idl = np.identity(2 * num_mode)
@@ -363,13 +433,18 @@ def choi_trick(S, d):
     sigma_Q = sigma + 0.5 * np.identity(4 * num_mode)
     A_mat = X @ (np.identity(4 * num_mode) - np.linalg.inv(sigma_Q))
     E = np.diag(np.concatenate([np.ones([num_mode]), np.ones([num_mode]) / np.tanh(choi_r)]))
-    Sigma = -(E @ A_mat[:2*num_mode, :2*num_mode] @ E).conj()
-    mu = np.concatenate([Sigma[:num_mode,:num_mode]@d.conj()+d.T, Sigma[num_mode:,:num_mode]@d.conj()])
+    Sigma = -(E @ A_mat[: 2 * num_mode, : 2 * num_mode] @ E).conj()
+    mu = np.concatenate(
+        [Sigma[:num_mode, :num_mode] @ d.conj() + d.T, Sigma[num_mode:, :num_mode] @ d.conj()]
+    )
     alpha = np.concatenate([d, np.zeros(num_mode)])
     zeta = alpha + Sigma @ np.conj(alpha)
     C = np.sqrt(
         np.sqrt(
-            np.linalg.det(np.eye(num_mode) - Sigma[:num_mode, :num_mode] @ np.conj(Sigma[:num_mode, :num_mode]))
+            np.linalg.det(
+                np.eye(num_mode)
+                - Sigma[:num_mode, :num_mode] @ np.conj(Sigma[:num_mode, :num_mode])
+            )
         )
     ) * np.exp(-0.5 * np.sum(np.conj(alpha) * zeta))
     return C, mu, Sigma
