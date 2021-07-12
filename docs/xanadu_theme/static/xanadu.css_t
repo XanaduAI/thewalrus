@@ -184,9 +184,18 @@ code, pre {
   background-color: #fff;
 }
 
-.nbinput {
-  margin-bottom: 20px;
+.nboutput {
+  margin-bottom: 10px !important;
 }
+
+.nbinput {
+  margin-bottom: 10px !important;
+}
+
+div.nbinput.container div.input_area pre {
+  margin: 0 !important;
+}
+
 
 pre {
   /*color: #c5c8c6;*/  /*tomorrow night*/
