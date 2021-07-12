@@ -1,6 +1,6 @@
 docutils==0.16
 sphinxcontrib-bibtex
-sphinx==1.8.5
+sphinx==3.5.3
 ipykernel
 nbsphinx==0.7
 cython>=0.20
@@ -9,7 +9,7 @@ numpy>=1.9
 sympy>=1.5.1
 repoze.lru>=0.7
 scipy>=1.2.1
-breathe==4.12.0
+breathe==4.29.0
 exhale
 version_information
 sphinx-copybutton
