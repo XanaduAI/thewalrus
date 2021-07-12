@@ -89,7 +89,7 @@ def build_extensions():
 
     return cythonize(
         [Extension("libwalrus", **config)],
-        compile_time_env={"_OPENMP": USE_OPENMP},
+        compile_time_env={},
     )
 
 

@@ -382,15 +382,15 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
 
 @jit(nopython=True)
 def one_det(B): # pragma: no cover
-    """ Calculates the determinant of an antisymmetric matrix with entries distributed
-    according to a normal distribution with scale equal to the entries of the symmetric matrix
+    """Calculates the determinant of an antisymmetric matrix with entries distributed
+    according to a normal distribution, with scale equal to the entries of the symmetric matrix
     given as input.
 
     Args:
-        B (array): symmetric matrix
+        B (array[float]): symmetric matrix
 
     Returns:
-        (float): determinant of the samples antisymmetric matrix
+        float: determinant of the samples antisymmetric matrix
     """
     mat = np.empty_like(B,dtype=np.float64)
     n,m = B.shape
@@ -401,11 +401,15 @@ def one_det(B): # pragma: no cover
     return np.linalg.det(mat)
 
 @jit(nopython=True)
-def hafnian_approx(A, num_samples = 1000): # pragma: no cover
-    """ Calculates Barvinok's approximation of the hafnian for a non-negative symmetric matrix.
+def hafnian_approx(A, num_samples=1000): # pragma: no cover
+    """Returns the approximation to the hafnian of a matrix with non-negative entries.
+
+    The approximation follows the stochastic Barvinok's approximation allowing the
+    hafnian can be approximated as the sum of determinants of matrices.
+    The accuracy of the approximation increases with increasing number of iterations. 
 
     Args:
-        B (array): symmetric matrix
+        B (array[float]): a symmetric matrix
 
     Returns:
         (float): approximate hafnian of the input
