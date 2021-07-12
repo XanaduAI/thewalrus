@@ -72,6 +72,8 @@ extensions = [
     'sphinx_copybutton'
 ]
 
+bibtex_bibfiles = ['references.bib']
+
 autosummary_generate = True
 autosummary_imported_members = False
 
@@ -351,4 +353,4 @@ def process_numba_signature(app, what, name, obj, options, signature, return_ann
 def setup(app):
     app.connect('autodoc-process-signature', process_numba_signature)
     app.add_directive('customgalleryitem', CustomGalleryItemDirective)
-    app.add_stylesheet('xanadu_gallery.css')
+    app.add_css_file('xanadu_gallery.css')
