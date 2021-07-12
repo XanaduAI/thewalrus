@@ -179,9 +179,13 @@ tt {
 
 code, pre {
   line-height: 23px !important;
-  margin: 20px 0 !important;
+  /*margin: 20px 0 !important;*/
   word-wrap: normal;
   background-color: #fff;
+}
+
+.nbinput {
+  margin-bottom: 20px;
 }
 
 pre {
