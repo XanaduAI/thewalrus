@@ -1704,9 +1704,7 @@ def test_n_body_marginals_not_even_shape():
     r2 = np.arcsinh(np.sqrt(2))
     cov = squeezing([2 * r1, 0, 2 * r2])
     mu = np.zeros([5])
-    with pytest.raises(
-        ValueError, match="The covariance matrix or vector of means are not of even dimensions"
-    ):
+    with pytest.raises(ValueError, match="The vector of means is not of even dimensions"):
         n_body_marginals(mu, cov[:5, :5], 4, 3)
 
 
