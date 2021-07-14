@@ -26,19 +26,15 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	squeezing
 	beamsplitter
 	two_mode_squeezing
-    gaussian_gate
 	grad_displacement
 	grad_squeezing
 	grad_beamsplitter
 	grad_two_mode_squeezing
-    grad_gaussian_gate
 
 """
-from itertools import product
-from typing import Tuple, Generator
-from numba import jit
-from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
+
+from numba import jit
 
 
 @jit(nopython=True)
@@ -400,146 +396,3 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                     )
 
     return grad_theta, grad_phi
-
-
-@jit(nopython=True)
-def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
-    r"""returns a copy of the given tuple of integers where the ith element has been decreased by 1
-
-    Args:
-        tup (Tuple[int]): the given tuple
-        i (int): the position of the element to be decreased
-
-    Returns:
-        Tuple[int,...]: the new tuple with the decrease on i-th element by 1
-    """
-    copy = tup[:]
-    return tuple_setitem(copy, i, tup[i] - 1)
-
-
-@jit(nopython=True)
-def remove(
-    pattern: Tuple[int, ...]
-) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
-    r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
-
-    Args:
-        pattern (Tuple[int, ...]): the pattern given to be decreased
-
-    Returns:
-        Generator[Tuple[int, Tuple[int, ...]], None, None]: the generator
-    """
-    for p, n in enumerate(pattern):
-        if n > 0:
-            yield p, dec(pattern, p)
-
-
-SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
-
-
-def gaussian_gate(C, mu, Sigma, cutoff, dtype=np.complex128):
-    # pylint: disable=too-many-arguments
-    r"""Calculates the Fock representation of the gaussian gate.
-
-    Args:
-        C (complex): parameter for the gaussian gate
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
-        cutoff (int): Fock ladder cutoff
-        num_modes (int): number of modes in the gaussian gate
-        dtype (data type): Specifies the data type used for the calculation
-
-    Returns:
-        array[complex]: The Fock representation of the gate
-    """
-    num_modes = len(mu) // 2
-    array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
-    array[(0,) * (2 * num_modes)] = C
-    for idx in product(range(cutoff), repeat=2 * num_modes):
-        if not idx == (0,) * (2 * num_modes):
-            array = fill_gaussian_gate_loop(array, idx, mu, Sigma)
-    return array
-
-
-@jit(nopython=True)
-def fill_gaussian_gate_loop(gate, idx, mu, Sigma):  # pragma: no cover
-    r"""Calculates the Fock representing of the gaussian gate for a given index.
-
-    Args:
-        gate (array[complex]): array representing the gaussian gate
-        idx (tuple): index of the gradients to be filled
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
-
-    Returns:
-        array[complex]: The Fock representing of the gaussian gate for a given index
-    """
-    i = 0
-    for i, val in enumerate(idx):
-        if val > 0:
-            break
-    ki = dec(idx, i)
-    u = mu[i] * gate[ki]
-    for l, kl in remove(ki):
-        u -= SQRT[ki[l]] * Sigma[i, l] * gate[kl]
-    gate[idx] = u / SQRT[idx[i]]
-    return gate
-
-
-def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, dtype=np.complex128):
-    # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the gaussian gate.
-
-    Args:
-        gate (array[complex]): array representing the gate
-        C (complex): parameter for the gaussian gate
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
-        cutoff (int): Fock ladder cutoff
-        num_modes (int): number of modes in the gaussian gate
-        dtype (data type): Specifies the data type used for the calculation
-
-    Returns:
-        array[complex], array[complex], array[complex]: the gradients of the gaussian gate with respect to C, mu and Sigma
-    """
-    num_modes = len(mu) // 2
-    dG_dC = gate / C
-    dG_dmu = np.zeros_like(gate, dtype=dtype)
-    dG_dSigma = np.zeros_like(gate, dtype=dtype)
-    for idx in product(range(cutoff), repeat=2 * num_modes):
-        if not idx == (0,) * (len(gate.shape)):
-            dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(
-                dG_dmu, dG_dSigma, gate, idx, mu, Sigma
-            )
-    return dG_dC, dG_dmu, dG_dSigma
-
-
-@jit(nopython=True)
-def fill_grad_gaussian_gate_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):  # pragma: no cover
-    # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the gaussian gate for a given index.
-
-    Args:
-        dG_dmu (array[complex]): array representing the gradients of the gaussian gate with respect to mu
-        dG_dSigma (array[complex]): array representing the gradients of the gaussian gate with respect to Sigma
-        gate (array[complex]): array representing the gaussian gate
-        idx (tuple): index of the gradients to be filled
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
-
-    Returns:
-        array[complex], array[complex]: the gradients of the gaussian gate with respect to mu and Sigma for a given index
-    """
-    i = 0
-    for i, val in enumerate(idx):
-        if val > 0:
-            break
-    ki = dec(idx, i)
-    dmu = mu[i] * dG_dmu[ki] + gate[ki]
-    dSigma = mu[i] * dG_dSigma[ki]
-    for l, kl in remove(ki):
-        dmu -= SQRT[ki[l]] * dG_dmu[kl] * Sigma[i, l]
-        dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + gate[kl])
-    dG_dSigma[idx] = dSigma / SQRT[idx[i]]
-    dG_dmu[idx] = dmu / SQRT[idx[i]]
-    return dG_dmu, dG_dSigma
