@@ -47,7 +47,7 @@ This can be compiled using the gcc ``g++`` compiler as follows,
 
     $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -fopenmp
 
-where ``/path/to/libwalrus.hpp`` is the path to the directory containing ``libwalrus.hpp``and the ``-fopenmp`` flag instructs the compiler to parallelize the compiled program using OpenMP.
+where ``/path/to/libwalrus.hpp`` is the path to the directory containing ``libwalrus.hpp`` and the ``-fopenmp`` flag instructs the compiler to parallelize the compiled program using OpenMP.
 
 Below, the main interface (available as templated functions) as well as all auxiliary functions are summarized and listed.
 
