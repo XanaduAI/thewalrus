@@ -105,7 +105,7 @@ This coefficient can be found by taking derivatives :cite:`quesada2018gaussian`
 .. math::
 	f(\bm{C}) = \frac{1}{(n/2)!}  \left. \frac{d^{n/2}}{d\eta^{n/2}} p_{n/2}(\eta \bm{C}) \right|_{\eta=0} = \frac{1}{(n/2)!}  \left. \frac{d^{n/2}}{d\eta^{n/2}} \frac{1}{\sqrt{\det(\mathbb{I} - \eta \bm{C})}} \right|_{\eta=0}.
 
-The function :math:`p_{n/2}(\eta\bm{C})` requires only the traces of the matrix powers of the matrices :math:`\bm{C}^k`, hence the name of this algorithm.
+The function :math:`p_{n/2}(\eta\bm{C})` requires only the traces of the matrix powers of the matrices :math:`\bm{C}^k`, hence the name of this algorithm. These powertrace can be calculated using the characteristic polynomial of the input matrix using the La Budde algorithm :cite:`rehman2011budde`. 
 
 This formula generalizes to the loop hafnian as follows
 
