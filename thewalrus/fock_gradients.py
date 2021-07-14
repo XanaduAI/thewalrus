@@ -394,3 +394,51 @@ def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
                 if 0 < q < cutoff:
                     Z[m, n, p, q] = R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1] + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
     return Z
+
+
+@jit(nopython=True)
+def grad_mzgate(T, theta, phi):  # pragma: no cover
+    r"""Calculates the gradients of the beamsplitter gate with respect to the transmissivity angle and reflection phase
+
+    Args:
+        T (array[complex]): array representing the gate
+        theta (float): transmissivity angle of the beamsplitter. The transmissivity is :math:`t=\cos(\theta)`
+        phi (float): reflection phase of the beamsplitter
+
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the beamsplitter gate with respect to theta and phi
+    """
+    cutoff = T.shape[0]
+    dtype = T.dtype
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    grad_theta = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    grad_phi = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff - m):
+            p = m + n
+            if 0 < p < cutoff:
+                grad_theta[m, n, p, 0] = -1j * 0.5 * u * v * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, 0] + 0.5 * u * v * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, 0]
+                grad_phi[m, n, p, 0] = (-1j * 0.5 * u * v + 1j * 0.5 * u) * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, 0] + (0.5 * u + 0.5 * u * v) * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, 0]
+
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                q = m + n - p
+                if 0 < q < cutoff:
+                    grad_theta[m, n, p, q] = (
+                            -1j * 0.5 * u * v * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, q]
+                            + 0.5 * u * v * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, q]
+                            + 0.5 * v * sqrt[m] * sqrt[q] * T[m - 1, n, p, q - 1]
+                            + 1j * 0.5 * v * sqrt[n] * sqrt[q] * T[m, n - 1, p, q - 1]
+                    )
+                    grad_phi[m, n, p, q] = (
+                            (-1j * 0.5 * u * v + 1j * 0.5 * u) * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, q]
+                            + (0.5 * u + 0.5 * u * v) * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, q]
+                    )
+
+    return grad_theta, grad_phi
