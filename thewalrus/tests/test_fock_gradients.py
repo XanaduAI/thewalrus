@@ -343,9 +343,7 @@ def test_grad_gaussian_gate_with_single_mode_squeezing(tol):
     C = np.sqrt(sechr)
     mu = np.zeros(2).T
     Sigma = np.array([[np.exp(1j * delta) * tanhr, -sechr], [-sechr, -np.exp(-1j * delta) * tanhr]])
-    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(
-        T, C, mu, Sigma, cutoff, dtype=np.complex128
-    )
+    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(T, C, mu, Sigma, cutoff, dtype=np.complex128)
     delta_plus = 0.00001 + 1j * 0.00001
     expected_grad_C = (
         gaussian_gate(C + delta_plus, mu, Sigma, cutoff)
@@ -377,9 +375,7 @@ def test_grad_gaussian_gate_with_beamsplitter(tol):
     C = 1
     mu = np.zeros(4).T
     Sigma = -np.block([[np.zeros((2, 2)), V], [V.T, np.zeros((2, 2))]])
-    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(
-        T, C, mu, Sigma, cutoff, dtype=np.complex128
-    )
+    grad_C, grad_mu, grad_Sigma = grad_gaussian_gate(T, C, mu, Sigma, cutoff, dtype=np.complex128)
     delta_plus = 0.00001 + 1j * 0.00001
     expected_grad_C = (
         gaussian_gate(C + delta_plus, mu, Sigma, cutoff)

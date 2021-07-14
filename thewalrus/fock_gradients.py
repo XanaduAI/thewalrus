@@ -436,6 +436,7 @@ def remove(
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
+
 def gaussian_gate(C, mu, Sigma, cutoff, dtype=np.complex128):
     # pylint: disable=too-many-arguments
     r"""Calculates the Fock representation of the gaussian gate.
@@ -454,7 +455,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, dtype=np.complex128):
     num_modes = len(mu) // 2
     array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
     array[(0,) * (2 * num_modes)] = C
-    for idx in product(range(cutoff), repeat = 2 * num_modes):
+    for idx in product(range(cutoff), repeat=2 * num_modes):
         if not idx == (0,) * (2 * num_modes):
             array = fill_gaussian_gate_loop(array, idx, mu, Sigma)
     return array
@@ -505,7 +506,7 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, dtype=np.complex128):
     dG_dC = gate / C
     dG_dmu = np.zeros_like(gate, dtype=dtype)
     dG_dSigma = np.zeros_like(gate, dtype=dtype)
-    for idx in product(range(cutoff), repeat = 2 * num_modes):
+    for idx in product(range(cutoff), repeat=2 * num_modes):
         if not idx == (0,) * (len(gate.shape)):
             dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(
                 dG_dmu, dG_dSigma, gate, idx, mu, Sigma
