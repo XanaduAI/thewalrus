@@ -45,16 +45,9 @@ This can be compiled using the gcc ``g++`` compiler as follows,
 
 .. code-block:: console
 
-    $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -I/path/to/Eigen -fopenmp
+    $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -fopenmp
 
-where ``/path/to/libwalrus.hpp`` is the path to the directory containing ``libwalrus.hpp``, ``/path/to/Eigen`` is the path to the Eigen C++ linear algebra header library, and the ``-fopenmp`` flag instructs the compiler to parallelize the compiled program using OpenMP.
-
-Additionally, you may instruct Eigen to simply act as a 'frontend' to an installed LAPACKE library. To do so, you must pass additional flags:
-
-.. code-block:: console
-
-    $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -I/path/to/Eigen \
-    -fopenmp -DLAPACKE -llapacke -lblas
+where ``/path/to/libwalrus.hpp`` is the path to the directory containing ``libwalrus.hpp``and the ``-fopenmp`` flag instructs the compiler to parallelize the compiled program using OpenMP.
 
 Below, the main interface (available as templated functions) as well as all auxiliary functions are summarized and listed.
 
@@ -64,7 +57,7 @@ Below, the main interface (available as templated functions) as well as all auxi
 
     .. code-block:: console
 
-        $ brew install eigen libomp
+        $ brew install libomp
         $ clang example.cpp -o example -O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp \
         -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/
 

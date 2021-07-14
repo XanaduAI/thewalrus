@@ -267,7 +267,7 @@ namespace trace_real {
 
 // Unit tests for the real trace_hafnian function
 // Check hafnian of real complete graphs with even dimensions.
-TEST(HafnianEigenDouble, CompleteGraphEven) {
+TEST(HafnianTraceDouble, CompleteGraphEven) {
   std::vector<double> mat4(16, 1.0);
   std::vector<double> mat6(36, 1.0);
   std::vector<double> mat8(64, 1.0);
@@ -277,7 +277,7 @@ TEST(HafnianEigenDouble, CompleteGraphEven) {
 }
 
 // Check hafnian of real random matrix with size 4x4.
-TEST(HafnianEigenDouble, Random) {
+TEST(HafnianTraceDouble, Random) {
   std::vector<double> mat(16, 1.0);
 
   std::default_random_engine generator;
@@ -298,7 +298,7 @@ TEST(HafnianEigenDouble, Random) {
 }
 
 // Check hafnian of complete graphs with odd dimensions.
-TEST(HafnianEigenDouble, CompleteGraphOdd) {
+TEST(HafnianTraceDouble, CompleteGraphOdd) {
   std::vector<double> mat5(25, 1.0);
   std::vector<double> mat7(49, 1.0);
   std::vector<double> mat9(81, 1.0);
@@ -308,7 +308,7 @@ TEST(HafnianEigenDouble, CompleteGraphOdd) {
 }
 
 // Check hafnian of an empty matrix.
-TEST(HafnianEigenDouble, Empty) {
+TEST(HafnianTraceDouble, Empty) {
   std::vector<double> mat(0, 0);
   EXPECT_EQ(1, libwalrus::hafnian_trace(mat));
 }
@@ -319,7 +319,7 @@ namespace trace_complex {
 
 // Unit tests for the complex recursive_hafnian function
 // Check hafnian of complex complete graphs with even dimensions.
-TEST(HafnianEigenDoubleComplex, CompleteGraphEven) {
+TEST(HafnianTraceDoubleComplex, CompleteGraphEven) {
   std::vector<std::complex<double>> mat(16, std::complex<double>(1.0, 0.0));
   std::vector<std::complex<double>> mat4(16, std::complex<double>(1.0, 1.0));
   std::vector<std::complex<double>> mat6(36, std::complex<double>(1.0, 1.0));
@@ -356,7 +356,7 @@ TEST(HafnianEigenDoubleComplex, CompleteGraphEven) {
 }
 
 // Check hafnian of complex random matrix with size 4x4.
-TEST(HafnianEigenDoubleComplex, Random) {
+TEST(HafnianTraceDoubleComplex, Random) {
   std::vector<std::complex<double>> mat(16, std::complex<double>(0.0, 0.0));
 
   std::default_random_engine generator;
@@ -388,7 +388,7 @@ TEST(HafnianEigenDoubleComplex, Random) {
 }
 
 // Check hafnian of complex complete graphs with odd dimensions.
-TEST(HafnianEigenDoubleComplex, CompleteGraphOdd) {
+TEST(HafnianTraceDoubleComplex, CompleteGraphOdd) {
   std::vector<std::complex<double>> mat(25, std::complex<double>(1.0, 0.0));
 
   std::complex<double> haf = libwalrus::hafnian_trace(mat);
@@ -401,7 +401,7 @@ TEST(HafnianEigenDoubleComplex, CompleteGraphOdd) {
 }
 
 // Check hafnian of a complex empty matrix.
-TEST(HafnianEigenDoubleComplex, Empty) {
+TEST(HafnianTraceDoubleComplex, Empty) {
   std::vector<std::complex<double>> mat(0, std::complex<double>(0.0, 0.0));
   std::complex<double> haf = libwalrus::hafnian_trace(mat);
 
@@ -528,7 +528,7 @@ namespace loophafnian_trace {
 // Unit tests for the loop hafnian function using power-traces
 // Check loop hafnian with eignevalues for all ones matrices with even
 // dimensions.
-TEST(LoopHafnianEigenDouble, EvenOnes) {
+TEST(LoopHafnianTraceDouble, EvenOnes) {
   std::vector<double> mat4(16, 1.0);
   std::vector<double> mat6(36, 1.0);
 
@@ -541,7 +541,7 @@ TEST(LoopHafnianEigenDouble, EvenOnes) {
 
 // // Check loop hafnian with power-traces for random matrices with even
 // dimensions.
-TEST(LoopHafnianEigenDouble, EvenRandom) {
+TEST(LoopHafnianTraceDouble, EvenRandom) {
   std::vector<double> mat2(4, 0.0);
   std::vector<double> mat4(16, 0.0);
 
@@ -582,7 +582,7 @@ TEST(LoopHafnianEigenDouble, EvenRandom) {
 
 // Check loop hafnian with power-traces for all ones matrices with odd
 // dimensions.
-TEST(LoopHafnianEigenDouble, Odd) {
+TEST(LoopHafnianTraceDouble, Odd) {
   std::vector<double> mat3(9, 1.0);
   std::vector<double> mat5(25, 1.0);
 
@@ -595,7 +595,7 @@ TEST(LoopHafnianEigenDouble, Odd) {
 
 // Check loop hafnian with power-traces for all ones complex matrices with even
 // dimensions.
-TEST(LoopHafnianEigenComplex, EvenOnes) {
+TEST(LoopHafnianTraceComplex, EvenOnes) {
   std::vector<std::complex<double>> mat4(16, std::complex<double>(1.0, 0.0));
   std::vector<std::complex<double>> mat6(36, std::complex<double>(1.0, 0.0));
 
@@ -610,7 +610,7 @@ TEST(LoopHafnianEigenComplex, EvenOnes) {
 
 // Check loop hafnian with power-traces for random complex matrices with even
 // dimensions.
-TEST(LoopHafnianEigenComplex, EvenRandom) {
+TEST(LoopHafnianTraceComplex, EvenRandom) {
   std::vector<std::complex<double>> mat2(4, 0.0);
   std::vector<std::complex<double>> mat4(16, 0.0);
 
@@ -654,7 +654,7 @@ TEST(LoopHafnianEigenComplex, EvenRandom) {
 }
 
 // Check loop hafnian with power-traces for complex matrices with odd dimensions.
-TEST(LoopHafnianEigenComplex, Odd) {
+TEST(LoopHafnianTraceComplex, Odd) {
   std::vector<std::complex<double>> mat3(9, std::complex<double>(1.0, 0.0));
   std::vector<std::complex<double>> mat5(25, std::complex<double>(1.0, 0.0));
 
@@ -841,7 +841,7 @@ TEST(LoopHafnianRepeatedDouble, Odd) {
 }
 
 // Check repeated hafnian of a complex empty matrix.
-TEST(HafnianEigenDoubleComplex, Empty) {
+TEST(HafnianTraceDoubleComplex, Empty) {
   std::vector<std::complex<double>> mat(0, std::complex<double>(0.0, 0.0));
   std::vector<std::complex<double>> mu(0, 0);
   std::vector<int> rpt(0, 0);
