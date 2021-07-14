@@ -437,7 +437,7 @@ def remove(
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
-def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+def gaussian_gate(C, mu, Sigma, cutoff, dtype=np.complex128):
     # pylint: disable=too-many-arguments
     r"""Calculates the Fock representation of the gaussian gate.
 
@@ -452,6 +452,7 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     Returns:
         array[complex]: The Fock representation of the gate
     """
+    num_modes = len(mu) // 2
     array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
     array[(0,) * (2 * num_modes)] = C
     for idx in product(range(cutoff), repeat = 2 * num_modes):
@@ -485,7 +486,7 @@ def fill_gaussian_gate_loop(gate, idx, mu, Sigma):  # pragma: no cover
     return gate
 
 
-def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
+def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, dtype=np.complex128):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the gaussian gate.
 
@@ -501,6 +502,7 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
     Returns:
         array[complex], array[complex], array[complex]: the gradients of the gaussian gate with respect to C, mu and Sigma
     """
+    num_modes = len(mu) // 2
     dG_dC = gate / C
     dG_dmu = np.zeros_like(gate, dtype=dtype)
     dG_dSigma = np.zeros_like(gate, dtype=dtype)
