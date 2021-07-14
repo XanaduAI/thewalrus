@@ -21,7 +21,9 @@ from thewalrus.fock_gradients import (
     two_mode_squeezing,
     grad_two_mode_squeezing,
     beamsplitter,
-    grad_beamsplitter
+    grad_beamsplitter,
+    mzgate,
+    grad_mzgate
 )
 import numpy as np
 
@@ -97,6 +99,26 @@ def test_grad_beamspitter():
     Drm = beamsplitter(r - dr, theta, cutoff)
     Dthetap = beamsplitter(r, theta + dtheta, cutoff)
     Dthetam = beamsplitter(r, theta - dtheta, cutoff)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
+
+
+def test_grad_mzgate():
+    """Tests the value of the analytic gradient for the mzgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi / 8
+    T = mzgate(r, theta, cutoff)
+    Dr, Dtheta = grad_mzgate(T, r, theta)
+
+    dr = 0.001
+    dtheta = 0.001
+    Drp = mzgate(r + dr, theta, cutoff)
+    Drm = mzgate(r - dr, theta, cutoff)
+    Dthetap = mzgate(r, theta + dtheta, cutoff)
+    Dthetam = mzgate(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
