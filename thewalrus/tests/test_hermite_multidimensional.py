@@ -135,10 +135,10 @@ def test_hermite_vs_hermite_modified():
 
 def test_hermite_numba_vs_hermite_renorm_modified(tol):
     """Test the relation hermite_numba and hermite renorm modified"""
-    cutoff = 5
-    R = np.random.rand(cutoff, cutoff) + 1j*np.random.rand(cutoff, cutoff)
+    cutoff = 10
+    R = np.random.rand(4, 4) + 1j*np.random.rand(4, 4)
     R += R.T
-    mu = np.random.rand(cutoff)+1j*np.random.rand(cutoff)
+    mu = np.random.rand(4)+1j*np.random.rand(4)
     C = 0.5
     hm = C * hermite_multidimensional(R, y = mu, cutoff = cutoff, renorm = True, modified = True)
     hm_nb = hermite_multidimensional_numba(C = C, mu = mu, Sigma = R, cutoff = cutoff, dtype=np.complex128)
