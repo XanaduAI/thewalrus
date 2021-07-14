@@ -55,7 +55,7 @@ def build_extensions():
         "sources": ["./thewalrus/libwalrus.pyx"],
         "depends": [
             "./include/libwalrus.hpp",
-            "./include/eigenvalue_hafnian.hpp",
+            "./include/trace_hafnian.hpp",
             "./include/recursive_hafnian.hpp",
             "./include/repeated_hafnian.hpp",
             "./include/permanent.hpp",
