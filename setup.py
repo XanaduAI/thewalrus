@@ -49,10 +49,7 @@ def build_extensions():
 
     CFLAGS = os.environ.get("CFLAGS", "-O3 -Wall")
 
-    USE_OPENBLAS = bool(os.environ.get("USE_OPENBLAS"))
-    USE_LAPACK = bool(os.environ.get("USE_LAPACK")) or USE_OPENBLAS
     USE_OPENMP = platform.system() != "Windows"
-    EIGEN_INCLUDE_DIR = os.environ.get("EIGEN_INCLUDE_DIR", "")
 
     config = {
         "sources": ["./thewalrus/libwalrus.pyx"],
@@ -61,8 +58,6 @@ def build_extensions():
             "./include/eigenvalue_hafnian.hpp",
             "./include/recursive_hafnian.hpp",
             "./include/repeated_hafnian.hpp",
-            "./include/hafnian_approx.hpp",
-            "./include/torontonian.hpp",
             "./include/permanent.hpp",
             "./include/hermite_multidimensional.hpp",
             "./include/stdafx.h",
@@ -92,22 +87,9 @@ def build_extensions():
         config["extra_compile_args"].extend(("-fopenmp", "-shared"))
         config["extra_link_args"].extend(("-fopenmp",))
 
-    if EIGEN_INCLUDE_DIR:
-        config["include_dirs"].append(EIGEN_INCLUDE_DIR)
-    else:
-        config["include_dirs"].extend(
-            ("/usr/include/eigen3", "/usr/local/include/eigen3")
-        )
-
-    if USE_OPENBLAS:
-        config["extra_compile_args"].append("-lopenblas")
-
-    if USE_LAPACK:
-        config["extra_compile_args"].extend(("-DLAPACKE=1", "-llapack"))
-
     return cythonize(
         [Extension("libwalrus", **config)],
-        compile_time_env={"_OPENMP": USE_OPENMP, "LAPACKE": USE_LAPACK},
+        compile_time_env={},
     )
 
 
