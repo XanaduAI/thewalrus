@@ -403,24 +403,6 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
     return grad_theta, grad_phi
 
 
-@lru_cache()
-def partition(num_modes: int, n_current: int, cutoff: int) -> Tuple[Tuple[int, ...], ...]:
-    r"""returns a list of possible combination of index. The length is fixed to 2*num_modes, last n_current bits are filled with all possible combinations of numbers where the max of number is up to the cutoff
-
-    Args:
-        num_modes (int): number of modes in the gaussian gate
-        n_current (int): up to which index is calculated
-        cutoff (int): Fock ladder cutoff
-
-    Returns:
-        tuple[tuple[int,...], ...]: the partition of possible index
-    """
-    return [
-        (0,) * (2 * num_modes - n_current) + comb
-        for comb in product(*(range(cutoff) for _ in range(n_current)))
-    ]
-
-
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     r"""returns a copy of the given tuple of integers where the ith element has been decreased by 1
@@ -455,7 +437,6 @@ def remove(
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
-
 def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
     # pylint: disable=too-many-arguments
     r"""Calculates the Fock representation of the gaussian gate.
@@ -472,12 +453,10 @@ def gaussian_gate(C, mu, Sigma, cutoff, num_modes, dtype=np.complex128):
         array[complex]: The Fock representation of the gate
     """
     array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
-    for n_current in range(1, 2 * num_modes + 1):
-        for idx in partition(num_modes, n_current, cutoff):
-            if idx == (0,) * (2 * num_modes):
-                array[idx] = C
-            else:
-                array = fill_gaussian_gate_loop(array, idx, mu, Sigma)
+    array[(0,) * (2 * num_modes)] = C
+    for idx in product(range(cutoff), repeat = 2 * num_modes):
+        if not idx == (0,) * (2 * num_modes):
+            array = fill_gaussian_gate_loop(array, idx, mu, Sigma)
     return array
 
 
@@ -525,12 +504,11 @@ def grad_gaussian_gate(gate, C, mu, Sigma, cutoff, num_modes, dtype=np.complex12
     dG_dC = gate / C
     dG_dmu = np.zeros_like(gate, dtype=dtype)
     dG_dSigma = np.zeros_like(gate, dtype=dtype)
-    for n_current in range(1, 2 * num_modes + 1):
-        for idx in partition(num_modes, n_current, cutoff):
-            if not idx == (0,) * (len(gate.shape)):
-                dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(
-                    dG_dmu, dG_dSigma, gate, idx, mu, Sigma
-                )
+    for idx in product(range(cutoff), repeat = 2 * num_modes):
+        if not idx == (0,) * (len(gate.shape)):
+            dG_dmu, dG_dSigma = fill_grad_gaussian_gate_loop(
+                dG_dmu, dG_dSigma, gate, idx, mu, Sigma
+            )
     return dG_dC, dG_dmu, dG_dSigma
 
 
