@@ -34,7 +34,6 @@ This module contains the Fock representation of the standard Gaussian gates as w
     grad_gaussian_gate
 
 """
-from functools import lru_cache
 from itertools import product
 from typing import Tuple, Generator
 from numba import jit
