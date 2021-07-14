@@ -22,11 +22,7 @@ from thewalrus.fock_gradients import (
     grad_two_mode_squeezing,
     beamsplitter,
     grad_beamsplitter,
-    gaussian_gate,
-    grad_gaussian_gate,
 )
-from thewalrus.quantum.fock_tensors import fock_tensor
-from thewalrus.random import random_symplectic
 import numpy as np
 
 
