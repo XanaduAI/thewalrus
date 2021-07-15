@@ -184,110 +184,115 @@ def remove(
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
-
 def hermite_multidimensional_numba(C, mu, Sigma, cutoff, dtype=np.complex128):
     # pylint: disable=too-many-arguments
-    r"""Calculates the Fock representation of the gaussian gate.
+    r"""Returns the multidimensional Hermite polynomials :math:`C*H_k^{(Sigma)}(mu)`.
+
+    Here :math:`Sigma` is an :math:`n \times n` square matrix,
+    :math:`mu` is an :math:`n` dimensional vector, and :math`C` is the complex number. The polynomials are
+    parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
+    and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
+    thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
 
     Args:
-        C (complex): parameter for the gaussian gate
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
-        cutoff (int): Fock ladder cutoff
-        num_modes (int): number of modes in the gaussian gate
+        C (complex): first value of the square matrix
+        mu (vector[complex]): vector argument of the Hermite polynomial
+        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
+        cutoff (int): maximum size of the subindices in the Hermite polynomial
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        array[complex]: The Fock representation of the gate
+        array[complex]: the multidimensional Hermite polynomials
     """
     num_modes = len(mu) // 2
     array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
     array[(0,) * (2 * num_modes)] = C
-    for idx in product(range(cutoff), repeat=2 * num_modes):
-        if not idx == (0,) * (2 * num_modes):
-            array = fill_hermite_multidimensional_numba_loop(array, idx, mu, Sigma)
+    all_idx = product(range(cutoff), repeat=2 * num_modes)
+    next(all_idx)
+    for idx in all_idx:
+        array = fill_hermite_multidimensional_numba_loop(array, idx, mu, Sigma)
     return array
 
 
 @jit(nopython=True)
-def fill_hermite_multidimensional_numba_loop(gate, idx, mu, Sigma):  # pragma: no cover
-    r"""Calculates the Fock representing of the gaussian gate for a given index.
+def fill_hermite_multidimensional_numba_loop(array, idx, mu, Sigma):  # pragma: no cover
+    r"""Calculates the hermit multidimensional polynomial for a given index.
 
     Args:
-        gate (array[complex]): array representing the gaussian gate
+        array (array[complex]): the multidimensional Hermite polynomials
         idx (tuple): index of the gradients to be filled
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
+        mu (vector[complex]): vector argument of the Hermite polynomial
+        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
 
     Returns:
-        array[complex]: The Fock representing of the gaussian gate for a given index
+        array[complex]: the hermit multidimensional polynomial for a given index
     """
     i = 0
     for i, val in enumerate(idx):
         if val > 0:
             break
     ki = dec(idx, i)
-    u = mu[i] * gate[ki]
+    u = mu[i] * array[ki]
     for l, kl in remove(ki):
-        u -= SQRT[ki[l]] * Sigma[i, l] * gate[kl]
-    gate[idx] = u / SQRT[idx[i]]
-    return gate
+        u -= SQRT[ki[l]] * Sigma[i, l] * array[kl]
+    array[idx] = u / SQRT[idx[i]]
+    return array
 
 
-def grad_hermite_multidimensional_numba(gate, C, mu, Sigma, cutoff, dtype=np.complex128):
+def grad_hermite_multidimensional_numba(array, C, mu, Sigma, cutoff, dtype=np.complex128):
     # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the gaussian gate.
+    r"""Calculates the gradients of the multidimensional Hermite polynomials :math:`C*H_k^{(Sigma)}(mu)` with respect to its parameters :math:`C`, :math:`mu` and :math:`Sigma`.
 
     Args:
-        gate (array[complex]): array representing the gate
-        C (complex): parameter for the gaussian gate
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
-        cutoff (int): Fock ladder cutoff
-        num_modes (int): number of modes in the gaussian gate
+        array (array[complex]): the multidimensional Hermite polynomials
+        C (complex): first value of the square matrix
+        mu (vector[complex]): vector argument of the Hermite polynomial
+        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
+        cutoff (int): maximum size of the subindices in the Hermite polynomial
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        array[complex], array[complex], array[complex]: the gradients of the gaussian gate with respect to C, mu and Sigma
+        array[complex], array[complex], array[complex]: the gradients of the multidimensional Hermite polynomials with respect to C, mu and Sigma
     """
     num_modes = len(mu) // 2
-    dG_dC = gate / C
-    dG_dmu = np.zeros_like(gate, dtype=dtype)
-    dG_dSigma = np.zeros_like(gate, dtype=dtype)
-    for idx in product(range(cutoff), repeat=2 * num_modes):
-        if not idx == (0,) * (len(gate.shape)):
-            dG_dmu, dG_dSigma = fill_grad_hermite_multidimensional_numba_loop(
-                dG_dmu, dG_dSigma, gate, idx, mu, Sigma
-            )
+    dG_dC = array / C
+    dG_dmu = np.zeros_like(array, dtype=dtype)
+    dG_dSigma = np.zeros_like(array, dtype=dtype)
+    all_idx = product(range(cutoff), repeat=2 * num_modes)
+    next(all_idx)
+    for idx in all_idx:
+        dG_dmu, dG_dSigma = fill_grad_hermite_multidimensional_numba_loop(
+            dG_dmu, dG_dSigma, array, idx, mu, Sigma
+        )
     return dG_dC, dG_dmu, dG_dSigma
 
 
 @jit(nopython=True)
-def fill_grad_hermite_multidimensional_numba_loop(dG_dmu, dG_dSigma, gate, idx, mu, Sigma):  # pragma: no cover
+def fill_grad_hermite_multidimensional_numba_loop(dG_dmu, dG_dSigma, array, idx, mu, Sigma):  # pragma: no cover
     # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the gaussian gate for a given index.
+    r"""Calculates the gradients of the multidimensional Hermite polynomials for a given index.
 
     Args:
-        dG_dmu (array[complex]): array representing the gradients of the gaussian gate with respect to mu
-        dG_dSigma (array[complex]): array representing the gradients of the gaussian gate with respect to Sigma
-        gate (array[complex]): array representing the gaussian gate
+        dG_dmu (array[complex]): array representing the gradients with respect to mu
+        dG_dSigma (array[complex]): array representing the gradients with respect to Sigma
+        array (array[complex]): the multidimensional Hermite polynomials
         idx (tuple): index of the gradients to be filled
-        mu (vector[complex]): parameter for the gaussian gate
-        Sigma (array[complex]): parameter for the gaussian gate
+        mu (vector[complex]): vector argument of the Hermite polynomial
+        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
 
     Returns:
-        array[complex], array[complex]: the gradients of the gaussian gate with respect to mu and Sigma for a given index
+        array[complex], array[complex]: the gradients of the multidimensional Hermite polynomials with respect to mu and Sigma for a given index
     """
     i = 0
     for i, val in enumerate(idx):
         if val > 0:
             break
     ki = dec(idx, i)
-    dmu = mu[i] * dG_dmu[ki] + gate[ki]
+    dmu = mu[i] * dG_dmu[ki] + array[ki]
     dSigma = mu[i] * dG_dSigma[ki]
     for l, kl in remove(ki):
         dmu -= SQRT[ki[l]] * dG_dmu[kl] * Sigma[i, l]
-        dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + gate[kl])
+        dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + array[kl])
     dG_dSigma[idx] = dSigma / SQRT[idx[i]]
     dG_dmu[idx] = dmu / SQRT[idx[i]]
     return dG_dmu, dG_dSigma
