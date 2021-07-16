@@ -361,11 +361,11 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
 
 @jit(nopython=True)
 def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
-    r"""Calculates the Fock representation of the mzgate.
+    r"""Calculates the Fock representation of the Mach-Zehnder interferometer.
 
     Args:
-        theta (float): transmissivity angle of the mzgate. The transmissivity is :math:`t=\cos(\theta)`
-        phi (float): reflection phase of the mzgate
+        theta (float): internal phase of the Mach-Zehnder interferometer
+        phi (float): external phase of the Mach-Zehnder interferometer
         cutoff (int): Fock ladder cutoff
         dtype (data type): Specifies the data type used for the calculation
 
@@ -399,12 +399,12 @@ def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
 @jit(nopython=True)
 def grad_mzgate(T, theta, phi):  # pragma: no cover
-    r"""Calculates the gradients of the mzgate gate with respect to the transmissivity angle and reflection phase
+    r"""Calculates the gradients of the Mach-Zehnder interferometer with respect to the transmissivity angle and reflection phase
 
     Args:
         T (array[complex]): array representing the gate
-        theta (float): transmissivity angle of the mzgate. The transmissivity is :math:`t=\cos(\theta)`
-        phi (float): reflection phase of the mzgate
+        theta (float): internal of the mzgate 
+        phi (float): external phase of the mzgate
 
     Returns:
         tuple[array[complex], array[complex]]: The gradient of the mzgate gate with respect to theta and phi

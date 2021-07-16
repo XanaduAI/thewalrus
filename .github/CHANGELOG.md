@@ -12,7 +12,7 @@
 
 * Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix [#246](https://github.com/XanaduAI/thewalrus/pull/246)
 
-* Adds the functions `mzgate` and `grad_mzgate` to calculate the fock representation of the MZ gate and its gradients [#257](https://github.com/XanaduAI/thewalrus/pull/257)
+* Adds the functions `mzgate` and `grad_mzgate` to calculate the Fock representation of the Mach-Zehnder gate and its gradients [#257](https://github.com/XanaduAI/thewalrus/pull/257)
 
 ### Improvements
 
