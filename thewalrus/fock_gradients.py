@@ -26,10 +26,12 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	squeezing
 	beamsplitter
 	two_mode_squeezing
+	mzgate
 	grad_displacement
 	grad_squeezing
 	grad_beamsplitter
 	grad_two_mode_squeezing
+	grad_mzgate
 
 """
 import numpy as np
@@ -90,7 +92,9 @@ def grad_displacement(T, r, phi):  # pragma: no cover
     for m in range(cutoff):
         for n in range(cutoff):
             grad_r[m, n] = -r * T[m, n] + sqrt[m] * ei * T[m - 1, n] - sqrt[n] * eic * T[m, n - 1]
-            grad_phi[m, n] = sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
+            grad_phi[m, n] = (
+                sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
+            )
 
     return grad_r, grad_phi
 
@@ -113,7 +117,12 @@ def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
 
     eitheta_tanhr = np.exp(1j * theta) * np.tanh(r)
     sechr = 1.0 / np.cosh(r)
-    R = np.array([[-eitheta_tanhr, sechr], [sechr, np.conj(eitheta_tanhr)],])
+    R = np.array(
+        [
+            [-eitheta_tanhr, sechr],
+            [sechr, np.conj(eitheta_tanhr)],
+        ]
+    )
 
     S[0, 0] = np.sqrt(sechr)
     for m in range(2, cutoff, 2):
@@ -122,7 +131,10 @@ def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
     for m in range(0, cutoff):
         for n in range(1, cutoff):
             if (m + n) % 2 == 0:
-                S[m, n] = sqrt[n - 1] / sqrt[n] * R[1, 1] * S[m, n - 2] + sqrt[m] / sqrt[n] * R[0, 1] * S[m - 1, n - 1]
+                S[m, n] = (
+                    sqrt[n - 1] / sqrt[n] * R[1, 1] * S[m, n - 2]
+                    + sqrt[m] / sqrt[n] * R[0, 1] * S[m - 1, n - 1]
+                )
     return S
 
 
@@ -158,7 +170,8 @@ def grad_squeezing(T, r, phi):  # pragma: no cover
                 + 0.5 * eiphiconj * sechr ** 2 * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
             )
             grad_phi[m, n] = (
-                -0.5j * eiphi * tanhr * sqrt[m] * sqrt[m - 1] * T[m - 2, n] - 0.5j * eiphiconj * tanhr * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
+                -0.5j * eiphi * tanhr * sqrt[m] * sqrt[m - 1] * T[m - 2, n]
+                - 0.5j * eiphiconj * tanhr * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
             )
 
     return grad_r, grad_phi
@@ -183,7 +196,14 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
 
     sc = 1.0 / np.cosh(r)
     eiptr = np.exp(-1j * theta) * np.tanh(r)
-    R = -np.array([[0, -np.conj(eiptr), -sc, 0], [-np.conj(eiptr), 0, 0, -sc], [-sc, 0, 0, eiptr], [0, -sc, eiptr, 0],])
+    R = -np.array(
+        [
+            [0, -np.conj(eiptr), -sc, 0],
+            [-np.conj(eiptr), 0, 0, -sc],
+            [-sc, 0, 0, eiptr],
+            [0, -sc, eiptr, 0],
+        ]
+    )
 
     Z[0, 0, 0, 0] = sc
 
@@ -204,7 +224,10 @@ def two_mode_squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cov
             for p in range(cutoff):
                 q = p - (m - n)
                 if 0 < q < cutoff:
-                    Z[m, n, p, q] = R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1] + R[2, 3] * sqrt[p] / sqrt[q] * Z[m, n, p - 1, q - 1]
+                    Z[m, n, p, q] = (
+                        R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                        + R[2, 3] * sqrt[p] / sqrt[q] * Z[m, n, p - 1, q - 1]
+                    )
     return Z
 
 
@@ -236,7 +259,9 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
 
     # rank 2
     for n in range(1, cutoff):
-        grad_r[n, n, 0, 0] = -tanhr * T[n, n, 0, 0] + sqrt[n] * sqrt[n] * ei * sechr ** 2 * T[n - 1, n - 1, 0, 0]
+        grad_r[n, n, 0, 0] = (
+            -tanhr * T[n, n, 0, 0] + sqrt[n] * sqrt[n] * ei * sechr ** 2 * T[n - 1, n - 1, 0, 0]
+        )
         grad_theta[n, n, 0, 0] = 1j * ei * tanhr * sqrt[n] * sqrt[n] * T[n - 1, n - 1, 0, 0]
 
     # rank 3
@@ -264,7 +289,8 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
                         - sqrt[p] * sqrt[q] * eic * sechr ** 2 * T[m, n, p - 1, q - 1]
                     )
                     grad_theta[m, n, p, q] = (
-                        1j * ei * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1, p, q] + 1j * eic * tanhr * sqrt[p] * sqrt[q] * T[m, n, p - 1, q - 1]
+                        1j * ei * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1, p, q]
+                        + 1j * eic * tanhr * sqrt[p] * sqrt[q] * T[m, n, p - 1, q - 1]
                     )
 
     return grad_r, grad_theta
@@ -286,7 +312,14 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
     ct = np.cos(theta)
     st = np.sin(theta) * np.exp(1j * phi)
-    R = np.array([[0, 0, ct, -np.conj(st)], [0, 0, st, ct], [ct, st, 0, 0], [-np.conj(st), ct, 0, 0],])
+    R = np.array(
+        [
+            [0, 0, ct, -np.conj(st)],
+            [0, 0, st, ct],
+            [ct, st, 0, 0],
+            [-np.conj(st), ct, 0, 0],
+        ]
+    )
 
     Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
     Z[0, 0, 0, 0] = 1.0
@@ -296,7 +329,10 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         for n in range(cutoff - m):
             p = m + n
             if 0 < p < cutoff:
-                Z[m, n, p, 0] = R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0] + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+                Z[m, n, p, 0] = (
+                    R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0]
+                    + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+                )
 
     # rank 4
     for m in range(cutoff):
@@ -304,7 +340,10 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
             for p in range(cutoff):
                 q = m + n - p
                 if 0 < q < cutoff:
-                    Z[m, n, p, q] = R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1] + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                    Z[m, n, p, q] = (
+                        R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1]
+                        + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                    )
     return Z
 
 
@@ -336,7 +375,10 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
         for n in range(cutoff - m):
             p = m + n
             if 0 < p < cutoff:
-                grad_theta[m, n, p, 0] = -sqrt[m] * sqrt[p] * st * T[m - 1, n, p - 1, 0] + sqrt[n] * sqrt[p] * ei * ct * T[m, n - 1, p - 1, 0]
+                grad_theta[m, n, p, 0] = (
+                    -sqrt[m] * sqrt[p] * st * T[m - 1, n, p - 1, 0]
+                    + sqrt[n] * sqrt[p] * ei * ct * T[m, n - 1, p - 1, 0]
+                )
                 grad_phi[m, n, p, 0] = 1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, 0]
 
     for m in range(cutoff):
@@ -351,7 +393,113 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                         - sqrt[m] * sqrt[q] * eic * ct * T[m - 1, n, p, q - 1]
                     )
                     grad_phi[m, n, p, q] = (
-                        1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, q] + 1j * sqrt[m] * sqrt[q] * eic * st * T[m - 1, n, p, q - 1]
+                        1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, q]
+                        + 1j * sqrt[m] * sqrt[q] * eic * st * T[m - 1, n, p, q - 1]
                     )
+
+    return grad_theta, grad_phi
+
+
+@jit(nopython=True)
+def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
+    r"""Calculates the Fock representation of the Mach-Zehnder interferometer.
+
+    Args:
+        theta (float): internal phase of the Mach-Zehnder interferometer
+        phi (float): external phase of the Mach-Zehnder interferometer
+        cutoff (int): Fock ladder cutoff
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array[float]: The Fock representation of the gate
+    """
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+    R = 0.5 * np.array(
+        [
+            [0, 0, u * (v - 1), 1j * (1 + v)],
+            [0, 0, 1j * u * (1 + v), 1 - v],
+            [u * (v - 1), 1j * u * (1 + v), 0, 0],
+            [1j * (1 + v), 1 - v, 0, 0],
+        ]
+    )
+
+    Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    Z[0, 0, 0, 0] = 1.0
+
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff - m):
+            p = m + n
+            if 0 < p < cutoff:
+                Z[m, n, p, 0] = (
+                    R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0]
+                    + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+                )
+
+    # rank 4
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                q = m + n - p
+                if 0 < q < cutoff:
+                    Z[m, n, p, q] = (
+                        R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1]
+                        + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                    )
+    return Z
+
+
+@jit(nopython=True)
+def grad_mzgate(T, theta, phi):  # pragma: no cover
+    r"""Calculates the gradients of the Mach-Zehnder interferometer with respect to the transmissivity angle and reflection phase
+
+    Args:
+        T (array[complex]): array representing the gate
+        theta (float): internal of the mzgate
+        phi (float): external phase of the mzgate
+
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the mzgate gate with respect to theta and phi
+    """
+    cutoff = T.shape[0]
+    dtype = T.dtype
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    grad_theta = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    grad_phi = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff - m):
+            p = m + n
+            if 0 < p < cutoff:
+                grad_theta[m, n, p, 0] = (
+                    1j * 0.5 * u * v * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, 0]
+                    - 0.5 * u * v * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, 0]
+                )
+                grad_phi[m, n, p, 0] = (1j * 0.5 * u * v - 1j * 0.5 * u) * sqrt[m] * sqrt[p] * T[
+                    m - 1, n, p - 1, 0
+                ] - (0.5 * u + 0.5 * u * v) * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, 0]
+
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                q = m + n - p
+                if 0 < q < cutoff:
+                    grad_theta[m, n, p, q] = (
+                        1j * 0.5 * u * v * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, q]
+                        - 0.5 * u * v * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, q]
+                        - 0.5 * v * sqrt[m] * sqrt[q] * T[m - 1, n, p, q - 1]
+                        - 1j * 0.5 * v * sqrt[n] * sqrt[q] * T[m, n - 1, p, q - 1]
+                    )
+                    grad_phi[m, n, p, q] = (1j * 0.5 * u * v - 1j * 0.5 * u) * sqrt[m] * sqrt[
+                        p
+                    ] * T[m - 1, n, p - 1, q] - (0.5 * u + 0.5 * u * v) * sqrt[n] * sqrt[p] * T[
+                        m, n - 1, p - 1, q
+                    ]
 
     return grad_theta, grad_phi
