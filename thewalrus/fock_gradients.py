@@ -457,7 +457,7 @@ def grad_mzgate(T, theta, phi):  # pragma: no cover
 
     Args:
         T (array[complex]): array representing the gate
-        theta (float): internal of the mzgate 
+        theta (float): internal of the mzgate
         phi (float): external phase of the mzgate
 
     Returns:
