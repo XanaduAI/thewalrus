@@ -74,6 +74,7 @@ from thewalrus.quantum import (
     total_photon_number_distribution,
     characteristic_function,
     photon_number_moment,
+    photon_number_cumulant,
 )
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -1685,6 +1686,7 @@ def test_photon_number_moment_random_all_power_one(hbar):
 @pytest.mark.parametrize("theta", [-1.7, 0.0, 2.5])
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
 def test_photon_number_moment_two_mode_squeezed(r, theta, hbar):
+    """Tests photon number correlations between the two modes of a two-mode squeezed vacuum state"""
     M = 2
     cov = 0.5 * hbar * two_mode_squeezing(2 * r, theta)
     mu = np.zeros([2 * M])

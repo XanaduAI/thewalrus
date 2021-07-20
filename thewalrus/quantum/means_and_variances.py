@@ -362,7 +362,18 @@ def photon_number_moment(mu, cov, indices, hbar=2):
         net_sum += prod_coeff * s_ordered_expectation(mu, cov, rpt, s=1, hbar=hbar)
     return net_sum
 
-def photon_number_cumulants(mu, cov, modes, hbar=2):
+def photon_number_cumulant(mu, cov, modes, hbar=2):
+    r"""Calculates the cumulant of the modes in the Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list): list of modes. Note that it can have repetitions.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): the cumulant
+    """
     if len(modes) == 1:
         j = modes[0]
         return photon_number_mean(mu, cov, j, hbar=hbar)
