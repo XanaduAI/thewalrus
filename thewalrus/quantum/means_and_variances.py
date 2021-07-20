@@ -219,6 +219,7 @@ def s_ordered_expectation(mu, cov, rpt, hbar=2, s=0):
     Here, :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
     indicates how many derivatives are taken with respect to the complex argument and its
     conjugate.
+    The values :math:`s=\{1,0,-1\}` correspond respectively to normal, symmetric and antinormal order.
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering.
@@ -298,40 +299,68 @@ def variance_clicks(cov, hbar=2):
 
     return term1 + 2 * term2
 
-def _coeff3(k, mu, m):
-    return (1/(np.math.factorial(mu)*np.math.factorial(k-mu)))*((-1)**(k-mu)*(mu**m))
+def _coeff_normal_ordered(m, k):
+    r"""Returns the coefficients giving the expansion of a photon number power in terms of normal ordered power of creation
+    and annihilation operators.
 
-def _coeff2(n,k):
-    if k<= n:
-        return sum([_coeff3(k,mu,n) for mu in range(0,k+1)])
+    Args:
+        m (int): power of the photon number operator, :math:`(a^\dagger a)^m `.
+        k (int): power of the normal ordered term, :math:`a^{\dagger i} a^i`.
+
+    Returns:
+        (float): expansion coefficient
+    """
+    if k <= m:
+        return sum(
+            [
+                (1 / (np.math.factorial(mu) * np.math.factorial(k - mu)))
+                * ((-1) ** (k - mu) * (mu ** m))
+                for mu in range(0, k + 1)
+            ]
+        )
     return 0
 
 
 def photon_number_moment(mu, cov, indices, hbar=2):
+    r"""Calculates the expectation value of product of powers in photon number of a Gaussian state.
+    The powers are specified by a dictionary witk modes as keys as powers as values.
 
-    max_order = np.max([indices[key] for key in indices])
+    The calculation is performed by first writing any power of the photon number as
 
-    #if max(max_order) <= 1:
-    #    return 
+    :math:`(a^\dagger a)^m = \sum_{k=1}^m c_k a^{\dagger k} a^k`
 
+    where the coefficients :math:`c_i` are provided by the function `_coeff_normal_ordered`.
 
-    M = len(cov)//2
-    N = MatrixSymbol('N', max_order+1, M) # Make an array of symbols
-    expr = np.prod([sum([_coeff2(indices[key],i)*N[i,key]  for i in range(1,1+indices[key])]) for key in indices]).expand()
-    terms = expr.as_terms()[0]
-    sorted_keys = list(indices.keys())
-    sorted_keys.sort()
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        indices (dictionary): specification of the different modes and their power of their photon number
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        float: the expectation value of the photon number powers.
+
+    """
+    N = len(cov) // 2
+    list_indices = [indices[key] for key in indices]
+    modes = [key for key in indices]
+    max_order = np.max(list_indices)
+    # Find the expansion coefficients of all the different powers
+    expansion_coeff = [
+        [_coeff_normal_ordered(indices[key], i) for i in range(1, 1 + indices[key])]
+        for key in indices
+    ]
+    values = [list(range(i)) for i in list_indices]
     net_sum = 0.0
-    for term in terms:
-        coeff = term[1][0][0]+1j*term[1][0][1]
-        powers = term[1][1]
-        rpts = [0]*M
-        for key, power in zip(sorted_keys, powers):
-            rpts[key] = power
-        rpts = rpts+rpts
-        print(term, "\n", rpts)
-        print("\n")
-        #rpts = list(1+np.array(rpts+rpts))
-        summand = coeff*s_ordered_expectation(mu, cov, rpts,hbar = hbar,s=1)
-        net_sum += summand
+    # Construct the product of each possible term appearing in the normal ordered expansion
+    for item in product(*values):
+        rpt = [0] * N
+        for i, key in enumerate(modes):
+            rpt[key] = item[i] + 1
+        rpt = rpt + rpt
+        prod_coeff = np.prod([expansion_coeff[i][coeff] for i, coeff in enumerate(item)])
+        net_sum += prod_coeff * s_ordered_expectation(mu, cov, rpt, s=1, hbar=hbar)
     return net_sum
+
+def photon_number_cumulants(mu, cov, modes, hbar=2):
+    return 0
