@@ -199,7 +199,7 @@ def hermite_multidimensional_numba(C, mu, Sigma, cutoff, dtype=np.complex128):
     thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
 
     Args:
-        C (complex): first value of the square matrix
+        C (complex): zeroth entry of the tensor
         mu (vector[complex]): vector argument of the Hermite polynomial
         Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
