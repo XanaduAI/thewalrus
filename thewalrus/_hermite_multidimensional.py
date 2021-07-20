@@ -193,7 +193,7 @@ def hermite_multidimensional_numba(C, mu, Sigma, cutoff, dtype=np.complex128):
     r"""Returns the multidimensional Hermite polynomials :math:`C*H_k^{(Sigma)}(mu)`.
 
     Here :math:`Sigma` is an :math:`n \times n` square matrix,
-    :math:`mu` is an :math:`n` dimensional vector, and :math`C` is the complex number. The polynomials are
+    :math:`mu` is an :math:`n` dimensional vector, and :math`C` is a complex number prefactor. The polynomials are
     parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
     and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
     thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
