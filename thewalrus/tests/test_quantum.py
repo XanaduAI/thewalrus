@@ -1646,6 +1646,7 @@ def test_s_ordered_expectation(s, cov, mu, hbar):
     obtained = s_ordered_expectation(mu, cov, [1, 1], hbar, s=s)
     assert np.allclose(expected, obtained)
 
+
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
 def test_photon_number_moment_all_thermal(hbar):
     """Test that photon_number_moment function gives the correct result for a product of thermal states"""
