@@ -20,8 +20,6 @@ from itertools import product
 
 import numpy as np
 
-from sympy import MatrixSymbol
-
 from .._hafnian import hafnian, reduction
 
 from .conversions import (
@@ -343,8 +341,7 @@ def photon_number_moment(mu, cov, indices, hbar=2):
     """
     N = len(cov) // 2
     list_indices = [indices[key] for key in indices]
-    modes = [key for key in indices]
-    max_order = np.max(list_indices)
+    modes = list(indices)
     # Find the expansion coefficients of all the different powers
     expansion_coeff = [
         [_coeff_normal_ordered(indices[key], i) for i in range(1, 1 + indices[key])]
@@ -389,3 +386,4 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
     # between a list which is what partition gives
     # and dictionary which is what photon_number_moment wants
     list_to_freq_dict = lambda words: {i:words.count(i) for i in set(words)}
+    return 0
