@@ -1652,52 +1652,54 @@ def test_photon_number_moment_all_thermal(hbar):
     """Test that photon_number_moment function gives the correct result for a product of thermal states"""
     M = 3
     N = np.random.rand(M)
-    N2 = 2*N**2+N
-    cov = 0.5*hbar*np.diag(np.concatenate([2*N+1,2*N+1]))
-    mu = np.zeros([2*M])
+    N2 = 2 * N ** 2 + N
+    cov = 0.5 * hbar * np.diag(np.concatenate([2 * N + 1, 2 * N + 1]))
+    mu = np.zeros([2 * M])
     order = 1
-    ind = {i:order for i in range(M)}
+    ind = {i: order for i in range(M)}
     value = photon_number_moment(mu, cov, ind, hbar=hbar)
     expected = np.prod(N)
     assert np.allclose(value, expected)
     order = 2
-    ind = {i:order for i in range(M)}
+    ind = {i: order for i in range(M)}
     value = photon_number_moment(mu, cov, ind, hbar=hbar)
     expected = np.prod(N2)
     assert np.allclose(value, expected)
+
 
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
 def test_photon_number_moment_random_all_power_one(hbar):
     """Test the expected value of the product of the number operators over a random 3-mode Gaussian state"""
     M = 3
-    cov = random_covariance(M, hbar = hbar)
-    mu = np.random.rand(2*M) - 0.5
+    cov = random_covariance(M, hbar=hbar)
+    mu = np.random.rand(2 * M) - 0.5
     order = 1
-    ind = {i:order for i in range(M)}
+    ind = {i: order for i in range(M)}
     value = photon_number_moment(mu, cov, ind, hbar=hbar)
-    rpt = [order]*(2*M)
+    rpt = [order] * (2 * M)
     expected = normal_ordered_expectation(mu, cov, rpt, hbar=hbar)
     assert np.allclose(value, expected)
+
 
 @pytest.mark.parametrize("r", [0.1, 1.0, 1.2])
 @pytest.mark.parametrize("theta", [-1.7, 0.0, 2.5])
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
 def test_photon_number_moment_two_mode_squeezed(r, theta, hbar):
     M = 2
-    cov = 0.5*hbar*two_mode_squeezing(2*r, theta)
-    mu = np.zeros([2*M])
+    cov = 0.5 * hbar * two_mode_squeezing(2 * r, theta)
+    mu = np.zeros([2 * M])
     # Check mean photon numbers in each mode
-    ind = {0:1}
+    ind = {0: 1}
     nbar = np.sinh(r) ** 2
-    assert np.allclose(nbar, photon_number_moment(mu, cov, ind, hbar = hbar))
-    ind = {1:1}
-    assert np.allclose(nbar, photon_number_moment(mu, cov, ind, hbar = hbar))
+    assert np.allclose(nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
+    ind = {1: 1}
+    assert np.allclose(nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
     # Check expected squared photon numbers in each mode
-    ind = {0:2}
+    ind = {0: 2}
     nbar = np.sinh(r) ** 2
-    assert np.allclose(2*nbar**2+nbar, photon_number_moment(mu, cov, ind, hbar = hbar))
-    ind = {1:2}
-    assert np.allclose(2*nbar**2+nbar, photon_number_moment(mu, cov, ind, hbar = hbar))
+    assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
+    ind = {1: 2}
+    assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
     # Check expected value of the product of the photon numbers
-    ind = {0:1,1:1}
-    assert np.allclose(2*nbar**2+nbar, photon_number_moment(mu, cov, ind, hbar = hbar))
+    ind = {0: 1, 1: 1}
+    assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
