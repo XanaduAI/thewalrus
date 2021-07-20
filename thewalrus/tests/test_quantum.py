@@ -65,6 +65,7 @@ from thewalrus.quantum import (
     loss_mat,
     fidelity,
     normal_ordered_expectation,
+    s_ordered_expectation,
     photon_number_expectation,
     photon_number_squared_expectation,
     variance_clicks,
@@ -1631,3 +1632,15 @@ def test_charactetistic_function_no_loss(s, k):
     val = characteristic_function(k=k, s=s, eta=1.0, mu=mu)
     expected = ((1 - p) / (1 - 2 * p)) ** (k / 2)
     assert np.allclose(val, expected)
+
+@pytest.mark.parametrize("s", np.linspace(-1,1,6))
+@pytest.mark.parametrize("cov", [squeezing(2*np.arcsinh(1),0.0), 1.8*np.identity(2)])
+@pytest.mark.parametrize("mu", [np.zeros(2), np.array([0.9,0.8])])
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
+def test_s_ordered_expectation(s, cov, mu, hbar):
+    """Checks that the ordered photon number is correct when calculated using s_ordered_expectation"""
+    cov = (hbar/2)*cov
+    mu = np.sqrt(hbar/2)*mu
+    expected = photon_number_mean(mu, cov, 0, hbar) + 0.5*(1-s)
+    obtained = s_ordered_expectation(mu, cov, [1,1], hbar, s=s)
+    assert np.allclose(expected, obtained)

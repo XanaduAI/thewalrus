@@ -20,6 +20,8 @@ from itertools import product
 
 import numpy as np
 
+from sympy import MatrixSymbol
+
 from .._hafnian import hafnian, reduction
 
 from .conversions import (
@@ -195,7 +197,6 @@ def photon_number_squared_expectation(mu, cov, modes, hbar=2):
         result += term
     return result
 
-
 def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     r"""Calculates the expectation value of the normal ordered product
     :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
@@ -210,11 +211,29 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     Returns:
         (float): expectation value of the normal ordered product of operators
     """
+    return s_ordered_expectation(mu, cov, rpt, hbar, s=1)
+
+def s_ordered_expectation(mu, cov, rpt, hbar=2, s=0):
+    r"""Calculates the expectation value of the s-ordered product
+    obtained by taking deirvatives of the characteristic function of a Gaussian states,
+    Here, :math:`\text{rpt}=(n_0, n_1, \ldots, n_{N-1}, m_0, m_1, \ldots, m_{N-1})`.
+    indicates how many derivatives are taken with respect to the complex argument and its
+    conjugate.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        rpt (list): integers specifying the terms to calculate.
+        hbar (float): value of hbar in the uncertainty relation.
+        s (float): value setting the ordering it must be between -1 and 1.
+
+    Returns:
+        (float): expectation value of the normal ordered product of operators
+    """
     alpha = complex_to_real_displacements(mu, hbar=hbar)
     n = len(cov)
-    V = (Qmat(cov, hbar=hbar) - np.identity(n)) @ Xmat(n // 2)
+    V = (Qmat(cov, hbar=hbar) - 0.5*(s+1)*np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
-
     if np.allclose(mu, 0):
         return hafnian(A)
 
@@ -278,3 +297,33 @@ def variance_clicks(cov, hbar=2):
             term2 += prob_vac_ij - vac_probs[i] * vac_probs[j]
 
     return term1 + 2 * term2
+
+def _coeff3(k, mu, m):
+    return (1/(np.math.factorial(mu)*np.math.factorial(k-mu)))*((-1)**(k-mu)*(mu**m))
+
+def _coeff2(n,k):
+    if k<= n:
+        return sum([_coeff3(k,mu,n) for mu in range(0,k+1)])
+    return 0
+
+
+def photon_number_moment(mu, cov, indices, hbar=2):
+    M = len(cov)//2
+    max_order = np.max([indices[key] for key in indices])
+    N = MatrixSymbol('N', max_order+1, M) # Make an array of symbols
+    expr = np.prod([sum([_coeff2(indices[key],i)*N[i,key]  for i in range(1,1+indices[key])]) for key in indices]).expand()
+    terms = expr.as_terms()[0]
+    sorted_keys = list(indices.keys())
+    sorted_keys.sort()
+    net_sum = 0.0
+    for term in terms:
+        print(term)
+        coeff = term[1][0][0]+1j*term[1][0][1]
+        powers = term[1][1]
+        rpts = [0]*M
+        for key, power in zip(sorted_keys, powers):
+            rpts[key] = power
+        rpts = rpts+rpts
+        summand = coeff*s_ordered_expectation(mu, cov, rpts,hbar = hbar,s=1)
+        net_sum += summand
+    return net_sum

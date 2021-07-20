@@ -101,6 +101,7 @@ Means and variances
     photon_number_expectation
     photon_number_squared_expectation
     normal_ordered_expectation
+    s_ordered_expectation
     mean_clicks
     variance_clicks
 
@@ -164,9 +165,11 @@ from .means_and_variances import (
     photon_number_covmat,
     photon_number_expectation,
     photon_number_squared_expectation,
+    photon_number_moment,
     normal_ordered_expectation,
     mean_clicks,
     variance_clicks,
+    s_ordered_expectation,
 )
 
 from .photon_number_distributions import (
