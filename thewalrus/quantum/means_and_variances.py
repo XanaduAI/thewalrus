@@ -308,8 +308,14 @@ def _coeff2(n,k):
 
 
 def photon_number_moment(mu, cov, indices, hbar=2):
-    M = len(cov)//2
+
     max_order = np.max([indices[key] for key in indices])
+
+    #if max(max_order) <= 1:
+    #    return 
+
+
+    M = len(cov)//2
     N = MatrixSymbol('N', max_order+1, M) # Make an array of symbols
     expr = np.prod([sum([_coeff2(indices[key],i)*N[i,key]  for i in range(1,1+indices[key])]) for key in indices]).expand()
     terms = expr.as_terms()[0]
@@ -317,13 +323,15 @@ def photon_number_moment(mu, cov, indices, hbar=2):
     sorted_keys.sort()
     net_sum = 0.0
     for term in terms:
-        print(term)
         coeff = term[1][0][0]+1j*term[1][0][1]
         powers = term[1][1]
         rpts = [0]*M
         for key, power in zip(sorted_keys, powers):
             rpts[key] = power
         rpts = rpts+rpts
+        print(term, "\n", rpts)
+        print("\n")
+        #rpts = list(1+np.array(rpts+rpts))
         summand = coeff*s_ordered_expectation(mu, cov, rpts,hbar = hbar,s=1)
         net_sum += summand
     return net_sum
