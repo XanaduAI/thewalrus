@@ -28,7 +28,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Timjan Kalajdzievski, Filippo Miatto, Nicolas Quesada
+Jake Bulmer, Timjan Kalajdzievski, Filippo Miatto, Nicolas Quesada, Yuan Yao
 
 ---
 
