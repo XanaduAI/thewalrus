@@ -363,4 +363,18 @@ def photon_number_moment(mu, cov, indices, hbar=2):
     return net_sum
 
 def photon_number_cumulants(mu, cov, modes, hbar=2):
-    return 0
+    if len(modes) == 1:
+        j = modes[0]
+        return photon_number_mean(mu, cov, j, hbar=hbar)
+
+    if len(modes) == 2:
+        j = modes[0]
+        k = modes[1]
+        return photon_number_mean(mu, cov, j, k, hbar=hbar)
+
+    # Here one could write the formula for 3 specifically
+    # or write the general result.
+    # You might find useful this little one liner to convert
+    # between a list which is what partition gives
+    # and dictionary which is what photon_number_moment wants
+    list_to_freq_dict = lambda words: {i:words.count(i) for i in set(words)}
