@@ -22,8 +22,11 @@ from thewalrus.fock_gradients import (
     grad_two_mode_squeezing,
     beamsplitter,
     grad_beamsplitter,
+    mzgate,
+    grad_mzgate,
 )
 import numpy as np
+import pytest
 
 
 def test_grad_displacement():
@@ -85,8 +88,8 @@ def test_grad_two_mode_squeezing():
     assert np.allclose(Dtheta, Dthetaapprox, atol=1e-5, rtol=0)
 
 
-def test_grad_beamspitter():
-    """Tests the value of the analytic gradient for the S2gate against finite differences"""
+def test_grad_beamsplitter():
+    """Tests the value of the analytic gradient for a beamsplitter against finite differences"""
     cutoff = 4
     r = 1.0
     theta = np.pi / 8
@@ -99,6 +102,26 @@ def test_grad_beamspitter():
     Drm = beamsplitter(r - dr, theta, cutoff)
     Dthetap = beamsplitter(r, theta + dtheta, cutoff)
     Dthetam = beamsplitter(r, theta - dtheta, cutoff)
+    Drapprox = (Drp - Drm) / (2 * dr)
+    Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
+    assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
+    assert np.allclose(Dtheta, Dthetaapprox, atol=1e-4, rtol=0)
+
+
+def test_grad_mzgate():
+    """Tests the value of the analytic gradient for the mzgate against finite differences"""
+    cutoff = 4
+    r = 1.0
+    theta = np.pi / 8
+    T = mzgate(r, theta, cutoff)
+    Dr, Dtheta = grad_mzgate(T, r, theta)
+
+    dr = 0.001
+    dtheta = 0.001
+    Drp = mzgate(r + dr, theta, cutoff)
+    Drm = mzgate(r - dr, theta, cutoff)
+    Dthetap = mzgate(r, theta + dtheta, cutoff)
+    Dthetam = mzgate(r, theta - dtheta, cutoff)
     Drapprox = (Drp - Drm) / (2 * dr)
     Dthetaapprox = (Dthetap - Dthetam) / (2 * dtheta)
     assert np.allclose(Dr, Drapprox, atol=1e-4, rtol=0)
@@ -192,15 +215,16 @@ def test_squeezing_values(tol):
     assert np.allclose(T, expected, atol=tol, rtol=0)
 
 
-def test_BS_selection_rules(tol):
-    r"""Test the selection rules of a beamsplitter.
-    If one writes the beamsplitter gate of :math:`U` and its matrix elements as
+@pytest.mark.parametrize("gate", [mzgate, beamsplitter])
+def test_passive_selection_rules(tol, gate):
+    r"""Test the selection rules of a beamsplitter or a mzgate.
+    If one writes the beamsplitter or the mzgate gate as :math:`U` and its matrix elements as
     :math:`\langle m, n |U|k,l \rangle` then these elements
     are nonzero if and only if :math:`m+n = k+l`. This test checks
     that this selection rule holds.
     """
     cutoff = 4
-    T = beamsplitter(np.random.rand(), np.random.rand(), cutoff)
+    T = gate(np.random.rand(), np.random.rand(), cutoff)
     m = np.arange(cutoff).reshape(-1, 1, 1, 1)
     n = np.arange(cutoff).reshape(1, -1, 1, 1)
     k = np.arange(cutoff).reshape(1, 1, -1, 1)
@@ -222,6 +246,17 @@ def test_BS_hong_ou_mandel_interference(tol):
     cutoff = 2
     phi = 2 * np.pi * np.random.rand()
     T = beamsplitter(np.pi / 4, phi, cutoff)  # a 50-50 beamsplitter with phase phi
+    assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
+
+
+def test_MZ_hong_ou_mandel_interference(tol):
+    r"""Tests Hong-Ou-Mandel interference for a mzgate.
+    If one writes :math:`U` for the Fock representation of a mzgate
+    then it must hold that :math:`\langle 1,1|U|1,1 \rangle = 0`.
+    """
+    cutoff = 2
+    phi = 2 * np.pi * np.random.rand()
+    T = mzgate(np.pi / 2, phi, cutoff)  # a mzgate with phase phi
     assert np.allclose(T[1, 1, 1, 1], 0.0, atol=tol, rtol=0)
 
 
@@ -264,6 +299,28 @@ def test_beamsplitter_values(tol):
     U = np.array([[ct, -np.conj(st)], [st, ct]])
     # Calculate the matrix \langle i | U | j \rangle = T[i+j]
     T = beamsplitter(theta, phi, 3)
+    U_rec = np.empty([nmodes, nmodes], dtype=complex)
+    for i, vec_i in enumerate(vec_list):
+        for j, vec_j in enumerate(vec_list):
+            U_rec[i, j] = T[tuple(vec_i + vec_j)]
+    assert np.allclose(U, U_rec, atol=tol, rtol=0)
+
+
+def test_mzgate_values(tol):
+    r"""Test that the representation of an interferometer in the single
+    excitation manifold is precisely the unitary matrix that represents it
+    mode in space. This test in particular checks that the MZ gate is
+    consistent with strawberryfields
+    """
+    nmodes = 2
+    vec_list = np.identity(nmodes, dtype=int).tolist()
+    theta = 2 * np.pi * np.random.rand()
+    phi = 2 * np.pi * np.random.rand()
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+    U = 0.5 * np.array([[u * (v - 1), 1j * (1 + v)], [1j * u * (1 + v), 1 - v]])
+    # Calculate the matrix \langle i | U | j \rangle = T[i+j]
+    T = mzgate(theta, phi, 3)
     U_rec = np.empty([nmodes, nmodes], dtype=complex)
     for i, vec_i in enumerate(vec_list):
         for j, vec_j in enumerate(vec_list):

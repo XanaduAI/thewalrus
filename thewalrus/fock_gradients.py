@@ -26,10 +26,12 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	squeezing
 	beamsplitter
 	two_mode_squeezing
+	mzgate
 	grad_displacement
 	grad_squeezing
 	grad_beamsplitter
 	grad_two_mode_squeezing
+	grad_mzgate
 
 """
 import numpy as np
@@ -394,5 +396,110 @@ def grad_beamsplitter(T, theta, phi):  # pragma: no cover
                         1j * sqrt[n] * sqrt[p] * ei * st * T[m, n - 1, p - 1, q]
                         + 1j * sqrt[m] * sqrt[q] * eic * st * T[m - 1, n, p, q - 1]
                     )
+
+    return grad_theta, grad_phi
+
+
+@jit(nopython=True)
+def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
+    r"""Calculates the Fock representation of the Mach-Zehnder interferometer.
+
+    Args:
+        theta (float): internal phase of the Mach-Zehnder interferometer
+        phi (float): external phase of the Mach-Zehnder interferometer
+        cutoff (int): Fock ladder cutoff
+        dtype (data type): Specifies the data type used for the calculation
+
+    Returns:
+        array[float]: The Fock representation of the gate
+    """
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+    R = 0.5 * np.array(
+        [
+            [0, 0, u * (v - 1), 1j * (1 + v)],
+            [0, 0, 1j * u * (1 + v), 1 - v],
+            [u * (v - 1), 1j * u * (1 + v), 0, 0],
+            [1j * (1 + v), 1 - v, 0, 0],
+        ]
+    )
+
+    Z = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    Z[0, 0, 0, 0] = 1.0
+
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff - m):
+            p = m + n
+            if 0 < p < cutoff:
+                Z[m, n, p, 0] = (
+                    R[0, 2] * sqrt[m] / sqrt[p] * Z[m - 1, n, p - 1, 0]
+                    + R[1, 2] * sqrt[n] / sqrt[p] * Z[m, n - 1, p - 1, 0]
+                )
+
+    # rank 4
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                q = m + n - p
+                if 0 < q < cutoff:
+                    Z[m, n, p, q] = (
+                        R[0, 3] * sqrt[m] / sqrt[q] * Z[m - 1, n, p, q - 1]
+                        + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
+                    )
+    return Z
+
+
+@jit(nopython=True)
+def grad_mzgate(T, theta, phi):  # pragma: no cover
+    r"""Calculates the gradients of the Mach-Zehnder interferometer with respect to the transmissivity angle and reflection phase
+
+    Args:
+        T (array[complex]): array representing the gate
+        theta (float): internal of the mzgate
+        phi (float): external phase of the mzgate
+
+    Returns:
+        tuple[array[complex], array[complex]]: The gradient of the mzgate gate with respect to theta and phi
+    """
+    cutoff = T.shape[0]
+    dtype = T.dtype
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    grad_theta = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+    grad_phi = np.zeros((cutoff, cutoff, cutoff, cutoff), dtype=dtype)
+
+    v = np.exp(1j * theta)
+    u = np.exp(1j * phi)
+
+    # rank 3
+    for m in range(cutoff):
+        for n in range(cutoff - m):
+            p = m + n
+            if 0 < p < cutoff:
+                grad_theta[m, n, p, 0] = (
+                    1j * 0.5 * u * v * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, 0]
+                    - 0.5 * u * v * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, 0]
+                )
+                grad_phi[m, n, p, 0] = (1j * 0.5 * u * v - 1j * 0.5 * u) * sqrt[m] * sqrt[p] * T[
+                    m - 1, n, p - 1, 0
+                ] - (0.5 * u + 0.5 * u * v) * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, 0]
+
+    for m in range(cutoff):
+        for n in range(cutoff):
+            for p in range(cutoff):
+                q = m + n - p
+                if 0 < q < cutoff:
+                    grad_theta[m, n, p, q] = (
+                        1j * 0.5 * u * v * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, q]
+                        - 0.5 * u * v * sqrt[n] * sqrt[p] * T[m, n - 1, p - 1, q]
+                        - 0.5 * v * sqrt[m] * sqrt[q] * T[m - 1, n, p, q - 1]
+                        - 1j * 0.5 * v * sqrt[n] * sqrt[q] * T[m, n - 1, p, q - 1]
+                    )
+                    grad_phi[m, n, p, q] = (1j * 0.5 * u * v - 1j * 0.5 * u) * sqrt[m] * sqrt[
+                        p
+                    ] * T[m - 1, n, p - 1, q] - (0.5 * u + 0.5 * u * v) * sqrt[n] * sqrt[p] * T[
+                        m, n - 1, p - 1, q
+                    ]
 
     return grad_theta, grad_phi
