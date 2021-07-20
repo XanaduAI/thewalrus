@@ -29,7 +29,9 @@ from .libwalrus import renorm_hermite_multidimensional_real as rhmr
 from ._hafnian import input_validation
 
 # pylint: disable=too-many-arguments
-def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, modified=False, rtol=1e-05, atol=1e-08):
+def hermite_multidimensional(
+    R, cutoff, y=None, renorm=False, make_tensor=True, modified=False, rtol=1e-05, atol=1e-08
+):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
     Here :math:`R` is an :math:`n \times n` square matrix, and
@@ -80,7 +82,6 @@ def hermite_multidimensional(R, cutoff, y=None, renorm=False, make_tensor=True, 
     m = y.shape[0]
     if m != n:
         raise ValueError("The matrix R and vector y have incompatible dimensions")
-
 
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
@@ -147,6 +148,8 @@ def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, ma
     return hermite_multidimensional(
         -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True
     )
+
+
 # Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
 
 
@@ -183,6 +186,7 @@ def remove(
 
 
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
+
 
 def hermite_multidimensional_numba(C, mu, Sigma, cutoff, dtype=np.complex128):
     # pylint: disable=too-many-arguments
@@ -268,7 +272,9 @@ def grad_hermite_multidimensional_numba(array, C, mu, Sigma, cutoff, dtype=np.co
 
 
 @jit(nopython=True)
-def fill_grad_hermite_multidimensional_numba_loop(dG_dmu, dG_dSigma, array, idx, mu, Sigma):  # pragma: no cover
+def fill_grad_hermite_multidimensional_numba_loop(
+    dG_dmu, dG_dSigma, array, idx, mu, Sigma
+):  # pragma: no cover
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the multidimensional Hermite polynomials for a given index.
 

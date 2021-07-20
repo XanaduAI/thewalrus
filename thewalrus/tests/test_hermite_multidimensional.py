@@ -19,12 +19,17 @@ import numpy as np
 
 from scipy.special import eval_hermitenorm, eval_hermite
 
-from thewalrus import hermite_multidimensional, hafnian_batched, hafnian_repeated, hermite_multidimensional_numba, grad_hermite_multidimensional_numba
+from thewalrus import (
+    hermite_multidimensional,
+    hafnian_batched,
+    hafnian_repeated,
+    hermite_multidimensional_numba,
+    grad_hermite_multidimensional_numba,
+)
 
 
 def test_hermite_multidimensional_renorm():
-    """ This tests the renormalized batchhafnian wrapper function to compute photon number statistics for a fixed gaussian state.
-	"""
+    """This tests the renormalized batchhafnian wrapper function to compute photon number statistics for a fixed gaussian state."""
     B = np.sqrt(0.5) * np.array([[0, 1], [1, 0]]) + 0 * 1j
     res = 10
     expected = np.diag(0.5 ** (np.arange(0, res) / 2))
@@ -133,39 +138,43 @@ def test_hermite_vs_hermite_modified():
         hermite_multidimensional(A, cutoff, y=mu),
     )
 
+
 def test_hermite_numba_vs_hermite_renorm_modified(tol):
     """Test the relation hermite_numba and hermite renorm modified"""
     cutoff = 10
-    R = np.random.rand(4, 4) + 1j*np.random.rand(4, 4)
+    R = np.random.rand(4, 4) + 1j * np.random.rand(4, 4)
     R += R.T
-    mu = np.random.rand(4)+1j*np.random.rand(4)
+    mu = np.random.rand(4) + 1j * np.random.rand(4)
     C = 0.5
-    hm = C * hermite_multidimensional(R, y = mu, cutoff = cutoff, renorm = True, modified = True)
-    hm_nb = hermite_multidimensional_numba(C = C, mu = mu, Sigma = R, cutoff = cutoff, dtype=np.complex128)
+    hm = C * hermite_multidimensional(R, y=mu, cutoff=cutoff, renorm=True, modified=True)
+    hm_nb = hermite_multidimensional_numba(C=C, mu=mu, Sigma=R, cutoff=cutoff, dtype=np.complex128)
     assert np.allclose(hm, hm_nb, atol=tol, rtol=0)
+
 
 def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences"""
     cutoff = 4
-    R = np.random.rand(cutoff, cutoff) + 1j*np.random.rand(cutoff, cutoff)
+    R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
     R += R.T
-    mu = np.random.rand(cutoff)+1j*np.random.rand(cutoff)
+    mu = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
     C = 0.5
-    gate = hermite_multidimensional_numba(C, mu, R, cutoff = cutoff, dtype=np.complex128)
-    grad_C, grad_mu, grad_Sigma = grad_hermite_multidimensional_numba(gate, C, mu, R, cutoff, dtype=np.complex128)
+    gate = hermite_multidimensional_numba(C, mu, R, cutoff=cutoff, dtype=np.complex128)
+    grad_C, grad_mu, grad_Sigma = grad_hermite_multidimensional_numba(
+        gate, C, mu, R, cutoff, dtype=np.complex128
+    )
     delta_plus = 0.00001 + 1j * 0.00001
     expected_grad_C = (
-    hermite_multidimensional_numba(C + delta_plus, mu, R, cutoff)
-     - hermite_multidimensional_numba(C - delta_plus, mu, R, cutoff)
+        hermite_multidimensional_numba(C + delta_plus, mu, R, cutoff)
+        - hermite_multidimensional_numba(C - delta_plus, mu, R, cutoff)
     ) / (2 * delta_plus)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
     expected_grad_mu = (
-    hermite_multidimensional_numba(C, mu + delta_plus, R, cutoff)
-     - hermite_multidimensional_numba(C, mu - delta_plus, R, cutoff)
+        hermite_multidimensional_numba(C, mu + delta_plus, R, cutoff)
+        - hermite_multidimensional_numba(C, mu - delta_plus, R, cutoff)
     ) / (2 * delta_plus)
     assert np.allclose(grad_mu, expected_grad_mu, atol=tol, rtol=0)
     expected_grad_Sigma = (
-    hermite_multidimensional_numba(C, mu, R + delta_plus, cutoff)
-     - hermite_multidimensional_numba(C, mu, R - delta_plus, cutoff)
+        hermite_multidimensional_numba(C, mu, R + delta_plus, cutoff)
+        - hermite_multidimensional_numba(C, mu, R - delta_plus, cutoff)
     ) / (2 * delta_plus)
     assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
