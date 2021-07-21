@@ -56,6 +56,7 @@ Fock states and tensors
     update_probabilities_with_noise
     find_classical_subsystem
     tvd_cutoff_bounds
+    n_body_marginals
 
 Adjacency matrices
 ^^^^^^^^^^^^^^^^^^
@@ -132,6 +133,7 @@ from .fock_tensors import (
     update_probabilities_with_noise,
     find_classical_subsystem,
     tvd_cutoff_bounds,
+    n_body_marginals,
 )
 
 from .adjacency_matrices import (
@@ -210,6 +212,7 @@ __all__ = [
     "mean_clicks",
     "variance_clicks",
     "pure_state_distribution",
+    "n_body_marginals",
 ]
 
 def deprecate(new_func):
