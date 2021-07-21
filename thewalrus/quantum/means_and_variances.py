@@ -382,10 +382,15 @@ def partition(collection):
             yield smaller[:n] + [[first] + subset] + smaller[n+1:]
         yield [[first]] + smaller
 
-def list_to_freq_dict(words):
+def _list_to_freq_dict(words):
     """
-    convert between a list which is what partition gives
-    and dictionary which is what photon_number_moment wants
+    convert between a list which of "words" and a dictionary
+    which shows how many times each word appears in word
+
+    Args:
+        words (list): 
+    Returns:
+        dict : how many times a word appears. key is word, value is multiplicity
     """
     return {i : words.count(i) for i in set(words)}
 
@@ -404,21 +409,12 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
 
     modes = list(modes) # turns modes from array to list if passed in as array
 
-    if len(modes) == 1:
-        j = modes[0]
-        return photon_number_mean(mu, cov, j, hbar=hbar)
-
-    if len(modes) == 2:
-        j = modes[0]
-        k = modes[1]
-        return photon_number_covar(mu, cov, j, k, hbar=hbar)
-
     kappa = 0 
     for pi in partition(modes):
         size = len(pi)
         term = factorial(size - 1) * (-1) ** (size - 1)
         for B in pi:
-            indices = list_to_freq_dict(B)
+            indices = _list_to_freq_dict(B)
             term *= photon_number_moment(mu, cov, indices, hbar=hbar)
         kappa += term 
     
