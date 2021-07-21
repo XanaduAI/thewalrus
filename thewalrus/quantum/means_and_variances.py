@@ -219,15 +219,27 @@ def s_ordered_expectation(mu, cov, rpt, hbar=2, s=0):
     Returns:
         (float): expectation value of the normal ordered product of operators
     """
+
+    # The following seven lines are written so that we remove from the calculation the
+    # modes k that we don't care about. These modes have rpt[k] = rpt[k+M] = 0
+    if np.allclose(rpt, 0):
+        return 1.0
+    M = len(cov) // 2
+    modes = np.where(np.array(rpt[0:M]) + np.array(rpt[M : 2 * M]) != 0)[0]
+    mu, cov = reduced_gaussian(mu, cov, list(modes))
+    ind = list(modes) + list(modes + M)
+    rpt = list(np.array(rpt)[np.array(ind)])
+
     alpha = complex_to_real_displacements(mu, hbar=hbar)
     n = len(cov)
-    V = (Qmat(cov, hbar=hbar) - 0.5*(s+1)*np.identity(n)) @ Xmat(n // 2)
+    V = (Qmat(cov, hbar=hbar) - 0.5 * (s + 1) * np.identity(n)) @ Xmat(n // 2)
     A = reduction(V, rpt)
     if np.allclose(mu, 0):
         return hafnian(A)
 
     np.fill_diagonal(A, reduction(np.conj(alpha), rpt))
     return hafnian(A, loop=True)
+
 
 
 
