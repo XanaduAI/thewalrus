@@ -78,17 +78,27 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     r""" Calculate the variance/covariance of the photon number distribution
     of a Gaussian state.
 
-    Args:
-        mu (array): vector of means of the Gaussian state using the ordering
-            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
-        cov (array): the covariance matrix of the Gaussian state
-        j (int): the j :sup:`th` mode
-        k (int): the k :sup:`th` mode
-        hbar (float): the ``hbar`` convention used in the commutation
-            relation :math:`[q, p]=i\hbar`
+    Implements the covariance matrix of the photon number distribution of a
+    Gaussian state according to the Last two eq. of Part II. in
+    `'Multidimensional Hermite polynomials and photon distribution for polymode
+    mixed light', Dodonov et al. <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_
 
-    Returns:
-        float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
+    .. math::
+        \sigma_{n_j n_j} &= \frac{1}{2}\left(T_j^2 - 2d_j - \frac{1}{2}\right)
+        + \left<\mathbf{Q}_j\right>\mathcal{M}_j\left<\mathbf{Q}_j\right>, \\
+        \sigma_{n_j n_k} &= \frac{1}{2}\mathrm{Tr}\left(\Lambda_j \mathbf{M} \Lambda_k \mathbf{M}\right)
+        + \left<\mathbf{Q}\right>\Lambda_j \mathbf{M} \Lambda_k\left<\mathbf{Q}\right>,
+
+    where :math:`T_j` and :math:`d_j` are the trace and the determinant of
+    :math:`2 \times 2` matrix :math:`\mathcal{M}_j` whose elements coincide
+    with the nonzero elements of matrix :math:`\mathbf{M}_j = \Lambda_j \mathbf{M} \Lambda_k`
+    while the two-vector :math:`\mathbf{Q}_j` has the components :math:`(q_j, p_j)`.
+    :math:`2N \times 2N` projector matrix :math:`\Lambda_j` has only two nonzero
+    elements: :math:`\left(\Lambda_j\right)_{jj} = \left(\Lambda_j\right)_{j+N,j+N} = 1`.
+    Note that the convention for ``mu`` used here differs from the one used in Dodonov et al.,
+    They both provide the same results in this particular case.
+    Also note that the original reference of Dodonov et al. has an incorrect prefactor of 1/2
+    in the last terms of the last equation above.
     """
 
     if j == k:
