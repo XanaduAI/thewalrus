@@ -16,13 +16,11 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from .libwalrus import torontonian_complex as tor_complex
-from .libwalrus import torontonian_real as tor_real
 from .quantum import Qmat, Xmat, Amat
 from . import reduction
 
 
-def tor(A, fsum=False):
+def tor(A):
     """Returns the Torontonian of a matrix.
 
     For more direct control, you may wish to call :func:`tor_real` or
@@ -52,10 +50,10 @@ def tor(A, fsum=False):
 
     if A.dtype == np.complex128:
         if np.any(np.iscomplex(A)):
-            return tor_complex(A, fsum=fsum)
-        return tor_real(np.float64(A.real), fsum=fsum)
+            return numba_tor(A)
+        return numba_tor(np.float64(A.real))
 
-    return tor_real(A, fsum=fsum)
+    return numba_tor(A)
 
 
 @numba.jit(nopython=True)

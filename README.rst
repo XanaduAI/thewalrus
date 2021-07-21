@@ -79,33 +79,21 @@ The Walrus depends on the following Python packages:
 In addition, to compile the C++ extension, the following dependencies are required:
 
 * A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
-* `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
 * `Cython <https://cython.org/>`_ an optimising static compiler for the Python programming language.
 
 On Debian-based systems, these can be installed via ``apt`` and ``curl``:
 
 .. code-block:: console
 
-    $ sudo apt install g++ libeigen3-dev
+    $ sudo apt install g++
     $ pip install Cython
 
 or using Homebrew on MacOS:
 
 .. code-block:: console
 
-    $ brew install gcc eigen
+    $ brew install gcc
     $ pip install Cython
-
-Alternatively, you can download the Eigen headers manually:
-
-.. code-block:: console
-
-    $ mkdir ~/.local/eigen3 && cd ~/.local/eigen3
-    $ wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz -O eigen3.tar.gz
-    $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
-    $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
-
-Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
 
 You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
 
@@ -120,20 +108,6 @@ OpenMP
 
 ``libwalrus`` uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux/MacOS using the GNU g++ compiler/Clang, due to insufficient support using Windows/MSCV.**
 
-
-
-Using LAPACK, OpenBLAS, or MKL
-------------------------------
-
-If you would like to take advantage of the highly optimized matrix routines of LAPACK, OpenBLAS, or MKL, you can optionally compile the ``libwalrus`` such that Eigen uses these frameworks as backends. As a result, all calls in the ``libwalrus`` library to Eigen functions are silently substituted with calls to LAPACK/OpenBLAS/MKL.
-
-For example, for LAPACK integration, make sure you have the ``lapacke`` C++ LAPACK bindings installed (``sudo apt install liblapacke-dev`` in Ubuntu-based Linux distributions), and then compile with the environment variable ``USE_LAPACK=1``:
-
-.. code-block:: console
-
-    $ USE_LAPACK=1 python -m pip install thewalrus --no-binary :all:
-
-Alternatively, you may pass ``USE_OPENBLAS=1`` to use the OpenBLAS library.
 
 
 Software tests
