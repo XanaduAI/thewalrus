@@ -94,7 +94,7 @@ def test_four_modes(hbar):
 
 
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
-def test_cumulants_three_mode_random_state(hbar):
+def test_cumulants_three_mode_random_state(hbar): # pylint: ignore=too-many-statements
     """Tests third order cumulants for a random state"""
     M = 3
     O = interferometer(random_interferometer(3))

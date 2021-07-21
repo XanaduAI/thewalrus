@@ -74,7 +74,6 @@ from thewalrus.quantum import (
     total_photon_number_distribution,
     characteristic_function,
     photon_number_moment,
-    photon_number_cumulant,
 )
 
 @pytest.mark.parametrize("n", [0, 1, 2])

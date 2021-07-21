@@ -18,6 +18,8 @@ Gaussian states.
 
 from itertools import product
 
+from scipy.special import factorial
+
 import numpy as np
 
 from .._hafnian import hafnian, reduction
@@ -28,8 +30,6 @@ from .conversions import (
     Xmat,
     complex_to_real_displacements
 )
-
-from scipy.special import factorial
 
 
 def photon_number_mean(mu, cov, j, hbar=2):
@@ -379,7 +379,7 @@ def _list_to_freq_dict(words):
     which shows how many times each word appears in word
 
     Args:
-        words (list): 
+        words (list): list of words
     Returns:
         dict : how many times a word appears. key is word, value is multiplicity
     """
@@ -407,6 +407,6 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
         for B in pi:
             indices = _list_to_freq_dict(B)
             term *= photon_number_moment(mu, cov, indices, hbar=hbar)
-        kappa += term 
-    
+        kappa += term
+
     return kappa
