@@ -106,7 +106,7 @@ You can compile the latest development version by cloning the git repository, an
 OpenMP
 ------
 
-``libwalrus`` uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux/MacOS using the GNU g++ compiler/Clang, due to insufficient support using Windows/MSCV.**
+``libwalrus`` uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux/MacOS using the GNU g++ compiler/Clang.**
 
 
 
