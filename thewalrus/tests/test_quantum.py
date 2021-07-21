@@ -356,7 +356,6 @@ def test_density_matrix_squeezed():
             [0.09196943, 0, -0.02635894, 0, 0.00925248],
         ]
     )
-too-many-statements
     assert np.allclose(res, expected)
 
 
