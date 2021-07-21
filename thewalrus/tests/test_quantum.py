@@ -1813,4 +1813,3 @@ def test_n_body_marginals_too_high_correlation():
         ValueError, match="The order of the correlations is higher than the number of modes"
     ):
         n_body_marginals(mu, cov, 4, 4)
-
