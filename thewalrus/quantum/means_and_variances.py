@@ -29,6 +29,8 @@ from .conversions import (
     complex_to_real_displacements
 )
 
+from scipy.special import factorial
+
 
 def photon_number_mean(mu, cov, j, hbar=2):
     r""" Calculate the mean photon number of mode j of a Gaussian state.
@@ -311,7 +313,7 @@ def _coeff_normal_ordered(m, k):
 
     return sum(
         [
-            (1 / (np.math.factorial(mu) * np.math.factorial(k - mu)))
+            (1 / (factorial(mu) * factorial(k - mu)))
             * ((-1) ** (k - mu) * (mu ** m))
             for mu in range(0, k + 1)
         ]
@@ -358,18 +360,50 @@ def photon_number_moment(mu, cov, indices, hbar=2):
         net_sum += prod_coeff * s_ordered_expectation(mu, cov, rpt, s=1, hbar=hbar)
     return net_sum
 
+def partition(collection):
+    """
+    generate all set partitions
+
+    taken from: https://stackoverflow.com/a/30134039
+
+    Args:
+        collection (sequence): set to find partitions of
+
+    Yields:
+        list[list]: set partition of collection
+    """
+    if len(collection) == 1:
+        yield [collection]
+        return
+
+    first = collection[0]
+    for smaller in partition(collection[1:]):
+        for n, subset in enumerate(smaller):
+            yield smaller[:n] + [[first] + subset] + smaller[n+1:]
+        yield [[first]] + smaller
+
+def list_to_freq_dict(words):
+    """
+    convert between a list which is what partition gives
+    and dictionary which is what photon_number_moment wants
+    """
+    return {i : words.count(i) for i in set(words)}
+
 def photon_number_cumulant(mu, cov, modes, hbar=2):
     r"""Calculates the cumulant of the modes in the Gaussian state.
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering.
         cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
-        modes (list): list of modes. Note that it can have repetitions.
+        modes (list or array): list of modes. Note that it can have repetitions.
         hbar (float): value of hbar in the uncertainty relation.
 
     Returns:
         (float): the cumulant
     """
+
+    modes = list(modes) # turns modes from array to list if passed in as array
+
     if len(modes) == 1:
         j = modes[0]
         return photon_number_mean(mu, cov, j, hbar=hbar)
@@ -379,10 +413,13 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
         k = modes[1]
         return photon_number_covar(mu, cov, j, k, hbar=hbar)
 
-    # Here one could write the formula for 3 specifically
-    # or write the general result.
-    # You might find useful this little one liner to convert
-    # between a list which is what partition gives
-    # and dictionary which is what photon_number_moment wants
-    list_to_freq_dict = lambda words: {i:words.count(i) for i in set(words)}
-    return 0
+    kappa = 0 
+    for pi in partition(modes):
+        size = len(pi)
+        term = factorial(size - 1) * (-1) ** (size - 1)
+        for B in pi:
+            indices = list_to_freq_dict(B)
+            term *= photon_number_moment(mu, cov, indices, hbar=hbar)
+        kappa += term 
+    
+    return kappa
