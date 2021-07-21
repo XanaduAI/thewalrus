@@ -17,9 +17,9 @@
 import numpy as np
 import pytest
 from scipy.linalg import block_diag
-from thewalrus.quantum import density_matrix, state_vector, probabilities, update_probabilities_with_loss
-from thewalrus.symplectic import expand, interferometer, two_mode_squeezing, loss
-
+from thewalrus.quantum import density_matrix, state_vector, probabilities, update_probabilities_with_loss, photon_number_cumulant
+from thewalrus.symplectic import expand, interferometer, two_mode_squeezing, loss, squeezing
+from thewalrus.random import random_interferometer
 
 @pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0/137])
 def test_cubic_phase(hbar):
@@ -91,3 +91,79 @@ def test_four_modes(hbar):
     probs = probabilities(means, cov, cutoff, hbar=hbar)
     probs_updated = update_probabilities_with_loss(etas, probs_lossless)
     assert np.allclose(probs, probs_updated[:cutoff, :cutoff, :cutoff, :cutoff], atol=1e-6)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
+def test_cumulants_three_mode_random_state(hbar):
+    """Tests third order cumulants for a random state"""
+    M = 3
+    O = interferometer(random_interferometer(3))
+    mu = np.random.rand(2 * M) - 0.5
+    hbar = 2
+    cov = 0.5 * hbar * O @ squeezing(np.random.rand(M)) @ O.T
+    cutoff = 50
+    probs = probabilities(mu, cov, cutoff, hbar=hbar)
+    n = np.arange(cutoff)
+    probs0 = np.sum(probs, axis=(1, 2))
+    probs1 = np.sum(probs, axis=(0, 2))
+    probs2 = np.sum(probs, axis=(0, 1))
+
+    # Check one body cumulants
+    n0_1 = n @ probs0
+    n1_1 = n @ probs1
+    n2_1 = n @ probs2
+    assert np.allclose(photon_number_cumulant(mu, cov, [0], hbar=hbar), n0_1)
+    assert np.allclose(photon_number_cumulant(mu, cov, [1], hbar=hbar), n1_1)
+    assert np.allclose(photon_number_cumulant(mu, cov, [2], hbar=hbar), n2_1)
+
+    n0_2 = n ** 2 @ probs0
+    n1_2 = n ** 2 @ probs1
+    n2_2 = n ** 2 @ probs2
+    var0 = n0_2 - n0_1 ** 2
+    var1 = n1_2 - n1_1 ** 2
+    var2 = n2_2 - n2_1 ** 2
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 0], hbar=hbar), var0)
+    assert np.allclose(photon_number_cumulant(mu, cov, [1, 1], hbar=hbar), var1)
+    assert np.allclose(photon_number_cumulant(mu, cov, [2, 2], hbar=hbar), var2)
+
+    n0_3 = n ** 3 @ probs0 - 3 * n0_2 * n0_1 + 2 * n0_1 ** 3
+    n1_3 = n ** 3 @ probs1 - 3 * n1_2 * n1_1 + 2 * n1_1 ** 3
+    n2_3 = n ** 3 @ probs2 - 3 * n2_2 * n2_1 + 2 * n2_1 ** 3
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 0, 0], hbar=hbar), n0_3)
+    assert np.allclose(photon_number_cumulant(mu, cov, [1, 1, 1], hbar=hbar), n1_3)
+    assert np.allclose(photon_number_cumulant(mu, cov, [2, 2, 2], hbar=hbar), n2_3)
+
+    # Check two body cumulants
+    probs01 = np.sum(probs, axis=(2))
+    probs02 = np.sum(probs, axis=(1))
+    probs12 = np.sum(probs, axis=(0))
+
+    n0n1 = n @ probs01 @ n
+    n0n2 = n @ probs02 @ n
+    n1n2 = n @ probs12 @ n
+    covar01 = n0n1 - n0_1 * n1_1
+    covar02 = n0n2 - n0_1 * n2_1
+    covar12 = n1n2 - n1_1 * n2_1
+
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 1], hbar=hbar), covar01)
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 2], hbar=hbar), covar02)
+    assert np.allclose(photon_number_cumulant(mu, cov, [1, 2], hbar=hbar), covar12)
+
+    kappa001 = n ** 2 @ probs01 @ n - 2 * n0n1 * n0_1 - n0_2 * n1_1 + 2 * n0_1 ** 2 * n1_1
+    kappa011 = n @ probs01 @ n ** 2 - 2 * n0n1 * n1_1 - n1_2 * n0_1 + 2 * n1_1 ** 2 * n0_1
+    kappa002 = n ** 2 @ probs02 @ n - 2 * n0n2 * n0_1 - n0_2 * n2_1 + 2 * n0_1 ** 2 * n2_1
+    kappa022 = n @ probs02 @ n ** 2 - 2 * n0n2 * n2_1 - n2_2 * n0_1 + 2 * n2_1 ** 2 * n0_1
+    kappa112 = n ** 2 @ probs12 @ n - 2 * n1n2 * n1_1 - n1_2 * n2_1 + 2 * n1_1 ** 2 * n2_1
+    kappa122 = n @ probs12 @ n ** 2 - 2 * n1n2 * n2_1 - n2_2 * n1_1 + 2 * n2_1 ** 2 * n1_1
+
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 0, 1], hbar=hbar), kappa001)
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 1, 1], hbar=hbar), kappa011)
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 0, 2], hbar=hbar), kappa002)
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 2, 2], hbar=hbar), kappa022)
+    assert np.allclose(photon_number_cumulant(mu, cov, [1, 1, 2], hbar=hbar), kappa112)
+    assert np.allclose(photon_number_cumulant(mu, cov, [1, 2, 2], hbar=hbar), kappa122)
+
+    # Finally, the three body cumulant
+    n0n1n2 = np.einsum("ijk, i, j, k", probs, n, n, n)
+    kappa012 = n0n1n2 - n0n1 * n2_1 - n0n2 * n1_1 - n1n2 * n0_1 + 2 * n0_1 * n1_1 * n2_1
+    assert np.allclose(photon_number_cumulant(mu, cov, [0, 1, 2], hbar=hbar), kappa012)

@@ -1112,7 +1112,7 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
     Phillips et al. (https://ris.utwente.nl/ws/files/122721825/PhysRevA.99.023836.pdf).
     """
     S = squeezing(r, phi)
-    mu = [np.sqrt(2 * hbar) * np.real(alpha), np.sqrt(2 * hbar) * np.imag(alpha)]
+    mu = np.array([np.sqrt(2 * hbar) * np.real(alpha), np.sqrt(2 * hbar) * np.imag(alpha)])
 
     cov = hbar / 2 * (S @ S.T)
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
@@ -1128,6 +1128,28 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
     mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
     assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
     assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic, atol=tol, rtol=0)
+
+@pytest.mark.parametrize("hbar", [0.1, 1, 2])
+def test_photon_number_covmat_random_state(hbar):
+    """Tests the photon number covariances of 2-mode random state"""
+    O = interferometer(random_interferometer(2))
+    mu = np.random.rand(4) - 0.5
+    cov = 0.5 * hbar * O @ squeezing([0.7, 1.3]) @ O.T
+    cutoff = 50
+    probs = probabilities(mu, cov, cutoff, hbar=hbar)
+    n = np.arange(cutoff)
+    n0n1 = n @ probs @ n
+    n1 = np.sum(probs, axis=0) @ n
+    n0 = np.sum(probs, axis=1) @ n
+    covar = n0n1 - n0 * n1
+    n12 = np.sum(probs, axis=0) @ (n ** 2)
+    n02 = np.sum(probs, axis=1) @ (n ** 2)
+    varn0 = n02 - n0 ** 2
+    varn1 = n12 - n1 ** 2
+    expected = np.array([[varn0, covar], [covar, varn1]])
+    Ncov = photon_number_covmat(mu, cov, hbar=hbar)
+    assert np.allclose(expected, Ncov)
+
 
 
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])

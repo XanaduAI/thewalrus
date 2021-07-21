@@ -78,26 +78,6 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     r""" Calculate the variance/covariance of the photon number distribution
     of a Gaussian state.
 
-    Implements the covariance matrix of the photon number distribution of a
-    Gaussian state according to the Last two eq. of Part II. in
-    `'Multidimensional Hermite polynomials and photon distribution for polymode
-    mixed light', Dodonov et al. <https://journals.aps.org/pra/abstract/10.1103/PhysRevA.50.813>`_
-
-    .. math::
-        \sigma_{n_j n_j} &= \frac{1}{2}\left(T_j^2 - 2d_j - \frac{1}{2}\right)
-        + \left<\mathbf{Q}_j\right>\mathcal{M}_j\left<\mathbf{Q}_j\right>, \\
-        \sigma_{n_j n_k} &= \frac{1}{2}\mathrm{Tr}\left(\Lambda_j \mathbf{M} \Lambda_k \mathbf{M}\right)
-        + \frac{1}{2}\left<\mathbf{Q}\right>\Lambda_j \mathbf{M} \Lambda_k\left<\mathbf{Q}\right>,
-
-    where :math:`T_j` and :math:`d_j` are the trace and the determinant of
-    :math:`2 \times 2` matrix :math:`\mathcal{M}_j` whose elements coincide
-    with the nonzero elements of matrix :math:`\mathbf{M}_j = \Lambda_j \mathbf{M} \Lambda_k`
-    while the two-vector :math:`\mathbf{Q}_j` has the components :math:`(q_j, p_j)`.
-    :math:`2N \times 2N` projector matrix :math:`\Lambda_j` has only two nonzero
-    elements: :math:`\left(\Lambda_j\right)_{jj} = \left(\Lambda_j\right)_{j+N,j+N} = 1`.
-    Note that the convention for ``mu`` used here differs from the one used in Dodonov et al.,
-    They both provide the same results in this particular case.
-
     Args:
         mu (array): vector of means of the Gaussian state using the ordering
             :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
@@ -112,20 +92,28 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     """
     if j == k:
         mu, cov = reduced_gaussian(mu, cov, [j])
-        term_1 = 0.5 * np.trace(cov) ** 2 - np.linalg.det(cov)
-        term_2 = mu @ cov @ mu
-        return ((term_1 + term_2) / hbar ** 2) - 0.25
+        return float(photon_number_cumulant(mu, cov, [0, 0], hbar=hbar))
 
     mu, cov = reduced_gaussian(mu, cov, [j, k])
-    term_1 = cov[0, 1] ** 2 + cov[0, 3] ** 2 + cov[2, 1] ** 2 + cov[2, 3] ** 2
-    term_2 = (
-        cov[0, 1] * mu[0] * mu[1]
-        + cov[2, 1] * mu[1] * mu[2]
-        + cov[0, 3] * mu[0] * mu[3]
-        + cov[2, 3] * mu[2] * mu[3]
-    )
+    return float(photon_number_cumulant(mu, cov, [0, 1], hbar=hbar))
 
-    return (term_1 + term_2) / (2 * hbar ** 2)
+
+    #if j == k:
+    #    mu, cov = reduced_gaussian(mu, cov, [j])
+    #    term_1 = 0.5 * np.trace(cov) ** 2 - np.linalg.det(cov)
+    #    term_2 = mu @ cov @ mu
+    #    return ((term_1 + term_2) / hbar ** 2) - 0.25
+
+    #mu, cov = reduced_gaussian(mu, cov, [j, k])
+    #term_1 = cov[0, 1] ** 2 + cov[0, 3] ** 2 + cov[2, 1] ** 2 + cov[2, 3] ** 2
+    #term_2 = (
+    #    cov[0, 1] * mu[0] * mu[1]
+    #    + cov[2, 1] * mu[1] * mu[2]
+    #    + cov[0, 3] * mu[0] * mu[3]
+    #    + cov[2, 3] * mu[2] * mu[3]
+    #)
+
+    #return (term_1 + term_2) / (2 * hbar ** 2)
 
 
 
@@ -358,13 +346,12 @@ def photon_number_moment(mu, cov, indices, hbar=2):
         rpt = rpt + rpt
         prod_coeff = np.prod([expansion_coeff[i][coeff] for i, coeff in enumerate(item)])
         net_sum += prod_coeff * s_ordered_expectation(mu, cov, rpt, s=1, hbar=hbar)
-    return net_sum
+    return np.real_if_close(net_sum)
 
 def partition(collection):
-    """
-    generate all set partitions
+    """Generate all set partitions of a collection.
 
-    taken from: https://stackoverflow.com/a/30134039
+    Taken from: https://stackoverflow.com/a/30134039
 
     Args:
         collection (sequence): set to find partitions of
@@ -383,8 +370,7 @@ def partition(collection):
         yield [[first]] + smaller
 
 def _list_to_freq_dict(words):
-    """
-    convert between a list which of "words" and a dictionary
+    """Convert between a list which of "words" and a dictionary
     which shows how many times each word appears in word
 
     Args:
