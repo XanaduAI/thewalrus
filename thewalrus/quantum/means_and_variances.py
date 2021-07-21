@@ -99,6 +99,18 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     They both provide the same results in this particular case.
     Also note that the original reference of Dodonov et al. has an incorrect prefactor of 1/2
     in the last terms of the last equation above.
+
+    Args:
+        mu (array): vector of means of the Gaussian state using the ordering
+            :math:`[q_1, q_2, \dots, q_n, p_1, p_2, \dots, p_n]`
+        cov (array): the covariance matrix of the Gaussian state
+        j (int): the j :sup:`th` mode
+        k (int): the k :sup:`th` mode
+        hbar (float): the ``hbar`` convention used in the commutation
+            relation :math:`[q, p]=i\hbar`
+
+    Returns:
+        float: the covariance for the photon numbers at modes :math:`j` and  :math:`k`.
     """
 
     if j == k:
