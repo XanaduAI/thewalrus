@@ -74,6 +74,7 @@ from thewalrus.quantum import (
     total_photon_number_distribution,
     characteristic_function,
     photon_number_moment,
+    n_body_marginals,
 )
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -355,7 +356,7 @@ def test_density_matrix_squeezed():
             [0.09196943, 0, -0.02635894, 0, 0.00925248],
         ]
     )
-
+too-many-statements
     assert np.allclose(res, expected)
 
 
@@ -1656,6 +1657,7 @@ def test_characteristic_function_no_loss(s, k):
     expected = ((1 - p) / (1 - 2 * p)) ** (k / 2)
     assert np.allclose(val, expected)
 
+
 @pytest.mark.parametrize("s", np.linspace(-1, 1, 6))
 @pytest.mark.parametrize("cov", [squeezing(2 * np.arcsinh(1), 0.0), 1.8 * np.identity(2)])
 @pytest.mark.parametrize("mu", [np.zeros(2), np.array([0.9, 0.8])])
@@ -1726,3 +1728,89 @@ def test_photon_number_moment_two_mode_squeezed(r, theta, hbar):
     # Check expected value of the product of the photon numbers
     ind = {0: 1, 1: 1}
     assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
+
+
+@pytest.mark.parametrize("r", [0.5, 0.7, 2])
+@pytest.mark.parametrize("phi", [0.5, 0.7, 2])
+def test_two_mode_squeezed_vacuum_marginals(r, phi):
+    """Check correct answer for two-mode squeezed vacuum"""
+    cov_tmsv = two_mode_squeezing(2 * r, phi)
+    means = np.zeros(len(cov_tmsv))
+    cutoff = 20
+    nbar = np.sinh(r) ** 2
+    ratio = nbar / (1 + nbar)
+    expected = (ratio ** np.arange(20)) * 1 / (1 + nbar)
+    result = n_body_marginals(means, cov_tmsv, cutoff, 2)
+    assert np.allclose(result[0][0], expected)
+    assert np.allclose(result[0][1], expected)
+    assert np.allclose(result[1][0, 1], np.diag(expected))
+    assert np.allclose(result[1][1, 0], np.diag(expected))
+    assert np.allclose(result[1][0, 0], 0)
+    assert np.allclose(result[1][1, 1], 0)
+
+
+def test_marginal_probs_are_normalized():
+    """Check that for an arbitrary states all the marginal are proper probabilities"""
+    cutoff = 10
+    r = 1.58
+    eta = 0.3
+    M = 5
+    N = 3
+    U = random_interferometer(M)
+    sq = np.array([r] * N + [0] * (M - N))
+    cov_in = eta * np.concatenate([np.exp(2 * sq), np.exp(-2 * sq)]) + (1 - eta)
+    O = interferometer(U)
+    cov = O @ np.diag(cov_in) @ O.T
+    means = np.zeros(len(cov))
+
+    result = n_body_marginals(means, cov, cutoff, 3)
+    for tensor in result:
+        assert np.alltrue(np.round(tensor, 14) >= 0.0)
+        assert np.alltrue(tensor <= 1.0)
+
+
+def test_correct_indexing_n_body_marginals():
+    """Check the indexing is correct by checking correct composition rules for a product state"""
+    r1 = np.arcsinh(1)
+    r2 = np.arcsinh(np.sqrt(2))
+    cov3 = squeezing([2 * r1, 0, 2 * r2])
+    marg = n_body_marginals(np.zeros(len(cov3)), cov3, 4, 3)
+    assert np.allclose(marg[1][2, 0][0, 2], marg[0][2][0] * marg[0][0][2])
+    assert np.allclose(marg[2][0, 1, 2][:, 0, :], marg[2][1, 0, 2][0, :, :])
+    assert np.allclose(marg[2][0, 1, 2][:, 0, :], marg[2][2, 0, 1][0, :, :].T)
+    assert np.allclose(marg[2][0, 1, 2][:, 1, :], 0)
+
+
+def test_n_body_marginals_mismatch_shape():
+    """Check the correct error is raised when shapes of means of cov do not match"""
+    r1 = np.arcsinh(1)
+    r2 = np.arcsinh(np.sqrt(2))
+    cov = squeezing([2 * r1, 0, 2 * r2])
+    mu = np.zeros([4])
+    with pytest.raises(
+        ValueError, match="The covariance matrix and vector of means have incompatible dimensions"
+    ):
+        n_body_marginals(mu, cov, 4, 3)
+
+
+def test_n_body_marginals_not_even_shape():
+    """Check the correct error is raised when shapes of means of cov are of odd size"""
+    r1 = np.arcsinh(1)
+    r2 = np.arcsinh(np.sqrt(2))
+    cov = squeezing([2 * r1, 0, 2 * r2])
+    mu = np.zeros([5])
+    with pytest.raises(ValueError, match="The vector of means is not of even dimensions"):
+        n_body_marginals(mu, cov[:5, :5], 4, 3)
+
+
+def test_n_body_marginals_too_high_correlation():
+    """Check the correct error is raised when the order of the correlation is larger than the number of modes"""
+    r1 = np.arcsinh(1)
+    r2 = np.arcsinh(np.sqrt(2))
+    cov = squeezing([2 * r1, 0, 2 * r2])
+    mu = np.zeros([6])
+    with pytest.raises(
+        ValueError, match="The order of the correlations is higher than the number of modes"
+    ):
+        n_body_marginals(mu, cov, 4, 4)
+

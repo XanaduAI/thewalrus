@@ -19,6 +19,8 @@ classical subsystems of Gaussian states.
 
 from itertools import count, product, chain
 
+from collections import OrderedDict
+
 import numpy as np
 import dask
 
@@ -43,6 +45,7 @@ from .gaussian_checks import (
     is_pure_cov,
     is_valid_cov
 )
+
 
 
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
@@ -632,3 +635,62 @@ def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-
         ps = np.real_if_close(np.diag(density_matrix(mu_red, cov_red, cutoff=cutoff, hbar=hbar)))
         bounds += 1 - np.cumsum(ps)
     return bounds
+
+def n_body_marginals(mean, cov, cutoff, n, hbar=2):
+    r"""Calculates the first n-body marginals of a Gaussian state.
+
+
+    For an M-mode Gaussian state there exists a photon number distribution with probability mass function
+    :math:`p[i_0,i_1,\ldots, i_{M-1}]`. The function ``n_body_marginals`` calculates the first n-body marginals
+    of the (all-mode) probability distribution :math:`p`. The :math:`n=1` marginals or single body marginals
+    are simply the probability that mode :math:`k` has :math:`i` photons, i.e. :math:`p_k[i]`.
+    For :math:`n=2` one obtains the two-body probabilities. For two modes :math:`k` and :math:`l` this is a
+    two dimensional probability distribution :math:`p_{k,l}[i,j]`.
+    Note that these marginals have interesting permutation properties, for example :math:`p_{k,l}[i,j] = p_{l,k}[j,i]`.
+
+    The function provided here takes advantage of these symmetries to minimize the amount of calculations.
+    The return of this function is a list of tensors where the first entry contains the one-body marginals of the :math:`M` modes
+    (giving a tensor of shape ``(M, cutoff)``), the second entry contains the two-body marginals (giving a tensor of shape ``(M,M,cutoff, cutoff)``)
+    and so on and so forth.
+
+    To be clever about not calculating things that can be obtained by permutations it checks whether the index vector representing the modes is sorted.
+    From the way ``itertools.product`` works we know that it will always produce a sorted index vector before generating any of its unordered permutations.
+    Thus whenever the index vector is ordered we perform the numerical calculation.
+
+    If it is an unsorted index vector it realizes, in the ``if`` statement, that it can be obtained by permuting the
+    marginal distribution of something that has already been calculated.
+
+    Args:
+        mean (array): length-:math:`2N` quadrature displacement vector
+        cov (array): length-:math:`2N` covariance matrix
+        cutoff (int): cutoff in Fock space
+        n (int): order of the correlations
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+
+    Returns:
+        list[array]: List with arrays containing the :math:`1,..,n` body marginal
+            distributions of the modes
+    """
+    M = len(mean)
+    if (M, M) != cov.shape:
+        raise ValueError("The covariance matrix and vector of means have incompatible dimensions")
+    if M % 2 != 0:
+        raise ValueError("The vector of means is not of even dimensions")
+    M = M // 2
+    if M < n:
+        raise ValueError("The order of the correlations is higher than the number of modes")
+
+    marginal = [np.zeros(([M] * i) + ([cutoff] * i)) for i in range(1, n + 1)]
+
+    for ind in product(range(M), repeat=n):
+        modes = list(set(ind))
+        acc = len(modes) - 1
+        if list(ind) == sorted(ind):
+            sub_mean, sub_cov = reduced_state(mean, cov, modes)  # this happens in phase space
+            marginal[acc][tuple(modes)] = probabilities(sub_mean, sub_cov, cutoff, hbar=hbar)
+        else:
+            modes_usrt = list(OrderedDict.fromkeys(ind))
+            perm = np.argsort(modes_usrt)
+            marginal[acc][tuple(modes_usrt)] = marginal[acc][tuple(modes)].transpose(perm)
+    return marginal
