@@ -319,8 +319,8 @@ def _coeff_normal_ordered(m, k):
 
 
 def photon_number_moment(mu, cov, indices, hbar=2):
-    r"""Calculates the expectation value of product of powers in photon number of a Gaussian state.
-    The powers are specified by a dictionary witk modes as keys as powers as values.
+    r"""Calculates the expectation value of product of powers of photon number operators of a Gaussian state.
+    The powers are specified by a dictionary with modes as keys and powers as values.
 
     The calculation is performed by first writing any power of the photon number as
 
