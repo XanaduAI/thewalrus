@@ -400,7 +400,7 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
 
     modes = list(modes) # turns modes from array to list if passed in as array
 
-    kappa = 0 
+    kappa = 0
     for pi in partition(modes):
         size = len(pi)
         term = factorial(size - 1) * (-1) ** (size - 1)
