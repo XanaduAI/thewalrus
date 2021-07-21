@@ -308,15 +308,14 @@ def _coeff_normal_ordered(m, k):
     Returns:
         (float): expansion coefficient
     """
-    if k <= m:
-        return sum(
-            [
-                (1 / (np.math.factorial(mu) * np.math.factorial(k - mu)))
-                * ((-1) ** (k - mu) * (mu ** m))
-                for mu in range(0, k + 1)
-            ]
-        )
-    return 0
+
+    return sum(
+        [
+            (1 / (np.math.factorial(mu) * np.math.factorial(k - mu)))
+            * ((-1) ** (k - mu) * (mu ** m))
+            for mu in range(0, k + 1)
+        ]
+    )
 
 
 def photon_number_moment(mu, cov, indices, hbar=2):
@@ -378,7 +377,7 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
     if len(modes) == 2:
         j = modes[0]
         k = modes[1]
-        return photon_number_mean(mu, cov, j, k, hbar=hbar)
+        return photon_number_covar(mu, cov, j, k, hbar=hbar)
 
     # Here one could write the formula for 3 specifically
     # or write the general result.
