@@ -641,7 +641,7 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
 
 
     For an M-mode Gaussian state there exists a photon number distribution with probability mass function
-    :math:`p[i_0,i_1,\ldots, i_{M-1}]`. The function `n_body_marginals` calculates the first n-body marginals
+    :math:`p[i_0,i_1,\ldots, i_{M-1}]`. The function ``n_body_marginals`` calculates the first n-body marginals
     of the (all-mode) probability distribution :math:`p`. The :math:`n=1` marginals or single body marginals
     are simply the probability that mode :math:`k` has :math:`i` photons, i.e. :math:`p_k[i]`.
     For :math:`n=2` one obtains the two-body probabilities. For two modes :math:`k` and :math:`l` this is a
@@ -650,14 +650,14 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
 
     The function provided here takes advantage of these symmetries to minimize the amount of calculations.
     The return of this function is a list of tensors where the first entry contains the one-body marginals of the :math:`M` modes
-    (giving a tensor of shape `(M, cutoff)`), the second entry contains the two-body marginals (giving a tensor of shape `(M,M,cutoff, cutoff)`)
+    (giving a tensor of shape ``(M, cutoff)``), the second entry contains the two-body marginals (giving a tensor of shape ``(M,M,cutoff, cutoff)``)
     and so on and so forth.
 
     To be clever about not calculating things that can be obtained by permutations it checks whether the index vector representing the modes is sorted.
     From the way `itertools.product` works we know that it will always produce a sorted index vector before generating any of its unordered permutations.
     Thus whenever the index vector is ordered we perform the numerical calculation.
 
-    If it is an unsorted index vector it realizes, in the `if` statement, that it can be obtained by permuting the
+    If it is an unsorted index vector it realizes, in the ``if`` statement, that it can be obtained by permuting the
     marginal distribution of something that has already been calculated.
 
     Args:
