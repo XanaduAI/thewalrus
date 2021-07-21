@@ -654,7 +654,7 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
     and so on and so forth.
 
     To be clever about not calculating things that can be obtained by permutations it checks whether the index vector representing the modes is sorted.
-    From the way `itertools.product` works we know that it will always produce a sorted index vector before generating any of its unordered permutations.
+    From the way ``itertools.product`` works we know that it will always produce a sorted index vector before generating any of its unordered permutations.
     Thus whenever the index vector is ordered we perform the numerical calculation.
 
     If it is an unsorted index vector it realizes, in the ``if`` statement, that it can be obtained by permuting the
