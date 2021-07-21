@@ -657,7 +657,7 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
     From the way `itertools.product` works we know that it will always produce a sorted index vector before generating any of its unordered permutations.
     Thus whenever the index vector is ordered we perform the numerical calculation.
 
-    If it is a unsorted index vector it realizes, in the `if` statement, that it can be obtained by permuting the
+    If it is an unsorted index vector it realizes, in the `if` statement, that it can be obtained by permuting the
     marginal distribution of something that has already been calculated.
 
     Args:
