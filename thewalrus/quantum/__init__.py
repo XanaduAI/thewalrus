@@ -219,6 +219,12 @@ __all__ = [
     "variance_clicks",
     "pure_state_distribution",
     "n_body_marginals",
+    "tvd_cutoff_bounds",
+    "photon_number_moment",
+    "s_ordered_expectation"
+    "photon_number_cumulant",
+    "total_photon_number_distribution",
+    "characteristic_function",
 ]
 
 def deprecate(new_func):
