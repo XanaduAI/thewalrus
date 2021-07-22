@@ -45,16 +45,9 @@ This can be compiled using the gcc ``g++`` compiler as follows,
 
 .. code-block:: console
 
-    $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -I/path/to/Eigen -fopenmp
+    $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -fopenmp
 
-where ``/path/to/libwalrus.hpp`` is the path to the directory containing ``libwalrus.hpp``, ``/path/to/Eigen`` is the path to the Eigen C++ linear algebra header library, and the ``-fopenmp`` flag instructs the compiler to parallelize the compiled program using OpenMP.
-
-Additionally, you may instruct Eigen to simply act as a 'frontend' to an installed LAPACKE library. To do so, you must pass additional flags:
-
-.. code-block:: console
-
-    $ g++ example.cpp -o example -std=c++11 -O3 -Wall -I/path/to/libwalrus.hpp -I/path/to/Eigen \
-    -fopenmp -DLAPACKE -llapacke -lblas
+where ``/path/to/libwalrus.hpp`` is the path to the directory containing ``libwalrus.hpp`` and the ``-fopenmp`` flag instructs the compiler to parallelize the compiled program using OpenMP.
 
 Below, the main interface (available as templated functions) as well as all auxiliary functions are summarized and listed.
 
@@ -64,7 +57,7 @@ Below, the main interface (available as templated functions) as well as all auxi
 
     .. code-block:: console
 
-        $ brew install eigen libomp
+        $ brew install libomp
         $ clang example.cpp -o example -O3 -Wall -fPIC -shared -Xpreprocessor -fopenmp -lomp \
         -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/
 
@@ -82,9 +75,6 @@ The following functions are intended as the main interface to the C++ ``libwalru
 :cpp:func:`libwalrus::hafnian`                                 Returns the hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
 :cpp:func:`libwalrus::loop_hafnian`                            Returns the loop hafnian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
 :cpp:func:`libwalrus::hafnian_rpt`                             Returns the hafnian of a matrix with repeated rows and columns using the algorithm described in *From moments of sum to moments of product*, `doi:10.1016/j.jmva.2007.01.013 <https://dx.doi.org/10.1016/j.jmva.2007.01.013>`__.
-:cpp:func:`libwalrus::hafnian_approx`                          Returns the approximate hafnian of a matrix with non-negative entries by sampling over determinants. The higher the number of samples, the better the accuracy.
-:cpp:func:`libwalrus::torontonian`                             Returns the Torontonian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__.
-:cpp:func:`libwalrus::torontonian_fsum`                        Returns the torontonian of a matrix using the algorithm described in *A faster hafnian formula for complex matrices and its benchmarking on the Titan supercomputer*, `arxiv:1805.12498 <https://arxiv.org/abs/1805.12498>`__, with increased accuracy via the ``fsum`` summation algorithm.
 :cpp:func:`libwalrus::permanent`                               Returns the permanent of a matrix using Ryser's algorithm with Gray code ordering.
 :cpp:func:`libwalrus::perm_fsum`                               Returns the permanent of a matrix using Ryser's algorithm with Gray code ordering, with increased accuracy via the ``fsum`` summation algorithm.
 :cpp:func:`libwalrus::hermite_multidimensional_cpp`            Returns photon number statistics of a Gaussian state for a given covariance matrix as described in *Multidimensional Hermite polynomials and photon distribution for polymode mixed light* `arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`__.
