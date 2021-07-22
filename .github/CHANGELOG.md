@@ -6,7 +6,7 @@
 
 * ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* Adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
 * ``torontonian_sample_state`` now can sample displaced Gaussian states [#248](https://github.com/XanaduAI/thewalrus/pull/248)
 
@@ -16,11 +16,20 @@
 
 * Adds the functions `mzgate` and `grad_mzgate` to calculate the Fock representation of the Mach-Zehnder gate and its gradients [#257](https://github.com/XanaduAI/thewalrus/pull/257)
 
+* Adds the ability to calculate n-body photon number distributions using the function `n_body_marginals` [#253](https://github.com/XanaduAI/thewalrus/pull/253)
+
+* Adds the ability to calculate cumulants and arbitrary expectation values of products of powers of photon numbers with the functions `photon_number_cumulant` and `photon_number_moment` respectively  
+[#264](https://github.com/XanaduAI/thewalrus/pull/264)
+
 ### Improvements
 
 * Speeds up the calculation of photon number variances/covariances [#244](https://github.com/XanaduAI/thewalrus/pull/244)
 
 ### Bug fixes
+
+* Corrects bug in the function `photon_number_covar` that gave incorrect results when the covariance between two modes with finite displacements was calculated. 
+[#264](https://github.com/XanaduAI/thewalrus/pull/264)
+
 
 ### Breaking changes
 
