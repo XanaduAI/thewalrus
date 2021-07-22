@@ -316,7 +316,7 @@ def variance_clicks(cov, hbar=2):
 
 def _coeff_normal_ordered(m, k):
     r"""Returns the coefficients giving the expansion of a photon number power in terms of normal ordered power of creation
-    and annihilation operators.
+    and annihilation operators. The coefficient is given by :math:`\sum_{\mu=0}^k \frac{(-1)^{k-\mu} \mu^m}{\mu!(k-\mu)!}`.
 
     Args:
         m (int): power of the photon number operator, :math:`(a^\dagger a)^m `.
