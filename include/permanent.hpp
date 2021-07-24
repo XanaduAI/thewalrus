@@ -376,16 +376,7 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
 {
     int n = std::sqrt(static_cast<double>(mat.size()));
     llint x = static_cast<llint>(pow(2,n - 1));
-    
-    T localsum, coeff;
-    T total = static_cast<T>(0);
     std::vector<T> col_sum(n, static_cast<T>(0));
-    llint og=0, ng, gd;
-    int sgn=1, gdi;
-   
-    constexpr T p1 = static_cast<T>(1.0);
-    constexpr T p2 = static_cast<T>(2.0);
-    constexpr T n2 = static_cast<T>(-2.0);
 
     // init col_sum 
     for (int i=0; i < n; ++i) {
@@ -394,16 +385,25 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
         }
     }
 
-    // over all permutations of delta
+    constexpr T p1 = static_cast<T>(1.0);
+    constexpr T p2 = static_cast<T>(2.0);
+    constexpr T n2 = static_cast<T>(-2.0);
+
+    T mulcolsum, coeff;
+    T total = static_cast<T>(0);
+    llint og=0, ng, gd;
+    int sgn=1, gdi;
+
+    // over all 2^{n-1} permutations of delta
     for (llint k=1; k < x+1; ++k) {
-        localsum = std::accumulate(
+        mulcolsum = std::accumulate(
                         col_sum.begin(), 
                         col_sum.end(), 
                         p1, 
                         std::multiplies<T>());
-        total += sgn > 0 ? localsum : -localsum;
+        total += sgn > 0 ? mulcolsum : -mulcolsum;
         
-        // updating gray order 
+        // updating gray order
         ng = igray(k);
         gd = og ^ ng;
 
@@ -453,7 +453,7 @@ inline T perm_BBFG(std::vector<T> &mat)
  * This algorithm was given by Glynn (2010) with the time-complexity 
  * of \f$O(n 2^n)\f$ using Gray code ordering.
  *
- * \endrst
+ * \endrstlocalsum
  *
  * This is a wrapper around the templated function `libwalrus::perm_BBFG` 
  * for Python integration. It accepts and returns double numeric types, 
