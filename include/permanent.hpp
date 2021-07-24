@@ -433,8 +433,8 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
  * \endrst
  *
  * This is a wrapper for computing permanent of a matrix based on 
- * Balasubramanian-Bax-Franklin-Glynn formula. For now, it is just 
- * calling a serial version of this algorithm using Gray code ordering. 
+ * Balasubramanian-Bax-Franklin-Glynn formula. For now, a serial 
+ * version of this algorithm using Gray code ordering is called. 
  * 
  * @param mat  a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
@@ -453,7 +453,7 @@ inline T perm_BBFG(std::vector<T> &mat)
  * This algorithm was given by Glynn (2010) with the time-complexity 
  * of \f$O(n 2^n)\f$ using Gray code ordering.
  *
- * \endrstlocalsum
+ * \endrst
  *
  * This is a wrapper around the templated function `libwalrus::perm_BBFG` 
  * for Python integration. It accepts and returns double numeric types, 

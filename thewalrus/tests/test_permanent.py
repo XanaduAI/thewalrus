@@ -63,8 +63,9 @@ class TestPermanentWrapper:
 
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_real(self, random_matrix):
-        """Check permanent(A)=perm_real(A) for a random
-        real matrix.
+        """Check perm(A) == perm_real(A) and 
+            perm(A) == perm_BBFG_real(A) for 
+            a random real matrix.
         """
         A = random_matrix(6)
         p = perm(A)
@@ -72,14 +73,14 @@ class TestPermanentWrapper:
         assert p == expected
 
         A = random_matrix(6)
-        p = perm(A)
-        expected = perm_BBFG_real(A)
-        assert p == expected
-
-        A = random_matrix(6)
         A = np.array(A, dtype=np.complex128)
         p = perm(A)
         expected = perm_real(np.float64(A.real))
+        assert p == expected
+
+        A = random_matrix(6)
+        p = perm(A)
+        expected = perm_BBFG_real(A)
         assert p == expected
         
         A = random_matrix(6)
@@ -90,7 +91,9 @@ class TestPermanentWrapper:
 
     @pytest.mark.parametrize("dtype", [np.complex128])
     def test_complex(self, random_matrix):
-        """Check perm(A)=perm_complex(A) for a random matrix.
+        """Check perm(A) == perm_complex(A) and 
+            perm(A) == perm_BBFG_complex(A) for 
+            a complex random matrix.
         """
         A = random_matrix(6)
         p = perm(A)
@@ -104,8 +107,10 @@ class TestPermanentWrapper:
 
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_complex_no_imag(self, random_matrix):
-        """Check perm(A)=perm_real(A) for a complex random matrix
-        with zero imaginary parts.
+        """Check perm(A) == perm_real(A) and 
+            perm(A) == perm_BBFG_real(A) for 
+            a complex random matrix with zero 
+            imaginary parts.
         """
         A = np.complex128(random_matrix(6))
         p = perm(A)
