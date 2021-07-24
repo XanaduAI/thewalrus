@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus import perm, perm_real, perm_complex, permanent_repeated
+from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
 
 
 class TestPermanentWrapper:
@@ -72,9 +72,20 @@ class TestPermanentWrapper:
         assert p == expected
 
         A = random_matrix(6)
+        p = perm(A)
+        expected = perm_BBFG_real(A)
+        assert p == expected
+
+        A = random_matrix(6)
         A = np.array(A, dtype=np.complex128)
         p = perm(A)
         expected = perm_real(np.float64(A.real))
+        assert p == expected
+        
+        A = random_matrix(6)
+        A = np.array(A, dtype=np.complex128)
+        p = perm(A)
+        expected = perm_BBFG_real(np.float64(A.real))
         assert p == expected
 
     @pytest.mark.parametrize("dtype", [np.complex128])
@@ -86,6 +97,11 @@ class TestPermanentWrapper:
         expected = perm_complex(A)
         assert np.allclose(p, expected)
 
+        A = random_matrix(6)
+        p = perm(A)
+        expected = perm_BBFG_complex(A)
+        assert np.allclose(p, expected)
+
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_complex_no_imag(self, random_matrix):
         """Check perm(A)=perm_real(A) for a complex random matrix
@@ -94,6 +110,11 @@ class TestPermanentWrapper:
         A = np.complex128(random_matrix(6))
         p = perm(A)
         expected = perm_real(A.real)
+        assert np.allclose(p, expected)
+
+        A = np.complex128(random_matrix(6))
+        p = perm(A)
+        expected = perm_BBFG_real(A.real)
         assert np.allclose(p, expected)
 
 

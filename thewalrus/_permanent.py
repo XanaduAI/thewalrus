@@ -17,7 +17,7 @@ Permanent Python interface
 import numpy as np
 
 from ._hafnian import hafnian_repeated
-from .libwalrus import perm_complex, perm_real
+from .libwalrus import perm_complex, perm_real, perm_complex, perm_BBFG_real, perm_BBFG_complex
 
 
 def perm(A, quad=True, fsum=False):
