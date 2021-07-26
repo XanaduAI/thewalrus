@@ -188,117 +188,120 @@ def remove(
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 
-def hermite_multidimensional_numba(C, mu, Sigma, cutoff, dtype=np.complex128):
+def hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128):
     # pylint: disable=too-many-arguments
-    r"""Returns the multidimensional Hermite polynomials :math:`C*H_k^{(Sigma)}(mu)`.
+    r"""Returns the multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
 
-    Here :math:`Sigma` is an :math:`n \times n` square matrix,
-    :math:`mu` is an :math:`n` dimensional vector, and :math`C` is a complex number prefactor. The polynomials are
+    Here :math:`R` is an :math:`n \times n` square matrix, and
+    :math:`y` is an :math:`n` dimensional vector. The polynomials are
     parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
     and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
-    thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
 
     Args:
-        C (complex): zeroth entry of the tensor
-        mu (vector[complex]): vector argument of the Hermite polynomial
-        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
+        C (complex): first value of the Hermite polynomials
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        array[complex]: the multidimensional Hermite polynomials
+        array[data type]: the multidimensional Hermite polynomials
     """
-    num_modes = len(mu) // 2
+    n, _ = R.shape
+    if y.shape[0] != n:
+        raise ValueError("The matrix R and vector y have incompatible dimensions")
+    num_modes = len(y) // 2
     array = np.zeros(((cutoff,) * (2 * num_modes)), dtype=dtype)
     array[(0,) * (2 * num_modes)] = C
     all_idx = product(range(cutoff), repeat=2 * num_modes)
     next(all_idx)
     for idx in all_idx:
-        array = fill_hermite_multidimensional_numba_loop(array, idx, mu, Sigma)
+        array = fill_hermite_multidimensional_numba_loop(array, idx, R, y)
     return array
 
 
 @jit(nopython=True)
-def fill_hermite_multidimensional_numba_loop(array, idx, mu, Sigma):  # pragma: no cover
+def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
     r"""Calculates the hermit multidimensional polynomial for a given index.
 
     Args:
-        array (array[complex]): the multidimensional Hermite polynomials
+        array (array[data type]): the multidimensional Hermite polynomials
         idx (tuple): index of the gradients to be filled
-        mu (vector[complex]): vector argument of the Hermite polynomial
-        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
 
     Returns:
-        array[complex]: the hermit multidimensional polynomial for a given index
+        array[data type]: the hermit multidimensional polynomial for a given index
     """
     i = 0
     for i, val in enumerate(idx):
         if val > 0:
             break
     ki = dec(idx, i)
-    u = mu[i] * array[ki]
+    u = y[i] * array[ki]
     for l, kl in remove(ki):
-        u -= SQRT[ki[l]] * Sigma[i, l] * array[kl]
+        u -= SQRT[ki[l]] * R[i, l] * array[kl]
     array[idx] = u / SQRT[idx[i]]
     return array
 
 
-def grad_hermite_multidimensional_numba(array, C, mu, Sigma, cutoff, dtype=np.complex128):
+def grad_hermite_multidimensional_numba(array, C, R, cutoff, y, dtype=np.complex128):
     # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the multidimensional Hermite polynomials :math:`C*H_k^{(Sigma)}(mu)` with respect to its parameters :math:`C`, :math:`mu` and :math:`Sigma`.
+    r"""Calculates the gradients of the multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
     Args:
-        array (array[complex]): the multidimensional Hermite polynomials
-        C (complex): first value of the square matrix
-        mu (vector[complex]): vector argument of the Hermite polynomial
-        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
+        array (array): the multidimensional Hermite polynomials
+        C (complex): first value of the Hermite polynomials
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
-        array[complex], array[complex], array[complex]: the gradients of the multidimensional Hermite polynomials with respect to C, mu and Sigma
+        array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
-    num_modes = len(mu) // 2
+    n, _ = R.shape
+    if y.shape[0] != n:
+        raise ValueError("The matrix R and vector y have incompatible dimensions")
+    num_modes = len(y) // 2
     dG_dC = array / C
-    dG_dmu = np.zeros_like(array, dtype=dtype)
-    dG_dSigma = np.zeros_like(array, dtype=dtype)
+    dG_dR = np.zeros_like(array, dtype=dtype)
+    dG_dy = np.zeros_like(array, dtype=dtype)
     all_idx = product(range(cutoff), repeat=2 * num_modes)
     next(all_idx)
     for idx in all_idx:
-        dG_dmu, dG_dSigma = fill_grad_hermite_multidimensional_numba_loop(
-            dG_dmu, dG_dSigma, array, idx, mu, Sigma
-        )
-    return dG_dC, dG_dmu, dG_dSigma
+        dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
+    return dG_dC, dG_dR, dG_dy
 
 
 @jit(nopython=True)
 def fill_grad_hermite_multidimensional_numba_loop(
-    dG_dmu, dG_dSigma, array, idx, mu, Sigma
+    dG_dR, dG_dy, array, idx, R, y
 ):  # pragma: no cover
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the multidimensional Hermite polynomials for a given index.
 
     Args:
-        dG_dmu (array[complex]): array representing the gradients with respect to mu
-        dG_dSigma (array[complex]): array representing the gradients with respect to Sigma
-        array (array[complex]): the multidimensional Hermite polynomials
+        dG_dR (array[data type]): array representing the gradients with respect to R
+        dG_dy (array[data type]): array representing the gradients with respect to y
+        array (array[data type]): the multidimensional Hermite polynomials
         idx (tuple): index of the gradients to be filled
-        mu (vector[complex]): vector argument of the Hermite polynomial
-        Sigma (array[complex]): square matrix parametrizing the Hermite polynomial
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
 
     Returns:
-        array[complex], array[complex]: the gradients of the multidimensional Hermite polynomials with respect to mu and Sigma for a given index
+        array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to R and y for a given index
     """
     i = 0
     for i, val in enumerate(idx):
         if val > 0:
             break
     ki = dec(idx, i)
-    dmu = mu[i] * dG_dmu[ki] + array[ki]
-    dSigma = mu[i] * dG_dSigma[ki]
+    dy = y[i] * dG_dy[ki] + array[ki]
+    dR = y[i] * dG_dR[ki]
     for l, kl in remove(ki):
-        dmu -= SQRT[ki[l]] * dG_dmu[kl] * Sigma[i, l]
-        dSigma -= SQRT[ki[l]] * (Sigma[i, l] * dG_dSigma[kl] + array[kl])
-    dG_dSigma[idx] = dSigma / SQRT[idx[i]]
-    dG_dmu[idx] = dmu / SQRT[idx[i]]
-    return dG_dmu, dG_dSigma
+        dy -= SQRT[ki[l]] * dG_dmu[kl] * R[i, l]
+        dR -= SQRT[ki[l]] * (R[i, l] * dG_dR[kl] + array[kl])
+    dG_dR[idx] = dR / SQRT[idx[i]]
+    dG_dy[idx] = dy / SQRT[idx[i]]
+    return dG_dR, dG_dy

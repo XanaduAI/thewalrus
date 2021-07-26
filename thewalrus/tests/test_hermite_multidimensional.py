@@ -144,10 +144,10 @@ def test_hermite_numba_vs_hermite_renorm_modified(tol):
     cutoff = 10
     R = np.random.rand(4, 4) + 1j * np.random.rand(4, 4)
     R += R.T
-    mu = np.random.rand(4) + 1j * np.random.rand(4)
+    y = np.random.rand(4) + 1j * np.random.rand(4)
     C = 0.5
-    hm = C * hermite_multidimensional(R, y=mu, cutoff=cutoff, renorm=True, modified=True)
-    hm_nb = hermite_multidimensional_numba(C=C, mu=mu, Sigma=R, cutoff=cutoff, dtype=np.complex128)
+    hm = C * hermite_multidimensional(R, y, cutoff=cutoff, renorm=True, modified=True)
+    hm_nb = hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128)
     assert np.allclose(hm, hm_nb, atol=tol, rtol=0)
 
 
@@ -158,23 +158,23 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     R += R.T
     mu = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
     C = 0.5
-    gate = hermite_multidimensional_numba(C, mu, R, cutoff=cutoff, dtype=np.complex128)
-    grad_C, grad_mu, grad_Sigma = grad_hermite_multidimensional_numba(
-        gate, C, mu, R, cutoff, dtype=np.complex128
+    gate = hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128)
+    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(
+        gate, C, R, cutoff, y, dtype=np.complex128
     )
     delta_plus = 0.00001 + 1j * 0.00001
     expected_grad_C = (
-        hermite_multidimensional_numba(C + delta_plus, mu, R, cutoff)
-        - hermite_multidimensional_numba(C - delta_plus, mu, R, cutoff)
+        hermite_multidimensional_numba(C + delta_plus, R, cutoff, y)
+        - hermite_multidimensional_numba(C - delta_plus, R, cutoff, y)
     ) / (2 * delta_plus)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
-    expected_grad_mu = (
-        hermite_multidimensional_numba(C, mu + delta_plus, R, cutoff)
-        - hermite_multidimensional_numba(C, mu - delta_plus, R, cutoff)
+    expected_grad_y = (
+        hermite_multidimensional_numba(C, R, cutoff, y + delta_plus)
+        - hermite_multidimensional_numba(C, R, cutoff, y - delta_plus)
     ) / (2 * delta_plus)
-    assert np.allclose(grad_mu, expected_grad_mu, atol=tol, rtol=0)
-    expected_grad_Sigma = (
-        hermite_multidimensional_numba(C, mu, R + delta_plus, cutoff)
-        - hermite_multidimensional_numba(C, mu, R - delta_plus, cutoff)
+    assert np.allclose(grad_y, expected_grad_y, atol=tol, rtol=0)
+    expected_grad_R = (
+        hermite_multidimensional_numba(C, R + delta_plus, cutoff, y)
+        - hermite_multidimensional_numba(C, R - delta_plus, cutoff, y)
     ) / (2 * delta_plus)
-    assert np.allclose(grad_Sigma, expected_grad_Sigma, atol=tol, rtol=0)
+    assert np.allclose(grad_R, expected_grad_R, atol=tol, rtol=0)
