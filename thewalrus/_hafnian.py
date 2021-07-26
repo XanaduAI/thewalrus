@@ -335,7 +335,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
 
 
-@jit(nopython=True)
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
 
@@ -348,9 +347,14 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     Returns:
         np.int64 or np.float64 or np.complex128: the loop hafnian of matrix ``A``.
     """
-    # input_validation(A, atol=atol, rtol=rtol)
+    input_validation(A, atol=atol, rtol=rtol)
     (n, _) = A.shape
     w = bandwidth(A)
+    return numba_hafnian_banded(A, w, loop)
+
+
+@jit(nopython=True)
+def numba_hafnian_banded(A, w, loop):
     if not loop:
         A = A - np.diag(np.diag(A))
     loop_haf = Dict.empty(key_type=types.Array, value_type=types.complex128)
