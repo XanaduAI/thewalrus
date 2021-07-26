@@ -23,19 +23,8 @@ from . import reduction
 def tor(A):
     """Returns the Torontonian of a matrix.
 
-    For more direct control, you may wish to call :func:`tor_real` or
-    :func:`tor_complex` directly.
-
-    The input matrix is cast to quadruple precision
-    internally for a quadruple precision torontonian computation.
-
     Args:
-        A (array): a np.complex128, square, symmetric array of even dimensions.
-        fsum (bool): if ``True``, the `Shewchuck algorithm <https://github.com/achan001/fsum>`_
-            for more accurate summation is performed. This can significantly increase
-            the `accuracy of the computation <https://link.springer.com/article/10.1007%2FPL00009321>`_,
-            but no casting to quadruple precision takes place, as the Shewchuck algorithm
-            only supports double precision.
+        A (array): a square array of even dimensions.
 
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
@@ -47,11 +36,6 @@ def tor(A):
 
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
-
-    if A.dtype == np.complex128:
-        if np.any(np.iscomplex(A)):
-            return numba_tor(A)
-        return numba_tor(np.float64(A.real))
 
     return numba_tor(A)
 
