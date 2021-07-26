@@ -19,6 +19,9 @@ from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
 from numba import jit
+from numba import types
+from numba.typed import Dict
+from thewalrus._torontonian import powerset
 
 import numpy as np
 
@@ -78,16 +81,16 @@ def bandwidth(A):
     return 0
 
 
-def powerset(iterable):
-    """Calculates the powerset of a list.
+# def powerset(iterable):
+    #"""Calculates the powerset of a list.
 
-    Args:
-        iterable (iterable): input list
+    #Args:
+     #   iterable (iterable): input list
 
-    Returns:
-        (chain): chain of all subsets of input list
-    """
-    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
+    #Returns:
+     #   (chain): chain of all subsets of input list
+    #"""
+    #return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
 
 
 def reduction(A, rpt):
@@ -332,6 +335,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
 
 
+@jit(nopython=True)
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
 
@@ -344,12 +348,14 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     Returns:
         np.int64 or np.float64 or np.complex128: the loop hafnian of matrix ``A``.
     """
-    input_validation(A, atol=atol, rtol=rtol)
+    # input_validation(A, atol=atol, rtol=rtol)
     (n, _) = A.shape
     w = bandwidth(A)
     if not loop:
         A = A - np.diag(np.diag(A))
-    loop_haf = {(): 1, (1,): A[0, 0]}
+    loop_haf = Dict.empty(key_type=types.Array, value_type=types.complex128)
+    loop_haf[()] = 1
+    loop_haf[(1,)] = A[0,0]
     for t in range(1, n + 1):
         if t - 2 * w - 1 > 0:
             lower_end = set(range(1, t - 2 * w))
@@ -359,7 +365,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
         diff = [item for item in upper_end if item not in lower_end]
         # Makes sure set ordering is preserved when the difference of two sets is taken
         # This is also used in the if statement below
-        ps = powerset(diff)
+        ps = powerset(tuple(diff))
         lower_end = tuple(lower_end)
         for D in ps:
             if lower_end + D not in loop_haf:
