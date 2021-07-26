@@ -156,7 +156,7 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     cutoff = 4
     R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
     R += R.T
-    mu = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
+    y = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
     C = 0.5
     gate = hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128)
     grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(

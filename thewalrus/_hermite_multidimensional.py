@@ -300,7 +300,7 @@ def fill_grad_hermite_multidimensional_numba_loop(
     dy = y[i] * dG_dy[ki] + array[ki]
     dR = y[i] * dG_dR[ki]
     for l, kl in remove(ki):
-        dy -= SQRT[ki[l]] * dG_dmu[kl] * R[i, l]
+        dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
         dR -= SQRT[ki[l]] * (R[i, l] * dG_dR[kl] + array[kl])
     dG_dR[idx] = dR / SQRT[idx[i]]
     dG_dy[idx] = dy / SQRT[idx[i]]
