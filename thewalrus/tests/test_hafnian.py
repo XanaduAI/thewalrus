@@ -310,7 +310,7 @@ class TestLoopHafnian:
         assert np.allclose(hafnian(A, loop=False), hafnian_sparse(A, loop=False))
 
 
-@pytest.mark.parametrize("n", [7, 8, 9, 10, 11, 12])
+@pytest.mark.parametrize("n", [7, 8, 9])
 @pytest.mark.parametrize("w", [1, 2, 3, 4, 5, 6])
 @pytest.mark.parametrize("loop", [True, False])
 def test_hafnian_banded(n, w, loop):
