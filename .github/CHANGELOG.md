@@ -33,6 +33,9 @@
 
 ### Breaking changes
 
+* Torontonians and approximations to the hafnian for non-negative matrices are no longer calculated in C++ using the Eigen software library.
+  Instead, they are now calculated in pure Python using Numba. These changes have the nice result of making The Walrus compilable from source using only a C++ compiler. [#262](https://github.com/XanaduAI/thewalrus/pull/262) [#259](https://github.com/XanaduAI/thewalrus/pull/259). 
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):

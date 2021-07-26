@@ -13,7 +13,7 @@
 // limitations under the License.
 #pragma once
 #include <version.hpp>
-#include <eigenvalue_hafnian.hpp>
+#include <trace_hafnian.hpp>
 #include <recursive_hafnian.hpp>
 #include <repeated_hafnian.hpp>
 #include <permanent.hpp>

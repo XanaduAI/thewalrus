@@ -292,9 +292,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
             If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this
             only affects the loop hafnian.
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
-        use_eigen (bool): if True (default), the Eigen linear algebra library
-            is used for matrix multiplication. If the hafnian library was compiled
-            with BLAS/Lapack support, then BLAS will be used for matrix multiplication.
         rtol (float): the relative tolerance parameter used in ``np.allclose``.
         atol (float): the absolute tolerance parameter used in ``np.allclose``.
 

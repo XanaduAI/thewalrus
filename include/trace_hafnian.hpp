@@ -308,7 +308,7 @@ inline T loop_hafnian(std::vector<T> &mat) {
 *       row-ordered symmetric matrix.
 * @return hafnian of the input matrix
 */
-std::complex<double> hafnian_eigen(std::vector<std::complex<double>> &mat) {
+std::complex<double> hafnian_trace(std::vector<std::complex<double>> &mat) {
     std::vector<std::complex<double>> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
     std::complex<double> haf;
@@ -337,7 +337,7 @@ std::complex<double> hafnian_eigen(std::vector<std::complex<double>> &mat) {
 *       row-ordered symmetric matrix.
 * @return hafnian of the input matrix
 */
-double hafnian_eigen(std::vector<double> &mat) {
+double hafnian_trace(std::vector<double> &mat) {
     std::vector<double> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
     double haf;
@@ -366,7 +366,7 @@ double hafnian_eigen(std::vector<double> &mat) {
 *       row-ordered symmetric matrix.
 * @return loop hafnian of the input matrix
 */
-std::complex<double> loop_hafnian_eigen(std::vector<std::complex<double>> &mat) {
+std::complex<double> loop_hafnian_trace(std::vector<std::complex<double>> &mat) {
     std::vector<std::complex<double>> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
     std::complex<double> haf;
@@ -405,7 +405,7 @@ std::complex<double> loop_hafnian_eigen(std::vector<std::complex<double>> &mat) 
 *       row-ordered symmetric matrix.
 * @return loop hafnian of the input matrix
 */
-double loop_hafnian_eigen(std::vector<double> &mat) {
+double loop_hafnian_trace(std::vector<double> &mat) {
     std::vector<double> matq(mat.begin(), mat.end());
     int n = std::sqrt(static_cast<double>(mat.size()));
     double haf;
