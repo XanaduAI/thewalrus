@@ -188,7 +188,7 @@ def remove(
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 
-def hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128):
+def hermite_multidimensional_numba(R, cutoff, y, C = 1, dtype=np.complex128):
     # pylint: disable=too-many-arguments
     r"""Returns the multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
 
@@ -198,10 +198,10 @@ def hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128):
     and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
 
     Args:
-        C (complex): first value of the Hermite polynomials
         R (array[complex]): square matrix parametrizing the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        C (complex): first value of the Hermite polynomials, the default value is 1
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
@@ -245,16 +245,16 @@ def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no co
     return array
 
 
-def grad_hermite_multidimensional_numba(array, C, R, cutoff, y, dtype=np.complex128):
+def grad_hermite_multidimensional_numba(array, R, cutoff, y, C = 1, dtype=np.complex128):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
     Args:
         array (array): the multidimensional Hermite polynomials
-        C (complex): first value of the Hermite polynomials
         R (array[complex]): square matrix parametrizing the Hermite polynomial
         cutoff (int): maximum size of the subindices in the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
+        C (complex): first value of the Hermite polynomials
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
