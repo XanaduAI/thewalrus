@@ -146,7 +146,7 @@ def test_hermite_numba_vs_hermite_renorm_modified(tol):
     R += R.T
     y = np.random.rand(4) + 1j * np.random.rand(4)
     C = 0.5
-    hm = C * hermite_multidimensional(R, y, cutoff=cutoff, renorm=True, modified=True)
+    hm = C * hermite_multidimensional(R, cutoff=cutoff, y=y, renorm=True, modified=True)
     hm_nb = hermite_multidimensional_numba(C, R, cutoff, y, dtype=np.complex128)
     assert np.allclose(hm, hm_nb, atol=tol, rtol=0)
 
