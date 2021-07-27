@@ -12,7 +12,7 @@
 
 * Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix [#246](https://github.com/XanaduAI/thewalrus/pull/246)
 
-* Adds the functions `hermite_multidimensional_numba` and `grad_hermite_multidimensional_numba` to calculate the multidimensional Hermite polynomials and its gradients with numba codes [#251](https://github.com/XanaduAI/thewalrus/pull/251)
+* Adds the functions `hermite_multidimensional_numba` and `grad_hermite_multidimensional_numba` to calculate the multidimensional Hermite polynomials and its gradients using numba [#251](https://github.com/XanaduAI/thewalrus/pull/251)
 
 * Adds the functions `mzgate` and `grad_mzgate` to calculate the Fock representation of the Mach-Zehnder gate and its gradients [#257](https://github.com/XanaduAI/thewalrus/pull/257)
 
