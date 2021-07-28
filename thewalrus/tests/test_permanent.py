@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
+from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG, perm_BBFG_real, perm_BBFG_complex
 
 
 class TestPermanentWrapper:
@@ -45,8 +45,12 @@ class TestPermanentWrapper:
         """Check 2x2 permanent"""
         A = random_matrix(2)
         p = perm(A)
-        assert p == A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0]
+        expected = (A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0])
+        assert p == expected
 
+        pp = perm_BBFG(A);
+        assert pp == expected
+        
     def test_3x3(self, random_matrix):
         """Check 3x3 permanent"""
         A = random_matrix(3)
@@ -60,6 +64,9 @@ class TestPermanentWrapper:
             + A[0, 0] * A[1, 1] * A[2, 2]
         )
         assert p == expected
+        
+        pp = perm_BBFG(A);
+        assert pp == expected
 
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_real(self, random_matrix):
@@ -93,7 +100,7 @@ class TestPermanentWrapper:
     def test_complex(self, random_matrix):
         """Check perm(A) == perm_complex(A) and 
             perm(A) == perm_BBFG_complex(A) for 
-            a complex random matrix.
+            a complex .
         """
         A = random_matrix(6)
         p = perm(A)

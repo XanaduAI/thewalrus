@@ -417,9 +417,63 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
         og = ng;
     }
 
+    // TODO: overflow handling
     return total / static_cast<T>(x);
 }
 
+template <typename T>
+inline T perm_BBFG_serial2(std::vector<T> &mat)
+{
+    int n = std::sqrt(static_cast<double>(mat.size()));
+    int sgn=1, k=0;
+
+    int *gray_list = new int[n];
+    T *coeffs = new T[n];
+    std::fill_n(coeffs, n, static_cast<T>(2.0));
+
+    std::vector<T> col_sum(n, static_cast<T>(0));
+    constexpr T p1 = static_cast<T>(1.0);
+    T mulcolsum, total = p1; 
+
+    // init col_sum 
+    for (int i=0; i < n; ++i) {
+        gray_list[i] = i;
+        for (int j=0; j < n; ++j) {
+            col_sum[i] += mat[j*n + i];
+        }
+        total *= col_sum[i];
+    }
+
+    while (k < n-1) {
+        for (int j=0; j < n; ++j) {
+            col_sum[j] -= coeffs[k] * mat[k*n+j];
+        }
+        
+        mulcolsum = std::accumulate(
+                        col_sum.begin(), 
+                        col_sum.end(), 
+                        p1, 
+                        std::multiplies<T>());
+
+        coeffs[k] = -coeffs[k];
+        sgn = -sgn; 
+        total += sgn > 0 ? mulcolsum : -mulcolsum;
+
+        // update ordering 
+        gray_list[0] = 0;
+        gray_list[k] = gray_list[k+1];
+        gray_list[k+1] = k+1;
+        k = gray_list[0];
+    }
+
+    delete[] gray_list;
+    delete[] coeffs;
+
+    // TODO: overflow handling 
+    T x = static_cast<T>(pow(2,n - 1));    
+
+    return total / x;
+}
 
 /**
  * Returns the permanent of a matrix
@@ -443,7 +497,7 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
 template <typename T>
 inline T perm_BBFG(std::vector<T> &mat) 
 {
-    return perm_BBFG_serial(mat);   
+    return perm_BBFG_serial2(mat);   
 }
 
 /**
