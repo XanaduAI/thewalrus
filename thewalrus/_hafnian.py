@@ -348,13 +348,13 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
         np.int64 or np.float64 or np.complex128: the loop hafnian of matrix ``A``.
     """
     input_validation(A, atol=atol, rtol=rtol)
-    (n, _) = A.shape
     w = bandwidth(A)
     return numba_hafnian_banded(A, w, loop)
 
 
 @jit(nopython=True)
-def numba_hafnian_banded(A, w, loop):
+def numba_hafnian_banded(A, w, loop=False):
+    (n, _) = A.shape
     if not loop:
         A = A - np.diag(np.diag(A))
     loop_haf = Dict.empty(key_type=types.Array, value_type=types.complex128)
@@ -362,10 +362,15 @@ def numba_hafnian_banded(A, w, loop):
     loop_haf[(1,)] = A[0,0]
     for t in range(1, n + 1):
         if t - 2 * w - 1 > 0:
-            lower_end = set(range(1, t - 2 * w))
+            lower_end = {1}
+            for i in range(2, t - 2 * w):
+                lower_end.add(i)
         else:
-            lower_end = set()
-        upper_end = set(range(1, t + 1))
+            lower_end = {0}
+            lower_end.clear()
+        upper_end = {1}
+        for i in range(2, t + 1):
+            upper_end.add(i)
         diff = [item for item in upper_end if item not in lower_end]
         # Makes sure set ordering is preserved when the difference of two sets is taken
         # This is also used in the if statement below
