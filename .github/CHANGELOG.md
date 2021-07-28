@@ -19,6 +19,8 @@
 * Adds the ability to calculate cumulants and arbitrary expectation values of products of powers of photon numbers with the functions `photon_number_cumulant` and `photon_number_moment` respectively  
 [#264](https://github.com/XanaduAI/thewalrus/pull/264)
 
+* Adds support for calculating the permanent using the BBFG algorithm [#263](https://github.com/XanaduAI/thewalrus/issues/263) 
+
 ### Improvements
 
 * Speeds up the calculation of photon number variances/covariances [#244](https://github.com/XanaduAI/thewalrus/pull/244)
