@@ -260,7 +260,7 @@ def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no co
 
 def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=np.complex128):
     # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
+    r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
     Args:
         array (array): the multidimensional Hermite polynomials
