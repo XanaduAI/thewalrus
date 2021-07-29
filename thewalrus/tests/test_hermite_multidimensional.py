@@ -139,6 +139,16 @@ def test_hermite_vs_hermite_modified():
     )
 
 
+def test_hermite_cutoffs():
+    """Test that the cutoff is correctly set"""
+    R = np.random.rand(3, 3) + 1j * np.random.rand(3, 3)
+    R = R + R.T
+    y = np.random.rand(3) + 1j * np.random.rand(3)
+    cutoff = (1, 2, 3)
+    hm = hermite_multidimensional_numba(R, cutoff, y=y)
+    assert hm.shape == cutoff
+
+
 def test_hermite_numba_vs_hermite_renorm_modified(tol):
     """Test the relation hermite_numba and hermite renorm modified"""
     cutoff = 10
@@ -147,7 +157,7 @@ def test_hermite_numba_vs_hermite_renorm_modified(tol):
     y = np.random.rand(4) + 1j * np.random.rand(4)
     C = 0.5
     hm = C * hermite_multidimensional(R, cutoff=cutoff, y=y, renorm=True, modified=True)
-    hm_nb = hermite_multidimensional_numba(R, cutoff, y, C = C, dtype=np.complex128)
+    hm_nb = hermite_multidimensional_numba(R, cutoff, y, C=C, dtype=np.complex128)
     assert np.allclose(hm, hm_nb, atol=tol, rtol=0)
 
 
