@@ -16,8 +16,8 @@ Hermite Multidimensional Python interface
 """
 from itertools import product
 from typing import Tuple, Generator
-from numba import jit
 from functools import lru_cache
+from numba import jit
 from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
 
