@@ -354,7 +354,6 @@ double permanent_fsum(std::vector<double> &mat)
 }
 
 
-
 /**
  * Returns the permanent of a matrix (nthreads=1)
  *
@@ -418,21 +417,40 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
     }
 
     // TODO: overflow handling
+
     return total / static_cast<T>(x);
 }
 
+/**
+ * Returns the permanent of a matrix (nthreads=1) (2nd version)
+ *
+ * \rst
+ *
+ * Returns the permanent of a matrix using the BBFG algorithm.
+ * This algorithm was given by Glynn (2010) with the time-complexity 
+ * of \f$O(n 2^n)\f$ using Gray code ordering.
+ *
+ * \endrst
+ *
+ *
+ * @param mat  a flattened vector of size \f$n^2\f$, representing an
+ *      \f$n\times n\f$ row-ordered symmetric matrix.
+ * @return permanent of the input matrix 
+ */
 template <typename T>
 inline T perm_BBFG_serial2(std::vector<T> &mat)
 {
     int n = std::sqrt(static_cast<double>(mat.size()));
     int sgn=1, k=0;
 
+    constexpr T p2 = static_cast<T>(2.0);
+    constexpr T p1 = static_cast<T>(1.0);
+
     int *gray_list = new int[n];
     T *coeffs = new T[n];
-    std::fill_n(coeffs, n, static_cast<T>(2.0));
+    std::fill_n(coeffs, n, p2);
 
     std::vector<T> col_sum(n, static_cast<T>(0));
-    constexpr T p1 = static_cast<T>(1.0);
     T mulcolsum, total = p1; 
 
     // init col_sum 
@@ -470,9 +488,8 @@ inline T perm_BBFG_serial2(std::vector<T> &mat)
     delete[] coeffs;
 
     // TODO: overflow handling 
-    T x = static_cast<T>(pow(2,n - 1));    
 
-    return total / x;
+    return total / static_cast<T>(pow(2,n - 1));
 }
 
 /**
