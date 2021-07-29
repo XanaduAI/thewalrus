@@ -49,7 +49,6 @@ class TestPermanentWrapper:
         assert p == expected
         pp = perm_BBFG(A)
         assert pp == expected
-        
     def test_3x3(self, random_matrix):
         """Check 3x3 permanent"""
         A = random_matrix(3)
