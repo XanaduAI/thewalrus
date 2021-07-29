@@ -293,7 +293,7 @@ def fill_grad_hermite_multidimensional_numba_loop(
     dG_dR, dG_dy, array, idx, R, y
 ):  # pragma: no cover
     # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the multidimensional Hermite polynomials for a given index.
+    r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials for a given index.
 
     Args:
         dG_dR (array[data type]): array representing the gradients with respect to R
