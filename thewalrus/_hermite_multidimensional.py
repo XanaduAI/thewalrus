@@ -202,7 +202,7 @@ SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
     # pylint: disable=too-many-arguments
-    r"""Returns the multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
+    r"""Returns the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
 
     Here :math:`R` is an :math:`n \times n` square matrix, and
     :math:`y` is an :math:`n` dimensional vector. The polynomials are
