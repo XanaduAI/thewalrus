@@ -235,7 +235,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
 
 @jit(nopython=True)
 def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
-    r"""Calculates the Hermite multidimensional polynomial for a given index.
+    r"""Calculates the renormalized Hermite multidimensional polynomial for a given index.
 
     Args:
         array (array[data type]): the multidimensional Hermite polynomials
