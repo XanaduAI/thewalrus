@@ -66,19 +66,18 @@ def perm(A, quad=True, fsum=False, method="ryser"):
             + A[0, 0] * A[1, 1] * A[2, 2]
         )
 
-    if method in {"ryser", "Ryser", "r"}:
-        if A.dtype == np.complex:
-            if np.any(np.iscomplex(A)):
-                return perm_complex(A, quad=quad)
-            return perm_real(np.float64(A.real), quad=quad, fsum=fsum)
-        return perm_real(A, quad=quad, fsum=fsum)
-    elif method in {"bbfg", "BBFG", "b"}:
+    if method == "bbfg":
         if A.dtype == np.complex:
             if np.any(np.iscomplex(A)):
                 return perm_BBFG_complex(A)
             return perm_BBFG_real(np.float64(A.real))
         return perm_BBFG_real(A)
-    raise ValueError("Input method is not supported.")
+
+    if A.dtype == np.complex:
+        if np.any(np.iscomplex(A)):
+            return perm_complex(A, quad=quad)
+        return perm_real(np.float64(A.real), quad=quad, fsum=fsum)
+    return perm_real(A, quad=quad, fsum=fsum)
 
 def permanent_repeated(A, rpt):
     r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
