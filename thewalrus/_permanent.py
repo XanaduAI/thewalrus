@@ -33,10 +33,10 @@ def perm(A, quad=True, fsum=False, method="ryser"):
         fsum (bool): Whether to use the ``fsum`` method for higher accuracy summation.
             Note that if ``fsum`` is true, double precision will be used, and the
             ``quad`` keyword argument will be ignored.
-        method (string): "ryser" calls the associated methods to 
-        `Ryser formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
-        and "bbfg" calls the associated methods to 
-        `BBFG formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
+        method (string): "ryser" calls the associated methods to
+            `Ryser formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
+            and "bbfg" calls the associated methods to
+            `BBFG formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
 
     Returns:
         np.float64 or np.complex128: the permanent of matrix A.
@@ -71,18 +71,15 @@ def perm(A, quad=True, fsum=False, method="ryser"):
             if np.any(np.iscomplex(A)):
                 return perm_complex(A, quad=quad)
             return perm_real(np.float64(A.real), quad=quad, fsum=fsum)
-
         return perm_real(A, quad=quad, fsum=fsum)
     elif method in {"bbfg", "BBFG", "b"}:
         if A.dtype == np.complex:
             if np.any(np.iscomplex(A)):
                 return perm_BBFG_complex(A)
             return perm_BBFG_real(np.float64(A.real))
+        return perm_BBFG_real(A)
+    raise ValueError("Input method is not supported.")
 
-        return perm_BBFG_real(A) 
-    else:
-        raise ValueError("Input method is not supported.")
-            
 def permanent_repeated(A, rpt):
     r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
     of :math:`A` is repeated :math:`rpt_i` times.
