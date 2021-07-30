@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG, perm_BBFG_real, perm_BBFG_complex
+from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
 
 
 class TestPermanentWrapper:
@@ -47,8 +47,8 @@ class TestPermanentWrapper:
         p = perm(A)
         expected = (A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0])
         assert p == expected
-        pp = perm_BBFG(A)
-        assert pp == expected
+        p = perm(A, method="bbfg")
+        assert p == expected
     def test_3x3(self, random_matrix):
         """Check 3x3 permanent"""
         A = random_matrix(3)
@@ -62,12 +62,12 @@ class TestPermanentWrapper:
             + A[0, 0] * A[1, 1] * A[2, 2]
         )
         assert p == expected
-        pp = perm_BBFG(A)
-        assert pp == expected
+        p = perm(A, method="bbfg")
+        assert p == expected
 
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_real(self, random_matrix):
-        """Check perm(A) == perm_real(A) and perm(A) == perm_BBFG_real(A) for a random real matrix."""
+        """Check perm(A) == perm_real(A) and perm(A, method="bbfg") == perm_BBFG_real(A) for a random real matrix."""
         A = random_matrix(6)
         p = perm(A)
         expected = perm_real(A)
@@ -78,12 +78,12 @@ class TestPermanentWrapper:
         expected = perm_real(np.float64(A.real))
         assert p == expected
         A = random_matrix(6)
-        p = perm(A)
+        p = perm(A, method="bbfg")
         expected = perm_BBFG_real(A)
         assert p == expected
         A = random_matrix(6)
         A = np.array(A, dtype=np.complex128)
-        p = perm(A)
+        p = perm(A, method="bbfg")
         expected = perm_BBFG_real(np.float64(A.real))
         assert p == expected
 
