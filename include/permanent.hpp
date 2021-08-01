@@ -98,6 +98,7 @@ namespace libwalrus {
  *
  * @param mat  a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
+ * @tparam T 
  * @return permanent of the input matrix
  */
 template <typename T>
@@ -193,6 +194,7 @@ inline T permanent(std::vector<T> &mat)
  *
  * @param mat  a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
+ * @tparam T 
  * @return permanent of the input matrix
  */
 template <typename T>
@@ -353,7 +355,6 @@ double permanent_fsum(std::vector<double> &mat)
     return static_cast<double>(perm);
 }
 
-
 /**
  * Returns the permanent of a matrix (nthreads=1)
  *
@@ -368,36 +369,39 @@ double permanent_fsum(std::vector<double> &mat)
  *
  * @param mat  a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
+ * @tparam T 
  * @return permanent of the input matrix
  */
 template <typename T>
 inline T perm_BBFG_serial(std::vector<T> &mat) 
 {
-    int n = std::sqrt(static_cast<double>(mat.size()));
-    llint x = static_cast<llint>(pow(2,n - 1));
-    std::vector<T> col_sum(n, static_cast<T>(0));
-
-    // init col_sum 
-    for (int i=0; i < n; ++i) {
-        for (int j=0; j < n; ++j) {
-            col_sum[i] += mat[j*n + i];
-        }
-    }
+    const size_t n = static_cast<size_t>(std::sqrt(static_cast<double>(mat.size())));
+    const ullint x = static_cast<ullint>(pow(2,n - 1));
 
     constexpr T p1 = static_cast<T>(1.0);
     constexpr T p2 = static_cast<T>(2.0);
     constexpr T n2 = static_cast<T>(-2.0);
+    constexpr T zero = static_cast<T>(0);
+    
+    size_t i, j;
+    std::vector<T> colsum(n, zero);
+    // init colsum 
+    for (i=0; i < n; ++i) {
+        for (j=0; j < n; ++j) {
+            colsum[i] += mat[j*n + i];
+        }
+    }
 
     T mulcolsum, coeff;
-    T total = static_cast<T>(0);
-    llint og=0, ng, gd;
+    T total = zero;
+    ullint k, og=0, ng, gd;
     int sgn=1, gdi;
 
     // over all 2^{n-1} permutations of delta
-    for (llint k=1; k < x+1; ++k) {
+    for (k=1; k < x+1; ++k) {
         mulcolsum = std::accumulate(
-                        col_sum.begin(), 
-                        col_sum.end(), 
+                        colsum.begin(), 
+                        colsum.end(), 
                         p1, 
                         std::multiplies<T>());
         total += sgn > 0 ? mulcolsum : -mulcolsum;
@@ -408,8 +412,8 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
 
         coeff = og > ng ? p2 : n2;
         gdi = left_most_set_bit(gd);
-        for (int j=0; j < n; ++j) {
-            col_sum[j] += coeff * mat[gdi * n + j];
+        for (j=0; j < n; ++j) {
+            colsum[j] += coeff * mat[gdi * n + j];
         }
 
         sgn = -sgn;
@@ -417,7 +421,6 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
     }
 
     // TODO: overflow handling
-
     return total / static_cast<T>(x);
 }
 
@@ -433,43 +436,45 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
  * \endrst
  *
  *
- * @param mat  a flattened vector of size \f$n^2\f$, representing an
+ * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
+ * @tparam T 
  * @return permanent of the input matrix 
  */
 template <typename T>
 inline T perm_BBFG_serial2(std::vector<T> &mat)
 {
-    int n = std::sqrt(static_cast<double>(mat.size()));
-    int sgn=1, k=0;
-
+    const size_t n = static_cast<size_t>(std::sqrt(static_cast<double>(mat.size())));
+    const T x = static_cast<T>(pow(2,n-1));
+    
     constexpr T p2 = static_cast<T>(2.0);
     constexpr T p1 = static_cast<T>(1.0);
+    constexpr T zero = static_cast<T>(0);
 
-    int *gray_list = new int[n];
-    T *coeffs = new T[n];
-    std::fill_n(coeffs, n, p2);
-
-    std::vector<T> col_sum(n, static_cast<T>(0));
+    std::vector<size_t> grays(n);
+    std::iota(grays.begin(), grays.end(), 0);
+    std::vector<T> coeffs(n, p2);
+    std::vector<T> colsum(n, zero);
     T mulcolsum, total = p1; 
+    size_t i, j, k=0;
+    int sgn=1;
 
-    // init col_sum 
-    for (int i=0; i < n; ++i) {
-        gray_list[i] = i;
-        for (int j=0; j < n; ++j) {
-            col_sum[i] += mat[j*n + i];
+    // init colsum 
+    for (i=0; i < n; ++i) {
+        for (j=0; j < n; ++j) {
+            colsum[i] += mat[j*n + i];
         }
-        total *= col_sum[i];
+        total *= colsum[i];
     }
 
     while (k < n-1) {
-        for (int j=0; j < n; ++j) {
-            col_sum[j] -= coeffs[k] * mat[k*n+j];
+        for (j=0; j < n; ++j) {
+            colsum[j] -= coeffs[k] * mat[k*n+j];
         }
-        
+
         mulcolsum = std::accumulate(
-                        col_sum.begin(), 
-                        col_sum.end(), 
+                        colsum.begin(), 
+                        colsum.end(), 
                         p1, 
                         std::multiplies<T>());
 
@@ -478,18 +483,14 @@ inline T perm_BBFG_serial2(std::vector<T> &mat)
         total += sgn > 0 ? mulcolsum : -mulcolsum;
 
         // update ordering 
-        gray_list[0] = 0;
-        gray_list[k] = gray_list[k+1];
-        gray_list[k+1] = k+1;
-        k = gray_list[0];
+        grays[0] = 0;
+        grays[k] = grays[k+1];
+        grays[k+1] = k+1;
+        k = grays[0];
     }
 
-    delete[] gray_list;
-    delete[] coeffs;
-
-    // TODO: overflow handling 
-
-    return total / static_cast<T>(pow(2,n - 1));
+     // TODO: overflow handling
+    return total / x;
 }
 
 /**
