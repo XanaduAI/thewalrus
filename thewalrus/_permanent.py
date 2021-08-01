@@ -66,7 +66,7 @@ def perm(A, quad=True, fsum=False, method="ryser"):
             + A[0, 0] * A[1, 1] * A[2, 2]
         )
 
-    isRyser = False if method == "bbfg" else True
+    isRyser = bool(method != "bbfg")
 
     if A.dtype == np.complex:
         if np.any(np.iscomplex(A)):
