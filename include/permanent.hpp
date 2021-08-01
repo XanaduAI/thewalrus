@@ -83,6 +83,21 @@ static inline std::vector<int> dec2bin(llint &k, int &n)
     return mat;
 }
 
+/**
+ * Get the next ordering index
+ *
+ * @param \f$l\f$
+ * @param \f$k\f$
+ * @return the \f$k+1\f$-th ordering index with updating \f$l\f$ from init index \f$k\f$
+ */
+static inline size_t next_perm_ordering_index(std::vector<size_t> &l, size_t k)
+{
+    l[0] = 0;
+    l[k] = l[k+1];
+    l[k+1] = k+1;
+    return l[0];
+}
+
 namespace libwalrus {
 
 /**
@@ -481,15 +496,10 @@ inline T perm_BBFG_serial2(std::vector<T> &mat)
         coeffs[k] = -coeffs[k];
         sgn = -sgn; 
         total += sgn > 0 ? mulcolsum : -mulcolsum;
-
-        // update ordering 
-        grays[0] = 0;
-        grays[k] = grays[k+1];
-        grays[k+1] = k+1;
-        k = grays[0];
+        k = next_perm_ordering_index(grays, k);
     }
 
-     // TODO: overflow handling
+    // TODO: overflow handling
     return total / x;
 }
 
