@@ -360,8 +360,9 @@ def numba_hafnian_banded(A, w, n, t, loop=False):
     if not loop:
         A = A - np.diag(np.diag(A))
     loop_haf = Dict.empty(key_type=types.Array, value_type=types.complex128)
-    loop_haf[()] = 1
-    loop_haf[(1,)] = A[0,0]
+    loop_haf[t] = 1
+    t2 = tuple_setitem(t, 0, 1.0)
+    loop_haf[t2] = A[0,0]
     for t in range(1, n + 1):
         if t - 2 * w - 1 > 0:
             lower_end = {1}
@@ -381,14 +382,12 @@ def numba_hafnian_banded(A, w, n, t, loop=False):
         lower_end = mr_tuple(t, lower_end)
         for D in ps:
             if lower_end + D not in loop_haf:
-                diff2 = [item for item in lower_end + D if item not in {i, t}]
-                diff2t = mr_tuple(t, diff2)
                 # pylint: disable=consider-using-generator
                 loop_haf[lower_end + D] = sum(
                     [
                         A[i - 1, t - 1]
                         * loop_haf[
-                            tuple([item for item in lower_end + D if item not in {i, t}])
+                            mr_tuple(t, [item for item in lower_end + D if item not in {i, t}])
                         ]
                         for i in D
                     ]
@@ -399,7 +398,10 @@ def numba_hafnian_banded(A, w, n, t, loop=False):
 
 @jit(nopython=True)
 def mr_tuple(zerot, inset):
+    if len(inset) == 0:
+        return zerot
     i = 0
+    tupled = zerot
     for x in inset:
         tupled = tuple_setitem(zerot, i, x)
         zerot = tupled
