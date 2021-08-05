@@ -22,6 +22,7 @@ from numba import jit
 from numba import types
 from numba.typed import Dict
 from thewalrus._torontonian import powerset
+from numba.cpython.unsafe.tuple import tuple_setitem
 
 import numpy as np
 
@@ -349,12 +350,13 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """
     input_validation(A, atol=atol, rtol=rtol)
     w = bandwidth(A)
-    return numba_hafnian_banded(A, w, loop)
+    (n, _) = A.shape
+    t = tuple(np.zeros(n))
+    return numba_hafnian_banded(A, w, n, t, loop)
 
 
 @jit(nopython=True)
-def numba_hafnian_banded(A, w, loop=False):
-    (n, _) = A.shape
+def numba_hafnian_banded(A, w, n, t, loop=False):
     if not loop:
         A = A - np.diag(np.diag(A))
     loop_haf = Dict.empty(key_type=types.Array, value_type=types.complex128)
@@ -374,22 +376,35 @@ def numba_hafnian_banded(A, w, loop=False):
         diff = [item for item in upper_end if item not in lower_end]
         # Makes sure set ordering is preserved when the difference of two sets is taken
         # This is also used in the if statement below
-        ps = powerset(tuple(diff))
-        lower_end = tuple(lower_end)
+        difft = mr_tuple(t, diff)
+        ps = powerset(difft)
+        lower_end = mr_tuple(t, lower_end)
         for D in ps:
             if lower_end + D not in loop_haf:
+                diff2 = [item for item in lower_end + D if item not in {i, t}]
+                diff2t = mr_tuple(t, diff2)
                 # pylint: disable=consider-using-generator
                 loop_haf[lower_end + D] = sum(
                     [
                         A[i - 1, t - 1]
                         * loop_haf[
-                            tuple([item for item in lower_end + D if item not in set((i, t))])
+                            tuple([item for item in lower_end + D if item not in {i, t}])
                         ]
                         for i in D
                     ]
                 )
 
     return loop_haf[tuple(range(1, n + 1))]
+
+
+@jit(nopython=True)
+def mr_tuple(zerot, inset):
+    i = 0
+    for x in inset:
+        tupled = tuple_setitem(zerot, i, x)
+        zerot = tupled
+        i = i + 1
+    return tupled
 
 
 @jit(nopython=True)
