@@ -110,10 +110,10 @@ namespace libwalrus {
  *
  * \endrst
  *
- *
- * @param mat  a flattened vector of size \f$n^2\f$, representing an
+ * 
+ * @tparam T type of the matrix data
+ * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @tparam T 
  * @return permanent of the input matrix
  */
 template <typename T>
@@ -205,11 +205,11 @@ inline T permanent(std::vector<T> &mat)
  * with Gray code ordering.
  *
  * \endrst
- *
- *
- * @param mat  a flattened vector of size \f$n^2\f$, representing an
+ * 
+ * 
+ * @tparam T type of the matrix data
+ * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @tparam T 
  * @return permanent of the input matrix
  */
 template <typename T>
@@ -309,6 +309,7 @@ inline double perm_fsum(std::vector<T> &mat)
  * to type `complex<long double>`, allowing for greater precision than 
  * supported by Python and NumPy.
  *
+ * 
  * @param mat vector representing the flattened matrix
  * @return the permanent
  */
@@ -336,6 +337,7 @@ std::complex<double> permanent_quad(std::vector<std::complex<double>> &mat)
  * to type `long double`, allowing for greater precision than supported
  * by Python and NumPy.
  *
+ * 
  * @param mat vector representing the flattened matrix
  * @return the permanent
  */
@@ -381,17 +383,22 @@ double permanent_fsum(std::vector<double> &mat)
  *
  * \endrst
  *
- *
- * @param mat  a flattened vector of size \f$n^2\f$, representing an
+ * 
+ * @tparam T type of the matrix data 
+ * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @tparam T 
  * @return permanent of the input matrix
  */
 template <typename T>
 inline T perm_BBFG_serial(std::vector<T> &mat) 
 {
     const size_t n = static_cast<size_t>(std::sqrt(static_cast<double>(mat.size())));
-    const ullint x = static_cast<ullint>(pow(2,n - 1));
+    const double p = pow(2, n-1);
+    const ullint x = static_cast<ullint>(p);
+    if (p != x) {
+        std::cerr << "overflow to inf" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     constexpr T p1 = static_cast<T>(1.0);
     constexpr T p2 = static_cast<T>(2.0);
@@ -435,7 +442,6 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
         og = ng;
     }
 
-    // TODO: overflow handling
     return total / static_cast<T>(x);
 }
 
@@ -449,19 +455,24 @@ inline T perm_BBFG_serial(std::vector<T> &mat)
  * of \f$O(n 2^n)\f$ using Gray code ordering.
  *
  * \endrst
- *
- *
+ * 
+ * 
+ * @tparam T type of the matrix data
  * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
- * @tparam T 
  * @return permanent of the input matrix 
  */
 template <typename T>
 inline T perm_BBFG_serial2(std::vector<T> &mat)
 {
     const size_t n = static_cast<size_t>(std::sqrt(static_cast<double>(mat.size())));
-    const T x = static_cast<T>(pow(2,n-1));
-    
+    const long double p = pow(2, n-1);
+    const T x = static_cast<T>(p);
+    if (p == HUGE_VAL || p != x) {
+        std::cerr << "overflow to inf" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     constexpr T p2 = static_cast<T>(2.0);
     constexpr T p1 = static_cast<T>(1.0);
     constexpr T zero = static_cast<T>(0);
@@ -499,7 +510,6 @@ inline T perm_BBFG_serial2(std::vector<T> &mat)
         k = next_perm_ordering_index(grays, k);
     }
 
-    // TODO: overflow handling
     return total / x;
 }
 
@@ -514,17 +524,17 @@ inline T perm_BBFG_serial2(std::vector<T> &mat)
  *
  * \endrst
  *
- * This is a wrapper for computing permanent of a matrix based on 
- * Balasubramanian-Bax-Franklin-Glynn formula. For now, a serial 
- * version of this algorithm using Gray code ordering is called. 
+ * This is a wrapper function for computing permanent of a matrix 
+ * based on Balasubramanian-Bax-Franklin-Glynn (BBFG) formula.
  * 
- * @param mat  a flattened vector of size \f$n^2\f$, representing an
+ * 
+ * @tparam T type of the matrix data
+ * @param mat a flattened vector of size \f$n^2\f$, representing an
  *      \f$n\times n\f$ row-ordered symmetric matrix.
  * @return permanent of the input matrix
  */
 template <typename T>
-inline T perm_BBFG(std::vector<T> &mat) 
-{
+inline T perm_BBFG(std::vector<T> &mat) {
     return perm_BBFG_serial2(mat);   
 }
 
@@ -545,6 +555,7 @@ inline T perm_BBFG(std::vector<T> &mat)
  * to type `long double`, allowing for greater precision than supported
  * by Python and NumPy.
  *
+ * 
  * @param mat vector representing the flattened matrix
  * @return the permanent
  */
@@ -572,6 +583,7 @@ double perm_BBFG_qp(std::vector<double> &mat)
  * to type `complex<long double>`, allowing for greater precision than 
  * supported by Python and NumPy.
  *
+ * 
  * @param mat vector representing the flattened matrix
  * @return the permanent
  */
