@@ -225,6 +225,8 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
     num_indices = len(y)
     if isinstance(cutoff, int):
         cutoff = tuple([cutoff] * num_indices)
+    else:
+        cutoff = tuple(cutoff)
     array = np.zeros(cutoff, dtype=dtype)
     array[(0,) * num_indices] = C
     for photons in range(1, sum(cutoff) - num_indices + 1):
@@ -279,6 +281,8 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=np.compl
     num_indices = len(y)
     if isinstance(cutoff, int):
         cutoff = tuple([cutoff] * num_indices)
+    else:
+        cutoff = tuple(cutoff)
     dG_dC = array / C
     dG_dR = np.zeros_like(array, dtype=dtype)
     dG_dy = np.zeros_like(array, dtype=dtype)
