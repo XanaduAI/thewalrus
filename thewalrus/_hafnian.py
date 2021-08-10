@@ -21,12 +21,26 @@ from itertools import chain, combinations
 from numba import jit
 from numba import types
 from numba.typed import Dict
-from thewalrus._torontonian import powerset
+#from thewalrus._torontonian import powerset
 from numba.cpython.unsafe.tuple import tuple_setitem
 
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
+
+@jit(nopython=True)
+def powerset(parent_set): # pragma: no cover
+    """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
+
+    Args:
+        parent_set (Sequence) : sequence to take powerset from
+    Return:
+        subset (tuple) : subset of parent_set
+    """
+    n = len(parent_set)
+    for i in range(n + 1):
+        for subset in combinations(parent_set, i):
+            yield subset
 
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
