@@ -22,8 +22,7 @@ import thewalrus as hf
 from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded
 
 from thewalrus.libwalrus import haf_complex, haf_real, haf_int
-from thewalrus._hafnian import bandwidth, numba_hafnian_banded, mr_tuple
-
+from thewalrus._hafnian import bandwidth, numba_hafnian_banded
 
 # the first 11 telephone numbers
 T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]

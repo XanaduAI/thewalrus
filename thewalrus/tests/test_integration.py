@@ -166,4 +166,5 @@ def test_cumulants_three_mode_random_state(hbar): # pylint: disable=too-many-sta
     # Finally, the three body cumulant
     n0n1n2 = np.einsum("ijk, i, j, k", probs, n, n, n)
     kappa012 = n0n1n2 - n0n1 * n2_1 - n0n2 * n1_1 - n1n2 * n0_1 + 2 * n0_1 * n1_1 * n2_1
+    print(kappa012, photon_number_cumulant(mu, cov, [0, 1, 2], hbar=hbar))
     assert np.allclose(photon_number_cumulant(mu, cov, [0, 1, 2], hbar=hbar), kappa012)
