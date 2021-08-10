@@ -372,6 +372,7 @@ double permanent_fsum(std::vector<double> &mat)
     return static_cast<double>(perm);
 }
 
+
 /**
  * Returns the permanent of a matrix (nthreads=1)
  *
