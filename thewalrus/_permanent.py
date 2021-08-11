@@ -20,7 +20,7 @@ from ._hafnian import hafnian_repeated
 from .libwalrus import perm_complex, perm_real, perm_BBFG_real, perm_BBFG_complex
 
 
-def perm(A, quad=True, fsum=False, method="ryser"):
+def perm(A, quad=True, fsum=False, method="bbfg"):
     """Returns the permanent of a matrix using the `method` formula
 
     For more direct control, you may wish to call :func:`perm_real`
