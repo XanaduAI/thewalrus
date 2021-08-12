@@ -448,14 +448,14 @@ def click_cumulant(mu, cov, modes, hbar=2):
         (float): the cumulant
     """
 
-    modes = list(modes) # turns modes from array to list if passed in as array
-    num_modes = len(mu)//2
+    modes = list(modes)  # turns modes from array to list if passed in as array
+    num_modes = len(mu) // 2
     kappa = 0
     for pi in partition(modes):
         size = len(pi)
         term = factorial(size - 1) * (-1) ** (size - 1)
         for B in pi:
-            B = list(set(B)) # remove repetitions
+            B = list(set(B))  # remove repetitions
             pattern = np.ones([len(B)])
             mu_red, cov_red = reduced_gaussian(mu, cov, B)
             summand = threshold_detection_prob_displacement(mu_red, cov_red, pattern, hbar=hbar)

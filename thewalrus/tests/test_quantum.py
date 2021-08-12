@@ -31,7 +31,7 @@ from thewalrus.symplectic import (
 )
 
 from thewalrus.random import random_covariance, random_interferometer
-
+from thewalrus._torontonian import threshold_detection_prob_displacement
 from thewalrus.quantum.fock_tensors import _prefactor
 from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
 from thewalrus.quantum.adjacency_matrices import _mean_clicks_adj
@@ -75,6 +75,7 @@ from thewalrus.quantum import (
     characteristic_function,
     photon_number_moment,
     n_body_marginals,
+    click_cumulant,
 )
 
 @pytest.mark.parametrize("n", [0, 1, 2])
@@ -1813,3 +1814,32 @@ def test_n_body_marginals_too_high_correlation():
         ValueError, match="The order of the correlations is higher than the number of modes"
     ):
         n_body_marginals(mu, cov, 4, 4)
+
+
+
+def test_click_cumulants():
+    """Tests the correctness of the click cumulant function"""
+    M = 3
+    cov = random_covariance(M)
+    mu = np.zeros([2 * M])
+    mu0, cov0 = reduced_gaussian(mu, cov, [0])
+    mu1, cov1 = reduced_gaussian(mu, cov, [1])
+    mu2, cov2 = reduced_gaussian(mu, cov, [2])
+    mu01, cov01 = reduced_gaussian(mu, cov, [0, 1])
+    mu02, cov02 = reduced_gaussian(mu, cov, [0, 2])
+    mu12, cov12 = reduced_gaussian(mu, cov, [1, 2])
+    expected = (
+        threshold_detection_prob_displacement(mu, cov, [1, 1, 1])
+        - threshold_detection_prob_displacement(mu01, cov01, [1, 1])
+        * threshold_detection_prob_displacement(mu2, cov2, [1])
+        - threshold_detection_prob_displacement(mu02, cov02, [1, 1])
+        * threshold_detection_prob_displacement(mu1, cov1, [1])
+        - threshold_detection_prob_displacement(mu12, cov12, [1, 1])
+        * threshold_detection_prob_displacement(mu0, cov0, [1])
+        + 2
+        * threshold_detection_prob_displacement(mu2, cov2, [1])
+        * threshold_detection_prob_displacement(mu1, cov1, [1])
+        * threshold_detection_prob_displacement(mu0, cov0, [1])
+    )
+    obtained = click_cumulant(mu, cov, [0, 1, 2])
+    assert np.allclose(expected, obtained)
