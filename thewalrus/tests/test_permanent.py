@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus import perm, perm_real, perm_complex, permanent_repeated
+from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
 
 
 class TestPermanentWrapper:
@@ -44,13 +44,17 @@ class TestPermanentWrapper:
     def test_2x2(self, random_matrix):
         """Check 2x2 permanent"""
         A = random_matrix(2)
-        p = perm(A)
-        assert p == A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0]
+        p = perm(A, method="ryser")
+        expected = (A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0])
+        assert p == expected
+
+        p = perm(A, method="bbfg")
+        assert p == expected
 
     def test_3x3(self, random_matrix):
         """Check 3x3 permanent"""
         A = random_matrix(3)
-        p = perm(A)
+        p = perm(A, method="ryser")
         expected = (
             A[0, 2] * A[1, 1] * A[2, 0]
             + A[0, 1] * A[1, 2] * A[2, 0]
@@ -61,39 +65,58 @@ class TestPermanentWrapper:
         )
         assert p == expected
 
+        p = perm(A, method="bbfg")
+        assert p == expected
+
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_real(self, random_matrix):
-        """Check permanent(A)=perm_real(A) for a random
-        real matrix.
-        """
+        """Check perm(A) == perm_real(A) and perm(A, method="bbfg") == perm_BBFG_real(A) for a random real matrix."""
         A = random_matrix(6)
-        p = perm(A)
+        p = perm(A, method="ryser")
         expected = perm_real(A)
-        assert p == expected
+        assert np.allclose(p, expected)
 
         A = random_matrix(6)
         A = np.array(A, dtype=np.complex128)
-        p = perm(A)
+        p = perm(A, method="ryser")
         expected = perm_real(np.float64(A.real))
-        assert p == expected
+        assert np.allclose(p, expected)
+
+        A = random_matrix(6)
+        p = perm(A, method="bbfg")
+        expected = perm_BBFG_real(A)
+        assert np.allclose(p, expected)
+
+        A = random_matrix(6)
+        A = np.array(A, dtype=np.complex128)
+        p = perm(A, method="bbfg")
+        expected = perm_BBFG_real(np.float64(A.real))
+        assert np.allclose(p, expected)
 
     @pytest.mark.parametrize("dtype", [np.complex128])
     def test_complex(self, random_matrix):
-        """Check perm(A)=perm_complex(A) for a random matrix.
-        """
+        """Check perm(A) == perm_complex(A) and perm(A) == perm_BBFG_complex(A) for a complex."""
         A = random_matrix(6)
-        p = perm(A)
+        p = perm(A, method="ryser")
         expected = perm_complex(A)
+        assert np.allclose(p, expected)
+
+        A = random_matrix(6)
+        p = perm(A, method="ryser")
+        expected = perm_BBFG_complex(A)
         assert np.allclose(p, expected)
 
     @pytest.mark.parametrize("dtype", [np.float64])
     def test_complex_no_imag(self, random_matrix):
-        """Check perm(A)=perm_real(A) for a complex random matrix
-        with zero imaginary parts.
-        """
+        """Check perm(A) == perm_real(A) and perm(A) == perm_BBFG_real(A) for a complex random matrix with zero imaginary parts."""
         A = np.complex128(random_matrix(6))
-        p = perm(A)
+        p = perm(A, method="ryser")
         expected = perm_real(A.real)
+        assert np.allclose(p, expected)
+
+        A = np.complex128(random_matrix(6))
+        p = perm(A, method="ryser")
+        expected = perm_BBFG_real(A.real)
         assert np.allclose(p, expected)
 
 
@@ -104,7 +127,6 @@ class TestPermanentRepeated:
         """Check 2x2 permanent when rpt is all 0"""
         A = np.array([[2, 1], [1, 3]])
         rpt = [0, 0]
-
         res = permanent_repeated(A, rpt)
         assert res == 1.0
 

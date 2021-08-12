@@ -110,6 +110,64 @@ TEST(PermanentComplex, Random) {
   EXPECT_NEAR(std::imag(expected), std::imag(perm), tol);
 }
 
+TEST(PermanentRealBBFG, CompleteGraph) {
+  std::vector<double> mat2(4, 1.0);
+  std::vector<double> mat3(9, 1.0);
+  std::vector<double> mat4(16, 1.0);
+
+  EXPECT_NEAR(2, libwalrus::perm_BBFG_qp(mat2), tol);
+  EXPECT_NEAR(6, libwalrus::perm_BBFG_qp(mat3), tol);
+  EXPECT_NEAR(24, libwalrus::perm_BBFG_qp(mat4), tol);
+}
+
+TEST(PermanentRealBBFG, Random) {
+  std::vector<double> mat(9, 1.0);
+
+  std::default_random_engine generator;
+  generator.seed(20);
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      double randnum = distribution(generator);
+      mat[i * 3 + j] = randnum;
+    }
+  }
+
+  double expected = mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] +
+                    mat[2] * mat[3] * mat[7] + mat[0] * mat[5] * mat[7] +
+                    mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
+
+  EXPECT_NEAR(expected, libwalrus::perm_BBFG_qp(mat), tol);
+}
+
+
+TEST(PermanentComplexBBFG, Random) {
+  std::vector<std::complex<double>> mat(9, 1.0);
+
+  std::default_random_engine generator;
+  generator.seed(20);
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      double randnum1 = distribution(generator);
+      double randnum2 = distribution(generator);
+      mat[i * 3 + j] = std::complex<double>(randnum1, randnum2);
+    }
+  }
+
+  std::complex<double> expected =
+      mat[2] * mat[4] * mat[6] + mat[1] * mat[5] * mat[6] +
+      mat[2] * mat[3] * mat[7] + mat[0] * mat[5] * mat[7] +
+      mat[1] * mat[3] * mat[8] + mat[0] * mat[4] * mat[8];
+
+  std::complex<double> perm = libwalrus::perm_BBFG_cmplx(mat);
+
+  EXPECT_NEAR(std::real(expected), std::real(perm), tol);
+  EXPECT_NEAR(std::imag(expected), std::imag(perm), tol);
+}
+
 }  // namespace permanent
 
 namespace recursive_real {
