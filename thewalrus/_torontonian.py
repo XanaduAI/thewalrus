@@ -16,8 +16,70 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from .quantum import Qmat, Xmat, Amat
-from . import reduction
+#from .quantum import Xmat, Amat
+#from thewalrus import reduction
+
+def Xmat(N):
+    r"""Returns the matrix :math:`X_n = \begin{bmatrix}0 & I_n\\ I_n & 0\end{bmatrix}`
+
+    Args:
+        N (int): positive integer
+
+    Returns:
+        array: :math:`2N\times 2N` array
+    """
+    I = np.identity(N)
+    O = np.zeros_like(I)
+    X = np.block([[O, I], [I, O]])
+    return X
+
+
+def Amat(cov, hbar=2, cov_is_qmat=False):
+    r"""Returns the :math:`A` matrix of the Gaussian state whose hafnian gives the photon number probabilities.
+
+    Args:
+        cov (array): :math:`2N\times 2N` covariance matrix
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+        cov_is_qmat (bool): if ``True``, it is assumed that ``cov`` is in fact the Q matrix.
+
+    Returns:
+        array: the :math:`A` matrix.
+    """
+    # number of modes
+    N = len(cov) // 2
+    X = Xmat(N)
+
+    # inverse Q matrix
+    if cov_is_qmat:
+        Q = cov
+    else:
+        Q = Qmat_numba(cov, hbar=hbar)
+
+    Qinv = np.linalg.inv(Q)
+
+    # calculate Hamilton's A matrix: A = X.(I-Q^{-1})*
+    A = X @ (np.identity(2 * N) - Qinv).conj()
+    return A
+
+def reduction(A, rpt):
+    r"""Calculates the reduction of an array by a vector of indices.
+
+    This is equivalent to repeating the ith row/column of :math:`A`, :math:`rpt_i` times.
+
+    Args:
+        A (array): matrix of size [N, N]
+        rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
+            of A to be repeated.
+    Returns:
+        array: the reduction of A by the index vector rpt
+    """
+    rows = [i for sublist in [[idx] * j for idx, j in enumerate(rpt)] for i in sublist]
+
+    if A.ndim == 1:
+        return A[rows]
+
+    return A[:, rows][rows]
 
 
 def tor(A):
@@ -247,7 +309,7 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
     if np.allclose(mu, 0, atol=atol, rtol=rtol):
         # no displacement
         n_modes = cov.shape[0] // 2
-        Q = Qmat(cov, hbar)
+        Q = Qmat_numba(cov, hbar)
         O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)

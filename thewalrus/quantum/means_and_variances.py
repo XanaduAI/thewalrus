@@ -23,6 +23,7 @@ from scipy.special import factorial
 import numpy as np
 
 from .._hafnian import hafnian, reduction
+from .._torontonian import threshold_detection_prob_displacement
 
 from .conversions import (
     reduced_gaussian,
@@ -408,7 +409,7 @@ def _list_to_freq_dict(words):
     return {i : words.count(i) for i in set(words)}
 
 def photon_number_cumulant(mu, cov, modes, hbar=2):
-    r"""Calculates the cumulant of the modes in the Gaussian state.
+    r"""Calculates the photon-number cumulant of the modes in the Gaussian state.
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering.
@@ -429,6 +430,36 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
         for B in pi:
             indices = _list_to_freq_dict(B)
             term *= photon_number_moment(mu, cov, indices, hbar=hbar)
+        kappa += term
+
+    return kappa
+
+
+def click_cumulant(mu, cov, modes, hbar=2):
+    r"""Calculates the cumulant of the modes in the Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list or array): list of modes.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): the cumulant
+    """
+
+    modes = list(modes) # turns modes from array to list if passed in as array
+    num_modes = len(mu)//2
+    kappa = 0
+    for pi in partition(modes):
+        size = len(pi)
+        term = factorial(size - 1) * (-1) ** (size - 1)
+        for B in pi:
+            B = list(set(B)) # remove repetitions
+            pattern = np.ones([len(B)])
+            mu_red, cov_red = reduced_gaussian(mu, cov, B)
+            summand = threshold_detection_prob_displacement(mu_red, cov_red, pattern, hbar=hbar)
+            term *= summand
         kappa += term
 
     return kappa
