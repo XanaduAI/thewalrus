@@ -219,7 +219,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     Returns:
         array[data type]: the multidimensional Hermite polynomials
     """
-    if dtype == None:
+    if dtype is None:
         dtype = R.dtype
     n, _ = R.shape
     if y.shape[0] != n:
@@ -276,7 +276,7 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     Returns:
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
-    if dtype == None:
+    if dtype is None:
         dtype = R.dtype
     n, _ = R.shape
     if y.shape[0] != n:
