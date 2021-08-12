@@ -32,6 +32,8 @@
 * Corrects bug in the function `photon_number_covar` that gave incorrect results when the covariance between two modes with finite displacements was calculated. 
 [#264](https://github.com/XanaduAI/thewalrus/pull/264)
 
+* Fixes a bug in `setup.py` that would cause the build to fail when using miniforge for M1 macs.
+[#273](https://github.com/XanaduAI/thewalrus/pull/273)
 
 ### Breaking changes
 
