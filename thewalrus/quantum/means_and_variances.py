@@ -436,7 +436,7 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
 
 
 def click_cumulant(mu, cov, modes, hbar=2):
-    r"""Calculates the cumulant of the modes in the Gaussian state.
+    r"""Calculates the click cumulant of the modes in the Gaussian state.
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering.
