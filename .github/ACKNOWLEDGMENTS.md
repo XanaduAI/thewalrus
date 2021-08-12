@@ -45,3 +45,5 @@
 * [Timjan Kalajdzievski](https://github.com/timjank) (Xanadu) - :beverage_box: Beard Czar
 
 * [Yuan Yao](https://github.com/sylviemonet) (Télécom Paris) - :dog: Schrödinger's Dog's owner
+
+* [Ali Asadi](https://github.com/maliasadi) (Western University) - :thread: Commander of threads

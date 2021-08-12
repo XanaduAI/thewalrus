@@ -119,7 +119,7 @@ from ._hafnian import (
 
 from ._low_rank_haf import low_rank_hafnian
 from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional, hermite_multidimensional_numba, grad_hermite_multidimensional_numba
-from ._permanent import perm, perm_complex, perm_real, permanent_repeated
+from ._permanent import perm, perm_complex, perm_real, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
 from ._torontonian import tor, threshold_detection_prob_displacement, threshold_detection_prob, numba_tor
 from ._version import __version__
 
