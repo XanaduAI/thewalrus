@@ -200,7 +200,7 @@ def remove(
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 
-def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
+def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Returns the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
 
@@ -219,6 +219,8 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
     Returns:
         array[data type]: the multidimensional Hermite polynomials
     """
+    if dtype == None:
+        dtype = R.dtype
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
@@ -259,7 +261,7 @@ def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no co
     return array
 
 
-def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=np.complex128):
+def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
@@ -274,6 +276,8 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=np.compl
     Returns:
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
+    if dtype == None:
+        dtype = R.dtype
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
