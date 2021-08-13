@@ -17,26 +17,7 @@ Torontonian Python interface
 import numpy as np
 import numba
 from thewalrus.quantum.conversions import Xmat, Amat
-#from thewalrus import reduction
-
-def reduction(A, rpt):
-    r"""Calculates the reduction of an array by a vector of indices.
-
-    This is equivalent to repeating the ith row/column of :math:`A`, :math:`rpt_i` times.
-
-    Args:
-        A (array): matrix of size [N, N]
-        rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
-            of A to be repeated.
-    Returns:
-        array: the reduction of A by the index vector rpt
-    """
-    rows = [i for sublist in [[idx] * j for idx, j in enumerate(rpt)] for i in sublist]
-
-    if A.ndim == 1:
-        return A[rows]
-
-    return A[:, rows][rows]
+from ._hafnian import reduction
 
 def tor(A):
     """Returns the Torontonian of a matrix.
