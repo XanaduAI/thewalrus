@@ -23,7 +23,7 @@ from scipy.special import factorial
 import numpy as np
 
 from .._hafnian import hafnian, reduction
-from .._torontonian import threshold_detection_prob_displacement
+from .._torontonian import threshold_detection_prob
 
 from .conversions import (
     reduced_gaussian,
@@ -458,7 +458,7 @@ def click_cumulant(mu, cov, modes, hbar=2):
             B = list(set(B))  # remove repetitions
             pattern = np.ones_like(B)
             mu_red, cov_red = reduced_gaussian(mu, cov, B)
-            summand = threshold_detection_prob_displacement(mu_red, cov_red, pattern, hbar=hbar)
+            summand = threshold_detection_prob(mu_red, cov_red, pattern, hbar=hbar)
             term *= summand
         kappa += term
 

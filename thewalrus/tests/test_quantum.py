@@ -31,7 +31,7 @@ from thewalrus.symplectic import (
 )
 
 from thewalrus.random import random_covariance, random_interferometer
-from thewalrus._torontonian import threshold_detection_prob_displacement
+from thewalrus import threshold_detection_prob
 from thewalrus.quantum.fock_tensors import _prefactor
 from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
 from thewalrus.quantum.adjacency_matrices import _mean_clicks_adj
@@ -1829,17 +1829,17 @@ def test_click_cumulants():
     mu02, cov02 = reduced_gaussian(mu, cov, [0, 2])
     mu12, cov12 = reduced_gaussian(mu, cov, [1, 2])
     expected = (
-        threshold_detection_prob_displacement(mu, cov, [1, 1, 1])
-        - threshold_detection_prob_displacement(mu01, cov01, [1, 1])
-        * threshold_detection_prob_displacement(mu2, cov2, [1])
-        - threshold_detection_prob_displacement(mu02, cov02, [1, 1])
-        * threshold_detection_prob_displacement(mu1, cov1, [1])
-        - threshold_detection_prob_displacement(mu12, cov12, [1, 1])
-        * threshold_detection_prob_displacement(mu0, cov0, [1])
+        threshold_detection_prob(mu, cov, [1, 1, 1])
+        - threshold_detection_prob(mu01, cov01, [1, 1])
+        * threshold_detection_prob(mu2, cov2, [1])
+        - threshold_detection_prob(mu02, cov02, [1, 1])
+        * threshold_detection_prob(mu1, cov1, [1])
+        - threshold_detection_prob(mu12, cov12, [1, 1])
+        * threshold_detection_prob(mu0, cov0, [1])
         + 2
-        * threshold_detection_prob_displacement(mu2, cov2, [1])
-        * threshold_detection_prob_displacement(mu1, cov1, [1])
-        * threshold_detection_prob_displacement(mu0, cov0, [1])
+        * threshold_detection_prob(mu2, cov2, [1])
+        * threshold_detection_prob(mu1, cov1, [1])
+        * threshold_detection_prob(mu0, cov0, [1])
     )
     obtained = click_cumulant(mu, cov, [0, 1, 2])
     assert np.allclose(expected, obtained)
