@@ -1816,12 +1816,13 @@ def test_n_body_marginals_too_high_correlation():
         n_body_marginals(mu, cov, 4, 4)
 
 
-
-def test_click_cumulants():
+@pytest.mark.parametrize("disp_scale", [0.0, 1.0, 2.0])
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 2.0, 1.7])
+def test_click_cumulants(disp_scale, hbar):
     """Tests the correctness of the click cumulant function"""
     M = 3
-    cov = random_covariance(M)
-    mu = np.zeros([2 * M])
+    cov = random_covariance(M, hbar=hbar)
+    mu = disp_scale * (np.random.rand(2 * M) - 0.5)
     mu0, cov0 = reduced_gaussian(mu, cov, [0])
     mu1, cov1 = reduced_gaussian(mu, cov, [1])
     mu2, cov2 = reduced_gaussian(mu, cov, [2])
@@ -1829,17 +1830,32 @@ def test_click_cumulants():
     mu02, cov02 = reduced_gaussian(mu, cov, [0, 2])
     mu12, cov12 = reduced_gaussian(mu, cov, [1, 2])
     expected = (
-        threshold_detection_prob(mu, cov, [1, 1, 1])
-        - threshold_detection_prob(mu01, cov01, [1, 1])
-        * threshold_detection_prob(mu2, cov2, [1])
-        - threshold_detection_prob(mu02, cov02, [1, 1])
-        * threshold_detection_prob(mu1, cov1, [1])
-        - threshold_detection_prob(mu12, cov12, [1, 1])
-        * threshold_detection_prob(mu0, cov0, [1])
+        threshold_detection_prob(mu, cov, [1, 1, 1], hbar=hbar)
+        - threshold_detection_prob(mu01, cov01, [1, 1], hbar=hbar)
+        * threshold_detection_prob(mu2, cov2, [1], hbar=hbar)
+        - threshold_detection_prob(mu02, cov02, [1, 1], hbar=hbar)
+        * threshold_detection_prob(mu1, cov1, [1], hbar=hbar)
+        - threshold_detection_prob(mu12, cov12, [1, 1], hbar=hbar)
+        * threshold_detection_prob(mu0, cov0, [1], hbar=hbar)
         + 2
-        * threshold_detection_prob(mu2, cov2, [1])
-        * threshold_detection_prob(mu1, cov1, [1])
-        * threshold_detection_prob(mu0, cov0, [1])
+        * threshold_detection_prob(mu2, cov2, [1], hbar=hbar)
+        * threshold_detection_prob(mu1, cov1, [1], hbar=hbar)
+        * threshold_detection_prob(mu0, cov0, [1], hbar=hbar)
     )
-    obtained = click_cumulant(mu, cov, [0, 1, 2])
+    obtained = click_cumulant(mu, cov, [0, 1, 2], hbar=hbar)
     assert np.allclose(expected, obtained)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 2.0, 1.7])
+def test_single_mode_first_and_second_cumulant(hbar):
+    """Tests the first and second order cumulants of a single mode are the mean and variance"""
+    M = 1
+    cov = random_covariance(M, hbar)
+    mu = np.zeros([2 * M])
+    expected_mean = mean_clicks(cov, hbar=hbar)
+    expected_var = variance_clicks(cov, hbar=hbar)
+
+    obtained_mean = click_cumulant(mu, cov, [0], hbar=hbar)
+    obtained_var = click_cumulant(mu, cov, [0, 0], hbar=hbar)
+    assert np.allclose(expected_mean, obtained_mean)
+    assert np.allclose(expected_var, obtained_var)
