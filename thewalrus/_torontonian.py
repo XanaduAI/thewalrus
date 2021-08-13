@@ -16,52 +16,8 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-#from .quantum import Xmat, Amat
+from thewalrus.quantum.conversions import Xmat, Amat
 #from thewalrus import reduction
-
-def Xmat(N):
-    r"""Returns the matrix :math:`X_n = \begin{bmatrix}0 & I_n\\ I_n & 0\end{bmatrix}`
-
-    Args:
-        N (int): positive integer
-
-    Returns:
-        array: :math:`2N\times 2N` array
-    """
-    I = np.identity(N)
-    O = np.zeros_like(I)
-    X = np.block([[O, I], [I, O]])
-    return X
-
-
-def Amat(cov, hbar=2, cov_is_qmat=False):
-    r"""Returns the :math:`A` matrix of the Gaussian state whose hafnian gives the photon number probabilities.
-
-    Args:
-        cov (array): :math:`2N\times 2N` covariance matrix
-        hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
-        cov_is_qmat (bool): if ``True``, it is assumed that ``cov`` is in fact the Q matrix.
-
-    Returns:
-        array: the :math:`A` matrix.
-    """
-    # number of modes
-    N = len(cov) // 2
-    X = Xmat(N)
-
-    # inverse Q matrix
-    if cov_is_qmat:
-        Q = cov
-    else:
-        Q = Qmat_numba(cov, hbar=hbar)
-
-    Qinv = np.linalg.inv(Q)
-
-    # calculate Hamilton's A matrix: A = X.(I-Q^{-1})*
-    A = X @ (np.identity(2 * N) - Qinv).conj()
-    return A
-
 
 def reduction(A, rpt):
     r"""Calculates the reduction of an array by a vector of indices.
