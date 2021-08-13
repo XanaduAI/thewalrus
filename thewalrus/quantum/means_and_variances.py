@@ -449,7 +449,6 @@ def click_cumulant(mu, cov, modes, hbar=2):
     """
 
     modes = list(modes)  # turns modes from array to list if passed in as array
-    num_modes = len(mu) // 2
     kappa = 0
     for pi in partition(modes):
         size = len(pi)
