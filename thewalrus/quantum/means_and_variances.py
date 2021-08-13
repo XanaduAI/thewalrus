@@ -456,7 +456,7 @@ def click_cumulant(mu, cov, modes, hbar=2):
         term = factorial(size - 1) * (-1) ** (size - 1)
         for B in pi:
             B = list(set(B))  # remove repetitions
-            pattern = np.ones([len(B)])
+            pattern = np.ones_like(B)
             mu_red, cov_red = reduced_gaussian(mu, cov, B)
             summand = threshold_detection_prob_displacement(mu_red, cov_red, pattern, hbar=hbar)
             term *= summand
