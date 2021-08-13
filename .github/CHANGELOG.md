@@ -23,6 +23,9 @@
 
 * Adds support for calculating the permanent using the BBFG algorithm [#267](https://github.com/XanaduAI/thewalrus/pull/267)
 
+* Adds the ability to calculate click cumulants in threshold detection with the function `click_cumulant`  
+[#264](https://github.com/XanaduAI/thewalrus/pull/274)
+
 ### Improvements
 
 * Speeds up the calculation of photon number variances/covariances [#244](https://github.com/XanaduAI/thewalrus/pull/244)
