@@ -184,8 +184,8 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
         minus = hermite_multidimensional_numba(R, cutoff, y, C)
         expected_grad_y = (plus - minus) / (2 * delta)
         y[i] += delta
-        assert np.allclose(grad_y[...,i], expected_grad_y, atol=tol, rtol=0)
-        
+        assert np.allclose(grad_y[..., i], expected_grad_y, atol=tol, rtol=0)
+
     for i in range(R.shape[0]):
         for j in range(R.shape[1]):
             R[i,j] += delta
@@ -194,7 +194,7 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
             minus = hermite_multidimensional_numba(R, cutoff, y, C)
             expected_grad_R = (plus - minus) / (2 * delta)
             R[i,j] += delta
-            assert np.allclose(grad_R[...,i,j], expected_grad_R, atol=tol, rtol=0)
+            assert np.allclose(grad_R[..., i, j], expected_grad_R, atol=tol, rtol=0)
 
 
 def test_auto_dtype_multidim_herm_numba():
