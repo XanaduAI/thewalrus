@@ -220,7 +220,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         array[data type]: the multidimensional Hermite polynomials
     """
     if dtype is None:
-        dtype = R.dtype
+        dtype = np.find_common_type([R.dtype, y.dtype], [np.array(C).dtype])
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
@@ -277,7 +277,7 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
     if dtype is None:
-        dtype = R.dtype
+        dtype = np.find_common_type([array.dtype, R.dtype, y.dtype], [np.array(C).dtype])
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
@@ -285,7 +285,7 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     if isinstance(cutoff, int):
         cutoff = tuple([cutoff] * num_indices)
     cutoff = tuple(cutoff)
-    dG_dC = array / C
+    dG_dC = (array / C).astype(dtype)
     dG_dR = np.zeros_like(array, dtype=dtype)
     dG_dy = np.zeros_like(array, dtype=dtype)
     for photons in range(1, sum(cutoff) - num_indices + 1):

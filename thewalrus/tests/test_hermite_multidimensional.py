@@ -188,3 +188,22 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
         - hermite_multidimensional_numba(R - delta_plus, cutoff, y, C = C)
     ) / (2 * delta_plus)
     assert np.allclose(grad_R, expected_grad_R, atol=tol, rtol=0)
+
+
+def test_auto_dtype_multidim_herm_numba(tol):
+    cutoff = 4
+    R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
+    R += R.T
+    y = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
+    C = 0.5
+
+    R = R.astype('complex64')
+    y = y.astype('complex128')
+    poly = hermite_multidimensional_numba(R, cutoff, y, C, dtype=None)
+    assert poly.dtype == y.dtype
+
+    R = R.astype('complex128')
+    y = y.astype('complex64')
+    poly = poly.astype('complex64')
+    grad = grad_hermite_multidimensional_numba(poly, R, cutoff, y, C, dtype=None)
+    assert all(g.dtype == R.dtype for g in grad)
