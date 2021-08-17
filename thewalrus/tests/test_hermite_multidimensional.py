@@ -162,7 +162,7 @@ def test_hermite_numba_vs_hermite_renorm_modified(tol):
 
 
 def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
-    """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences"""
+    """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences."""
     cutoff = 4
     R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
     R += R.T
