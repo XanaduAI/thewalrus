@@ -190,7 +190,8 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     assert np.allclose(grad_R, expected_grad_R, atol=tol, rtol=0)
 
 
-def test_auto_dtype_multidim_herm_numba(tol):
+def test_auto_dtype_multidim_herm_numba():
+    """Tests that auto-dtype detection works"""
     cutoff = 4
     R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
     R += R.T
