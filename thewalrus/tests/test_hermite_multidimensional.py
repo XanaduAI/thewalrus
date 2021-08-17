@@ -172,22 +172,29 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(
         gate, R, cutoff, y, C = C, dtype=np.complex128
     )
-    delta_plus = 0.00001 + 1j * 0.00001
-    expected_grad_C = (
-        hermite_multidimensional_numba(R, cutoff, y, C = C + delta_plus)
-        - hermite_multidimensional_numba(R, cutoff, y, C = C - delta_plus)
-    ) / (2 * delta_plus)
+
+    delta = 0.00001 + 1j * 0.00001
+    expected_grad_C = (hermite_multidimensional_numba(R, cutoff, y, C + delta) - hermite_multidimensional_numba(R, cutoff, y, C - delta)) / (2 * delta)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
-    expected_grad_y = (
-        hermite_multidimensional_numba(R, cutoff, y + delta_plus, C = C)
-        - hermite_multidimensional_numba(R, cutoff, y - delta_plus, C = C)
-    ) / (2 * delta_plus)
-    assert np.allclose(grad_y, expected_grad_y, atol=tol, rtol=0)
-    expected_grad_R = (
-        hermite_multidimensional_numba(R + delta_plus, cutoff, y, C = C)
-        - hermite_multidimensional_numba(R - delta_plus, cutoff, y, C = C)
-    ) / (2 * delta_plus)
-    assert np.allclose(grad_R, expected_grad_R, atol=tol, rtol=0)
+
+    for i in range(y.shape[0]):
+        y[i] += delta
+        plus = hermite_multidimensional_numba(R, cutoff, y, C)
+        y[i] -= 2*delta
+        minus = hermite_multidimensional_numba(R, cutoff, y, C)
+        expected_grad_y = (plus - minus) / (2 * delta)
+        y[i] += delta
+        assert np.allclose(grad_y[...,i], expected_grad_y, atol=tol, rtol=0)
+        
+    for i in range(R.shape[0]):
+        for j in range(R.shape[1]):
+            R[i,j] += delta
+            plus = hermite_multidimensional_numba(R, cutoff, y, C)
+            R[i,j] -= 2*delta
+            minus = hermite_multidimensional_numba(R, cutoff, y, C)
+            expected_grad_R = (plus - minus) / (2 * delta)
+            R[i,j] += delta
+            assert np.allclose(grad_R[...,i,j], expected_grad_R, atol=tol, rtol=0)
 
 
 def test_auto_dtype_multidim_herm_numba():
