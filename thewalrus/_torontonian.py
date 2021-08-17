@@ -16,9 +16,8 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from .quantum import Qmat, Xmat, Amat
-from . import reduction
-
+from thewalrus.quantum.conversions import Xmat, Amat
+from ._hafnian import reduction
 
 def tor(A):
     """Returns the Torontonian of a matrix.
@@ -247,7 +246,7 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
     if np.allclose(mu, 0, atol=atol, rtol=rtol):
         # no displacement
         n_modes = cov.shape[0] // 2
-        Q = Qmat(cov, hbar)
+        Q = Qmat_numba(cov, hbar)
         O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)

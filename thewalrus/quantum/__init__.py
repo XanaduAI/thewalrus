@@ -107,6 +107,7 @@ Means and variances
     mean_clicks
     variance_clicks
     photon_number_cumulant
+    click_cumulant
 
 Photon number distributions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -175,6 +176,7 @@ from .means_and_variances import (
     mean_clicks,
     variance_clicks,
     s_ordered_expectation,
+    click_cumulant,
 )
 
 from .photon_number_distributions import (
