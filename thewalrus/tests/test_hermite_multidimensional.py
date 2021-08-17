@@ -168,12 +168,10 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     R += R.T
     y = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
     C = 0.5
-    gate = hermite_multidimensional_numba(R, cutoff, y, C = C, dtype=np.complex128)
-    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(
-        gate, R, cutoff, y, C = C, dtype=np.complex128
-    )
+    gate = hermite_multidimensional_numba(R, cutoff, y, C, dtype=np.complex128)
+    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(gate, R, cutoff, y, C, dtype=np.complex128)
 
-    delta = 0.00001 + 1j * 0.00001
+    delta = 0.000001 + 1j * 0.000001
     expected_grad_C = (hermite_multidimensional_numba(R, cutoff, y, C + delta) - hermite_multidimensional_numba(R, cutoff, y, C - delta)) / (2 * delta)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
 
@@ -215,3 +213,17 @@ def test_auto_dtype_multidim_herm_numba():
     poly = poly.astype('complex64')
     grad = grad_hermite_multidimensional_numba(poly, R, cutoff, y, C, dtype=None)
     assert all(g.dtype == R.dtype for g in grad)
+
+
+def test_multi_cutoffs_multidim_herm_numba():
+    """Tests that different cutoffs give the right result"""
+    dim = 4
+    R = np.random.rand(dim, dim) + 1j * np.random.rand(dim, dim)
+    R += R.T
+    y = np.random.rand(dim) + 1j * np.random.rand(dim)
+    C = 0.5
+
+    n = [np.random.randint(0, 4) for _ in range(dim)]
+    poly = hermite_multidimensional_numba(R, [3+n[0], 3+n[1], 3+n[2], 3+n[3]], y, C)
+    poly_expected = hermite_multidimensional_numba(R, 3, y, C)
+    assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
