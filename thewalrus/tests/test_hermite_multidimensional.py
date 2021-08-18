@@ -198,11 +198,12 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
 
 def test_auto_dtype_multidim_herm_numba():
     """Tests that auto-dtype detection works"""
-    cutoff = 4
-    R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
+    d = 4
+    R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
     R += R.T
-    y = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
+    y = np.random.rand(d) + 1j * np.random.rand(d)
     C = 0.5
+    cutoff = 3
 
     R = R.astype('complex64')
     y = y.astype('complex128')
@@ -218,13 +219,13 @@ def test_auto_dtype_multidim_herm_numba():
 
 def test_multi_cutoffs_multidim_herm_numba():
     """Tests that different cutoffs give the right result"""
-    dim = 4
-    R = np.random.rand(dim, dim) + 1j * np.random.rand(dim, dim)
+    d = 4
+    R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
     R += R.T
-    y = np.random.rand(dim) + 1j * np.random.rand(dim)
+    y = np.random.rand(d) + 1j * np.random.rand(d)
     C = 0.5
 
-    n = [np.random.randint(0, 4) for _ in range(dim)]
+    n = [np.random.randint(0, 4) for _ in range(d)]
     poly = hermite_multidimensional_numba(R, [3+n[0], 3+n[1], 3+n[2], 3+n[3]], y, C)
     poly_expected = hermite_multidimensional_numba(R, 3, y, C)
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
