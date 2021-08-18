@@ -163,11 +163,12 @@ def test_hermite_numba_vs_hermite_renorm_modified(tol):
 
 def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences."""
-    cutoff = 4
-    R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
+    d = 4
+    R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
     R += R.T
-    y = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
+    y = np.random.rand(d) + 1j * np.random.rand(d)
     C = 0.5
+    cutoff = [3, 3, 3, 3]
     gate = hermite_multidimensional_numba(R, cutoff, y, C, dtype=np.complex128)
     grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(gate, R, cutoff, y, C, dtype=np.complex128)
 
