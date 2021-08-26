@@ -200,7 +200,7 @@ def remove(
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 
-def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
+def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Returns the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
 
@@ -219,17 +219,20 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=np.complex128):
     Returns:
         array[data type]: the multidimensional Hermite polynomials
     """
+    if dtype is None:
+        dtype = np.find_common_type([R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
     num_indices = len(y)
     if isinstance(cutoff, int):
-        cutoff = tuple([cutoff] * num_indices)
-    cutoff = tuple(cutoff)
-    array = np.zeros(cutoff, dtype=dtype)
+        cutoffs = tuple([cutoff] * num_indices)
+    else:
+        cutoffs = tuple(cutoff)
+    array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    for photons in range(1, sum(cutoff) - num_indices + 1):
-        for idx in partition(photons, cutoff):
+    for photons in range(1, sum(cutoffs) - num_indices + 1):
+        for idx in partition(photons, cutoffs):
             array = fill_hermite_multidimensional_numba_loop(array, idx, R, y)
     return array
 
@@ -259,7 +262,7 @@ def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no co
     return array
 
 
-def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=np.complex128):
+def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
@@ -274,18 +277,21 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=np.compl
     Returns:
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
+    if dtype is None:
+        dtype = np.find_common_type([array.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
     num_indices = len(y)
     if isinstance(cutoff, int):
-        cutoff = tuple([cutoff] * num_indices)
-    cutoff = tuple(cutoff)
-    dG_dC = array / C
-    dG_dR = np.zeros_like(array, dtype=dtype)
-    dG_dy = np.zeros_like(array, dtype=dtype)
-    for photons in range(1, sum(cutoff) - num_indices + 1):
-        for idx in partition(photons, cutoff):
+        cutoffs = tuple([cutoff] * num_indices)
+    else:
+        cutoffs = tuple(cutoff)
+    dG_dC = np.array(array / C).astype(dtype)
+    dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
+    dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
+    for photons in range(1, sum(cutoffs) - num_indices + 1):
+        for idx in partition(photons, cutoffs):
             dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
     return dG_dC, dG_dR, dG_dy
 
@@ -313,11 +319,13 @@ def fill_grad_hermite_multidimensional_numba_loop(
         if val > 0:
             break
     ki = dec(idx, i)
-    dy = y[i] * dG_dy[ki] + array[ki]
+    dy = y[i] * dG_dy[ki]
+    dy[i] += array[ki]
     dR = y[i] * dG_dR[ki]
     for l, kl in remove(ki):
         dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
-        dR -= SQRT[ki[l]] * (R[i, l] * dG_dR[kl] + array[kl])
+        dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
+        dR[i, l] -= SQRT[ki[l]] * array[kl]
     dG_dR[idx] = dR / SQRT[idx[i]]
     dG_dy[idx] = dy / SQRT[idx[i]]
     return dG_dR, dG_dy
