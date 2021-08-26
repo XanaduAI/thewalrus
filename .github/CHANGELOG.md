@@ -1,45 +1,69 @@
-# Version 0.16.0-dev
+# Version 0.17.0-dev
 
 ### New features
 
-* Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
-
-* ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing [#249](https://github.com/XanaduAI/thewalrus/pull/249)
-
-* Adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations [#249](https://github.com/XanaduAI/thewalrus/pull/249)
-
-* ``torontonian_sample_state`` now can sample displaced Gaussian states [#248](https://github.com/XanaduAI/thewalrus/pull/248)
-
-* Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix [#246](https://github.com/XanaduAI/thewalrus/pull/246)
-
-* Adds the functions `hermite_multidimensional_numba` and `grad_hermite_multidimensional_numba` to calculate renormalized multidimensional Hermite polynomials and its gradients using numba [#251](https://github.com/XanaduAI/thewalrus/pull/251)
-
-* Adds the functions `mzgate` and `grad_mzgate` to calculate the Fock representation of the Mach-Zehnder gate and its gradients [#257](https://github.com/XanaduAI/thewalrus/pull/257)
-
-* Adds the ability to calculate n-body photon number distributions using the function `n_body_marginals` [#253](https://github.com/XanaduAI/thewalrus/pull/253)
-
-* Adds the ability to calculate cumulants and arbitrary expectation values of products of powers of photon numbers with the functions `photon_number_cumulant` and `photon_number_moment` respectively  
-[#264](https://github.com/XanaduAI/thewalrus/pull/264)
-
-* Adds support for calculating the permanent using the BBFG algorithm [#267](https://github.com/XanaduAI/thewalrus/pull/267)
-
-* Adds the ability to calculate click cumulants in threshold detection with the function `click_cumulant`  
-[#264](https://github.com/XanaduAI/thewalrus/pull/274)
-
 ### Improvements
-
-* Speeds up the calculation of photon number variances/covariances [#244](https://github.com/XanaduAI/thewalrus/pull/244)
 
 ### Bug fixes
 
-* Corrects bug in the function `photon_number_covar` that gave incorrect results when the covariance between two modes with finite displacements was calculated. 
+### Breaking changes
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+---
+
+# Version 0.16.0
+
+### New features
+
+* Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure Python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
+
+* The ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+
+* Adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+
+* The ``torontonian_sample_state`` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
+
+* Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix. [#246](https://github.com/XanaduAI/thewalrus/pull/246)
+
+* Adds the functions `hermite_multidimensional_numba` and `grad_hermite_multidimensional_numba` to calculate renormalized multidimensional Hermite polynomials and its gradients using numba. [#251](https://github.com/XanaduAI/thewalrus/pull/251)
+
+* Adds the functions `mzgate` and `grad_mzgate` to calculate the Fock representation of the Mach-Zehnder gate and its gradients. [#257](https://github.com/XanaduAI/thewalrus/pull/257)
+
+* Adds the ability to calculate n-body photon number distributions using the function `n_body_marginals`. [#253](https://github.com/XanaduAI/thewalrus/pull/253)
+
+* Adds the ability to calculate cumulants and arbitrary expectation values of products of powers of photon numbers with the functions `photon_number_cumulant` and `photon_number_moment` respectively. [#264](https://github.com/XanaduAI/thewalrus/pull/264)
+
+* Adds support for calculating the permanent using the BBFG algorithm and changes this to the default method for calculating permanents. [#267](https://github.com/XanaduAI/thewalrus/pull/267)
+
+* Adds the ability to calculate click cumulants in threshold detection with the function `click_cumulant`. [#264](https://github.com/XanaduAI/thewalrus/pull/274)
+
+### Improvements
+
+* Speeds up the calculation of photon number variances/covariances. [#244](https://github.com/XanaduAI/thewalrus/pull/244)
+
+* Updates documentation for the the `tor` function. [#265](https://github.com/XanaduAI/thewalrus/pull/265)
+
+* Numba methods for multidimensional hermite can now detect dtype automatically. [#271](https://github.com/XanaduAI/thewalrus/pull/271)
+
+### Bug fixes
+
+* Corrects bug in the function `photon_number_covar` that gave incorrect results when the covariance between two modes with finite displacements was calculated.
 [#264](https://github.com/XanaduAI/thewalrus/pull/264)
 
+* Fixes a bug in `setup.py` that would cause the build to fail when using miniforge for M1 macs.
+[#273](https://github.com/XanaduAI/thewalrus/pull/273)
+
+* Updates the `samples.generate_hafnian_sample` function to renormalizing probabilities. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
 ### Breaking changes
 
-* Torontonians and approximations to the hafnian for non-negative matrices are no longer calculated in C++ using the Eigen software library.
-  Instead, they are now calculated in pure Python using Numba. These changes have the nice result of making The Walrus compilable from source using only a C++ compiler. [#262](https://github.com/XanaduAI/thewalrus/pull/262) [#259](https://github.com/XanaduAI/thewalrus/pull/259). 
+* Torontonians and approximations to the hafnian for non-negative matrices are no longer calculated
+  in C++ using the Eigen software library. Instead, they are now calculated in pure Python using
+  Numba. These changes have the nice result of making The Walrus compilable from source using only a
+  C++ compiler. [#262](https://github.com/XanaduAI/thewalrus/pull/262) [#259](https://github.com/XanaduAI/thewalrus/pull/259).
 
 ### Contributors
 

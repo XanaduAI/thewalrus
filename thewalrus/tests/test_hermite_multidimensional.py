@@ -162,29 +162,70 @@ def test_hermite_numba_vs_hermite_renorm_modified(tol):
 
 
 def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
-    """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences"""
-    cutoff = 4
-    R = np.random.rand(cutoff, cutoff) + 1j * np.random.rand(cutoff, cutoff)
+    """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences."""
+    d = 4
+    R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
     R += R.T
-    y = np.random.rand(cutoff) + 1j * np.random.rand(cutoff)
+    y = np.random.rand(d) + 1j * np.random.rand(d)
     C = 0.5
-    gate = hermite_multidimensional_numba(R, cutoff, y, C = C, dtype=np.complex128)
-    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(
-        gate, R, cutoff, y, C = C, dtype=np.complex128
-    )
-    delta_plus = 0.00001 + 1j * 0.00001
-    expected_grad_C = (
-        hermite_multidimensional_numba(R, cutoff, y, C = C + delta_plus)
-        - hermite_multidimensional_numba(R, cutoff, y, C = C - delta_plus)
-    ) / (2 * delta_plus)
+    cutoff = [3, 3, 3, 3]
+    gate = hermite_multidimensional_numba(R, cutoff, y, C, dtype=np.complex128)
+    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(gate, R, cutoff, y, C, dtype=np.complex128)
+
+    delta = 0.000001 + 1j * 0.000001
+    expected_grad_C = (hermite_multidimensional_numba(R, cutoff, y, C + delta) - hermite_multidimensional_numba(R, cutoff, y, C - delta)) / (2 * delta)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
-    expected_grad_y = (
-        hermite_multidimensional_numba(R, cutoff, y + delta_plus, C = C)
-        - hermite_multidimensional_numba(R, cutoff, y - delta_plus, C = C)
-    ) / (2 * delta_plus)
-    assert np.allclose(grad_y, expected_grad_y, atol=tol, rtol=0)
-    expected_grad_R = (
-        hermite_multidimensional_numba(R + delta_plus, cutoff, y, C = C)
-        - hermite_multidimensional_numba(R - delta_plus, cutoff, y, C = C)
-    ) / (2 * delta_plus)
-    assert np.allclose(grad_R, expected_grad_R, atol=tol, rtol=0)
+
+    for i in range(y.shape[0]):
+        y[i] += delta
+        plus = hermite_multidimensional_numba(R, cutoff, y, C)
+        y[i] -= 2*delta
+        minus = hermite_multidimensional_numba(R, cutoff, y, C)
+        expected_grad_y = (plus - minus) / (2 * delta)
+        y[i] += delta
+        assert np.allclose(grad_y[..., i], expected_grad_y, atol=tol, rtol=0)
+
+    for i in range(R.shape[0]):
+        for j in range(R.shape[1]):
+            R[i,j] += delta
+            plus = hermite_multidimensional_numba(R, cutoff, y, C)
+            R[i,j] -= 2*delta
+            minus = hermite_multidimensional_numba(R, cutoff, y, C)
+            expected_grad_R = (plus - minus) / (2 * delta)
+            R[i,j] += delta
+            assert np.allclose(grad_R[..., i, j], expected_grad_R, atol=tol, rtol=0)
+
+
+def test_auto_dtype_multidim_herm_numba():
+    """Tests that auto-dtype detection works"""
+    d = 4
+    R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
+    R += R.T
+    y = np.random.rand(d) + 1j * np.random.rand(d)
+    C = 0.5
+    cutoff = 3
+
+    R = R.astype('complex64')
+    y = y.astype('complex128')
+    poly = hermite_multidimensional_numba(R, cutoff, y, C, dtype=None)
+    assert poly.dtype == y.dtype
+
+    R = R.astype('complex128')
+    y = y.astype('complex64')
+    poly = poly.astype('complex64')
+    grad = grad_hermite_multidimensional_numba(poly, R, cutoff, y, C, dtype=None)
+    assert all(g.dtype == R.dtype for g in grad)
+
+
+def test_multi_cutoffs_multidim_herm_numba():
+    """Tests that different cutoffs give the right result"""
+    d = 4
+    R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
+    R += R.T
+    y = np.random.rand(d) + 1j * np.random.rand(d)
+    C = 0.5
+
+    n = [np.random.randint(0, 4) for _ in range(d)]
+    poly = hermite_multidimensional_numba(R, [3+n[0], 3+n[1], 3+n[2], 3+n[3]], y, C)
+    poly_expected = hermite_multidimensional_numba(R, 3, y, C)
+    assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
