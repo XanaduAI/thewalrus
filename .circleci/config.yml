@@ -75,6 +75,7 @@ jobs:
       - image: circleci/python:3.6.12-stretch
     environment:
       CIBW_BUILD: 'cp37-* cp38-* cp39-*'
+      CIBW_ARCHS: 'x86_64'
       CIBW_BEFORE_BUILD_LINUX: pip install numpy==1.19.5 scipy cython
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
