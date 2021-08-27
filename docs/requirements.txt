@@ -10,7 +10,7 @@ sympy>=1.5.1
 repoze.lru>=0.7
 scipy>=1.2.1
 breathe==4.29.0
-Jinja2==2.11
+Jinja2==2.11.3
 exhale
 version_information
 sphinx-copybutton
