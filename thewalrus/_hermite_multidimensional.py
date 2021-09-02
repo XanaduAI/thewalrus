@@ -219,22 +219,15 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         cutoffs = tuple(cutoff)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    # for photons in range(1, sum(cutoffs) - num_indices + 1):
-    #     for idx in partition(photons, cutoffs):
-    # return array
-    return fill_hermite_multidimensional_numba(array, R, y)
-
-@jit(nopython=True)
-def fill_hermite_multidimensional_numba(array, R, y):
-    indices = np.ndindex(array.shape)
+    indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
-        array = fill_hermite_multidimensional_numba_loop(array, idx, R, y)
+        array = hermite_multidimensional_numba_loop(array, idx, R, y)
     return array
 
 
 @jit(nopython=True)
-def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
+def hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
     r"""Calculates the renormalized Hermite multidimensional polynomial for a given index.
     Assumes that the polynomials needed for the calculation are stored in `array`.
 
@@ -287,16 +280,11 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
-    dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba(dG_dR, dG_dy, array, R, y)
-    return dG_dC, dG_dR, dG_dy
-
-@jit(nopython=True)
-def fill_grad_hermite_multidimensional_numba(dG_dR, dG_dy, array, R, y):
-    indices = np.ndindex(array.shape)
+    indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
         dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
-    return dG_dR, dG_dy
+    return dG_dC, dG_dR, dG_dy
 
 @jit(nopython=True)
 def fill_grad_hermite_multidimensional_numba_loop(
