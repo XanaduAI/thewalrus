@@ -1,16 +1,10 @@
-# Version 0.17.0-dev
-
-### New features
-
-### Improvements
+# Version 0.16.1
 
 ### Bug fixes
 
 * Updates the `samples.generate_torontonian_sample` function to ensure probabilities are normalized. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
 * Pins Numba to version `<0.54` to avoid binary imcompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
-
-### Breaking changes
 
 ### Contributors
 
