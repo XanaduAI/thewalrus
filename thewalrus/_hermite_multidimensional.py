@@ -217,12 +217,15 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         cutoffs = tuple(cutoff)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
+    return _hermite_multidimensional_numba(R, array, y, cutoffs, num_indices)
+
+@jit(nopython=True)
+def _hermite_multidimensional_numba(R, array, y, cutoffs, num_indices):
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
         array = hermite_multidimensional_numba_loop(array, idx, R, y)
     return array
-
 
 @jit(nopython=True)
 def hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
@@ -248,7 +251,6 @@ def hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
         u -= SQRT[ki[l]] * R[i, l] * array[kl]
     array[idx] = u / SQRT[idx[i]]
     return array
-
 
 def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
@@ -278,6 +280,10 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
+    return _grad_hermite_multidimensional_numba(R, array, dG_dR, dG_dy, cutoffs, num_indices)
+
+@jit(nopython=True)
+def _grad_hermite_multidimensional_numba(R, array, dG_dR, dG_dy, cutoffs, num_indices):
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
