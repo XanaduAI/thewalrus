@@ -146,23 +146,11 @@ def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, ma
 
     if mu is None:
         mu = np.zeros([n], dtype=complex)
-
+    # The minus signs are intentional and are due to the fact that
+    # Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
     return hermite_multidimensional(
         -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True
     )
-
-
-# Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
-@lru_cache()
-def partition(photons, cutoff):
-    r"""Returns a list of all the ways of putting n photons into modes that have a given cutoff dimension.
-    This function is useful to fill the amplitude array by multiplets of constant photon number.
-
-    Args:
-        photons (int): number of photons in the multiplet
-        cutoff (tuple[int]): the cutoff of each mode
-    """
-    return [comb for comb in product(*(range(min(photons, i - 1) + 1) for i in cutoff)) if sum(comb) == photons]
 
 
 @jit(nopython=True)
@@ -231,15 +219,24 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         cutoffs = tuple(cutoff)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    for photons in range(1, sum(cutoffs) - num_indices + 1):
-        for idx in partition(photons, cutoffs):
-            array = fill_hermite_multidimensional_numba_loop(array, idx, R, y)
+    # for photons in range(1, sum(cutoffs) - num_indices + 1):
+    #     for idx in partition(photons, cutoffs):
+    # return array
+    return fill_hermite_multidimensional_numba(array, R, y)
+
+@jit(nopython=True)
+def fill_hermite_multidimensional_numba(array, R, y):
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        array = fill_hermite_multidimensional_numba_loop(array, idx, R, y)
     return array
 
 
 @jit(nopython=True)
 def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
     r"""Calculates the renormalized Hermite multidimensional polynomial for a given index.
+    Assumes that the polynomials needed for the calculation are stored in `array`.
 
     Args:
         array (array[data type]): the multidimensional Hermite polynomials
@@ -248,7 +245,7 @@ def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no co
         y (vector[complex]): vector argument of the Hermite polynomial
 
     Returns:
-        array[data type]: the hermit multidimensional polynomial for a given index
+        array[data type]: the Hermite multidimensional polynomial for a given index
     """
     i = 0
     for i, val in enumerate(idx):
@@ -290,11 +287,16 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
-    for photons in range(1, sum(cutoffs) - num_indices + 1):
-        for idx in partition(photons, cutoffs):
-            dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
+    dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba(dG_dR, dG_dy, array, R, y)
     return dG_dC, dG_dR, dG_dy
 
+@jit(nopython=True)
+def fill_grad_hermite_multidimensional_numba(dG_dR, dG_dy, array, R, y):
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
+    return dG_dR, dG_dy
 
 @jit(nopython=True)
 def fill_grad_hermite_multidimensional_numba_loop(
