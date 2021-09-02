@@ -217,10 +217,10 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         cutoffs = tuple(cutoff)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    return _hermite_multidimensional_numba(R, array, y, cutoffs, num_indices)
+    return _hermite_multidimensional_numba(R, array, y, cutoffs)
 
 @jit(nopython=True)
-def _hermite_multidimensional_numba(R, array, y, cutoffs, num_indices):
+def _hermite_multidimensional_numba(R, array, y, cutoffs):
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
