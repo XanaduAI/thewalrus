@@ -224,33 +224,17 @@ def _hermite_multidimensional_numba(R, array, y, cutoffs):
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
-        array = hermite_multidimensional_numba_loop(array, idx, R, y)
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        u = y[i] * array[ki]
+        for l, kl in remove(ki):
+            u -= SQRT[ki[l]] * R[i, l] * array[kl]
+        array[idx] = u / SQRT[idx[i]]
     return array
-
-@jit(nopython=True)
-def hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
-    r"""Calculates the renormalized Hermite multidimensional polynomial for a given index.
-    Assumes that the polynomials needed for the calculation are stored in `array`.
-
-    Args:
-        array (array[data type]): the multidimensional Hermite polynomials
-        idx (tuple): index of the gradients to be filled
-        R (array[complex]): square matrix parametrizing the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
-
-    Returns:
-        array[data type]: the Hermite multidimensional polynomial for a given index
-    """
-    i = 0
-    for i, val in enumerate(idx):
-        if val > 0:
-            break
-    ki = dec(idx, i)
-    u = y[i] * array[ki]
-    for l, kl in remove(ki):
-        u -= SQRT[ki[l]] * R[i, l] * array[kl]
-    array[idx] = u / SQRT[idx[i]]
-    return array
+    
 
 def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
@@ -288,39 +272,18 @@ def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs):
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
-        dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
-    return dG_dR, dG_dy
-
-@jit(nopython=True)
-def fill_grad_hermite_multidimensional_numba_loop(
-    dG_dR, dG_dy, array, idx, R, y
-):  # pragma: no cover
-    # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials for a given index.
-
-    Args:
-        dG_dR (array[data type]): array representing the gradients with respect to R
-        dG_dy (array[data type]): array representing the gradients with respect to y
-        array (array[data type]): the multidimensional Hermite polynomials
-        idx (tuple): index of the gradients to be filled
-        R (array[complex]): square matrix parametrizing the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
-
-    Returns:
-        array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to R and y for a given index
-    """
-    i = 0
-    for i, val in enumerate(idx):
-        if val > 0:
-            break
-    ki = dec(idx, i)
-    dy = y[i] * dG_dy[ki]
-    dy[i] += array[ki]
-    dR = y[i] * dG_dR[ki]
-    for l, kl in remove(ki):
-        dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
-        dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
-        dR[i, l] -= SQRT[ki[l]] * array[kl]
-    dG_dR[idx] = dR / SQRT[idx[i]]
-    dG_dy[idx] = dy / SQRT[idx[i]]
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        dy = y[i] * dG_dy[ki]
+        dy[i] += array[ki]
+        dR = y[i] * dG_dR[ki]
+        for l, kl in remove(ki):
+            dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
+            dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
+            dR[i, l] -= SQRT[ki[l]] * array[kl]
+        dG_dR[idx] = dR / SQRT[idx[i]]
+        dG_dy[idx] = dy / SQRT[idx[i]]
     return dG_dR, dG_dy
