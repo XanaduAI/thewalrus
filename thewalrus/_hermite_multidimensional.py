@@ -220,7 +220,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     return _hermite_multidimensional_numba(R, array, y, cutoffs)
 
 @jit(nopython=True)
-def _hermite_multidimensional_numba(R, array, y, cutoffs):
+def _hermite_multidimensional_numba(R, array, y, cutoffs):  # pragma: no cover
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
@@ -268,7 +268,7 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     return dG_dC, dG_dR, dG_dy
 
 @jit(nopython=True)
-def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs):
+def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs):  # pragma: no cover
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
