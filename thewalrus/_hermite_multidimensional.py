@@ -234,7 +234,7 @@ def _hermite_multidimensional_numba(R, array, y, cutoffs):
             u -= SQRT[ki[l]] * R[i, l] * array[kl]
         array[idx] = u / SQRT[idx[i]]
     return array
-    
+
 
 def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
