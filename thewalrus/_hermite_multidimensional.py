@@ -280,15 +280,16 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
-    return _grad_hermite_multidimensional_numba(R, array, dG_dR, dG_dy, cutoffs, num_indices)
+    dG_dR, dG_dy = _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs, num_indices)
+    return dG_dC, dG_dR, dG_dy
 
 @jit(nopython=True)
-def _grad_hermite_multidimensional_numba(R, array, dG_dR, dG_dy, cutoffs, num_indices):
+def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs, num_indices):
     indices = np.ndindex(cutoffs)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
         dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
-    return dG_dC, dG_dR, dG_dy
+    return dG_dR, dG_dy
 
 @jit(nopython=True)
 def fill_grad_hermite_multidimensional_numba_loop(
