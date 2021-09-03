@@ -213,9 +213,9 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
 
 @jit(nopython=True)
 def _hermite_multidimensional_numba(R, y, array):
-    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array 
+    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
     initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
-    
+
     Args:
         R (array[complex]): square matrix parametrizing the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
@@ -239,14 +239,13 @@ def _hermite_multidimensional_numba(R, y, array):
     return array
 
 
-def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
+def grad_hermite_multidimensional_numba(array, R, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
     Args:
         array (array): the multidimensional Hermite polynomials
         R (array[complex]): square matrix parametrizing the Hermite polynomial
-        cutoff (int or list[int]): maximum sizes of the subindices in the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
         C (complex): first value of the Hermite polynomials
         dtype (data type): Specifies the data type used for the calculation
@@ -259,11 +258,6 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
-    num_indices = len(y)
-    if isinstance(cutoff, int):
-        cutoffs = tuple([cutoff] * num_indices)
-    else:
-        cutoffs = tuple(cutoff)
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
