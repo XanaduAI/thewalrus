@@ -212,7 +212,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     return _hermite_multidimensional_numba(R, y, array)
 
 @jit(nopython=True)
-def _hermite_multidimensional_numba(R, y, array):  #pragma no cover
+def _hermite_multidimensional_numba(R, y, array):  #pragma: no cover
     r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
     initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
 
@@ -265,7 +265,7 @@ def grad_hermite_multidimensional_numba(array, R, y, C=1, dtype=None):
     return dG_dC, dG_dR, dG_dy
 
 @jit(nopython=True)
-def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy):  #pragma no cover
+def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy):  #pragma: no cover
     r"""
     Numba-compiled function to fill two arrays (dG_dR, dG_dy) with the gradients of the renormalized multidimensional Hermite polynomials
     with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
