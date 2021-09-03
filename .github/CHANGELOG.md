@@ -3,7 +3,7 @@
 ### New features
 
 ### Improvements
-
+* Faster implementation of `hermite_multidimensional_numba` and `hermite_multidimensional_numba_grad`. [#280](https://github.com/XanaduAI/thewalrus/pull/280)
 ### Bug fixes
 
 * Updates the `samples.generate_torontonian_sample` function to ensure probabilities are normalized. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
@@ -16,7 +16,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Josh Izaac, Nicolas Quesada.
+Josh Izaac, Filippo Miatto, Nicolas Quesada.
 
 ---
 
