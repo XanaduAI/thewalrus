@@ -190,7 +190,7 @@ def hafnian(
 
         return hafnian_approx(A, num_samples=num_samples)
 
-    if A.dtype == np.complex:
+    if A.dtype == complex:
         # array data is complex type
         if np.any(np.iscomplex(A)):
             # array values contain non-zero imaginary parts
@@ -326,7 +326,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     if len(mu) != len(A):
         raise ValueError("Length of means vector must be the same length as the matrix A.")
 
-    if A.dtype == np.complex or mu.dtype == np.complex:
+    if complex in (A.dtype, mu.dtype):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
