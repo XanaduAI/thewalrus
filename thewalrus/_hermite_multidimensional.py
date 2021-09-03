@@ -86,7 +86,7 @@ def hermite_multidimensional(
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
 
-    if Rt.dtype == np.float and yt.dtype == np.float:
+    if Rt.dtype == float and yt.dtype == float:
         if renorm:
             values = np.array(rhmr(Rt, yt, cutoff))
         else:
