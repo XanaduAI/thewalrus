@@ -150,31 +150,25 @@ def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, ma
         -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True
     )
 
-
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     r"""returns a copy of the given tuple of integers where the ith element has been decreased by 1
-
     Args:
         tup (Tuple[int]): the given tuple
         i (int): the position of the element to be decreased
-
     Returns:
         Tuple[int,...]: the new tuple with the decrease on i-th element by 1
     """
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
 
-
 @jit(nopython=True)
 def remove(
     pattern: Tuple[int, ...]
 ) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
-
     Args:
         pattern (Tuple[int, ...]): the pattern given to be decreased
-
     Returns:
         Generator[Tuple[int, Tuple[int, ...]], None, None]: the generator
     """
@@ -182,9 +176,7 @@ def remove(
         if n > 0:
             yield p, dec(pattern, p)
 
-
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
-
 
 def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
@@ -217,11 +209,22 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         cutoffs = tuple(cutoff)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    return _hermite_multidimensional_numba(R, array, y, cutoffs)
+    return _hermite_multidimensional_numba(R, y, array)
 
 @jit(nopython=True)
-def _hermite_multidimensional_numba(R, array, y, cutoffs):  # pragma: no cover
-    indices = np.ndindex(cutoffs)
+def _hermite_multidimensional_numba(R, y, array):
+    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array 
+    initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
+    
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        array (array[complex]): array to be filled with the Hermite polynomials
+
+    Returns:
+        array[complex]: the multidimensional Hermite polynomials
+    """
+    indices = np.ndindex(array.shape)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
         i = 0
@@ -264,12 +267,26 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
-    dG_dR, dG_dy = _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs)
+    dG_dR, dG_dy = _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy)
     return dG_dC, dG_dR, dG_dy
 
 @jit(nopython=True)
-def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy, cutoffs):  # pragma: no cover
-    indices = np.ndindex(cutoffs)
+def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy):
+    r"""
+    Numba-compiled function to fill two arrays (dG_dR, dG_dy) with the gradients of the renormalized multidimensional Hermite polynomials
+    with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
+
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        array (array[complex]): array of the multidimensional Hermite polynomials
+        dG_dR (array[complex]): array to be filled with the gradients of the renormalized multidimensional Hermite polynomials with respect to R
+        dG_dy (array[complex]): array to be filled with the gradients of the renormalized multidimensional Hermite polynomials with respect to y
+
+    Returns:
+        dG_dR[complex], dG_dy[complex]: the gradients of the renormalized multidimensional Hermite polynomials with respect to R and y
+    """
+    indices = np.ndindex(array.shape)
     next(indices)  # skip the first index (0,...,0)
     for idx in indices:
         i = 0
