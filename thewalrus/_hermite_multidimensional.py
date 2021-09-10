@@ -205,7 +205,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     num_indices = len(y)
     if isinstance(cutoff, (list, tuple)):
         cutoffs = tuple(cutoff)
-    else: # we want to catch np.ndarray(int) which can't be cast to tuple
+    else: # we want to catch np.ndarray(int) which cannot be cast to tuple
         cutoffs = tuple([int(cutoff)] * num_indices)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
