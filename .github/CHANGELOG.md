@@ -5,7 +5,7 @@
 ### Improvements
 * Faster implementation of `hermite_multidimensional_numba` and `hermite_multidimensional_numba_grad`. [#280](https://github.com/XanaduAI/thewalrus/pull/280)
 ### Bug fixes
-
+* `hermite_multidimensional_numba` now can handle a cutoff of type `np.ndarray` with `shape=[]`. [#283](https://github.com/XanaduAI/thewalrus/pull/283)
 ### Breaking changes
 
 ### Contributors
