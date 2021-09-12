@@ -204,7 +204,7 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
     num_indices = len(y)
     # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
-    if isinstance(cutoff, np.ndarray) and cutoff.ndim == 0 or len(cutoff) == 1:
+    if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
         cutoff = int(cutoff)
     if isinstance(cutoff, Iterable):
         cutoffs = tuple(cutoff)
