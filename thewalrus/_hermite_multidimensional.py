@@ -14,7 +14,7 @@
 """
 Hermite Multidimensional Python interface
 """
-from typing import Tuple, Generator
+from typing import Tuple, Generator, Iterable
 from numba import jit
 from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
@@ -203,10 +203,13 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
     num_indices = len(y)
-    if isinstance(cutoff, int):
-        cutoffs = tuple([cutoff] * num_indices)
-    else:
+    # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
+    if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
+        cutoff = int(cutoff)
+    if isinstance(cutoff, Iterable):
         cutoffs = tuple(cutoff)
+    else:
+        cutoffs = tuple([cutoff]) * num_indices
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
     return _hermite_multidimensional_numba(R, y, array)
@@ -253,6 +256,7 @@ def grad_hermite_multidimensional_numba(array, R, y, C=1, dtype=None):
     Returns:
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
+    print('from TW: ', array, R, y, C, dtype)
     if dtype is None:
         dtype = np.find_common_type([array.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
     n, _ = R.shape
