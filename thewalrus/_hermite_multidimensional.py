@@ -14,9 +14,7 @@
 """
 Hermite Multidimensional Python interface
 """
-from itertools import product
-from typing import Tuple, Generator
-from functools import lru_cache
+from typing import Tuple, Generator, Iterable
 from numba import jit
 from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
@@ -88,7 +86,7 @@ def hermite_multidimensional(
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
 
-    if Rt.dtype == np.float and yt.dtype == np.float:
+    if Rt.dtype == float and yt.dtype == float:
         if renorm:
             values = np.array(rhmr(Rt, yt, cutoff))
         else:
@@ -146,49 +144,31 @@ def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, ma
 
     if mu is None:
         mu = np.zeros([n], dtype=complex)
-
+    # The minus signs are intentional and are due to the fact that
+    # Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
     return hermite_multidimensional(
         -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True
     )
 
-
-# Note the minus signs in the arguments. Those are intentional and are due to the fact that Dodonov et al. in PRA 50, 813 (1994) use (p,q) ordering instead of (q,p) ordering
-@lru_cache()
-def partition(photons, cutoff):
-    r"""Returns a list of all the ways of putting n photons into modes that have a given cutoff dimension.
-    This function is useful to fill the amplitude array by multiplets of constant photon number.
-
-    Args:
-        photons (int): number of photons in the multiplet
-        cutoff (tuple[int]): the cutoff of each mode
-    """
-    return [comb for comb in product(*(range(min(photons, i - 1) + 1) for i in cutoff)) if sum(comb) == photons]
-
-
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     r"""returns a copy of the given tuple of integers where the ith element has been decreased by 1
-
     Args:
         tup (Tuple[int]): the given tuple
         i (int): the position of the element to be decreased
-
     Returns:
         Tuple[int,...]: the new tuple with the decrease on i-th element by 1
     """
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
 
-
 @jit(nopython=True)
 def remove(
     pattern: Tuple[int, ...]
 ) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
-
     Args:
         pattern (Tuple[int, ...]): the pattern given to be decreased
-
     Returns:
         Generator[Tuple[int, Tuple[int, ...]], None, None]: the generator
     """
@@ -196,9 +176,7 @@ def remove(
         if n > 0:
             yield p, dec(pattern, p)
 
-
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
-
 
 def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
@@ -225,51 +203,52 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
     num_indices = len(y)
-    if isinstance(cutoff, int):
-        cutoffs = tuple([cutoff] * num_indices)
-    else:
+    # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
+    if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
+        cutoff = int(cutoff)
+    if isinstance(cutoff, Iterable):
         cutoffs = tuple(cutoff)
+    else:
+        cutoffs = tuple([cutoff]) * num_indices
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    for photons in range(1, sum(cutoffs) - num_indices + 1):
-        for idx in partition(photons, cutoffs):
-            array = fill_hermite_multidimensional_numba_loop(array, idx, R, y)
-    return array
-
+    return _hermite_multidimensional_numba(R, y, array)
 
 @jit(nopython=True)
-def fill_hermite_multidimensional_numba_loop(array, idx, R, y):  # pragma: no cover
-    r"""Calculates the renormalized Hermite multidimensional polynomial for a given index.
+def _hermite_multidimensional_numba(R, y, array):  #pragma: no cover
+    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
+    initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
 
     Args:
-        array (array[data type]): the multidimensional Hermite polynomials
-        idx (tuple): index of the gradients to be filled
         R (array[complex]): square matrix parametrizing the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
+        array (array[complex]): array to be filled with the Hermite polynomials
 
     Returns:
-        array[data type]: the hermit multidimensional polynomial for a given index
+        array[complex]: the multidimensional Hermite polynomials
     """
-    i = 0
-    for i, val in enumerate(idx):
-        if val > 0:
-            break
-    ki = dec(idx, i)
-    u = y[i] * array[ki]
-    for l, kl in remove(ki):
-        u -= SQRT[ki[l]] * R[i, l] * array[kl]
-    array[idx] = u / SQRT[idx[i]]
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        u = y[i] * array[ki]
+        for l, kl in remove(ki):
+            u -= SQRT[ki[l]] * R[i, l] * array[kl]
+        array[idx] = u / SQRT[idx[i]]
     return array
 
 
-def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
+def grad_hermite_multidimensional_numba(array, R, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
     Args:
         array (array): the multidimensional Hermite polynomials
         R (array[complex]): square matrix parametrizing the Hermite polynomial
-        cutoff (int or list[int]): maximum sizes of the subindices in the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
         C (complex): first value of the Hermite polynomials
         dtype (data type): Specifies the data type used for the calculation
@@ -277,55 +256,49 @@ def grad_hermite_multidimensional_numba(array, R, cutoff, y, C=1, dtype=None):
     Returns:
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
+    print('from TW: ', array, R, y, C, dtype)
     if dtype is None:
         dtype = np.find_common_type([array.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
-    num_indices = len(y)
-    if isinstance(cutoff, int):
-        cutoffs = tuple([cutoff] * num_indices)
-    else:
-        cutoffs = tuple(cutoff)
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
-    for photons in range(1, sum(cutoffs) - num_indices + 1):
-        for idx in partition(photons, cutoffs):
-            dG_dR, dG_dy = fill_grad_hermite_multidimensional_numba_loop(dG_dR, dG_dy, array, idx, R, y)
+    dG_dR, dG_dy = _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy)
     return dG_dC, dG_dR, dG_dy
 
-
 @jit(nopython=True)
-def fill_grad_hermite_multidimensional_numba_loop(
-    dG_dR, dG_dy, array, idx, R, y
-):  # pragma: no cover
-    # pylint: disable=too-many-arguments
-    r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials for a given index.
+def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy):  #pragma: no cover
+    r"""
+    Numba-compiled function to fill two arrays (dG_dR, dG_dy) with the gradients of the renormalized multidimensional Hermite polynomials
+    with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
 
     Args:
-        dG_dR (array[data type]): array representing the gradients with respect to R
-        dG_dy (array[data type]): array representing the gradients with respect to y
-        array (array[data type]): the multidimensional Hermite polynomials
-        idx (tuple): index of the gradients to be filled
         R (array[complex]): square matrix parametrizing the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
+        array (array[complex]): array of the multidimensional Hermite polynomials
+        dG_dR (array[complex]): array to be filled with the gradients of the renormalized multidimensional Hermite polynomials with respect to R
+        dG_dy (array[complex]): array to be filled with the gradients of the renormalized multidimensional Hermite polynomials with respect to y
 
     Returns:
-        array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to R and y for a given index
+        dG_dR[complex], dG_dy[complex]: the gradients of the renormalized multidimensional Hermite polynomials with respect to R and y
     """
-    i = 0
-    for i, val in enumerate(idx):
-        if val > 0:
-            break
-    ki = dec(idx, i)
-    dy = y[i] * dG_dy[ki]
-    dy[i] += array[ki]
-    dR = y[i] * dG_dR[ki]
-    for l, kl in remove(ki):
-        dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
-        dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
-        dR[i, l] -= SQRT[ki[l]] * array[kl]
-    dG_dR[idx] = dR / SQRT[idx[i]]
-    dG_dy[idx] = dy / SQRT[idx[i]]
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        dy = y[i] * dG_dy[ki]
+        dy[i] += array[ki]
+        dR = y[i] * dG_dR[ki]
+        for l, kl in remove(ki):
+            dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
+            dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
+            dR[i, l] -= SQRT[ki[l]] * array[kl]
+        dG_dR[idx] = dR / SQRT[idx[i]]
+        dG_dy[idx] = dy / SQRT[idx[i]]
     return dG_dR, dG_dy
