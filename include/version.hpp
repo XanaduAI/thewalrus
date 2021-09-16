@@ -21,13 +21,13 @@
 #define HAFNIAN_VERSION_MAJOR 0
 
 /// The minor version number
-#define HAFNIAN_VERSION_MINOR 17
+#define HAFNIAN_VERSION_MINOR 16
 
 /// The patch number
-#define HAFNIAN_VERSION_PATCH 0
+#define HAFNIAN_VERSION_PATCH 2
 
 /// The complete version number
 #define HAFNIAN_VERSION_CODE (HAFNIAN_VERSION_MAJOR * 10000 + HAFNIAN_VERSION_MINOR * 100 + HAFNIAN_VERSION_PATCH)
 
 /// Version number as string
-#define HAFNIAN_VERSION_STRING "0.17.0"
+#define HAFNIAN_VERSION_STRING "0.16.2"
