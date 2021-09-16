@@ -256,7 +256,6 @@ def grad_hermite_multidimensional_numba(array, R, y, C=1, dtype=None):
     Returns:
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
-    print('from TW: ', array, R, y, C, dtype)
     if dtype is None:
         dtype = np.find_common_type([array.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
     n, _ = R.shape
