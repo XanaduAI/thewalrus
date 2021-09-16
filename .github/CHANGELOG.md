@@ -1,7 +1,7 @@
 # Version 0.16.2
 
 ### Bug fixes
-* `hermite_multidimensional_numba` now can handle a cutoff of type `np.ndarray` with `shape=[]`. [#283](https://github.com/XanaduAI/thewalrus/pull/283)
+* `hermite_multidimensional_numba` can now handle a cutoff of type `np.ndarray` with `shape=[]`. [#283](https://github.com/XanaduAI/thewalrus/pull/283)
 
 ### Contributors
 
