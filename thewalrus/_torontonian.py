@@ -16,28 +16,14 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from .libwalrus import torontonian_complex as tor_complex
-from .libwalrus import torontonian_real as tor_real
-from .quantum import Qmat, Xmat, Amat
-from . import reduction
+from thewalrus.quantum.conversions import Xmat, Amat
+from ._hafnian import reduction
 
-
-def tor(A, fsum=False):
+def tor(A):
     """Returns the Torontonian of a matrix.
 
-    For more direct control, you may wish to call :func:`tor_real` or
-    :func:`tor_complex` directly.
-
-    The input matrix is cast to quadruple precision
-    internally for a quadruple precision torontonian computation.
-
     Args:
-        A (array): a np.complex128, square, symmetric array of even dimensions.
-        fsum (bool): if ``True``, the `Shewchuck algorithm <https://github.com/achan001/fsum>`_
-            for more accurate summation is performed. This can significantly increase
-            the `accuracy of the computation <https://link.springer.com/article/10.1007%2FPL00009321>`_,
-            but no casting to quadruple precision takes place, as the Shewchuck algorithm
-            only supports double precision.
+        A (array): a square array of even dimensions.
 
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
@@ -50,12 +36,7 @@ def tor(A, fsum=False):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
-    if A.dtype == np.complex128:
-        if np.any(np.iscomplex(A)):
-            return tor_complex(A, fsum=fsum)
-        return tor_real(np.float64(A.real), fsum=fsum)
-
-    return tor_real(A, fsum=fsum)
+    return numba_tor(A)
 
 
 @numba.jit(nopython=True)
@@ -265,7 +246,7 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
     if np.allclose(mu, 0, atol=atol, rtol=rtol):
         # no displacement
         n_modes = cov.shape[0] // 2
-        Q = Qmat(cov, hbar)
+        Q = Qmat_numba(cov, hbar)
         O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)

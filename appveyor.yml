@@ -2,10 +2,10 @@ environment:
   global:
       APPVEYOR_SAVE_CACHE_ON_ERROR: true
       APPVEYOR_SKIP_FINALIZE_ON_EXIT: true
-      EIGEN_INCLUDE_DIR: C:\eigen-3.3.7\
       TEST_TIMEOUT: 1000
       CIBW_BEFORE_BUILD: pip install numpy==1.19.5 scipy cython
-      CIBW_SKIP: "cp27-* cp33-* cp34-* cp35-* cp36-* *win32"
+      CIBW_BUILD: 'cp37-* cp38-* cp39-*'
+      CIBW_ARCHS: 'AMD64'
       CIBW_TEST_REQUIRES: "numpy scipy pytest pytest-cov pytest-randomly"
       CIBW_TEST_COMMAND: "python -m pytest --randomly-seed=137 {project}/thewalrus"
       CIBW_BUILD_VERBOSITY: 3
@@ -25,10 +25,6 @@ stack: python 3.7
 
 init:
 - cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
-
-install:
-  - ps: wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip -outfile eigen3.zip
-  - cmd: 7z x eigen3.zip -o"C:\" -y > nul
 
 build_script:
   - set PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%

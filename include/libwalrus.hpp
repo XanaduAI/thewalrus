@@ -13,11 +13,9 @@
 // limitations under the License.
 #pragma once
 #include <version.hpp>
-#include <eigenvalue_hafnian.hpp>
+#include <trace_hafnian.hpp>
 #include <recursive_hafnian.hpp>
 #include <repeated_hafnian.hpp>
-#include <hafnian_approx.hpp>
-#include <torontonian.hpp>
 #include <permanent.hpp>
 #include <hermite_multidimensional.hpp>
 

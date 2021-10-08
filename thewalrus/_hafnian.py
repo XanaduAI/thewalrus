@@ -18,6 +18,8 @@ Hafnian Python interface
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
+from numba import jit
+
 import numpy as np
 
 from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
@@ -186,7 +188,9 @@ def hafnian(
         if np.any(A < 0):
             raise ValueError("Input matrix must not have negative entries")
 
-    if A.dtype == np.complex:
+        return hafnian_approx(A, num_samples=num_samples)
+
+    if A.dtype == complex:
         # array data is complex type
         if np.any(np.iscomplex(A)):
             # array values contain non-zero imaginary parts
@@ -288,9 +292,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
             If not provided, ``mu`` is set to the diagonal of matrix ``A``. Note that this
             only affects the loop hafnian.
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
-        use_eigen (bool): if True (default), the Eigen linear algebra library
-            is used for matrix multiplication. If the hafnian library was compiled
-            with BLAS/Lapack support, then BLAS will be used for matrix multiplication.
         rtol (float): the relative tolerance parameter used in ``np.allclose``.
         atol (float): the absolute tolerance parameter used in ``np.allclose``.
 
@@ -325,7 +326,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     if len(mu) != len(A):
         raise ValueError("Length of means vector must be the same length as the matrix A.")
 
-    if A.dtype == np.complex or mu.dtype == np.complex:
+    if complex in (A.dtype, mu.dtype):
         return haf_rpt_complex(A, nud, mu=mu, loop=loop)
 
     return haf_rpt_real(A, nud, mu=mu, loop=loop)
@@ -374,3 +375,43 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
                 )
 
     return loop_haf[tuple(range(1, n + 1))]
+
+
+@jit(nopython=True)
+def _one_det(B):  # pragma: no cover
+    """Calculates the determinant of an antisymmetric matrix with entries distributed
+    according to a normal distribution, with scale equal to the entries of the symmetric matrix
+    given as input.
+
+    Args:
+        B (array[float]): symmetric matrix
+
+    Returns:
+        float: determinant of the samples antisymmetric matrix
+    """
+    mat = np.empty_like(B, dtype=np.float64)
+    n, m = B.shape
+    for i in range(n):
+        for j in range(m):
+            mat[i, j] = B[i, j] * np.random.normal()
+            mat[j, i] = -mat[i, j]
+    return np.linalg.det(mat)
+
+
+@jit(nopython=True)
+def hafnian_approx(A, num_samples=1000):  # pragma: no cover
+    """Returns the approximation to the hafnian of a matrix with non-negative entries.
+
+    The approximation follows the stochastic Barvinok's approximation allowing the
+    hafnian can be approximated as the sum of determinants of matrices.
+    The accuracy of the approximation increases with increasing number of iterations.
+
+    Args:
+        B (array[float]): a symmetric matrix
+
+    Returns:
+        (float): approximate hafnian of the input
+    """
+
+    sqrtA = np.sqrt(A)
+    return np.array([_one_det(sqrtA) for _ in range(num_samples)]).mean()

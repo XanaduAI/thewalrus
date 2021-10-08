@@ -56,6 +56,7 @@ Fock states and tensors
     update_probabilities_with_noise
     find_classical_subsystem
     tvd_cutoff_bounds
+    n_body_marginals
 
 Adjacency matrices
 ^^^^^^^^^^^^^^^^^^
@@ -101,8 +102,12 @@ Means and variances
     photon_number_expectation
     photon_number_squared_expectation
     normal_ordered_expectation
+    photon_number_moment
+    s_ordered_expectation
     mean_clicks
     variance_clicks
+    photon_number_cumulant
+    click_cumulant
 
 Photon number distributions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -132,6 +137,7 @@ from .fock_tensors import (
     update_probabilities_with_noise,
     find_classical_subsystem,
     tvd_cutoff_bounds,
+    n_body_marginals,
 )
 
 from .adjacency_matrices import (
@@ -164,9 +170,13 @@ from .means_and_variances import (
     photon_number_covmat,
     photon_number_expectation,
     photon_number_squared_expectation,
+    photon_number_moment,
+    photon_number_cumulant,
     normal_ordered_expectation,
     mean_clicks,
     variance_clicks,
+    s_ordered_expectation,
+    click_cumulant,
 )
 
 from .photon_number_distributions import (
@@ -210,6 +220,13 @@ __all__ = [
     "mean_clicks",
     "variance_clicks",
     "pure_state_distribution",
+    "n_body_marginals",
+    "tvd_cutoff_bounds",
+    "photon_number_moment",
+    "s_ordered_expectation",
+    "photon_number_cumulant",
+    "total_photon_number_distribution",
+    "characteristic_function",
 ]
 
 def deprecate(new_func):

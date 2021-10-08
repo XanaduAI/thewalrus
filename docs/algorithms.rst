@@ -80,8 +80,8 @@ Unfortunately, there is no known generalization of this algorithm to loop hafnia
 
 
 
-Eigenvalue-trace algorithm
---------------------------
+Trace algorithm
+---------------
 Based on the work of Cygan and Pilipczuk :cite:`cygan2015faster`, Björklund *et al* :cite:`bjorklund2018faster` introduced another algorithm to calculate the hafnian of a real or complex matrix of size :math:`n` in 2018. This algorithm which runs in time :math:`O(n^3 2^{n/2})` and can be more succinctly expressed as an equation
 
 .. math::
@@ -105,9 +105,7 @@ This coefficient can be found by taking derivatives :cite:`quesada2018gaussian`
 .. math::
 	f(\bm{C}) = \frac{1}{(n/2)!}  \left. \frac{d^{n/2}}{d\eta^{n/2}} p_{n/2}(\eta \bm{C}) \right|_{\eta=0} = \frac{1}{(n/2)!}  \left. \frac{d^{n/2}}{d\eta^{n/2}} \frac{1}{\sqrt{\det(\mathbb{I} - \eta \bm{C})}} \right|_{\eta=0}.
 
-The function :math:`p_{n/2}(\eta\bm{C})` requires only the traces of the matrix powers of the matrices :math:`\bm{C}^k`, hence the name of this algorithm.
-
-Note that these traces can be written in terms of the sums of powers of the eigenvalues of the matrix :math:`\bm{C}`.
+The function :math:`p_{n/2}(\eta\bm{C})` requires only the traces of the matrix powers of the matrices :math:`\bm{C}^k`, hence the name of this algorithm. These powertraces can be calculated using the characteristic polynomial of the input matrix using the La Budde algorithm :cite:`rehman2011budde`. 
 
 This formula generalizes to the loop hafnian as follows
 
