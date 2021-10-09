@@ -21,6 +21,7 @@ from scipy.special import factorial2, factorial as fac
 from thewalrus import hafnian, haf_real
 
 
+@pytest.mark.flaky()
 @pytest.mark.parametrize("n", [6, 8, 10])
 def test_rank_one(n):
     """ Test the hafnian of rank one matrices so that it is within
