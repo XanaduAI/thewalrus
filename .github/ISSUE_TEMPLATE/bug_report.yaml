@@ -22,7 +22,7 @@ body:
     attributes:
       value: |
           For general technical details and contribution guidelines, check out our documentation:
-          https://thewalrus.readthedocs.io
+          https://the-walrus.readthedocs.io/
 
           # Issue description
           Description of the issue - include code snippets in the Source code section below and screenshots if relevant.
