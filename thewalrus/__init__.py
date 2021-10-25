@@ -176,8 +176,6 @@ def about():
     """
     # pylint: disable=import-outside-toplevel
     import sys
-    import platform
-    import os
     import numpy
     import scipy
     import sympy
