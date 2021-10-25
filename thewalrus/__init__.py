@@ -186,7 +186,7 @@ def about():
 
     # a QuTiP-style infobox
     print("\nThe Walrus: a Python library for for the calculation of hafnians, Hermite polynomials, and Gaussian boson sampling.")
-    print("Copyright 2018-2020 Xanadu Quantum Technologies Inc.\n")
+    print("Copyright 2018-2021 Xanadu Quantum Technologies Inc.\n")
 
     print("Python version:            {}.{}.{}".format(*sys.version_info[0:3]))
     print("Platform info:             {}".format(platform.platform()))
