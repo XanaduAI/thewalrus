@@ -118,9 +118,26 @@ from ._hafnian import (
 )
 
 from ._low_rank_haf import low_rank_hafnian
-from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional, hermite_multidimensional_numba, grad_hermite_multidimensional_numba
-from ._permanent import perm, perm_complex, perm_real, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
-from ._torontonian import tor, threshold_detection_prob_displacement, threshold_detection_prob, numba_tor
+from ._hermite_multidimensional import (
+    hafnian_batched,
+    hermite_multidimensional,
+    hermite_multidimensional_numba,
+    grad_hermite_multidimensional_numba,
+)
+from ._permanent import (
+    perm,
+    perm_complex,
+    perm_real,
+    permanent_repeated,
+    perm_BBFG_real,
+    perm_BBFG_complex,
+)
+from ._torontonian import (
+    tor,
+    threshold_detection_prob_displacement,
+    threshold_detection_prob,
+    numba_tor,
+)
 from ._version import __version__
 
 
@@ -149,6 +166,7 @@ def version():
       str: The package version number
     """
     return __version__
+
 
 def about():
     """The Walrus information.
@@ -180,10 +198,11 @@ def about():
     import scipy
     import sympy
     import numba
-    import cython
 
     # a QuTiP-style infobox
-    print("\nThe Walrus: a Python library for for the calculation of hafnians, Hermite polynomials, and Gaussian boson sampling.")
+    print(
+        "\nThe Walrus: a Python library for for the calculation of hafnians, Hermite polynomials, and Gaussian boson sampling."
+    )
     print("Copyright 2018-2021 Xanadu Quantum Technologies Inc.\n")
 
     print("Python version:            {}.{}.{}".format(*sys.version_info[0:3]))
@@ -194,4 +213,3 @@ def about():
     print("Scipy version:             {}".format(scipy.__version__))
     print("SymPy version:             {}".format(sympy.__version__))
     print("Numba version:             {}".format(numba.__version__))
-    print("Cython version:            {}".format(cython.__version__))

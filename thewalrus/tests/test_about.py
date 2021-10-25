@@ -28,7 +28,7 @@ import thewalrus as tw
 @pytest.mark.slow
 def test_about():
     """
-    about: Tests if the about string prints correct.
+    about: Tests if the about string prints correctly.
     """
     f = io.StringIO()
     with contextlib.redirect_stdout(f):
@@ -42,4 +42,3 @@ def test_about():
     assert "Scipy version" in out
     assert "SymPy version" in out
     assert "Numba version" in out
-    assert "Cython version" in out
