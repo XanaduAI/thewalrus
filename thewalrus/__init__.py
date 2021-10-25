@@ -166,7 +166,7 @@ def about():
 
         Python version:            3.8.5
         Platform info:             Linux-5.8.18-1-MANJARO-x86_64-with-arch-Manjaro-Linux
-        Installation path:         /home/sduquemesa/xanadu/thewalrus/thewalrus
+        Installation path:         /home/username/xanadu/thewalrus/thewalrus
         The Walrus version:        0.17.0-dev
         Numpy version:             1.19.5
         Scipy version:             1.7.1
