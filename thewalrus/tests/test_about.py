@@ -14,7 +14,6 @@
 """
 Unit tests for the :mod:`thewalrus` configuration class :class:`Configuration`.
 """
-# pylint: disable=protected-access
 
 import contextlib
 import io
