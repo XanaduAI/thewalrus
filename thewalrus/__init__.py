@@ -118,9 +118,26 @@ from ._hafnian import (
 )
 
 from ._low_rank_haf import low_rank_hafnian
-from ._hermite_multidimensional import hafnian_batched, hermite_multidimensional, hermite_multidimensional_numba, grad_hermite_multidimensional_numba
-from ._permanent import perm, perm_complex, perm_real, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
-from ._torontonian import tor, threshold_detection_prob_displacement, threshold_detection_prob, numba_tor
+from ._hermite_multidimensional import (
+    hafnian_batched,
+    hermite_multidimensional,
+    hermite_multidimensional_numba,
+    grad_hermite_multidimensional_numba,
+)
+from ._permanent import (
+    perm,
+    perm_complex,
+    perm_real,
+    permanent_repeated,
+    perm_BBFG_real,
+    perm_BBFG_complex,
+)
+from ._torontonian import (
+    tor,
+    threshold_detection_prob_displacement,
+    threshold_detection_prob,
+    numba_tor,
+)
 from ._version import __version__
 
 
@@ -149,3 +166,50 @@ def version():
       str: The package version number
     """
     return __version__
+
+
+def about():
+    """The Walrus information.
+
+    Prints the installed version numbers for TW and its dependencies,
+    and some system info. Please include this information in bug reports.
+
+    **Example:**
+
+    .. code-block:: pycon
+
+        >>> tw.about()
+        The Walrus: a Python library for for the calculation of hafnians, Hermite polynomials, and Gaussian boson sampling.
+        Copyright 2018-2020 Xanadu Quantum Technologies Inc.
+
+        Python version:            3.8.5
+        Platform info:             Linux-5.8.18-1-MANJARO-x86_64-with-arch-Manjaro-Linux
+        Installation path:         /home/username/xanadu/thewalrus/thewalrus
+        The Walrus version:        0.17.0-dev
+        Numpy version:             1.19.5
+        Scipy version:             1.7.1
+        SymPy version:             1.8
+        Numba version:             0.53.1
+        Cython version:            0.29.24
+    """
+    # pylint: disable=import-outside-toplevel
+    import sys
+    import numpy
+    import scipy
+    import sympy
+    import numba
+
+    # a QuTiP-style infobox
+    print(
+        "\nThe Walrus: a Python library for for the calculation of hafnians, Hermite polynomials, and Gaussian boson sampling."
+    )
+    print("Copyright 2018-2021 Xanadu Quantum Technologies Inc.\n")
+
+    print("Python version:            {}.{}.{}".format(*sys.version_info[0:3]))
+    print("Platform info:             {}".format(platform.platform()))
+    print("Installation path:         {}".format(os.path.dirname(__file__)))
+    print("The Walrus version:        {}".format(__version__))
+    print("Numpy version:             {}".format(numpy.__version__))
+    print("Scipy version:             {}".format(scipy.__version__))
+    print("SymPy version:             {}".format(sympy.__version__))
+    print("Numba version:             {}".format(numba.__version__))
