@@ -25,7 +25,6 @@ import pytest
 import thewalrus as tw
 
 
-@pytest.mark.slow
 def test_about():
     """
     about: Tests if the about string prints correctly.
