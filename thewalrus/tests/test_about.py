@@ -19,8 +19,6 @@ import contextlib
 import io
 import re
 
-import pytest
-
 import thewalrus as tw
 
 
