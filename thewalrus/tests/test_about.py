@@ -21,6 +21,7 @@ import re
 
 import thewalrus as tw
 
+
 def test_about():
     """
     about: Tests if the about string prints correctly.
