@@ -18,7 +18,14 @@ import pytest
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus import perm, perm_real, perm_complex, permanent_repeated, perm_BBFG_real, perm_BBFG_complex
+from thewalrus import (
+    perm,
+    perm_real,
+    perm_complex,
+    permanent_repeated,
+    perm_BBFG_real,
+    perm_BBFG_complex,
+)
 
 
 class TestPermanentWrapper:
@@ -45,7 +52,7 @@ class TestPermanentWrapper:
         """Check 2x2 permanent"""
         A = random_matrix(2)
         p = perm(A, method="ryser")
-        expected = (A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0])
+        expected = A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0]
         assert p == expected
 
         p = perm(A, method="bbfg")

@@ -173,13 +173,16 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(gate, R, y, C, dtype=np.complex128)
 
     delta = 0.000001 + 1j * 0.000001
-    expected_grad_C = (hermite_multidimensional_numba(R, cutoff, y, C + delta) - hermite_multidimensional_numba(R, cutoff, y, C - delta)) / (2 * delta)
+    expected_grad_C = (
+        hermite_multidimensional_numba(R, cutoff, y, C + delta)
+        - hermite_multidimensional_numba(R, cutoff, y, C - delta)
+    ) / (2 * delta)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
 
     for i in range(y.shape[0]):
         y[i] += delta
         plus = hermite_multidimensional_numba(R, cutoff, y, C)
-        y[i] -= 2*delta
+        y[i] -= 2 * delta
         minus = hermite_multidimensional_numba(R, cutoff, y, C)
         expected_grad_y = (plus - minus) / (2 * delta)
         y[i] += delta
@@ -187,12 +190,12 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
 
     for i in range(R.shape[0]):
         for j in range(R.shape[1]):
-            R[i,j] += delta
+            R[i, j] += delta
             plus = hermite_multidimensional_numba(R, cutoff, y, C)
-            R[i,j] -= 2*delta
+            R[i, j] -= 2 * delta
             minus = hermite_multidimensional_numba(R, cutoff, y, C)
             expected_grad_R = (plus - minus) / (2 * delta)
-            R[i,j] += delta
+            R[i, j] += delta
             assert np.allclose(grad_R[..., i, j], expected_grad_R, atol=tol, rtol=0)
 
 
@@ -205,14 +208,14 @@ def test_auto_dtype_multidim_herm_numba():
     C = 0.5
     cutoff = 3
 
-    R = R.astype('complex64')
-    y = y.astype('complex128')
+    R = R.astype("complex64")
+    y = y.astype("complex128")
     poly = hermite_multidimensional_numba(R, cutoff, y, C, dtype=None)
     assert poly.dtype == y.dtype
 
-    R = R.astype('complex128')
-    y = y.astype('complex64')
-    poly = poly.astype('complex64')
+    R = R.astype("complex128")
+    y = y.astype("complex64")
+    poly = poly.astype("complex64")
     grad = grad_hermite_multidimensional_numba(poly, R, y, C, dtype=None)
     assert all(g.dtype == R.dtype for g in grad)
 
@@ -229,5 +232,7 @@ def test_multi_cutoffs_multidim_herm_numba():
     poly = hermite_multidimensional_numba(R, cutoffs, y, C)
     poly_expected = hermite_multidimensional_numba(R, 3, y, C)
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
-    poly_expected = hermite_multidimensional_numba(R, np.array(3), y, C) # testing ndarrary cutoff int
+    poly_expected = hermite_multidimensional_numba(
+        R, np.array(3), y, C
+    )  # testing ndarrary cutoff int
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)

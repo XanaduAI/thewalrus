@@ -22,8 +22,9 @@ from scipy.linalg import sqrtm
 
 from ..symplectic import sympmat
 
+
 def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
-    r""" Checks if the covariance matrix is a valid quantum covariance matrix.
+    r"""Checks if the covariance matrix is a valid quantum covariance matrix.
 
     Args:
         cov (array): a covariance matrix
@@ -56,7 +57,7 @@ def is_valid_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
 
 
 def is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
-    r""" Checks if the covariance matrix is a valid quantum covariance matrix
+    r"""Checks if the covariance matrix is a valid quantum covariance matrix
     that corresponds to a quantum pure state
 
     Args:
@@ -77,7 +78,7 @@ def is_pure_cov(cov, hbar=2, rtol=1e-05, atol=1e-08):
 
 
 def is_classical_cov(cov, hbar=2, atol=1e-08):
-    r""" Checks if the covariance matrix can be efficiently sampled.
+    r"""Checks if the covariance matrix can be efficiently sampled.
 
     Args:
         cov (array): a covariance matrix

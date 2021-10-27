@@ -40,12 +40,7 @@ from .conversions import (
     complex_to_real_displacements,
 )
 
-from .gaussian_checks import (
-    is_classical_cov,
-    is_pure_cov,
-    is_valid_cov
-)
-
+from .gaussian_checks import is_classical_cov, is_pure_cov, is_valid_cov
 
 
 def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
@@ -170,11 +165,7 @@ def state_vector(
             gamma = rescaling * gamma
             denom = np.sqrt(np.sqrt(np.linalg.det(Q / np.cosh(choi_r)).real))
 
-        psi = (
-            pref
-            * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True)
-            / denom
-        )
+        psi = pref * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / denom
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
@@ -283,15 +274,11 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
 
         if np.allclose(mu, np.zeros_like(mu)):
-            tensor = pref * hermite_multidimensional(
-                -A, cutoff, renorm=True, modified=True
-            )
+            tensor = pref * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
             return tensor.transpose(sf_order)
         beta = complex_to_real_displacements(mu, hbar=hbar)
         y = beta - A @ beta.conj()
-        tensor = pref * hermite_multidimensional(
-            -A, cutoff, y=y, renorm=True, modified=True
-        )
+        tensor = pref * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
         return tensor.transpose(sf_order)
 
     M = N - len(post_select)
@@ -361,9 +348,7 @@ def fock_tensor(
     m, _ = S.shape
     l = m // 2
     if l != len(alpha):
-        raise ValueError(
-            "The matrix S and the vector alpha do not have compatible dimensions"
-        )
+        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
     # Check if S corresponds to an interferometer, if so use optimized routines
     if np.allclose(S @ S.T, np.identity(m), rtol=rtol, atol=atol) and np.allclose(
         alpha, 0, rtol=rtol, atol=atol
@@ -382,9 +367,7 @@ def fock_tensor(
         ch = np.cosh(choi_r) * np.identity(l)
         sh = np.sinh(choi_r) * np.identity(l)
         zh = np.zeros([l, l])
-        Schoi = np.block(
-            [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
-        )
+        Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
         # And then its Choi expanded symplectic
         S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
         # And this is the corresponding covariance matrix
@@ -437,7 +420,9 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
     Returns:
         (array): Fock space probabilities up to cutoff. The shape of this tensor is ``[cutoff]*num_modes``.
     """
-    if is_pure_cov(cov, hbar=hbar, rtol=rtol, atol=atol):  # Check if the covariance matrix cov is pure
+    if is_pure_cov(
+        cov, hbar=hbar, rtol=rtol, atol=atol
+    ):  # Check if the covariance matrix cov is pure
         return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
 
@@ -460,8 +445,9 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
             # maximum is needed because sometimes a probability is very close to zero from below
     return probs
 
+
 @jit(nopython=True)
-def loss_mat(eta, cutoff): # pragma: no cover
+def loss_mat(eta, cutoff):  # pragma: no cover
     r"""Constructs a binomial loss matrix with transmission eta up to n photons.
 
     Args:
@@ -488,6 +474,7 @@ def loss_mat(eta, cutoff): # pragma: no cover
             lm[i, j] = lm[i, j - 1] * (eta / mu) * (i - j + 1) / (j)
     return lm
 
+
 def update_probabilities_with_loss(etas, probs):
     """Given a list of transmissivities a tensor of probabilitites, calculate
     an updated tensor of probabilities after loss is applied.
@@ -502,7 +489,9 @@ def update_probabilities_with_loss(etas, probs):
 
     probs_shape = probs.shape
     if len(probs_shape) != len(etas):
-        raise ValueError("The list of transmission etas and the tensor of probabilities probs have incompatible dimensions.")
+        raise ValueError(
+            "The list of transmission etas and the tensor of probabilities probs have incompatible dimensions."
+        )
 
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     cutoff = probs_shape[0]
@@ -514,9 +503,10 @@ def update_probabilities_with_loss(etas, probs):
         probs = np.copy(qein)
     return qein
 
+
 @jit(nopython=True)
-def _update_1d(probs, one_d, cutoff): # pragma: no cover
-    """ Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
+def _update_1d(probs, one_d, cutoff):  # pragma: no cover
+    """Performs a convolution of the two arrays. The first one does not need to be one dimensional, which is why we do not use ``np.convolve``.
 
     Args:
         probs (array): (multidimensional) array
@@ -531,6 +521,7 @@ def _update_1d(probs, one_d, cutoff): # pragma: no cover
         for j in range(min(i + 1, len(one_d))):
             new_d[i] += probs[i - j] * one_d[j]
     return new_d
+
 
 def update_probabilities_with_noise(probs_noise, probs):
     """Given a list of noise probability distributions for each of the modes and a tensor of
@@ -551,7 +542,7 @@ def update_probabilities_with_noise(probs_noise, probs):
             "The list of probability distributions probs_noise and the tensor of probabilities probs have incompatible dimensions."
         )
 
-    for k in range(num_modes): #update one mode at a time
+    for k in range(num_modes):  # update one mode at a time
         perm = np.arange(num_modes)
         perm[0] = k
         perm[k] = 0
@@ -605,8 +596,9 @@ def _prefactor(mu, cov, hbar=2):
     Qinv = np.linalg.inv(Q)
     return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
 
+
 def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-05, atol=1e-08):
-    r""" Gives bounds of the total variation distance between the exact Gaussian Boson Sampling
+    r"""Gives bounds of the total variation distance between the exact Gaussian Boson Sampling
     distribution extending to infinity in Fock space and the ones truncated by any value between 0
     and the user provided cutoff.
 
@@ -635,6 +627,7 @@ def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-
         ps = np.real_if_close(np.diag(density_matrix(mu_red, cov_red, cutoff=cutoff, hbar=hbar)))
         bounds += 1 - np.cumsum(ps)
     return bounds
+
 
 def n_body_marginals(mean, cov, cutoff, n, hbar=2):
     r"""Calculates the first n-body marginals of a Gaussian state.

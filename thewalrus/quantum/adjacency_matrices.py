@@ -24,7 +24,7 @@ from .means_and_variances import mean_clicks
 
 
 def adj_scaling_torontonian(A, c_mean):
-    r""" Returns the scaling parameter by which the adjacency matrix A
+    r"""Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that encodes it has
     give a mean number of clicks equal to ``c_mean`` when measured with
     threshold detectors.
@@ -44,7 +44,7 @@ def adj_scaling_torontonian(A, c_mean):
     localA = A / vals[0]  # rescale the matrix so that the singular values are between 0 and 1.
 
     def cost(x):
-        r""" Cost function giving the difference between the wanted number of clicks and the number
+        r"""Cost function giving the difference between the wanted number of clicks and the number
         of clicks at a given scaling value. It assumes that the adjacency matrix has been rescaled
         so that it has singular values between 0 and 1.
 
@@ -68,7 +68,7 @@ def adj_scaling_torontonian(A, c_mean):
 
 
 def _mean_clicks_adj(A):
-    r""" Given an adjacency matrix this function calculates the mean number of clicks.
+    r"""Given an adjacency matrix this function calculates the mean number of clicks.
     For this to make sense the user must provide a matrix with singular values
     less than or equal to one. See Appendix A.3 of <https://arxiv.org/abs/1902.00462>`_
     by Banchi et al.
@@ -88,7 +88,7 @@ def _mean_clicks_adj(A):
 
 
 def adj_scaling(A, n_mean):
-    r""" Returns the scaling parameter by which the adjacency matrix A
+    r"""Returns the scaling parameter by which the adjacency matrix A
     should be rescaled so that the Gaussian state that endodes it has
     a total mean photon number n_mean.
 
@@ -110,7 +110,7 @@ def adj_scaling(A, n_mean):
         raise ValueError("The singular values of the matrix A are too small.")
 
     def mean_photon_number(x, vals):
-        r""" Returns the mean number of photons in the Gaussian state that
+        r"""Returns the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A where vals are the singular values of A
 
         Args:
@@ -126,7 +126,7 @@ def adj_scaling(A, n_mean):
 
     # The following function is implicitly tested in test_adj_scaling
     def grad_mean_photon_number(x, vals):  # pragma: no cover
-        r""" Returns the gradient od the mean number of photons in the Gaussian state that
+        r"""Returns the gradient od the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
         vals are the singular values of A
 
@@ -153,7 +153,7 @@ def adj_scaling(A, n_mean):
 
 
 def adj_to_qmat(A, n_mean):
-    r""" Returns the Qmat xp-covariance matrix associated to a graph with
+    r"""Returns the Qmat xp-covariance matrix associated to a graph with
     adjacency matrix :math:`A` and with mean photon number :math:`n_{mean}`.
 
     Args:
