@@ -14,18 +14,13 @@
 """
 Unit tests for the :mod:`thewalrus` configuration class :class:`Configuration`.
 """
-# pylint: disable=protected-access
 
 import contextlib
 import io
 import re
 
-import pytest
-
 import thewalrus as tw
 
-
-@pytest.mark.slow
 def test_about():
     """
     about: Tests if the about string prints correctly.
