@@ -1,4 +1,4 @@
-name: Wheels
+name: Wheels MacOS
 on:
   push:
     branches:
@@ -33,7 +33,7 @@ jobs:
       matrix:
         os: [macos-10.14]
         arch: [x86_64, arm64]
-    name: ${{ matrix.os }}
+    name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
 
     steps:

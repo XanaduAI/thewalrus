@@ -1,4 +1,4 @@
-name: Wheels
+name: Wheels Linux
 on:
   push:
     branches:
@@ -28,7 +28,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         arch: [x86_64, aarch64, ppc64le]
-    name: ${{ matrix.os }}
+    name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
 
     steps:
