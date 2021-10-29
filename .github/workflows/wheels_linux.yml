@@ -51,7 +51,6 @@ jobs:
         env:
           CIBW_ARCHS_LINUX: ${{matrix.arch}}
 
-      - uses: actions/upload-artifact@v2
+      - uses: kittaakos/upload-artifact-as-is@v0
         with:
-          name: ${{ runner.os }}-wheels.zip
-          path: ./wheelhouse/*.whl
+          path: ./wheelhouse/
