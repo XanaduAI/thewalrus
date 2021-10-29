@@ -24,7 +24,6 @@ env:
 jobs:
   win-wheels:
     strategy:
-      fail-fast: false
       matrix:
         os: [windows-latest]
     name: ${{ matrix.os }}

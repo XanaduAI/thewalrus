@@ -24,7 +24,6 @@ env:
 jobs:
   linux-wheels-x86-64:
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         arch: [x86_64]
