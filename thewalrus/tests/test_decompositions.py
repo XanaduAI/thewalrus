@@ -21,6 +21,7 @@ from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.decompositions import williamson
 from thewalrus.symplectic import sympmat as omega
 
+
 class TestWilliamsonDecomposition:
     """Tests for the Williamson decomposition"""
 

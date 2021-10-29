@@ -229,6 +229,7 @@ __all__ = [
     "characteristic_function",
 ]
 
+
 def deprecate(new_func):
     """Wrapper for deprecated functions to raise warning"""
 
@@ -236,10 +237,12 @@ def deprecate(new_func):
     def wrapper(*args, **kwargs):
         warnings.warn(
             f"This function is deprecated and will be removed. Use {new_func.__name__} instead.",
-            DeprecationWarning
+            DeprecationWarning,
         )
         return new_func(*args, **kwargs)
+
     return wrapper
+
 
 # old names for functions; remove in due time
 Means = deprecate(real_to_complex_displacements)

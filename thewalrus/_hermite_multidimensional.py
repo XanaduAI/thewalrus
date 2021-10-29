@@ -150,6 +150,7 @@ def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, ma
         -A, cutoff, y=mu, renorm=renorm, make_tensor=make_tensor, modified=True
     )
 
+
 @jit(nopython=True)
 def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     r"""returns a copy of the given tuple of integers where the ith element has been decreased by 1
@@ -161,6 +162,7 @@ def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
     """
     copy = tup[:]
     return tuple_setitem(copy, i, tup[i] - 1)
+
 
 @jit(nopython=True)
 def remove(
@@ -176,7 +178,9 @@ def remove(
         if n > 0:
             yield p, dec(pattern, p)
 
+
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
+
 
 def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     # pylint: disable=too-many-arguments
@@ -201,7 +205,9 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         dtype = np.find_common_type([R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
     n, _ = R.shape
     if y.shape[0] != n:
-        raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
+        raise ValueError(
+            f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})"
+        )
     num_indices = len(y)
     # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
     if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
@@ -214,8 +220,9 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
     array[(0,) * num_indices] = C
     return _hermite_multidimensional_numba(R, y, array)
 
+
 @jit(nopython=True)
-def _hermite_multidimensional_numba(R, y, array):  #pragma: no cover
+def _hermite_multidimensional_numba(R, y, array):  # pragma: no cover
     r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
     initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
 
@@ -257,18 +264,23 @@ def grad_hermite_multidimensional_numba(array, R, y, C=1, dtype=None):
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
     if dtype is None:
-        dtype = np.find_common_type([array.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
+        dtype = np.find_common_type(
+            [array.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name]
+        )
     n, _ = R.shape
     if y.shape[0] != n:
-        raise ValueError(f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})")
+        raise ValueError(
+            f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})"
+        )
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
     dG_dR, dG_dy = _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy)
     return dG_dC, dG_dR, dG_dy
 
+
 @jit(nopython=True)
-def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy):  #pragma: no cover
+def _grad_hermite_multidimensional_numba(R, y, array, dG_dR, dG_dy):  # pragma: no cover
     r"""
     Numba-compiled function to fill two arrays (dG_dR, dG_dy) with the gradients of the renormalized multidimensional Hermite polynomials
     with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.

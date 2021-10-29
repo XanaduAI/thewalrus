@@ -181,7 +181,7 @@ def T(n):
 
     Returns:
         int: the nth telephone number
-     """
+    """
     if n in (0, 1):
         return 1
     return T(n - 1) + (n - 1) * T(n - 2)

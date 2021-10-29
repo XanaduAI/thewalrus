@@ -24,7 +24,7 @@ from .gaussian_checks import is_pure_cov
 
 
 def pure_state_distribution(cov, cutoff=50, hbar=2, padding_factor=2):
-    r""" Calculates the total photon number distribution of a pure state
+    r"""Calculates the total photon number distribution of a pure state
     with zero mean.
 
     Args:
@@ -43,7 +43,9 @@ def pure_state_distribution(cov, cutoff=50, hbar=2, padding_factor=2):
         N = n // 2
         B = A[0:N, 0:N]
         rs = np.arctanh(np.linalg.svd(B, compute_uv=False))
-        return _convolve_squeezed_state_distribution(rs, cutoff=cutoff, padding_factor=padding_factor)[0:cutoff]
+        return _convolve_squeezed_state_distribution(
+            rs, cutoff=cutoff, padding_factor=padding_factor
+        )[0:cutoff]
     raise ValueError("The Gaussian state is not pure")
 
 
