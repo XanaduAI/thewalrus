@@ -3,6 +3,7 @@
 ### New features
 
 ### Improvements
+* Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
 
 ### Bug fixes
 
@@ -11,6 +12,8 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Mikhail Andrenkov
 
 ---
 
