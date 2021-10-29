@@ -30,7 +30,7 @@ T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
 
 
 def random_banded(n, bw):
-    """ Generates a random matrix of a given size and bandwidth.
+    """Generates a random matrix of a given size and bandwidth.
 
     Args:
       n (int): Size of the matrix
@@ -40,9 +40,9 @@ def random_banded(n, bw):
       (array): a matrix with the given properties
     """
 
-    M = np.zeros([n,n], dtype=np.complex128)
-    for j in range(bw+1):
-        M += np.diag(np.random.rand(n-j) + 1j*np.random.rand(n-j),k=j)
+    M = np.zeros([n, n], dtype=np.complex128)
+    for j in range(bw + 1):
+        M += np.diag(np.random.rand(n - j) + 1j * np.random.rand(n - j), k=j)
     M += M.T
     return M
 
@@ -298,14 +298,17 @@ class TestLoopHafnian:
         expected = np.prod(v)
         assert np.allclose(haf, expected)
 
-
     @pytest.mark.parametrize("n", [2, 3, 5, 10, 15, 20])
     @pytest.mark.parametrize("fill", [0.5, 0.2, 0.1, 0.05])
     def test_valid_output(self, random_matrix, n, fill):
         """Tests that sparse loop hafnian matches full implementation"""
         A = random_matrix(n, fill_factor=fill)
-        assert np.allclose(hafnian_sparse(A, loop=True), hafnian_sparse(A, D=set(range(len(A))), loop=True))
-        assert np.allclose(hafnian_sparse(A, loop=False), hafnian_sparse(A, D=set(range(len(A))), loop=False))
+        assert np.allclose(
+            hafnian_sparse(A, loop=True), hafnian_sparse(A, D=set(range(len(A))), loop=True)
+        )
+        assert np.allclose(
+            hafnian_sparse(A, loop=False), hafnian_sparse(A, D=set(range(len(A))), loop=False)
+        )
         assert np.allclose(hafnian(A, loop=True), hafnian_sparse(A, loop=True))
         assert np.allclose(hafnian(A, loop=False), hafnian_sparse(A, loop=False))
 
@@ -315,7 +318,7 @@ class TestLoopHafnian:
 @pytest.mark.parametrize("loop", [True, False])
 def test_hafnian_banded(n, w, loop):
     """Check banded loop hafnian is correct"""
-    M = random_banded(n,w)
+    M = random_banded(n, w)
     result = hafnian_banded(M, loop=loop)
     expected = hafnian(M, loop=loop)
     assert np.allclose(result, expected)
@@ -325,7 +328,7 @@ def test_hafnian_banded(n, w, loop):
 @pytest.mark.parametrize("bw", [18, 17, 16])
 def test_bandwidth(N, bw):
     """Check bandwidth is correct"""
-    A = random_banded(N,3)
+    A = random_banded(N, 3)
     A[0, bw] = 1.0
     A[bw, 0] = 1.0
     result = bandwidth(A)

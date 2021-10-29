@@ -20,7 +20,7 @@ import numpy as np
 
 
 def reduced_gaussian(mu, cov, modes):
-    r""" Returns the vector of means and the covariance matrix of the specified modes.
+    r"""Returns the vector of means and the covariance matrix of the specified modes.
 
     Args:
         mu (array): a length-:math:`2N` ``np.float64`` vector of means.

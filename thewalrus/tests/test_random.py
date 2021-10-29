@@ -57,9 +57,12 @@ def test_random_banded(n, top_one_init, real):
         assert np.allclose(U @ U.T.conj(), np.identity(n))
         assert bandwidth(U) == w
 
+
 def test_wrong_bandwidth():
     """Test that the correct error is raised if w > n-1."""
     n = 10
     w = 10
-    with pytest.raises(ValueError, match="The bandwidth can be at most one minus the size of the matrix."):
+    with pytest.raises(
+        ValueError, match="The bandwidth can be at most one minus the size of the matrix."
+    ):
         random_banded_interferometer(n, w)
