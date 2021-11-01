@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-11]
-        arch: [x86_64, arm64]
+        arch: [x86_64]
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
 
