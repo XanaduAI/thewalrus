@@ -110,7 +110,6 @@ info = {
         "numba>=0.49.1,<0.54",
         "scipy>=1.2.1",
         "sympy>=1.5.1",
-        "repoze.lru>=0.7",
     ],
     "setup_requires": ["cython", "numpy"],
     "ext_modules": build_extensions(),
