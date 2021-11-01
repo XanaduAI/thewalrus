@@ -72,7 +72,7 @@ jobs:
           sudo apt-get -y -q install cmake gcc libomp-dev
 
       - name: Install Google Test
-        working_directory: ~/googletest
+        working-directory: ~/googletest
         run: |
           wget -qO - https://github.com/google/googletest/archive/release-1.11.0.tar.gz | tar -xz
           cmake -D CMAKE_INSTALL_PREFIX:PATH=~/googletest -D CMAKE_BUILD_TYPE=Release googletest-release-1.11.0
