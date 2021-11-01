@@ -45,7 +45,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.7'
+          python-version: '3.9'
 
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==1.12.0
