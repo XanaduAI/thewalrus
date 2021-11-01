@@ -15,11 +15,11 @@
 Algorithms for hafnians of low-rank matrices.
 """
 
+from functools import lru_cache
 from itertools import product
 import numpy as np
 from sympy import symbols, expand
 from scipy.special import factorial2
-from repoze.lru import lru_cache
 
 
 @lru_cache(maxsize=1000000)
