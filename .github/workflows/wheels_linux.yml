@@ -52,5 +52,6 @@ jobs:
           CIBW_ARCHS_LINUX: ${{matrix.arch}}
 
       - uses: kittaakos/upload-artifact-as-is@v0
+        if: github.ref == 'refs/heads/master'
         with:
           path: ./wheelhouse/
