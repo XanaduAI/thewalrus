@@ -21,7 +21,6 @@ from itertools import chain, combinations
 from numba import jit
 from numba import types
 from numba.typed import Dict
-#from thewalrus._torontonian import powerset
 from numba.cpython.unsafe.tuple import tuple_setitem
 
 import numpy as np
