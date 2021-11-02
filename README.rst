@@ -1,13 +1,13 @@
 The Walrus
 ##########
 
-.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg
-    :alt: CircleCI
-    :target: https://circleci.com/gh/XanaduAI/thewalrus/tree/master
+.. image:: https://github.com/XanaduAI/thewalrus/actions/workflows/tests.yml/badge.svg
+    :alt: Tests
+    :target: https://github.com/XanaduAI/thewalrus/actions/workflows/tests.yml
 
-.. image:: https://ci.appveyor.com/api/projects/status/9udscqldo1xd25yk/branch/master?svg=true
-    :alt: Appveyor
-    :target: https://ci.appveyor.com/project/josh146/hafnian/branch/master
+.. image:: https://github.com/XanaduAI/thewalrus/actions/workflows/build.yml/badge.svg
+    :alt: Build
+    :target: https://github.com/XanaduAI/thewalrus/actions/workflows/build.yml
 
 .. image:: https://img.shields.io/codecov/c/github/xanaduai/thewalrus/master.svg?style=flat
     :alt: Codecov coverage
