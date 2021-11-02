@@ -25,7 +25,7 @@ class TestReferenceHafnian:
     """Tests for the reference hafnian"""
 
     def test_telephone(self):
-        r""" Checks that the function T produces the first 11 telephone numbers"""
+        r"""Checks that the function T produces the first 11 telephone numbers"""
         tn = np.array([1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496])
         Tn = np.array([T(n) for n in range(len(tn))])
         assert np.all(tn == Tn)

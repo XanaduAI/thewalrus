@@ -6,8 +6,9 @@ on:
   pull_request:
 
 jobs:
-  core-tests:
-    runs-on: ubuntu-18.04
+  python-tests:
+    name: Python tests
+    runs-on: ubuntu-latest
 
     steps:
       - name: Cancel Previous Runs
@@ -15,18 +16,19 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v2
+      - name: Checkout The Walrus
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.9
 
       - name: Before install
         run: |
           sudo apt-get -qq update;
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test;
-          sudo apt-get install gcc-4.8;
+          sudo apt-get install gcc;
 
       - name: Install dependencies
         run: |
@@ -45,3 +47,35 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage.xml
+
+  cpp-tests:
+    name: C++ tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout The Walrus
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -y -q update
+          sudo apt-get -y -q install cmake gcc libomp-dev libgtest-dev
+
+      - name: Build unit tests
+        run: |
+          cd tests
+          GOOGLETEST_DIR=$HOME/googletest make cpptests
+
+      - name: Run unit tests
+        run: |
+          cd tests && ./cpptests

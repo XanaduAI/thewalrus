@@ -79,10 +79,6 @@ def build_extensions():
             ("-Xpreprocessor", "-fopenmp", "-mmacosx-version-min=10.9", "-shared")
         )
         config["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp", "-lomp"))
-        config["include_dirs"].append(
-            "/Applications/Xcode.app/Contents/Developer/Toolchains/"
-            "XcodeDefault.xctoolchain/usr/include/c++/v1/"
-        )
     else:
         config["extra_compile_args"].extend(("-fopenmp", "-shared"))
         config["extra_link_args"].extend(("-fopenmp",))
@@ -111,10 +107,9 @@ info = {
     "provides": ["thewalrus"],
     "install_requires": [
         "dask[delayed]",
-        "numba>=0.49.1",
+        "numba>=0.49.1,<0.54",
         "scipy>=1.2.1",
         "sympy>=1.5.1",
-        "repoze.lru>=0.7",
     ],
     "setup_requires": ["cython", "numpy"],
     "ext_modules": build_extensions(),

@@ -371,7 +371,9 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
 
         probs = np.real_if_close(probs)
         probs = np.maximum(probs, 0)
-        result = np.random.choice(range(2), p=probs / prev_prob)
+        local_p = probs / prev_prob
+        local_p /= np.sum(local_p)
+        result = np.random.choice(range(2), p=local_p)
 
         results.append(result)
         prev_prob = probs[result]

@@ -31,7 +31,7 @@ from thewalrus.symplectic import (
 )
 
 from thewalrus.random import random_covariance, random_interferometer
-
+from thewalrus import threshold_detection_prob
 from thewalrus.quantum.fock_tensors import _prefactor
 from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
 from thewalrus.quantum.adjacency_matrices import _mean_clicks_adj
@@ -75,7 +75,9 @@ from thewalrus.quantum import (
     characteristic_function,
     photon_number_moment,
     n_body_marginals,
+    click_cumulant,
 )
+
 
 @pytest.mark.parametrize("n", [0, 1, 2])
 def test_reduced_gaussian(n):
@@ -478,7 +480,7 @@ def test_mean_clicks(r, theta, hbar):
 
 
 def test_Covmat():
-    """ Test the Covmat function by checking that its inverse function is Qmat """
+    """Test the Covmat function by checking that its inverse function is Qmat"""
     n = 1
     B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     B = B + B.T
@@ -494,7 +496,7 @@ def test_Covmat():
 
 
 def test_adj_to_qmat():
-    """ Test the adj_to_qmat for the analytically solvable case of a single mode"""
+    """Test the adj_to_qmat for the analytically solvable case of a single mode"""
     A = np.array([[10.0]])
     n_mean = 1.0
     cov = Covmat(adj_to_qmat(A, n_mean))
@@ -504,14 +506,14 @@ def test_adj_to_qmat():
 
 
 def test_is_valid_cov():
-    """ Test if is_valid_cov for a valid covariance matrix """
+    """Test if is_valid_cov for a valid covariance matrix"""
     hbar = 2
     val = is_valid_cov(V, hbar=hbar)
     assert val
 
 
 def test_is_valid_cov_non_square():
-    """ Test False if matrix is not square"""
+    """Test False if matrix is not square"""
     hbar = 2
     V = np.ones([3, 4])
     val = is_valid_cov(V, hbar=hbar)
@@ -519,7 +521,7 @@ def test_is_valid_cov_non_square():
 
 
 def test_is_valid_cov_non_symmetric():
-    """ Test False if matrix is not symmetric"""
+    """Test False if matrix is not symmetric"""
     hbar = 2
     V = np.zeros([4, 4])
     V[0, 1] = 1
@@ -528,7 +530,7 @@ def test_is_valid_cov_non_symmetric():
 
 
 def test_is_valid_cov_not_even_dimension():
-    """ Test False if matrix does not have even dimensions"""
+    """Test False if matrix does not have even dimensions"""
     hbar = 2
     V = np.zeros([5, 5])
     val = is_valid_cov(V, hbar=hbar)
@@ -546,7 +548,7 @@ def test_is_valid_cov_too_certain():
 
 
 def test_is_pure_cov():
-    """ Test if is_pure_cov for a pure state"""
+    """Test if is_pure_cov for a pure state"""
     hbar = 2
     val = is_pure_cov(V, hbar=hbar)
     assert val
@@ -554,7 +556,7 @@ def test_is_pure_cov():
 
 @pytest.mark.parametrize("nbar", [0, 1, 2])
 def test_is_valid_cov_thermal(nbar):
-    """ Test if is_valid_cov for a mixed state"""
+    """Test if is_valid_cov for a mixed state"""
     hbar = 2
     dim = 10
     cov = (2 * nbar + 1) * np.identity(dim)
@@ -564,7 +566,7 @@ def test_is_valid_cov_thermal(nbar):
 
 @pytest.mark.parametrize("nbar", [0, 1, 2])
 def test_is_pure_cov_thermal(nbar):
-    """ Test if is_pure_cov for vacuum and thermal states"""
+    """Test if is_pure_cov for vacuum and thermal states"""
     hbar = 2
     dim = 10
     cov = (2 * nbar + 1) * np.identity(dim)
@@ -578,7 +580,7 @@ def test_is_pure_cov_thermal(nbar):
 @pytest.mark.parametrize("i", [0, 1, 2, 3, 4])
 @pytest.mark.parametrize("j", [0, 1, 2, 3, 4])
 def test_pure_state_amplitude_two_mode_squeezed(i, j):
-    """ Tests pure state amplitude for a two mode squeezed vacuum state """
+    """Tests pure state amplitude for a two mode squeezed vacuum state"""
     nbar = 1.0
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
@@ -595,7 +597,7 @@ def test_pure_state_amplitude_two_mode_squeezed(i, j):
 
 @pytest.mark.parametrize("i", [0, 1, 2, 3, 4])
 def test_pure_state_amplitude_coherent(i):
-    """ Tests pure state amplitude for a coherent state """
+    """Tests pure state amplitude for a coherent state"""
     cov = np.identity(2)
     mu = np.array([1.0, 2.0])
     beta = complex_to_real_displacements(mu)
@@ -632,7 +634,7 @@ def test_pure_amplitude_tms_complex_displacement():
     q = 0.6
     p = -1.4
     hbar = 2
-    alpha = 1 / np.sqrt(2*hbar) * (q + 1j * p)
+    alpha = 1 / np.sqrt(2 * hbar) * (q + 1j * p)
     alpha_c = np.conjugate(alpha)
     n = 3
     # Calculate the amplitude for outcome [n,n]
@@ -640,12 +642,14 @@ def test_pure_amplitude_tms_complex_displacement():
     # The minus sign arises due to differences in convention
     cov = hbar / 2 * S @ S.T
     mu = np.array([q, q, p, p])
-    amp1 = pure_state_amplitude(mu, cov, [n,n], hbar=hbar)
+    amp1 = pure_state_amplitude(mu, cov, [n, n], hbar=hbar)
     # The following equation is taken from "Photon statistics of two-mode squeezed states
     # and interference in four-dimensional phase space, CM Caves et al."
 
     hyperbolic_pref = (-np.tanh(r)) ** n / np.cosh(r)
-    laguerre_part = np.polynomial.Laguerre([0] * n + [1])((alpha + alpha_c * np.tanh(r)) ** 2 / np.tanh(r))
+    laguerre_part = np.polynomial.Laguerre([0] * n + [1])(
+        (alpha + alpha_c * np.tanh(r)) ** 2 / np.tanh(r)
+    )
     exp_part = np.exp(-(alpha * alpha_c + alpha_c ** 2 * np.tanh(r)))
     amp2 = hyperbolic_pref * laguerre_part * exp_part
     assert np.allclose(amp1, amp2)
@@ -663,11 +667,10 @@ def test_state_vector_pure_amplitude():
     cov = 0.5 * hbar * S @ S.T
     beta = np.array([x + 1j * y, x - 1j * y])
 
-
     means = real_to_complex_displacements(beta, hbar=hbar)
     cutoff = 10
     amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
-    amps2 = state_vector(means, cov, cutoff  = cutoff)
+    amps2 = state_vector(means, cov, cutoff=cutoff)
     assert np.allclose(amps1, amps2)
 
 
@@ -685,12 +688,12 @@ def test_state_vector_pure_amplitude_complex():
     means = real_to_complex_displacements(beta, hbar=hbar)
     cutoff = 10
     amps1 = np.array([pure_state_amplitude(means, cov, [i]) for i in range(cutoff)])
-    amps2 = state_vector(means, cov, cutoff  = cutoff)
+    amps2 = state_vector(means, cov, cutoff=cutoff)
     assert np.allclose(amps1, amps2)
 
 
 def test_state_vector_two_mode_squeezed():
-    """ Tests state_vector for a two mode squeezed vacuum state """
+    """Tests state_vector for a two mode squeezed vacuum state"""
     nbar = 1.0
     cutoff = 5
     phase = np.pi / 8
@@ -709,7 +712,7 @@ def test_state_vector_two_mode_squeezed():
 
 
 def test_state_vector_two_mode_squeezed_post():
-    """ Tests state_vector for a two mode squeezed vacuum state """
+    """Tests state_vector for a two mode squeezed vacuum state"""
     nbar = 1.0
     cutoff = 5
     phase = np.pi / 8
@@ -732,7 +735,7 @@ def test_state_vector_two_mode_squeezed_post():
 
 
 def test_state_vector_coherent():
-    """ Tests state vector for a coherent state """
+    """Tests state vector for a coherent state"""
     cutoff = 5
     cov = np.identity(2)
     mu = np.array([1.0, 2.0])
@@ -749,7 +752,7 @@ def test_state_vector_coherent():
 
 
 def test_state_vector_two_mode_squeezed_post_normalize():
-    """ Tests state_vector for a two mode squeezed vacuum state """
+    """Tests state_vector for a two mode squeezed vacuum state"""
     nbar = 1.0
     cutoff = 5
     phase = np.pi / 8
@@ -773,7 +776,7 @@ def test_state_vector_two_mode_squeezed_post_normalize():
 
 
 def test_is_classical_cov_squeezed():
-    """ Tests that a squeezed state is not classical"""
+    """Tests that a squeezed state is not classical"""
     nbar = 1.0
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
@@ -783,7 +786,7 @@ def test_is_classical_cov_squeezed():
 
 @pytest.mark.parametrize("nbar", [0.0, 1.0, 2.0, 3.0, 4.0])
 def test_is_classical_cov_thermal(nbar):
-    """ Tests that a thermal state is classical"""
+    """Tests that a thermal state is classical"""
     cov = (2 * nbar + 1) * np.identity(2)
     assert is_classical_cov(cov)
 
@@ -1128,6 +1131,7 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
     assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
     assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic, atol=tol, rtol=0)
 
+
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])
 def test_photon_number_covmat_random_state(hbar):
     """Tests the photon number covariances of 2-mode random state"""
@@ -1148,7 +1152,6 @@ def test_photon_number_covmat_random_state(hbar):
     expected = np.array([[varn0, covar], [covar, varn1]])
     Ncov = photon_number_covmat(mu, cov, hbar=hbar)
     assert np.allclose(expected, Ncov)
-
 
 
 @pytest.mark.parametrize("hbar", [0.1, 1, 2])
@@ -1232,7 +1235,7 @@ def test_loss_value_error(eta):
 @pytest.mark.parametrize("num_modes", [1, 2, 3])
 @pytest.mark.parametrize("parallel", [True, False])
 def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
-    """ Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
+    """Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
 
     if parallel:  # set single-thread use in OpenMP
         monkeypatch.setenv("OMP_NUM_THREADS", "1")
@@ -1342,6 +1345,7 @@ def test_fidelity_squeezed_vacuum(r1, r2, hbar):
     mu = np.zeros([2])
     assert np.allclose(1 / np.cosh(r1 - r2), fidelity(mu, cov1, mu, cov2, hbar=hbar))
 
+
 @pytest.mark.parametrize("n1", [0.5, 1, 2, 1.6])
 @pytest.mark.parametrize("n2", [0.5, 1, 2, 1.6])
 @pytest.mark.parametrize("hbar", [0.5, 1, 2, 1.6])
@@ -1353,6 +1357,7 @@ def test_fidelity_thermal(n1, n2, hbar):
     mu1 = np.zeros([2])
     mu2 = np.zeros([2])
     assert np.allclose(expected, fidelity(mu1, cov1, mu2, cov2, hbar=hbar))
+
 
 def test_fidelity_wrong_shape():
     """Tests the correct error is raised"""
@@ -1610,6 +1615,7 @@ def test_big_displaced_squeezed_matelem():
     probs_displaced_squeezed = probabilities(mu, cov, cutoff, hbar=1.0)
     assert np.allclose(np.sum(probs_displaced_squeezed), 1.0)
 
+
 @pytest.mark.parametrize("s", [0.5, 0.7, 0.9, 1.1])
 @pytest.mark.parametrize("k", [4, 6, 10, 12])
 def test_total_photon_number_distribution_values(s, k):
@@ -1658,7 +1664,6 @@ def test_characteristic_function_no_loss(s, k):
 
 
 @pytest.mark.parametrize("s", np.linspace(-1, 1, 9))
-
 @pytest.mark.parametrize("cov", [squeezing(2 * np.arcsinh(1), 0.0), 1.8 * np.identity(2)])
 @pytest.mark.parametrize("mu", [np.zeros(2), np.array([0.9, 0.8])])
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
@@ -1813,3 +1818,48 @@ def test_n_body_marginals_too_high_correlation():
         ValueError, match="The order of the correlations is higher than the number of modes"
     ):
         n_body_marginals(mu, cov, 4, 4)
+
+
+@pytest.mark.parametrize("disp_scale", [0.0, 1.0, 2.0])
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 2.0, 1.7])
+def test_click_cumulants(disp_scale, hbar):
+    """Tests the correctness of the click cumulant function"""
+    M = 3
+    cov = random_covariance(M, hbar=hbar)
+    mu = disp_scale * (np.random.rand(2 * M) - 0.5)
+    mu0, cov0 = reduced_gaussian(mu, cov, [0])
+    mu1, cov1 = reduced_gaussian(mu, cov, [1])
+    mu2, cov2 = reduced_gaussian(mu, cov, [2])
+    mu01, cov01 = reduced_gaussian(mu, cov, [0, 1])
+    mu02, cov02 = reduced_gaussian(mu, cov, [0, 2])
+    mu12, cov12 = reduced_gaussian(mu, cov, [1, 2])
+    expected = (
+        threshold_detection_prob(mu, cov, [1, 1, 1], hbar=hbar)
+        - threshold_detection_prob(mu01, cov01, [1, 1], hbar=hbar)
+        * threshold_detection_prob(mu2, cov2, [1], hbar=hbar)
+        - threshold_detection_prob(mu02, cov02, [1, 1], hbar=hbar)
+        * threshold_detection_prob(mu1, cov1, [1], hbar=hbar)
+        - threshold_detection_prob(mu12, cov12, [1, 1], hbar=hbar)
+        * threshold_detection_prob(mu0, cov0, [1], hbar=hbar)
+        + 2
+        * threshold_detection_prob(mu2, cov2, [1], hbar=hbar)
+        * threshold_detection_prob(mu1, cov1, [1], hbar=hbar)
+        * threshold_detection_prob(mu0, cov0, [1], hbar=hbar)
+    )
+    obtained = click_cumulant(mu, cov, [0, 1, 2], hbar=hbar)
+    assert np.allclose(expected, obtained)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 2.0, 1.7])
+def test_single_mode_first_and_second_cumulant(hbar):
+    """Tests the first and second order cumulants of a single mode are the mean and variance"""
+    M = 1
+    cov = random_covariance(M, hbar)
+    mu = np.zeros([2 * M])
+    expected_mean = mean_clicks(cov, hbar=hbar)
+    expected_var = variance_clicks(cov, hbar=hbar)
+
+    obtained_mean = click_cumulant(mu, cov, [0], hbar=hbar)
+    obtained_var = click_cumulant(mu, cov, [0, 0], hbar=hbar)
+    assert np.allclose(expected_mean, obtained_mean)
+    assert np.allclose(expected_var, obtained_var)

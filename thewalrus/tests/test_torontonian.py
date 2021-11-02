@@ -19,8 +19,14 @@ import numpy as np
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
-from thewalrus import tor, threshold_detection_prob_displacement, threshold_detection_prob, numba_tor
+from thewalrus import (
+    tor,
+    threshold_detection_prob_displacement,
+    threshold_detection_prob,
+    numba_tor,
+)
 from thewalrus.symplectic import two_mode_squeezing
+
 
 def gen_omats(l, nbar):
     r"""Generates the matrix O that enters inside the Torontonian for an l mode system
@@ -99,8 +105,7 @@ def test_torontonian_tmsv_complex():
 
 
 def test_torontonian_vacuum():
-    """Calculates the torontonian of a vacuum in n modes
-    """
+    """Calculates the torontonian of a vacuum in n modes"""
     n_modes = 5
     Omat = np.zeros([2 * n_modes, 2 * n_modes])
     tor_val = tor(Omat)
@@ -112,6 +117,8 @@ def test_torontonian_vacuum():
 def test_torontonian_analytical_mats(l, nbar):
     """Checks the correct value of the torontonian for the analytical family described by gen_omats"""
     assert np.allclose(torontonian_analytical(l, nbar), tor(gen_omats(l, nbar)))
+
+
 @pytest.mark.parametrize("r", [0.5, 0.5, -0.8, 1, 0])
 @pytest.mark.parametrize("alpha", [0.5, 2, -0.5, 0.0, -0.5])
 def test_disp_torontonian(r, alpha):
@@ -165,6 +172,7 @@ def test_disp_torontonian_two_mode(scale):
     )
     assert np.allclose(expected, prob_click)
 
+
 @pytest.mark.parametrize("n_modes", range(1, 10))
 def test_tor_and_threshold_displacement_prob_agree(n_modes):
     """Tests that threshold_detection_prob_displacement and the usual tor expression agree
@@ -177,6 +185,7 @@ def test_tor_and_threshold_displacement_prob_agree(n_modes):
     prob = threshold_detection_prob_displacement(mu, cv, np.array([1] * n_modes))
     assert np.allclose(expected, prob)
 
+
 @pytest.mark.parametrize("n_modes", range(1, 10))
 def test_tor_and_threshold_prob_agree(n_modes):
     """Tests that threshold_detection_prob_displacement and the usual tor expression agree
@@ -188,6 +197,7 @@ def test_tor_and_threshold_prob_agree(n_modes):
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
     prob = threshold_detection_prob(mu, cv, [1] * n_modes)
     assert np.allclose(expected, prob)
+
 
 @pytest.mark.parametrize("N", range(1, 10))
 def test_numba_tor(N):

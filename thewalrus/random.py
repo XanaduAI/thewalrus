@@ -28,6 +28,7 @@ import scipy as sp
 # Random numbers and matrices                                           |
 # ------------------------------------------------------------------------
 
+
 def randnc(*arg):
     """Normally distributed array of random complex numbers."""
     return np.random.randn(*arg) + 1j * np.random.randn(*arg)
@@ -145,6 +146,7 @@ def random_block_interferometer(N, top_one=True, real=False):
     if top_one:
         return sp.linalg.block_diag(u0, *u2s)
     return sp.linalg.block_diag(*u2s, u0)
+
 
 def random_banded_interferometer(N, w, top_one_init=True, real=False):
     r"""Generates a banded unitary matrix.

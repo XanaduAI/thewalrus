@@ -117,6 +117,7 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     T hafnian_recursive[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
     T permanent[T](vector[T] &mat)
+    T perm_BBFG[T](vector[T] &mat) 
 
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud)
@@ -125,6 +126,8 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     double complex permanent_quad(vector[double complex] &mat)
     double perm_fsum[T](vector[T] &mat)
     double permanent_fsum(vector[double] &mat)
+    double perm_BBFG_qp(vector[double] &mat)
+    double complex perm_BBFG_cmplx(vector[double complex] &mat)
 
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
@@ -335,7 +338,6 @@ def haf_real(double[:, :] A, bint loop=False, bint recursive=True, quad=True, bi
 # ==============================================================================
 # Permanent
 
-
 def perm_complex(double complex[:, :] A, quad=True):
     """Returns the hafnian of a complex matrix A via the C++ libwalrus library.
 
@@ -359,7 +361,6 @@ def perm_complex(double complex[:, :] A, quad=True):
         return permanent_quad(mat)
 
     return permanent(mat)
-
 
 def perm_real(double [:, :] A, quad=True, fsum=False):
     """Returns the hafnian of a real matrix A via the C++ libwalrus library.
@@ -390,6 +391,45 @@ def perm_real(double [:, :] A, quad=True, fsum=False):
 
     return permanent(mat)
 
+def perm_BBFG_complex(double complex[:, :] A):
+    """Returns the hafnian of a complex matrix A via the C++ libwalrus library
+        using Balasubramanian-Bax-Franklin-Glynn formula.
+
+    Args:
+        A (array): a np.float, square array
+
+    Returns:
+        np.complex128: the hafnian of matrix A
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double complex] mat
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    # Exposes a c function to python
+    return perm_BBFG_cmplx(mat)
+
+def perm_BBFG_real(double [:, :] A):
+    """Returns the hafnian of a real matrix A via the C++ libwalrus library
+        using Balasubramanian-Bax-Franklin-Glynn formula.
+
+    Args:
+        A (array): a np.float64, square array
+
+    Returns:
+        np.float64: the hafnian of matrix A
+    """
+    cdef int i, j, n = A.shape[0]
+    cdef vector[double] mat
+
+    for i in range(n):
+        for j in range(n):
+            mat.push_back(A[i, j])
+
+    # Exposes a c function to python
+    return perm_BBFG_qp(mat)
 
 # ==============================================================================
 # Batch hafnian

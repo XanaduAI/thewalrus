@@ -22,3 +22,4 @@ docs/.ipynb_checkpoints/*
 coverage.xml
 docs/code/api/*
 thewalrus/libwalrus.cpp
+.mypy_cache/

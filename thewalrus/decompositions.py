@@ -20,11 +20,12 @@ import numpy as np
 from scipy.linalg import block_diag, sqrtm, schur
 from thewalrus.symplectic import sympmat
 
+
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
     See https://math.stackexchange.com/questions/1171842/finding-the-symplectic-matrix-in-williamsons-theorem/2682630#2682630
-	and https://strawberryfields.ai/photonics/conventions/decompositions.html#williamson-decomposition
+        and https://strawberryfields.ai/photonics/conventions/decompositions.html#williamson-decomposition
     Args:
         V (array[float]): positive definite symmetric (real) matrix
         rtol (float): the relative tolerance parameter used in ``np.allclose``
@@ -70,12 +71,12 @@ def williamson(V, rtol=1e-05, atol=1e-08):
             seq.append(I)
         else:
             seq.append(X)
-    perm = np.array([2*i for i in range(n)] + [2*i+1 for i in range(n)])
+    perm = np.array([2 * i for i in range(n)] + [2 * i + 1 for i in range(n)])
     p = block_diag(*seq)
     Kt = K @ p
-    Ktt = Kt[:,perm]
+    Ktt = Kt[:, perm]
     s1t = p @ s1 @ p
-    dd = [1/s1t[2 * i, 2 * i + 1] for i in range(n)]
-    Db = np.diag(dd+dd)
+    dd = [1 / s1t[2 * i, 2 * i + 1] for i in range(n)]
+    Db = np.diag(dd + dd)
     S = Mm12 @ Ktt @ sqrtm(Db)
     return Db, np.linalg.inv(S).T

@@ -16,26 +16,15 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from .quantum import Qmat, Xmat, Amat
-from . import reduction
+from thewalrus.quantum.conversions import Xmat, Amat
+from ._hafnian import reduction
 
 
 def tor(A):
     """Returns the Torontonian of a matrix.
 
-    For more direct control, you may wish to call :func:`tor_real` or
-    :func:`tor_complex` directly.
-
-    The input matrix is cast to quadruple precision
-    internally for a quadruple precision torontonian computation.
-
     Args:
-        A (array): a np.complex128, square, symmetric array of even dimensions.
-        fsum (bool): if ``True``, the `Shewchuck algorithm <https://github.com/achan001/fsum>`_
-            for more accurate summation is performed. This can significantly increase
-            the `accuracy of the computation <https://link.springer.com/article/10.1007%2FPL00009321>`_,
-            but no casting to quadruple precision takes place, as the Shewchuck algorithm
-            only supports double precision.
+        A (array): a square array of even dimensions.
 
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
@@ -48,16 +37,11 @@ def tor(A):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
-    if A.dtype == np.complex128:
-        if np.any(np.iscomplex(A)):
-            return numba_tor(A)
-        return numba_tor(np.float64(A.real))
-
     return numba_tor(A)
 
 
 @numba.jit(nopython=True)
-def combinations(pool, r): # pragma: no cover
+def combinations(pool, r):  # pragma: no cover
     """Numba implementation of `itertools.combinations`.
     As itertools.combinations not callable from numba decorated functions.
 
@@ -94,7 +78,7 @@ def combinations(pool, r): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def powerset(parent_set): # pragma: no cover
+def powerset(parent_set):  # pragma: no cover
     """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
 
     Args:
@@ -109,7 +93,7 @@ def powerset(parent_set): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def nb_block(X): # pragma: no cover
+def nb_block(X):  # pragma: no cover
     """Numba implementation of `np.block`.
     Only suitable for 2x2 blocks.
 
@@ -126,7 +110,7 @@ def nb_block(X): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def numba_ix(arr, rows, cols): # pragma: no cover
+def numba_ix(arr, rows, cols):  # pragma: no cover
     """Numba implementation of `np.ix_`.
     Required due to numba lacking support for advanced numpy indexing.
 
@@ -143,7 +127,7 @@ def numba_ix(arr, rows, cols): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def Qmat_numba(cov, hbar=2): # pragma: no cover
+def Qmat_numba(cov, hbar=2):  # pragma: no cover
     r"""Numba compatible version of `thewalrus.quantum.Qmat`
 
     Returns the :math:`Q` Husimi matrix of the Gaussian state.
@@ -158,9 +142,9 @@ def Qmat_numba(cov, hbar=2): # pragma: no cover
     N = len(cov) // 2
     I = np.identity(N)
 
-    x = cov[:N, :N] * (2. / hbar)
-    xp = cov[:N, N:] * (2. / hbar)
-    p = cov[N:, N:] * (2. / hbar)
+    x = cov[:N, :N] * (2.0 / hbar)
+    xp = cov[:N, N:] * (2.0 / hbar)
+    p = cov[N:, N:] * (2.0 / hbar)
     # the (Hermitian) matrix elements <a_i^\dagger a_j>
     aidaj = (x + p + 1j * (xp - xp.T) - 2 * I) / 4
     # the (symmetric) matrix elements <a_i a_j>
@@ -172,7 +156,7 @@ def Qmat_numba(cov, hbar=2): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragma: no cover
+def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2):  # pragma: no cover
     r"""Threshold detection probabilities for Gaussian states with displacement.
     Formula from Jake Bulmer and Stefano Paesani.
 
@@ -195,13 +179,16 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
 
     means_x = mu[:n]
     means_p = mu[n:]
-    avec = np.concatenate((means_x + 1j * means_p, means_x - 1j * means_p), axis=0) / np.sqrt(2 * hbar)
+    avec = np.concatenate((means_x + 1j * means_p, means_x - 1j * means_p), axis=0) / np.sqrt(
+        2 * hbar
+    )
 
     Q = Qmat_numba(cov, hbar=hbar)
 
     if max(det_pattern) > 1:
         raise ValueError(
-            "When using threshold detectors, the detection pattern can contain only 1s or 0s.")
+            "When using threshold detectors, the detection pattern can contain only 1s or 0s."
+        )
 
     nonzero_idxs = np.where(det_pattern == 1)[0]
     zero_idxs = np.where(det_pattern == 0)[0]
@@ -226,7 +213,7 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
     p0a = p0a_fact_exp / p0a_fact_det
 
     n_det = len(nonzero_idxs)
-    p_sum = 1.  # empty set is not included in the powerset function so we start at 1
+    p_sum = 1.0  # empty set is not included in the powerset function so we start at 1
     for z in powerset(np.arange(n_det)):
         Z = np.asarray(z)
         ZZ = np.concatenate((Z, Z + n_det), axis=0)
@@ -242,7 +229,10 @@ def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2): # pragm
 
     return p0a * p_sum
 
-def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10): # pylint: disable=too-many-arguments
+
+def threshold_detection_prob(
+    mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10
+):  # pylint: disable=too-many-arguments
     r"""Threshold detection probabilities for Gaussian states.
     Formula from Jake Bulmer and Stefano Paesani.
     When state is displaced, threshold_detection_prob_displacement is called.
@@ -263,7 +253,7 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
     if np.allclose(mu, 0, atol=atol, rtol=rtol):
         # no displacement
         n_modes = cov.shape[0] // 2
-        Q = Qmat(cov, hbar)
+        Q = Qmat_numba(cov, hbar)
         O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)
@@ -271,8 +261,9 @@ def threshold_detection_prob(mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-1
     det_pattern = np.asarray(det_pattern).astype(np.int8)
     return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
 
+
 @numba.jit(nopython=True)
-def numba_tor(A): # pragma: no cover
+def numba_tor(A):  # pragma: no cover
     """Returns the Torontonian of a matrix using numba.
 
     For more direct control, you may wish to call :func:`tor_real` or
@@ -288,12 +279,12 @@ def numba_tor(A): # pragma: no cover
         np.float64 or np.complex128: the torontonian of matrix A.
     """
     n_det = A.shape[0] // 2
-    p_sum = 1.  # empty set is not included in the powerset function so we start at 1
+    p_sum = 1.0  # empty set is not included in the powerset function so we start at 1
     for z in powerset(np.arange(n_det)):
         Z = np.asarray(z)
         ZZ = np.concatenate((Z, Z + n_det), axis=0)
         A_ZZ = numba_ix(A, ZZ, ZZ)
         n = len(Z)
-        p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2*n) - A_ZZ))
+        p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2 * n) - A_ZZ))
 
     return p_sum * (-1) ** (n_det)

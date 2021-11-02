@@ -49,6 +49,7 @@ Code details
 import numpy as np
 from scipy.optimize import root_scalar
 
+
 def rescale_adjacency_matrix_thermal(
     A, n_mean, check_positivity=True, check_symmetry=True, rtol=1e-05, atol=1e-08
 ):
@@ -68,8 +69,15 @@ def rescale_adjacency_matrix_thermal(
         tuple(array,array): rescaled eigenvalues and eigenvectors of the matrix A
     """
     return rescale_adjacency_matrix(
-        A, n_mean, 1.0, check_positivity=check_positivity, check_symmetry=check_symmetry, rtol=rtol, atol=atol
+        A,
+        n_mean,
+        1.0,
+        check_positivity=check_positivity,
+        check_symmetry=check_symmetry,
+        rtol=rtol,
+        atol=atol,
     )
+
 
 def rescale_adjacency_matrix(
     A, n_mean, scale, check_positivity=True, check_symmetry=True, rtol=1e-05, atol=1e-08
@@ -121,9 +129,8 @@ def rescale_adjacency_matrix(
         n = np.sum(vals2 / (1.0 - vals2))
         return n
 
-
     # The following function is implicitly tested in test_rescaling_thermal
-    def grad_mean_photon_number(x, vals): # pragma: no cover
+    def grad_mean_photon_number(x, vals):  # pragma: no cover
         r"""Returns the gradient of the mean number of photons in the Gaussian state that
         encodes the adjacency matrix x*A with respect to x.
         vals are the eigenvalues of A
@@ -146,23 +153,22 @@ def rescale_adjacency_matrix(
     assert res.converged
     return res.root * ls, O
 
+
 def generate_thermal_samples(ls, O, num_samples=1):
     r"""Generates samples of the Gaussian state in terms of the mean photon number parameter ls and the interferometer O.
 
-        Args:
-            ls (array): squashing parameters
-            O (array): Orthogonal matrix representing the interferometer
-            num_samples: Number of samples to generate
+    Args:
+        ls (array): squashing parameters
+        O (array): Orthogonal matrix representing the interferometer
+        num_samples: Number of samples to generate
 
-        Returns:
-            list(array: samples
+    Returns:
+        list(array: samples
     """
     rs = 0.5 * ls / (1 - ls)
     return [
         np.random.poisson(
-            np.abs(
-                O @ (np.random.normal(0, np.sqrt(rs)) + 1j * np.random.normal(0, np.sqrt(rs)))
-            )
+            np.abs(O @ (np.random.normal(0, np.sqrt(rs)) + 1j * np.random.normal(0, np.sqrt(rs))))
             ** 2
         )
         for _ in range(num_samples)

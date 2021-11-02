@@ -23,17 +23,13 @@ from scipy.special import factorial
 import numpy as np
 
 from .._hafnian import hafnian, reduction
+from .._torontonian import threshold_detection_prob
 
-from .conversions import (
-    reduced_gaussian,
-    Qmat,
-    Xmat,
-    complex_to_real_displacements
-)
+from .conversions import reduced_gaussian, Qmat, Xmat, complex_to_real_displacements
 
 
 def photon_number_mean(mu, cov, j, hbar=2):
-    r""" Calculate the mean photon number of mode j of a Gaussian state.
+    r"""Calculate the mean photon number of mode j of a Gaussian state.
 
     Args:
         mu (array): vector of means of the Gaussian state using the ordering
@@ -48,16 +44,12 @@ def photon_number_mean(mu, cov, j, hbar=2):
     """
     num_modes = len(mu) // 2
     return (
-        mu[j] ** 2
-        + mu[j + num_modes] ** 2
-        + cov[j, j]
-        + cov[j + num_modes, j + num_modes]
-        - hbar
+        mu[j] ** 2 + mu[j + num_modes] ** 2 + cov[j, j] + cov[j + num_modes, j + num_modes] - hbar
     ) / (2 * hbar)
 
 
 def photon_number_mean_vector(mu, cov, hbar=2):
-    r""" Calculate the mean photon number of each of the modes in a Gaussian state
+    r"""Calculate the mean photon number of each of the modes in a Gaussian state
 
     Args:
         mu (array): vector of means of the Gaussian state using the ordering
@@ -131,9 +123,8 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
     return (term_1 + 2 * term_2) / (2 * hbar ** 2)
 
 
-
 def photon_number_covmat(mu, cov, hbar=2):
-    r""" Calculate the covariance matrix of the photon number distribution of a
+    r"""Calculate the covariance matrix of the photon number distribution of a
     Gaussian state.
 
     Args:
@@ -149,7 +140,7 @@ def photon_number_covmat(mu, cov, hbar=2):
     N = len(mu) // 2
     pnd_cov = np.zeros((N, N))
     for i in range(N):
-        for j in range(i+1):
+        for j in range(i + 1):
             pnd_cov[i][j] = photon_number_covar(mu, cov, i, j, hbar=hbar)
             pnd_cov[j][i] = pnd_cov[i][j]
     return pnd_cov
@@ -200,6 +191,7 @@ def photon_number_squared_expectation(mu, cov, modes, hbar=2):
         result += term
     return result
 
+
 def normal_ordered_expectation(mu, cov, rpt, hbar=2):
     r"""Calculates the expectation value of the normal ordered product
     :math:`\prod_{i=0}^{N-1} a_i^{\dagger n_i} \prod_{j=0}^{N-1} a_j^{m_j}` with respect to an N-mode Gaussian state,
@@ -215,6 +207,7 @@ def normal_ordered_expectation(mu, cov, rpt, hbar=2):
         (float): expectation value of the normal ordered product of operators
     """
     return s_ordered_expectation(mu, cov, rpt, hbar, s=1)
+
 
 def s_ordered_expectation(mu, cov, rpt, hbar=2, s=0):
     r"""Calculates the expectation value of the s-ordered product
@@ -256,10 +249,8 @@ def s_ordered_expectation(mu, cov, rpt, hbar=2, s=0):
     return hafnian(A, loop=True)
 
 
-
-
 def mean_clicks(cov, hbar=2):
-    r""" Calculates the total mean number of clicks when a zero-mean gaussian state
+    r"""Calculates the total mean number of clicks when a zero-mean gaussian state
     is measured using threshold detectors.
 
     Args
@@ -281,7 +272,7 @@ def mean_clicks(cov, hbar=2):
 
 
 def variance_clicks(cov, hbar=2):
-    r""" Calculates the variance of the total number of clicks when a zero-mean gaussian state
+    r"""Calculates the variance of the total number of clicks when a zero-mean gaussian state
     is measured using threshold detectors.
 
     Args
@@ -314,6 +305,7 @@ def variance_clicks(cov, hbar=2):
 
     return term1 + 2 * term2
 
+
 def _coeff_normal_ordered(m, k):
     r"""Returns the coefficients giving the expansion of a photon number power in terms of normal ordered power of creation
     and annihilation operators. The coefficient is given by :math:`\sum_{\mu=0}^k \frac{(-1)^{k-\mu} \mu^m}{\mu!(k-\mu)!}`.
@@ -328,8 +320,7 @@ def _coeff_normal_ordered(m, k):
 
     return sum(
         [
-            (1 / (factorial(mu) * factorial(k - mu)))
-            * ((-1) ** (k - mu) * (mu ** m))
+            (1 / (factorial(mu) * factorial(k - mu))) * ((-1) ** (k - mu) * (mu ** m))
             for mu in range(0, k + 1)
         ]
     )
@@ -375,6 +366,7 @@ def photon_number_moment(mu, cov, indices, hbar=2):
         net_sum += prod_coeff * s_ordered_expectation(mu, cov, rpt, s=1, hbar=hbar)
     return np.real_if_close(net_sum)
 
+
 def partition(collection):
     """Generate all set partitions of a collection.
 
@@ -393,8 +385,9 @@ def partition(collection):
     first = collection[0]
     for smaller in partition(collection[1:]):
         for n, subset in enumerate(smaller):
-            yield smaller[:n] + [[first] + subset] + smaller[n+1:]
+            yield smaller[:n] + [[first] + subset] + smaller[n + 1 :]
         yield [[first]] + smaller
+
 
 def _list_to_freq_dict(words):
     """Convert between a list which of "words" and a dictionary
@@ -405,10 +398,11 @@ def _list_to_freq_dict(words):
     Returns:
         dict : how many times a word appears. key is word, value is multiplicity
     """
-    return {i : words.count(i) for i in set(words)}
+    return {i: words.count(i) for i in set(words)}
+
 
 def photon_number_cumulant(mu, cov, modes, hbar=2):
-    r"""Calculates the cumulant of the modes in the Gaussian state.
+    r"""Calculates the photon-number cumulant of the modes in the Gaussian state.
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering.
@@ -420,7 +414,7 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
         (float): the cumulant
     """
 
-    modes = list(modes) # turns modes from array to list if passed in as array
+    modes = list(modes)  # turns modes from array to list if passed in as array
 
     kappa = 0
     for pi in partition(modes):
@@ -429,6 +423,35 @@ def photon_number_cumulant(mu, cov, modes, hbar=2):
         for B in pi:
             indices = _list_to_freq_dict(B)
             term *= photon_number_moment(mu, cov, indices, hbar=hbar)
+        kappa += term
+
+    return kappa
+
+
+def click_cumulant(mu, cov, modes, hbar=2):
+    r"""Calculates the click cumulant of the modes in the Gaussian state.
+
+    Args:
+        mu (array): length-:math:`2N` means vector in xp-ordering.
+        cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
+        modes (list or array): list of modes.
+        hbar (float): value of hbar in the uncertainty relation.
+
+    Returns:
+        (float): the cumulant
+    """
+
+    modes = list(modes)  # turns modes from array to list if passed in as array
+    kappa = 0
+    for pi in partition(modes):
+        size = len(pi)
+        term = factorial(size - 1) * (-1) ** (size - 1)
+        for B in pi:
+            B = list(set(B))  # remove repetitions
+            pattern = np.ones_like(B)
+            mu_red, cov_red = reduced_gaussian(mu, cov, B)
+            summand = threshold_detection_prob(mu_red, cov_red, pattern, hbar=hbar)
+            term *= summand
         kappa += term
 
     return kappa

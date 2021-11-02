@@ -17,16 +17,25 @@
 import numpy as np
 import pytest
 from scipy.linalg import block_diag
-from thewalrus.quantum import density_matrix, state_vector, probabilities, update_probabilities_with_loss, photon_number_cumulant
+from thewalrus.quantum import (
+    density_matrix,
+    state_vector,
+    probabilities,
+    update_probabilities_with_loss,
+    photon_number_cumulant,
+)
 from thewalrus.symplectic import expand, interferometer, two_mode_squeezing, loss, squeezing
 from thewalrus.random import random_interferometer
 
-@pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0/137])
+
+@pytest.mark.parametrize("hbar", [0.1, 0.5, 1, 2, 1.0 / 137])
 def test_cubic_phase(hbar):
     """Test that all the possible ways of obtaining a cubic phase state using the different methods agree"""
-    mu = np.sqrt(hbar/2.0) * np.array([-0.50047867, 0.37373598, 0.01421683, 0.26999427, 0.04450994, 0.01903583])
+    mu = np.sqrt(hbar / 2.0) * np.array(
+        [-0.50047867, 0.37373598, 0.01421683, 0.26999427, 0.04450994, 0.01903583]
+    )
 
-    cov = (hbar/2.0) * np.array(
+    cov = (hbar / 2.0) * np.array(
         [
             [1.57884241, 0.81035494, 1.03468307, 1.14908791, 0.09179507, -0.11893174],
             [0.81035494, 1.06942863, 0.89359234, 0.20145142, 0.16202296, 0.4578259],
@@ -52,9 +61,9 @@ def test_cubic_phase(hbar):
     assert np.allclose(rho_c, rho)
 
 
-@pytest.mark.parametrize("hbar", [2.0, 1.0/137])
+@pytest.mark.parametrize("hbar", [2.0, 1.0 / 137])
 def test_four_modes(hbar):
-    """ Test that probabilities are correctly updates for a four modes system under loss"""
+    """Test that probabilities are correctly updates for a four modes system under loss"""
     # All this block is to generate the correct covariance matrix.
     # It correnponds to num_modes=4 modes that undergo two mode squeezing between modes i and i + (num_modes / 2).
     # Then they undergo displacement.
@@ -63,8 +72,12 @@ def test_four_modes(hbar):
     num_modes = 4
     theta = 0.45
     phi = 0.7
-    u2x2 = np.array([[np.cos(theta / 2), np.exp(1j * phi) * np.sin(theta / 2)],
-                    [-np.exp(-1j * phi) * np.sin(theta / 2), np.cos(theta / 2)]])
+    u2x2 = np.array(
+        [
+            [np.cos(theta / 2), np.exp(1j * phi) * np.sin(theta / 2)],
+            [-np.exp(-1j * phi) * np.sin(theta / 2), np.cos(theta / 2)],
+        ]
+    )
 
     u4x4 = block_diag(u2x2, u2x2)
 
@@ -94,7 +107,7 @@ def test_four_modes(hbar):
 
 
 @pytest.mark.parametrize("hbar", [0.5, 1.0, 1.7, 2.0])
-def test_cumulants_three_mode_random_state(hbar): # pylint: disable=too-many-statements
+def test_cumulants_three_mode_random_state(hbar):  # pylint: disable=too-many-statements
     """Tests third order cumulants for a random state"""
     M = 3
     O = interferometer(random_interferometer(3))
