@@ -7,7 +7,7 @@ on:
 
 jobs:
   linux-wheels-x86-64:
-    name: Wheels Linux x86_64
+    name: wheels linux
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -52,7 +52,7 @@ jobs:
           path: ./wheelhouse/
 
   mac-wheels-x86-64:
-    name: Wheels MacOS x86_64
+    name: wheels macos
     strategy:
       fail-fast: false
       matrix:
@@ -101,7 +101,7 @@ jobs:
           path: ./wheelhouse/
 
   win-wheels:
-    name: Wheels Windows
+    name: wheels windows
     strategy:
       matrix:
         os: [windows-latest]
