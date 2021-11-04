@@ -99,9 +99,8 @@ def hermite_multidimensional(
     else:
         values = np.array(_hermite_multidimensional(Rt, yt, array))
 
-    if make_tensor:
-        shape = cutoff * np.ones([n], dtype=int)
-        values = np.reshape(values, shape)
+    if not make_tensor:
+        values = values.flatten()
 
     return values
 
