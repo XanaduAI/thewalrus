@@ -22,15 +22,12 @@ import numpy as np
 from .libwalrus import hermite_multidimensional as hm
 from .libwalrus import hermite_multidimensional_real as hmr
 
-from .libwalrus import renorm_hermite_multidimensional as rhm
-from .libwalrus import renorm_hermite_multidimensional_real as rhmr
-
 from ._hafnian import input_validation
 
 
 # pylint: disable=too-many-arguments
 def hermite_multidimensional(
-    R, cutoff, y=None, renorm=False, make_tensor=True, modified=False, rtol=1e-05, atol=1e-08
+    R, cutoff, y=None, C=1, renorm=False, make_tensor=True, modified=False, rtol=1e-05, atol=1e-08
 ):
     r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
 
@@ -54,6 +51,7 @@ def hermite_multidimensional(
         R (array): square matrix parametrizing the Hermite polynomial family
         cutoff (int): maximum size of the subindices in the Hermite polynomial
         y (array): vector argument of the Hermite polynomial
+        C (complex): first value of the Hermite polynomials, the default value is 1
         renorm (bool): If ``True``, normalizes the returned multidimensional Hermite
             polynomials such that :math:`H_k^{(R)}(y)/\prod_i k_i!`
         make_tensor (bool): If ``False``, returns a flattened one dimensional array
@@ -83,17 +81,32 @@ def hermite_multidimensional(
     if m != n:
         raise ValueError("The matrix R and vector y have incompatible dimensions")
 
+    num_indices = len(y)
+    # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
+    if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
+        cutoff = int(cutoff)
+    if isinstance(cutoff, Iterable):
+        cutoffs = tuple(cutoff)
+    else:
+        cutoffs = tuple([cutoff]) * num_indices
+
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
 
+    dtype = np.find_common_type([R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
+    array = np.zeros(cutoffs, dtype=dtype)
+    array[(0,) * num_indices] = C
+
     if Rt.dtype == float and yt.dtype == float:
         if renorm:
-            values = np.array(rhmr(Rt, yt, cutoff))
+            values = np.array(_hermite_multidimensional_numba(Rt, yt, array))
         else:
             values = np.array(hmr(Rt, yt, cutoff))
     else:
         if renorm:
-            values = np.array(rhm(np.complex128(R), np.complex128(y), cutoff))
+            values = np.array(
+                _hermite_multidimensional_numba(np.complex128(R), np.complex128(y), array)
+            )
         else:
             values = np.array(hm(np.complex128(R), np.complex128(y), cutoff))
 
