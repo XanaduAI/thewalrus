@@ -183,45 +183,6 @@ def remove(
 SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
 
 
-def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
-    # pylint: disable=too-many-arguments
-    r"""Returns the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)`.
-
-    Here :math:`R` is an :math:`n \times n` square matrix, and
-    :math:`y` is an :math:`n` dimensional vector. The polynomials are
-    parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
-    and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
-
-    Args:
-        R (array[complex]): square matrix parametrizing the Hermite polynomial
-        cutoff (int or list[int]): maximum sizes of the subindices in the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
-        C (complex): first value of the Hermite polynomials, the default value is 1
-        dtype (data type): Specifies the data type used for the calculation
-
-    Returns:
-        array[data type]: the multidimensional Hermite polynomials
-    """
-    if dtype is None:
-        dtype = np.find_common_type([R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
-    n, _ = R.shape
-    if y.shape[0] != n:
-        raise ValueError(
-            f"The matrix R and vector y have incompatible dimensions ({R.shape} vs {y.shape})"
-        )
-    num_indices = len(y)
-    # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
-    if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
-        cutoff = int(cutoff)
-    if isinstance(cutoff, Iterable):
-        cutoffs = tuple(cutoff)
-    else:
-        cutoffs = tuple([cutoff]) * num_indices
-    array = np.zeros(cutoffs, dtype=dtype)
-    array[(0,) * num_indices] = C
-    return _hermite_multidimensional_renorm(R, y, array)
-
-
 @jit(nopython=True)
 def _hermite_multidimensional_renorm(R, y, array):  # pragma: no cover
     r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
