@@ -93,22 +93,14 @@ def hermite_multidimensional(
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
 
-    dtype = np.find_common_type([R.dtype.name, y.dtype.name], [np.array(C).dtype.name])
+    dtype = np.find_common_type([Rt.dtype.name, yt.dtype.name], [np.array(C).dtype.name])
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
 
-    if Rt.dtype == float and yt.dtype == float:
-        if renorm:
-            values = np.array(_hermite_multidimensional_numba(Rt, yt, array))
-        else:
-            values = np.array(hmr(Rt, yt, cutoff))
+    if renorm:
+        values = np.array(_hermite_multidimensional_renorm(Rt, yt, array))
     else:
-        if renorm:
-            values = np.array(
-                _hermite_multidimensional_numba(np.complex128(R), np.complex128(y), array)
-            )
-        else:
-            values = np.array(hm(np.complex128(R), np.complex128(y), cutoff))
+        values = np.array(_hermite_multidimensional(Rt, yt, array))
 
     if make_tensor:
         shape = cutoff * np.ones([n], dtype=int)
@@ -231,11 +223,11 @@ def hermite_multidimensional_numba(R, cutoff, y, C=1, dtype=None):
         cutoffs = tuple([cutoff]) * num_indices
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
-    return _hermite_multidimensional_numba(R, y, array)
+    return _hermite_multidimensional_renorm(R, y, array)
 
 
 @jit(nopython=True)
-def _hermite_multidimensional_numba(R, y, array):  # pragma: no cover
+def _hermite_multidimensional_renorm(R, y, array):  # pragma: no cover
     r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
     initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
 
@@ -259,6 +251,34 @@ def _hermite_multidimensional_numba(R, y, array):  # pragma: no cover
         for l, kl in remove(ki):
             u -= SQRT[ki[l]] * R[i, l] * array[kl]
         array[idx] = u / SQRT[idx[i]]
+    return array
+
+
+@jit(nopython=True)
+def _hermite_multidimensional(R, y, array):  # pragma: no cover
+    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
+    initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
+
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        array (array[complex]): array to be filled with the Hermite polynomials
+
+    Returns:
+        array[complex]: the multidimensional Hermite polynomials
+    """
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        u = y[i] * array[ki]
+        for l, kl in remove(ki):
+            u -= ki[l] * R[i, l] * array[kl]
+        array[idx] = u
     return array
 
 
