@@ -68,7 +68,7 @@ def hermite_multidimensional(
         if m == n:
             ym = R @ y
             return hermite_multidimensional(
-                R, cutoff, y=ym, renorm=renorm, make_tensor=make_tensor, modified=True
+                R, cutoff, y=ym, C=C, renorm=renorm, make_tensor=make_tensor, modified=True
             )
 
     if y is None:
