@@ -145,11 +145,11 @@ def test_hermite_cutoffs():
     R = R + R.T
     y = np.random.rand(3) + 1j * np.random.rand(3)
     cutoff = (1, 2, 3)
-    hm = hermite_multidimensional_numba(R, cutoff, y=y)
+    hm = hermite_multidimensional(R, cutoff, y=y)
     assert hm.shape == cutoff
 
 
-def test_hermite_numba_vs_hermite_renorm_modified(tol):
+def test_hermite_vs_hermite_renorm_modified(tol):
     """Test the relation hermite_numba and hermite renorm modified"""
     cutoff = 10
     R = np.random.rand(4, 4) + 1j * np.random.rand(4, 4)
@@ -229,10 +229,8 @@ def test_multi_cutoffs_multidim_herm_numba():
     C = 0.5
 
     cutoffs = [np.random.randint(3, 7) for _ in range(d)]
-    poly = hermite_multidimensional_numba(R, cutoffs, y, C)
-    poly_expected = hermite_multidimensional_numba(R, 3, y, C)
+    poly = hermite_multidimensional(R, cutoffs, y, C)
+    poly_expected = hermite_multidimensional(R, 3, y, C)
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
-    poly_expected = hermite_multidimensional_numba(
-        R, np.array(3), y, C
-    )  # testing ndarrary cutoff int
+    poly_expected = hermite_multidimensional(R, np.array(3), y, C)  # testing ndarrary cutoff int
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
