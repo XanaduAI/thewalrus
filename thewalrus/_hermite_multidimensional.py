@@ -19,9 +19,6 @@ from numba import jit
 from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
 
-from .libwalrus import hermite_multidimensional as hm
-from .libwalrus import hermite_multidimensional_real as hmr
-
 from ._hafnian import input_validation
 
 
