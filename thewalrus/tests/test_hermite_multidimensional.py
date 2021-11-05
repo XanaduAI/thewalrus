@@ -21,10 +21,12 @@ from scipy.special import eval_hermitenorm, eval_hermite
 
 from thewalrus import (
     hermite_multidimensional,
+    interferometer,
     hafnian_batched,
     hafnian_repeated,
     grad_hermite_multidimensional_numba,
 )
+from thewalrus.random import random_interferometer
 
 
 def test_hermite_multidimensional_renorm():
@@ -221,3 +223,18 @@ def test_multi_cutoffs_multidim_herm():
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
     poly_expected = hermite_multidimensional(R, np.array(3), y, C)  # testing ndarrary cutoff int
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
+
+
+def test_interferometer_vs_hermite_multidimensional():
+    """Test that intertferometer and hermite_multidimensional give the same result"""
+    cutoff = 6
+    U = random_interferometer(4)
+    R = np.block([[0 * U, -U], [-U.T, 0 * U]])
+
+    hermite_renorm = hermite_multidimensional(R, cutoff, y=None, renorm=True)
+    interf_renorm = interferometer(R, cutoff, renorm=True)
+    assert np.allclose(hermite_renorm, interf_renorm)
+
+    hermite = hermite_multidimensional(R, cutoff, y=None, renorm=False)
+    interf = interferometer(R, cutoff, renorm=False)
+    assert np.allclose(hermite, interf)

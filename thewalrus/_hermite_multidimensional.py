@@ -105,6 +105,64 @@ def hermite_multidimensional(
     return values
 
 
+def interferometer(R, cutoff, C=1, renorm=True, make_tensor=True, rtol=1e-05, atol=1e-08):
+    r"""Returns the matrix elements of an interferometer parametrized in terms of its R matrix.
+
+    Here :math:`R` is an :math:`n \times n` square matrix. The polynomials are
+    parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
+    and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
+    thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
+
+    This tensor can either be flattened into a vector or returned as an actual
+    tensor with :math:`n` indices.
+
+    .. note::
+
+        Note that `interferometer` uses the normalized multidimensional Hermite polynomials.
+
+    Args:
+        R (array): square matrix parametrizing the Hermite polynomial family
+        cutoff (int): maximum size of the subindices in the Hermite polynomial
+        C (complex): first value of the Hermite polynomials, the default value is 1
+        renorm (bool): If ``True``, normalizes the returned multidimensional Hermite
+            polynomials such that :math:`H_k^{(R)}(y)/\prod_i k_i!`
+        make_tensor (bool): If ``False``, returns a flattened one dimensional array
+            containing the values of the polynomial
+        rtol (float): the relative tolerance parameter used in ``np.allclose``
+        atol (float): the absolute tolerance parameter used in ``np.allclose``
+    Returns:
+        (array): the multidimensional Hermite polynomials
+    """
+
+    input_validation(R, atol=atol, rtol=rtol)
+    n, num_indices = R.shape
+
+    # we want to catch np.ndarray(int) of ndim=0 which cannot be cast to tuple
+    if isinstance(cutoff, np.ndarray) and (cutoff.ndim == 0 or len(cutoff) == 1):
+        cutoff = int(cutoff)
+    if isinstance(cutoff, Iterable):
+        cutoffs = tuple(cutoff)
+    else:
+        cutoffs = tuple([cutoff]) * num_indices
+
+    Rt = np.real_if_close(R)
+
+    dtype = np.find_common_type([Rt.dtype.name], [np.array(C).dtype.name])
+    array = np.zeros(cutoffs, dtype=dtype)
+    array[(0,) * num_indices] = C
+
+    if renorm:
+        values = np.array(_interferometer_renorm(Rt, array))
+    else:
+        values = np.array(_interferometer(Rt, array))
+
+    if make_tensor:
+        shape = cutoff * np.ones([n], dtype=int)
+        values = np.reshape(values, shape)
+
+    return values
+
+
 # pylint: disable=too-many-arguments
 def hafnian_batched(A, cutoff, mu=None, rtol=1e-05, atol=1e-08, renorm=False, make_tensor=True):
     r"""Calculates the hafnian of :func:`reduction(A, k) <hafnian.reduction>`
@@ -236,6 +294,86 @@ def _hermite_multidimensional(R, y, array):  # pragma: no cover
         for l, kl in remove(ki):
             u -= ki[l] * R[i, l] * array[kl]
         array[idx] = u
+    return array
+
+
+@jit(nopython=True)
+def _interferometer_renorm(R, array):  # pragma: no cover
+    r"""Numba-compiled function returning the matrix elements of an interferometer
+    parametrized in terms of its R matrix
+
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        array (array[complex]): array to be filled with the Hermite polynomials
+
+    Returns:
+        array[complex]: the multidimensional Hermite polynomials
+    """
+    dim, _ = R.shape
+    num_modes = dim / 2
+
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        bran = 0
+        for ii in range(0, num_modes):
+            bran += idx[ii]
+
+        ketn = 0
+        for ii in range(num_modes, dim):
+            ketn += idx[ii]
+
+        if bran == ketn:
+            i = 0
+            for i, val in enumerate(idx):
+                if val > 0:
+                    break
+            ki = dec(idx, i)
+            u = 0
+            for l, kl in remove(ki):
+                u -= SQRT[ki[l]] * R[i, l] * array[kl]
+            array[idx] = u / SQRT[idx[i]]
+
+    return array
+
+
+@jit(nopython=True)
+def _interferometer(R, array):  # pragma: no cover
+    r"""Numba-compiled function returning the matrix elements of an interferometer
+    parametrized in terms of its R matrix
+
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        array (array[complex]): array to be filled with the Hermite polynomials
+
+    Returns:
+        array[complex]: the multidimensional Hermite polynomials
+    """
+    dim, _ = R.shape
+    num_modes = dim / 2
+
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        bran = 0
+        for ii in range(0, num_modes):
+            bran += idx[ii]
+
+        ketn = 0
+        for ii in range(num_modes, dim):
+            ketn += idx[ii]
+
+        if bran == ketn:
+            i = 0
+            for i, val in enumerate(idx):
+                if val > 0:
+                    break
+            ki = dec(idx, i)
+            u = 0
+            for l, kl in remove(ki):
+                u -= ki[l] * R[i, l] * array[kl]
+            array[idx] = u
+
     return array
 
 
