@@ -24,7 +24,7 @@ from thewalrus import (
     interferometer,
     hafnian_batched,
     hafnian_repeated,
-    grad_hermite_multidimensional_numba,
+    grad_hermite_multidimensional,
 )
 from thewalrus.random import random_interferometer
 
@@ -151,7 +151,7 @@ def test_hermite_cutoffs():
 
 
 def test_grad_hermite_multidimensional_vs_finite_differences(tol):
-    """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences."""
+    """Tests the gradients of hermite polynomials. The gradients of parameters are tested by finite differences."""
     d = 4
     R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
     R += R.T
@@ -159,7 +159,7 @@ def test_grad_hermite_multidimensional_vs_finite_differences(tol):
     C = 0.5
     cutoff = [3, 3, 3, 3]
     gate = hermite_multidimensional(R, cutoff, y, C, renorm=True, modified=True)
-    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(gate, R, y, C, dtype=np.complex128)
+    grad_C, grad_R, grad_y = grad_hermite_multidimensional(gate, R, y, C, dtype=np.complex128)
 
     delta = 0.000001 + 1j * 0.000001
     expected_grad_C = (
@@ -205,7 +205,7 @@ def test_auto_dtype_multidim_herm():
     R = R.astype("complex128")
     y = y.astype("complex64")
     poly = poly.astype("complex64")
-    grad = grad_hermite_multidimensional_numba(poly, R, y, C, dtype=None)
+    grad = grad_hermite_multidimensional(poly, R, y, C, dtype=None)
     assert all(g.dtype == R.dtype for g in grad)
 
 

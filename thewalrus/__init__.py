@@ -122,7 +122,7 @@ from ._hermite_multidimensional import (
     hafnian_batched,
     hermite_multidimensional,
     interferometer,
-    grad_hermite_multidimensional_numba,
+    grad_hermite_multidimensional,
 )
 from ._permanent import (
     perm,
