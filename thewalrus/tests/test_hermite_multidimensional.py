@@ -14,6 +14,7 @@
 """Tests for the batch hafnian wrapper function"""
 # pylint: disable=no-self-use,redefined-outer-name
 from itertools import product
+import pytest
 
 import numpy as np
 
@@ -225,16 +226,13 @@ def test_multi_cutoffs_multidim_herm():
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
 
 
-def test_interferometer_vs_hermite_multidimensional():
+@pytest.mark.parametrize("renorm", [True, False])
+def test_interferometer_vs_hermite_multidimensional(renorm):
     """Test that intertferometer and hermite_multidimensional give the same result"""
     cutoff = 6
     U = random_interferometer(4)
     R = np.block([[0 * U, -U], [-U.T, 0 * U]])
 
-    hermite_renorm = hermite_multidimensional(R, cutoff, y=None, renorm=True)
-    interf_renorm = interferometer(R, cutoff, renorm=True)
+    hermite_renorm = hermite_multidimensional(R, cutoff, y=None, renorm=renorm)
+    interf_renorm = interferometer(R, cutoff, renorm=renorm)
     assert np.allclose(hermite_renorm, interf_renorm)
-
-    hermite = hermite_multidimensional(R, cutoff, y=None, renorm=False)
-    interf = interferometer(R, cutoff, renorm=False)
-    assert np.allclose(hermite, interf)
