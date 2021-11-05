@@ -152,7 +152,7 @@ __all__ = [
     "permanent_repeated",
     "reduction",
     "hermite_multidimensional",
-    "grad_hermite_multidimensional_numba",
+    "grad_hermite_multidimensional",
     "version",
 ]
 
