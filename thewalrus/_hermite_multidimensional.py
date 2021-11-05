@@ -377,7 +377,7 @@ def _interferometer(R, array):  # pragma: no cover
     return array
 
 
-def grad_hermite_multidimensional(array, R, y, C=1, dtype=None):
+def grad_hermite_multidimensional(array, R, y, C=1, renorm=True, dtype=None):
     # pylint: disable=too-many-arguments
     r"""Calculates the gradients of the renormalized multidimensional Hermite polynomials :math:`C*H_k^{(R)}(y)` with respect to its parameters :math:`C`, :math:`y` and :math:`R`.
 
@@ -386,6 +386,8 @@ def grad_hermite_multidimensional(array, R, y, C=1, dtype=None):
         R (array[complex]): square matrix parametrizing the Hermite polynomial
         y (vector[complex]): vector argument of the Hermite polynomial
         C (complex): first value of the Hermite polynomials
+        renorm (bool): If ``True``, uses the normalized multidimensional Hermite
+            polynomials such that :math:`H_k^{(R)}(y)/\prod_i k_i!`
         dtype (data type): Specifies the data type used for the calculation
 
     Returns:
@@ -403,12 +405,16 @@ def grad_hermite_multidimensional(array, R, y, C=1, dtype=None):
     dG_dC = np.array(array / C).astype(dtype)
     dG_dR = np.zeros(array.shape + R.shape, dtype=dtype)
     dG_dy = np.zeros(array.shape + y.shape, dtype=dtype)
-    dG_dR, dG_dy = _grad_hermite_multidimensional(R, y, array, dG_dR, dG_dy)
+    if renorm:
+        dG_dR, dG_dy = _grad_hermite_multidimensional_renorm(R, y, array, dG_dR, dG_dy)
+    else:
+        dG_dR, dG_dy = _grad_hermite_multidimensional(R, y, array, dG_dR, dG_dy)
+
     return dG_dC, dG_dR, dG_dy
 
 
 @jit(nopython=True)
-def _grad_hermite_multidimensional(R, y, array, dG_dR, dG_dy):  # pragma: no cover
+def _grad_hermite_multidimensional_renorm(R, y, array, dG_dR, dG_dy):  # pragma: no cover
     r"""
     Numba-compiled function to fill two arrays (dG_dR, dG_dy) with the gradients of the renormalized multidimensional Hermite polynomials
     with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
@@ -440,4 +446,40 @@ def _grad_hermite_multidimensional(R, y, array, dG_dR, dG_dy):  # pragma: no cov
             dR[i, l] -= SQRT[ki[l]] * array[kl]
         dG_dR[idx] = dR / SQRT[idx[i]]
         dG_dy[idx] = dy / SQRT[idx[i]]
+    return dG_dR, dG_dy
+
+
+@jit(nopython=True)
+def _grad_hermite_multidimensional(R, y, array, dG_dR, dG_dy):  # pragma: no cover
+    r"""
+    Numba-compiled function to fill two arrays (dG_dR, dG_dy) with the gradients of the renormalized multidimensional Hermite polynomials
+    with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
+
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        array (array[complex]): array of the multidimensional Hermite polynomials
+        dG_dR (array[complex]): array to be filled with the gradients of the renormalized multidimensional Hermite polynomials with respect to R
+        dG_dy (array[complex]): array to be filled with the gradients of the renormalized multidimensional Hermite polynomials with respect to y
+
+    Returns:
+        dG_dR[complex], dG_dy[complex]: the gradients of the renormalized multidimensional Hermite polynomials with respect to R and y
+    """
+    indices = np.ndindex(array.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        dy = y[i] * dG_dy[ki]
+        dy[i] += array[ki]
+        dR = y[i] * dG_dR[ki]
+        for l, kl in remove(ki):
+            dy -= ki[l] * dG_dy[kl] * R[i, l]
+            dR -= ki[l] * R[i, l] * dG_dR[kl]
+            dR[i, l] -= ki[l] * array[kl]
+        dG_dR[idx] = dR
+        dG_dy[idx] = dy
     return dG_dR, dG_dy
