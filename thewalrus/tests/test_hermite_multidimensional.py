@@ -161,7 +161,9 @@ def test_grad_hermite_multidimensional_vs_finite_differences(tol, renorm):
     C = 0.5
     cutoff = [3, 3, 3, 3]
     gate = hermite_multidimensional(R, cutoff, y, C, renorm=renorm, modified=True)
-    grad_C, grad_R, grad_y = grad_hermite_multidimensional(gate, R, y, C, dtype=np.complex128)
+    grad_C, grad_R, grad_y = grad_hermite_multidimensional(
+        gate, R, y, C, renorm=renorm, dtype=np.complex128
+    )
 
     delta = 0.000001 + 1j * 0.000001
     expected_grad_C = (
