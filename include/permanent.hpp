@@ -19,14 +19,20 @@
 
 typedef unsigned long long int ullint;
 typedef long long int llint;
-//typedef long double qp;
 
-#if (defined(__GNUC__) || defined(__GNUG__)) && !(defined(__clang__) || defined(__INTEL_COMPILER))
+
+/**
+ * Check for compiler support for quad precision floats. Only
+ * GCC on x86 is supported.
+ */
+#if (defined(__GNUC__) || defined(__GNUG__)) && \
+    (defined(__x86_64__) || defined(__i386__)) && \
+    !(defined(__clang__))
 typedef __float128 qp;
-//#include <quadmath.h>
 #else
 typedef long double qp;
 #endif
+
 
 /**
  * Gray code generator.
