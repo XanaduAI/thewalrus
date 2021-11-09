@@ -29,7 +29,7 @@ def hermite_multidimensional(
     r"""Returns photon number statistics of a Gaussian state for a given
     covariance matrix as described in *Multidimensional Hermite polynomials
     and photon distribution for polymode mixed light*
-    `arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`.
+    `arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`_.
 
     Here :math:`R` is an :math:`n \times n` square matrix, and
     :math:`y` is an :math:`n` dimensional vector. The polynomials :math:`H_k^{(R)}(y)` are
@@ -41,7 +41,7 @@ def hermite_multidimensional(
     tensor with :math:`n` indices.
 
     This implementation is based on the MATLAB code available at github
-    `clementsw/gaussian-optics <https://github.com/clementsw/gaussian-optics>`.
+    `clementsw/gaussian-optics <https://github.com/clementsw/gaussian-optics>`_.
 
     .. note::
 
