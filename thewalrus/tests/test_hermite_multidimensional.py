@@ -228,10 +228,10 @@ def test_multi_cutoffs_multidim_herm():
 
 
 @pytest.mark.parametrize("renorm", [True, False])
-def test_interferometer_vs_hermite_multidimensional(renorm):
+@pytest.mark.parametrize("cutoff", [6, [np.random.randint(3, 7) for _ in range(4)]])
+def test_interferometer_vs_hermite_multidimensional(renorm, cutoff):
     """Test that intertferometer and hermite_multidimensional give the same result"""
-    cutoff = 6
-    U = random_interferometer(4)
+    U = random_interferometer(2)
     R = np.block([[0 * U, -U], [-U.T, 0 * U]])
 
     hermite_renorm = hermite_multidimensional(R, cutoff, y=None, renorm=renorm)
