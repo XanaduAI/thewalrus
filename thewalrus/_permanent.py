@@ -93,13 +93,13 @@ def perm_ryser(M):
     Returns:
         np.float64 or np.complex128: the permanent of matrix M.
     """
-    # Raise an errors if matrix is not square
+    # Raises an error if the matrix is not square
     (a, b) = M.shape
     if a != b:
         raise Exception('Not a square matrix')
     n = len(M)
     # row_comb keeps the sum of previous subsets.
-    # Every iteration, it removes a term and/or adds a new new term
+    # Every iteration, it removes a term and/or adds a new term
     # to give the term to add for the next subset
     row_comb = np.zeros((n), dtype=M.dtype)
     total = 0
