@@ -26,16 +26,22 @@ from ._hafnian import input_validation
 def hermite_multidimensional(
     R, cutoff, y=None, C=1, renorm=False, make_tensor=True, modified=False, rtol=1e-05, atol=1e-08
 ):
-    r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`.
+    r"""Returns photon number statistics of a Gaussian state for a given
+    covariance matrix as described in *Multidimensional Hermite polynomials
+    and photon distribution for polymode mixed light*
+    `arxiv:9308033 <https://arxiv.org/abs/hep-th/9308033>`.
 
     Here :math:`R` is an :math:`n \times n` square matrix, and
-    :math:`y` is an :math:`n` dimensional vector. The polynomials are
+    :math:`y` is an :math:`n` dimensional vector. The polynomials :math:`H_k^{(R)}(y)` are
     parametrized by the multi-index :math:`k=(k_0,k_1,\ldots,k_{n-1})`,
     and are calculated for all values :math:`0 \leq k_j < \text{cutoff}`,
     thus a tensor of dimensions :math:`\text{cutoff}^n` is returned.
 
     This tensor can either be flattened into a vector or returned as an actual
     tensor with :math:`n` indices.
+
+    This implementation is based on the MATLAB code available at github
+    `clementsw/gaussian-optics <https://github.com/clementsw/gaussian-optics>`.
 
     .. note::
 
