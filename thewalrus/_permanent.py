@@ -15,18 +15,17 @@
 Permanent Python interface
 """
 import numpy as np
-
-from ._hafnian import hafnian_repeated
-from .libwalrus import perm_complex, perm_real, perm_BBFG_real, perm_BBFG_complex
 from numba import jit
+from ._hafnian import hafnian_repeated
+# from .libwalrus import perm_complex, perm_real, perm_BBFG_real, perm_BBFG_complex
+
+# pylint: disable = C0103, R0914
 
 
 def perm(A, quad=True, fsum=False, method="bbfg"):
     """Returns the permanent of a matrix using the `method` formula
-
     For more direct control, you may wish to call :func:`perm_real`
     or :func:`perm_complex` directly.
-
     Args:
         A (array): a square array.
         quad (bool): If ``True``, the input matrix is cast to a ``long double``
@@ -35,10 +34,11 @@ def perm(A, quad=True, fsum=False, method="bbfg"):
             Note that if ``fsum`` is true, double precision will be used, and the
             ``quad`` keyword argument will be ignored.
         method (string): "ryser" calls the associated methods to
-            `Ryser formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
+            `Ryser formula
+            <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
             and "bbfg" calls the associated methods to
-            `BBFG formula <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
-
+            `BBFG formula
+            <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
     Returns:
         np.float64 or np.complex128: the permanent of matrix A.
     """
@@ -68,27 +68,30 @@ def perm(A, quad=True, fsum=False, method="bbfg"):
         )
 
     isRyser = bool(method != "bbfg")
-    
+
     return perm_ryser(A) if isRyser else perm_bbfg(A)
+
 
 @jit(nopython=True)
 def perm_ryser(M):
     """
     Returns the permanent of a matrix using the Ryser formula in Gray ordering
-    
-    The code is an re-implementation from a Python 2 code found in 
-    `Permanent code golf <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_  using numba. 
-    
+
+    The code is an re-implementation from a Python 2 code found in
+    `Permanent code golf
+    <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
+    using numba.
+
     Args:
         M (array) : a square array.
-        
+
     Returns:
         np.float64 or np.complex128: the permanent of matrix M.
     """
     # Raises an error if the matrix is not square
     (a, b) = M.shape
     if a != b:
-        raise Exception('Not a square matrix')
+        raise Exception("Not a square matrix")
     n = len(M)
     # row_comb keeps the sum of previous subsets.
     # Every iteration, it removes a term and/or adds a new term
@@ -97,36 +100,34 @@ def perm_ryser(M):
     total = 0
     old_grey = 0
     sign = +1
-    binary_power_dict = [2**i for i in range(n)]
+    binary_power_dict = [2 ** i for i in range(n)]
     num_loops = 2 ** n
     for k in range(0, num_loops):
-        bin_index = ((k+1) % num_loops)
+        bin_index = (k + 1) % num_loops
         reduced = np.prod(row_comb)
         total += sign * reduced
         new_grey = bin_index ^ (bin_index // 2)
         grey_diff = old_grey ^ new_grey
         grey_diff_index = binary_power_dict.index(grey_diff)
         new_vector = M[grey_diff_index]
-        direction = (old_grey > new_grey) - (old_grey < new_grey) 
+        direction = (old_grey > new_grey) - (old_grey < new_grey)
         for i in range(n):
             row_comb[i] += new_vector[i] * direction
         sign = -sign
         old_grey = new_grey
     return total
 
+
 @jit(nopython=True)
 def perm_bbfg(M):
     """
     Returns the permanent of a matrix using the bbfg formula in Gray ordering
-
     The code is a re-implementation from a Python 2 code found in
     `Permanent code golf
     <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
     using numba.
-
     Args:
         M (array) : a square array.
-
     Returns:
         np.float64 or np.complex128: the permanent of a matrix M.
     """
@@ -156,23 +157,18 @@ def perm_bbfg(M):
         old_gray = new_gray
     return total / num_loops
 
+
 def permanent_repeated(A, rpt):
     r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
     of :math:`A` is repeated :math:`rpt_i` times.
-
     This function constructs the matrix
-
     .. math:: B = \begin{bmatrix} 0 & A\\ A^T & 0 \end{bmatrix},
-
     and then calculates :math:`perm(A)=haf(B)`, by calling
-
     >>> hafnian_repeated(B, rpt*2, loop=False)
-
     Args:
         A (array): matrix of size [N, N]
         rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
             of A to be repeated.
-
     Returns:
         np.int64 or np.float64 or np.complex128: the permanent of matrix A.
     """
