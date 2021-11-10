@@ -6,13 +6,13 @@ on:
   pull_request:
 
 jobs:
-  linux-wheels-x86-64:
-    name: wheels linux
+  linux-wheels:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        arch: [x86_64]
+        arch: [x86_64, aarch64]
     runs-on: ${{ matrix.os }}
+    name: wheels linux-${{ matrix.arch }}
 
     env:
       CIBW_BUILD: 'cp37-* cp38-* cp39-*'
