@@ -122,6 +122,47 @@ def perm_ryser(M):
         old_grey = new_grey
     return total
 
+@jit(nopython=True)
+def perm_bbfg(M):
+    """
+    Returns the permanent of a matrix using the bbfg formula in Gray ordering
+
+    The code is a re-implementation from a Python 2 code found in
+    `Permanent code golf
+    <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
+    using numba.
+
+    Args:
+        M (array) : a square array.
+
+    Returns:
+        np.float64 or np.complex128: the permanent of a matrix M.
+    """
+    # Raises an error if the matrix is not square
+    (a, b) = M.shape
+    if a != b:
+        raise Exception("Not a square matrix")
+
+    n = len(M)
+    row_comb = np.sum(M, 0)
+    total = 0
+    old_gray = 0
+    sign = +1
+    binary_power_dict = [2 ** i for i in range(n)]
+    num_loops = 2 ** (n - 1)
+    for bin_index in range(1, num_loops + 1):
+        reduced = np.prod(row_comb)
+        total += sign * reduced
+        new_gray = bin_index ^ (bin_index // 2)
+        gray_diff = old_gray ^ new_gray
+        gray_diff_index = binary_power_dict.index(gray_diff)
+        new_vector = M[gray_diff_index]
+        direction = 2 * ((old_gray > new_gray) - (old_gray < new_gray))
+        for i in range(n):
+            row_comb[i] += new_vector[i] * direction
+        sign = -sign
+        old_gray = new_gray
+    return total / num_loops
 
 def permanent_repeated(A, rpt):
     r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
