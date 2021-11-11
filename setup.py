@@ -59,7 +59,6 @@ def build_extensions():
             "./include/recursive_hafnian.hpp",
             "./include/repeated_hafnian.hpp",
             "./include/permanent.hpp",
-            "./include/hermite_multidimensional.hpp",
             "./include/stdafx.h",
             "./include/fsum.hpp",
         ],
@@ -71,9 +70,7 @@ def build_extensions():
 
     if platform.system() == "Windows":
         config["extra_compile_args"].extend(("-static",))
-        config["extra_link_args"].extend(
-            ("-static", "-static-libgfortran", "-static-libgcc")
-        )
+        config["extra_link_args"].extend(("-static", "-static-libgfortran", "-static-libgcc"))
     elif platform.system() == "Darwin":
         config["extra_compile_args"].extend(
             ("-Xpreprocessor", "-fopenmp", "-mmacosx-version-min=10.9", "-shared")
