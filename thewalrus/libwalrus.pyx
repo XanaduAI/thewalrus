@@ -13,7 +13,7 @@
 # limitations under the License.
 #cython: boundscheck=False, wraparound=False, embedsignature=True
 # distutils: language=c++
-cimport cython
+import cython
 cimport numpy as np
 import numpy as np
 from libc.stdlib cimport free
@@ -140,11 +140,6 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
 
     double loop_hafnian_rpt_quad(vector[double] &mat, vector[double] &mu, vector[int] &nud)
     double complex loop_hafnian_rpt_quad(vector[double complex] &mat, vector[double complex] &mu, vector[int] &nud)
-
-    T* hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &cutoff)
-    T* renorm_hermite_multidimensional_cpp[T](vector[T] &mat, vector[T] &d, int &cutoff)
-    T* interferometer_cpp[T](vector[T] &mat, int &cutoff)
-
 
 
 # ==============================================================================
@@ -430,165 +425,3 @@ def perm_BBFG_real(double [:, :] A):
 
     # Exposes a c function to python
     return perm_BBFG_qp(mat)
-
-# ==============================================================================
-# Batch hafnian
-
-def hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):
-    r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
-    via the C++ libwalrus library.
-
-    Args:
-        R (array[complex128]): square matrix parametrizing the Hermite polynomial family
-        y (array[complex128]): vector argument of the Hermite polynomial
-        cutoff (int): maximum size of the subindices in the Hermite polynomial
-
-    Returns:
-        array[complex128]: the multidimensional Hermite polynomials
-    """
-    cdef int i, j, n = R.shape[0]
-    cdef vector[double complex] R_mat, y_mat
-
-    for i in range(n):
-        for j in range(n):
-            R_mat.push_back(R[i, j])
-
-    for i in range(n):
-        y_mat.push_back(y[i])
-    length = cutoff**n
-
-    cdef double complex *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
-
-    return complex_pointer_to_array(array, length)
-
-
-def hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
-    r"""Returns the multidimensional Hermite polynomials :math:`H_k^{(R)}(y)`
-    via the C++ libwalrus library.
-
-    Args:
-        R (array[float64]): square matrix parametrizing the Hermite polynomial family
-        y (array[float64]): vector argument of the Hermite polynomial
-        cutoff (int): maximum size of the subindices in the Hermite polynomial
-
-    Returns:
-        array[float64]: the multidimensional Hermite polynomials
-    """
-    cdef int i, j, n = R.shape[0]
-    cdef vector[double] R_mat, y_mat
-
-    for i in range(n):
-        for j in range(n):
-            R_mat.push_back(R[i, j])
-
-    for i in range(n):
-        y_mat.push_back(y[i])
-    length = cutoff**n
-    cdef double *array = hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
-
-    return double_pointer_to_array(array, length)
-
-
-def renorm_hermite_multidimensional(double complex[:, :] R, double complex[:] y, int cutoff):
-    r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
-    via the C++ libwalrus library. They are given in terms of the standard multidimensional
-    Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`.
-
-    Args:
-        R (array[complex128]): square matrix parametrizing the Hermite polynomial family
-        y (array[complex128]): vector argument of the Hermite polynomial
-        cutoff (int): maximum size of the subindices in the Hermite polynomial
-
-    Returns:
-        array[complex128]: the renormalized multidimensional Hermite polynomials
-    """
-    cdef int i, j, n = R.shape[0]
-    cdef vector[double complex] R_mat, y_mat
-
-    for i in range(n):
-        for j in range(n):
-            R_mat.push_back(R[i, j])
-
-    for i in range(n):
-        y_mat.push_back(y[i])
-    length = cutoff**n
-
-    cdef double complex *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
-
-    return complex_pointer_to_array(array, length)
-
-
-def renorm_hermite_multidimensional_real(double [:, :] R, double [:] y, int cutoff):
-    r"""Returns the renormalized multidimensional Hermite polynomials :math:`rH_k^{(R)}(y)`
-    via the C++ libwalrus library. They are given in terms of the standard multidimensional
-    Hermite polynomials as :math:`H_k^{(R)}(y)/\sqrt{\prod(\prod_i k_i!)}`.
-
-    Args:
-        R (array[float64]): square matrix parametrizing the Hermite polynomial family
-        y (array[float64]): vector argument of the Hermite polynomial
-        cutoff (int): maximum size of the subindices in the Hermite polynomial
-
-    Returns:
-        array[float64]: the renormalized multidimensional Hermite polynomials
-    """
-    cdef int i, j, n = R.shape[0]
-    cdef vector[double] R_mat, y_mat
-
-    for i in range(n):
-        for j in range(n):
-            R_mat.push_back(R[i, j])
-
-    for i in range(n):
-        y_mat.push_back(y[i])
-    length = cutoff**n
-    cdef double *array = renorm_hermite_multidimensional_cpp(R_mat, y_mat, cutoff)
-
-    return double_pointer_to_array(array, length)
-
-
-def interferometer(double complex[:, :] R, int cutoff):
-    r"""Returns the matrix elements of an interferometer by using a custom version of
-    the renormalized Hermite polynomials.
-
-    Args:
-        R (array[complex128]): square matrix parametrizing the interferometer
-        cutoff (int): maximum size of the subindices in the tensor
-
-    Returns:
-        array[complex128]: the matrix elements of the interferometer
-    """
-    cdef int i, j, n = R.shape[0]
-    cdef vector[double complex] R_mat
-
-    for i in range(n):
-        for j in range(n):
-            R_mat.push_back(R[i, j])
-
-    length = cutoff**n
-    cdef double complex *array = interferometer_cpp(R_mat, cutoff)
-
-    return np.reshape(complex_pointer_to_array(array, length), [cutoff]*n)
-
-def interferometer_real(double [:, :] R, int cutoff):
-    r"""Returns the matrix elements of an interferometer by using a custom version of
-    the renormalized Hermite polynomials.
-
-    Args:
-        R (array[float64]): square matrix parametrizing the interferometer
-        cutoff (int): maximum size of the subindices in the tensor
-
-    Returns:
-        array[float64]: the matrix elements of the interferometer
-    """
-    cdef int i, j, n = R.shape[0]
-    cdef vector[double] R_mat
-
-    for i in range(n):
-        for j in range(n):
-            R_mat.push_back(R[i, j])
-    length = cutoff**n
-    cdef double *array = interferometer_cpp(R_mat, cutoff)
-
-    return np.reshape(double_pointer_to_array(array, length), [cutoff]*n)
-
-
