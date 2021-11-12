@@ -13,7 +13,7 @@
 # limitations under the License.
 #cython: boundscheck=False, wraparound=False, embedsignature=True
 # distutils: language=c++
-import cython
+cimport cython
 cimport numpy as np
 import numpy as np
 from libc.stdlib cimport free
