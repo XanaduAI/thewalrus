@@ -28,10 +28,9 @@ from scipy.special import factorial as fac
 from numba import jit
 
 from ..symplectic import expand, is_symplectic, reduced_state
-from ..libwalrus import interferometer, interferometer_real
 
 from .._hafnian import hafnian, hafnian_repeated, reduction
-from .._hermite_multidimensional import hermite_multidimensional, hafnian_batched
+from .._hermite_multidimensional import hermite_multidimensional, hafnian_batched, interferometer
 
 from .conversions import (
     Amat,
@@ -355,13 +354,9 @@ def fock_tensor(
     ):
         reU = S[:l, :l]
         imU = S[:l, l:]
-        if np.allclose(imU, 0, rtol=rtol, atol=atol):
-            Ub = np.block([[0 * reU, -reU], [-reU.T, 0 * reU]])
-            tensor = interferometer_real(Ub, cutoff)
-        else:
-            U = reU - 1j * imU
-            Ub = np.block([[0 * U, -U], [-U.T, 0 * U]])
-            tensor = interferometer(Ub, cutoff)
+        U = reU - 1j * imU
+        Ub = np.block([[0 * U, -U], [-U.T, 0 * U]])
+        tensor = interferometer(Ub, cutoff)
     else:
         # Construct the covariance matrix of l two-mode squeezed vacua pairing modes i and i+l
         ch = np.cosh(choi_r) * np.identity(l)

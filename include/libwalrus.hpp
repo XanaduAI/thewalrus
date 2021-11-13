@@ -17,7 +17,6 @@
 #include <recursive_hafnian.hpp>
 #include <repeated_hafnian.hpp>
 #include <permanent.hpp>
-#include <hermite_multidimensional.hpp>
 
 /**
  * @namespace libwalrus

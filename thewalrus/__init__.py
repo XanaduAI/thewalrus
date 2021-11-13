@@ -121,8 +121,8 @@ from ._low_rank_haf import low_rank_hafnian
 from ._hermite_multidimensional import (
     hafnian_batched,
     hermite_multidimensional,
-    hermite_multidimensional_numba,
-    grad_hermite_multidimensional_numba,
+    interferometer,
+    grad_hermite_multidimensional,
 )
 from ._permanent import (
     perm,
@@ -152,8 +152,7 @@ __all__ = [
     "permanent_repeated",
     "reduction",
     "hermite_multidimensional",
-    "hermite_multidimensional_numba",
-    "grad_hermite_multidimensional_numba",
+    "grad_hermite_multidimensional",
     "version",
 ]
 

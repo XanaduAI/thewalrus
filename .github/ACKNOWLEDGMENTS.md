@@ -37,13 +37,15 @@
 * [Theodor Isacsson](https://github.com/thisac) (Xanadu) - :postal_horn: Jarl of contractions
 
 * [Rachel Chadwick](https://github.com/rachelchadwick) (University of Bristol) - :princess: Queen of complex conjugates
- 
+
 * [Stefano Paesani](https://scholar.google.com/citations?user=u41vIV0AAAAJ&hl=it) (University of Bristol) - :crossed_swords: Emperor of phase space
 
-* [Jake Bulmer](https://scholar.google.com/citations?hl=it&user=gwklyzwAAAAJ) (University of Bristol) - :shield: Commander of clicks 
+* [Jake Bulmer](https://scholar.google.com/citations?hl=it&user=gwklyzwAAAAJ) (University of Bristol) - :shield: Commander of clicks
 
 * [Timjan Kalajdzievski](https://github.com/timjank) (Xanadu) - :beverage_box: Beard Czar
 
 * [Yuan Yao](https://github.com/sylviemonet) (Télécom Paris) - :dog: Schrödinger's Dog's owner
 
 * [Ali Asadi](https://github.com/maliasadi) (Western University) - :thread: Commander of threads
+
+* [Sebastián Duque](https://github.com/sduquemesa) (Xanadu) - 🎧 Quantum sound explorer

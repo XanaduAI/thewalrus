@@ -5,6 +5,8 @@
 ### Improvements
 * Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
 
+* Multidimensional Hermite polynomials are now implemented in numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
+
 ### Bug fixes
 
 ### Breaking changes

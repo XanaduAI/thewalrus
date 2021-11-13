@@ -103,7 +103,7 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../include/stdafx.h ../include/libwalrus.hpp ../include/version.hpp ../include/trace_hafnian.hpp ../include/recursive_hafnian.hpp ../include/repeated_hafnian.hpp ../include/permanent.hpp ../include/hermite_multidimensional.hpp ../include/powtrace.hpp",
+    "exhaleDoxygenStdin":    "INPUT = ../include/stdafx.h ../include/libwalrus.hpp ../include/version.hpp ../include/trace_hafnian.hpp ../include/recursive_hafnian.hpp ../include/repeated_hafnian.hpp ../include/permanent.hpp ../include/powtrace.hpp",
     # "exhaleUseDoxyfile": True
 }
 
