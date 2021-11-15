@@ -33,12 +33,6 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud)
 
-    double permanent_quad(vector[double] &mat)
-    double complex permanent_quad(vector[double complex] &mat)
-    double perm_fsum[T](vector[T] &mat)
-    double permanent_fsum(vector[double] &mat)
-    double perm_BBFG_qp(vector[double] &mat)
-    double complex perm_BBFG_cmplx(vector[double complex] &mat)
 
     double hafnian_recursive_quad(vector[double] &mat)
     double complex hafnian_recursive_quad(vector[double complex] &mat)
