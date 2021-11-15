@@ -126,12 +126,9 @@ from ._hermite_multidimensional import (
 )
 from ._permanent import (
     perm,
-    perm_complex,
-    perm_real,
-    permanent_repeated,
-    perm_BBFG_real,
-    perm_BBFG_complex,
+    permanent_repeated
 )
+
 from ._torontonian import (
     tor,
     threshold_detection_prob_displacement,
