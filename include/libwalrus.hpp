@@ -16,7 +16,6 @@
 #include <trace_hafnian.hpp>
 #include <recursive_hafnian.hpp>
 #include <repeated_hafnian.hpp>
-#include <permanent.hpp>
 
 /**
  * @namespace libwalrus
