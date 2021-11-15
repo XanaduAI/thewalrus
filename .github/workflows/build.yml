@@ -25,6 +25,10 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD_VERBOSITY: 1
 
+      # wheelhouse uploader
+      WHEELHOUSE_UPLOADER_USERNAME: ${{ secrets.WHEELHOUSE_UPLOADER_USERNAME }}
+      WHEELHOUSE_UPLOADER_SECRET: ${{ secrets.WHEELHOUSE_UPLOADER_SECRET }}
+
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.4.1
@@ -46,10 +50,15 @@ jobs:
         env:
           CIBW_ARCHS_LINUX: ${{matrix.arch}}
 
-      - uses: kittaakos/upload-artifact-as-is@v0
-        if: github.ref == 'refs/heads/master'
+      - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/
+          path: ./wheelhouse/*.whl
+
+      - name: Upload Wheels
+        if: github.ref == 'refs/heads/master'
+        run: |
+          pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+          python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
   mac-wheels-x86-64:
     name: wheels macos
@@ -74,6 +83,10 @@ jobs:
         python -m pytest --randomly-seed=137 {project}/thewalrus
       CIBW_BUILD_VERBOSITY: 1
 
+      # wheelhouse uploader
+      WHEELHOUSE_UPLOADER_USERNAME: ${{ secrets.WHEELHOUSE_UPLOADER_USERNAME }}
+      WHEELHOUSE_UPLOADER_SECRET: ${{ secrets.WHEELHOUSE_UPLOADER_SECRET }}
+
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.4.1
@@ -95,10 +108,15 @@ jobs:
         env:
           CIBW_ARCHS_MACOS: ${{matrix.arch}}
 
-      - uses: kittaakos/upload-artifact-as-is@v0
-        if: github.ref == 'refs/heads/master'
+      - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/
+          path: ./wheelhouse/*.whl
+
+      - name: Upload Wheels
+        if: github.ref == 'refs/heads/master'
+        run: |
+          pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+          python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
   win-wheels:
     name: wheels windows
@@ -119,6 +137,10 @@ jobs:
         python -m pytest --randomly-seed=137 {project}/thewalrus
       CIBW_BUILD_VERBOSITY: 1
 
+      # wheelhouse uploader
+      WHEELHOUSE_UPLOADER_USERNAME: ${{ secrets.WHEELHOUSE_UPLOADER_USERNAME }}
+      WHEELHOUSE_UPLOADER_SECRET: ${{ secrets.WHEELHOUSE_UPLOADER_SECRET }}
+
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.4.1
@@ -135,7 +157,12 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v1.12.0
 
-      - uses: kittaakos/upload-artifact-as-is@v0
-        if: github.ref == 'refs/heads/master'
+      - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/
+          path: ./wheelhouse/*.whl
+
+      - name: Upload Wheels
+        if: github.ref == 'refs/heads/master'
+        run: |
+          pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+          python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
