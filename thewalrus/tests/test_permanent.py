@@ -20,11 +20,11 @@ from scipy.special import factorial as fac
 
 from thewalrus import (
     perm,
-    perm_real,
-    perm_complex,
+    #perm_real,
+    #perm_complex,
     permanent_repeated,
-    perm_BBFG_real,
-    perm_BBFG_complex,
+    #perm_BBFG_real,
+    #perm_BBFG_complex,
 )
 
 
