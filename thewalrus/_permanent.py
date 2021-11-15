@@ -17,7 +17,6 @@ Permanent Python interface
 import numpy as np
 from numba import jit
 from ._hafnian import hafnian_repeated
-# from .libwalrus import perm_complex, perm_real, perm_BBFG_real, perm_BBFG_complex
 
 # pylint: disable = C0103, R0914
 
