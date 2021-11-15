@@ -27,6 +27,11 @@ from thewalrus import (
     #perm_BBFG_complex,
 )
 
+perm_real = perm
+perm_complex = perm
+perm_BBFG_real = perm
+perm_BBFG_complex = perm
+
 
 class TestPermanentWrapper:
     """Tests for the Permanent function"""
