@@ -22,17 +22,12 @@ from ._hafnian import hafnian_repeated
 # pylint: disable = C0103, R0914
 
 
-def perm(A, quad=True, fsum=False, method="bbfg"):
+def perm(A, method="bbfg"):
     """Returns the permanent of a matrix using the `method` formula
     For more direct control, you may wish to call :func:`perm_real`
     or :func:`perm_complex` directly.
     Args:
         A (array): a square array.
-        quad (bool): If ``True``, the input matrix is cast to a ``long double``
-            matrix internally for a quadruple precision hafnian computation.
-        fsum (bool): Whether to use the ``fsum`` method for higher accuracy summation.
-            Note that if ``fsum`` is true, double precision will be used, and the
-            ``quad`` keyword argument will be ignored.
         method (string): "ryser" calls the associated methods to
             `Ryser formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
