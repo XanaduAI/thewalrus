@@ -14,6 +14,7 @@
 """Tests for the batch hafnian wrapper function"""
 # pylint: disable=no-self-use,redefined-outer-name
 from itertools import product
+import pytest
 
 import numpy as np
 
@@ -21,11 +22,12 @@ from scipy.special import eval_hermitenorm, eval_hermite
 
 from thewalrus import (
     hermite_multidimensional,
+    interferometer,
     hafnian_batched,
     hafnian_repeated,
-    hermite_multidimensional_numba,
-    grad_hermite_multidimensional_numba,
+    grad_hermite_multidimensional,
 )
+from thewalrus.random import random_interferometer
 
 
 def test_hermite_multidimensional_renorm():
@@ -145,45 +147,36 @@ def test_hermite_cutoffs():
     R = R + R.T
     y = np.random.rand(3) + 1j * np.random.rand(3)
     cutoff = (1, 2, 3)
-    hm = hermite_multidimensional_numba(R, cutoff, y=y)
+    hm = hermite_multidimensional(R, cutoff, y=y)
     assert hm.shape == cutoff
 
 
-def test_hermite_numba_vs_hermite_renorm_modified(tol):
-    """Test the relation hermite_numba and hermite renorm modified"""
-    cutoff = 10
-    R = np.random.rand(4, 4) + 1j * np.random.rand(4, 4)
-    R += R.T
-    y = np.random.rand(4) + 1j * np.random.rand(4)
-    C = 0.5
-    hm = C * hermite_multidimensional(R, cutoff=cutoff, y=y, renorm=True, modified=True)
-    hm_nb = hermite_multidimensional_numba(R, cutoff, y, C=C, dtype=np.complex128)
-    assert np.allclose(hm, hm_nb, atol=tol, rtol=0)
-
-
-def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
-    """Tests the gradients of hermite_numba. The gradients of parameters are tested by finite differences."""
+@pytest.mark.parametrize("renorm", [True, False])
+def test_grad_hermite_multidimensional_vs_finite_differences(tol, renorm):
+    """Tests the gradients of hermite polynomials. The gradients of parameters are tested by finite differences."""
     d = 4
     R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
     R += R.T
     y = np.random.rand(d) + 1j * np.random.rand(d)
     C = 0.5
     cutoff = [3, 3, 3, 3]
-    gate = hermite_multidimensional_numba(R, cutoff, y, C, dtype=np.complex128)
-    grad_C, grad_R, grad_y = grad_hermite_multidimensional_numba(gate, R, y, C, dtype=np.complex128)
+    gate = hermite_multidimensional(R, cutoff, y, C, renorm=renorm, modified=True)
+    grad_C, grad_R, grad_y = grad_hermite_multidimensional(
+        gate, R, y, C, renorm=renorm, dtype=np.complex128
+    )
 
     delta = 0.000001 + 1j * 0.000001
     expected_grad_C = (
-        hermite_multidimensional_numba(R, cutoff, y, C + delta)
-        - hermite_multidimensional_numba(R, cutoff, y, C - delta)
+        hermite_multidimensional(R, cutoff, y, C + delta, renorm=renorm, modified=True)
+        - hermite_multidimensional(R, cutoff, y, C - delta, renorm=renorm, modified=True)
     ) / (2 * delta)
     assert np.allclose(grad_C, expected_grad_C, atol=tol, rtol=0)
 
     for i in range(y.shape[0]):
         y[i] += delta
-        plus = hermite_multidimensional_numba(R, cutoff, y, C)
+        plus = hermite_multidimensional(R, cutoff, y, C, renorm=renorm, modified=True)
         y[i] -= 2 * delta
-        minus = hermite_multidimensional_numba(R, cutoff, y, C)
+        minus = hermite_multidimensional(R, cutoff, y, C, renorm=renorm, modified=True)
         expected_grad_y = (plus - minus) / (2 * delta)
         y[i] += delta
         assert np.allclose(grad_y[..., i], expected_grad_y, atol=tol, rtol=0)
@@ -191,15 +184,15 @@ def test_grad_hermite_multidimensional_numba_vs_finite_differences(tol):
     for i in range(R.shape[0]):
         for j in range(R.shape[1]):
             R[i, j] += delta
-            plus = hermite_multidimensional_numba(R, cutoff, y, C)
+            plus = hermite_multidimensional(R, cutoff, y, C, renorm=renorm, modified=True)
             R[i, j] -= 2 * delta
-            minus = hermite_multidimensional_numba(R, cutoff, y, C)
+            minus = hermite_multidimensional(R, cutoff, y, C, renorm=renorm, modified=True)
             expected_grad_R = (plus - minus) / (2 * delta)
             R[i, j] += delta
             assert np.allclose(grad_R[..., i, j], expected_grad_R, atol=tol, rtol=0)
 
 
-def test_auto_dtype_multidim_herm_numba():
+def test_auto_dtype_multidim_herm():
     """Tests that auto-dtype detection works"""
     d = 4
     R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
@@ -210,17 +203,17 @@ def test_auto_dtype_multidim_herm_numba():
 
     R = R.astype("complex64")
     y = y.astype("complex128")
-    poly = hermite_multidimensional_numba(R, cutoff, y, C, dtype=None)
+    poly = hermite_multidimensional(R, cutoff, y, C)
     assert poly.dtype == y.dtype
 
     R = R.astype("complex128")
     y = y.astype("complex64")
     poly = poly.astype("complex64")
-    grad = grad_hermite_multidimensional_numba(poly, R, y, C, dtype=None)
+    grad = grad_hermite_multidimensional(poly, R, y, C, dtype=None)
     assert all(g.dtype == R.dtype for g in grad)
 
 
-def test_multi_cutoffs_multidim_herm_numba():
+def test_multi_cutoffs_multidim_herm():
     """Tests that different cutoffs give the right result"""
     d = 4
     R = np.random.rand(d, d) + 1j * np.random.rand(d, d)
@@ -229,10 +222,20 @@ def test_multi_cutoffs_multidim_herm_numba():
     C = 0.5
 
     cutoffs = [np.random.randint(3, 7) for _ in range(d)]
-    poly = hermite_multidimensional_numba(R, cutoffs, y, C)
-    poly_expected = hermite_multidimensional_numba(R, 3, y, C)
+    poly = hermite_multidimensional(R, cutoffs, y, C)
+    poly_expected = hermite_multidimensional(R, 3, y, C)
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
-    poly_expected = hermite_multidimensional_numba(
-        R, np.array(3), y, C
-    )  # testing ndarrary cutoff int
+    poly_expected = hermite_multidimensional(R, np.array(3), y, C)  # testing ndarrary cutoff int
     assert np.allclose(poly[:3, :3, :3, :3], poly_expected)
+
+
+@pytest.mark.parametrize("renorm", [True, False])
+@pytest.mark.parametrize("cutoff", [6, np.array(6), [3, 4, 5, 6]])
+def test_interferometer_vs_hermite_multidimensional(renorm, cutoff):
+    """Test that intertferometer and hermite_multidimensional give the same result"""
+    U = random_interferometer(2)
+    R = np.block([[0 * U, -U], [-U.T, 0 * U]])
+
+    hermite_renorm = hermite_multidimensional(R, cutoff, y=None, renorm=renorm)
+    interf_renorm = interferometer(R, cutoff, renorm=renorm)
+    assert np.allclose(hermite_renorm, interf_renorm)
