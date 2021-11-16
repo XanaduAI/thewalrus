@@ -27,7 +27,7 @@ def perm(A, method="bbfg"):
     or :func:`perm_complex` directly.
     Args:
         A (array): a square array.
-        method (string): "ryser" calls the associated methods to
+        method (string): Set this to ``"ryser"`` to use the
             `Ryser formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
             and "bbfg" calls the associated methods to
