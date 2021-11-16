@@ -18,13 +18,10 @@ import numpy as np
 from numba import jit
 from ._hafnian import hafnian_repeated
 
-# pylint: disable = C0103, R0914
-
-
 def perm(A, method="bbfg"):
     """Returns the permanent of a matrix using various methods.
-    For more direct control, you may wish to call :func:`perm_real`
-    or :func:`perm_complex` directly.
+
+
     Args:
         A (array): a square array.
         method (string): Set this to ``"ryser"`` to use the
