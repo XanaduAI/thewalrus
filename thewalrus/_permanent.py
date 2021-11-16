@@ -69,7 +69,7 @@ def perm(A, method="bbfg"):
 @jit(nopython=True)
 def perm_ryser(M):
     """
-    Returns the permanent of a matrix using the Ryser formula in Gray ordering
+    Returns the permanent of a matrix using the Ryser formula in Gray ordering.
 
     The code is an re-implementation from a Python 2 code found in
     `Permanent code golf
