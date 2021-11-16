@@ -74,7 +74,7 @@ def perm_ryser(M):
     The code is an re-implementation from a Python 2 code found in
     `Permanent code golf
     <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
-    using numba.
+    using Numba.
 
     Args:
         M (array) : a square array.
