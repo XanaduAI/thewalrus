@@ -22,7 +22,7 @@ from ._hafnian import hafnian_repeated
 
 
 def perm(A, method="bbfg"):
-    """Returns the permanent of a matrix using the `method` formula
+    """Returns the permanent of a matrix using various methods.
     For more direct control, you may wish to call :func:`perm_real`
     or :func:`perm_complex` directly.
     Args:
