@@ -119,9 +119,11 @@ def perm_bbfg(M):
     The code is a re-implementation from a Python 2 code found in
     `Permanent code golf
     <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
-    using numba.
+    using Numba.
+
     Args:
         M (array) : a square array.
+
     Returns:
         np.float64 or np.complex128: the permanent of a matrix M.
     """
