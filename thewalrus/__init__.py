@@ -124,10 +124,7 @@ from ._hermite_multidimensional import (
     interferometer,
     grad_hermite_multidimensional,
 )
-from ._permanent import (
-    perm,
-    permanent_repeated
-)
+from ._permanent import perm, permanent_repeated
 
 from ._torontonian import (
     tor,
