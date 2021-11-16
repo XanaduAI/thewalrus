@@ -27,8 +27,6 @@ cdef extern from "../include/libwalrus.hpp" namespace "libwalrus":
     T hafnian[T](vector[T] &mat)
     T hafnian_recursive[T](vector[T] &mat)
     T loop_hafnian[T](vector[T] &mat)
-    T permanent[T](vector[T] &mat)
-    T perm_BBFG[T](vector[T] &mat) 
 
     T hafnian_rpt[T](vector[T] &mat, vector[int] &nud)
     T loop_hafnian_rpt[T](vector[T] &mat, vector[T] &mu, vector[int] &nud)
