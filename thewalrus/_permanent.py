@@ -30,7 +30,7 @@ def perm(A, method="bbfg"):
         method (string): Set this to ``"ryser"`` to use the
             `Ryser formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
-            and "bbfg" calls the associated methods to
+            or ``"bbfg"`` to use the
             `BBFG formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
     Returns:
