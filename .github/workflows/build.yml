@@ -60,7 +60,7 @@ jobs:
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
 
-          python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
+          python -m wheelhouse_uploader upload --provider-name S3 --region us-east-1 --local-folder ./wheelhouse/ xanadu-wheels
 
   mac-wheels-x86-64:
     name: wheels macos
@@ -119,7 +119,7 @@ jobs:
         # if: github.ref == 'refs/heads/master'
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
-          python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
+          python -m wheelhouse_uploader upload --provider-name S3 --region us-east-1 --local-folder ./wheelhouse/ xanadu-wheels
 
   win-wheels:
     name: wheels windows
@@ -170,5 +170,5 @@ jobs:
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
 
-          python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
+          python -m wheelhouse_uploader upload --provider-name S3 --region us-east-1 --local-folder ./wheelhouse/ xanadu-wheels
 
