@@ -59,6 +59,7 @@ jobs:
         # if: github.ref == 'refs/heads/master'
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
+
           python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
   mac-wheels-x86-64:
@@ -168,5 +169,6 @@ jobs:
         # # if: github.ref == 'refs/heads/master'
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
+
           python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
