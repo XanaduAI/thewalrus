@@ -154,14 +154,20 @@ def perm_bbfg(M):
 def permanent_repeated(A, rpt):
     r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
     of :math:`A` is repeated :math:`rpt_i` times.
+    
     This function constructs the matrix
+    
     .. math:: B = \begin{bmatrix} 0 & A\\ A^T & 0 \end{bmatrix},
+    
     and then calculates :math:`perm(A)=haf(B)`, by calling
+    
     >>> hafnian_repeated(B, rpt*2, loop=False)
+    
     Args:
         A (array): matrix of size [N, N]
         rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
             of A to be repeated.
+            
     Returns:
         np.int64 or np.float64 or np.complex128: the permanent of matrix A.
     """
