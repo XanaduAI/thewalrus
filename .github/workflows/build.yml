@@ -50,13 +50,14 @@ jobs:
         env:
           CIBW_ARCHS_LINUX: ${{matrix.arch}}
 
-      - uses: kittaakos/upload-artifact-as-is@v0
-        # if: github.ref == 'refs/heads/master'
+      - name: Upload wheels to github artifacts
+        uses: kittaakos/upload-artifact-as-is@v0
+        if: github.ref == 'refs/heads/master'
         with:
           path: ./wheelhouse/
 
-      - name: Upload Wheels
-        # if: github.ref == 'refs/heads/master'
+      - name: Upload wheels to xanadu-wheels
+        if: github.ref == 'refs/heads/master'
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
 
@@ -110,13 +111,14 @@ jobs:
         env:
           CIBW_ARCHS_MACOS: ${{matrix.arch}}
 
-      - uses: kittaakos/upload-artifact-as-is@v0
-        # if: github.ref == 'refs/heads/master'
+      - name: Upload wheels to github artifacts
+        uses: kittaakos/upload-artifact-as-is@v0
+        if: github.ref == 'refs/heads/master'
         with:
           path: ./wheelhouse/
 
-      - name: Upload Wheels
-        # if: github.ref == 'refs/heads/master'
+      - name: Upload wheels to xanadu-wheels
+        if: github.ref == 'refs/heads/master'
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
           python -m wheelhouse_uploader upload --provider-name S3 --region us-east-1 --local-folder ./wheelhouse/ xanadu-wheels
@@ -160,13 +162,14 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v1.12.0
 
-      - uses: kittaakos/upload-artifact-as-is@v0
-        # if: github.ref == 'refs/heads/master'
+      - name: Upload wheels to github artifacts
+        uses: kittaakos/upload-artifact-as-is@v0
+        if: github.ref == 'refs/heads/master'
         with:
           path: ./wheelhouse/
 
-      - name: Upload Wheels
-        # # if: github.ref == 'refs/heads/master'
+      - name: Upload wheels to xanadu-wheels
+        if: github.ref == 'refs/heads/master'
         run: |
           pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
 
