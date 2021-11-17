@@ -58,7 +58,7 @@ jobs:
       - name: Upload Wheels
         if: github.ref == 'refs/heads/master'
         run: |
-          pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+          pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
           python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
   mac-wheels-x86-64:
@@ -117,7 +117,7 @@ jobs:
       - name: Upload Wheels
         if: github.ref == 'refs/heads/master'
         run: |
-          pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+          pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
           python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
   win-wheels:
@@ -167,6 +167,6 @@ jobs:
       - name: Upload Wheels
         if: github.ref == 'refs/heads/master'
         run: |
-          pip install --user https://github.com/joerick/libcloud/archive/v1.5.0-s3fix.zip wheelhouse-uploader
+          pip install --user https://github.com/apache/libcloud/archive/refs/tags/v3.4.1.zip wheelhouse-uploader
           python -m wheelhouse_uploader upload --provider-name S3 --local-folder ./wheelhouse/ xanadu-wheels
 
