@@ -22,7 +22,6 @@ from ._hafnian import hafnian_repeated
 def perm(A, method="bbfg"):
     """Returns the permanent of a matrix using various methods.
 
-
     Args:
         A (array): a square array.
         method (string): Set this to ``"ryser"`` to use the
@@ -114,6 +113,7 @@ def perm_ryser(M):
 def perm_bbfg(M):
     """
     Returns the permanent of a matrix using the bbfg formula in Gray ordering
+    
     The code is a re-implementation from a Python 2 code found in
     `Permanent code golf
     <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
