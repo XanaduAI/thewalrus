@@ -18,6 +18,7 @@ import numpy as np
 from numba import jit
 from ._hafnian import hafnian_repeated
 
+
 def perm(A, method="bbfg"):
     """Returns the permanent of a matrix using various methods.
 
