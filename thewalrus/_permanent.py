@@ -67,7 +67,7 @@ def perm(A, method="bbfg"):
 
 
 @jit(nopython=True)
-def perm_ryser(M):
+def perm_ryser(M):  # pragma: no cover
     """
     Returns the permanent of a matrix using the Ryser formula in Gray ordering.
 
@@ -113,7 +113,7 @@ def perm_ryser(M):
 
 
 @jit(nopython=True)
-def perm_bbfg(M):
+def perm_bbfg(M):  # pragma: no cover
     """
     Returns the permanent of a matrix using the bbfg formula in Gray ordering
     The code is a re-implementation from a Python 2 code found in
