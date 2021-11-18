@@ -1,21 +1,17 @@
-# Version 0.17.0-dev
-
-### New features
+# Version 0.17.0
 
 ### Improvements
 * Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
 
-* Multidimensional Hermite polynomials are now implemented in numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
+* Multidimensional Hermite polynomials are now implemented in Numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
 
-### Bug fixes
-
-### Breaking changes
+* Updates missing figures in the "Basics of Hafnians and Loop Hafnians" documentation. [#288](https://github.com/XanaduAI/thewalrus/pull/288)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov
+Mikhail Andrenkov, Sebastián Duque
 
 ---
 
@@ -42,7 +38,7 @@ Filippo Miatto
 
 * Updates the `samples.generate_torontonian_sample` function to ensure probabilities are normalized. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
-* Pins Numba to version `<0.54` to avoid binary imcompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
+* Pins Numba to version `<0.54` to avoid binary incompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
 ### Contributors
 
