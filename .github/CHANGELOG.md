@@ -1,3 +1,20 @@
+# Version 0.18.0-dev
+
+### New features
+
+### Improvements
+
+### Bug fixes
+
+### Breaking changes
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+
+---
+
 # Version 0.17.0
 
 ### Improvements
