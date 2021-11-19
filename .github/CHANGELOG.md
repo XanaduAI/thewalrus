@@ -12,7 +12,6 @@
 
 This release contains contributions from (in alphabetical order):
 
-
 ---
 
 # Version 0.17.0
