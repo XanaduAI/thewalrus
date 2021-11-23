@@ -1,10 +1,5 @@
 import numpy as np
-
 from numba import jit
-
-from thewalrus.quantum import Xmat, Amat, Qmat
-from thewalrus._torontonian import Qmat_numba
-from scipy.stats import poisson
 
 @jit(nopython=True, cache=True)
 def get_reflection_vector(matrix, size, k):
