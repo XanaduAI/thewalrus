@@ -22,8 +22,9 @@ from ._hafnian import hafnian_repeated
 def perm(A, method="bbfg"):
     """Returns the permanent of a matrix using various methods.
 
+
     Args:
-        A (array): a square array.
+        A (array[float or complex]): a square array.
         method (string): Set this to ``"ryser"`` to use the
             `Ryser formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
