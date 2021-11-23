@@ -154,7 +154,14 @@ def _charpoly_from_labudde(H, n, k):
 
 @jit(nopython=True, cache=True)
 def charpoly_from_labudde(H, method="ravel"):
-
+    """
+    Calculates the characteristic polynomial of the matrix H
+    Args:
+        H (array): square matrix
+        method (string): pre-processing operation on H
+    Returns
+        (array): list of power traces from 0 to n-1
+    """
     if method == "ravel":
         Hflat = H.ravel()
     elif method == "flatten":
