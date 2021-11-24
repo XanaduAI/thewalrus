@@ -28,6 +28,7 @@ Summary
     perm
     perm_ryser
     perm_bbfg
+    permanent_repeated
 Code details
 ------------
 """
