@@ -21,7 +21,7 @@ This submodule provides access to tools for finding the permanent of a matrix. T
 here was first derived in
 * Ryser, Herbert John (1963).
   Combinatorial Mathematics, The Carus Mathematical Monographs, Vol. 14, Mathematical Association of America.
-* Glynn, David G. 
+* Glynn, David G.
   (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887–1891.
   <doi:10.1016/j.ejc.2010.01.010>`_
 
