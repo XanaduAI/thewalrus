@@ -14,7 +14,9 @@
 r"""
 Permanent Algorithms
 =============================
+
 .. currentmodule:: thewalrus._permanent
+
 This submodule provides access to tools for finding the permanent of a matrix. The algorithms implemented
 here was first derived in
 * Ryser, Herbert John (1963).
@@ -22,13 +24,16 @@ here was first derived in
 * Glynn, David G. 
   (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887–1891.
   <doi:10.1016/j.ejc.2010.01.010>`_
+
 Summary
 -------
 .. autosummary::
+
     perm
     perm_ryser
     perm_bbfg
     permanent_repeated
+
 Code details
 ------------
 """
