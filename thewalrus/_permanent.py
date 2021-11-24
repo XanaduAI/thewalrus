@@ -11,8 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Permanent Python interface
+r"""
+Permanent Algorithms
+=============================
+.. currentmodule:: thewalrus._permanent
+This submodule provides access to tools for finding the permanent of a matrix. The algorithms implemented
+here was first derived in
+* Ryser, Herbert John (1963).
+  Combinatorial Mathematics, The Carus Mathematical Monographs, Vol. 14, Mathematical Association of America.
+* Glynn, David G. 
+  (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887–1891.
+  <doi:10.1016/j.ejc.2010.01.010>`_
+Summary
+-------
+.. autosummary::
+    perm
+    perm_ryser
+    perm_bbfg
+Code details
+------------
 """
 import numpy as np
 from numba import jit
