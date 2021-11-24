@@ -131,6 +131,10 @@ class TestHafnianWrapper:
         haf = hafnian(A)
         expected = haf_real(A)
         assert np.allclose(haf, expected)
+        
+        haf = hafnian(A, loop=True, quad=False)
+        expected = haf_real(A, loop=True)
+        assert np.allclose(haf, expected)
 
         haf = hafnian(A, loop=True)
         expected = haf_real(A, loop=True)
