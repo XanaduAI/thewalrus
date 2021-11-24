@@ -23,6 +23,7 @@ jobs:
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly flaky
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+      CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
       CIBW_BUILD_VERBOSITY: 1
 
     steps:
