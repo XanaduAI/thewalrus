@@ -80,10 +80,6 @@ def perm_ryser(M):  # pragma: no cover
     Returns:
         np.float64 or np.complex128: the permanent of matrix M.
     """
-    # Raises an error if the matrix is not square
-    (a, b) = M.shape
-    if a != b:
-        raise Exception("Not a square matrix")
     n = len(M)
     # row_comb keeps the sum of previous subsets.
     # Every iteration, it removes a term and/or adds a new term
@@ -126,10 +122,6 @@ def perm_bbfg(M):  # pragma: no cover
     Returns:
         np.float64 or np.complex128: the permanent of a matrix M.
     """
-    # Raises an error if the matrix is not square
-    (a, b) = M.shape
-    if a != b:
-        raise Exception("Not a square matrix")
 
     n = len(M)
     row_comb = np.sum(M, 0)
