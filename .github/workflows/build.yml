@@ -18,7 +18,7 @@ jobs:
       CIBW_BUILD: 'cp37-* cp38-* cp39-*'
       # Python build settings
       CIBW_BEFORE_BUILD: |
-        pip install numpy==1.19.5 scipy cython
+        pip install numpy scipy cython
       # Testing of built wheels
       CIBW_TEST_REQUIRES: numpy scipy pytest pytest-cov pytest-randomly flaky
       CIBW_TEST_COMMAND: python -m pytest --randomly-seed=137 {project}/thewalrus
