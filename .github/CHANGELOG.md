@@ -7,6 +7,9 @@
 
 * Multidimensional Hermite polynomials are now implemented in numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
 
+* Permanent algorithms are implemented in numba, hence reducing the C++ dependencies of The Walrus. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
+
+
 ### Bug fixes
 
 ### Breaking changes
@@ -15,7 +18,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov
+Mikhail Andrenkov, Sebastián Duque, Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
