@@ -15,9 +15,8 @@
 
 This release contains contributions from (in alphabetical order):
 
-<<<<<<< HEAD
-Mikhail Andrenkov, Sebastián Duque, Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
-=======
+Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
+
 ---
 
 # Version 0.17.0
@@ -34,7 +33,6 @@ Mikhail Andrenkov, Sebastián Duque, Benjamin Lanthier, Dominic Leclerc, Nicolas
 This release contains contributions from (in alphabetical order):
 
 Mikhail Andrenkov, Sebastián Duque
->>>>>>> 9eff336c3ea30fc3d1d197afde43bf6c7a0965e5
 
 ---
 
