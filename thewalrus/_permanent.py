@@ -11,32 +11,47 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Permanent Python interface
+r"""
+Permanent Algorithms
+=============================
+
+.. currentmodule:: thewalrus._permanent
+
+This submodule provides access to tools for finding the permanent of a matrix. The algorithms implemented
+here was first derived in
+* Ryser, Herbert John (1963).
+  Combinatorial Mathematics, The Carus Mathematical Monographs, Vol. 14, Mathematical Association of America.
+* Glynn, David G.
+  (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887–1891.
+  <doi:10.1016/j.ejc.2010.01.010>`_
+
+Summary
+-------
+.. autosummary::
+
+    perm
+    perm_ryser
+    perm_bbfg
+    permanent_repeated
+
+Code details
+------------
 """
 import numpy as np
 from numba import jit
 from ._hafnian import hafnian_repeated
-# from .libwalrus import perm_complex, perm_real, perm_BBFG_real, perm_BBFG_complex
-
-# pylint: disable = C0103, R0914
 
 
-def perm(A, quad=True, fsum=False, method="bbfg"):
-    """Returns the permanent of a matrix using the `method` formula
-    For more direct control, you may wish to call :func:`perm_real`
-    or :func:`perm_complex` directly.
+def perm(A, method="bbfg"):
+    """Returns the permanent of a matrix using various methods.
+
+
     Args:
-        A (array): a square array.
-        quad (bool): If ``True``, the input matrix is cast to a ``long double``
-            matrix internally for a quadruple precision hafnian computation.
-        fsum (bool): Whether to use the ``fsum`` method for higher accuracy summation.
-            Note that if ``fsum`` is true, double precision will be used, and the
-            ``quad`` keyword argument will be ignored.
-        method (string): "ryser" calls the associated methods to
+        A (array[float or complex]): a square array.
+        method (string): Set this to ``"ryser"`` to use the
             `Ryser formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Ryser_formula>`_,
-            and "bbfg" calls the associated methods to
+            or ``"bbfg"`` to use the
             `BBFG formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
     Returns:
@@ -73,14 +88,14 @@ def perm(A, quad=True, fsum=False, method="bbfg"):
 
 
 @jit(nopython=True)
-def perm_ryser(M):
+def perm_ryser(M):  # pragma: no cover
     """
-    Returns the permanent of a matrix using the Ryser formula in Gray ordering
+    Returns the permanent of a matrix using the Ryser formula in Gray ordering.
 
     The code is an re-implementation from a Python 2 code found in
     `Permanent code golf
     <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
-    using numba.
+    using Numba.
 
     Args:
         M (array) : a square array.
@@ -88,10 +103,6 @@ def perm_ryser(M):
     Returns:
         np.float64 or np.complex128: the permanent of matrix M.
     """
-    # Raises an error if the matrix is not square
-    (a, b) = M.shape
-    if a != b:
-        raise Exception("Not a square matrix")
     n = len(M)
     # row_comb keeps the sum of previous subsets.
     # Every iteration, it removes a term and/or adds a new term
@@ -119,22 +130,21 @@ def perm_ryser(M):
 
 
 @jit(nopython=True)
-def perm_bbfg(M):
+def perm_bbfg(M):  # pragma: no cover
     """
     Returns the permanent of a matrix using the bbfg formula in Gray ordering
+
     The code is a re-implementation from a Python 2 code found in
     `Permanent code golf
     <https://codegolf.stackexchange.com/questions/97060/calculate-the-permanent-as-quickly-as-possible>`_
-    using numba.
+    using Numba.
+
     Args:
         M (array) : a square array.
+
     Returns:
         np.float64 or np.complex128: the permanent of a matrix M.
     """
-    # Raises an error if the matrix is not square
-    (a, b) = M.shape
-    if a != b:
-        raise Exception("Not a square matrix")
 
     n = len(M)
     row_comb = np.sum(M, 0)
@@ -161,14 +171,20 @@ def perm_bbfg(M):
 def permanent_repeated(A, rpt):
     r"""Calculates the permanent of matrix :math:`A`, where the ith row/column
     of :math:`A` is repeated :math:`rpt_i` times.
+
     This function constructs the matrix
+
     .. math:: B = \begin{bmatrix} 0 & A\\ A^T & 0 \end{bmatrix},
+
     and then calculates :math:`perm(A)=haf(B)`, by calling
+
     >>> hafnian_repeated(B, rpt*2, loop=False)
+
     Args:
         A (array): matrix of size [N, N]
         rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
             of A to be repeated.
+
     Returns:
         np.int64 or np.float64 or np.complex128: the permanent of matrix A.
     """

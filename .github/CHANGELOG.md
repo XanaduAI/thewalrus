@@ -1,11 +1,8 @@
-# Version 0.17.0-dev
+# Version 0.18.0-dev
 
 ### New features
 
 ### Improvements
-* Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
-
-* Multidimensional Hermite polynomials are now implemented in numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
 
 * Permanent algorithms are implemented in numba, hence reducing the C++ dependencies of The Walrus. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
 
@@ -18,7 +15,26 @@
 
 This release contains contributions from (in alphabetical order):
 
+<<<<<<< HEAD
 Mikhail Andrenkov, Sebastián Duque, Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
+=======
+---
+
+# Version 0.17.0
+
+### Improvements
+* Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
+
+* Multidimensional Hermite polynomials are now implemented in Numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
+
+* Updates missing figures in the "Basics of Hafnians and Loop Hafnians" documentation. [#288](https://github.com/XanaduAI/thewalrus/pull/288)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Mikhail Andrenkov, Sebastián Duque
+>>>>>>> 9eff336c3ea30fc3d1d197afde43bf6c7a0965e5
 
 ---
 
@@ -45,7 +61,7 @@ Filippo Miatto
 
 * Updates the `samples.generate_torontonian_sample` function to ensure probabilities are normalized. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
-* Pins Numba to version `<0.54` to avoid binary imcompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
+* Pins Numba to version `<0.54` to avoid binary incompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
 ### Contributors
 

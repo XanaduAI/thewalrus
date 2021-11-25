@@ -18,14 +18,12 @@ import pytest
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus import (
-    perm,
-    perm_real,
-    perm_complex,
-    permanent_repeated,
-    perm_BBFG_real,
-    perm_BBFG_complex,
-)
+from thewalrus import perm, permanent_repeated
+
+perm_real = perm
+perm_complex = perm
+perm_BBFG_real = lambda x: perm(x, method="bbfg")
+perm_BBFG_complex = lambda x: perm(x, method="bbfg")
 
 
 class TestPermanentWrapper:
