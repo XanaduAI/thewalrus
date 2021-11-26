@@ -16,8 +16,6 @@
 cimport cython
 cimport numpy as np
 import numpy as np
-from libc.stdlib cimport free
-from cpython cimport PyObject, Py_INCREF
 from libcpp.vector cimport vector
 
 np.import_array()
