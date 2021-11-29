@@ -18,9 +18,10 @@ characteristic polynomials of matrices.
 import numpy as np
 from numba import jit
 
+
 @jit(nopython=True, cache=True)
 def get_reflection_vector(matrix, size, k):
-    r""" Compute reflection vector for householder transformation on
+    r"""Compute reflection vector for householder transformation on
     general complex matrices. See Introduction to Numerical Analysis-Springer New York (2002)
     (3rd Edition) by J. Stoer and R. Bulirsch Section 6.5.1.
 
@@ -54,7 +55,7 @@ def get_reflection_vector(matrix, size, k):
 
 @jit(nopython=True, cache=True)
 def apply_householder(A, v, size_A, k):
-    r""" Apply householder transformation on a matrix A
+    r"""Apply householder transformation on a matrix A
     See  Matrix Computations by Golub and Van Loan
     (4th Edition) Sections 5.1.4 and 7.4.2
 
@@ -91,8 +92,8 @@ def apply_householder(A, v, size_A, k):
 
 @jit(nopython=True, cache=True)
 def reduce_matrix_to_hessenberg(matrix, size):
-    r""" Reduce the matrix to upper hessenberg form
-         without Lapack. This function only accepts Row-Order 
+    r"""Reduce the matrix to upper hessenberg form
+         without Lapack. This function only accepts Row-Order
          matrices.
 
     Args:
@@ -109,7 +110,7 @@ def reduce_matrix_to_hessenberg(matrix, size):
 
 @jit(nopython=True, cache=True)
 def beta(H, i, size):
-    r""" Auxiliary function for Labudde algorithm.
+    r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of beta
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
@@ -126,7 +127,7 @@ def beta(H, i, size):
 
 @jit(nopython=True, cache=True)
 def alpha(H, i, size):
-    r""" Auxiliary function for Labudde algorithm.
+    r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of alpha
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
@@ -143,7 +144,7 @@ def alpha(H, i, size):
 
 @jit(nopython=True, cache=True)
 def hij(H, i, j, size):
-    r""" Auxiliary function for Labudde algorithm.
+    r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of hij
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
@@ -161,7 +162,7 @@ def hij(H, i, j, size):
 
 @jit(nopython=True, cache=True)
 def mlo(i, j, size):
-    r""" Auxiliary function for Labudde algorithm.
+    r"""Auxiliary function for Labudde algorithm.
          The labudde paper uses indices that start counting at 1
          so this function lowers them to start counting at 0.
          See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
@@ -179,7 +180,7 @@ def mlo(i, j, size):
 
 @jit(nopython=True, cache=True)
 def _charpoly_from_labudde(H, n, k):
-    r""" Compute characteristic polynomial using the LaBudde algorithm.
+    r"""Compute characteristic polynomial using the LaBudde algorithm.
          See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
          If the matrix is n by n but you only want coefficients k < n
          set k below n. If you want all coefficients, set k = n.
@@ -191,7 +192,7 @@ def _charpoly_from_labudde(H, n, k):
     Returns:
         array: char-poly coeffs + auxiliary data (see comment in function)
     """
-    
+
     c = np.zeros(n * n, dtype=H.dtype)
     c[mlo(1, 1, n)] = -alpha(H, 1, n)
     c[mlo(2, 1, n)] = c[mlo(1, 1, n)] - alpha(H, 2, n)
