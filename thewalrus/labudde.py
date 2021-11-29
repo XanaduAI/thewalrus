@@ -1,8 +1,37 @@
+# Copyright 2019 Xanadu Quantum Technologies Inc.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+This module implements the labudde algorithm to calculate the 
+characteristic polynomials of matrices.
+"""
 import numpy as np
 from numba import jit
 
 @jit(nopython=True, cache=True)
 def get_reflection_vector(matrix, size, k):
+    r""" Compute reflection vector for householder transformation on
+    general complex matrices. See Introduction to Numerical Analysis-Springer New York (2002)
+    (3rd Edition) by J. Stoer and R. Bulirsch Section 6.5.1.
+
+    Args:
+        matrix (array): the matrix in the householder transformation
+        size (int): size of matrix
+        k (int): offset for submatrix
+
+    Returns:
+        array: reflection vector
+    """
     sizeH = size - k
     reflect_vector = np.zeros(sizeH, dtype=matrix.dtype)
     order = size - sizeH
@@ -25,6 +54,16 @@ def get_reflection_vector(matrix, size, k):
 
 @jit(nopython=True, cache=True)
 def apply_householder(A, v, size_A, k):
+    r""" Apply householder transformation on a matrix A
+    See  Matrix Computations by Golub and Van Loan
+    (4th Edition) Sections 5.1.4 and 7.4.2
+
+    Args:
+        A (array): A matrix to apply householder on
+        v (array): reflection vector
+        size_A (int): size of matrix A
+        k (int): offset for submatrix
+    """
     sizeH = len(v)
     norm_v_sqr = np.linalg.norm(v) ** 2
     if norm_v_sqr == 0:
@@ -52,6 +91,17 @@ def apply_householder(A, v, size_A, k):
 
 @jit(nopython=True, cache=True)
 def reduce_matrix_to_hessenberg(matrix, size):
+    r""" Reduce the matrix to upper hessenberg form
+         without Lapack. This function only accepts Row-Order 
+         matrices.
+
+    Args:
+        matrix (array): the matrix to be reduced
+        size (int): size of matrix
+
+    Returns:
+        array: matrix in hessenberg form
+    """
     for i in range(1, size - 1):
         reflect_vector = get_reflection_vector(matrix, size, i)
         apply_householder(matrix, reflect_vector, size, i)
@@ -59,26 +109,89 @@ def reduce_matrix_to_hessenberg(matrix, size):
 
 @jit(nopython=True, cache=True)
 def beta(H, i, size):
+    r""" Auxiliary function for Labudde algorithm.
+         See pg 10 of for definition of beta
+         [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
+    Args:
+        matrix (array): upper-Hessenberg matrix
+        i (int): row
+        size (int): size of the matrix
+
+    Returns:
+        float: element of the lower-diagonal of matrix H
+    """
     return H[(i - 1) * size + i - 2]
 
 
 @jit(nopython=True, cache=True)
 def alpha(H, i, size):
+    r""" Auxiliary function for Labudde algorithm.
+         See pg 10 of for definition of alpha
+         [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
+    Args:
+        matrix (array): upper-Hessenberg matrix
+        i (int): row
+        size (int): size of the matrix
+
+    Returns:
+        float: element of the central-diagonal of matrix H
+    """
     return H[(i - 1) * size + i - 1]
 
 
 @jit(nopython=True, cache=True)
 def hij(H, i, j, size):
+    r""" Auxiliary function for Labudde algorithm.
+         See pg 10 of for definition of hij
+         [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
+    Args:
+        matrix (array): upper-Hessenberg matrix
+        i (int): row
+        j (int): column
+        size (int): size of the matrix
+
+    Returns:
+        float: element of the lower-diagonal of matrix H
+    """
     return H[(i - 1) * size + j - 1]
 
 
 @jit(nopython=True, cache=True)
 def mlo(i, j, size):
+    r""" Auxiliary function for Labudde algorithm.
+         The labudde paper uses indices that start counting at 1
+         so this function lowers them to start counting at 0.
+         See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    Args:
+        matrix (array): upper-Hessenberg matrix
+        i (int): row
+        j (int): column
+        size (int): size of the matrix
+
+    Returns:
+        int: linear matrix index lowered by 1
+    """
     return (i - 1) * size + j - 1
 
 
 @jit(nopython=True, cache=True)
 def _charpoly_from_labudde(H, n, k):
+    r""" Compute characteristic polynomial using the LaBudde algorithm.
+         See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+         If the matrix is n by n but you only want coefficients k < n
+         set k below n. If you want all coefficients, set k = n.
+    Args:
+        H (array): matrix in Hessenberg form (RowMajor)
+        n (int): size of matrix
+        k (int): compute coefficients up to k (k must be <= n)
+
+    Returns:
+        array: char-poly coeffs + auxiliary data (see comment in function)
+    """
+    
     c = np.zeros(n * n, dtype=H.dtype)
     c[mlo(1, 1, n)] = -alpha(H, 1, n)
     c[mlo(2, 1, n)] = c[mlo(1, 1, n)] - alpha(H, 2, n)
@@ -244,42 +357,3 @@ def power_trace_labudde(H, n):
             ssum -= char_pol[k] * pow_traces[-k - 1]
         pow_traces.append(ssum)
     return np.array(pow_traces, dtype=H.dtype)
-
-
-@jit(nopython=True, cache=True)
-def f_all_labudde(H, n):
-
-    pow_traces = power_trace_labudde(H, n // 2 + 1)
-    count = 0
-    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
-    comb[0, 0] = 1
-    for i in range(1, n // 2 + 1):
-        factor = pow_traces[i] / (2 * i)
-        powfactor = 1
-        count = 1 - count
-        comb[count, :] = comb[1 - count, :]
-        for j in range(1, n // (2 * i) + 1):
-            powfactor *= factor / j
-            for k in range(i * j + 1, n // 2 + 2):
-                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-
-    return comb[count, :]
-
-
-@jit(nopython=True, cache=True)
-def f_from_powtraces(pow_traces, n):
-
-    count = 0
-    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
-    comb[0, 0] = 1
-    for i in range(1, n // 2 + 1):
-        factor = pow_traces[i] / (2 * i)
-        powfactor = 1.0
-        count = 1 - count
-        comb[count, :] = comb[1 - count, :]
-        for j in range(1, n // (2 * i) + 1):
-            powfactor = powfactor * factor / j
-            for k in range(i * j + 1, n // 2 + 2):
-                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-
-    return comb[count, n // 2]
