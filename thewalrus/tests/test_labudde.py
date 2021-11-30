@@ -18,14 +18,26 @@ import thewalrus.labudde
 
 import pytest
 
-
-def test_labudde_2by2():
+@pytest.mark.parametrize("phi", [.1, .2, .3])
+def test_labudde_2by2(phi):
     """Test that the labudde algorithm produces the correct characteristic polynomial
-    from https://en.wikipedia.org/wiki/Characteristic_polynomial."""
-    phi = 0.1 * math.pi
+    from https://en.wikipedia.org/wiki/Characteristic_polynomial."""    
+    phi = .1*math.pi
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
-    mat = np.array([[cosh_phi, sinh_phi], [sinh_phi, cosh_phi]])
+    mat = np.array([[cosh_phi, sinh_phi],[sinh_phi,cosh_phi]])
     charpoly = thewalrus.labudde.charpoly_from_labudde(mat)
-    assert np.allclose(charpoly[0], -2 * cosh_phi)
-    assert np.allclose(charpoly[1], 1)
+    assert np.allclose(charpoly[0],-2*cosh_phi)
+    assert np.allclose(charpoly[1],1)
+
+
+@pytest.mark.parametrize("n", [1, 2, 3])
+def test_powtrace_consistency(n):
+    """Consistency test between power_trace_eigen and power_trace_labudde"""
+    phi = .1*math.pi
+    sinh_phi = math.sinh(phi)
+    cosh_phi = math.cosh(phi)
+    mat = np.array([[cosh_phi, sinh_phi],[sinh_phi,cosh_phi]])
+    pow_trace_lab = power_trace_labudde(mat,n)
+    pow_trace_eig = power_trace_eigen(mat,n)
+    assert np.allclose(pow_trace_lab,pow_trace_eig)

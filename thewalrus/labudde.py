@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-This module implements the labudde algorithm to calculate the 
+This module implements the labudde algorithm to calculate the
 characteristic polynomials of matrices.
 """
 import numpy as np
@@ -289,36 +289,12 @@ def charpoly_from_labudde(H, method="ravel"):
 
 
 @jit(nopython=True)
-def power_trace_eigen_h(H, n):
-    """
-    Calculates the powertraces of the matrix H up to power n-1.
-    Args:
-        H (array): square matrix
-        n (int): required order
-        is_hermitian (boolean): whether the input matrix is hermitian
-    Returns
-        (array): list of power traces from 0 to n-1
-    """
-    pow_traces = np.zeros(n, dtype=np.float64)
-    vals = np.linalg.eigvalsh(H)
-    pow_traces[0] = H.shape[0]
-    pow_traces[1] = vals.sum()
-    pow_vals = vals
-    for i in range(2, n):
-        pow_vals = pow_vals * vals
-        pow_traces[i] = np.sum(pow_vals)
-    return pow_traces
-
-
-@jit(nopython=True)
 def power_trace_eigen(H, n):
     """
     Calculates the powertraces of the matrix H up to power n-1.
     Args:
         H (array): square matrix
         n (int): required order
-        is_hermitian (boolean): whether the input matrix is hermitian
-    Returns
         (array): list of power traces from 0 to n-1
     """
     pow_traces = np.zeros(n, dtype=np.complex128)
@@ -346,13 +322,13 @@ def power_trace_labudde(H, n):
     min_val = min(n, m)
     pow_traces = [m, np.trace(H)]
     A = H
-    for i in range(min_val - 2):
+    for _ in range(min_val - 2):
         A = A @ H
         pow_traces.append(np.trace(A))
     if n <= m:
         return np.array(pow_traces, dtype=H.dtype)
     char_pol = charpoly_from_labudde(H)
-    for i in range(min_val, n):
+    for _ in range(min_val, n):
         ssum = 0
         for k in range(m):
             ssum -= char_pol[k] * pow_traces[-k - 1]
