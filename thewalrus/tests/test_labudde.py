@@ -22,7 +22,6 @@ import pytest
 def test_labudde_2by2(phi):
     """Test that the labudde algorithm produces the correct characteristic polynomial
     from https://en.wikipedia.org/wiki/Characteristic_polynomial."""    
-    phi = .1*math.pi
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
     mat = np.array([[cosh_phi, sinh_phi],[sinh_phi,cosh_phi]])
