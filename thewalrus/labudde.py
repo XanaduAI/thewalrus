@@ -1,7 +1,7 @@
 import numpy as np
 from numba import jit
 
-@jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True) #allo
 def get_reflection_vector(matrix, size, k):
     sizeH = size - k
     reflect_vector = np.zeros(sizeH, dtype=matrix.dtype)
