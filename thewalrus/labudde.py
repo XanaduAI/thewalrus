@@ -15,6 +15,7 @@
 This module implements the labudde algorithm to calculate the
 characteristic polynomials of matrices.
 """
+# pylint: disable=too-many-branches
 import numpy as np
 from numba import jit
 
