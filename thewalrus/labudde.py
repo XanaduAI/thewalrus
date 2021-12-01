@@ -288,26 +288,6 @@ def charpoly_from_labudde(H, method="ravel"):
     return coeff
 
 
-@jit(nopython=True)
-def power_trace_eigen(H, n):
-    """
-    Calculates the powertraces of the matrix H up to power n-1.
-    Args:
-        H (array): square matrix
-        n (int): required order
-        (array): list of power traces from 0 to n-1
-    """
-    pow_traces = np.zeros(n, dtype=np.complex128)
-    vals = np.linalg.eigvals(H)
-    pow_traces[0] = H.shape[0]
-    pow_traces[1] = vals.sum()
-    pow_vals = vals
-    for i in range(2, n):
-        pow_vals = pow_vals * vals
-        pow_traces[i] = np.sum(pow_vals)
-    return pow_traces
-
-
 @jit(nopython=True, cache=True)
 def power_trace_labudde(H, n):
     """

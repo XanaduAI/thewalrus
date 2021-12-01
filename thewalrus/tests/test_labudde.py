@@ -18,25 +18,36 @@ import thewalrus.labudde
 
 import pytest
 
-@pytest.mark.parametrize("phi", [.1, .2, .3])
+
+@pytest.mark.parametrize("phi", [0.1, 0.2, 0.3])
 def test_labudde_2by2(phi):
     """Test that the labudde algorithm produces the correct characteristic polynomial
-    from https://en.wikipedia.org/wiki/Characteristic_polynomial."""    
+    from https://en.wikipedia.org/wiki/Characteristic_polynomial."""
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
-    mat = np.array([[cosh_phi, sinh_phi],[sinh_phi,cosh_phi]])
+    mat = np.array([[cosh_phi, sinh_phi], [sinh_phi, cosh_phi]])
     charpoly = thewalrus.labudde.charpoly_from_labudde(mat)
-    assert np.allclose(charpoly[0],-2*cosh_phi)
-    assert np.allclose(charpoly[1],1)
+    assert np.allclose(charpoly[0], -2 * cosh_phi)
+    assert np.allclose(charpoly[1], 1)
 
 
 @pytest.mark.parametrize("n", [1, 2, 3])
-def test_powtrace_consistency(n):
+def test_powtrace_2by2(n):
     """Consistency test between power_trace_eigen and power_trace_labudde"""
-    phi = .1*math.pi
+    phi = 0.1 * math.pi
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
-    mat = np.array([[cosh_phi, sinh_phi],[sinh_phi,cosh_phi]])
-    pow_trace_lab = power_trace_labudde(mat,n)
-    pow_trace_eig = power_trace_eigen(mat,n)
-    assert np.allclose(pow_trace_lab,pow_trace_eig)
+    mat = np.array([[cosh_phi, sinh_phi], [sinh_phi, cosh_phi]])
+    pow_trace_lab = thewalrus.labudde.power_trace_labudde(mat, n + 1)
+
+    # Use wolfram alpha to verify with:
+    # Trace[[[1.04975523, 0.31935254], [0.31935254, 1.04975523]]^1]
+    # Trace[[[1.04975523, 0.31935254], [0.31935254, 1.04975523]]^2]
+    # Trace[[[1.04975523, 0.31935254], [0.31935254, 1.04975523]]^3]
+
+    if n == 1:
+        assert np.allclose(pow_trace_lab[-1], 2.09951)
+    if n == 2:
+        assert np.allclose(pow_trace_lab[-1], 2.40794)
+    if n == 3:
+        assert np.allclose(pow_trace_lab[-1], 2.95599)
