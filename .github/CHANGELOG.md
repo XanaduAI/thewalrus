@@ -4,6 +4,9 @@
 
 ### Improvements
 
+* Permanent algorithms are implemented in numba, hence reducing the C++ dependencies of The Walrus. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
+
+
 ### Bug fixes
 
 ### Breaking changes
@@ -11,6 +14,8 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
