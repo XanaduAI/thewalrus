@@ -19,15 +19,14 @@ import thewalrus.labudde
 import pytest
 
 
-@pytest.mark.parametrize("method", ["ravel", "flatten", "reshape"])
 @pytest.mark.parametrize("phi", [0.1, 0.2, 0.3])
-def test_labudde_2by2(phi, method):
+def test_labudde_2by2(phi):
     """Test that the La Budde algorithm produces the correct characteristic polynomial
     from https://en.wikipedia.org/wiki/Characteristic_polynomial."""
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
     mat = np.array([[cosh_phi, sinh_phi], [sinh_phi, cosh_phi]])
-    charpoly = thewalrus.labudde.charpoly_from_labudde(mat, method)
+    charpoly = thewalrus.labudde.charpoly_from_labudde(mat)
     assert np.allclose(charpoly[0], -2 * cosh_phi)
     assert np.allclose(charpoly[1], 1)
 
