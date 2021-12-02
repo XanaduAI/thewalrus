@@ -40,7 +40,7 @@ def get_reflection_vector(matrix, k):  # pragma: no cover
 
     matrix_column = np.zeros(sizeH, dtype=matrix.dtype)
     for i in range(0, sizeH):
-        matrix_column[i] = matrix[k+i,offset]
+        matrix_column[i] = matrix[k + i, offset]
 
     sigma = np.linalg.norm(matrix_column)
     if matrix_column[0] != 0:
@@ -51,6 +51,7 @@ def get_reflection_vector(matrix, k):  # pragma: no cover
 
     reflect_vector[0] += sigma
     return reflect_vector
+
 
 @jit(nopython=True, cache=True)
 def apply_householder(A, v, k):
@@ -89,6 +90,7 @@ def apply_householder(A, v, k):
         for j in range(0, sizeH):
             A[i, k + j] -= 2 * Av[i] * np.conj(v[j]) / norm_v_sqr
 
+
 @jit(nopython=True, cache=True)
 def reduce_matrix_to_hessenberg(matrix):
     r"""Reduce the matrix to upper hessenberg form
@@ -105,9 +107,10 @@ def reduce_matrix_to_hessenberg(matrix):
         reflect_vector = get_reflection_vector(matrix, i)
         apply_householder(matrix, reflect_vector, i)
 
+
 @jit(nopython=True, cache=True)
 def beta(H, i):
-r"""Auxiliary function for Labudde algorithm.
+    r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of beta
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
@@ -120,9 +123,10 @@ r"""Auxiliary function for Labudde algorithm.
     """
     return H[i - 1, i - 2]
 
+
 @jit(nopython=True, cache=True)
 def alpha(H, i):
-  r"""Auxiliary function for Labudde algorithm.
+    r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of alpha
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
@@ -152,6 +156,7 @@ def hij(H, i, j):
     """
     return H[i - 1, j - 1]
 
+
 @jit(nopython=True, cache=True)
 def mlo(i, j):  # pragma: no cover
     r"""Auxiliary function for Labudde algorithm.
@@ -162,17 +167,18 @@ def mlo(i, j):  # pragma: no cover
         matrix (array): upper-Hessenberg matrix
         i (int): row
         j (int): column
-  
+
     Returns:
         int: linear matrix index lowered by 1
     """
     return tuple((i - 1, j - 1))
 
+
 @jit(nopython=True, cache=True)
 def _charpoly_from_labudde(H, k):  # pragma: no cover
-      r"""Compute characteristic polynomial using La Budde's algorithm. 
+    r"""Compute characteristic polynomial using La Budde's algorithm.
     See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
-         
+
     .. note::
         If the matrix is n by n but you only want coefficients ``k < n`` set
         ``k`` below ``n``. If you want all coefficients, set ``k = n``.
@@ -183,8 +189,8 @@ def _charpoly_from_labudde(H, k):  # pragma: no cover
     Returns:
         array: char-poly coeffs + auxiliary data (see comment in function)
     """
-n=len(H)
-    c = np.zeros((n , n), dtype=H.dtype) # make sure what is means
+    n = len(H)
+    c = np.zeros_like(H)
     c[mlo(1, 1)] = -alpha(H, 1)
     c[mlo(2, 1)] = c[mlo(1, 1)] - alpha(H, 2)
     c[mlo(2, 2)] = alpha(H, 1) * alpha(H, 2) - hij(H, 1, 2) * beta(H, 2)
@@ -224,9 +230,7 @@ n=len(H)
         for bm in range(i, 1, -1):
             beta_prod *= beta(H, bm)
 
-        c[mlo(i, i)] = (
-            -alpha(H, i) * c[mlo(i - 1, i - 1)] - suma - hij(H, 1, i) * beta_prod
-        )
+        c[mlo(i, i)] = -alpha(H, i) * c[mlo(i - 1, i - 1)] - suma - hij(H, 1, i) * beta_prod
 
     for i in range(k + 1, n + 1):
         c[mlo(i, 1)] = c[mlo(i - 1, 1)] - alpha(H, i)
@@ -255,6 +259,7 @@ n=len(H)
     poly_list = [c[n - 1, i - 1] for i in range(1, n + 1)]
 
     return poly_list
+
 
 @jit(nopython=True, cache=True)
 def charpoly_from_labudde(H):
@@ -292,8 +297,9 @@ def power_trace_eigen_h(H, n):
         pow_traces[i] = np.sum(pow_vals)
     return pow_traces
 
+
 @jit(nopython=True)
-def power_trace_eigen(H, n): # pragma: no cover
+def power_trace_eigen(H, n):  # pragma: no cover
     """
     Calculates the powertraces of the matrix H up to power n-1.
     Args:
@@ -312,6 +318,7 @@ def power_trace_eigen(H, n): # pragma: no cover
         pow_vals = pow_vals * vals
         pow_traces[i] = np.sum(pow_vals)
     return pow_traces
+
 
 @jit(nopython=True, cache=True)
 def power_trace_labudde(H, n):  # pragma: no cover
@@ -339,4 +346,3 @@ def power_trace_labudde(H, n):  # pragma: no cover
             ssum -= char_pol[k] * pow_traces[-k - 1]
         pow_traces.append(ssum)
     return np.array(pow_traces, dtype=H.dtype)
-
