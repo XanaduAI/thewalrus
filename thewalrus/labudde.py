@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2021 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-This module implements the labudde algorithm to calculate the
+This module implements La Budde's algorithm to calculate the
 characteristic polynomials of matrices.
 """
 # pylint: disable=too-many-branches
@@ -56,9 +56,8 @@ def get_reflection_vector(matrix, size, k):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def apply_householder(A, v, size_A, k):  # pragma: no cover
-    r"""Apply householder transformation on a matrix A
-    See  Matrix Computations by Golub and Van Loan
-    (4th Edition) Sections 5.1.4 and 7.4.2
+    """Apply householder transformation on a matrix A. See  Matrix Computations 
+    by Golub and Van Loan (4th Edition) Sections 5.1.4 and 7.4.2
 
     Args:
         A (array): A matrix to apply householder on
@@ -93,9 +92,8 @@ def apply_householder(A, v, size_A, k):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def reduce_matrix_to_hessenberg(matrix, size):  # pragma: no cover
-    r"""Reduce the matrix to upper hessenberg form
-         without Lapack. This function only accepts Row-Order
-         matrices.
+    """Reduce the matrix to upper hessenberg form without Lapack. This function 
+    only accepts Row-Order matrices.
 
     Args:
         matrix (array): the matrix to be reduced
@@ -111,9 +109,8 @@ def reduce_matrix_to_hessenberg(matrix, size):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def beta(H, i, size):  # pragma: no cover
-    r"""Auxiliary function for Labudde algorithm.
-         See pg 10 of for definition of beta
-         [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    """Auxiliary function for La Budde's algorithm. See pg 10 of for definition of 
+    beta [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
     Args:
         matrix (array): upper-Hessenberg matrix
@@ -128,9 +125,8 @@ def beta(H, i, size):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def alpha(H, i, size):  # pragma: no cover
-    r"""Auxiliary function for Labudde algorithm.
-         See pg 10 of for definition of alpha
-         [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    """Auxiliary function for La Budde's algorithm. See pg 10 of for definition of 
+    alpha [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
     Args:
         matrix (array): upper-Hessenberg matrix
@@ -145,9 +141,8 @@ def alpha(H, i, size):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def hij(H, i, j, size):  # pragma: no cover
-    r"""Auxiliary function for Labudde algorithm.
-         See pg 10 of for definition of hij
-         [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    """Auxiliary function for La Budde's algorithm. See pg 10 of for definition of 
+    hij [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
     Args:
         matrix (array): upper-Hessenberg matrix
@@ -163,10 +158,13 @@ def hij(H, i, j, size):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def mlo(i, j, size):  # pragma: no cover
-    r"""Auxiliary function for Labudde algorithm.
-         The labudde paper uses indices that start counting at 1
-         so this function lowers them to start counting at 0.
-         See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    """Auxiliary function for La Budde's algorithm. 
+    See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    
+    .. note::
+    
+        The La Budde paper uses indices that start counting at 1 so this function 
+        lowers them to start counting at 0. 
     Args:
         matrix (array): upper-Hessenberg matrix
         i (int): row
@@ -181,10 +179,13 @@ def mlo(i, j, size):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def _charpoly_from_labudde(H, n, k):  # pragma: no cover
-    r"""Compute characteristic polynomial using the LaBudde algorithm.
-         See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
-         If the matrix is n by n but you only want coefficients k < n
-         set k below n. If you want all coefficients, set k = n.
+    """Compute characteristic polynomial using La Budde's algorithm. 
+    See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+         
+    .. note::
+
+        If the matrix is n by n but you only want coefficients ``k < n`` set
+        ``k`` below ``n``. If you want all coefficients, set ``k = n``.
     Args:
         H (array): matrix in Hessenberg form (RowMajor)
         n (int): size of matrix
@@ -269,8 +270,8 @@ def _charpoly_from_labudde(H, n, k):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def charpoly_from_labudde(H, method="ravel"):  # pragma: no cover
-    """
-    Calculates the characteristic polynomial of the matrix H
+    """Calculates the characteristic polynomial of the matrix ``H``.
+    
     Args:
         H (array): square matrix
         method (string): pre-processing operation on H
@@ -291,8 +292,8 @@ def charpoly_from_labudde(H, method="ravel"):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def power_trace_labudde(H, n):  # pragma: no cover
-    """
-    Calculates the powertraces of the matrix H up to power n-1.
+    """Calculates the powertraces of the matrix H up to power ``n-1``.
+
     Args:
         H (array): square matrix
         n (int): required order

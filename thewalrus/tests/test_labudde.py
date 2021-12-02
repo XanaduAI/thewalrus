@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2021 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import pytest
 @pytest.mark.parametrize("method", ["ravel", "flatten", "reshape"])
 @pytest.mark.parametrize("phi", [0.1, 0.2, 0.3])
 def test_labudde_2by2(phi, method):
-    """Test that the labudde algorithm produces the correct characteristic polynomial
+    """Test that the La Budde algorithm produces the correct characteristic polynomial
     from https://en.wikipedia.org/wiki/Characteristic_polynomial."""
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
