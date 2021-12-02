@@ -15,17 +15,21 @@
 This module implements the labudde algorithm to calculate the 
 characteristic polynomials of matrices.
 """
+# pylint: disable=too-many-branches
 import numpy as np
 from numba import jit
 
+
 @jit(nopython=True, cache=True)
-def get_reflection_vector(matrix, k):
+def get_reflection_vector(matrix, k):  # pragma: no cover
     r"""Compute reflection vector for householder transformation on
     general complex matrices. See Introduction to Numerical Analysis-Springer New York (2002)
     (3rd Edition) by J. Stoer and R. Bulirsch Section 6.5.1.
+
     Args:
         matrix (array): the matrix in the householder transformation
         k (int): offset for submatrix
+
     Returns:
         array: reflection vector
     """
@@ -53,6 +57,7 @@ def apply_householder(A, v, k):
     r"""Apply householder transformation on a matrix A
     See  Matrix Computations by Golub and Van Loan
     (4th Edition) Sections 5.1.4 and 7.4.2
+
     Args:
         A (array): A matrix to apply householder on
         v (array): reflection vector
@@ -89,8 +94,10 @@ def reduce_matrix_to_hessenberg(matrix):
     r"""Reduce the matrix to upper hessenberg form
          without Lapack. This function only accepts Row-Order
          matrices.
+
     Args:
         matrix (array): the matrix to be reduced
+
     Returns:
         array: matrix in hessenberg form
     """
@@ -100,12 +107,14 @@ def reduce_matrix_to_hessenberg(matrix):
 
 @jit(nopython=True, cache=True)
 def beta(H, i):
-    r"""Auxiliary function for Labudde algorithm.
+r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of beta
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
     Args:
-        H (array): upper-Hessenberg matrix
+        matrix (array): upper-Hessenberg matrix
         i (int): row
+
     Returns:
         float: element of the lower-diagonal of matrix H
     """
@@ -113,13 +122,14 @@ def beta(H, i):
 
 @jit(nopython=True, cache=True)
 def alpha(H, i):
-    r"""Auxiliary function for Labudde algorithm.
+  r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of alpha
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
     Args:
-        H (array): upper-Hessenberg matrix
+        matrix (array): upper-Hessenberg matrix
         i (int): row
-        
+
     Returns:
         float: element of the central-diagonal of matrix H
     """
@@ -131,17 +141,19 @@ def hij(H, i, j):
     r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of hij
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
     Args:
-        H (array): upper-Hessenberg matrix
+        matrix (array): upper-Hessenberg matrix
         i (int): row
         j (int): column
+
     Returns:
         float: element of the lower-diagonal of matrix H
     """
     return H[i - 1, j - 1]
 
 @jit(nopython=True, cache=True)
-def mlo(i, j):
+def mlo(i, j):  # pragma: no cover
     r"""Auxiliary function for Labudde algorithm.
          The labudde paper uses indices that start counting at 1
          so this function lowers them to start counting at 0.
@@ -150,24 +162,28 @@ def mlo(i, j):
         matrix (array): upper-Hessenberg matrix
         i (int): row
         j (int): column
+  
     Returns:
         int: linear matrix index lowered by 1
     """
     return tuple((i - 1, j - 1))
 
 @jit(nopython=True, cache=True)
-def _charpoly_from_labudde(H, k):
-    r"""Compute characteristic polynomial using the LaBudde algorithm.
-         See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
-         If the matrix is n by n but you only want coefficients k < n
-         set k below n. If you want all coefficients, set k = n.
+def _charpoly_from_labudde(H, k):  # pragma: no cover
+      r"""Compute characteristic polynomial using La Budde's algorithm. 
+    See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+         
+    .. note::
+        If the matrix is n by n but you only want coefficients ``k < n`` set
+        ``k`` below ``n``. If you want all coefficients, set ``k = n``.
     Args:
         H (array): matrix in Hessenberg form (RowMajor)
+        n (int): size of matrix
         k (int): compute coefficients up to k (k must be <= n)
     Returns:
         array: char-poly coeffs + auxiliary data (see comment in function)
     """
-    n=len(H)
+n=len(H)
     c = np.zeros((n , n), dtype=H.dtype) # make sure what is means
     c[mlo(1, 1)] = -alpha(H, 1)
     c[mlo(2, 1)] = c[mlo(1, 1)] - alpha(H, 2)
@@ -254,6 +270,7 @@ def charpoly_from_labudde(H):
     coeff = _charpoly_from_labudde(H, n)
     return coeff
 
+
 @jit(nopython=True)
 def power_trace_eigen_h(H, n):
     """
@@ -276,7 +293,7 @@ def power_trace_eigen_h(H, n):
     return pow_traces
 
 @jit(nopython=True)
-def power_trace_eigen(H, n):
+def power_trace_eigen(H, n): # pragma: no cover
     """
     Calculates the powertraces of the matrix H up to power n-1.
     Args:
@@ -295,7 +312,6 @@ def power_trace_eigen(H, n):
         pow_vals = pow_vals * vals
         pow_traces[i] = np.sum(pow_vals)
     return pow_traces
-
 
 @jit(nopython=True, cache=True)
 def power_trace_labudde(H, n):  # pragma: no cover
@@ -323,3 +339,4 @@ def power_trace_labudde(H, n):  # pragma: no cover
             ssum -= char_pol[k] * pow_traces[-k - 1]
         pow_traces.append(ssum)
     return np.array(pow_traces, dtype=H.dtype)
+
