@@ -251,7 +251,7 @@ def charpoly_from_labudde(H):
     """
     n = len(H)
     reduce_matrix_to_hessenberg(H)
-    coeff = _charpoly_from_labudde(H, n, n)
+    coeff = _charpoly_from_labudde(H, n)
     return coeff
 
 @jit(nopython=True)
@@ -295,3 +295,31 @@ def power_trace_eigen(H, n):
         pow_vals = pow_vals * vals
         pow_traces[i] = np.sum(pow_vals)
     return pow_traces
+
+
+@jit(nopython=True, cache=True)
+def power_trace_labudde(H, n):  # pragma: no cover
+    """
+    Calculates the powertraces of the matrix H up to power n-1.
+    Args:
+        H (array): square matrix
+        n (int): required order
+    Returns
+        (array): list of power traces from 0 to n-1
+    """
+    m = len(H)
+    min_val = min(n, m)
+    pow_traces = [m, np.trace(H)]
+    A = H
+    for _ in range(min_val - 2):
+        A = A @ H
+        pow_traces.append(np.trace(A))
+    if n <= m:
+        return np.array(pow_traces, dtype=H.dtype)
+    char_pol = charpoly_from_labudde(H)
+    for _ in range(min_val, n):
+        ssum = 0
+        for k in range(m):
+            ssum -= char_pol[k] * pow_traces[-k - 1]
+        pow_traces.append(ssum)
+    return np.array(pow_traces, dtype=H.dtype)
