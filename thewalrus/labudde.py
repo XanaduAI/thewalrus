@@ -54,7 +54,7 @@ def get_reflection_vector(matrix, k):  # pragma: no cover
 
 
 @jit(nopython=True, cache=True)
-def apply_householder(A, v, k):
+def apply_householder(A, v, k):  # pragma: no cover
     r"""Apply householder transformation on a matrix A. See  Matrix Computations
     by Golub and Van Loan (4th Edition) Sections 5.1.4 and 7.4.2
 
@@ -91,7 +91,7 @@ def apply_householder(A, v, k):
 
 
 @jit(nopython=True, cache=True)
-def reduce_matrix_to_hessenberg(matrix):
+def reduce_matrix_to_hessenberg(matrix):  # pragma: no cover
     r"""Reduce the matrix to upper hessenberg form without Lapack. This function
     only accepts Row-Order matrices.
 
@@ -107,7 +107,7 @@ def reduce_matrix_to_hessenberg(matrix):
 
 
 @jit(nopython=True, cache=True)
-def beta(H, i):
+def beta(H, i):  # pragma: no cover
     r"""Auxiliary function for Labudde algorithm. See pg 10 of
     [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of beta.
 
@@ -122,7 +122,7 @@ def beta(H, i):
 
 
 @jit(nopython=True, cache=True)
-def alpha(H, i):
+def alpha(H, i):  # pragma: no cover
     r"""Auxiliary function for La Budde's algorithm. See pg 10 of
     [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of alpha.
 
@@ -137,7 +137,7 @@ def alpha(H, i):
 
 
 @jit(nopython=True, cache=True)
-def hij(H, i, j):
+def hij(H, i, j):  # pragma: no cover
     r"""Auxiliary function for La Budde's algorithm. See pg 10 of
     [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of hij.
 
