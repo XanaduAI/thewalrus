@@ -154,7 +154,7 @@ def hij(H, i, j):
 
 @jit(nopython=True, cache=True)
 def mlo(i, j):  # pragma: no cover
-"""Auxiliary function for La Budde's algorithm.
+    """Auxiliary function for La Budde's algorithm.
     See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
     .. note::
