@@ -22,7 +22,7 @@ from numba import jit
 
 @jit(nopython=True, cache=True)
 def get_reflection_vector(matrix, k):  # pragma: no cover
-    r"""Compute reflection vector for householder transformation on 
+    r"""Compute reflection vector for householder transformation on
     general complex matrices. See Introduction to Numerical Analysis-Springer New York (2002)
     (3rd Edition) by J. Stoer and R. Bulirsch Section 6.5.1.
 
@@ -123,7 +123,7 @@ def beta(H, i):
 
 @jit(nopython=True, cache=True)
 def alpha(H, i):
-    r"""Auxiliary function for Labudde algorithm. See pg 10 of
+    r"""Auxiliary function for La Budde's algorithm. See pg 10 of
     [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of alpha.
 
     Args:
@@ -138,7 +138,7 @@ def alpha(H, i):
 
 @jit(nopython=True, cache=True)
 def hij(H, i, j):
-    r"""Auxiliary function for Labudde algorithm. See pg 10 of
+    r"""Auxiliary function for La Budde's algorithm. See pg 10 of
     [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of hij.
 
     Args:
