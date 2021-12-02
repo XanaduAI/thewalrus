@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-This module implements the labudde algorithm to calculate the
+This module implements the labudde algorithm to calculate the 
 characteristic polynomials of matrices.
 """
 # pylint: disable=too-many-branches
@@ -21,27 +21,26 @@ from numba import jit
 
 
 @jit(nopython=True, cache=True)
-def get_reflection_vector(matrix, size, k):  # pragma: no cover
+def get_reflection_vector(matrix, k):  # pragma: no cover
     r"""Compute reflection vector for householder transformation on
     general complex matrices. See Introduction to Numerical Analysis-Springer New York (2002)
     (3rd Edition) by J. Stoer and R. Bulirsch Section 6.5.1.
 
     Args:
         matrix (array): the matrix in the householder transformation
-        size (int): size of matrix
         k (int): offset for submatrix
 
     Returns:
         array: reflection vector
     """
+    size = len(matrix)
     sizeH = size - k
     reflect_vector = np.zeros(sizeH, dtype=matrix.dtype)
-    order = size - sizeH
-    offset = order - 1
+    offset = k - 1
 
     matrix_column = np.zeros(sizeH, dtype=matrix.dtype)
     for i in range(0, sizeH):
-        matrix_column[i] = matrix[(i + order) * size + offset]
+        matrix_column[i] = matrix[k + i, offset]
 
     sigma = np.linalg.norm(matrix_column)
     if matrix_column[0] != 0:
@@ -55,7 +54,7 @@ def get_reflection_vector(matrix, size, k):  # pragma: no cover
 
 
 @jit(nopython=True, cache=True)
-def apply_householder(A, v, size_A, k):  # pragma: no cover
+def apply_householder(A, v, k):
     r"""Apply householder transformation on a matrix A
     See  Matrix Computations by Golub and Van Loan
     (4th Edition) Sections 5.1.4 and 7.4.2
@@ -66,6 +65,7 @@ def apply_householder(A, v, size_A, k):  # pragma: no cover
         size_A (int): size of matrix A
         k (int): offset for submatrix
     """
+    size_A = len(A)
     sizeH = len(v)
     norm_v_sqr = np.linalg.norm(v) ** 2
     if norm_v_sqr == 0:
@@ -76,41 +76,40 @@ def apply_householder(A, v, size_A, k):  # pragma: no cover
 
     for j in range(0, size_A - k + 1):
         for l in range(0, sizeH):
-            vHA[j] += np.conj(v[l]) * A[(k + l) * size_A + k - 1 + j]
+            vHA[j] += np.conj(v[l]) * A[k + l, k - 1 + j]
 
     for i in range(0, sizeH):
         for j in range(0, size_A - k + 1):
-            A[(k + i) * size_A + k - 1 + j] -= 2 * v[i] * vHA[j] / norm_v_sqr
+            A[k + i, k - 1 + j] -= 2 * v[i] * vHA[j] / norm_v_sqr
 
     for i in range(0, size_A):
         for l in range(0, sizeH):
-            Av[i] += A[(i) * size_A + k + l] * v[l]
+            Av[i] += A[i, k + l] * v[l]
 
     for i in range(0, size_A):
         for j in range(0, sizeH):
-            A[(i) * size_A + k + j] -= 2 * Av[i] * np.conj(v[j]) / norm_v_sqr
+            A[i, k + j] -= 2 * Av[i] * np.conj(v[j]) / norm_v_sqr
 
 
 @jit(nopython=True, cache=True)
-def reduce_matrix_to_hessenberg(matrix, size):  # pragma: no cover
+def reduce_matrix_to_hessenberg(matrix):
     r"""Reduce the matrix to upper hessenberg form
          without Lapack. This function only accepts Row-Order
          matrices.
 
     Args:
         matrix (array): the matrix to be reduced
-        size (int): size of matrix
 
     Returns:
         array: matrix in hessenberg form
     """
-    for i in range(1, size - 1):
-        reflect_vector = get_reflection_vector(matrix, size, i)
-        apply_householder(matrix, reflect_vector, size, i)
+    for i in range(1, len(matrix) - 1):
+        reflect_vector = get_reflection_vector(matrix, i)
+        apply_householder(matrix, reflect_vector, i)
 
 
 @jit(nopython=True, cache=True)
-def beta(H, i, size):  # pragma: no cover
+def beta(H, i):
     r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of beta
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
@@ -118,16 +117,15 @@ def beta(H, i, size):  # pragma: no cover
     Args:
         matrix (array): upper-Hessenberg matrix
         i (int): row
-        size (int): size of the matrix
 
     Returns:
         float: element of the lower-diagonal of matrix H
     """
-    return H[(i - 1) * size + i - 2]
+    return H[i - 1, i - 2]
 
 
 @jit(nopython=True, cache=True)
-def alpha(H, i, size):  # pragma: no cover
+def alpha(H, i):
     r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of alpha
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
@@ -135,16 +133,15 @@ def alpha(H, i, size):  # pragma: no cover
     Args:
         matrix (array): upper-Hessenberg matrix
         i (int): row
-        size (int): size of the matrix
 
     Returns:
         float: element of the central-diagonal of matrix H
     """
-    return H[(i - 1) * size + i - 1]
+    return H[i - 1, i - 1]
 
 
 @jit(nopython=True, cache=True)
-def hij(H, i, j, size):  # pragma: no cover
+def hij(H, i, j):
     r"""Auxiliary function for Labudde algorithm.
          See pg 10 of for definition of hij
          [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
@@ -153,16 +150,15 @@ def hij(H, i, j, size):  # pragma: no cover
         matrix (array): upper-Hessenberg matrix
         i (int): row
         j (int): column
-        size (int): size of the matrix
 
     Returns:
         float: element of the lower-diagonal of matrix H
     """
-    return H[(i - 1) * size + j - 1]
+    return H[i - 1, j - 1]
 
 
 @jit(nopython=True, cache=True)
-def mlo(i, j, size):  # pragma: no cover
+def mlo(i, j):  # pragma: no cover
     r"""Auxiliary function for Labudde algorithm.
          The labudde paper uses indices that start counting at 1
          so this function lowers them to start counting at 0.
@@ -171,54 +167,54 @@ def mlo(i, j, size):  # pragma: no cover
         matrix (array): upper-Hessenberg matrix
         i (int): row
         j (int): column
-        size (int): size of the matrix
 
     Returns:
         int: linear matrix index lowered by 1
     """
-    return (i - 1) * size + j - 1
+    return tuple((i - 1, j - 1))
 
 
 @jit(nopython=True, cache=True)
-def _charpoly_from_labudde(H, n, k):  # pragma: no cover
-    r"""Compute characteristic polynomial using the LaBudde algorithm.
-         See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
-         If the matrix is n by n but you only want coefficients k < n
-         set k below n. If you want all coefficients, set k = n.
+def _charpoly_from_labudde(H, k):  # pragma: no cover
+    r"""Compute characteristic polynomial using La Budde's algorithm.
+    See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+
+    .. note::
+        If the matrix is n by n but you only want coefficients ``k < n`` set
+        ``k`` below ``n``. If you want all coefficients, set ``k = n``.
     Args:
         H (array): matrix in Hessenberg form (RowMajor)
         n (int): size of matrix
         k (int): compute coefficients up to k (k must be <= n)
-
     Returns:
         array: char-poly coeffs + auxiliary data (see comment in function)
     """
-
-    c = np.zeros(n * n, dtype=H.dtype)
-    c[mlo(1, 1, n)] = -alpha(H, 1, n)
-    c[mlo(2, 1, n)] = c[mlo(1, 1, n)] - alpha(H, 2, n)
-    c[mlo(2, 2, n)] = alpha(H, 1, n) * alpha(H, 2, n) - hij(H, 1, 2, n) * beta(H, 2, n)
+    n = len(H)
+    c = np.zeros_like(H)
+    c[mlo(1, 1)] = -alpha(H, 1)
+    c[mlo(2, 1)] = c[mlo(1, 1)] - alpha(H, 2)
+    c[mlo(2, 2)] = alpha(H, 1) * alpha(H, 2) - hij(H, 1, 2) * beta(H, 2)
 
     for i in range(3, k + 1):
-        c[mlo(i, 1, n)] = c[mlo(i - 1, 1, n)] - alpha(H, i, n)
+        c[mlo(i, 1)] = c[mlo(i - 1, 1)] - alpha(H, i)
         for j in range(2, i):
             suma = 0
             beta_prod = 1
             for m in range(1, j - 1):
                 beta_prod = 1
                 for bm in range(i, i - m, -1):
-                    beta_prod *= beta(H, bm, n)
-                suma += hij(H, i - m, i, n) * beta_prod * c[mlo(i - m - 1, j - m - 1, n)]
+                    beta_prod *= beta(H, bm)
+                suma += hij(H, i - m, i) * beta_prod * c[mlo(i - m - 1, j - m - 1)]
 
             beta_prod = 1
             for bm in range(i, i - j + 1, -1):
-                beta_prod *= beta(H, bm, n)
+                beta_prod *= beta(H, bm)
 
-            c[mlo(i, j, n)] = (
-                c[mlo(i - 1, j, n)]
-                - alpha(H, i, n) * c[mlo(i - 1, j - 1, n)]
+            c[mlo(i, j)] = (
+                c[mlo(i - 1, j)]
+                - alpha(H, i) * c[mlo(i - 1, j - 1)]
                 - suma
-                - hij(H, i - j + 1, i, n) * beta_prod
+                - hij(H, i - j + 1, i) * beta_prod
             )
 
         suma = 0
@@ -227,19 +223,17 @@ def _charpoly_from_labudde(H, n, k):  # pragma: no cover
         for m in range(1, i - 1):
             beta_prod = 1
             for bm in range(i, i - m, -1):
-                beta_prod *= beta(H, bm, n)
-            suma += hij(H, i - m, i, n) * beta_prod * c[mlo(i - m - 1, i - m - 1, n)]
+                beta_prod *= beta(H, bm)
+            suma += hij(H, i - m, i) * beta_prod * c[mlo(i - m - 1, i - m - 1)]
 
         beta_prod = 1
         for bm in range(i, 1, -1):
-            beta_prod *= beta(H, bm, n)
+            beta_prod *= beta(H, bm)
 
-        c[mlo(i, i, n)] = (
-            -alpha(H, i, n) * c[mlo(i - 1, i - 1, n)] - suma - hij(H, 1, i, n) * beta_prod
-        )
+        c[mlo(i, i)] = -alpha(H, i) * c[mlo(i - 1, i - 1)] - suma - hij(H, 1, i) * beta_prod
 
     for i in range(k + 1, n + 1):
-        c[mlo(i, 1, n)] = c[mlo(i - 1, 1, n)] - alpha(H, i, n)
+        c[mlo(i, 1)] = c[mlo(i - 1, 1)] - alpha(H, i)
 
         if k >= 2:
             for j in range(2, k + 1):
@@ -248,45 +242,82 @@ def _charpoly_from_labudde(H, n, k):  # pragma: no cover
                 for m in range(1, j - 1):
                     beta_prod = 1
                     for bm in range(i, i - m, -1):
-                        beta_prod *= beta(H, bm, n)
+                        beta_prod *= beta(H, bm)
 
-                    suma += hij(H, i - m, i, n) * beta_prod * c[mlo(i - m - 1, j - m - 1, n)]
+                    suma += hij(H, i - m, i) * beta_prod * c[mlo(i - m - 1, j - m - 1)]
 
                 beta_prod = 1
                 for bm in range(i, i - j + 1, -1):
-                    beta_prod *= beta(H, bm, n)
+                    beta_prod *= beta(H, bm)
 
-                c[mlo(i, j, n)] = (
-                    c[mlo(i - 1, j, n)]
-                    - alpha(H, i, n) * c[mlo(i - 1, j - 1, n)]
+                c[mlo(i, j)] = (
+                    c[mlo(i - 1, j)]
+                    - alpha(H, i) * c[mlo(i - 1, j - 1)]
                     - suma
-                    - hij(H, i - j + 1, i, n) * beta_prod
+                    - hij(H, i - j + 1, i) * beta_prod
                 )
-    poly_list = [c[(n - 1) * n + i - 1] for i in range(1, n + 1)]
+    poly_list = [c[n - 1, i - 1] for i in range(1, n + 1)]
 
     return poly_list
 
 
 @jit(nopython=True, cache=True)
-def charpoly_from_labudde(H, method="ravel"):  # pragma: no cover
+def charpoly_from_labudde(H):
     """
     Calculates the characteristic polynomial of the matrix H
     Args:
         H (array): square matrix
-        method (string): pre-processing operation on H
     Returns
         (array): list of power traces from 0 to n-1
     """
-    if method == "ravel":
-        Hflat = H.ravel()
-    elif method == "flatten":
-        Hflat = H.flatten()
-    elif method == "reshape":
-        Hflat = H.reshape(-1)
     n = len(H)
-    reduce_matrix_to_hessenberg(Hflat, n)
-    coeff = _charpoly_from_labudde(Hflat, n, n)
+    reduce_matrix_to_hessenberg(H)
+    coeff = _charpoly_from_labudde(H, n)
     return coeff
+
+
+@jit(nopython=True)
+def power_trace_eigen_h(H, n):
+    """
+    Calculates the powertraces of the matrix H up to power n-1.
+    Args:
+        H (array): square matrix
+        n (int): required order
+        is_hermitian (boolean): whether the input matrix is hermitian
+    Returns
+        (array): list of power traces from 0 to n-1
+    """
+    pow_traces = np.zeros(n, dtype=np.float64)
+    vals = np.linalg.eigvalsh(H)
+    pow_traces[0] = H.shape[0]
+    pow_traces[1] = vals.sum()
+    pow_vals = vals
+    for i in range(2, n):
+        pow_vals = pow_vals * vals
+        pow_traces[i] = np.sum(pow_vals)
+    return pow_traces
+
+
+@jit(nopython=True)
+def power_trace_eigen(H, n):  # pragma: no cover
+    """
+    Calculates the powertraces of the matrix H up to power n-1.
+    Args:
+        H (array): square matrix
+        n (int): required order
+        is_hermitian (boolean): whether the input matrix is hermitian
+    Returns
+        (array): list of power traces from 0 to n-1
+    """
+    pow_traces = np.zeros(n, dtype=np.complex128)
+    vals = np.linalg.eigvals(H)
+    pow_traces[0] = H.shape[0]
+    pow_traces[1] = vals.sum()
+    pow_vals = vals
+    for i in range(2, n):
+        pow_vals = pow_vals * vals
+        pow_traces[i] = np.sum(pow_vals)
+    return pow_traces
 
 
 @jit(nopython=True, cache=True)
