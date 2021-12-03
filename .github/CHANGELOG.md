@@ -2,6 +2,8 @@
 
 ### New features
 
+* Python module for the Labudde method of computing characteristic polynomials. [#304](Add python code for the labudde algorithm)
+
 ### Improvements
 
 * Permanent algorithms are implemented in numba, hence reducing the C++ dependencies of The Walrus. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
