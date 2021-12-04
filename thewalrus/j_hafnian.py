@@ -11,17 +11,20 @@ from j_loop_hafnian_subroutines import (
     )
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_hafnian(A, edge_reps, glynn=True):
+def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
 
-    """
-    compute hafnian, using inputs as prepared by frontend hafnian function
-    compiled with Numba
+    r"""
+    Compute hafnian, using inputs as prepared by frontend hafnian function
+    compiled with Numba.
+
+
     Args:
-        A (array): matrix ordered according to the chosen perfect matching
-        edge_reps (array): how many times each edge in the perfect matching is repeated
-        glynn (bool): whether to use finite difference sieve
+        A (array): matrix ordered according to the chosen perfect matching.
+        edge_reps (array): how many times each edge in the perfect matching is repeated.
+        glynn (bool): whether to use finite difference sieve.
+
     Returns:
-        complex128: value of loop hafnian
+        complex128: value of loop hafnian.
     """
 
     n = A.shape[0]
@@ -68,15 +71,18 @@ def _calc_hafnian(A, edge_reps, glynn=True):
     return H
 
 def hafnian(A, reps=None, glynn=True):
-    """
-    calculate hafnian with (optional) repeated rows and columns
+    r"""
+    Calculate hafnian with (optional) repeated rows and columns.
+
+
     Args:
-        A (array): N x N matrix 
+        A (array): N x N matrix.
         reps (list): length-N list of repetitions of each row/col (optional), if not provided, each row/column
-                    assumed to be repeated once
+                    assumed to be repeated once.
         glynn (bool): If True, use Glynn-style finite difference sieve formula, if False, use Ryser style inclusion/exclusion principle.
+        
     Returns
-        np.complex128: result of loop hafnian calculation
+        np.complex128: result of loop hafnian calculation.
     """
 
     n = A.shape[0]
