@@ -22,11 +22,12 @@ from j_loop_hafnian_subroutines import (
     find_kept_edges,
     f,
     get_AX_S,
-    eigvals
-    )
-# pylint: disable=W0612
+    eigvals,
+)
+
+# pylint: disable=W0612, E1133
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
+def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
 
     r"""
     Compute hafnian, using inputs as prepared by frontend hafnian function
@@ -43,7 +44,7 @@ def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
     """
 
     n = A.shape[0]
-    N = 2 * edge_reps.sum() # number of photons
+    N = 2 * edge_reps.sum()  # number of photons
 
     if glynn:
         steps = ((edge_reps[0] + 2) // 2) * np.prod(edge_reps[1:] + 1)
@@ -54,15 +55,15 @@ def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
     max_binom = edge_reps.max() + 1
     binoms = precompute_binoms(max_binom)
 
-    H = np.complex128(0) #start running total for the hafnian
+    H = np.complex128(0)  # start running total for the hafnian
 
     for j in numba.prange(steps):
 
         kept_edges = find_kept_edges(j, edge_reps)
         edge_sum = kept_edges.sum()
 
-        binom_prod = 1.
-        for i in range(n//2):
+        binom_prod = 1.0
+        for i in range(n // 2):
             binom_prod *= binoms[edge_reps[i], kept_edges[i]]
 
         if glynn:
@@ -70,20 +71,21 @@ def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
 
         AX_S = get_AX_S(kept_edges, A)
 
-        E = eigvals(AX_S) # O(n^3) step
+        E = eigvals(AX_S)  # O(n^3) step
 
-        prefac = (-1.) ** (N//2 - edge_sum) * binom_prod
+        prefac = (-1.0) ** (N // 2 - edge_sum) * binom_prod
 
         if glynn and kept_edges[0] == 0:
             prefac *= 0.5
-        Hnew = prefac * f(E, N)[N//2]
+        Hnew = prefac * f(E, N)[N // 2]
 
         H += Hnew
 
     if glynn:
-        H = H * 0.5 ** (N//2 - 1)
+        H = H * 0.5 ** (N // 2 - 1)
 
     return H
+
 
 def hafnian(A, reps=None, glynn=True):
     r"""
@@ -108,10 +110,10 @@ def hafnian(A, reps=None, glynn=True):
     N = sum(reps)
 
     if N == 0:
-        return 1.
+        return 1.0
 
     if N % 2 == 1:
-        return 0.
+        return 0.0
 
     assert n == len(reps)
 
@@ -123,4 +125,3 @@ def hafnian(A, reps=None, glynn=True):
 
     H = _calc_hafnian(Ax, edge_reps, glynn)
     return H
-    
