@@ -19,7 +19,7 @@ import pytest
 
 import numpy as np
 from thewalrus import hafnian_repeated
-from thewalrus.libwalrus import haf_rpt_complex, haf_rpt_real
+from j_hafnian import haf as jhaf
 
 
 # the first 11 telephone numbers
@@ -98,13 +98,13 @@ class TestHafnianRepeatedWrapper:
         A = np.random.random([6, 6])
         A += A.T
         haf = hafnian_repeated(A, [1] * 6)
-        expected = haf_rpt_real(np.float64(A), np.ones([6], dtype=np.int32))
+        expected = jhaf(np.float64(A), np.ones([6], dtype=np.int32))
         assert np.allclose(haf, expected)
 
         A = np.random.random([6, 6])
         A += A.T
         haf = hafnian_repeated(np.complex128(A), [1] * 6)
-        expected = haf_rpt_real(np.float64(A), np.ones([6], dtype=np.int32))
+        expected = jhaf(np.float64(A), np.ones([6], dtype=np.int32))
         assert np.allclose(haf, expected)
 
     def test_complex(self):
@@ -115,7 +115,7 @@ class TestHafnianRepeatedWrapper:
         A += 1j * np.random.random([6, 6])
         A += A.T
         haf = hafnian_repeated(A, [1] * 6)
-        expected = haf_rpt_complex(np.complex128(A), np.ones([6], dtype=np.int32))
+        expected = jhaf(np.complex128(A), np.ones([6], dtype=np.int32))
         assert np.allclose(haf, expected)
 
 

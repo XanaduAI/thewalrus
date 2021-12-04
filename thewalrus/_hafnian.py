@@ -23,6 +23,7 @@ from numba import jit
 import numpy as np
 
 from j_hafnian import haf
+from j_loop_hafnian import loop_hafnian
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
@@ -111,7 +112,7 @@ def reduction(A, rpt):
 
 # pylint: disable=too-many-arguments
 def hafnian(
-    A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, approx=False, num_samples=1000
+    A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, approx=False, num_samples=1000, glynn=True
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
 
@@ -127,6 +128,7 @@ def hafnian(
             the approximation algorithm can only be applied to matrices ``A`` that only have non-negative entries.
         num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples`` iterations
             for estimation of the hafnian of the non-negative matrix ``A``.
+        glynn (bool): whether to use finite difference sieve.
 
     Returns:
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
@@ -185,9 +187,11 @@ def hafnian(
 
         return hafnian_approx(A, num_samples=num_samples)
 
+    if loop:
+        return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
     return haf(
-        A, reps=None, glynn=True
+        A, reps=None, glynn=glynn
     )
 
 
@@ -235,7 +239,7 @@ def hafnian_sparse(A, D=None, loop=False):
     return lhaf(D)
 
 
-def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
+def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=True):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 
     The :func:`reduction` function may be used to show the resulting matrix
@@ -267,6 +271,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         rtol (float): the relative tolerance parameter used in ``np.allclose``.
         atol (float): the absolute tolerance parameter used in ``np.allclose``.
+        glynn (bool): whether to use finite difference sieve.
 
     Returns:
         np.int64 or np.float64 or np.complex128: the hafnian of matrix A.
@@ -299,7 +304,10 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     if len(mu) != len(A):
         raise ValueError("Length of means vector must be the same length as the matrix A.")
 
-    return haf(A, reps=rpt, glynn=True)
+    if loop:
+        return loop_hafnian(A, D=mu, reps=rpt, glynn=glynn)
+
+    return haf(A, reps=rpt, glynn=glynn)
 
 
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):

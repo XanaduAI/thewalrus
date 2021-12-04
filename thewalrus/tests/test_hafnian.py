@@ -21,7 +21,8 @@ from scipy.special import factorial as fac
 import thewalrus as hf
 from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded
 
-from thewalrus.libwalrus import haf_complex, haf_real, haf_int
+from j_hafnian import haf as jhaf
+from j_loop_hafnian import loop_hafnian
 from thewalrus._hafnian import bandwidth
 
 
@@ -129,18 +130,18 @@ class TestHafnianWrapper:
         A = np.random.random([6, 6])
         A += A.T
         haf = hafnian(A)
-        expected = haf_real(A)
+        expected = jhaf(A)
         assert np.allclose(haf, expected)
 
         haf = hafnian(A, loop=True)
-        expected = haf_real(A, loop=True)
+        expected = loop_hafnian(A)
         assert np.allclose(haf, expected)
 
         A = np.random.random([6, 6])
         A += A.T
         A = np.array(A, dtype=np.complex128)
         haf = hafnian(A)
-        expected = haf_real(np.float64(A.real))
+        expected = jhaf(np.float64(A.real))
         assert np.allclose(haf, expected)
 
     def test_int_wrapper(self):
@@ -149,7 +150,7 @@ class TestHafnianWrapper:
         """
         A = np.int64(np.ones([6, 6]))
         haf = hafnian(A)
-        expected = haf_int(np.int64(A))
+        expected = jhaf(np.int64(A))
         assert np.allclose(haf, expected)
 
     def test_int_wrapper_loop(self):
@@ -158,7 +159,7 @@ class TestHafnianWrapper:
         """
         A = np.int64(np.ones([6, 6]))
         haf = hafnian(A, loop=True)
-        expected = haf_real(np.float64(A), loop=True)
+        expected = loop_hafnian(np.float64(A))
         assert np.allclose(haf, expected)
 
     def test_complex_wrapper(self):
@@ -169,11 +170,11 @@ class TestHafnianWrapper:
         A += 1j * np.random.random([6, 6])
         A += A.T
         haf = hafnian(A)
-        expected = haf_complex(A)
+        expected = jhaf(A)
         assert np.allclose(haf, expected)
 
         haf = hafnian(A, loop=True)
-        expected = haf_complex(A, loop=True)
+        expected = loop_hafnian(A)
         assert np.allclose(haf, expected)
 
 
