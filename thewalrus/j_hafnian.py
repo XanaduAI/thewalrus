@@ -1,15 +1,30 @@
-import numpy as np 
-import numba 
+# Copyright 2019 Xanadu Quantum Technologies Inc.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Computation of the hafnian.
+"""
+import numpy as np
+import numba
 from j_loop_hafnian_subroutines import (
     precompute_binoms,
-    nb_ix,
     matched_reps,
     find_kept_edges,
     f,
     get_AX_S,
     eigvals
     )
-
+# pylint: disable=W0612
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
 
@@ -35,7 +50,7 @@ def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
     else:
         steps = np.prod(edge_reps + 1)
 
-    # precompute binomial coefficients 
+    # precompute binomial coefficients
     max_binom = edge_reps.max() + 1
     binoms = precompute_binoms(max_binom)
 
@@ -49,7 +64,7 @@ def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
         binom_prod = 1.
         for i in range(n//2):
             binom_prod *= binoms[edge_reps[i], kept_edges[i]]
-        
+
         if glynn:
             kept_edges = 2 * kept_edges - edge_reps
 
@@ -59,7 +74,7 @@ def _calc_hafnian(A, edge_reps, glynn=True): # pragma: no cover
 
         prefac = (-1.) ** (N//2 - edge_sum) * binom_prod
 
-        if glynn and kept_edges[0]==0:
+        if glynn and kept_edges[0] == 0:
             prefac *= 0.5
         Hnew = prefac * f(E, N)[N//2]
 
@@ -80,7 +95,7 @@ def hafnian(A, reps=None, glynn=True):
         reps (list): length-N list of repetitions of each row/col (optional), if not provided, each row/column
                     assumed to be repeated once.
         glynn (bool): If True, use Glynn-style finite difference sieve formula, if False, use Ryser style inclusion/exclusion principle.
-        
+
     Returns
         np.complex128: result of loop hafnian calculation.
     """
@@ -108,10 +123,4 @@ def hafnian(A, reps=None, glynn=True):
 
     H = _calc_hafnian(Ax, edge_reps, glynn)
     return H
-
-### compile code on some small instances ###
-A = np.ones((4,4))
-assert np.allclose(hafnian(A), 3)
-A = np.ones((8,8))
-assert np.allclose(hafnian(A), 105)
-############################################
+    
