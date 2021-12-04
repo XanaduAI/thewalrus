@@ -1,6 +1,6 @@
 import numpy as np 
 import numba 
-from _loop_hafnian_subroutines import (
+from j_loop_hafnian_subroutines import (
     precompute_binoms,
     nb_ix,
     matched_reps,
