@@ -22,8 +22,7 @@ from numba import jit
 
 import numpy as np
 
-from .libwalrus import haf_complex, haf_int, haf_real, haf_rpt_complex, haf_rpt_real
-
+from j_hafnian import haf
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
@@ -112,12 +111,9 @@ def reduction(A, rpt):
 
 # pylint: disable=too-many-arguments
 def hafnian(
-    A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, quad=True, approx=False, num_samples=1000
+    A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, approx=False, num_samples=1000
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
-
-    For more direct control, you may wish to call :func:`haf_real`,
-    :func:`haf_complex`, or :func:`haf_int` directly.
 
     Args:
         A (array): a square, symmetric array of even dimensions.
@@ -127,7 +123,6 @@ def hafnian(
             If ``loop=True``, then this keyword argument is ignored.
         rtol (float): the relative tolerance parameter used in ``np.allclose``.
         atol (float): the absolute tolerance parameter used in ``np.allclose``.
-        quad (bool): If ``True``, the hafnian algorithm is performed with quadruple precision.
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note that
             the approximation algorithm can only be applied to matrices ``A`` that only have non-negative entries.
         num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples`` iterations
@@ -190,29 +185,9 @@ def hafnian(
 
         return hafnian_approx(A, num_samples=num_samples)
 
-    if A.dtype == complex:
-        # array data is complex type
-        if np.any(np.iscomplex(A)):
-            # array values contain non-zero imaginary parts
-            return haf_complex(A, loop=loop, recursive=recursive, quad=quad)
 
-        # all array values have zero imaginary parts
-        return haf_real(np.float64(A.real), loop=loop, recursive=recursive, quad=quad)
-
-    if np.issubdtype(A.dtype, np.integer) and not loop:
-        # array data is an integer type, and the user is not
-        # requesting the loop hafnian
-        return haf_int(np.int64(A))
-
-    if np.issubdtype(A.dtype, np.integer) and loop:
-        # array data is an integer type, and the user is
-        # requesting the loop hafnian. Currently no
-        # integer function for loop hafnians, have to instead
-        # convert to float and use haf_real
-        A = np.float64(A)
-
-    return haf_real(
-        A, loop=loop, recursive=recursive, quad=quad, approx=approx, nsamples=num_samples
+    return haf(
+        A, reps=None, glynn=True
     )
 
 
@@ -281,8 +256,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
 
         >>> hafnian_repeated(A, rpt) == hafnian(A)
 
-    For more direct control, you may wish to call :func:`haf_rpt_real` or
-    :func:`haf_rpt_complex` directly.
 
     Args:
         A (array): a square, symmetric :math:`N\times N` array.
@@ -326,10 +299,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08):
     if len(mu) != len(A):
         raise ValueError("Length of means vector must be the same length as the matrix A.")
 
-    if complex in (A.dtype, mu.dtype):
-        return haf_rpt_complex(A, nud, mu=mu, loop=loop)
-
-    return haf_rpt_real(A, nud, mu=mu, loop=loop)
+    return haf(A, reps=rpt, glynn=True)
 
 
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
