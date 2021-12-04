@@ -25,6 +25,7 @@ import numpy as np
 from j_hafnian import haf
 from j_loop_hafnian import loop_hafnian
 
+
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
 
@@ -87,7 +88,9 @@ def powerset(iterable):
     Returns:
         (chain): chain of all subsets of input list
     """
-    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
+    return chain.from_iterable(
+        combinations(iterable, r) for r in range(len(iterable) + 1)
+    )
 
 
 def reduction(A, rpt):
@@ -112,7 +115,14 @@ def reduction(A, rpt):
 
 # pylint: disable=too-many-arguments
 def hafnian(
-    A, loop=False, recursive=True, rtol=1e-05, atol=1e-08, approx=False, num_samples=1000, glynn=True
+    A,
+    loop=False,
+    recursive=True,
+    rtol=1e-05,
+    atol=1e-08,
+    approx=False,
+    num_samples=1000,
+    glynn=True,
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
 
@@ -190,9 +200,7 @@ def hafnian(
     if loop:
         return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
-    return haf(
-        A, reps=None, glynn=glynn
-    )
+    return haf(A, reps=None, glynn=glynn)
 
 
 def hafnian_sparse(A, D=None, loop=False):
@@ -280,7 +288,9 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     input_validation(A, atol=atol, rtol=rtol)
 
     if len(rpt) != len(A):
-        raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")
+        raise ValueError(
+            "the rpt argument must be 1-dimensional sequence of length len(A)."
+        )
 
     nud = np.array(rpt, dtype=np.int32)
 
@@ -302,7 +312,9 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
         return 0
 
     if len(mu) != len(A):
-        raise ValueError("Length of means vector must be the same length as the matrix A.")
+        raise ValueError(
+            "Length of means vector must be the same length as the matrix A."
+        )
 
     if loop:
         return loop_hafnian(A, D=mu, reps=rpt, glynn=glynn)
@@ -346,7 +358,13 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
                     [
                         A[i - 1, t - 1]
                         * loop_haf[
-                            tuple([item for item in lower_end + D if item not in set((i, t))])
+                            tuple(
+                                [
+                                    item
+                                    for item in lower_end + D
+                                    if item not in set((i, t))
+                                ]
+                            )
                         ]
                         for i in D
                     ]

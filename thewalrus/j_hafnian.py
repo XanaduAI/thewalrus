@@ -1,4 +1,4 @@
-# Copyright 2021 Xanadu Quantum Technologies Inc.
+# Copyright 2019 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
         glynn (bool): whether to use finite difference sieve.
 
     Returns:
-        complex128: value of loop hafnian.
+        complex128: value of hafnian.
     """
 
     n = A.shape[0]
@@ -87,7 +87,7 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
     return H
 
 
-def hafnian(A, reps=None, glynn=True):
+def haf(A, reps=None, glynn=True):
     r"""
     Calculate hafnian with (optional) repeated rows and columns.
 
@@ -99,7 +99,7 @@ def hafnian(A, reps=None, glynn=True):
         glynn (bool): If True, use Glynn-style finite difference sieve formula, if False, use Ryser style inclusion/exclusion principle.
 
     Returns
-        np.complex128: result of loop hafnian calculation.
+        np.complex128: result of hafnian calculation.
     """
 
     n = A.shape[0]

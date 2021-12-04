@@ -305,10 +305,12 @@ class TestLoopHafnian:
         """Tests that sparse loop hafnian matches full implementation"""
         A = random_matrix(n, fill_factor=fill)
         assert np.allclose(
-            hafnian_sparse(A, loop=True), hafnian_sparse(A, D=set(range(len(A))), loop=True)
+            hafnian_sparse(A, loop=True),
+            hafnian_sparse(A, D=set(range(len(A))), loop=True),
         )
         assert np.allclose(
-            hafnian_sparse(A, loop=False), hafnian_sparse(A, D=set(range(len(A))), loop=False)
+            hafnian_sparse(A, loop=False),
+            hafnian_sparse(A, D=set(range(len(A))), loop=False),
         )
         assert np.allclose(hafnian(A, loop=True), hafnian_sparse(A, loop=True))
         assert np.allclose(hafnian(A, loop=False), hafnian_sparse(A, loop=False))
