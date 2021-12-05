@@ -30,62 +30,6 @@ except ImportError as exc:
     ) from exc
 
 
-BUILD_EXT = True
-
-
-def build_extensions():
-
-    if not BUILD_EXT:
-        return []
-
-    try:
-        from Cython.Build import cythonize
-    except ImportError as exc:
-        raise ImportError(
-            "Cython must be installed to build the extension."
-            "You can install it with pip"
-            "\n\npip install cython"
-        ) from exc
-
-    CFLAGS = os.environ.get("CFLAGS", "-O3 -Wall")
-
-    USE_OPENMP = platform.system() != "Windows"
-
-    config = {
-        "sources": ["./thewalrus/libwalrus.pyx"],
-        "depends": [
-            "./include/libwalrus.hpp",
-            "./include/trace_hafnian.hpp",
-            "./include/recursive_hafnian.hpp",
-            "./include/repeated_hafnian.hpp",
-            "./include/permanent.hpp",
-            "./include/stdafx.h",
-            "./include/fsum.hpp",
-        ],
-        "extra_compile_args": [*{"-fPIC", "-std=c++11", *CFLAGS.split(" ")}],
-        "extra_link_args": [],
-        "include_dirs": ["./include", np.get_include()],
-        "language": "c++",
-    }
-
-    if platform.system() == "Windows":
-        config["extra_compile_args"].extend(("-static",))
-        config["extra_link_args"].extend(("-static", "-static-libgfortran", "-static-libgcc"))
-    elif platform.system() == "Darwin":
-        config["extra_compile_args"].extend(
-            ("-Xpreprocessor", "-fopenmp", "-mmacosx-version-min=10.9", "-shared")
-        )
-        config["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp", "-lomp"))
-    else:
-        config["extra_compile_args"].extend(("-fopenmp", "-shared"))
-        config["extra_link_args"].extend(("-fopenmp",))
-
-    return cythonize(
-        [Extension("libwalrus", **config)],
-        compile_time_env={},
-    )
-
-
 def get_version():
     with open("thewalrus/_version.py") as f:
         return f.readlines()[-1].split()[-1].strip("\"'")
@@ -109,7 +53,6 @@ info = {
         "sympy>=1.5.1",
     ],
     "setup_requires": ["cython", "numpy"],
-    "ext_modules": build_extensions(),
     "ext_package": "thewalrus",
 }
 
