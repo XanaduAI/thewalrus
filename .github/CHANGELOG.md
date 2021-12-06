@@ -2,7 +2,7 @@
 
 ### New features
 
-* Python module for the Labudde method of computing characteristic polynomials. [#304](Add python code for the labudde algorithm)
+* Python module for the La Budde method of computing characteristic polynomials. [#304](Add python code for the labudde algorithm)
 
 ### Improvements
 
