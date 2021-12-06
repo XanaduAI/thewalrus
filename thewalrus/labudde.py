@@ -265,8 +265,7 @@ def _charpoly_from_labudde(H, k):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def charpoly_from_labudde(H):  # pragma: no cover
-    """
-    Calculates the characteristic polynomial of the matrix H.
+    """Calculates the characteristic polynomial of the matrix ``H``.
 
     Args:
         H (array): square matrix
