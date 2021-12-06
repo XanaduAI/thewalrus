@@ -17,7 +17,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
+Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Trevor Vincent, Jiaqi Zhao
 
 ---
 
