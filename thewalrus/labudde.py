@@ -186,7 +186,8 @@ def _charpoly_from_labudde(H, k):  # pragma: no cover
     Args:
         H (array): matrix in Hessenberg form (RowMajor)
         n (int): size of matrix
-        k (int): compute coefficients up to k (k must be <= n)
+        k (int): compute coefficients up to ``k`` (``k`` must be ``<= n``)
+        
     Returns:
         array: char-poly coeffs + auxiliary data (see comment in function)
     """
