@@ -281,14 +281,14 @@ def charpoly_from_labudde(H):  # pragma: no cover
 
 @jit(nopython=True, cache=True)
 def power_trace_labudde(H, n):  # pragma: no cover
-    """
-    Calculates the powertraces of the matrix H up to power ``n-1``.
+    """Calculates the powertraces of the matrix ``H`` up to power ``n-1``.
 
     Args:
         H (array): square matrix
         n (int): required order
-    Returns
-        (array): list of power traces from 0 to n-1
+        
+    Returns:
+        (array): list of power traces from ``0`` to ``n-1``
     """
     m = len(H)
     min_val = min(n, m)
