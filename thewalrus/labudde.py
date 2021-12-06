@@ -269,8 +269,9 @@ def charpoly_from_labudde(H):  # pragma: no cover
 
     Args:
         H (array): square matrix
+        
     Returns
-        (array): list of power traces from 0 to n-1
+        (array): list of power traces from ``0`` to ``n-1``
     """
     n = len(H)
     reduce_matrix_to_hessenberg(H)
