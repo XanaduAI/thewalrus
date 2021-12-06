@@ -56,7 +56,7 @@ def get_reflection_vector(matrix, k):  # pragma: no cover
 @jit(nopython=True, cache=True)
 def apply_householder(A, v, k):  # pragma: no cover
     r"""Apply householder transformation on a matrix A. See  Matrix Computations
-    by Golub and Van Loan (4th Edition) Sections 5.1.4 and 7.4.2
+    by Golub and Van Loan (4th Edition) Sections 5.1.4 and 7.4.2.
 
     Args:
         A (array): A matrix to apply householder on
