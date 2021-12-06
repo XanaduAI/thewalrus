@@ -179,15 +179,15 @@ def _charpoly_from_labudde(H, k):  # pragma: no cover
     See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
 
     .. note::
-    
+
         If the matrix is n by n but you only want coefficients ``k < n`` set
         ``k`` below ``n``. If you want all coefficients, set ``k = n``.
-        
+
     Args:
         H (array): matrix in Hessenberg form (RowMajor)
         n (int): size of matrix
         k (int): compute coefficients up to ``k`` (``k`` must be ``<= n``)
-        
+
     Returns:
         array: char-poly coeffs + auxiliary data (see comment in function)
     """
@@ -269,7 +269,7 @@ def charpoly_from_labudde(H):  # pragma: no cover
 
     Args:
         H (array): square matrix
-        
+
     Returns
         (array): list of power traces from ``0`` to ``n-1``
     """
@@ -286,7 +286,7 @@ def power_trace_labudde(H, n):  # pragma: no cover
     Args:
         H (array): square matrix
         n (int): required order
-        
+
     Returns:
         (array): list of power traces from ``0`` to ``n-1``
     """
