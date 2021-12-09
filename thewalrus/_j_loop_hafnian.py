@@ -17,7 +17,7 @@ Loop-Hafnian Python interface
 
 import numpy as np
 import numba
-from j_loop_hafnian_subroutines import (
+from _j_loop_hafnian_subroutines import (
     precompute_binoms,
     matched_reps,
     find_kept_edges,
