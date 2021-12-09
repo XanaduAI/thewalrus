@@ -22,6 +22,7 @@ from numba import jit
 
 import numpy as np
 
+<<<<<<< HEAD
 from j_loop_hafnian_subroutines import (
     precompute_binoms,
     matched_reps,
@@ -244,6 +245,11 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
 
     H = _calc_loop_hafnian(Ax, Dx, edge_reps, oddloop, oddV, glynn)
     return H
+=======
+from j_hafnian import haf
+from j_loop_hafnian import loop_hafnian
+
+>>>>>>> parent of 9c5ff23 (Update _hafnian.py)
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
