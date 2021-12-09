@@ -22,9 +22,6 @@ from numba import jit
 
 import numpy as np
 
-from _j_hafnian import haf
-from _j_loop_hafnian import loop_hafnian
-
 @numba.jit(nopython=True, cache=True)
 def nb_binom(n, k):  # pragma: no cover
     """
