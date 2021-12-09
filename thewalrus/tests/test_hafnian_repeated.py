@@ -18,8 +18,8 @@ from math import factorial as fac
 import pytest
 
 import numpy as np
-from thewalrus._hafnian import hafnian_repeated
-from thewalrus._hafnian import haf as jhaf
+from thewalrus import hafnian_repeated
+from thewalrus import haf as jhaf
 
 
 # the first 11 telephone numbers
