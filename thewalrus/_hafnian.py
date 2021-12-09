@@ -22,9 +22,6 @@ from numba import jit
 
 import numpy as np
 
-from j_hafnian import haf
-from j_loop_hafnian import loop_hafnian
-
 from j_loop_hafnian_subroutines import (
     precompute_binoms,
     matched_reps,
