@@ -22,8 +22,8 @@ from numba import jit
 
 import numpy as np
 
-from j_hafnian import haf
-from j_loop_hafnian import loop_hafnian
+#from j_hafnian import haf
+#from j_loop_hafnian import loop_hafnian
 import samples
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
