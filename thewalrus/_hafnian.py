@@ -18,11 +18,11 @@ Hafnian Python interface
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
-from numba import jit
+import numba 
 
 import numpy as np
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def nb_binom(n, k):  # pragma: no cover
     """
     Numba version of binomial coefficient function.
@@ -43,7 +43,7 @@ def nb_binom(n, k):  # pragma: no cover
     return binom
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def precompute_binoms(max_binom):  # pragma: no cover
     """
     Precompute binomial coefficients, return as a 2d array.
@@ -59,7 +59,7 @@ def precompute_binoms(max_binom):  # pragma: no cover
     return binoms
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def nb_ix(arr, rows, cols):  # pragma: no cover
     """
     Numba implementation of np.ix_ .
@@ -154,7 +154,7 @@ def matched_reps(reps):
     return x, edgereps, oddmode
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def find_kept_edges(j, reps):  # pragma: no cover
     """
     Write j as a string where the ith digit is in base (reps[i]+1)
@@ -174,7 +174,7 @@ def find_kept_edges(j, reps):  # pragma: no cover
     return np.array(output[::-1], dtype=reps.dtype)
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def f(E, n):  # pragma: no cover
     """
     Evaluate the polyonial coefficients of the function in the eigevalue-trace formula.
@@ -203,7 +203,7 @@ def f(E, n):  # pragma: no cover
     return comb[count, :]
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def f_loop(E, AX_S, XD_S, D_S, n):  # pragma : no cover
     """
     Evaluate the polyonial coefficients of the function in the eigenvalue-trace formula.
@@ -236,7 +236,7 @@ def f_loop(E, AX_S, XD_S, D_S, n):  # pragma : no cover
     return comb[count, :]
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     """
     Evaluate the polyonial coefficients of the function in the eigevalue-trace formula
@@ -278,7 +278,7 @@ def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     return comb[count, :]
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def get_AX_S(kept_edges, A):  # pragma: no cover
     """
     Given the kept edges, return the appropriate scaled submatrices to compute f.
@@ -308,7 +308,7 @@ def get_AX_S(kept_edges, A):  # pragma: no cover
     return AX_nonzero
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     """
     Given the kept edges, return the appropriate scaled submatrices to compute f.
@@ -361,7 +361,7 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     return AX_nonzero, XD_nonzero, D_nonzero, oddVX_nonzero
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     """
     Find oddVX_nonzero0 for batching (sometimes different vertices are identified as self edges).
@@ -388,7 +388,7 @@ def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     return oddVX_nonzero0
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def get_Dsubmatrices(kept_edges, D):  # pragma: no cover
     """
     Find submatrices for batch gamma functions.
@@ -409,7 +409,7 @@ def get_Dsubmatrices(kept_edges, D):  # pragma: no cover
     return XD_nonzero, D_nonzero
 
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def eigvals(M):  # pragma: no cover
     """
     Computes the eigenvalues of a matrix.
@@ -428,7 +428,7 @@ def calc_approx_steps(fixed_reps, N_cutoff):
     return steps
 
 # pylint: disable=W0612, E1133
-@jit(nopython=True, parallel=True, cache=True)
+@numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
 
     r"""
@@ -523,7 +523,7 @@ def haf(A, reps=None, glynn=True):
     return H
 
 # pylint: disable=too-many-arguments, redefined-outer-name, not-an-iterable
-@jit(nopython=True, parallel=True, cache=True)
+@numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian(
     A, D, edge_reps, oddloop=None, oddV=None, glynn=True
 ):  # pragma: no cover
@@ -990,7 +990,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     return loop_haf[tuple(range(1, n + 1))]
 
 
-@jit(nopython=True)
+@numba.jit(nopython=True)
 def _one_det(B):  # pragma: no cover
     """Calculates the determinant of an antisymmetric matrix with entries distributed
     according to a normal distribution, with scale equal to the entries of the symmetric matrix
@@ -1011,7 +1011,7 @@ def _one_det(B):  # pragma: no cover
     return np.linalg.det(mat)
 
 
-@jit(nopython=True)
+@numba.jit(nopython=True)
 def hafnian_approx(A, num_samples=1000):  # pragma: no cover
     """Returns the approximation to the hafnian of a matrix with non-negative entries.
 
