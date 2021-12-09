@@ -154,7 +154,7 @@ def matched_reps(reps):
     return x, edgereps, oddmode
 
 
-@numba.jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True)
 def find_kept_edges(j, reps):  # pragma: no cover
     """
     Write j as a string where the ith digit is in base (reps[i]+1)
