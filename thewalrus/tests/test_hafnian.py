@@ -21,8 +21,8 @@ from scipy.special import factorial as fac
 import thewalrus as hf
 from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded
 
-from thewalrus import haf as jhaf
-from thewalrus import loop_hafnian
+from thewalrus._hafnian import haf as jhaf
+from thewalrus._hafnian import loop_hafnian
 from thewalrus._hafnian import bandwidth
 
 
