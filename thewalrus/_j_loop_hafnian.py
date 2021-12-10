@@ -13,6 +13,10 @@
 # limitations under the License.
 """
 Loop-Hafnian Python interface
+
+Bulmer, Jacob F. F., et al. “The Boundary for Quantum Advantage in
+Gaussian Boson Sampling.” ArXiv:2108.01622 [Quant-Ph], Aug. 2021.
+arXiv.org, http://arxiv.org/abs/2108.01622
 """
 
 import numpy as np
