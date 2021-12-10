@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""
+Bulmer, Jacob F. F., et al. “The Boundary for Quantum Advantage in
+Gaussian Boson Sampling.” ArXiv:2108.01622 [Quant-Ph], Aug. 2021.
+arXiv.org, http://arxiv.org/abs/2108.01622
+"""
 import numba
 import numpy as np
 
