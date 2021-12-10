@@ -13,6 +13,10 @@
 # limitations under the License.
 """
 Computation of the hafnian.
+
+Bulmer, Jacob F. F., et al. “The Boundary for Quantum Advantage in
+Gaussian Boson Sampling.” ArXiv:2108.01622 [Quant-Ph], Aug. 2021.
+arXiv.org, http://arxiv.org/abs/2108.01622
 """
 import numpy as np
 import numba
