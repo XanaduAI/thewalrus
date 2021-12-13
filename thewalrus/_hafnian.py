@@ -178,7 +178,7 @@ def find_kept_edges(j, reps):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def f(E, n):  # pragma: no cover
     """
-    Evaluate the polyonial coefficients of the function in the eigevalue-trace formula.
+    Evaluate the polynomial coefficients of the function in the eigevalue-trace formula.
     Args:
         E (array): eigenvalues of AX
         n (int): number of polynomial coefficients to compute
@@ -207,7 +207,7 @@ def f(E, n):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def f_loop(E, AX_S, XD_S, D_S, n):  # pragma: no cover
     """
-    Evaluate the polyonial coefficients of the function in the eigenvalue-trace formula.
+    Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
     Args:
         E (array): Eigenvalues of AX
         AX_S (array): AX_S with weights given by repetitions and exluded rows removed
@@ -241,7 +241,7 @@ def f_loop(E, AX_S, XD_S, D_S, n):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     """
-    Evaluate the polyonial coefficients of the function in the eigevalue-trace formula
+    Evaluate the polynomial coefficients of the function in the eigevalue-trace formula
     when there is a self-edge in the fixed perfect matching.
     Args:
         E (array): Eigenvalues of AX
