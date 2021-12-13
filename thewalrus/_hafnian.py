@@ -911,7 +911,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
 
     nud = np.array(rpt, dtype=np.int32)
 
-    if not np.all(np.mod(nud, 1) == 0) or np.any(nud < 0):
+    if not np.all(np.mod(rpt, 1) == 0) or np.any(nud < 0):
         raise ValueError("the rpt argument must contain non-negative integers.")
 
     if np.all(nud == 0):
