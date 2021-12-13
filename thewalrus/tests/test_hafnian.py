@@ -19,7 +19,7 @@ import numpy as np
 from scipy.special import factorial as fac
 
 import thewalrus as hf
-from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded
+from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded, matched_reps
 
 from thewalrus._hafnian import haf as jhaf
 from thewalrus._hafnian import loop_hafnian
@@ -358,3 +358,12 @@ def test_haf_odd_size():
     """Tests hafnian and loop hafnian with no repetitions"""
     A = np.ones([2, 2])
     assert np.allclose(jhaf(A, reps=[1, 2]), 0.0)
+
+
+def test_empty_matched_reps():
+    """Tests that when the repetitions are zero an empty array is returned"""
+    reps = [0, 0, 0, 0]
+    x, y, z = matched_reps(reps)
+    assert x.shape == (0,)
+    assert y.shape == (0,)
+    assert z is None
