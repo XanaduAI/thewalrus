@@ -112,6 +112,7 @@ from ._hafnian import (
     reduction,
     hafnian_sparse,
     hafnian_banded,
+    matched_reps,
 )
 
 from ._low_rank_haf import low_rank_hafnian
@@ -140,6 +141,7 @@ __all__ = [
     "hafnian_batched",
     "hafnian_sparse",
     "hafnian_banded",
+    "matched_reps",
     "tor",
     "perm",
     "permanent_repeated",
