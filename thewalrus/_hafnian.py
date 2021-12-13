@@ -180,7 +180,7 @@ def f(E, n):  # pragma: no cover
     """
     Evaluate the polyonial coefficients of the function in the eigevalue-trace formula.
     Args:
-        E (array): eigevavlues of AX
+        E (array): eigenvalues of AX
         n (int): number of polynomial coefficients to compute
     Returns:
         array: polynomial coefficients
