@@ -346,7 +346,7 @@ def test_bandwidth_zero(N):
     assert np.allclose(result, expected)
 
 
-def haf_edge_cases():
+def test_haf_edge_cases():
     """Tests hafnian and loop hafnian with no repetitions"""
     A = np.ones([2, 2])
     D = np.ones([2])
@@ -354,7 +354,7 @@ def haf_edge_cases():
     assert np.allclose(jhaf(A, reps=[0, 0]), 1)
 
 
-def haf_odd_size():
+def test_haf_odd_size():
     """Tests hafnian and loop hafnian with no repetitions"""
     A = np.ones([2, 2])
     assert np.allclose(jhaf(A, reps=[1, 2]), 0.0)
