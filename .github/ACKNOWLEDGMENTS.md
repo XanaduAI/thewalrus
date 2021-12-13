@@ -52,8 +52,8 @@
 
 * [Jiaqi Zhao](https://github.com/JQZ1111) (Polytechnique Montréal) - Photon squeezer
 
-* [Dominic Leclerc](https://github.com/dleclerc33) (Polytechnique de Montréal) :fleur_de_lis: King of vaccum
+* [Dominic Leclerc](https://github.com/dleclerc33) (Polytechnique Montréal) :fleur_de_lis: King of vaccum
 
-* [Benjamin Lanthier](https://github.com/benjaminlanthier) (Polytechnique de Montréal) :mage: Warlock of eigenvalues
+* [Benjamin Lanthier](https://github.com/benjaminlanthier) (Polytechnique Montréal) :mage: Warlock of eigenvalues
 
-* [Brandon Turcotte](https://github.com/brandonpolymtl) (Polytechnique de Montréal) - :star2: The Quantum-plators
+* [Brandon Turcotte](https://github.com/brandonpolymtl) (Polytechnique Montréal) - :star2: The Quantum-plators

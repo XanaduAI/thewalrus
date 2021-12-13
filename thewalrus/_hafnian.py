@@ -620,7 +620,7 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
         return 1.0
 
     if N == 1:
-        return D[0]
+        return np.where(np.array(rpt)==1)[0][0]
 
     assert n == len(reps)
 
@@ -934,9 +934,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
         )
 
     if loop:
-        if sum(rpt) == 1:
-            pos = np.where(np.array(rpt)==1)[0][0]
-            return mu[pos]
         return loop_hafnian(A, D=mu, reps=rpt, glynn=glynn)
 
     return haf(A, reps=rpt, glynn=glynn)
