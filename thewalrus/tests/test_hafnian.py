@@ -178,53 +178,51 @@ class TestHafnianWrapper:
         assert np.allclose(haf, expected)
 
 
-@pytest.mark.parametrize("recursive", [True, False])
 class TestHafnian:
-    """Various Hafnian consistency checks.
-    Tests should run for recursive and trace algorithms"""
+    """Various Hafnian consistency checks."""
 
-    def test_2x2(self, random_matrix, recursive):
+    def test_2x2(self, random_matrix):
         """Check 2x2 hafnian"""
         A = random_matrix(2)
-        haf = hafnian(A, recursive=recursive)
+        haf = hafnian(A)
         assert np.allclose(haf, A[0, 1])
 
-    def test_3x3(self, dtype, recursive):
+    def test_3x3(self, dtype):
         """Check 3x3 hafnian"""
         A = dtype(np.ones([3, 3]))
-        haf = hafnian(A, recursive=recursive)
+        haf = hafnian(A)
         assert haf == 0.0
 
-    def test_4x4(self, random_matrix, recursive):
+    def test_4x4(self, random_matrix):
         """Check 4x4 hafnian"""
         A = random_matrix(4)
-        haf = hafnian(A, recursive=recursive)
+        haf = hafnian(A)
         expected = A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2]
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_identity(self, n, dtype, recursive):
+    def test_identity(self, n, dtype):
         """Check hafnian(I)=0"""
         A = dtype(np.identity(n))
-        haf = hafnian(A, recursive=recursive)
+        haf = hafnian(A)
         assert np.allclose(haf, 0)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_ones(self, n, dtype, recursive):
+    def test_ones(self, n, dtype):
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = dtype(np.ones([2 * n, 2 * n]))
-        haf = hafnian(A, recursive=recursive)
+        haf = hafnian(A)
         expected = fac(2 * n) / (fac(n) * (2 ** n))
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_block_ones(self, n, dtype, recursive):
+    def test_block_ones(self, n, dtype):
         """Check hafnian([[0, I_n], [I_n, 0]])=n!"""
         O = np.zeros([n, n])
         B = np.ones([n, n])
         A = np.vstack([np.hstack([O, B]), np.hstack([B, O])])
         A = dtype(A)
-        haf = hafnian(A, recursive=recursive)
+        haf = hafnian(A)
         expected = float(fac(n))
         assert np.allclose(haf, expected)
 

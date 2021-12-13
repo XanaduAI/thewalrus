@@ -606,7 +606,7 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
         return 1.0
 
     if N == 1:
-        return np.where(np.array(reps) == 1)[0][0]
+        return D[np.where(np.array(reps) == 1)[0][0]]
 
     assert n == len(reps)
 
