@@ -105,12 +105,9 @@ import numpy as np
 import thewalrus.quantum
 
 from ._hafnian import (
-    haf_complex,
-    haf_int,
-    haf_real,
-    haf_rpt_complex,
-    haf_rpt_real,
     hafnian,
+    haf,
+    loop_hafnian,
     hafnian_repeated,
     reduction,
     hafnian_sparse,
@@ -136,6 +133,8 @@ from ._version import __version__
 
 
 __all__ = [
+    "haf",
+    "loop_hafnian",
     "hafnian",
     "hafnian_repeated",
     "hafnian_batched",
