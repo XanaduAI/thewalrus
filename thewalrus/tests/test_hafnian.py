@@ -357,7 +357,6 @@ def haf_edge_cases():
 def haf_odd_size():
     """Tests hafnian and loop hafnian with no repetitions"""
     A = np.ones([2, 2])
-    D = np.ones([2])
     assert np.allclose(jhaf(A, reps=[1, 2]), 0.0)
 
 
