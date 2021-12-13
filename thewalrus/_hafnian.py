@@ -407,13 +407,6 @@ def eigvals(M):  # pragma: no cover
     return np.linalg.eigvals(M)
 
 
-# @numba.jit(nopython=True, cache=True)
-# pylint: disable = missing-function-docstring
-def calc_approx_steps(fixed_reps, N_cutoff):
-    steps = int(np.prod(np.sqrt(fixed_reps)) + 1) * N_cutoff // 2
-    return steps
-
-
 # pylint: disable=W0612, E1133
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
