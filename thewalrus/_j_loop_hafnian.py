@@ -33,9 +33,7 @@ from _j_loop_hafnian_subroutines import (
 
 # pylint: disable=too-many-arguments, redefined-outer-name, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_loop_hafnian(
-    A, D, edge_reps, oddloop=None, oddV=None, glynn=True
-):  # pragma: no cover
+def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  # pragma: no cover
     """
     Compute loop hafnian, using inputs as prepared by frontend loop_hafnian function
     compiled with Numba.

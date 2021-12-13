@@ -316,12 +316,8 @@ def get_AX_S(kept_edges, A):  # pragma: no cover
     A_nonzero = nb_ix(A, nonzero_rows, nonzero_rows)
 
     AX_nonzero = np.empty_like(A_nonzero, dtype=np.complex128)
-    AX_nonzero[:, :n_nonzero_edges] = (
-        kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-    )
-    AX_nonzero[:, n_nonzero_edges:] = (
-        kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
-    )
+    AX_nonzero[:, :n_nonzero_edges] = kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+    AX_nonzero[:, n_nonzero_edges:] = kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
 
     return AX_nonzero
 
@@ -353,12 +349,8 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     A_nonzero = nb_ix(A, nonzero_rows, nonzero_rows)
 
     AX_nonzero = np.empty_like(A_nonzero, dtype=np.complex128)
-    AX_nonzero[:, :n_nonzero_edges] = (
-        kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-    )
-    AX_nonzero[:, n_nonzero_edges:] = (
-        kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
-    )
+    AX_nonzero[:, :n_nonzero_edges] = kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+    AX_nonzero[:, n_nonzero_edges:] = kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
 
     D_nonzero = D[nonzero_rows]
 
@@ -369,12 +361,8 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     if oddV is not None:
         oddV_nonzero = oddV[nonzero_rows]
         oddVX_nonzero = np.empty_like(oddV_nonzero, dtype=np.complex128)
-        oddVX_nonzero[:n_nonzero_edges] = (
-            kept_edges_nonzero * oddV_nonzero[n_nonzero_edges:]
-        )
-        oddVX_nonzero[n_nonzero_edges:] = (
-            kept_edges_nonzero * oddV_nonzero[:n_nonzero_edges]
-        )
+        oddVX_nonzero[:n_nonzero_edges] = kept_edges_nonzero * oddV_nonzero[n_nonzero_edges:]
+        oddVX_nonzero[n_nonzero_edges:] = kept_edges_nonzero * oddV_nonzero[:n_nonzero_edges]
     else:
         oddVX_nonzero = None
 
@@ -400,12 +388,8 @@ def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     kept_edges_nonzero = kept_edges[np.where(kept_edges != 0)]
     oddV_nonzero0 = oddV0[nonzero_rows]
     oddVX_nonzero0 = np.empty_like(oddV_nonzero0, dtype=np.complex128)
-    oddVX_nonzero0[:n_nonzero_edges] = (
-        kept_edges_nonzero * oddV_nonzero0[n_nonzero_edges:]
-    )
-    oddVX_nonzero0[n_nonzero_edges:] = (
-        kept_edges_nonzero * oddV_nonzero0[:n_nonzero_edges]
-    )
+    oddVX_nonzero0[:n_nonzero_edges] = kept_edges_nonzero * oddV_nonzero0[n_nonzero_edges:]
+    oddVX_nonzero0[n_nonzero_edges:] = kept_edges_nonzero * oddV_nonzero0[:n_nonzero_edges]
 
     return oddVX_nonzero0
 
