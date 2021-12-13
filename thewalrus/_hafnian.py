@@ -236,6 +236,7 @@ def f_loop(E, AX_S, XD_S, D_S, n):  # pragma : no cover
                 comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
     return comb[count, :]
 
+
 # pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True)
 def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
