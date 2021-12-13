@@ -47,35 +47,3 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage.xml
-
-  cpp-tests:
-    name: c++
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.4.1
-        with:
-          access_token: ${{ github.token }}
-
-      - name: Checkout The Walrus
-        uses: actions/checkout@v2
-
-      - uses: actions/setup-python@v2
-        name: Install Python
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get -y -q update
-          sudo apt-get -y -q install cmake gcc libomp-dev libgtest-dev
-
-      - name: Build unit tests
-        run: |
-          cd tests
-          GOOGLETEST_DIR=$HOME/googletest make cpptests
-
-      - name: Run unit tests
-        run: |
-          cd tests && ./cpptests
