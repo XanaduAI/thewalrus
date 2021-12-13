@@ -29,7 +29,7 @@ def test_rank_one(n):
     x = np.random.rand(n)
     A = np.outer(x, x)
     exact = factorial2(n - 1) * np.prod(x)
-    approx = hafnian(A, approx=True, nsamples=10000)
+    approx = hafnian(A, approx=True, num_samples=10000)
     assert np.allclose(approx, exact, rtol=2e-1, atol=0)
 
 
