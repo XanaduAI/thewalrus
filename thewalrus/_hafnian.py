@@ -205,7 +205,7 @@ def f(E, n):  # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def f_loop(E, AX_S, XD_S, D_S, n):  # pragma : no cover
+def f_loop(E, AX_S, XD_S, D_S, n):  # pragma: no cover
     """
     Evaluate the polyonial coefficients of the function in the eigenvalue-trace formula.
     Args:
