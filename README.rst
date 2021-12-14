@@ -73,27 +73,8 @@ Compiling from source
 The Walrus depends on the following Python packages:
 
 * `Python <http://python.org/>`_ >= 3.7
-* `NumPy <http://numpy.org/>`_  >= 1.13.3
-* `Numba <https://numba.pydata.org/>`_ >= 0.43.1
-
-In addition, to compile the C++ extension, the following dependencies are required:
-
-* A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
-* `Cython <https://cython.org/>`_ an optimising static compiler for the Python programming language.
-
-On Debian-based systems, these can be installed via ``apt`` and ``curl``:
-
-.. code-block:: console
-
-    $ sudo apt install g++
-    $ pip install Cython
-
-or using Homebrew on MacOS:
-
-.. code-block:: console
-
-    $ brew install gcc
-    $ pip install Cython
+* `NumPy <http://numpy.org/>`_  >= 1.19.2
+* `Numba <https://numba.pydata.org/>`_ >= 0.48.0
 
 You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
 
@@ -101,13 +82,6 @@ You can compile the latest development version by cloning the git repository, an
 
     $ git clone https://github.com/XanaduAI/thewalrus.git
     $ cd thewalrus && python -m pip install -e .
-
-
-OpenMP
-------
-
-``libwalrus`` uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux/MacOS using the GNU g++ compiler/Clang.**
-
 
 
 Software tests
@@ -119,45 +93,19 @@ To ensure that The Walrus library is working correctly after installation, the t
 
     $ make test
 
-To run the low-level C++ test suite, `Googletest <https://github.com/google/googletest>`_
-will need to be installed. In Ubuntu-based distributions, this can be done as follows:
-
-.. code-block:: console
-
-    sudo apt-get install cmake libgtest-dev
-
-Alternatively, the latest Googletest release can be installed from source:
-
-.. code-block:: console
-
-    sudo apt install cmake
-    wget -qO - https://github.com/google/googletest/archive/release-1.8.1.tar.gz | tar -xz
-    cmake -D CMAKE_INSTALL_PREFIX:PATH=$HOME/googletest -D CMAKE_BUILD_TYPE=Release googletest-release-1.8.1
-    make install
-
-If installing Googletest from source, make sure that the included headers and
-libraries are available on your include/library paths.
 
 Documentation
 =============
 
 The Walrus documentation is available online on `Read the Docs <https://the-walrus.readthedocs.io>`_.
 
-To build it locally, you need to have the following packages installed:
+Additional packages are required to build the documentation locally as specified in `doc/requirements.txt`.
+These packages can be installed using:
 
-* `Sphinx <http://sphinx-doc.org/>`_ >= 1.5
-* `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >= 0.3.6
-* `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_
-* `Pandoc <https://pandoc.org/>`_
-* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >= 4.12.0
-* `exhale <https://exhale.readthedocs.io/en/latest/>`_
-* `Doxygen <http://www.doxygen.nl/>`_
-
-They can be installed via a combination of ``pip`` and ``apt`` if on a Debian-based system:
-::
+.. code-block:: console
 
     $ sudo apt install pandoc doxygen
-    $ pip3 install sphinx sphinxcontrib-bibtex nbsphinx breathe exhale
+    $ pip3 install -r docs/requirements.txt
 
 To build the HTML documentation, go to the top-level directory and run the command
 
