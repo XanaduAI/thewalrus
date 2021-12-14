@@ -101,7 +101,6 @@ import thewalrus.quantum
 
 from ._hafnian import (
     hafnian,
-    haf,
     loop_hafnian,
     hafnian_repeated,
     reduction,
@@ -129,13 +128,12 @@ from ._version import __version__
 
 
 __all__ = [
-    "haf",
-    "loop_hafnian",
     "hafnian",
     "hafnian_repeated",
     "hafnian_batched",
     "hafnian_sparse",
     "hafnian_banded",
+    "loop_hafnian",
     "matched_reps",
     "tor",
     "perm",

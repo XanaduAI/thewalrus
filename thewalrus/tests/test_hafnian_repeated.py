@@ -19,7 +19,7 @@ import pytest
 
 import numpy as np
 from thewalrus import hafnian_repeated
-from thewalrus import haf as jhaf
+from thewalrus._hafnian import _haf as jhaf
 
 
 # the first 11 telephone numbers
