@@ -24,12 +24,6 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Before install
-        run: |
-          sudo apt-get -qq update;
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test;
-          sudo apt-get install gcc;
-
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
