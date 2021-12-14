@@ -17,7 +17,7 @@ Reference implementations
 
 .. currentmodule:: thewalrus.reference
 
-This submodule provides access to pure-Python reference implementations of the
+This submodule provides access to reference implementations of the
 hafnian and loop hafnian by summing over the set of perfect matching permutations
 or the set of single pair matchings.
 

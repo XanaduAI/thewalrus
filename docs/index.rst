@@ -89,7 +89,7 @@ The Walrus Documentation
 Features
 ========
 
-* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices.
+* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices powered by `Numba <https://numba.pydata.org/>`_.
 
 * An easy to use interface to use the loop hafnian for Gaussian quantum state calculations.
 
