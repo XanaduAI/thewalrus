@@ -13,22 +13,7 @@
 # limitations under the License.
 
 #!/usr/bin/env python3
-import os
-import platform
-
-from setuptools import find_packages
-
-try:
-    import numpy as np
-    from numpy.distutils.core import setup
-    from numpy.distutils.extension import Extension
-except ImportError as exc:
-    raise ImportError(
-        "Numpy must be installed to build The Walrus."
-        "You can install it with pip:"
-        "\n\npip install numpy"
-    ) from exc
-
+from setuptools import find_packages, setup
 
 def get_version():
     with open("thewalrus/_version.py") as f:
@@ -39,7 +24,7 @@ info = {
     "name": "thewalrus",
     "version": get_version(),
     "maintainer": "Xanadu Inc.",
-    "maintainer_email": "nicolas@xanadu.ai",
+    "maintainer_email": "software@xanadu.ai",
     "url": "https://github.com/XanaduAI/thewalrus",
     "license": "Apache License 2.0",
     "packages": find_packages(where="."),
@@ -52,7 +37,6 @@ info = {
         "scipy>=1.2.1",
         "sympy>=1.5.1",
     ],
-    "setup_requires": ["cython", "numpy"],
     "ext_package": "thewalrus",
 }
 
