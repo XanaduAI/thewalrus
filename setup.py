@@ -52,7 +52,7 @@ info = {
         "scipy>=1.2.1",
         "sympy>=1.5.1",
     ],
-    "setup_requires": ["cython", "numpy"],
+    "setup_requires": ["numpy"],
     "ext_package": "thewalrus",
 }
 
