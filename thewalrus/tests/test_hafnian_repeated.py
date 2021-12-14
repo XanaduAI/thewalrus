@@ -33,8 +33,6 @@ class TestHafnianRepeatedWrapper:
     * exceptions
     * validation
     * values computed by the wrapper
-    * that the wrapper returns the same
-      value as the C++ functions
     """
 
     def test_array_exception(self):

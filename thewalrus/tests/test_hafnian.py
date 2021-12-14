@@ -79,8 +79,6 @@ class TestHafnianWrapper:
 
     * exceptions
     * validation
-    * that the wrapper returns the same
-      value as the C++ functions
     """
 
     def test_version_number(self):
