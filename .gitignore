@@ -16,7 +16,7 @@ tests/__pycache__/*
 tests/*.o
 coverage_html_report
 coverage.xml
-.coverage
+.coverage*
 
 docs/_build
 docs/doxyoutput/*
