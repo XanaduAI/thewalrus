@@ -168,4 +168,3 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    code/random
    code/fock_gradients
    code/reference
-   code/libwalrus
