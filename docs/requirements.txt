@@ -3,7 +3,6 @@ sphinxcontrib-bibtex
 sphinx==3.5.3
 ipykernel
 nbsphinx==0.7
-cython>=0.20
 numba>=0.49.1
 numpy>=1.9
 sympy>=1.5.1
