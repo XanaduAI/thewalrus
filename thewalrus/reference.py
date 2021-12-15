@@ -36,7 +36,7 @@ Reference functions
     hafnian
 
 Code details
-^^^^^^^^^^^^
+------------
 
 .. autofunction::
     hafnian

@@ -37,7 +37,7 @@ Summary
 	grad_mzgate
 
 Code details
-^^^^^^^^^^^^
+------------
 """
 import numpy as np
 
