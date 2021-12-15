@@ -2,14 +2,11 @@
 
 Please complete the following checklist when submitting a PR:
 
-- [ ] All new features must include a Python unit test, C++ unit test,
-      or both if applicable.
+- [ ] All new features must include a unit test.
       If you've fixed a bug or added code that should be tested, add a test to the
-      tests (C++) and thewalrus/tests directory!
+      tests directory!
 
-- [ ] All new Python and C++ code must be clearly commented and documented.
-      Python code is documented using Napolean Google style, and C++ code
-      is documented using Doxygen.
+- [ ] All new Python code must be clearly commented and documented.
       If you do make documentation changes, make sure that the docs build and
       render correctly by running `make docs`.
 

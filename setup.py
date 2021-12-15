@@ -13,78 +13,7 @@
 # limitations under the License.
 
 #!/usr/bin/env python3
-import os
-import platform
-
-from setuptools import find_packages
-
-try:
-    import numpy as np
-    from numpy.distutils.core import setup
-    from numpy.distutils.extension import Extension
-except ImportError as exc:
-    raise ImportError(
-        "Numpy must be installed to build The Walrus."
-        "You can install it with pip:"
-        "\n\npip install numpy"
-    ) from exc
-
-
-BUILD_EXT = True
-
-
-def build_extensions():
-
-    if not BUILD_EXT:
-        return []
-
-    try:
-        from Cython.Build import cythonize
-    except ImportError as exc:
-        raise ImportError(
-            "Cython must be installed to build the extension."
-            "You can install it with pip"
-            "\n\npip install cython"
-        ) from exc
-
-    CFLAGS = os.environ.get("CFLAGS", "-O3 -Wall")
-
-    USE_OPENMP = platform.system() != "Windows"
-
-    config = {
-        "sources": ["./thewalrus/libwalrus.pyx"],
-        "depends": [
-            "./include/libwalrus.hpp",
-            "./include/trace_hafnian.hpp",
-            "./include/recursive_hafnian.hpp",
-            "./include/repeated_hafnian.hpp",
-            "./include/permanent.hpp",
-            "./include/stdafx.h",
-            "./include/fsum.hpp",
-        ],
-        "extra_compile_args": [*{"-fPIC", "-std=c++11", *CFLAGS.split(" ")}],
-        "extra_link_args": [],
-        "include_dirs": ["./include", np.get_include()],
-        "language": "c++",
-    }
-
-    if platform.system() == "Windows":
-        config["extra_compile_args"].extend(("-static",))
-        config["extra_link_args"].extend(("-static", "-static-libgfortran", "-static-libgcc"))
-    elif platform.system() == "Darwin":
-        config["extra_compile_args"].extend(
-            ("-Xpreprocessor", "-fopenmp", "-mmacosx-version-min=10.9", "-shared")
-        )
-        config["extra_link_args"].extend(("-Xpreprocessor", "-fopenmp", "-lomp"))
-    else:
-        config["extra_compile_args"].extend(("-fopenmp", "-shared"))
-        config["extra_link_args"].extend(("-fopenmp",))
-
-    return cythonize(
-        [Extension("libwalrus", **config)],
-        compile_time_env={},
-    )
-
+from setuptools import find_packages, setup
 
 def get_version():
     with open("thewalrus/_version.py") as f:
@@ -95,7 +24,7 @@ info = {
     "name": "thewalrus",
     "version": get_version(),
     "maintainer": "Xanadu Inc.",
-    "maintainer_email": "nicolas@xanadu.ai",
+    "maintainer_email": "software@xanadu.ai",
     "url": "https://github.com/XanaduAI/thewalrus",
     "license": "Apache License 2.0",
     "packages": find_packages(where="."),
@@ -107,9 +36,9 @@ info = {
         "numba>=0.49.1,<0.54",
         "scipy>=1.2.1",
         "sympy>=1.5.1",
+        "numpy>=1.19.2"
     ],
-    "setup_requires": ["cython", "numpy"],
-    "ext_modules": build_extensions(),
+    "setup_requires": ["numpy"],
     "ext_package": "thewalrus",
 }
 

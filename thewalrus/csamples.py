@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 r"""
-Classical Sampling Algorithms
+Classical sampling algorithms
 =============================
 
 .. currentmodule:: thewalrus.csamples

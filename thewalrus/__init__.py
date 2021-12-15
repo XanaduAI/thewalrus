@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 r"""
-Python library
-==============
+The Walrus
+==========
 
 .. currentmodule:: thewalrus
 
-This is the top level module of the The Walrus Python interface,
-containing functions for computing the hafnian, loop hafnian,
-and torontonian of matrices.
+This is the top level module of the The Walrus, containing functions for
+computing the hafnian, loop hafnian, and torontonian of matrices.
 
 Algorithm terminology
 ---------------------
@@ -75,8 +74,8 @@ Sparse hafnian algorithm
 
 
 
-Python wrappers
----------------
+Functions
+---------
 
 .. autosummary::
     hafnian
@@ -87,14 +86,12 @@ Python wrappers
     permanent_repeated
     hermite_multidimensional
     hafnian_banded
-
-Pure Python functions
----------------------
-
-.. autosummary::
     reduction
     version
     low_rank_hafnian
+
+Code details
+^^^^^^^^^^^^
 """
 # pylint: disable=wrong-import-position
 import os
@@ -105,16 +102,13 @@ import numpy as np
 import thewalrus.quantum
 
 from ._hafnian import (
-    haf_complex,
-    haf_int,
-    haf_real,
-    haf_rpt_complex,
-    haf_rpt_real,
     hafnian,
+    loop_hafnian,
     hafnian_repeated,
     reduction,
     hafnian_sparse,
     hafnian_banded,
+    matched_reps,
 )
 
 from ._low_rank_haf import low_rank_hafnian
@@ -141,6 +135,8 @@ __all__ = [
     "hafnian_batched",
     "hafnian_sparse",
     "hafnian_banded",
+    "loop_hafnian",
+    "matched_reps",
     "tor",
     "perm",
     "permanent_repeated",

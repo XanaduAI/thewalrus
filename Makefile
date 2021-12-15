@@ -9,12 +9,10 @@ TESTRUNNER := -m pytest --randomly-seed=137 thewalrus
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  install            to install The Walrus"
-	@echo "  libperm            to compile the Fortran permanent library"
 	@echo "  wheel              to build the The Walrus wheel"
 	@echo "  dist               to package the source distribution"
 	@echo "  clean              to delete all temporary, cache, and build files"
 	@echo "  clean-docs         to delete all built documentation"
-	@echo "  test-cpp           to run the C++ test suite"
 	@echo "  test               to run the Python test suite"
 	@echo "  coverage           to generate a coverage report"
 
@@ -46,15 +44,7 @@ doc:
 
 .PHONY : clean-docs
 clean-docs:
-	rm -rf docs/libwalrus_cpp_api
 	make -C docs clean
-
-test-cpp:
-	make -C tests clean
-	echo "Going to compile C++ tests"
-	make -C tests cpptests
-	echo "Compilation done for C++ tests"
-	make -C tests
 
 test:
 	$(PYTHON) $(TESTRUNNER)
