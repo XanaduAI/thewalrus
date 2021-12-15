@@ -75,8 +75,8 @@ Sparse hafnian algorithm
 
 
 
-Python wrappers
----------------
+Functions
+---------
 
 .. autosummary::
     hafnian
@@ -87,11 +87,6 @@ Python wrappers
     permanent_repeated
     hermite_multidimensional
     hafnian_banded
-
-Pure Python functions
----------------------
-
-.. autosummary::
     reduction
     version
     low_rank_hafnian

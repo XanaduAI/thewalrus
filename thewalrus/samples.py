@@ -40,7 +40,6 @@ Torontonian sampling
     torontonian_sample_graph
     torontonian_sample_classical_state
     threshold_detection_prob
-    threshold_detection_prob_displacement
 
 Brute force sampling
 --------------------

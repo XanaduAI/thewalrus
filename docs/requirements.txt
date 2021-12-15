@@ -3,14 +3,11 @@ sphinxcontrib-bibtex
 sphinx==3.5.3
 ipykernel
 nbsphinx==0.7
-cython>=0.20
 numba>=0.49.1
 numpy>=1.9
 sympy>=1.5.1
 scipy>=1.2.1
-breathe==4.29.0
 Jinja2==2.11.3
-exhale
 version_information
 sphinx-copybutton
 dask[delayed]
