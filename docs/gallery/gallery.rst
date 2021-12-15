@@ -61,6 +61,7 @@ If you develop a new circuit and measurement scheme to prepare a non-Gaussian st
     photon_added
     cat
     four_cat
+    gkp
 
 .. Copy the template below in order to create a link to your notebook, and a thumbnail.
 
