@@ -104,7 +104,7 @@ These packages can be installed using:
 
 .. code-block:: console
 
-    $ sudo apt install pandoc doxygen
+    $ sudo apt install pandoc
     $ pip3 install -r docs/requirements.txt
 
 To build the HTML documentation, go to the top-level directory and run the command
