@@ -52,7 +52,7 @@
 
 * [Jiaqi Zhao](https://github.com/JQZ1111) (Polytechnique Montréal) - Photon squeezer
 
-* [Dominic Leclerc](https://github.com/dleclerc33) (Polytechnique Montréal) :fleur_de_lis: King of vaccum
+* [Dominic Leclerc](https://github.com/dleclerc33) (Polytechnique Montréal) :fleur_de_lis: King of vacuum
 
 * [Benjamin Lanthier](https://github.com/benjaminlanthier) (Polytechnique Montréal) :mage: Warlock of eigenvalues
 

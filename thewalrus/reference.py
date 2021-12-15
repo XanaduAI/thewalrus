@@ -34,8 +34,8 @@ Reference functions
 .. autosummary::
     hafnian
 
-Details
-^^^^^^^
+Code details
+^^^^^^^^^^^^
 
 .. autofunction::
     hafnian
@@ -50,8 +50,8 @@ Auxiliary functions
     pmp
     T
 
-Details
-^^^^^^^
+Code details
+^^^^^^^^^^^^
 """
 import functools
 

@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 r"""
-Python library
-==============
+The Walrus
+==========
 
 .. currentmodule:: thewalrus
 
-This is the top level module of the The Walrus Python interface,
-containing functions for computing the hafnian, loop hafnian,
-and torontonian of matrices.
+This is the top level module of the The Walrus, containing functions for
+computing the hafnian, loop hafnian, and torontonian of matrices.
 
 Algorithm terminology
 ---------------------
@@ -90,6 +89,9 @@ Functions
     reduction
     version
     low_rank_hafnian
+
+Code details
+^^^^^^^^^^^^
 """
 # pylint: disable=wrong-import-position
 import os

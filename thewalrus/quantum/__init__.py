@@ -119,8 +119,8 @@ Photon number distributions
     characteristic_function
 
 
-Details
-^^^^^^^
+Code details
+^^^^^^^^^^^^
 """
 import warnings
 import functools
