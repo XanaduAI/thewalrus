@@ -12,8 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
+Decompositions
+==============
+
+**Module name:** :mod:`thewalrus.decompositions`
+
+.. currentmodule:: thewalrus.decompositions
+
 This module implements common shared matrix decompositions that are
 used to perform gate decompositions.
+
+Summary
+-------
+
+.. autosummary::
+    williamson
+
+Code details
+------------
 """
 import numpy as np
 

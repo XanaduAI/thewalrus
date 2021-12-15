@@ -1,2 +1,3 @@
 .. automodule:: thewalrus.reference
-    :members: memoized, partitions, spm, pmp, T
+    :members:
+    :exclude-members: LimitedSizeDict, hafnian

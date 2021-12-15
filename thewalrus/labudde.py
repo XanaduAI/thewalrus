@@ -12,8 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
+La Budde's algorithm
+====================
+
+**Module name:** :mod:`thewalrus.labudde`
+
+.. currentmodule:: thewalrus.labudde
+
 This module implements the La Budde's algorithm to calculate the
 characteristic polynomials of matrices.
+
+Summary
+-------
+.. autosummary::
+    get_reflection_vector
+    apply_householder
+    reduce_matrix_to_hessenberg
+    charpoly_from_labudde
+    power_trace_labudde
+
+Code details
+------------
 """
 # pylint: disable=too-many-branches
 import numpy as np

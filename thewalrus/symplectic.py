@@ -54,7 +54,7 @@ Gates and operations
     rotation
 
 Code details
-^^^^^^^^^^^^
+------------
 """
 import numpy as np
 

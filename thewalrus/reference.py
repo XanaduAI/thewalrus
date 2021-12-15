@@ -15,6 +15,8 @@
 Reference implementations
 =========================
 
+**Module name:** :mod:`thewalrus.reference`
+
 .. currentmodule:: thewalrus.reference
 
 This submodule provides access to reference implementations of the
@@ -26,7 +28,6 @@ For more details on these definitions see:
 * Andreas Björklund, Brajesh Gupt, and Nicolás Quesada. "A faster hafnian formula for
   complex matrices and its benchmarking on the Titan supercomputer"
   `arxiv:1805.12498 (2018) <https://arxiv.org/abs/arxiv:1805.12498>`_
-
 
 Reference functions
 -------------------
@@ -51,7 +52,7 @@ Auxiliary functions
     T
 
 Code details
-^^^^^^^^^^^^
+------------
 """
 import functools
 

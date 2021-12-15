@@ -12,30 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 r"""
-Permanent Algorithms
-=============================
-
-.. currentmodule:: thewalrus._permanent
-
 This submodule provides access to tools for finding the permanent of a matrix. The algorithms implemented
 here was first derived in
+
 * Ryser, Herbert John (1963).
   Combinatorial Mathematics, The Carus Mathematical Monographs, Vol. 14, Mathematical Association of America.
 * Glynn, David G.
-  (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887–1891.
+  (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887-1891.
   <doi:10.1016/j.ejc.2010.01.010>`_
-
-Summary
--------
-.. autosummary::
-
-    perm
-    perm_ryser
-    perm_bbfg
-    permanent_repeated
-
-Code details
-------------
 """
 import numpy as np
 from numba import jit
@@ -54,8 +38,9 @@ def perm(A, method="bbfg"):
             or ``"bbfg"`` to use the
             `BBFG formula
             <https://en.wikipedia.org/wiki/Computing_the_permanent#Balasubramanian%E2%80%93Bax%E2%80%93Franklin%E2%80%93Glynn_formula>`_.
+
     Returns:
-        np.float64 or np.complex128: the permanent of matrix A.
+        float or complex: the permanent of matrix ``A``
     """
 
     if not isinstance(A, np.ndarray):
@@ -101,7 +86,7 @@ def perm_ryser(M):  # pragma: no cover
         M (array) : a square array.
 
     Returns:
-        np.float64 or np.complex128: the permanent of matrix M.
+        float or complex: the permanent of matrix ``M``
     """
     n = len(M)
     # row_comb keeps the sum of previous subsets.
@@ -143,7 +128,7 @@ def perm_bbfg(M):  # pragma: no cover
         M (array) : a square array.
 
     Returns:
-        np.float64 or np.complex128: the permanent of a matrix M.
+        float or complex: the permanent of a matrix ``M``
     """
 
     n = len(M)
@@ -186,7 +171,7 @@ def permanent_repeated(A, rpt):
             of A to be repeated.
 
     Returns:
-        np.int64 or np.float64 or np.complex128: the permanent of matrix A.
+        int or float or complex: the permanent of matrix ``A``
     """
     n = A.shape[0]
     O = np.zeros([n, n])

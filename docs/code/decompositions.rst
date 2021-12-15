@@ -1,0 +1,2 @@
+.. automodule:: thewalrus.decompositions
+	:members:

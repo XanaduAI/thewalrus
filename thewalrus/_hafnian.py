@@ -747,7 +747,7 @@ def hafnian(
         glynn (bool): whether to use finite difference sieve
 
     Returns:
-        int, float, complex: the hafnian of matrix ``A``
+        int or float or complex: the hafnian of matrix ``A``
     """
     # pylint: disable=too-many-return-statements,too-many-branches
     input_validation(A, rtol=rtol, atol=atol)
@@ -890,7 +890,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
         glynn (bool): whether to use finite difference sieve
 
     Returns:
-        int, float, complex: the hafnian of matrix A
+        int or float or complex: the hafnian of matrix A
     """
     # pylint: disable=too-many-return-statements,too-many-branches
     input_validation(A, atol=atol, rtol=rtol)
@@ -936,7 +936,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
         A (array): a square, symmetric array of even dimensions
 
     Returns:
-        int, float, complex: the loop hafnian of matrix ``A``
+        int or float or complex: the loop hafnian of matrix ``A``
     """
     input_validation(A, atol=atol, rtol=rtol)
     (n, _) = A.shape

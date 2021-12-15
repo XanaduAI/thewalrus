@@ -15,10 +15,15 @@
 Random matrices
 ===============
 
+**Module name:** :mod:`thewalrus.random`
+
 .. currentmodule:: thewalrus.random
 
 This submodule provides access to utility functions to generate random unitary, symplectic
 and covariance matrices.
+
+Summary
+-------
 
 .. autosummary::
     random_covariance
@@ -28,7 +33,7 @@ and covariance matrices.
     random_banded_interferometer
 
 Code details
-^^^^^^^^^^^^
+------------
 """
 import numpy as np
 import scipy as sp

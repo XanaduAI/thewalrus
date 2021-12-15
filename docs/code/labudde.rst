@@ -1,0 +1,2 @@
+.. automodule:: thewalrus.labudde
+	:members:
