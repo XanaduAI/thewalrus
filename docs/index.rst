@@ -76,7 +76,7 @@ The Walrus Documentation
                             <h3 class="card-title pl-3 mt-4">
                             API
                             </h3>
-                            <p class="mb-3 grey-text px-3">Explore The Walrus Python and C++ APIs <i class="fas fa-angle-double-right"></i></p>
+                            <p class="mb-3 grey-text px-3">Explore The Walrus Python API <i class="fas fa-angle-double-right"></i></p>
                         </div>
                     </div>
                 </div>
