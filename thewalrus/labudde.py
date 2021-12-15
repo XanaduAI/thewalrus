@@ -19,7 +19,7 @@ La Budde's algorithm
 
 .. currentmodule:: thewalrus.labudde
 
-This module implements the La Budde's algorithm to calculate the
+This module implements La Budde's algorithm to calculate the
 characteristic polynomials of matrices.
 
 Summary
@@ -128,7 +128,7 @@ def reduce_matrix_to_hessenberg(matrix):  # pragma: no cover
 @jit(nopython=True, cache=True)
 def beta(H, i):  # pragma: no cover
     r"""Auxiliary function for Labudde algorithm. See pg 10 of
-    [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of beta.
+    `arXiv:1104.3769 <https://arxiv.org/abs/1104.3769v1>`_ for definition of beta.
 
     Args:
         matrix (array): upper-Hessenberg matrix
@@ -143,7 +143,7 @@ def beta(H, i):  # pragma: no cover
 @jit(nopython=True, cache=True)
 def alpha(H, i):  # pragma: no cover
     r"""Auxiliary function for La Budde's algorithm. See pg 10 of
-    [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of alpha.
+    `arXiv:1104.3769 <https://arxiv.org/abs/1104.3769v1>`_ for definition of alpha.
 
     Args:
         matrix (array): upper-Hessenberg matrix
@@ -158,7 +158,7 @@ def alpha(H, i):  # pragma: no cover
 @jit(nopython=True, cache=True)
 def hij(H, i, j):  # pragma: no cover
     r"""Auxiliary function for La Budde's algorithm. See pg 10 of
-    [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1) for definition of hij.
+    `arXiv:1104.3769 <https://arxiv.org/abs/1104.3769v1>`_ for definition of hij.
 
     Args:
         matrix (array): upper-Hessenberg matrix
@@ -174,7 +174,7 @@ def hij(H, i, j):  # pragma: no cover
 @jit(nopython=True, cache=True)
 def mlo(i, j):  # pragma: no cover
     """Auxiliary function for La Budde's algorithm.
-    See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    See `arXiv:1104.3769 <https://arxiv.org/abs/1104.3769v1>`_.
 
     .. note::
 
@@ -195,7 +195,7 @@ def mlo(i, j):  # pragma: no cover
 @jit(nopython=True, cache=True)
 def _charpoly_from_labudde(H, k):  # pragma: no cover
     r"""Compute characteristic polynomial using La Budde's algorithm.
-    See [arXiv:1104.3769](https://arxiv.org/abs/1104.3769v1).
+    See `arXiv:1104.3769 <https://arxiv.org/abs/1104.3769v1>`_.
 
     .. note::
 

@@ -12,6 +12,10 @@ Python API
 
 * The :mod:`thewalrus.symplectic` submodule provides access to a convenient set of symplectic matrices and utility functions to manipulate them
 
+* The :mod:`thewalrus.decompositions` submodule provides access to common shared matrix decompositions used to perform gate decompositions
+
+* The :mod:`thewalrus.labudde` submodule provides access to La Budde's algorithm to calculate the characteristic polynomials of matrices
+
 * The :mod:`thewalrus.random` submodule provides access to random unitary, symplectic and covariance matrices
 
 * The :mod:`thewalrus.fock_gradients` submodule provides access to the Fock representation of certain continuous-variable gates and their gradients
@@ -22,4 +26,4 @@ Python API
 Octave
 ------
 
-In addition, two auxiallary Octave functions are provided: :download:`octave/hafnian.m <../octave/hafnian.m>` and :download:`octave/loophafnian.m <../octave/loophafnian.m>`.
+In addition, two auxiliary Octave functions are provided: :download:`octave/hafnian.m <../octave/hafnian.m>` and :download:`octave/loophafnian.m <../octave/loophafnian.m>`.
