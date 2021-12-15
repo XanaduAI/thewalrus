@@ -1161,9 +1161,6 @@ def test_photon_number_covmat_random_state(hbar):
 def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypatch):
     """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
 
-    if parallel:  # set single-thread use in OpenMP
-        monkeypatch.setenv("OMP_NUM_THREADS", "1")
-
     cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
     cov2 = hbar * cov2 @ cov2.T / 2.0
     mean2 = np.zeros([4])
@@ -1187,9 +1184,6 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypa
 @pytest.mark.parametrize("parallel", [True, False])
 def test_update_with_loss_coherent_states(etas, etai, parallel, hbar, monkeypatch):
     """Checks probabilities are updated correctly for coherent states"""
-
-    if parallel:  # set single-thread use in OpenMP
-        monkeypatch.setenv("OMP_NUM_THREADS", "1")
 
     n_modes = 2
     cov = hbar * np.identity(2 * n_modes) / 2
@@ -1236,9 +1230,6 @@ def test_loss_value_error(eta):
 @pytest.mark.parametrize("parallel", [True, False])
 def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
     """Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
-
-    if parallel:  # set single-thread use in OpenMP
-        monkeypatch.setenv("OMP_NUM_THREADS", "1")
 
     cutoff = 15
     nbar_vals = np.random.rand(num_modes)
