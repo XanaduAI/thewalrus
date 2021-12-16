@@ -1,8 +1,8 @@
-# Version 0.18.0-dev
+# Version 0.18.0
 
 ### New features
 
-* Python module for the La Budde method of computing characteristic polynomials. [#304](Add python code for the labudde algorithm)
+* Python module for the La Budde method of computing characteristic polynomials. [#304](https://github.com/XanaduAI/thewalrus/pull/304)
 
 ### Improvements
 
@@ -10,10 +10,7 @@
 
 * Hafnian algorithms are implemented in Python using Numba just-in-time compilation. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
 
-* The Walrus is no longer dependent on C++, and all C++-related code and documentation is removed. Instead, all code has been ported to Python using just-in-time compilation to improve performance. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
-
 * Documentation is updated to include the characteristic polynomials and decompositions modules. [#312](https://github.com/XanaduAI/thewalrus/pull/312)
-
 
 ### Bug fixes
 
@@ -24,7 +21,9 @@
   tw.samples.generate_torontonian_sample
   ```
 
-### Breaking changes
+### Breaking Changes
+
+* The Walrus is no longer dependent on C++, and all C++-related code and documentation is removed. Instead, all code has been ported to Python using just-in-time compilation to improve performance. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
 
 ### Contributors
 
