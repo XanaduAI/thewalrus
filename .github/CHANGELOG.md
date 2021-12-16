@@ -2,7 +2,7 @@
 
 ### New features
 
-* Python module for the La Budde method of computing characteristic polynomials. [#304](https://github.com/XanaduAI/thewalrus/pull/310)
+* Python module for the La Budde method of computing characteristic polynomials. [#304](https://github.com/XanaduAI/thewalrus/pull/304)
 
 ### Improvements
 
