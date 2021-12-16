@@ -10,10 +10,7 @@
 
 * Hafnian algorithms are implemented in Python using Numba just-in-time compilation. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
 
-* The Walrus is no longer dependent on C++, and all C++-related code and documentation is removed. Instead, all code has been ported to Python using just-in-time compilation to improve performance. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
-
 * Documentation is updated to include the characteristic polynomials and decompositions modules. [#312](https://github.com/XanaduAI/thewalrus/pull/312)
-
 
 ### Bug fixes
 
@@ -23,6 +20,10 @@
   import thewalrus as tw
   tw.samples.generate_torontonian_sample
   ```
+
+### Breaking Changes
+
+* The Walrus is no longer dependent on C++, and all C++-related code and documentation is removed. Instead, all code has been ported to Python using just-in-time compilation to improve performance. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
 
 ### Contributors
 
