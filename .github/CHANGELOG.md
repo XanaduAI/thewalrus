@@ -1,4 +1,4 @@
-# Version 0.18.0-dev
+# Version 0.18.0
 
 ### New features
 
@@ -23,8 +23,6 @@
   import thewalrus as tw
   tw.samples.generate_torontonian_sample
   ```
-
-### Breaking changes
 
 ### Contributors
 
