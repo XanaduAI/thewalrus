@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Fock gradients of Gaussian gates
-================================
+Fock representations
+====================
 
 **Module name:** :mod:`thewalrus.fock_gradients`
 

@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-La Budde's algorithm
-====================
+Characteristic polynomials
+==========================
 
-**Module name:** :mod:`thewalrus.labudde`
+**Module name:** :mod:`thewalrus.charpoly`
 
-.. currentmodule:: thewalrus.labudde
+.. currentmodule:: thewalrus.charpoly
 
 This module implements La Budde's algorithm to calculate the
 characteristic polynomials of matrices.
@@ -28,8 +28,8 @@ Summary
     get_reflection_vector
     apply_householder
     reduce_matrix_to_hessenberg
-    charpoly_from_labudde
-    power_trace_labudde
+    charpoly
+    powertrace
 
 Code details
 ------------
@@ -193,7 +193,7 @@ def mlo(i, j):  # pragma: no cover
 
 
 @jit(nopython=True, cache=True)
-def _charpoly_from_labudde(H, k):  # pragma: no cover
+def _charpoly(H, k):  # pragma: no cover
     r"""Compute characteristic polynomial using La Budde's algorithm.
     See `arXiv:1104.3769 <https://arxiv.org/abs/1104.3769v1>`_.
 
@@ -283,7 +283,7 @@ def _charpoly_from_labudde(H, k):  # pragma: no cover
 
 
 @jit(nopython=True, cache=True)
-def charpoly_from_labudde(H):  # pragma: no cover
+def charpoly(H):  # pragma: no cover
     """Calculates the characteristic polynomial of the matrix ``H``.
 
     Args:
@@ -294,12 +294,12 @@ def charpoly_from_labudde(H):  # pragma: no cover
     """
     n = len(H)
     reduce_matrix_to_hessenberg(H)
-    coeff = _charpoly_from_labudde(H, n)
+    coeff = _charpoly(H, n)
     return coeff
 
 
 @jit(nopython=True, cache=True)
-def power_trace_labudde(H, n):  # pragma: no cover
+def powertrace(H, n):  # pragma: no cover
     """Calculates the powertraces of the matrix ``H`` up to power ``n-1``.
 
     Args:
@@ -318,7 +318,7 @@ def power_trace_labudde(H, n):  # pragma: no cover
         pow_traces.append(np.trace(A))
     if n <= m:
         return np.array(pow_traces, dtype=H.dtype)
-    char_pol = charpoly_from_labudde(H)
+    char_pol = charpoly(H)
     for _ in range(min_val, n):
         ssum = 0
         for k in range(m):

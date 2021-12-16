@@ -95,7 +95,7 @@ import thewalrus.quantum
 import thewalrus.csamples
 import thewalrus.decompositions
 import thewalrus.fock_gradients
-import thewalrus.labudde
+import thewalrus.charpoly
 import thewalrus.random
 import thewalrus.reference
 import thewalrus.samples

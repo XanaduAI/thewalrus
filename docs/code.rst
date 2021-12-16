@@ -14,7 +14,7 @@ Python API
 
 * The :mod:`thewalrus.decompositions` submodule provides access to common shared matrix decompositions used to perform gate decompositions
 
-* The :mod:`thewalrus.labudde` submodule provides access to La Budde's algorithm to calculate the characteristic polynomials of matrices
+* The :mod:`thewalrus.charpoly` submodule provides access to La Budde's algorithm to calculate the characteristic polynomials of matrices
 
 * The :mod:`thewalrus.random` submodule provides access to random unitary, symplectic and covariance matrices
 

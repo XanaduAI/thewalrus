@@ -165,8 +165,8 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    code/samples
    code/csamples
    code/symplectic
-   code/decompositions
-   code/labudde
+   code/charpoly
    code/random
    code/fock_gradients
+   code/decompositions
    code/reference
