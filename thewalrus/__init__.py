@@ -72,8 +72,6 @@ Sparse hafnian algorithm
     An algorithm that calculates the hafnian of a sparse matrix by taking advantage of the Laplace expansion and memoization, to store
     only the relevant paths that contribute non-zero values to the final calculation.
 
-
-
 Functions
 ---------
 
@@ -91,15 +89,17 @@ Functions
     low_rank_hafnian
 
 Code details
-^^^^^^^^^^^^
+------------
 """
-# pylint: disable=wrong-import-position
-import os
-import platform
-
-import numpy as np
-
 import thewalrus.quantum
+import thewalrus.csamples
+import thewalrus.decompositions
+import thewalrus.fock_gradients
+import thewalrus.charpoly
+import thewalrus.random
+import thewalrus.reference
+import thewalrus.samples
+import thewalrus.symplectic
 
 from ._hafnian import (
     hafnian,
@@ -182,6 +182,9 @@ def about():
         Cython version:            0.29.24
     """
     # pylint: disable=import-outside-toplevel
+    import os
+    import platform
+
     import sys
     import numpy
     import scipy

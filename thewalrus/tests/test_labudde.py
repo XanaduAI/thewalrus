@@ -14,7 +14,7 @@
 """Labudde tests"""
 import math
 import numpy as np
-import thewalrus.labudde
+import thewalrus.charpoly
 
 import pytest
 
@@ -26,19 +26,19 @@ def test_labudde_2by2(phi):
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
     mat = np.array([[cosh_phi, sinh_phi], [sinh_phi, cosh_phi]])
-    charpoly = thewalrus.labudde.charpoly_from_labudde(mat)
+    charpoly = thewalrus.charpoly.charpoly(mat)
     assert np.allclose(charpoly[0], -2 * cosh_phi)
     assert np.allclose(charpoly[1], 1)
 
 
 @pytest.mark.parametrize("n", [1, 2, 3])
 def test_powtrace_2by2(n):
-    """Consistency test between power_trace_eigen and power_trace_labudde"""
+    """Consistency test between power_trace_eigen and powertrace"""
     phi = 0.1 * math.pi
     sinh_phi = math.sinh(phi)
     cosh_phi = math.cosh(phi)
     mat = np.array([[cosh_phi, sinh_phi], [sinh_phi, cosh_phi]])
-    pow_trace_lab = thewalrus.labudde.power_trace_labudde(mat, n + 1)
+    pow_trace_lab = thewalrus.charpoly.powertrace(mat, n + 1)
 
     # Use wolfram alpha to verify with:
     # Trace[[[1.04975523, 0.31935254], [0.31935254, 1.04975523]]^1]
@@ -55,7 +55,7 @@ def test_powtrace_2by2(n):
 
 @pytest.mark.parametrize("n", [1, 2, 4])
 def test_powtrace_4by4(n):
-    """Consistency test between power_trace_eigen and power_trace_labudde"""
+    """Consistency test between power_trace_eigen and powertrace"""
 
     mat = np.array(
         [
@@ -65,7 +65,7 @@ def test_powtrace_4by4(n):
             [21.31935254, 3.14975523, 7, 8],
         ]
     )
-    pow_trace_lab = thewalrus.labudde.power_trace_labudde(mat, n + 1)
+    pow_trace_lab = thewalrus.charpoly.powertrace(mat, n + 1)
     if n == 1:
         assert np.allclose(pow_trace_lab[-1], 15.0995)
     if n == 2:

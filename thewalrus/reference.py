@@ -15,6 +15,8 @@
 Reference implementations
 =========================
 
+**Module name:** :mod:`thewalrus.reference`
+
 .. currentmodule:: thewalrus.reference
 
 This submodule provides access to reference implementations of the
@@ -27,7 +29,6 @@ For more details on these definitions see:
   complex matrices and its benchmarking on the Titan supercomputer"
   `arxiv:1805.12498 (2018) <https://arxiv.org/abs/arxiv:1805.12498>`_
 
-
 Reference functions
 -------------------
 
@@ -35,7 +36,7 @@ Reference functions
     hafnian
 
 Code details
-^^^^^^^^^^^^
+------------
 
 .. autofunction::
     hafnian
@@ -51,7 +52,7 @@ Auxiliary functions
     T
 
 Code details
-^^^^^^^^^^^^
+------------
 """
 import functools
 

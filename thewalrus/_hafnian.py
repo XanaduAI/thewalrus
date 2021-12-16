@@ -477,6 +477,9 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
 def _haf(A, reps=None, glynn=True):
     r"""Calculate hafnian with (optional) repeated rows and columns.
 
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): N x N matrix.
         reps (list): Length-N list of repetitions of each row/col (optional). If not provided,
@@ -518,6 +521,9 @@ def _haf(A, reps=None, glynn=True):
 def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  # pragma: no cover
     """Compute loop hafnian, using inputs as prepared by frontend loop_hafnian function
     compiled with Numba.
+
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
 
     Args:
         A (array): matrix ordered according to the chosen perfect matching.
@@ -586,6 +592,9 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
 def loop_hafnian(A, D=None, reps=None, glynn=True):
     """Calculate loop hafnian with (optional) repeated rows and columns.
 
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): N x N matrix.
         D (array): Diagonal entries of matrix (optional). If not provided, ``D`` is the diagonal of ``A``.
@@ -594,6 +603,7 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
             row/column assumed to be repeated once.
         glynn (bool): If ``True``, use Glynn-style finite difference sieve formula, if ``False``,
             use Ryser style inclusion/exclusion principle.
+
     Returns
         complex: result of loop hafnian calculation
     """
@@ -731,6 +741,9 @@ def hafnian(
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
 
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): a square, symmetric array of even dimensions
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
@@ -747,7 +760,7 @@ def hafnian(
         glynn (bool): whether to use finite difference sieve
 
     Returns:
-        int, float, complex: the hafnian of matrix ``A``
+        int or float or complex: the hafnian of matrix ``A``
     """
     # pylint: disable=too-many-return-statements,too-many-branches
     input_validation(A, rtol=rtol, atol=atol)
@@ -856,6 +869,9 @@ def hafnian_sparse(A, D=None, loop=False):
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=True):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     The :func:`reduction` function may be used to show the resulting matrix
     with repeated rows and columns as per ``rpt``.
 
@@ -890,7 +906,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
         glynn (bool): whether to use finite difference sieve
 
     Returns:
-        int, float, complex: the hafnian of matrix A
+        int or float or complex: the hafnian of matrix A
     """
     # pylint: disable=too-many-return-statements,too-many-branches
     input_validation(A, atol=atol, rtol=rtol)
@@ -936,7 +952,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
         A (array): a square, symmetric array of even dimensions
 
     Returns:
-        int, float, complex: the loop hafnian of matrix ``A``
+        int or float or complex: the loop hafnian of matrix ``A``
     """
     input_validation(A, atol=atol, rtol=rtol)
     (n, _) = A.shape

@@ -5,17 +5,13 @@ The Walrus
     :alt: Tests
     :target: https://github.com/XanaduAI/thewalrus/actions/workflows/tests.yml
 
-.. image:: https://github.com/XanaduAI/thewalrus/actions/workflows/build.yml/badge.svg
-    :alt: Build
-    :target: https://github.com/XanaduAI/thewalrus/actions/workflows/build.yml
-
 .. image:: https://img.shields.io/codecov/c/github/xanaduai/thewalrus/master.svg?style=flat
     :alt: Codecov coverage
     :target: https://codecov.io/gh/XanaduAI/thewalrus
 
-.. image:: https://img.shields.io/codacy/grade/df94d22534cf4c05b1bddcf697011a82.svg?style=flat
-    :alt: Codacy grade
-    :target: https://app.codacy.com/app/XanaduAI/thewalrus?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/thewalrus&utm_campaign=badger
+.. image:: https://img.shields.io/codefactor/grade/github/XanaduAI/thewalrus/master?style=flat
+    :alt: CodeFactor Grade
+    :target: https://www.codefactor.io/repository/github/xanaduai/thewalrus
 
 .. image:: https://img.shields.io/readthedocs/the-walrus.svg?style=flat
     :alt: Read the Docs

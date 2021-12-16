@@ -6,10 +6,23 @@
 
 ### Improvements
 
-* Permanent algorithms are implemented in numba, hence reducing the C++ dependencies of The Walrus. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
+* Permanent algorithms are implemented in Python using Numba just-in-time compilation. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
+
+* Hafnian algorithms are implemented in Python using Numba just-in-time compilation. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
+
+* The Walrus is no longer dependent on C++, and all C++-related code and documentation is removed. Instead, all code has been ported to Python using just-in-time compilation to improve performance. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
+
+* Documentation is updated to include the characteristic polynomials and decompositions modules. [#312](https://github.com/XanaduAI/thewalrus/pull/312)
 
 
 ### Bug fixes
+
+* Makes modules reachable via the global namespace, instead of requiring importing the modules explicitly. [#312](https://github.com/XanaduAI/thewalrus/pull/312)
+
+  ```python
+  import thewalrus as tw
+  tw.samples.generate_torontonian_sample
+  ```
 
 ### Breaking changes
 
@@ -17,7 +30,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Trevor Vincent, Jiaqi Zhao
+Theodor Isacsson, Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Trevor Vincent, Jiaqi Zhao
 
 ---
 
