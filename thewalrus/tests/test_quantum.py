@@ -1158,7 +1158,7 @@ def test_photon_number_covmat_random_state(hbar):
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("parallel", [True, False])
-def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypatch):
+def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar):
     """Test the probabilities are updated correctly for a lossy two mode squeezed vacuum state"""
 
     cov2 = two_mode_squeezing(np.arcsinh(1.0), 0.0)
@@ -1182,7 +1182,7 @@ def test_update_with_loss_two_mode_squeezed(etas, etai, parallel, hbar, monkeypa
 @pytest.mark.parametrize("etas", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("etai", [0.1, 0.4, 0.9, 1.0])
 @pytest.mark.parametrize("parallel", [True, False])
-def test_update_with_loss_coherent_states(etas, etai, parallel, hbar, monkeypatch):
+def test_update_with_loss_coherent_states(etas, etai, parallel, hbar):
     """Checks probabilities are updated correctly for coherent states"""
 
     n_modes = 2
@@ -1228,7 +1228,7 @@ def test_loss_value_error(eta):
 
 @pytest.mark.parametrize("num_modes", [1, 2, 3])
 @pytest.mark.parametrize("parallel", [True, False])
-def test_update_with_noise_coherent(num_modes, parallel, monkeypatch):
+def test_update_with_noise_coherent(num_modes, parallel):
     """Test that adding noise on coherent states gives the same probabilities at some other coherent states"""
 
     cutoff = 15
