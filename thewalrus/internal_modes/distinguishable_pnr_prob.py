@@ -188,7 +188,7 @@ def _vac_prob(covs, M, hbar=2):
 
     return vac_prob
 
-def dist_prob(pattern, rs, T, hbar=2):
+def distinguishable_pnr_prob(pattern, rs, T, hbar=2):
     """
     probabilities for completely distinguishable GBS
 
@@ -216,4 +216,3 @@ def dist_prob(pattern, rs, T, hbar=2):
         return _vac_prob(np.array(covs), M, hbar=hbar)
 
     return _dist_prob_gray(np.array(pattern), np.array(covs), M)
-    
