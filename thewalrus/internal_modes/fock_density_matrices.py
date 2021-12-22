@@ -20,7 +20,7 @@ import numba
 
 from scipy.special import factorial as fac
 
-from .._hafnian import nb_binom, nb_ix
+from .._hafnian import nb_binom, nb_ix, find_kept_edges
 from .useful_tools import nb_block, nb_Qmat, f_all_charpoly
 
 @numba.jit(nopython=True, parallel=True, cache=True)
