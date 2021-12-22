@@ -22,7 +22,7 @@ import numba
 from scipy.special import factorial as fac
 
 from ..quantum import Qmat
-from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace
+from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix
 from ..charpoly import powertrace
 
 from .useful_tools import spatial_reps_to_schmidt_reps, spatial_modes_to_schmidt_modes
@@ -68,7 +68,7 @@ def hafkd(As, edge_reps, K=1):
 
         powertraces = np.zeros(N // 2 + 1, dtype=np.complex128)
         for A in As:
-            A_nonzero = numba_ix(A, nonzero_schmidt_modes, nonzero_schmidt_modes)
+            A_nonzero = nb_ix(A, nonzero_schmidt_modes, nonzero_schmidt_modes)
             AX_S = np.empty_like(A_nonzero, dtype=np.complex128)
             AX_S[:,:n_nonzero_edges] = glynn_schmidt_edges_nonzero * A_nonzero[:,n_nonzero_edges:]
             AX_S[:,n_nonzero_edges:] = glynn_schmidt_edges_nonzero * A_nonzero[:,:n_nonzero_edges]
@@ -114,7 +114,7 @@ def pnr_prob(covs, i, hbar=2):
         vac_prob /= np.sqrt(np.linalg.det(Q).real)
 
     fac_prod = np.prod(fac(i), dtype=np.float64)
-    haf = hafkd(np.array(As), np.array(pattern), K)
+    haf = hafkd(np.array(As), np.array(i), K)
     prob = haf.real * vac_prob / fac_prod
 
     return prob

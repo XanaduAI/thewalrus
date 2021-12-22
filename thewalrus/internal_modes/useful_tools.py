@@ -1,9 +1,9 @@
 import numpy as np 
-from numba import jit 
+import numba 
 from ..charpoly import powertrace
 
 
-jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def spatial_modes_to_schmidt_modes(spatial_modes, K):
     """
     returns index of schmidt modes corresponding to the give spatial modes. 
@@ -26,7 +26,7 @@ def spatial_modes_to_schmidt_modes(spatial_modes, K):
 
     return schmidt_modes
 
-jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def spatial_reps_to_schmidt_reps(spatial_reps, K):
     """
     returns reps of schmidt modes corresponding to the give spatial reps. 
@@ -90,7 +90,7 @@ def nb_block(X): # pragma: no cover
     xtmp2 = np.concatenate(X[1], axis=1)
     return np.concatenate((xtmp1, xtmp2), axis=0)
 
-@jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def f_all_charpoly(H, n):
 
     pow_traces = powertrace(H, n // 2 + 1)
