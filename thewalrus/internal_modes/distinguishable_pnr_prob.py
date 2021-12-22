@@ -19,7 +19,15 @@ import numba
 
 from ..symplectic import passive_transformation, squeezing
 from ..quantum import Qmat
-from .._hafnian import nb_binom
+from .._hafnian import nb_binom, f
+from .useful_tools import nb_Qmat, nb_block
+
+fact = np.array([
+    1, 1, 2, 6, 24, 120, 720, 5040, 40320,
+    362880, 3628800, 39916800, 479001600,
+    6227020800, 87178291200, 1307674368000,
+    20922789888000, 355687428096000, 6402373705728000,
+    121645100408832000, 2432902008176640000], dtype='int64')
 
 @numba.jit(nopython=True, cache=True)
 def guan_code(n):
@@ -75,7 +83,7 @@ def _dist_prob_gray(pattern, covs, M):
     assert len(pattern) == M
     for cov in covs:
         assert cov.shape[0] == 2 * M 
-        Q = numba_Qmat(cov)
+        Q = nb_Qmat(cov)
         O = np.identity(2 * M) - np.linalg.inv(Q)
         A = np.empty_like(O)
         A[:M,:] = O[M:,:].conj()
@@ -156,7 +164,7 @@ def _dist_prob_gray(pattern, covs, M):
             E.extend([x,y])
 
         E = np.array(E)
-        Hnew = prefac * f(E, N)
+        Hnew = prefac * f(E, N)[N // 2].real
 
         prev_nonzero_rows = nonzero_rows.copy()
 
@@ -166,7 +174,7 @@ def _dist_prob_gray(pattern, covs, M):
 
     return prob
 
-def _vac_prob(covs, M, hbar=2):
+def _vac_prob(covs, M):
     """
     vacuum probability
 
@@ -182,13 +190,13 @@ def _vac_prob(covs, M, hbar=2):
 
     for cov in covs:
         assert cov.shape[0] == 2 * M 
-        Q = Qmat(cov, hbar=hbar)
+        Q = Qmat(cov)
 
         vac_prob /= np.sqrt(np.linalg.det(Q).real)
 
     return vac_prob
 
-def distinguishable_pnr_prob(pattern, rs, T, hbar=2):
+def distinguishable_pnr_prob(pattern, rs, T):
     """
     probabilities for completely distinguishable GBS
 
@@ -213,6 +221,6 @@ def distinguishable_pnr_prob(pattern, rs, T, hbar=2):
             covs.append(cov)
 
     if sum(pattern) == 0:
-        return _vac_prob(np.array(covs), M, hbar=hbar)
+        return _vac_prob(np.array(covs), M)
 
     return _dist_prob_gray(np.array(pattern), np.array(covs), M)

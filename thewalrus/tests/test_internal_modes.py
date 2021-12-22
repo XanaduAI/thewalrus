@@ -19,9 +19,13 @@ import pytest
 
 import numpy as np 
 
+from scipy.stats import unitary_group
+
+from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob
+
 from thewalrus.random import random_covariance
-from thewalrus.internal_modes import pnr_prob
 from thewalrus.quantum import density_matrix_element
+from thewalrus.symplectic import squeezing, passive_transformation
 
 @pytest.mark.parametrize("M", [3,4,5,6])
 def test_pnr_prob_single_internal_mode(M):
@@ -38,3 +42,33 @@ def test_pnr_prob_single_internal_mode(M):
     p2 = density_matrix_element(mu, cov, pattern, pattern).real
     
     assert np.isclose(p1, p2)
+
+@pytest.mark.parametrize("M", [3,4,5,6])
+def test_distinguishable_pnr_prob(M):
+    hbar = 2
+
+    pattern = [3,2,0] + [1] * (M - 3)
+
+    mu = np.zeros(2 * M)
+
+    rs = [1] * M
+    T = 0.5 * unitary_group.rvs(M)
+
+    big_cov = np.zeros((2*M**2, 2*M**2))
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, T)
+        covs.append(cov)
+        big_cov[i::M,i::M] = cov
+
+    p1 = pnr_prob(covs, pattern, hbar=hbar)
+    p2 = pnr_prob(big_cov, pattern, hbar=hbar)
+    p3 = distinguishable_pnr_prob(pattern, rs, T)
+
+    assert np.isclose(p1,p2)
+    assert np.isclose(p1,p3)
+    assert np.isclose(p2,p3)

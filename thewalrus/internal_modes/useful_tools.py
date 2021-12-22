@@ -72,7 +72,7 @@ def nb_Qmat(cov, hbar=2): # pragma: no cover
     aiaj = (x - p + 1j * (xp + xp.T)) / 4
 
     # calculate the covariance matrix sigma_Q appearing in the Q function:
-    Q = numba_block(((aidaj, aiaj.conj()), (aiaj, aidaj.conj()))) + np.identity(2 * N)
+    Q = nb_block(((aidaj, aiaj.conj()), (aiaj, aidaj.conj()))) + np.identity(2 * N)
     return Q
 
 

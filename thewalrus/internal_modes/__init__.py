@@ -1,1 +1,2 @@
 from .pnr_statistics import pnr_prob
+from .distinguishable_pnr_prob import distinguishable_pnr_prob
