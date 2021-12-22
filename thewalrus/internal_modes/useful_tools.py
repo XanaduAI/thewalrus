@@ -1,5 +1,6 @@
 import numpy as np 
 from numba import jit 
+from ..charpoly import powertrace
 
 
 jit(nopython=True, cache=True)
@@ -46,3 +47,64 @@ def spatial_reps_to_schmidt_reps(spatial_reps, K):
         schmidt_reps[i*K:(i+1)*K] = r
 
     return schmidt_reps
+
+@numba.jit(nopython=True, cache=True)
+def nb_Qmat(cov, hbar=2): # pragma: no cover
+    r"""Numba compatible version of `thewalrus.quantum.Qmat`
+    Returns the :math:`Q` Husimi matrix of the Gaussian state.
+    Args:
+        cov (array): :math:`2N\times 2N xp-` Wigner covariance matrix
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+    Returns:
+        array: the :math:`Q` matrix.
+    """
+    # number of modes
+    N = len(cov) // 2
+    I = np.identity(N)
+
+    x = cov[:N, :N] * (2. / hbar)
+    xp = cov[:N, N:] * (2. / hbar)
+    p = cov[N:, N:] * (2. / hbar)
+    # the (Hermitian) matrix elements <a_i^\dagger a_j>
+    aidaj = (x + p + 1j * (xp - xp.T) - 2 * I) / 4
+    # the (symmetric) matrix elements <a_i a_j>
+    aiaj = (x - p + 1j * (xp + xp.T)) / 4
+
+    # calculate the covariance matrix sigma_Q appearing in the Q function:
+    Q = numba_block(((aidaj, aiaj.conj()), (aiaj, aidaj.conj()))) + np.identity(2 * N)
+    return Q
+
+
+@numba.jit(nopython=True, cache=True)
+def nb_block(X): # pragma: no cover
+    """Numba implementation of `np.block`.
+    Only suitable for 2x2 blocks.
+    Taken from: https://stackoverflow.com/a/57562911
+    Args:
+        X (array) : arrays for blocks of matrix
+    Return:
+        array : the block matrix from X
+    """
+    xtmp1 = np.concatenate(X[0], axis=1)
+    xtmp2 = np.concatenate(X[1], axis=1)
+    return np.concatenate((xtmp1, xtmp2), axis=0)
+
+@jit(nopython=True, cache=True)
+def f_all_charpoly(H, n):
+
+    pow_traces = powertrace(H, n // 2 + 1)
+    count = 0
+    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
+    comb[0, 0] = 1
+    for i in range(1, n // 2 + 1):
+        factor = pow_traces[i] / (2 * i)
+        powfactor = 1
+        count = 1 - count
+        comb[count, :] = comb[1 - count, :]
+        for j in range(1, n // (2 * i) + 1):
+            powfactor *= factor / j
+            for k in range(i * j + 1, n // 2 + 2):
+                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
+
+    return comb[count, :]
