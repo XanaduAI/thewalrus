@@ -15,6 +15,8 @@
 Quantum algorithms
 ==================
 
+**Module name:** :mod:`thewalrus.quantum`
+
 .. currentmodule:: thewalrus.quantum
 
 This submodule provides access to various utility functions that act on Gaussian
@@ -41,7 +43,7 @@ states, see:
 
 
 Fock states and tensors
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 .. autosummary::
 
@@ -59,7 +61,7 @@ Fock states and tensors
     n_body_marginals
 
 Adjacency matrices
-^^^^^^^^^^^^^^^^^^
+------------------
 
 .. autosummary::
 
@@ -68,7 +70,7 @@ Adjacency matrices
     adj_to_qmat
 
 Gaussian checks
-^^^^^^^^^^^^^^^
+---------------
 
 .. autosummary::
 
@@ -78,7 +80,7 @@ Gaussian checks
     fidelity
 
 Conversions
-^^^^^^^^^^^
+-----------
 
 .. autosummary::
 
@@ -91,7 +93,7 @@ Conversions
     real_to_complex_displacements
 
 Means and variances
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 .. autosummary::
 
@@ -110,7 +112,7 @@ Means and variances
     click_cumulant
 
 Photon number distributions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
 .. autosummary::
 
@@ -119,8 +121,8 @@ Photon number distributions
     characteristic_function
 
 
-Details
-^^^^^^^
+Code details
+------------
 """
 import warnings
 import functools

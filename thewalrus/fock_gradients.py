@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Fock gradients of Gaussian gates
-================================
+Fock representations
+====================
+
+**Module name:** :mod:`thewalrus.fock_gradients`
 
 .. currentmodule:: thewalrus.fock_gradients
 
 This module contains the Fock representation of the standard Gaussian gates as well as their gradients.
 
-.. autosummary::
-    :toctree: api
+Summary
+-------
 
+.. autosummary::
 	displacement
 	squeezing
 	beamsplitter
@@ -33,6 +36,8 @@ This module contains the Fock representation of the standard Gaussian gates as w
 	grad_two_mode_squeezing
 	grad_mzgate
 
+Code details
+------------
 """
 import numpy as np
 

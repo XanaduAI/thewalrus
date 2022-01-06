@@ -76,7 +76,7 @@ The Walrus Documentation
                             <h3 class="card-title pl-3 mt-4">
                             API
                             </h3>
-                            <p class="mb-3 grey-text px-3">Explore The Walrus Python and C++ APIs <i class="fas fa-angle-double-right"></i></p>
+                            <p class="mb-3 grey-text px-3">Explore The Walrus Python API <i class="fas fa-angle-double-right"></i></p>
                         </div>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ The Walrus Documentation
 Features
 ========
 
-* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices.
+* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices powered by `Numba <https://numba.pydata.org/>`_.
 
 * An easy to use interface to use the loop hafnian for Gaussian quantum state calculations.
 
@@ -165,7 +165,8 @@ The Walrus library is **free** and **open source**, released under the Apache Li
    code/samples
    code/csamples
    code/symplectic
+   code/charpoly
    code/random
    code/fock_gradients
+   code/decompositions
    code/reference
-   code/libwalrus

@@ -12,8 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
+Decompositions
+==============
+
+**Module name:** :mod:`thewalrus.decompositions`
+
+.. currentmodule:: thewalrus.decompositions
+
 This module implements common shared matrix decompositions that are
 used to perform gate decompositions.
+
+Summary
+-------
+
+.. autosummary::
+    williamson
+
+Code details
+------------
 """
 import numpy as np
 
@@ -24,8 +40,9 @@ from thewalrus.symplectic import sympmat
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
-    See https://math.stackexchange.com/questions/1171842/finding-the-symplectic-matrix-in-williamsons-theorem/2682630#2682630
-        and https://strawberryfields.ai/photonics/conventions/decompositions.html#williamson-decomposition
+    See `this thread <https://math.stackexchange.com/questions/1171842/finding-the-symplectic-matrix-in-williamsons-theorem/2682630#2682630>`_
+    and the `Williamson decomposition documentation <https://strawberryfields.ai/photonics/conventions/decompositions.html#williamson-decomposition>`_
+
     Args:
         V (array[float]): positive definite symmetric (real) matrix
         rtol (float): the relative tolerance parameter used in ``np.allclose``

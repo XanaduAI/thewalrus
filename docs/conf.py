@@ -67,8 +67,6 @@ extensions = [
     'sphinxcontrib.bibtex',
     'edit_on_github',
     'nbsphinx',
-    'breathe',
-    'exhale',
     'sphinx_copybutton'
 ]
 
@@ -82,30 +80,6 @@ nbsphinx_execute = 'never'
 nbsphinx_epilog = """
 .. note:: :download:`Click here <../{{env.docname}}.ipynb>` to download this gallery page as an interactive Jupyter notebook.
 """
-
-# Setup the breathe extension
-breathe_projects = {
-    "libwalrus C++": "./doxyoutput/xml"
-}
-
-breathe_default_project = "libwalrus C++"
-breathe_domain_by_extension = {"hpp" : "cpp"}
-
-# Setup the exhale extension
-exhale_args = {
-    # These arguments are required
-    "containmentFolder":     "./libwalrus_cpp_api",
-    "rootFileName":          "library_root.rst",
-    "rootFileTitle":         "C++ Library API",
-    "doxygenStripFromPath":  "..",
-    # Suggested optional arguments
-    "createTreeView":        True,
-    # TIP: if using the sphinx-bootstrap-theme, you need
-    # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../include/stdafx.h ../include/libwalrus.hpp ../include/version.hpp ../include/trace_hafnian.hpp ../include/recursive_hafnian.hpp ../include/repeated_hafnian.hpp ../include/permanent.hpp ../include/powtrace.hpp",
-    # "exhaleUseDoxyfile": True
-}
 
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"
 nbsphinx_requirejs_path = ""

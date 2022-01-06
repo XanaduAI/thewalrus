@@ -15,9 +15,11 @@
 Reference implementations
 =========================
 
+**Module name:** :mod:`thewalrus.reference`
+
 .. currentmodule:: thewalrus.reference
 
-This submodule provides access to pure-Python reference implementations of the
+This submodule provides access to reference implementations of the
 hafnian and loop hafnian by summing over the set of perfect matching permutations
 or the set of single pair matchings.
 
@@ -27,15 +29,14 @@ For more details on these definitions see:
   complex matrices and its benchmarking on the Titan supercomputer"
   `arxiv:1805.12498 (2018) <https://arxiv.org/abs/arxiv:1805.12498>`_
 
-
 Reference functions
 -------------------
 
 .. autosummary::
     hafnian
 
-Details
-^^^^^^^
+Code details
+------------
 
 .. autofunction::
     hafnian
@@ -50,8 +51,8 @@ Auxiliary functions
     pmp
     T
 
-Details
-^^^^^^^
+Code details
+------------
 """
 import functools
 

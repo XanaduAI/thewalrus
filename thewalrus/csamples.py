@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 r"""
-Classical Sampling Algorithms
+Classical sampling algorithms
 =============================
+
+**Module name:** :mod:`thewalrus.csamples`
 
 .. currentmodule:: thewalrus.csamples
 
@@ -32,10 +34,9 @@ For more precise details of the implementation see
   "Point processes with Gaussian boson sampling" `Phys. Rev. E 101, 022134, (2020).
   <https://journals.aps.org/pre/abstract/10.1103/PhysRevE.101.022134>`_.
 
-
-
 Summary
 -------
+
 .. autosummary::
     rescale_adjacency_matrix_thermal
     rescale_adjacency_matrix

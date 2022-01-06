@@ -15,11 +15,12 @@
 Sampling algorithms
 ===================
 
+**Module name:** :mod:`thewalrus.samples`
+
 .. currentmodule:: thewalrus.samples
 
 This submodule provides access to algorithms to sample from the
 hafnian or the torontonian of Gaussian quantum states.
-
 
 Hafnian sampling
 ----------------
@@ -40,7 +41,6 @@ Torontonian sampling
     torontonian_sample_graph
     torontonian_sample_classical_state
     threshold_detection_prob
-    threshold_detection_prob_displacement
 
 Brute force sampling
 --------------------

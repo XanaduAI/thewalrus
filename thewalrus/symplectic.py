@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Symplectic Operations
+Symplectic operations
 =====================
 
 **Module name:** :mod:`thewalrus.symplectic`
@@ -54,7 +54,7 @@ Gates and operations
     rotation
 
 Code details
-^^^^^^^^^^^^
+------------
 """
 import numpy as np
 

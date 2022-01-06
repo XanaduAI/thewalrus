@@ -1,11 +1,8 @@
-# Version 0.17.0-dev
+# Version 0.19.0-dev
 
 ### New features
 
 ### Improvements
-* Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
-
-* Multidimensional Hermite polynomials are now implemented in numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
 
 ### Bug fixes
 
@@ -15,7 +12,57 @@
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov
+---
+
+# Version 0.18.0
+
+### New features
+
+* Python module for the La Budde method of computing characteristic polynomials. [#304](https://github.com/XanaduAI/thewalrus/pull/304)
+
+### Improvements
+
+* Permanent algorithms are implemented in Python using Numba just-in-time compilation. [#300](https://github.com/XanaduAI/thewalrus/pull/300)
+
+* Hafnian algorithms are implemented in Python using Numba just-in-time compilation. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
+
+* Documentation is updated to include the characteristic polynomials and decompositions modules. [#312](https://github.com/XanaduAI/thewalrus/pull/312)
+
+### Bug fixes
+
+* Makes modules reachable via the global namespace, instead of requiring importing the modules explicitly. [#312](https://github.com/XanaduAI/thewalrus/pull/312)
+
+  ```python
+  import thewalrus as tw
+  tw.samples.generate_torontonian_sample
+  ```
+
+### Breaking Changes
+
+* The Walrus is no longer dependent on C++, and all C++-related code and documentation is removed. Instead, all code has been ported to Python using just-in-time compilation to improve performance. [#311](https://github.com/XanaduAI/thewalrus/pull/311)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Theodor Isacsson, Benjamin Lanthier, Dominic Leclerc, Nicolas Quesada, Brandon Turcotte, Trevor Vincent, Jiaqi Zhao
+
+---
+
+# Version 0.17.0
+
+### Improvements
+* Python installation no longer requires [`repoze.lru`](https://pypi.org/project/repoze.lru/). [#293](https://github.com/XanaduAI/thewalrus/pull/293)
+
+* Multidimensional Hermite polynomials are now implemented in Numba, hence reducing the C++ dependencies of The Walrus. [#295](https://github.com/XanaduAI/thewalrus/pull/295)
+
+* Updates missing figures in the "Basics of Hafnians and Loop Hafnians" documentation. [#288](https://github.com/XanaduAI/thewalrus/pull/288)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Mikhail Andrenkov, Sebastián Duque
 
 ---
 
@@ -42,7 +89,7 @@ Filippo Miatto
 
 * Updates the `samples.generate_torontonian_sample` function to ensure probabilities are normalized. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
-* Pins Numba to version `<0.54` to avoid binary imcompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
+* Pins Numba to version `<0.54` to avoid binary incompatibilities with the 1.21 release of NumPy. [#250](https://github.com/XanaduAI/thewalrus/pull/250)
 
 ### Contributors
 

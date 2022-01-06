@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 r"""
-Python library
-==============
+The Walrus
+==========
 
 .. currentmodule:: thewalrus
 
-This is the top level module of the The Walrus Python interface,
-containing functions for computing the hafnian, loop hafnian,
-and torontonian of matrices.
+This is the top level module of the The Walrus, containing functions for
+computing the hafnian, loop hafnian, and torontonian of matrices.
 
 Algorithm terminology
 ---------------------
@@ -73,10 +72,8 @@ Sparse hafnian algorithm
     An algorithm that calculates the hafnian of a sparse matrix by taking advantage of the Laplace expansion and memoization, to store
     only the relevant paths that contribute non-zero values to the final calculation.
 
-
-
-Python wrappers
----------------
+Functions
+---------
 
 .. autosummary::
     hafnian
@@ -87,34 +84,31 @@ Python wrappers
     permanent_repeated
     hermite_multidimensional
     hafnian_banded
-
-Pure Python functions
----------------------
-
-.. autosummary::
     reduction
     version
     low_rank_hafnian
+
+Code details
+------------
 """
-# pylint: disable=wrong-import-position
-import os
-import platform
-
-import numpy as np
-
 import thewalrus.quantum
+import thewalrus.csamples
+import thewalrus.decompositions
+import thewalrus.fock_gradients
+import thewalrus.charpoly
+import thewalrus.random
+import thewalrus.reference
+import thewalrus.samples
+import thewalrus.symplectic
 
 from ._hafnian import (
-    haf_complex,
-    haf_int,
-    haf_real,
-    haf_rpt_complex,
-    haf_rpt_real,
     hafnian,
+    loop_hafnian,
     hafnian_repeated,
     reduction,
     hafnian_sparse,
     hafnian_banded,
+    matched_reps,
 )
 
 from ._low_rank_haf import low_rank_hafnian
@@ -124,14 +118,8 @@ from ._hermite_multidimensional import (
     interferometer,
     grad_hermite_multidimensional,
 )
-from ._permanent import (
-    perm,
-    perm_complex,
-    perm_real,
-    permanent_repeated,
-    perm_BBFG_real,
-    perm_BBFG_complex,
-)
+from ._permanent import perm, permanent_repeated
+
 from ._torontonian import (
     tor,
     threshold_detection_prob_displacement,
@@ -147,6 +135,8 @@ __all__ = [
     "hafnian_batched",
     "hafnian_sparse",
     "hafnian_banded",
+    "loop_hafnian",
+    "matched_reps",
     "tor",
     "perm",
     "permanent_repeated",
@@ -192,6 +182,9 @@ def about():
         Cython version:            0.29.24
     """
     # pylint: disable=import-outside-toplevel
+    import os
+    import platform
+
     import sys
     import numpy
     import scipy
