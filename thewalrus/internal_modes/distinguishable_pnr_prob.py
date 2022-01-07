@@ -20,14 +20,7 @@ import numba
 from ..symplectic import passive_transformation, squeezing
 from ..quantum import Qmat
 from .._hafnian import nb_binom, f
-from .useful_tools import nb_Qmat, nb_block
-
-fact = np.array([
-    1, 1, 2, 6, 24, 120, 720, 5040, 40320,
-    362880, 3628800, 39916800, 479001600,
-    6227020800, 87178291200, 1307674368000,
-    20922789888000, 355687428096000, 6402373705728000,
-    121645100408832000, 2432902008176640000], dtype='int64')
+from .useful_tools import nb_Qmat, nb_block, fact
 
 @numba.jit(nopython=True, cache=True)
 def guan_code(n):

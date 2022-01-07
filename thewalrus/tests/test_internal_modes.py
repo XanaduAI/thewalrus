@@ -31,17 +31,29 @@ from thewalrus import low_rank_hafnian, reduction
 
 from thewalrus.internal_modes import (
     pnr_prob,
-    distinguishable_pnr_prob
-
+    distinguishable_pnr_prob,
+    density_matrix_single_mode
     )
+from thewalrus.internal_modes.prepare_cov import (
+    orthonormal_basis,
+    state_prep,
+    prepare_cov)
 
 from thewalrus.random import random_covariance
-from thewalrus.quantum import density_matrix_element, Amat, Qmat, state_vector
+from thewalrus.quantum import (
+    density_matrix_element, 
+    density_matrix, 
+    Amat, 
+    Qmat, 
+    state_vector
+    )
 from thewalrus.symplectic import squeezing, passive_transformation
 from thewalrus.symplectic import autonne as takagi
 
+from strawberryfields.ops import BSgate, Interferometer, Sgate
 
 ### auxilliary functions for testing ###
+
 def vacuum_prob_distinguishable(rs, T):
     """Calculates the vacuum probability when distinguishable squeezed states go into an interferometer.
     Args:
@@ -462,4 +474,242 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     obtained = distinguishable_pnr_prob(pat_list, rs_vec, T)
     assert np.allclose(expected, obtained)
     assert np.allclose(expected, obtained)
+
+def test_pure_gkp():
+    """test pure gkp state density matrix using 2 methods from the walrus against
+    internal_modes.density_matrix_single_mode (but with only 1 temporal mode)"""
+
+    m1, m2 = 5, 7
+    params = np.array(
+        [
+            -1.38155106,
+            -1.21699567,
+            0.7798817,
+            1.04182349,
+            0.87702211,
+            0.90243916,
+            1.48353639,
+            1.6962906,
+            -0.24251599,
+            0.1958,
+        ]
+    )
+    sq_r = params[:3]
+    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
+    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
+    sq_virt = params[9]
+
+    nmodes = 3
+    prog = sf.Program(nmodes)
+    eng = sf.Engine("gaussian")
+
+    with prog.context as q:
+        for k in range(3):
+            Sgate(sq_r[k]) | q[k]
+
+        BSgate(bs_theta1, bs_phi1) | (q[0], q[1])
+        BSgate(bs_theta2, bs_phi2) | (q[1], q[2])
+        BSgate(bs_theta3, bs_phi3) | (q[0], q[1])
+
+        Sgate(sq_virt) | q[2]
+
+        Interferometer(
+            np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
+        ) | q  # state comes out of top mode
+
+    state = eng.run(prog).state
+    mu, cov = state.means(), state.cov()
+
+    cutoff = 26
+    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, normalize=False, cutoff=cutoff)
+
+    rho1 = np.outer(psi, psi.conj())
+    rho1 /= np.trace(rho1)
+
+    # get density matrix directly using The Walrus
+    rho2 = density_matrix(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
+    rho2 /= np.trace(rho2)
+
+    # get density matrix using new code
+    rho3 = density_matrix_single_mode(cov, [5, 7], cutoff=cutoff - 1)
+    rho3 /= np.trace(rho3)
+
+    assert np.allclose(rho1, rho2, atol=1e-6)
+    assert np.allclose(rho1, rho3, atol=1e-6)
+    assert np.allclose(rho2, rho3, atol=1e-6)
+
+def test_lossy_gkp():
+    """
+    test against thewalrus for lossy gkp state generation
+    """
+
+    m1, m2 = 5, 7
+    params = np.array(
+        [
+            -1.38155106,
+            -1.21699567,
+            0.7798817,
+            1.04182349,
+            0.87702211,
+            0.90243916,
+            1.48353639,
+            1.6962906,
+            -0.24251599,
+            0.1958,
+        ]
+    )
+    sq_r = params[:3]
+    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
+    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
+    sq_virt = params[9]
+
+    nmodes = 3
+    prog = sf.Program(nmodes)
+    eng = sf.Engine("gaussian")
+
+    with prog.context as q:
+        for k in range(3):
+            Sgate(sq_r[k]) | q[k]
+
+        BSgate(bs_theta1, bs_phi1) | (q[0], q[1])
+        BSgate(bs_theta2, bs_phi2) | (q[1], q[2])
+        BSgate(bs_theta3, bs_phi3) | (q[0], q[1])
+
+        Sgate(sq_virt) | q[2]
+
+        Interferometer(
+            np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
+        ) | q  # state comes out of top mode
+
+    state = eng.run(prog).state
+    mu, cov = state.means(), state.cov()
+
+    cutoff = 26
+
+    eta = 0.95
+    T = np.diag([np.sqrt(eta)] * 3)
+    mu, cov_lossy = passive_transformation(mu, cov, T)
+
+    # get density matrix using The Walrus
+    rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
+    rho_loss1 /= np.trace(rho_loss1)
+
+    # get density matrix using new code
+    rho_loss2 = density_matrix_single_mode(cov_lossy, [5, 7], cutoff=cutoff - 1)
+    rho_loss2 /= np.trace(rho_loss2)
+
+    assert np.allclose(rho_loss1, rho_loss2, atol=1e-6)
+
+def test_vac_schmidt_modes_gkp():
+    """
+    add vacuum schmidt modes and check it doesn't change the state
+    """
+    m1, m2 = 5, 7
+    params = np.array(
+        [
+            -1.38155106,
+            -1.21699567,
+            0.7798817,
+            1.04182349,
+            0.87702211,
+            0.90243916,
+            1.48353639,
+            1.6962906,
+            -0.24251599,
+            0.1958,
+        ]
+    )
+    sq_r = params[:3]
+    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
+    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
+    sq_virt = params[9]
+
+    nmodes = 3
+    prog = sf.Program(nmodes)
+    eng = sf.Engine("gaussian")
+
+    with prog.context as q:
+        for k in range(3):
+            Sgate(sq_r[k]) | q[k]
+
+        BSgate(bs_theta1, bs_phi1) | (q[0], q[1])
+        BSgate(bs_theta2, bs_phi2) | (q[1], q[2])
+        BSgate(bs_theta3, bs_phi3) | (q[0], q[1])
+
+        Sgate(sq_virt) | q[2]
+
+        Interferometer(
+            np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
+        ) | q  # state comes out of top mode
+
+    state = eng.run(prog).state
+    mu, cov = state.means(), state.cov()
+
+    cutoff = 26
+    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, normalize=False, cutoff=cutoff)
+
+    rho1 = np.outer(psi, psi.conj())
+    rho1 /= np.trace(rho1)
+
+    M = 3
+    K = 5
+    big_cov = np.eye(2 * M * K, dtype=np.complex128)
+    big_cov[::K, ::K] = cov
+
+    rho_big = density_matrix_single_mode(big_cov, [5, 7], cutoff=cutoff - 1)
+    rho_big /= np.trace(rho_big)
+
+    assert np.allclose(rho1, rho_big, atol=1e-4)
+
+# def test_density_matrix():
+#     """
+#     test generation of heralded density matrix against combinatorial calculation
+#     """
+#     U = unitary_group.rvs(2)
+
+#     N = [3]
+
+#     efficiency = 1 * np.ones(2)
+
+#     noise = None
+
+#     n0 = 2.9267754749886055
+#     n1 = 2.592138225047742
+#     K = 1.0
+#     maximum = 1
+#     zs0 = np.arcsinh(
+#         np.sqrt((2 * n0 / (K + 1)) * np.array([((K - 1) / (K + 1)) ** i for i in range(maximum)]))
+#     )
+#     zs1 = np.arcsinh(
+#         np.sqrt((2 * n1 / (K + 1)) * np.array([((K - 1) / (K + 1)) ** i for i in range(maximum)]))
+#     )
+#     rjs = [zs0, zs1]
+
+#     O = np.identity(2, dtype=np.complex128)
+#     S = 0.8 * np.exp(0 * 1j)
+#     O[0, 1] = S.conj()
+#     O[1, 0] = S
+
+#     cutoff = 8
+
+#     dm = heralded_density_matrix(
+#         rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, hbar=2, normalize=True
+#     )
+
+#     rho = np.zeros((cutoff, cutoff), dtype=np.complex128)
+#     for i in range(cutoff):
+#         for j in range(cutoff):
+#             rho[i, j] = sum(dm[i, j, m, m] for m in range(cutoff))
+
+#     rho_norm = rho / np.trace(rho)
+
+#     eps, W = orthonormal_basis(O, rjs)
+#     Q = state_prep(eps, W, thresh=5e-3)
+#     U2 = np.array([[0, 1], [1, 0]]) @ U
+#     Q_U2 = implement_U(Q, U2)
+
+#     rho2 = density_matrix_single_mode(Q_U2, N, cutoff - 1)
+#     rho2_norm = rho2 / np.trace(rho2)
+
+#     assert np.allclose(rho_norm, rho2_norm)
 

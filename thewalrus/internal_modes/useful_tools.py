@@ -1,7 +1,9 @@
 import numpy as np 
+from scipy.special import factorial
 import numba 
 from ..charpoly import powertrace
 
+fact = np.array([factorial(i) for i in range(110)], dtype=np.float64)
 
 @numba.jit(nopython=True, cache=True)
 def spatial_modes_to_schmidt_modes(spatial_modes, K):

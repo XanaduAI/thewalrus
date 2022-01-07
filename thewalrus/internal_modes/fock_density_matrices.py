@@ -18,10 +18,14 @@ Set of functions for calculating Fock basis density matrices for heralded states
 import numpy as np 
 import numba
 
-from scipy.special import factorial as fac
-
 from .._hafnian import nb_binom, nb_ix, find_kept_edges
-from .useful_tools import nb_block, nb_Qmat, f_all_charpoly
+from .useful_tools import (
+    nb_block, 
+    nb_Qmat, 
+    f_all_charpoly,
+    spatial_reps_to_schmidt_reps,
+    fact
+    )
 
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _density_matrix_single_mode(cov, pattern, cutoff=13):
@@ -117,11 +121,11 @@ def _density_matrix_single_mode(cov, pattern, cutoff=13):
 
         haf_arr += haf_arr_new
 
-    rho = (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fac(pattern)))
+    rho = (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
 
     for n in range(cutoff+1):
         for m in range(cutoff+1):
-            rho[n,m] /= np.sqrt(fac(n) * fac(m)) * (2 ** ((N_fixed + n + m) // 2))
+            rho[n,m] /= np.sqrt(fact[n] * fact[m]) * (2 ** ((N_fixed + n + m) // 2))
 
     return rho
 
