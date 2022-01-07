@@ -66,6 +66,8 @@ def _dist_prob_gray(pattern, covs, M):
 
     Uses some Gray/Guan code tricks to calculate eigenvalues at each step in O(N) time for each squeezer
 
+    algorithm created by Jake Bulmer and Nicolas Quesada (currently unpublished)
+
     Args:
         pattern (array[int]): photon number outcome
         covs (array[:,:,:]): array of covariance matrices, one for each squeezer

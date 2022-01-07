@@ -24,11 +24,12 @@ from .._hafnian import nb_binom, nb_ix, find_kept_edges
 from .useful_tools import nb_block, nb_Qmat, f_all_charpoly
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _density_matrix_multimode(cov, pattern, cutoff=13):
+def _density_matrix_single_mode(cov, pattern, cutoff=13):
     """
     numba function (use the wrapper function: density_matrix_multimode)
 
-    density matrix of first mode when heralded by pattern on a zero-displaced Gaussian state
+    density matrix of first mode when heralded by pattern on a zero-displaced Gaussian state,
+    and allows for herald modes to contain multiple internal modes per PNR detector.
 
     Args:
         cov (array): 2M x 2M covariance matrix
@@ -124,17 +125,19 @@ def _density_matrix_multimode(cov, pattern, cutoff=13):
 
     return rho
 
-def density_matrix_multimode(cov, pattern, cutoff=13):
+def density_matrix_single_mode(cov, pattern, cutoff=13):
     """
-    calculates density matrix of first mode when heralded by pattern on a zero-displaced Gaussian state
+    calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
+    where each mode contains K internal modes.
 
     Args:
-        cov (array): 2M x 2M covariance matrix
+        cov (array): 2MK x 2MK covariance matrix
         pattern (list): M-1 length list of the heralding pattern
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
     Returns:
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
+
     cov = np.array(cov).astype(np.float64)
     pattern = np.array(pattern)
-    return _density_matrix_multimode(cov, pattern, cutoff)
+    return _density_matrix_single_mode(cov, pattern, cutoff)
