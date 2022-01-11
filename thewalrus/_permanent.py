@@ -23,6 +23,9 @@ here was first derived in
 """
 import numpy as np
 from numba import jit
+
+from scipy.special import factorial
+
 from ._hafnian import hafnian_repeated
 
 
@@ -178,3 +181,121 @@ def permanent_repeated(A, rpt):
     B = np.vstack([np.hstack([O, A]), np.hstack([A.T, O])])
 
     return hafnian_repeated(B, rpt * 2, loop=False)
+
+@jit(nopython=True, parallel=True)
+def brs(A, E):
+    r"""
+    Calculates the Bristolian, a matrix function introduced for calculating the threshold detector 
+    statistics on measurements of Fock states interfering in linear optical interferometers.
+
+    See the paper 'Threshold detector statistics of Bosonic states' for more detail (to be published soon)
+
+    Args:
+        A (array): matrix of size [m, n]
+        E (array): matrix of size [r, n]
+
+    Returns:
+        int or float or complex: the Bristol of matrices A and E
+    """
+    m = A.shape[0]
+    
+    steps = 2 ** m
+    ones = np.ones(m, dtype=np.int8)
+    total = 0
+    for j in numba.prange(steps):
+        kept_rows = np.where(find_kept_edges(j, ones) != 0)[0]
+        Ay = A[kept_rows, :]
+        plusminus = (-1) ** ((m - len(kept_rows)) % 2)
+        total += plusminus * perm_bbfg(Ay.conj().T @ Ay + E)
+    return total
+
+@jit(nopython=True, parallel=True)
+def ubrs(A):
+    r"""
+    Calculates the Unitary Bristolian, a matrix function introduced for calculating the threshold detector 
+    statistics on measurements of Fock states interfering in lossless linear optical interferometers.
+
+    See the paper 'Threshold detector statistics of Bosonic states' for more detail (to be published soon)
+
+    Args:
+        A (array): matrix of size [m, n]
+
+    Returns:
+        int or float or complex: the Unitary Bristol of matrix A
+    """
+    m, n = A.shape
+    steps = 2 ** m
+    ones = np.ones(m, dtype=np.int8)
+    total = 0
+    for j in numba.prange(steps):
+        kept_rows = np.where(find_kept_edges(j, ones) != 0)[0]
+        Az = A[kept_rows, :]
+        plusminus = (-1) ** ((m - len(kept_rows)) % 2)
+        total += plusminus * perm_bbfg(Az.conj().T @ Az)
+    return total
+
+def fock_prob(n, m, U):
+    r"""
+    Calculates the probability of a an input Fock state, n, scattering to an output Fock state, m, through 
+    an interferometer described by matrix U.
+    The matrix U does not need to be unitary, but the total photon number at the input and the output must be equal.
+
+    Args:
+        n (sequence[int]): length-M list giving the input Fock state occupancy of each mode
+        m (sequence[int]): length-M list giving the output Fock state occupancy of each mode
+        U (array): M x M matrix describing the a linear optical transformation
+
+    Returns:
+        float: probability of Fock state, n, scattering to m, through an interferometer, U
+    """
+    assert sum(n) == sum(m)
+
+    in_modes = np.array(list(chain(*[[i]*j for i, j in enumerate(n) if j > 0])))
+    out_modes = np.array(list(chain(*[[i]*j for i, j in enumerate(m) if j > 0])))
+
+    Umn = U[np.ix_(out_modes, in_modes)]
+    
+    n = np.array(n)
+    m = np.array(m)
+
+    return abs(perm(Umn))**2 / (np.prod(factorial(n), dtype=np.float64) * np.prod(factorial(m), dtype=np.float64))
+
+def fock_threshold_prob(n, d, T):
+    r"""
+    Calculates the probability of a an M_in mode input Fock state, n, scattering through an interferometer described by 
+    T, being detected by M_out threshold detectors, with outcome given by M_out-length list, d.
+    T is an M_out x M_in matrix. It does not need to be unitary but M_out <= M_in.
+
+    Args:
+        n (sequence[int]): length-M_in list giving the input Fock state occupancy of each mode
+        d (sequence[int]): length-M_out list giving the outputs of threshold detectors
+        T (array): M_out x M_in matrix describing the a linear optical transformation, M_out <= M_in
+
+    Returns:
+        float: probability of Fock state, n, scattering through an interferometer, T, to give threshold detector outcome, d
+    """
+    n = np.array(n)
+    d = np.array(d)
+  
+    assert len(n) == T.shape[1]
+    assert len(d) == T.shape[0]
+    assert T.shape[0] <= T.shape[1]
+    
+    fac_prod = np.prod(factorial(n), dtype=np.float64)
+    
+    in_modes = np.array(list(chain(*[[i]*j for i, j in enumerate(n) if j > 0])))
+    C = np.where(d > 0)[0]
+    
+    A = T[np.ix_(C, in_modes)]
+    
+    # if matrix is unitary, use the Unitary Bristolian
+    R2 = np.eye(T.shape[1]) - T.conj().T @ T
+    if np.allclose(R2, np.zeros((T.shape[1], T.shape[1]))):
+        U_dn = T[np.ix_(C, in_modes)]
+        return ubrs(U_dn).real / fac_prod
+   
+
+    # Use the Bristolian for nonunitary transformations
+    R = sqrtm(R2)
+    E = R.conj().T @ R
+    return brs(A, E).real / fac_prod
