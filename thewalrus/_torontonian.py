@@ -16,8 +16,8 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from thewalrus.quantum.conversions import Xmat, Amat
-from ._hafnian import reduction
+from thewalrus.quantum.conversions import Xmat, Qmat, Amat
+from ._hafnian import reduction, find_kept_edges, nb_ix
 
 
 def tor(A):
@@ -40,201 +40,11 @@ def tor(A):
     return numba_tor(A)
 
 
-@numba.jit(nopython=True)
-def combinations(pool, r):  # pragma: no cover
-    """Numba implementation of `itertools.combinations`.
-    As itertools.combinations not callable from numba decorated functions.
-
-    Taken from: https://stackoverflow.com/a/61393666
-
-    Args:
-        pool (Sequence): sequence to take combinations from
-
-        r (int) : number of elements of combination
-    Yields:
-        results (list) : length r combination from pool
-    """
-    n = len(pool)
-    indices = list(range(r))
-    empty = not (n and (0 < r <= n))
-
-    if not empty:
-        result = [pool[i] for i in indices]
-        yield result
-
-    while not empty:
-        i = r - 1
-        while i >= 0 and indices[i] == i + n - r:
-            i -= 1
-        if i < 0:
-            empty = True
-        else:
-            indices[i] += 1
-            for j in range(i + 1, r):
-                indices[j] = indices[j - 1] + 1
-
-            result = [pool[i] for i in indices]
-            yield result
-
-
-@numba.jit(nopython=True)
-def powerset(parent_set):  # pragma: no cover
-    """Generates the powerset, the set of all the subsets, of its input. Does not include the empty set.
-
-    Args:
-        parent_set (Sequence) : sequence to take powerset from
-    Return:
-        subset (tuple) : subset of parent_set
-    """
-    n = len(parent_set)
-    for i in range(n + 1):
-        for subset in combinations(parent_set, i):
-            yield subset
-
-
-@numba.jit(nopython=True)
-def nb_block(X):  # pragma: no cover
-    """Numba implementation of `np.block`.
-    Only suitable for 2x2 blocks.
-
-    Taken from: https://stackoverflow.com/a/57562911
-
-    Args:
-        X (array) : arrays for blocks of matrix
-    Return:
-        array : the block matrix from X
-    """
-    xtmp1 = np.concatenate(X[0], axis=1)
-    xtmp2 = np.concatenate(X[1], axis=1)
-    return np.concatenate((xtmp1, xtmp2), axis=0)
-
-
-@numba.jit(nopython=True)
-def numba_ix(arr, rows, cols):  # pragma: no cover
-    """Numba implementation of `np.ix_`.
-    Required due to numba lacking support for advanced numpy indexing.
-
-    Args:
-        arr (array) : matrix to take submatrix of
-        rows (array) : rows to be selected in submatrix
-        cols (array) : columns to be selected in submatrix
-
-    Return:
-        array: selected submatrix of arr, of shape `(len(rows), len(cols))`
-
-    """
-    return arr[rows][:, cols]
-
-
-@numba.jit(nopython=True)
-def Qmat_numba(cov, hbar=2):  # pragma: no cover
-    r"""Numba compatible version of `thewalrus.quantum.Qmat`
-
-    Returns the :math:`Q` Husimi matrix of the Gaussian state.
-    Args:
-        cov (array): :math:`2N\times 2N xp-` Wigner covariance matrix
-        hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
-    Returns:
-        array: the :math:`Q` matrix.
-    """
-    # number of modes
-    N = len(cov) // 2
-    I = np.identity(N)
-
-    x = cov[:N, :N] * (2.0 / hbar)
-    xp = cov[:N, N:] * (2.0 / hbar)
-    p = cov[N:, N:] * (2.0 / hbar)
-    # the (Hermitian) matrix elements <a_i^\dagger a_j>
-    aidaj = (x + p + 1j * (xp - xp.T) - 2 * I) / 4
-    # the (symmetric) matrix elements <a_i a_j>
-    aiaj = (x - p + 1j * (xp + xp.T)) / 4
-
-    # calculate the covariance matrix sigma_Q appearing in the Q function:
-    Q = nb_block(((aidaj, aiaj.conj()), (aiaj, aidaj.conj()))) + np.identity(2 * N)
-    return Q
-
-
-@numba.jit(nopython=True)
-def threshold_detection_prob_displacement(mu, cov, det_pattern, hbar=2):  # pragma: no cover
-    r"""Threshold detection probabilities for Gaussian states with displacement.
-    Formula from Jake Bulmer and Stefano Paesani.
-
-
-    Args:
-        mu (1d array) : means of xp Gaussian Wigner function
-        cov (2d array) : : xp Wigner covariance matrix
-        det_pattern (1d numpy array) : array of {0,1} to describe the threshold detection outcome
-        hbar (float): the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`.
-
-    Returns:
-        np.float64 : probability of detection pattern
-    """
-    det_pattern = np.asarray(det_pattern).astype(np.int8)
-
-    m = len(cov)
-    assert cov.shape == (m, m)
-    assert m % 2 == 0
-    n = m // 2
-
-    means_x = mu[:n]
-    means_p = mu[n:]
-    avec = np.concatenate((means_x + 1j * means_p, means_x - 1j * means_p), axis=0) / np.sqrt(
-        2 * hbar
-    )
-
-    Q = Qmat_numba(cov, hbar=hbar)
-
-    if max(det_pattern) > 1:
-        raise ValueError(
-            "When using threshold detectors, the detection pattern can contain only 1s or 0s."
-        )
-
-    nonzero_idxs = np.where(det_pattern == 1)[0]
-    zero_idxs = np.where(det_pattern == 0)[0]
-
-    ii1 = np.concatenate((nonzero_idxs, nonzero_idxs + n), axis=0)
-    ii0 = np.concatenate((zero_idxs, zero_idxs + n), axis=0)
-
-    Qaa = numba_ix(Q, ii0, ii0)
-    Qab = numba_ix(Q, ii0, ii1)
-    Qba = numba_ix(Q, ii1, ii0)
-    Qbb = numba_ix(Q, ii1, ii1)
-
-    Qaa_inv = np.linalg.inv(Qaa)
-    Qcond = Qbb - Qba @ Qaa_inv @ Qab
-
-    avec_a = avec[ii0]
-    avec_b = avec[ii1]
-    avec_cond = avec_b - Qba @ Qaa_inv @ avec_a
-
-    p0a_fact_exp = np.exp(avec_a @ Qaa_inv @ avec_a.conj() * (-0.5)).real
-    p0a_fact_det = np.sqrt(np.linalg.det(Qaa).real)
-    p0a = p0a_fact_exp / p0a_fact_det
-
-    n_det = len(nonzero_idxs)
-    p_sum = 1.0  # empty set is not included in the powerset function so we start at 1
-    for z in powerset(np.arange(n_det)):
-        Z = np.asarray(z)
-        ZZ = np.concatenate((Z, Z + n_det), axis=0)
-
-        avec0 = avec_cond[ZZ]
-        Q0 = numba_ix(Qcond, ZZ, ZZ)
-        Q0inv = np.linalg.inv(Q0)
-
-        fact_exp = np.exp(avec0 @ Q0inv @ avec0.conj() * (-0.5)).real
-        fact_det = np.sqrt(np.linalg.det(Q0).real)
-
-        p_sum += ((-1) ** len(Z)) * fact_exp / fact_det
-
-    return p0a * p_sum
-
-
 def threshold_detection_prob(
     mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10
 ):  # pylint: disable=too-many-arguments
     r"""Threshold detection probabilities for Gaussian states.
-    Formula from Jake Bulmer and Stefano Paesani.
+    Formula from Jake Bulmer, Nicolas Quesada and Stefano Paesani.
     When state is displaced, threshold_detection_prob_displacement is called.
     Otherwise, tor is called.
 
@@ -250,16 +60,29 @@ def threshold_detection_prob(
         np.float64 : probability of detection pattern
     """
 
+    n = cov.shape[0] // 2
+
     if np.allclose(mu, 0, atol=atol, rtol=rtol):
         # no displacement
         n_modes = cov.shape[0] // 2
-        Q = Qmat_numba(cov, hbar)
-        O = Xmat(n_modes) @ Amat(cov, hbar=hbar)
+        Q = Qmat(cov, hbar)
+        O = np.eye(2*n) - np.linalg.inv(Q)
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)
         return tor(Os) / np.sqrt(np.linalg.det(Q))
-    det_pattern = np.asarray(det_pattern).astype(np.int8)
-    return threshold_detection_prob_displacement(mu, cov, det_pattern, hbar)
+
+    x = mu[:n]
+    p = mu[n:]
+    alpha = np.concatenate((x + 1j * p, x - 1j * p)) / np.sqrt(2 * hbar)
+    
+    sigma = Qmat(cov, hbar=hbar)
+    I = np.eye(2 * n)
+    inv_sigma = np.linalg.inv(sigma)
+    O = I - inv_sigma
+    gamma = inv_sigma @ alpha
+    
+    gamma_red, O_red = reduced_gaussian(gamma, O, np.where(np.array(det_pattern) == 1)[0])
+    return vac_prob(alpha, sigma) * numba_ltor(O_red, gamma_red).real
 
 
 @numba.jit(nopython=True)
@@ -280,6 +103,7 @@ def numba_tor(A):  # pragma: no cover
     """
     n_det = A.shape[0] // 2
     p_sum = 1.0  # empty set is not included in the powerset function so we start at 1
+    
     for z in powerset(np.arange(n_det)):
         Z = np.asarray(z)
         ZZ = np.concatenate((Z, Z + n_det), axis=0)
@@ -288,3 +112,38 @@ def numba_tor(A):  # pragma: no cover
         p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2 * n) - A_ZZ))
 
     return p_sum * (-1) ** (n_det)
+
+@numba.jit(nopython=True, cache=True)
+def vac_prob(alpha, sigma):
+    return (np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha) / np.sqrt(np.linalg.det(sigma))).real
+
+@numba.jit(nopython=True, cache=True, parallel=True)
+def numba_ltor(O, gamma):
+    N = O.shape[0] // 2
+    N_odd = N % 2
+    
+    steps = 2 ** N
+    ones = np.ones(N, dtype=np.int8)
+    
+    ltor = 0.
+    for j in numba.prange(steps):
+        X_modes = find_kept_edges(j, ones)
+        lenX = X_modes.sum()
+        I = np.eye(2 * lenX, dtype=O.dtype)
+        plusminus = (-1) ** ((N_odd - lenX % 2) % 2)
+        
+        kept_modes = np.where(X_modes != 0)[0]
+        kept_rows = np.concatenate((kept_modes, kept_modes + N))
+        O_XX = nb_ix(O, kept_rows, kept_rows)
+        
+        I_m_O_XX = I - O_XX
+        I_m_O_XX_inv = np.linalg.inv(I_m_O_XX)
+        
+        gamma_X = gamma[kept_rows]
+        top = np.exp(0.5 * gamma_X.conj() @ I_m_O_XX_inv @ gamma_X)
+        bottom = np.sqrt(np.linalg.det(I_m_O_XX))
+        
+        ltor += plusminus * top / bottom
+    
+    return ltor.real
+    
