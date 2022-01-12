@@ -2,6 +2,8 @@
 
 ### New features
 
+* New functions for threshold detection probabilities of Fock states, the Bristolian (brs) and the Unitary Bristolian (ubrs) [#316](https://github.com/XanaduAI/thewalrus/pull/316)
+
 ### Improvements
 
 ### Bug fixes
