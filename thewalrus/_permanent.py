@@ -22,11 +22,13 @@ here was first derived in
   <doi:10.1016/j.ejc.2010.01.010>`_
 """
 import numpy as np
-from numba import jit
+from numba import jit, prange
 
+from itertools import chain
 from scipy.special import factorial
+from scipy.linalg import sqrtm
 
-from ._hafnian import hafnian_repeated
+from ._hafnian import hafnian_repeated, find_kept_edges
 
 
 def perm(A, method="bbfg"):
@@ -202,7 +204,7 @@ def brs(A, E):
     steps = 2 ** m
     ones = np.ones(m, dtype=np.int8)
     total = 0
-    for j in numba.prange(steps):
+    for j in prange(steps):
         kept_rows = np.where(find_kept_edges(j, ones) != 0)[0]
         Ay = A[kept_rows, :]
         plusminus = (-1) ** ((m - len(kept_rows)) % 2)
@@ -227,7 +229,7 @@ def ubrs(A):
     steps = 2 ** m
     ones = np.ones(m, dtype=np.int8)
     total = 0
-    for j in numba.prange(steps):
+    for j in prange(steps):
         kept_rows = np.where(find_kept_edges(j, ones) != 0)[0]
         Az = A[kept_rows, :]
         plusminus = (-1) ** ((m - len(kept_rows)) % 2)
