@@ -171,102 +171,105 @@ class TestPermanentRepeated:
 def test_brs_HOM():
     """HOM test"""
 
-    U = np.array([[1,1],[1,-1]]) / np.sqrt(2)
+    U = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
 
-    n = [1,1]
-    d = [1,1]
+    n = [1, 1]
+    d = [1, 1]
 
     assert np.isclose(fock_threshold_prob(n, d, U), fock_prob(n, d, U))
 
-    d = [1,0]
-    m = [2,0]
+    d = [1, 0]
+    m = [2, 0]
 
     assert np.isclose(fock_threshold_prob(n, d, U), fock_prob(n, m, U))
 
 
-@pytest.mark.parametrize("eta", [0.2,0.5,0.9,1])
+@pytest.mark.parametrize("eta", [0.2, 0.5, 0.9, 1])
 def test_brs_HOM_lossy(eta):
     """lossy HOM dip test"""
-    T = np.sqrt(eta / 2) * np.array([[1,1],[1,-1]])
+    T = np.sqrt(eta / 2) * np.array([[1, 1], [1, -1]])
 
-    n = [1,1]
-    d = [1,1]
+    n = [1, 1]
+    d = [1, 1]
 
     assert np.isclose(fock_prob(n, d, T), fock_threshold_prob(n, d, T))
 
+
 def test_brs_ZTL():
-    """ test 3-mode ZTL suppression"""
+    """test 3-mode ZTL suppression"""
 
     U = np.fft.fft(np.eye(3)) / np.sqrt(3)
 
-    n = [1,1,1]
-    d = [1,1,0]
+    n = [1, 1, 1]
+    d = [1, 1, 0]
 
     p1 = fock_threshold_prob(n, d, U)
-    p2 = fock_prob(n, [1,2,0], U) + fock_prob(n, [2,1,0], U)
+    p2 = fock_prob(n, [1, 2, 0], U) + fock_prob(n, [2, 1, 0], U)
     assert np.isclose(p1, p2)
 
-    n = [1,1,1]
-    d = [1,1,1]
+    n = [1, 1, 1]
+    d = [1, 1, 1]
 
     p1 = fock_threshold_prob(n, d, U)
     p2 = fock_prob(n, d, U)
     assert np.isclose(p1, p2)
 
     T = U[:2, :]
-    d = [1,1]
+    d = [1, 1]
 
     p1 = fock_threshold_prob(n, d, T)
-    p2 = fock_prob(n, [1,1,1], U)
+    p2 = fock_prob(n, [1, 1, 1], U)
 
     assert np.isclose(p1, p2)
 
-    d = [1,0,0]
+    d = [1, 0, 0]
 
     p1 = fock_threshold_prob(n, d, U)
-    p2 = fock_prob(n, [3,0,0], U)
+    p2 = fock_prob(n, [3, 0, 0], U)
 
     assert np.isclose(p1, p2)
 
-    n = [1,2,0]
-    d = [0,1,1]
+    n = [1, 2, 0]
+    d = [0, 1, 1]
 
     p1 = fock_threshold_prob(n, d, U)
-    p2 = fock_prob(n, [0,2,1], U) + fock_prob(n, [0,1,2], U)
+    p2 = fock_prob(n, [0, 2, 1], U) + fock_prob(n, [0, 1, 2], U)
 
     assert np.isclose(p1, p2)
 
-@pytest.mark.parametrize("eta", [0.2,0.5,0.9,1])
+
+@pytest.mark.parametrize("eta", [0.2, 0.5, 0.9, 1])
 def test_brs_ZTL_lossy(eta):
     """test lossy 3-mode ZTL suppression"""
     T = np.sqrt(eta) * np.fft.fft(np.eye(3)) / np.sqrt(3)
 
-    n = [1,1,1]
-    d = [1,1,0]
+    n = [1, 1, 1]
+    d = [1, 1, 0]
 
-    p1 = eta**2 * (1 - eta) / 3
+    p1 = eta ** 2 * (1 - eta) / 3
     p2 = fock_threshold_prob(n, d, T)
 
     assert np.allclose(p1, p2)
 
-@pytest.mark.parametrize("d", [[1,1,1],[1,1,0],[1,0,0]])
+
+@pytest.mark.parametrize("d", [[1, 1, 1], [1, 1, 0], [1, 0, 0]])
 def test_brs_ubrs(d):
     """test that brs and ubrs give same results for unitary transformation"""
 
     U = np.fft.fft(np.eye(3)) / np.sqrt(3)
 
-    n = np.array([2,1,0])
-    d = np.array(d)    
+    n = np.array([2, 1, 0])
+    d = np.array(d)
 
-    in_modes = np.array(list(chain(*[[i]*j for i, j in enumerate(n) if j > 0])))
+    in_modes = np.array(list(chain(*[[i] * j for i, j in enumerate(n) if j > 0])))
     click_modes = np.where(d > 0)[0]
 
     U_dn = U[np.ix_(click_modes, in_modes)]
 
     b1 = ubrs(U_dn)
 
-    R = sqrtm(np.eye(U.shape[1]) - U.conj().T @ U)[:,in_modes]
-    E = R.conj().T @ R 
+    R = sqrtm(np.eye(U.shape[1]) - U.conj().T @ U)[:, in_modes]
+    E = R.conj().T @ R
 
     b2 = brs(U_dn, E)
 
