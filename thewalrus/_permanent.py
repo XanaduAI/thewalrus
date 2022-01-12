@@ -21,10 +21,11 @@ here was first derived in
   (2010), "The permanent of a square matrix", European Journal of Combinatorics, 31 (7): 1887-1891.
   <doi:10.1016/j.ejc.2010.01.010>`_
 """
+from itertools import chain
+
 import numpy as np
 from numba import jit, prange
 
-from itertools import chain
 from scipy.special import factorial
 from scipy.linalg import sqrtm
 
@@ -227,7 +228,7 @@ def ubrs(A): # pragma: no cover
     Returns:
         int or float or complex: the Unitary Bristol of matrix A
     """
-    m, n = A.shape
+    m = A.shape[0]
     steps = 2 ** m
     ones = np.ones(m, dtype=np.int8)
     total = 0

@@ -13,14 +13,15 @@
 # limitations under the License.
 """Tests for the Python permanent wrapper function"""
 # pylint: disable=no-self-use
+
+from itertools import chain
+
 import pytest
 
 import numpy as np
 
 from scipy.special import factorial as fac
 from scipy.linalg import sqrtm
-
-from itertools import chain
 
 from thewalrus import perm, permanent_repeated, brs, ubrs
 from thewalrus._permanent import fock_prob, fock_threshold_prob
