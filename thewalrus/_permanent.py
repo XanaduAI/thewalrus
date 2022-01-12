@@ -186,7 +186,7 @@ def permanent_repeated(A, rpt):
 
 
 @jit(nopython=True, parallel=True)
-def brs(A, E):
+def brs(A, E): # pragma: no cover
     r"""
     Calculates the Bristolian, a matrix function introduced for calculating the threshold detector
     statistics on measurements of Fock states interfering in linear optical interferometers.
@@ -214,7 +214,7 @@ def brs(A, E):
 
 
 @jit(nopython=True, parallel=True)
-def ubrs(A):
+def ubrs(A): # pragma: no cover
     r"""
     Calculates the Unitary Bristolian, a matrix function introduced for calculating the threshold detector
     statistics on measurements of Fock states interfering in lossless linear optical interferometers.
