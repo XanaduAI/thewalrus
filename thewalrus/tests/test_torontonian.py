@@ -21,9 +21,11 @@ from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xm
 from thewalrus.random import random_covariance
 from thewalrus import (
     tor,
-    threshold_detection_prob_displacement,
+    ltor,
+    numba_ltor,
     threshold_detection_prob,
     numba_tor,
+    numba_vac_prob
 )
 from thewalrus.symplectic import two_mode_squeezing
 
@@ -137,9 +139,9 @@ def test_disp_torontonian(r, alpha):
     cov = two_mode_squeezing(abs(2 * r), np.angle(2 * r))
     mu = 2 * np.array([alpha.real, alpha.real, alpha.imag, alpha.imag])
 
-    p00n = threshold_detection_prob_displacement(mu, cov, np.array([0, 0]))
-    p01n = threshold_detection_prob_displacement(mu, cov, np.array([0, 1]))
-    p11n = threshold_detection_prob_displacement(mu, cov, np.array([1, 1]))
+    p00n = threshold_detection_prob(mu, cov, np.array([0, 0]))
+    p01n = threshold_detection_prob(mu, cov, np.array([0, 1]))
+    p11n = threshold_detection_prob(mu, cov, np.array([1, 1]))
 
     assert np.isclose(p00a, p00n)
     assert np.isclose(p01a, p01n)
@@ -151,7 +153,7 @@ def test_disp_torontonian_single_mode(scale):
     """Calculates the probability of clicking for a single mode state"""
     cv = random_covariance(1)
     mu = scale * (2 * np.random.rand(2) - 1)
-    prob_click = threshold_detection_prob_displacement(mu, cv, np.array([1]))
+    prob_click = threshold_detection_prob(mu, cv, np.array([1]))
     expected = 1 - density_matrix_element(mu, cv, [0], [0])
     assert np.allclose(prob_click, expected)
 
@@ -175,28 +177,17 @@ def test_disp_torontonian_two_mode(scale):
 
 @pytest.mark.parametrize("n_modes", range(1, 10))
 def test_tor_and_threshold_displacement_prob_agree(n_modes):
-    """Tests that threshold_detection_prob_displacement and the usual tor expression agree
+    """Tests that threshold_detection_prob, ltor and the usual tor expression all agree
     when displacements are zero"""
     cv = random_covariance(n_modes)
     mu = np.zeros([2 * n_modes])
     Q = Qmat(cv)
     O = Xmat(n_modes) @ Amat(cv)
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
-    prob = threshold_detection_prob_displacement(mu, cv, np.array([1] * n_modes))
+    prob = threshold_detection_prob(mu, cv, np.array([1] * n_modes))
+    prob2 = numba_ltor(O, mu) / np.sqrt(np.linalg.det(Q))
     assert np.allclose(expected, prob)
-
-
-@pytest.mark.parametrize("n_modes", range(1, 10))
-def test_tor_and_threshold_prob_agree(n_modes):
-    """Tests that threshold_detection_prob_displacement and the usual tor expression agree
-    when displacements are zero"""
-    cv = random_covariance(n_modes)
-    mu = np.zeros([2 * n_modes])
-    Q = Qmat(cv)
-    O = Xmat(n_modes) @ Amat(cv)
-    expected = tor(O) / np.sqrt(np.linalg.det(Q))
-    prob = threshold_detection_prob(mu, cv, [1] * n_modes)
-    assert np.allclose(expected, prob)
+    assert np.isclose(expected, prob2)
 
 
 @pytest.mark.parametrize("N", range(1, 10))

@@ -16,7 +16,7 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from thewalrus.quantum.conversions import Xmat, Qmat, Amat
+from thewalrus.quantum.conversions import Xmat, Qmat, Amat, reduced_gaussian
 from ._hafnian import reduction, find_kept_edges, nb_ix
 
 
@@ -114,7 +114,7 @@ def threshold_detection_prob(
     gamma = inv_sigma @ alpha
     
     gamma_red, O_red = reduced_gaussian(gamma, O, np.where(np.array(det_pattern) == 1)[0])
-    return vac_prob(alpha, sigma) * numba_ltor(O_red, gamma_red).real
+    return numba_vac_prob(alpha, sigma) * numba_ltor(O_red, gamma_red).real
 
 
 @numba.jit(nopython=True)
@@ -144,14 +144,14 @@ def numba_tor(O):  # pragma: no cover
         kept_rows = np.concatenate((kept_modes, kept_modes + N))
         O_XX = nb_ix(O, kept_rows, kept_rows)
         
-        bottom = np.sqrt(np.linalg.det(I_m_O_XX))
+        bottom = np.sqrt(np.linalg.det(I - O_XX))
         
         tor += plusminus / bottom
     
     return tor
 
 @numba.jit(nopython=True)
-def vac_prob(alpha, sigma): # pragma: no cover
+def numba_vac_prob(alpha, sigma): # pragma: no cover
     r"""
     Return the vacuum probability of a Gaussian state with Q function sigma
     and displacement vector, alpha.
@@ -173,7 +173,7 @@ def numba_ltor(O, gamma): # pragma: no cover
         gamma (array): a vector of even dimension
 
     Returns:
-        np.float64 or np.complex128: the loop torontonian of matrix O, vector gamma
+        np.complex128: the loop torontonian of matrix O, vector gamma
     """
     N = O.shape[0] // 2
     N_odd = N % 2
@@ -181,6 +181,9 @@ def numba_ltor(O, gamma): # pragma: no cover
     steps = 2 ** N
     ones = np.ones(N, dtype=np.int8)
     
+    gamma = gamma.astype(np.complex128)
+    O = O.astype(np.complex128)
+
     ltor = 0.
     for j in numba.prange(steps):
         X_modes = find_kept_edges(j, ones)
