@@ -37,8 +37,40 @@ def tor(A):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
+    if matshape[0] % 2 != 0:
+        raise ValueError("matrix dimension must be even")
+
     return numba_tor(A)
 
+def ltor(A, gamma):
+    """Returns the loop Torontonian of an NxN matrix and an N-length vector.
+
+    Args:
+        A (array): an NxN array of even dimensions.
+        gamma (array): an N-length vector of even dimensions
+
+    Returns:
+        np.float64 or np.complex128: the loop torontonian of matrix A, vector gamma
+    """
+
+    if not isinstance(A, np.ndarray):
+        raise TypeError("Input matrix must be a NumPy array.")
+
+    if not isinstance(gamma, np.ndarray):
+        raise TypeError("Input matrix must be a NumPy array.")
+
+    matshape = A.shape
+
+    if matshape[0] != matshape[1]:
+        raise ValueError("Input matrix must be square.")
+
+    if matshape[0] != len(gamma):
+        raise ValueError("gamma must be a vector matching the dimension of A")
+
+    if matshape[0] % 2 != 0:
+        raise ValueError("matrix dimension must be even")
+
+    return numba_ltor(A, gamma)
 
 def threshold_detection_prob(
     mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10
@@ -86,39 +118,63 @@ def threshold_detection_prob(
 
 
 @numba.jit(nopython=True)
-def numba_tor(A):  # pragma: no cover
-    """Returns the Torontonian of a matrix using numba.
-
-    For more direct control, you may wish to call :func:`tor_real` or
-    :func:`tor_complex` directly.
-
-    The input matrix is cast to quadruple precision
-    internally for a quadruple precision torontonian computation.
+def numba_tor(O):  # pragma: no cover
+    r"""Returns the Torontonian of a matrix using numba.
 
     Args:
-        A (array): a square, symmetric array of even dimensions.
+        O (array): a square, symmetric array of even dimensions.
 
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
     """
-    n_det = A.shape[0] // 2
-    p_sum = 1.0  # empty set is not included in the powerset function so we start at 1
+    N = O.shape[0] // 2
+    N_odd = N % 2
     
-    for z in powerset(np.arange(n_det)):
-        Z = np.asarray(z)
-        ZZ = np.concatenate((Z, Z + n_det), axis=0)
-        A_ZZ = numba_ix(A, ZZ, ZZ)
-        n = len(Z)
-        p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2 * n) - A_ZZ))
+    steps = 2 ** N
+    ones = np.ones(N, dtype=np.int8)
+    
+    tor = 0.
+    for j in numba.prange(steps):
+        X_modes = find_kept_edges(j, ones)
+        lenX = X_modes.sum()
+        I = np.eye(2 * lenX, dtype=O.dtype)
+        plusminus = (-1) ** ((N_odd - lenX % 2) % 2)
+        
+        kept_modes = np.where(X_modes != 0)[0]
+        kept_rows = np.concatenate((kept_modes, kept_modes + N))
+        O_XX = nb_ix(O, kept_rows, kept_rows)
+        
+        bottom = np.sqrt(np.linalg.det(I_m_O_XX))
+        
+        tor += plusminus / bottom
+    
+    return tor
 
-    return p_sum * (-1) ** (n_det)
+@numba.jit(nopython=True)
+def vac_prob(alpha, sigma): # pragma: no cover
+    r"""
+    Return the vacuum probability of a Gaussian state with Q function sigma
+    and displacement vector, alpha.
 
-@numba.jit(nopython=True, cache=True)
-def vac_prob(alpha, sigma):
-    return (np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha) / np.sqrt(np.linalg.det(sigma))).real
+    Args:
+        alpha (array): a 2M-length vector describing the complex displacement
+        sigma (array): a 2Mx2M matrix describing the Q-function covariance matrix
+    Returns:
+        float: vacuum probability of Gaussian state
+    """
+    return (np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha).real / np.sqrt(np.linalg.det(sigma))).real
 
-@numba.jit(nopython=True, cache=True, parallel=True)
-def numba_ltor(O, gamma):
+@numba.jit(nopython=True, parallel=True)
+def numba_ltor(O, gamma): # pragma: no cover
+    r"""Returns the loop Torontonian of a matrix using numba.
+
+    Args:
+        O (array): a square, symmetric array of even dimensions.
+        gamma (array): a vector of even dimension
+
+    Returns:
+        np.float64 or np.complex128: the loop torontonian of matrix O, vector gamma
+    """
     N = O.shape[0] // 2
     N_odd = N % 2
     
@@ -145,5 +201,4 @@ def numba_ltor(O, gamma):
         
         ltor += plusminus * top / bottom
     
-    return ltor.real
-    
+    return ltor
