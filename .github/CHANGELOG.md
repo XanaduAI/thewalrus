@@ -1,8 +1,11 @@
 # Version 0.19.0-dev
 
 ### New features
+* new function `ltor` is added which allows `threshold_detector_prob` to act more consistently on displaced and zero-mean Gaussian states. [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
 ### Improvements
+* update methods for calculating threshold detector probabilties of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
+* numba_tor now can benefit from numba parallelisation [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
 ### Bug fixes
 
