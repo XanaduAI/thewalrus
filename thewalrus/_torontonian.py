@@ -105,7 +105,8 @@ def threshold_detection_prob(
 
     x = mu[:n]
     p = mu[n:]
-    alpha = np.concatenate((x + 1j * p, x - 1j * p)) / np.sqrt(2 * hbar)
+    
+    alpha = np.concatenate((x - 1j * p, x + 1j * p)) / np.sqrt(2 * hbar)
     
     sigma = Qmat(cov, hbar=hbar)
     I = np.eye(2 * n)
