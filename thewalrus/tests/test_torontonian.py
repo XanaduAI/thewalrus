@@ -192,16 +192,18 @@ def test_numba_tor(N):
     t2 = numba_tor(O)
     assert np.isclose(t1, t2)
 
+
 def test_tor_exceptions():
     """test that correct exceptions are raised for tor function"""
     with pytest.raises(TypeError):
         tor("hello")
 
     with pytest.raises(ValueError):
-        tor(np.zeros((4,2)))
+        tor(np.zeros((4, 2)))
 
     with pytest.raises(ValueError):
-        tor(np.zeros((3,3)))
+        tor(np.zeros((3, 3)))
+
 
 def test_ltor_exceptions():
     """test that correct exceptions are raised for ltor function"""
@@ -209,15 +211,13 @@ def test_ltor_exceptions():
         ltor("hello", np.zeros(4))
 
     with pytest.raises(TypeError):
-        ltor(np.zeros((4,4)), "hello")
+        ltor(np.zeros((4, 4)), "hello")
 
     with pytest.raises(ValueError):
-        ltor(np.zeros((4,2)), np.zeros(4))
+        ltor(np.zeros((4, 2)), np.zeros(4))
 
     with pytest.raises(ValueError):
-        ltor(np.zeros((3,3)), np.zeros(3))
+        ltor(np.zeros((3, 3)), np.zeros(3))
 
     with pytest.raises(ValueError):
-        ltor(np.zeros((4,4)), np.zeros(6))
-
-    
+        ltor(np.zeros((4, 4)), np.zeros(6))
