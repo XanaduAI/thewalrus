@@ -166,6 +166,8 @@ def numba_vac_prob(alpha, sigma):  # pragma: no cover
     Returns:
         float: vacuum probability of Gaussian state
     """
+    alpha = alpha.astype(np.complex128)
+    sigma = sigma.astype(np.complex128)
     return (
         np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha).real
         / np.sqrt(np.linalg.det(sigma))

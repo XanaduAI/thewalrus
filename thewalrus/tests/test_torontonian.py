@@ -179,8 +179,10 @@ def test_tor_and_threshold_displacement_prob_agree(n_modes):
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
     prob = threshold_detection_prob(mu, cv, np.array([1] * n_modes))
     prob2 = numba_ltor(O, mu) / np.sqrt(np.linalg.det(Q))
-    assert np.allclose(expected, prob)
+    prob3 = numba_vac_prob(mu, Q) * ltor(O, mu)
+    assert np.isclose(expected, prob)
     assert np.isclose(expected, prob2)
+    assert np.isclose(expected, prob3)
 
 
 @pytest.mark.parametrize("N", range(1, 10))
@@ -207,6 +209,7 @@ def test_tor_exceptions():
 
 def test_ltor_exceptions():
     """test that correct exceptions are raised for ltor function"""
+
     with pytest.raises(TypeError):
         ltor("hello", np.zeros(4))
 
