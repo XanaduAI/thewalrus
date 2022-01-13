@@ -107,10 +107,9 @@ def threshold_detection_prob(
     x = mu[:n]
     p = mu[n:]
 
-    ### Not sure why this needs the conjugate??
-    alpha = np.concatenate((x + 1j * p, x - 1j * p)).conj() / np.sqrt(2 * hbar)
+    alpha = np.concatenate((x + 1j * p, x - 1j * p)) / np.sqrt(2 * hbar)
 
-    sigma = Qmat(cov, hbar=hbar)
+    sigma = Qmat(cov, hbar=hbar).conj()
     I = np.eye(2 * n)
     inv_sigma = np.linalg.inv(sigma)
     O = I - inv_sigma
