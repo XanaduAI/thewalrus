@@ -19,14 +19,7 @@ import numpy as np
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
-from thewalrus import (
-    tor,
-    ltor,
-    numba_ltor,
-    threshold_detection_prob,
-    numba_tor,
-    numba_vac_prob
-)
+from thewalrus import tor, ltor, numba_ltor, threshold_detection_prob, numba_tor, numba_vac_prob
 from thewalrus.symplectic import two_mode_squeezing
 
 

@@ -16,7 +16,7 @@ Torontonian Python interface
 """
 import numpy as np
 import numba
-from thewalrus.quantum.conversions import Xmat, Qmat, Amat, reduced_gaussian
+from thewalrus.quantum.conversions import Qmat, reduced_gaussian
 from ._hafnian import reduction, find_kept_edges, nb_ix
 
 
@@ -41,6 +41,7 @@ def tor(A):
         raise ValueError("matrix dimension must be even")
 
     return numba_tor(A)
+
 
 def ltor(A, gamma):
     """Returns the loop Torontonian of an NxN matrix and an N-length vector.
@@ -72,6 +73,7 @@ def ltor(A, gamma):
 
     return numba_ltor(A, gamma)
 
+
 def threshold_detection_prob(
     mu, cov, det_pattern, hbar=2, atol=1e-10, rtol=1e-10
 ):  # pylint: disable=too-many-arguments
@@ -96,24 +98,23 @@ def threshold_detection_prob(
 
     if np.allclose(mu, 0, atol=atol, rtol=rtol):
         # no displacement
-        n_modes = cov.shape[0] // 2
         Q = Qmat(cov, hbar)
-        O = np.eye(2*n) - np.linalg.inv(Q)
+        O = np.eye(2 * n) - np.linalg.inv(Q)
         rpt2 = np.concatenate((det_pattern, det_pattern))
         Os = reduction(O, rpt2)
         return tor(Os) / np.sqrt(np.linalg.det(Q))
 
     x = mu[:n]
     p = mu[n:]
-    
+
     alpha = np.concatenate((x - 1j * p, x + 1j * p)) / np.sqrt(2 * hbar)
-    
+
     sigma = Qmat(cov, hbar=hbar)
     I = np.eye(2 * n)
     inv_sigma = np.linalg.inv(sigma)
     O = I - inv_sigma
     gamma = inv_sigma @ alpha
-    
+
     gamma_red, O_red = reduced_gaussian(gamma, O, np.where(np.array(det_pattern) == 1)[0])
     return numba_vac_prob(alpha, sigma) * numba_ltor(O_red, gamma_red).real
 
@@ -130,29 +131,30 @@ def numba_tor(O):  # pragma: no cover
     """
     N = O.shape[0] // 2
     N_odd = N % 2
-    
+
     steps = 2 ** N
     ones = np.ones(N, dtype=np.int8)
-    
-    tor = 0.
+
+    total = 0.0
     for j in numba.prange(steps):
         X_modes = find_kept_edges(j, ones)
         lenX = X_modes.sum()
         I = np.eye(2 * lenX, dtype=O.dtype)
         plusminus = (-1) ** ((N_odd - lenX % 2) % 2)
-        
+
         kept_modes = np.where(X_modes != 0)[0]
         kept_rows = np.concatenate((kept_modes, kept_modes + N))
         O_XX = nb_ix(O, kept_rows, kept_rows)
-        
+
         bottom = np.sqrt(np.linalg.det(I - O_XX))
-        
-        tor += plusminus / bottom
-    
-    return tor
+
+        total += plusminus / bottom
+
+    return total
+
 
 @numba.jit(nopython=True)
-def numba_vac_prob(alpha, sigma): # pragma: no cover
+def numba_vac_prob(alpha, sigma):  # pragma: no cover
     r"""
     Return the vacuum probability of a Gaussian state with Q function sigma
     and displacement vector, alpha.
@@ -163,10 +165,14 @@ def numba_vac_prob(alpha, sigma): # pragma: no cover
     Returns:
         float: vacuum probability of Gaussian state
     """
-    return (np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha).real / np.sqrt(np.linalg.det(sigma))).real
+    return (
+        np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha).real
+        / np.sqrt(np.linalg.det(sigma))
+    ).real
+
 
 @numba.jit(nopython=True, parallel=True)
-def numba_ltor(O, gamma): # pragma: no cover
+def numba_ltor(O, gamma):  # pragma: no cover
     r"""Returns the loop Torontonian of a matrix using numba.
 
     Args:
@@ -178,31 +184,31 @@ def numba_ltor(O, gamma): # pragma: no cover
     """
     N = O.shape[0] // 2
     N_odd = N % 2
-    
+
     steps = 2 ** N
     ones = np.ones(N, dtype=np.int8)
-    
+
     gamma = gamma.astype(np.complex128)
     O = O.astype(np.complex128)
 
-    ltor = 0.
+    total = 0.0
     for j in numba.prange(steps):
         X_modes = find_kept_edges(j, ones)
         lenX = X_modes.sum()
         I = np.eye(2 * lenX, dtype=O.dtype)
         plusminus = (-1) ** ((N_odd - lenX % 2) % 2)
-        
+
         kept_modes = np.where(X_modes != 0)[0]
         kept_rows = np.concatenate((kept_modes, kept_modes + N))
         O_XX = nb_ix(O, kept_rows, kept_rows)
-        
+
         I_m_O_XX = I - O_XX
         I_m_O_XX_inv = np.linalg.inv(I_m_O_XX)
-        
+
         gamma_X = gamma[kept_rows]
         top = np.exp(0.5 * gamma_X.conj() @ I_m_O_XX_inv @ gamma_X)
         bottom = np.sqrt(np.linalg.det(I_m_O_XX))
-        
-        ltor += plusminus * top / bottom
-    
-    return ltor
+
+        total += plusminus * top / bottom
+
+    return total
