@@ -13,11 +13,11 @@
 # limitations under the License.
 """Tests for the Torontonian"""
 # pylint: disable=no-self-use,redefined-outer-name
+from itertools import product
+
 import pytest
 
 import numpy as np
-
-from itertools import product
 
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
