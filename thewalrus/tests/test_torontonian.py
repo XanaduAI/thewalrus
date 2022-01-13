@@ -16,6 +16,9 @@
 import pytest
 
 import numpy as np
+
+from itertools import product
+
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
@@ -224,3 +227,18 @@ def test_ltor_exceptions():
 
     with pytest.raises(ValueError):
         ltor(np.zeros((4, 4)), np.zeros(6))
+
+
+@pytest.mark.parametrize("n", range(1, 6))
+@pytest.mark.parametrize("scale", [0, 1, 1.4])
+def test_probs_sum_to_1(n, scale):
+    """test that threshold probabilities sum to 1"""
+    cov = random_covariance(n)
+    mu = scale * (2 * np.random.rand(2 * n) - 1)
+
+    p_total = 0
+    for det_pattern in product([0, 1], repeat=n):
+        p = threshold_detection_prob(mu, cov, det_pattern)
+        p_total += p
+
+    assert np.isclose(p_total, 1)
