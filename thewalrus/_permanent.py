@@ -304,6 +304,10 @@ def fock_threshold_prob(n, d, T):
         return ubrs(U_dn).real / fac_prod
 
     # Use the Bristolian for nonunitary transformations
-    R = sqrtm(R2)[:, in_modes]
-    E = R.conj().T @ R
+    if max(n) > 1:
+        R = sqrtm(R2)[:, in_modes]
+        E = R.conj().T @ R
+    else:
+        E = R2[np.ix_(in_modes, in_modes)]
+        
     return brs(A, E).real / fac_prod
