@@ -281,7 +281,7 @@ def test_brs_ubrs(d):
 @pytest.mark.parametrize("M", range(2, 7))
 def test_brs_random(M):
     """test that brs and per agree for random matices"""
-    N = M - 1
+
     n = np.ones(M, dtype=int)
     n[np.random.randint(0, M)] = 0
     d = np.ones(M, dtype=int)
