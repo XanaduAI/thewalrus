@@ -309,5 +309,5 @@ def fock_threshold_prob(n, d, T):
         E = R.conj().T @ R
     else:
         E = R2[np.ix_(in_modes, in_modes)]
-        
+
     return brs(A, E).real / fac_prod
