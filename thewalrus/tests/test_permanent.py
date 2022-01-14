@@ -14,7 +14,7 @@
 """Tests for the Python permanent wrapper function"""
 # pylint: disable=no-self-use
 
-from itertools import chain
+from itertools import chain, product
 
 import pytest
 
@@ -296,3 +296,25 @@ def test_brs_random(M):
     p2 = fock_prob(n, d, T)
 
     assert np.isclose(p1, p2)
+
+
+@pytest.mark.parametrize("M", range(2, 5))
+def test_brs_prob_normed(M):
+    """test that fock threshold probability is normalised"""
+
+    N = M + 1  # guarentee at least some bunching
+
+    in_modes = np.random.choice(np.arange(M), N)
+    n = np.bincount(in_modes, minlength=M)
+
+    loss_in = np.random.random(M)
+    loss_out = np.random.random(M)
+    U = unitary_group.rvs(M)
+    T = np.diag(loss_in) @ U @ np.diag(loss_out)
+
+    p_total = 0
+    for det_pattern in product([0, 1], repeat=M):
+        p = fock_threshold_prob(n, det_pattern, T)
+        p_total += p
+
+    assert np.isclose(p_total, 1)
