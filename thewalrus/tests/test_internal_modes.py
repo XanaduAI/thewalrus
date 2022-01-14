@@ -54,7 +54,7 @@ from thewalrus.symplectic import autonne as takagi
 from strawberryfields.ops import BSgate, Interferometer, Sgate
 
 ### auxilliary functions for testing ###
-
+# if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
 
 ### Nico's code for combinatorial approach for distinguishable calculations ###
 def vacuum_prob_distinguishable(rs, T):
