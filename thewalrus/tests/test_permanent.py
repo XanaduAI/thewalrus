@@ -22,6 +22,7 @@ import numpy as np
 
 from scipy.special import factorial as fac
 from scipy.linalg import sqrtm
+from scipy.stats import unitary_group
 
 from thewalrus import perm, permanent_repeated, brs, ubrs
 from thewalrus._permanent import fock_prob, fock_threshold_prob
@@ -275,3 +276,23 @@ def test_brs_ubrs(d):
     b2 = brs(U_dn, E)
 
     assert np.allclose(b1, b2)
+
+
+@pytest.mark.parametrize("M", range(2, 7))
+def test_brs_random(M):
+    """test that brs and per agree for random matices"""
+    N = M - 1
+    n = np.ones(M, dtype=int)
+    n[np.random.randint(0, M)] = 0
+    d = np.ones(M, dtype=int)
+    d[np.random.randint(0, M)] = 0
+
+    loss_in = np.random.random(M)
+    loss_out = np.random.random(M)
+    U = unitary_group.rvs(M)
+    T = np.diag(loss_in) @ U @ np.diag(loss_out)
+
+    p1 = fock_threshold_prob(n, d, T)
+    p2 = fock_prob(n, d, T)
+
+    assert np.isclose(p1, p2)
