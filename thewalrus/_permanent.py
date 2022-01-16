@@ -254,7 +254,8 @@ def fock_prob(n, m, U):
     Returns:
         float: probability of Fock state, n, scattering to m, through an interferometer, U
     """
-    assert sum(n) == sum(m)
+    if sum(n) != sum(m):
+        raise ValueError("number of input photons must equal number of output photons")
 
     in_modes = np.array(list(chain(*[[i] * j for i, j in enumerate(n) if j > 0])))
     out_modes = np.array(list(chain(*[[i] * j for i, j in enumerate(m) if j > 0])))
@@ -286,9 +287,12 @@ def fock_threshold_prob(n, d, T):
     n = np.array(n)
     d = np.array(d)
 
-    assert len(n) == T.shape[1]
-    assert len(d) == T.shape[0]
-    assert T.shape[0] <= T.shape[1]
+    if len(n) != T.shape[1]:
+        raise ValueError("length of n must matrix number of input modes of T")
+    if len(d) != T.shape[0]:
+        raise ValueError("length of d must match number of output modes of T")
+    if T.shape[0] > T.shape[1]:
+        raise ValueError("number of output modes cannot be larger than number of input modes")
 
     fac_prod = np.prod(factorial(n), dtype=np.float64)
 

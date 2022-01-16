@@ -318,3 +318,33 @@ def test_brs_prob_normed(M):
         p_total += p
 
     assert np.isclose(p_total, 1)
+
+
+def test_fock_thresh_valueerror():
+    with pytest.raises(ValueError):
+        n = [1, 1, 1]
+        T = np.ones((2, 2))
+        d = [1, 1]
+        fock_threshold_prob(n, d, T)
+
+    with pytest.raises(ValueError):
+        n = [1, 1]
+        d = [1, 1, 1]
+        T = np.ones((2, 2))
+        fock_threshold_prob(n, d, T)
+
+    with pytest.raises(ValueError):
+        n = [1, 1]
+        d = [1, 1, 1]
+        T = np.ones((3, 2))
+        fock_threshold_prob(n, d, T)
+
+
+def test_fock_prob_valueerror():
+    with pytest.raises(ValueError):
+        n = [1, 1, 2, 1]
+        m = [1, 1, 1, 3]
+
+        U = np.eye((4))
+
+        fock_prob(n, m, U)
