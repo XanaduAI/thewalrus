@@ -82,6 +82,8 @@ Functions
     tor
     perm
     permanent_repeated
+    brs
+    ubrs
     hermite_multidimensional
     hafnian_banded
     reduction
@@ -140,6 +142,8 @@ __all__ = [
     "tor",
     "perm",
     "permanent_repeated",
+    "brs",
+    "ubrs",
     "reduction",
     "hermite_multidimensional",
     "grad_hermite_multidimensional",
