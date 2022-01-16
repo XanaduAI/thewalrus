@@ -321,6 +321,7 @@ def test_brs_prob_normed(M):
 
 
 def test_fock_thresh_valueerror():
+    """test that input checks are raised"""
     with pytest.raises(ValueError):
         n = [1, 1, 1]
         T = np.ones((2, 2))
@@ -341,6 +342,7 @@ def test_fock_thresh_valueerror():
 
 
 def test_fock_prob_valueerror():
+    """test that input checks are raised"""
     with pytest.raises(ValueError):
         n = [1, 1, 2, 1]
         m = [1, 1, 1, 3]
