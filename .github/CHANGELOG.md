@@ -14,6 +14,8 @@
 
 This release contains contributions from (in alphabetical order):
 
+Jake Bulmer
+
 ---
 
 # Version 0.18.0
