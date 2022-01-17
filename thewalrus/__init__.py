@@ -80,6 +80,7 @@ Functions
     hafnian_repeated
     hafnian_batched
     tor
+    ltor
     perm
     permanent_repeated
     hermite_multidimensional
@@ -133,6 +134,7 @@ __all__ = [
     "loop_hafnian",
     "matched_reps",
     "tor",
+    "ltor",
     "perm",
     "permanent_repeated",
     "reduction",
