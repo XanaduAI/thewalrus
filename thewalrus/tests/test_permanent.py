@@ -45,6 +45,25 @@ class TestPermanentWrapper:
         A = np.array([[2, 1], [1, np.nan]])
         with pytest.raises(ValueError):
             perm(A)
+    
+    def test_0x0(self):
+        """Check 0x0 permanent returns 1"""
+        p = perm(np.zeros((0, 0)), method="ryser")
+        expected = 1
+        assert p == expected
+        
+        p = perm(np.zeros((0, 0)), method="bbfg")
+        assert p == expected
+        
+    def test_1x1(self, random_matrix):
+        """Check 1x1 permanent"""
+        A = random_matrix(1)
+        p = perm(A, method="ryser")
+        expected = A[0, 0]
+        assert p == expected
+        
+        p = perm(A, method="bbfg")
+        assert p == expected
 
     def test_2x2(self, random_matrix):
         """Check 2x2 permanent"""
