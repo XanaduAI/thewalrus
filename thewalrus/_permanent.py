@@ -232,7 +232,7 @@ def ubrs(A):  # pragma: no cover
     steps = 2 ** m
     ones = np.ones(m, dtype=np.int8)
     total = 0
-    for j in prange(steps):
+    for j in prange(1, steps):
         kept_rows = np.where(find_kept_edges(j, ones) != 0)[0]
         Az = A[kept_rows, :]
         plusminus = (-1) ** ((m - len(kept_rows)) % 2)
