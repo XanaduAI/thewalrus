@@ -302,16 +302,11 @@ def fock_threshold_prob(n, d, T):
     A = T[np.ix_(C, in_modes)]
 
     # if matrix is unitary, use the Unitary Bristolian
-    R2 = np.eye(T.shape[1]) - T.conj().T @ T
-    if np.allclose(R2, np.zeros((T.shape[1], T.shape[1]))):
+    E = np.eye(T.shape[1]) - T.conj().T @ T
+    if np.allclose(E, np.zeros((T.shape[1], T.shape[1]))):
         U_dn = T[np.ix_(C, in_modes)]
         return ubrs(U_dn).real / fac_prod
 
-    # Use the Bristolian for nonunitary transformations
-    if max(n) > 1:
-        R = sqrtm(R2)[:, in_modes]
-        E = R.conj().T @ R
-    else:
-        E = R2[np.ix_(in_modes, in_modes)]
+    E_n = E[np.ix_(in_modes, in_modes)]
 
-    return brs(A, E).real / fac_prod
+    return brs(A, E_n).real / fac_prod
