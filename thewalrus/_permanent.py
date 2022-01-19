@@ -27,7 +27,6 @@ import numpy as np
 from numba import jit, prange
 
 from scipy.special import factorial
-from scipy.linalg import sqrtm
 
 from ._hafnian import hafnian_repeated, find_kept_edges
 
