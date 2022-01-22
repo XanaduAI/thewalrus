@@ -296,7 +296,7 @@ def quad_cholesky(L, Z, idx, mat):
     """Returns the Cholesky of a matrix using sub-matrix of prior
     Cholesky based on the new matrix and lower right quadrant.
 
-    Formula from paper:
+    Algorithm from paper:
     https://arxiv.org/pdf/2109.04528.pdf
 
     Args:
@@ -321,11 +321,13 @@ def quad_cholesky(L, Z, idx, mat):
         for k in range(i): z += Ls[i,k]*Ls[i,k].conjugate()
         Ls[i,i] = np.sqrt(mat[i,i] - z)
     return Ls
+
 @numba.jit(nopython=True)
 def recursiveTor(L, modes, A, n):
-    """Returns the Torontonian of a matrix using numba.
+    """Returns the recursive Torontonian sub-computation of a matrix
+    using numba.
 
-    Formula from paper:
+    Algorithm from paper:
     https://arxiv.org/pdf/2109.04528.pdf
 
     Args:
@@ -351,11 +353,12 @@ def recursiveTor(L, modes, A, n):
         det = np.square(np.prod(np.diag(Ls)))
         tor += ((-1) ** len(nextModes))/np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
     return tor
+
 @numba.jit(nopython=True)
 def rec_torontonian(A):
     """Returns the Torontonian of a matrix using numba.
 
-    Formula from paper:
+    Algorithm from paper:
     https://arxiv.org/pdf/2109.04528.pdf
 
     Args:
