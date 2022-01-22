@@ -288,3 +288,49 @@ def numba_tor(A):  # pragma: no cover
         p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2 * n) - A_ZZ))
 
     return p_sum * (-1) ** (n_det)
+
+@numba.jit(nopython=True)
+def quad_cholesky(L, Z, idx, mat):
+  Ls = numba_ix(L, Z, Z)
+  for i in range(idx, len(mat)):
+    for j in range(idx, i):
+      z = 0.
+      for k in range(j): z += Ls[i,k]*Ls[j,k].conjugate()
+      Ls[i,j] = (mat[i][j] - z)/Ls[j,j]
+    z = 0.
+    for k in range(i): z += Ls[i,k]*Ls[i,k].conjugate()
+    Ls[i,i] = np.sqrt(mat[i,i] - z)
+  return Ls
+@numba.jit(nopython=True)
+def recursiveTor(L, modes, A, n):
+  tor, start = 0., 0 if len(modes) == 0 else modes[-1]+1
+  for i in range(start, n):
+    nextModes = np.append(modes, i)
+    nm, idx = len(A) >> 1, (i - len(modes))*2
+    Z = np.concatenate((np.arange(idx), np.arange(idx+2, nm*2)), axis=0); nm -= 1
+    Az = numba_ix(A, Z, Z)
+    #Ls = np.linalg.cholesky(np.eye(2*nm) - Az)
+    Ls = quad_cholesky(L, Z, idx, np.eye(2*nm) - Az)
+    det = np.square(np.prod(np.diag(Ls)))
+    tor += ((-1) ** len(nextModes))/np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
+  return tor
+@numba.jit(nopython=True)
+def rec_torontonian(A):
+  """Returns the Torontonian of a matrix using numba.
+
+    Formula from paper:
+    https://arxiv.org/pdf/2109.04528.pdf
+
+    Args:
+        A (array): a square, symmetric array of even dimensions.
+
+    Returns:
+        np.float64 or np.complex128: the torontonian of matrix A.  
+  """
+  n = A.shape[0] >> 1
+  Z = np.zeros(2*n, dtype=np.int_)
+  for i in range(n): Z[2*i] = i; Z[2*i+1] = i+n
+  A = numba_ix(A, Z, Z)
+  L = np.linalg.cholesky(np.eye(2*n) - A)
+  det = np.square(np.prod(np.diag(L)))
+  return 1/np.sqrt(det) + recursiveTor(L, np.empty(0, dtype=np.int_), A, n)
