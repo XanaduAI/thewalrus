@@ -4,6 +4,8 @@
 
 ### Improvements
 
+* Recursive Torontonian added for faster computation. [#](https://github.com/XanaduAI/thewalrus/pull/)
+
 ### Bug fixes
 
 ### Breaking changes
@@ -11,6 +13,8 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Gregory Morse
 
 ---
 
