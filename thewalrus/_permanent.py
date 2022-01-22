@@ -55,7 +55,7 @@ def perm(A, method="bbfg"):
         raise ValueError("Input matrix must not contain NaNs.")
 
     if matshape[0] == 0:
-        return 1
+        return A.dtype.type(1.0)
 
     if matshape[0] == 1:
         return A[0, 0]
@@ -96,7 +96,7 @@ def perm_ryser(M):  # pragma: no cover
     """
     n = len(M)
     if n == 0:
-        return 1
+        return M.dtype.type(1.0)
     # row_comb keeps the sum of previous subsets.
     # Every iteration, it removes a term and/or adds a new term
     # to give the term to add for the next subset
@@ -141,7 +141,7 @@ def perm_bbfg(M):  # pragma: no cover
 
     n = len(M)
     if n == 0:
-        return 1
+        return M.dtype.type(1.0)
     row_comb = np.sum(M, 0)
     total = 0
     old_gray = 0
