@@ -4,7 +4,7 @@
 
 ### Improvements
 
-* Recursive Torontonian added for faster computation. [#](https://github.com/XanaduAI/thewalrus/pull/)
+* Recursive Torontonian added for faster computation. [#321](https://github.com/XanaduAI/thewalrus/pull/321)
 
 ### Bug fixes
 
