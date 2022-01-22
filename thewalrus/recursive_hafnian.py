@@ -34,5 +34,4 @@ def solve(b,s,w,g,n):
             for u in range(n):
                 for v in range(n-u):
                     c[int(j*(j-1)/2+k)][u+v+1] += b[int((j+1)*(j+2)/2)][u]*b[int((k+1)*(k+2)/2+1)][v] + b[int((k+1)*(k+2)/2)][u]*b[int((j+1)*(j+2)/2+1)][v]
-    print(c,g)
     return h + solve(c, s-2, w, e, n)
