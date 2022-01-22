@@ -20,11 +20,13 @@ from thewalrus.quantum.conversions import Xmat, Amat
 from ._hafnian import reduction
 
 
-def tor(A):
+def tor(A, recursive=True):
     """Returns the Torontonian of a matrix.
 
     Args:
         A (array): a square array of even dimensions.
+
+        recursive: use the faster recursive implementation.
 
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
@@ -37,7 +39,7 @@ def tor(A):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
-    return numba_tor(A)
+    return rec_torontonian(A) if recursive else numba_tor(A)
 
 
 @numba.jit(nopython=True)
@@ -291,32 +293,67 @@ def numba_tor(A):  # pragma: no cover
 
 @numba.jit(nopython=True)
 def quad_cholesky(L, Z, idx, mat):
-  Ls = numba_ix(L, Z, Z)
-  for i in range(idx, len(mat)):
-    for j in range(idx, i):
-      z = 0.
-      for k in range(j): z += Ls[i,k]*Ls[j,k].conjugate()
-      Ls[i,j] = (mat[i][j] - z)/Ls[j,j]
-    z = 0.
-    for k in range(i): z += Ls[i,k]*Ls[i,k].conjugate()
-    Ls[i,i] = np.sqrt(mat[i,i] - z)
-  return Ls
+    """Returns the Cholesky of a matrix using sub-matrix of prior
+    Cholesky based on the new matrix and lower right quadrant.
+
+    Formula from paper:
+    https://arxiv.org/pdf/2109.04528.pdf
+
+    Args:
+        L (array): previous Cholesky.
+        
+        Z (array): new sub-matrix indices.
+        
+        idx: index of starting row/column of lower right quadrant.
+        
+        mat (array): new matrix.
+
+    Returns:
+        np.float64 or np.complex128: the Cholesky of matrix mat.
+    """
+    Ls = numba_ix(L, Z, Z)
+    for i in range(idx, len(mat)):
+        for j in range(idx, i):
+            z = 0.
+            for k in range(j): z += Ls[i,k]*Ls[j,k].conjugate()
+            Ls[i,j] = (mat[i][j] - z)/Ls[j,j]
+        z = 0.
+        for k in range(i): z += Ls[i,k]*Ls[i,k].conjugate()
+        Ls[i,i] = np.sqrt(mat[i,i] - z)
+    return Ls
 @numba.jit(nopython=True)
 def recursiveTor(L, modes, A, n):
-  tor, start = 0., 0 if len(modes) == 0 else modes[-1]+1
-  for i in range(start, n):
-    nextModes = np.append(modes, i)
-    nm, idx = len(A) >> 1, (i - len(modes))*2
-    Z = np.concatenate((np.arange(idx), np.arange(idx+2, nm*2)), axis=0); nm -= 1
-    Az = numba_ix(A, Z, Z)
-    #Ls = np.linalg.cholesky(np.eye(2*nm) - Az)
-    Ls = quad_cholesky(L, Z, idx, np.eye(2*nm) - Az)
-    det = np.square(np.prod(np.diag(Ls)))
-    tor += ((-1) ** len(nextModes))/np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
-  return tor
+    """Returns the Torontonian of a matrix using numba.
+
+    Formula from paper:
+    https://arxiv.org/pdf/2109.04528.pdf
+
+    Args:
+        L (array): current Cholesky.
+        
+        modes (array): optical mode
+        
+        A (array): a square, symmetric array of even dimensions.
+        
+        n: size of the original matrix.
+
+    Returns:
+        np.float64 or np.complex128: the recursive torontonian
+        sub-computation of matrix A.  
+    """
+    tor, start = 0., 0 if len(modes) == 0 else modes[-1]+1
+    for i in range(start, n):
+        nextModes = np.append(modes, i)
+        nm, idx = len(A) >> 1, (i - len(modes))*2
+        Z = np.concatenate((np.arange(idx), np.arange(idx+2, nm*2)), axis=0); nm -= 1
+        Az = numba_ix(A, Z, Z)
+        Ls = quad_cholesky(L, Z, idx, np.eye(2*nm) - Az)
+        det = np.square(np.prod(np.diag(Ls)))
+        tor += ((-1) ** len(nextModes))/np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
+    return tor
 @numba.jit(nopython=True)
 def rec_torontonian(A):
-  """Returns the Torontonian of a matrix using numba.
+    """Returns the Torontonian of a matrix using numba.
 
     Formula from paper:
     https://arxiv.org/pdf/2109.04528.pdf
@@ -326,11 +363,11 @@ def rec_torontonian(A):
 
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.  
-  """
-  n = A.shape[0] >> 1
-  Z = np.zeros(2*n, dtype=np.int_)
-  for i in range(n): Z[2*i] = i; Z[2*i+1] = i+n
-  A = numba_ix(A, Z, Z)
-  L = np.linalg.cholesky(np.eye(2*n) - A)
-  det = np.square(np.prod(np.diag(L)))
-  return 1/np.sqrt(det) + recursiveTor(L, np.empty(0, dtype=np.int_), A, n)
+    """
+    n = A.shape[0] >> 1
+    Z = np.zeros(2*n, dtype=np.int_)
+    for i in range(n): Z[2*i] = i; Z[2*i+1] = i+n
+    A = numba_ix(A, Z, Z)
+    L = np.linalg.cholesky(np.eye(2*n) - A)
+    det = np.square(np.prod(np.diag(L)))
+    return 1/np.sqrt(det) + recursiveTor(L, np.empty(0, dtype=np.int_), A, n)
