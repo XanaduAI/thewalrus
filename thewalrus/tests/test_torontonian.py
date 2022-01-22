@@ -209,8 +209,8 @@ def test_numba_tor(N):
     assert np.isclose(t1, t2)
 
 @pytest.mark.parametrize("N", range(1, 10))
-def test_numba_tor(N):
-    """Tests numba implementation of the torontonian against the default implementation"""
+def test_recursive_tor(N):
+    """Tests numba implementation of the recursive torontonian against the default implementation"""
     cov = random_covariance(N)
     O = Xmat(N) @ Amat(cov)
     t1 = tor(O)
