@@ -24,6 +24,7 @@ from thewalrus import (
     threshold_detection_prob_displacement,
     threshold_detection_prob,
     numba_tor,
+    rec_torontonian,
 )
 from thewalrus.symplectic import two_mode_squeezing
 
