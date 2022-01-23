@@ -361,7 +361,8 @@ def recursiveTor(L, modes, A, n):  # pragma: no cover
     return tot
 
 @numba.jit(nopython=True)
-def rec_torontonian(A):
+def rec_torontonian(A):  # pragma: no cover
+
     """Returns the Torontonian of a matrix using numba.
 
     Algorithm from paper:
