@@ -292,7 +292,8 @@ def numba_tor(A):  # pragma: no cover
     return p_sum * (-1) ** (n_det)
 
 @numba.jit(nopython=True)
-def quad_cholesky(L, Z, idx, mat):
+def quad_cholesky(L, Z, idx, mat):  # pragma: no cover
+
     """Returns the Cholesky factorization of a matrix using sub-matrix of prior
 
     Cholesky based on the new matrix and lower right quadrant.
