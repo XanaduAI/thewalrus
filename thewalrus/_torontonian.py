@@ -293,7 +293,8 @@ def numba_tor(A):  # pragma: no cover
 
 @numba.jit(nopython=True)
 def quad_cholesky(L, Z, idx, mat):
-    """Returns the Cholesky of a matrix using sub-matrix of prior
+    """Returns the Cholesky factorization of a matrix using sub-matrix of prior
+
     Cholesky based on the new matrix and lower right quadrant.
 
     Algorithm from paper:
