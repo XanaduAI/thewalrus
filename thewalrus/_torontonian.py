@@ -327,7 +327,8 @@ def quad_cholesky(L, Z, idx, mat):  # pragma: no cover
     return Ls
 
 @numba.jit(nopython=True)
-def recursiveTor(L, modes, A, n):
+def recursiveTor(L, modes, A, n):  # pragma: no cover
+
     """Returns the recursive Torontonian sub-computation of a matrix
     using numba.
 
