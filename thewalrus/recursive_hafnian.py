@@ -4,7 +4,15 @@ import numpy as np
 import numba
 
 @numba.jit
-def hafnian(m):
+def hafnian(m)
+    nb_lines = len(m)
+    nb_columns = len(m[0])
+    if nb_lines != nb_columns:
+        raise ValueError('Matrix must be square')
+    
+    if nb_lines % 2 != 0:
+        raison ValueError('Matrix size must be even')
+    
     n = int(float(len(m))/2)
     z = np.zeros((n*(2*n-1),n+1))
     for j in range(1, 2*n):
