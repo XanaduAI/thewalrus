@@ -16,7 +16,6 @@ This release contains contributions from (in alphabetical order):
 
 Gregory Morse
 
-
 ---
 
 # Version 0.18.0
