@@ -332,17 +332,14 @@ def recursiveTor(L, modes, A, n):
     https://arxiv.org/pdf/2109.04528.pdf
 
     Args:
-        L (array): current Cholesky.
-
+        L (array): current Cholesky
         modes (array): optical mode
-
-        A (array): a square, symmetric array of even dimensions.
-
-        n: size of the original matrix.
+        A (array): a square, symmetric array of even dimensions
+        n: size of the original matrix
 
     Returns:
         np.float64 or np.complex128: the recursive torontonian
-        sub-computation of matrix A.
+        sub-computation of matrix ``A``
     """
     tot, start = 0.0, 0 if len(modes) == 0 else modes[-1] + 1
     for i in range(start, n):
