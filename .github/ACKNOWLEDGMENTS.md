@@ -57,3 +57,5 @@
 * [Benjamin Lanthier](https://github.com/benjaminlanthier) (Polytechnique Montréal) :mage: Warlock of eigenvalues
 
 * [Brandon Turcotte](https://github.com/brandonpolymtl) (Polytechnique Montréal) - :star2: The Quantum-plators
+
+* [Gregory Morse](https://github.com/GregoryMorse) (Eötvös Loránd University) - :volcano: Low level code perfector
