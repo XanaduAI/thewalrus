@@ -357,9 +357,7 @@ def recursiveTor(L, modes, A, n):
         Az = numba_ix(A, Z, Z)
         Ls = quad_cholesky(L, Z, idx, np.eye(2 * nm) - Az)
         det = np.square(np.prod(np.diag(Ls)))
-        tot += ((-1) ** len(nextModes)) / np.sqrt(det) + recursiveTor(
-            Ls, nextModes, Az, n
-        )
+        tot += ((-1) ** len(nextModes)) / np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
     return tot
 
 
