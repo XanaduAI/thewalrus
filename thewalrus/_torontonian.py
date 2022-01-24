@@ -292,7 +292,7 @@ def numba_tor(A):  # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def quad_cholesky(L, Z, idx, mat):
+def quad_cholesky(L, Z, idx, mat):  # pragma: no cover
     """Returns the Cholesky factorization of a matrix using sub-matrix of prior
 
     Cholesky based on the new matrix and lower right quadrant.
@@ -324,7 +324,7 @@ def quad_cholesky(L, Z, idx, mat):
 
 
 @numba.jit(nopython=True)
-def recursiveTor(L, modes, A, n):
+def recursiveTor(L, modes, A, n):  # pragma: no cover
     """Returns the recursive Torontonian sub-computation of a matrix
     using numba.
 
@@ -341,10 +341,11 @@ def recursiveTor(L, modes, A, n):
         np.float64 or np.complex128: the recursive torontonian
         sub-computation of matrix ``A``
     """
+    tot = 0.0
     if len(modes) == 0:
-        tot, start = 0.0, 0
+        start = 0
     else:
-        tot, start = modes[-1] + 1
+        start = modes[-1] + 1
 
     for i in range(start, n):
         nextModes = np.append(modes, i)
@@ -361,7 +362,7 @@ def recursiveTor(L, modes, A, n):
 
 
 @numba.jit(nopython=True)
-def rec_torontonian(A):
+def rec_torontonian(A):  # pragma: no cover
     """Returns the Torontonian of a matrix using numba.
 
     Algorithm from paper:
