@@ -209,6 +209,7 @@ def test_numba_tor(N):
     t2 = numba_tor(O)
     assert np.isclose(t1, t2)
 
+
 @pytest.mark.parametrize("N", range(1, 10))
 def test_recursive_tor(N):
     """Tests numba implementation of the recursive torontonian against the default
