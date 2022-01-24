@@ -200,7 +200,7 @@ where :math:`\text{tor}` is the Torontonian. For :math:`2 \ell \times 2 \ell` ma
 .. math::
 	\text{tor}(\bm{O}) = \sum_{S \in P([\ell])} (-1)^{|S|} \frac{1}{\sqrt{\det\left(\mathbb{I} - \bm{O}_{(S)}\right)}}
 
-The torontonian can be thought of as a generating function for hafnians (cf. the trace algorithm formula in :ref:`algorithms <algorithms>` section).
+The torontonian can be thought of as a generating function for hafnians (cf. the trace algorithm formula in :ref:`algorithms <algorithms>` section).  The torontonian algorithm can be specified recursively to improve its performance :cite:`kaposi2021polynomial`
 
 .. tip::
 
