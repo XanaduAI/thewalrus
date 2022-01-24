@@ -1,9 +1,36 @@
+# Copyright 2022 Xanadu Quantum Technologies Inc.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+This module computes the hafnian of a matrix with a recursive algorithm
+as described in described in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
+The code was adapted from c++ with the code found on:
+https://github.com/XanaduAI/thewalrus/blob/v0.17.0/include/recursive_hafnian.hpp
+"""
+# pylint: disable=too-many-branches
 import numpy as np
 import numba
 
 
 @numba.jit
 def hafnian(m):
+    r"""Computes the hafnian of the matrix with the recursive algorithm. It is an implementation of 
+    algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
+    Args:
+        m (array): the input matrix
+    Returns:
+        float: the hafnian of the input matrix
+    """
     nb_lines = len(m)
     nb_columns = len(m[0])
     if nb_lines != nb_columns:
@@ -23,6 +50,16 @@ def hafnian(m):
 
 @numba.jit
 def solve(b,s,w,g,n):
+    r"""Implements the recursive algorithm.
+    Args:
+        b (array): the input matrix
+        s (int): 
+        k (int): offset for submatrix
+        k (int): offset for submatrix
+        k (int): offset for submatrix
+    Returns:
+        float: the hafnian of the input matrix
+    """
     if s == 0:
         return w*g[n]
     c = np.zeros((int((s-2)*(s-3)/2), n+1))
