@@ -341,16 +341,22 @@ def recursiveTor(L, modes, A, n):
         np.float64 or np.complex128: the recursive torontonian
         sub-computation of matrix ``A``
     """
-    tot, start = 0.0, 0 if len(modes) == 0 else modes[-1] + 1
+    if len(modes) == 0:
+        tot, start = 0.0, 0
+    else:
+        tot, start = modes[-1] + 1
+
     for i in range(start, n):
         nextModes = np.append(modes, i)
         nm, idx = len(A) >> 1, (i - len(modes)) * 2
         Z = np.concatenate((np.arange(idx), np.arange(idx + 2, nm * 2)), axis=0)
         nm -= 1
+
         Az = numba_ix(A, Z, Z)
         Ls = quad_cholesky(L, Z, idx, np.eye(2 * nm) - Az)
         det = np.square(np.prod(np.diag(Ls)))
         tot += ((-1) ** len(nextModes)) / np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
+
     return tot
 
 
