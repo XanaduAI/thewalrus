@@ -375,10 +375,9 @@ def rec_torontonian(A):  # pragma: no cover
         np.float64 or np.complex128: the torontonian of matrix A.
     """
     n = A.shape[0] >> 1
-    Z = np.zeros(2*n, dtype=np.int_)
-    for i in range(n):
-        Z[2*i] = i
-        Z[2*i+1] = i+n
+    Z = np.empty((2*n,), dtype=np.int_)
+    Z[0::2] = np.arange(0, n)
+    Z[1::2] = np.arange(n, 2*n)
     A = numba_ix(A, Z, Z)
     L = np.linalg.cholesky(np.eye(2*n) - A)
     det = np.square(np.prod(np.diag(L)))
