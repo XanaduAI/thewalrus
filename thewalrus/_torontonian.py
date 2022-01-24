@@ -362,10 +362,10 @@ def rec_torontonian(A):
     https://arxiv.org/pdf/2109.04528.pdf
 
     Args:
-        A (array): a square, symmetric array of even dimensions.
+        A (array): a square, symmetric array of even dimensions
 
     Returns:
-        np.float64 or np.complex128: the torontonian of matrix A.
+        np.float64 or np.complex128: the torontonian of matrix ``A``
     """
     n = A.shape[0] >> 1
     Z = np.empty((2 * n,), dtype=np.int_)
