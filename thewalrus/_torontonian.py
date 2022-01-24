@@ -25,7 +25,6 @@ def tor(A, recursive=True):
 
     Args:
         A (array): a square array of even dimensions.
-
         recursive: use the faster recursive implementation.
 
     Returns:
