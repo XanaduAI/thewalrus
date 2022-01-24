@@ -6,11 +6,15 @@
 
 ### Bug fixes
 
+* Permanent algorithms handle 0x0 cases correctly. [#320](https://github.com/XanaduAI/thewalrus/pull/320)
+
 ### Breaking changes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Gregory Morse
 
 ---
 
