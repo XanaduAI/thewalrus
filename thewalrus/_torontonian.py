@@ -302,16 +302,13 @@ def quad_cholesky(L, Z, idx, mat):
     https://arxiv.org/pdf/2109.04528.pdf
 
     Args:
-        L (array): previous Cholesky.
-
-        Z (array): new sub-matrix indices.
-
-        idx: index of starting row/column of lower right quadrant.
-
-        mat (array): new matrix.
+        L (array): previous Cholesky
+        Z (array): new sub-matrix indices
+        idx: index of starting row/column of lower right quadrant
+        mat (array): new matrix
 
     Returns:
-        np.float64 or np.complex128: the Cholesky of matrix mat.
+        np.float64 or np.complex128: the Cholesky of matrix ``mat``
     """
     Ls = numba_ix(L, Z, Z)
     for i in range(idx, len(mat)):
