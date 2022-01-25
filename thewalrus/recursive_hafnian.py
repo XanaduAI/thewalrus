@@ -52,11 +52,11 @@ def hafnian(m):
 def solve(b,s,w,g,n):
     r"""Implements the recursive algorithm.
     Args:
-        b (array): the input matrix
-        s (int): 
-        k (int): offset for submatrix
-        k (int): offset for submatrix
-        k (int): offset for submatrix
+        b (array): matrix that is transformed recursively
+        s (int): size of the original matrix that changes at every recursion
+        k (int): a variable of the recursive algorithm
+        g (int): matrix that is transformed recursively
+        n (int): size of the original matrix divided by 2
     Returns:
         float: the hafnian of the input matrix
     """
