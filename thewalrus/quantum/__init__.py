@@ -120,6 +120,15 @@ Photon number distributions
     total_photon_number_distribution
     characteristic_function
 
+Entanglement
+---------------------------
+
+.. autosummary::
+
+    vonNeumann_entropy
+    entanglement_entropy
+    log_negativity
+
 
 Code details
 ------------
@@ -187,6 +196,12 @@ from .photon_number_distributions import (
     characteristic_function,
 )
 
+from .entanglement import (
+    vonNeumann_entropy,
+    entanglement_entropy,
+    log_negativity,
+)
+
 __all__ = [
     "pure_state_amplitude",
     "state_vector",
@@ -229,6 +244,9 @@ __all__ = [
     "photon_number_cumulant",
     "total_photon_number_distribution",
     "characteristic_function",
+    "vonNeumann_entropy",
+    "entanglement_entropy",
+    "log_negativity",
 ]
 
 
