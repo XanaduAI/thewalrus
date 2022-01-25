@@ -12,6 +12,7 @@ Tutorials
    basics
    hafnian_tutorial
    permanent_tutorial
+   torontonian_tutorial
 
 
 The following tutorials introduce core mathematical concepts
