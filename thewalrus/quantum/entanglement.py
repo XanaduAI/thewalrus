@@ -37,20 +37,20 @@ def get_partition(modes_A, split, M):
     if modes_A is not None:
         if not isinstance(modes_A, (int, range, list, tuple, np.ndarray)):
             raise TypeError(
-                "modes_A must be either integer, range, tuple or np.ndarray."
+                "``modes_A`` must be either integer, range, tuple or np.ndarray."
             )
         if isinstance(modes_A, int):
             modes_A = [modes_A]
         for mode in modes_A:
             if not isinstance(mode, int) or mode < 0 or mode > M - 1:
                 raise ValueError(
-                    f"Every element of modes_A must be an integer between 0 and {M - 1}"
+                    f"Every element of ``modes_A`` must be an integer between 0 and {M - 1}"
                 )
 
     if modes_A is None and split is not None:
         if not isinstance(split, int) or split > M - 1:
             raise ValueError(
-                "split must be an integer smaller than the number of modes."
+                "``split`` must be an integer smaller than the number of modes."
             )
         modes_A = range(split)
 
