@@ -2,6 +2,8 @@
 
 ### New features
 
+* Entanglement measures `entanglement_entropy` and `log_negativity` for bipartite Gaussian states. [#332](https://github.com/XanaduAI/thewalrus/pull/322)
+
 ### Improvements
 
 * Recursive Torontonian added for faster computation based on paper ["Polynomial speedup in Torontonian calculation by a scalable recursive algorithm" by Ágoston Kaposi, Zoltán Kolarovszki, Tamás Kozsik, Zoltán Zimborás, and Péter Rakyta](https://arxiv.org/pdf/2109.04528.pdf). [#321](https://github.com/XanaduAI/thewalrus/pull/321)
@@ -16,7 +18,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Gregory Morse
+Fabian Laudenbach, Gregory Morse
 
 ---
 
