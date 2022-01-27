@@ -12,11 +12,12 @@ Tutorials
    basics
    hafnian_tutorial
    permanent_tutorial
+   torontonian_tutorial
 
 
 The following tutorials introduce core mathematical concepts
 provided by The Walrus, including the hafnian, loop hafnian,
-and the permanent.
+the permanent and the torontonian.
 
 .. customgalleryitem::
     :tooltip: Basics of hafnians and loop hafnians
@@ -32,6 +33,11 @@ and the permanent.
     :tooltip: Benchmarking the permanent
     :description: :doc:`permanent_tutorial`
     :figure: gallery/perm_benchmark.png
+
+.. customgalleryitem::
+    :tooltip: Benchmarking the torontonian
+    :description: :doc:`torontonian_tutorial`
+    :figure: gallery/tor_benchmark.png
 
 .. raw:: html
 

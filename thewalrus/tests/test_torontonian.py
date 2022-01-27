@@ -24,6 +24,7 @@ from thewalrus import (
     threshold_detection_prob_displacement,
     threshold_detection_prob,
     numba_tor,
+    rec_torontonian,
 )
 from thewalrus.symplectic import two_mode_squeezing
 
@@ -206,4 +207,15 @@ def test_numba_tor(N):
     O = Xmat(N) @ Amat(cov)
     t1 = tor(O)
     t2 = numba_tor(O)
+    assert np.isclose(t1, t2)
+
+
+@pytest.mark.parametrize("N", range(1, 10))
+def test_recursive_tor(N):
+    """Tests numba implementation of the recursive torontonian against the default
+    implementation"""
+    cov = random_covariance(N)
+    O = Xmat(N) @ Amat(cov)
+    t1 = tor(O)
+    t2 = rec_torontonian(O)
     assert np.isclose(t1, t2)
