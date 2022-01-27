@@ -13,11 +13,18 @@
 # limitations under the License.
 """Entanglement tests"""
 # pylint: disable=no-self-use, assignment-from-no-return
+import pytest
+
 import numpy as np
 
 from thewalrus.quantum import entanglement_entropy, log_negativity
 from thewalrus.random import random_interferometer
-from thewalrus.symplectic import interferometer, passive_transformation
+from thewalrus.symplectic import (
+    interferometer,
+    passive_transformation,
+    two_mode_squeezing,
+    xxpp_to_xpxp,
+)
 
 
 def random_cov(num_modes=200, pure=False, nonclassical=True):
@@ -118,3 +125,20 @@ def test_log_negativity_split():
     E_0 = log_negativity(cov, split=split)
     E_1 = log_negativity(cov, modes_A=range(split))
     assert np.isclose(E_0, E_1)
+
+
+@pytest.mark.parametrize("r", [0.1, 0.5, 1.0, 1.3])
+@pytest.mark.parametrize("etaA", [0.1, 0.5, 1.0])
+@pytest.mark.parametrize("etaB", [0.1, 0.5, 1.0])
+def test_log_negativity_two_modes(r, etaA, etaB):
+    """Tests the log_negativity for two modes states following Eq. 13 of https://arxiv.org/pdf/quant-ph/0506124.pdf"""
+    cov = two_mode_squeezing(2 * r, 0)
+    _, cov_lossy = passive_transformation(np.zeros([4]), cov, np.diag([etaA, etaB]))
+    cov_xpxp = xxpp_to_xpxp(cov_lossy)
+    alpha = cov_xpxp[:2, :2]
+    gamma = cov_xpxp[2:, :2]
+    beta = cov_xpxp[2:, 2:]
+    invariant = np.linalg.det(alpha) + np.linalg.det(beta) - 2 * np.linalg.det(gamma)
+    detcov = np.linalg.det(cov_xpxp)
+    expected = -np.log(np.sqrt((invariant - np.sqrt(invariant ** 2 - 4 * detcov)) / 2))
+    assert np.allclose(expected, log_negativity(cov_lossy, modes_A=[0]))
