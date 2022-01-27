@@ -127,18 +127,32 @@ def test_log_negativity_split():
     assert np.isclose(E_0, E_1)
 
 
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 2.0, 1.7])
 @pytest.mark.parametrize("r", [0.1, 0.5, 1.0, 1.3])
 @pytest.mark.parametrize("etaA", [0.1, 0.5, 1.0])
 @pytest.mark.parametrize("etaB", [0.1, 0.5, 1.0])
-def test_log_negativity_two_modes(r, etaA, etaB):
+def test_log_negativity_two_modes(r, etaA, etaB, hbar):
     """Tests the log_negativity for two modes states following Eq. 13 of https://arxiv.org/pdf/quant-ph/0506124.pdf"""
-    cov = two_mode_squeezing(2 * r, 0)
-    _, cov_lossy = passive_transformation(np.zeros([4]), cov, np.diag([etaA, etaB]))
-    cov_xpxp = xxpp_to_xpxp(cov_lossy)
+    cov = (hbar / 2) * two_mode_squeezing(2 * r, 0)
+    _, cov_lossy = passive_transformation(np.zeros([4]), cov, np.diag([etaA, etaB]), hbar=hbar)
+    cov_xpxp = xxpp_to_xpxp(cov_lossy) / (hbar / 2)
     alpha = cov_xpxp[:2, :2]
     gamma = cov_xpxp[2:, :2]
     beta = cov_xpxp[2:, 2:]
     invariant = np.linalg.det(alpha) + np.linalg.det(beta) - 2 * np.linalg.det(gamma)
     detcov = np.linalg.det(cov_xpxp)
     expected = -np.log(np.sqrt((invariant - np.sqrt(invariant ** 2 - 4 * detcov)) / 2))
-    assert np.allclose(expected, log_negativity(cov_lossy, modes_A=[0]))
+    obtained = log_negativity(cov_lossy, modes_A=[0], hbar=hbar)
+    assert np.allclose(expected, obtained)
+
+
+@pytest.mark.parametrize("hbar", [0.5, 1.0, 2.0, 1.7])
+@pytest.mark.parametrize("r", [0.1, 0.5, 1.0, 1.3])
+def test_entanglement_entropy_two_modes(r, hbar):
+    """Tests the log_negativity for two modes states following Eq. 1 of https://journals.aps.org/pra/pdf/10.1103/PhysRevA.63.022305"""
+    cov = (hbar / 2) * two_mode_squeezing(2 * r, 0)
+    expected = (np.cosh(r) ** 2) * np.log(np.cosh(r) ** 2) - np.sinh(r) ** 2 * np.log(
+        np.sinh(r) ** 2
+    )
+    obtained = entanglement_entropy(cov, modes_A=[0], hbar=hbar)
+    assert np.allclose(expected, obtained)

@@ -56,17 +56,21 @@ def get_partition(modes_A, split, M):
     return list(modes_A)
 
 
-def vonNeumann_entropy(cov):
+def vonNeumann_entropy(cov, hbar=2):
     r"""Returns the vonNeumann entropy of a covariance matrix.
 
     Args:
         cov (array): a covariance matrix
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
 
     Returns:
         (float): vonNeumann entropy
     """
-    if not is_valid_cov(cov):
+    if not is_valid_cov(cov, hbar=hbar):
         raise ValueError("Input is not a valid covariance matrix.")
+
+    cov = cov / (hbar / 2)
 
     nus = symplectic_eigenvals(cov)
 
@@ -79,7 +83,7 @@ def vonNeumann_entropy(cov):
     return S
 
 
-def entanglement_entropy(cov, modes_A=None, split=None):
+def entanglement_entropy(cov, modes_A=None, split=None, hbar=2):
     r"""Returns the entanglement entropy of a covariance matrix under a given
     bipartition.
 
@@ -88,12 +92,15 @@ def entanglement_entropy(cov, modes_A=None, split=None):
         modes_A (iterable or int): the subset of modes used for the bipartition
         split (int): the index of the mode separating the two partitions
             (alternative to ``modes_A``)
-
+        hbar (float): the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
     Returns:
         (float): logarithmic negativity
     """
-    if not is_pure_cov(cov):
+    if not is_pure_cov(cov, hbar=hbar):
         raise ValueError("Input is not a pure covariance matrix.")
+
+    cov = cov / (hbar / 2)
 
     M = int(len(cov) / 2)
 
@@ -106,7 +113,7 @@ def entanglement_entropy(cov, modes_A=None, split=None):
     return E
 
 
-def log_negativity(cov, modes_A=None, split=None):
+def log_negativity(cov, modes_A=None, split=None, hbar=2):
     r"""Returns the logarithmic negativity of a covariance matrix under a given
     bipartition.
 
@@ -119,8 +126,10 @@ def log_negativity(cov, modes_A=None, split=None):
     Returns:
         (float): entanglement entropy
     """
-    if not is_valid_cov(cov):
+    if not is_valid_cov(cov, hbar=hbar):
         raise ValueError("Input is not a valid covariance matrix.")
+
+    cov = cov / (hbar / 2)
 
     M = int(len(cov) / 2)
 
