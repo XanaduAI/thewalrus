@@ -36,9 +36,7 @@ def get_partition(modes_A, split, M):
     """
     if modes_A is not None:
         if not isinstance(modes_A, (int, range, list, tuple, np.ndarray)):
-            raise TypeError(
-                "``modes_A`` must be either integer, range, tuple or np.ndarray."
-            )
+            raise TypeError("``modes_A`` must be either integer, range, tuple or np.ndarray.")
         if isinstance(modes_A, int):
             modes_A = [modes_A]
         for mode in modes_A:
@@ -49,15 +47,11 @@ def get_partition(modes_A, split, M):
 
     if modes_A is None and split is not None:
         if not isinstance(split, int) or split > M - 1:
-            raise ValueError(
-                "``split`` must be an integer smaller than the number of modes."
-            )
+            raise ValueError("``split`` must be an integer smaller than the number of modes.")
         modes_A = range(split)
 
     if modes_A is None and split is None:
-        raise TypeError(
-            "A bipartition must be defined, either by ``modes_A`` or ``split``."
-        )
+        raise TypeError("A bipartition must be defined, either by ``modes_A`` or ``split``.")
 
     return list(modes_A)
 
@@ -79,9 +73,7 @@ def vonNeumann_entropy(cov):
     S = 0
     for nu in nus:
         if not np.isclose(nu, 1):
-            g = (nu + 1) / 2 * np.log((nu + 1) / 2) - (nu - 1) / 2 * np.log(
-                (nu - 1) / 2
-            )
+            g = (nu + 1) / 2 * np.log((nu + 1) / 2) - (nu - 1) / 2 * np.log((nu - 1) / 2)
             S += g
 
     return S

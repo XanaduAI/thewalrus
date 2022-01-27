@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2022 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 # limitations under the License.
 """Entanglement tests"""
 # pylint: disable=no-self-use, assignment-from-no-return
-import pytest
-
 import numpy as np
 
 from thewalrus.quantum import entanglement_entropy, log_negativity
@@ -44,9 +42,7 @@ def random_cov(num_modes=200, pure=False, nonclassical=True):
     r = 1.234
     if nonclassical:
         # squeezed inputs
-        cov_in = np.diag(
-            np.concatenate([np.exp(2 * r) * np.ones(M), np.exp(-2 * r) * np.ones(M)])
-        )
+        cov_in = np.diag(np.concatenate([np.exp(2 * r) * np.ones(M), np.exp(-2 * r) * np.ones(M)]))
     elif not nonclassical and pure:
         # vacuum inputs
         cov_in = np.eye(2 * M)
@@ -67,12 +63,10 @@ def test_entanglement_entropy_bipartition():
     entanglement entropy"""
     M = 200
     cov = random_cov(num_modes=M, pure=True, nonclassical=True)
-    modes_A = [1, 11, 111]
-    # make a list that contains all modes but 1, 11, and 111:
+    modes_A = 111
+    # make a list that contains all modes but 111:
     modes_B = list(range(M))
     modes_B.pop(111)
-    modes_B.pop(11)
-    modes_B.pop(1)
     E_A = entanglement_entropy(cov, modes_A=modes_A)
     E_B = entanglement_entropy(cov, modes_A=modes_B)
     assert np.isclose(E_A, E_B)
@@ -83,12 +77,10 @@ def test_log_negativity_bipartition():
     negativity"""
     M = 200
     cov = random_cov(num_modes=M, pure=False, nonclassical=True)
-    modes_A = [1, 11, 111]
-    # make a list that contains all modes but 1, 11, and 111:
+    modes_A = 111
+    # make a list that contains all modes but 111:
     modes_B = list(range(M))
     modes_B.pop(111)
-    modes_B.pop(11)
-    modes_B.pop(1)
     E_A = log_negativity(cov, modes_A=modes_A)
     E_B = log_negativity(cov, modes_A=modes_B)
     assert np.isclose(E_A, E_B)
