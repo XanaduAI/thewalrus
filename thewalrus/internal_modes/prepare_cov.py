@@ -17,6 +17,8 @@ Set of functions for forming a covariance matrix over multiple modes, based on o
 
 import numpy as np
 from itertools import chain
+
+from scipy.linalg import block_diag
 from strawberryfields.decompositions import takagi
 from ..quantum import fidelity
 from ..symplectic import interferometer, reduced_state, squeezing, passive_transformation
@@ -206,8 +208,14 @@ def prepare_cov(rjs, O, T, thresh=1e-2, hbar=2.):
     eps, W = orthonormal_basis(O, rjs)
     Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
 
+
+    M = T.shape[0]
+    K = Qinit.shape[0] // (2 * M)
+    T_K = np.zeros((M*K, M*K), dtype=np.complex128)
+    for i in range(K):
+        T_K[i::K,i::K] = T
     mu = np.zeros(Qinit.shape[0])
-    mu, Qu = passive_transformation(mu, Qinit, T, hbar=hbar)
+    mu, Qu = passive_transformation(mu, Qinit, T_K, hbar=hbar)
 
     return Qu
 
