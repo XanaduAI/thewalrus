@@ -53,7 +53,7 @@ def hafkd(As, edge_reps, K=1):
         binom_prod = 1. 
         for i in range(M):
             binom_prod *= nb_binom(edge_reps[i], kept_edges[i])
-
+            
         glynn_edges = 2 * kept_edges - edge_reps
 
         z = np.concatenate((glynn_edges, glynn_edges))
