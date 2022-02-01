@@ -310,8 +310,12 @@ def get_AX_S(kept_edges, A):  # pragma: no cover
     A_nonzero = nb_ix(A, nonzero_rows, nonzero_rows)
 
     AX_nonzero = np.empty_like(A_nonzero, dtype=np.complex128)
-    AX_nonzero[:, :n_nonzero_edges] = kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-    AX_nonzero[:, n_nonzero_edges:] = kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    AX_nonzero[:, :n_nonzero_edges] = (
+        kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+    )
+    AX_nonzero[:, n_nonzero_edges:] = (
+        kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    )
 
     return AX_nonzero
 
@@ -340,8 +344,12 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     A_nonzero = nb_ix(A, nonzero_rows, nonzero_rows)
 
     AX_nonzero = np.empty_like(A_nonzero, dtype=np.complex128)
-    AX_nonzero[:, :n_nonzero_edges] = kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-    AX_nonzero[:, n_nonzero_edges:] = kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    AX_nonzero[:, :n_nonzero_edges] = (
+        kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+    )
+    AX_nonzero[:, n_nonzero_edges:] = (
+        kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    )
 
     D_nonzero = D[nonzero_rows]
 
@@ -352,8 +360,12 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     if oddV is not None:
         oddV_nonzero = oddV[nonzero_rows]
         oddVX_nonzero = np.empty_like(oddV_nonzero, dtype=np.complex128)
-        oddVX_nonzero[:n_nonzero_edges] = kept_edges_nonzero * oddV_nonzero[n_nonzero_edges:]
-        oddVX_nonzero[n_nonzero_edges:] = kept_edges_nonzero * oddV_nonzero[:n_nonzero_edges]
+        oddVX_nonzero[:n_nonzero_edges] = (
+            kept_edges_nonzero * oddV_nonzero[n_nonzero_edges:]
+        )
+        oddVX_nonzero[n_nonzero_edges:] = (
+            kept_edges_nonzero * oddV_nonzero[:n_nonzero_edges]
+        )
     else:
         oddVX_nonzero = None
 
@@ -379,8 +391,12 @@ def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     kept_edges_nonzero = kept_edges[np.where(kept_edges != 0)]
     oddV_nonzero0 = oddV0[nonzero_rows]
     oddVX_nonzero0 = np.empty_like(oddV_nonzero0, dtype=np.complex128)
-    oddVX_nonzero0[:n_nonzero_edges] = kept_edges_nonzero * oddV_nonzero0[n_nonzero_edges:]
-    oddVX_nonzero0[n_nonzero_edges:] = kept_edges_nonzero * oddV_nonzero0[:n_nonzero_edges]
+    oddVX_nonzero0[:n_nonzero_edges] = (
+        kept_edges_nonzero * oddV_nonzero0[n_nonzero_edges:]
+    )
+    oddVX_nonzero0[n_nonzero_edges:] = (
+        kept_edges_nonzero * oddV_nonzero0[:n_nonzero_edges]
+    )
 
     return oddVX_nonzero0
 
@@ -519,7 +535,9 @@ def _haf(A, reps=None, glynn=True):
 
 # pylint: disable=too-many-arguments, redefined-outer-name, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  # pragma: no cover
+def _calc_loop_hafnian(
+    A, D, edge_reps, oddloop=None, oddV=None, glynn=True
+):  # pragma: no cover
     """Compute loop hafnian, using inputs as prepared by frontend loop_hafnian function
     compiled with Numba.
 
@@ -706,7 +724,9 @@ def powerset(iterable):
     Returns:
         chain: chain of all subsets of input list
     """
-    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
+    return chain.from_iterable(
+        combinations(iterable, r) for r in range(len(iterable) + 1)
+    )
 
 
 def reduction(A, rpt):
@@ -807,8 +827,8 @@ def hafnian(
             )
             return result
 
-        return A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2] 
-    
+        return A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2]
+
     if approx:
         if np.any(np.iscomplex(A)):
             raise ValueError("Input matrix must be real")
@@ -825,7 +845,7 @@ def hafnian(
         if loop:
             raise TypeError("Recursive algorithm does not support the loop hafnian")
 
-        return recursive_hafnian(A)   
+        return recursive_hafnian(A)
 
     return _haf(A, reps=None, glynn=glynn)
 
@@ -859,11 +879,11 @@ def hafnian_sparse(A, D=None, loop=False):
     r, _ = np.nonzero(A)
     m = max(Counter(r).values())  # max nonzero values per row/column
 
-    @lru_cache(maxsize=2**m)
+    @lru_cache(maxsize=2 ** m)
     def indices(d, k):
         return d.intersection(set(np.nonzero(A[k])[0]))
 
-    @lru_cache(maxsize=2**m)
+    @lru_cache(maxsize=2 ** m)
     def lhaf(d: frozenset) -> float:
         if not d:
             return 1
@@ -920,7 +940,9 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     input_validation(A, atol=atol, rtol=rtol)
 
     if len(rpt) != len(A):
-        raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")
+        raise ValueError(
+            "the rpt argument must be 1-dimensional sequence of length len(A)."
+        )
 
     nud = np.array(rpt, dtype=np.int32)
 
@@ -938,11 +960,13 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
 
     if np.allclose(A, 0, rtol=rtol, atol=atol):
         if loop:
-            return np.prod(mu**rpt)
+            return np.prod(mu ** rpt)
         return 0
 
     if len(mu) != len(A):
-        raise ValueError("Length of means vector must be the same length as the matrix A.")
+        raise ValueError(
+            "Length of means vector must be the same length as the matrix A."
+        )
 
     if loop:
         return loop_hafnian(A, D=mu, reps=rpt, glynn=glynn)
@@ -986,7 +1010,13 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
                     [
                         A[i - 1, t - 1]
                         * loop_haf[
-                            tuple([item for item in lower_end + D if item not in set((i, t))])
+                            tuple(
+                                [
+                                    item
+                                    for item in lower_end + D
+                                    if item not in set((i, t))
+                                ]
+                            )
                         ]
                         for i in D
                     ]
@@ -996,7 +1026,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
 
 
 @numba.jit(nopython=True)
-def recursive_hafnian(A): # pragma: no cover
+def recursive_hafnian(A):  # pragma: no cover
     r"""Computes the hafnian of the matrix with the recursive algorithm. It is an implementation of
     algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
 
@@ -1025,7 +1055,7 @@ def recursive_hafnian(A): # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def solve(b, s, w, g, n): # pragma: no cover
+def solve(b, s, w, g, n):  # pragma: no cover
     r"""Implements the recursive algorithm.
 
     Args:
