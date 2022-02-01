@@ -231,7 +231,7 @@ class TestPassiveTransformation:
         """Test that an transformation returns the correct state"""
 
         M = 4
-        cov = np.arange(4 * M ** 2, dtype=np.float64).reshape((2 * M, 2 * M))
+        cov = np.arange(4 * M**2, dtype=np.float64).reshape((2 * M, 2 * M))
         mu = np.arange(2 * M, dtype=np.float64)
 
         T = np.sqrt(0.9) * M ** (-0.5) * np.ones((6, M), dtype=np.float64)
@@ -262,7 +262,7 @@ class TestPassiveTransformation:
     @pytest.mark.parametrize("M", range(1, 10))
     def test_valid_cov(self, M, tol):
         """test that the output is a valid covariance matrix, even when not square"""
-        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2 * M, 2 * M))
+        a = np.arange(4 * M**2, dtype=np.float64).reshape((2 * M, 2 * M))
         cov = a @ a.T + np.eye(2 * M)
         mu = np.arange(2 * M, dtype=np.float64)
 
@@ -280,7 +280,7 @@ class TestPassiveTransformation:
         test that the outputs agree with the interferometer class when
         transformation is unitary
         """
-        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2 * M, 2 * M))
+        a = np.arange(4 * M**2, dtype=np.float64).reshape((2 * M, 2 * M))
         cov = a @ a.T + np.eye(2 * M)
         mu = np.arange(2 * M, dtype=np.float64)
 
@@ -299,7 +299,7 @@ class TestPassiveTransformation:
         """test that the output is a valid covariance matrix, even when not square"""
 
         M = 4
-        a = np.arange(4 * M ** 2, dtype=np.float64).reshape((2 * M, 2 * M))
+        a = np.arange(4 * M**2, dtype=np.float64).reshape((2 * M, 2 * M))
         cov = a @ a.T + np.eye(2 * M)
         mu = np.arange(2 * M, dtype=np.float64)
 
@@ -590,7 +590,7 @@ class TestMeanPhotonNumber:
         mean_photon, var = symplectic.mean_photon_number(mu, cov, hbar=hbar)
 
         mean_ex = np.abs(a) ** 2 + nbar
-        var_ex = nbar ** 2 + nbar + np.abs(a) ** 2 * (1 + 2 * nbar)
+        var_ex = nbar**2 + nbar + np.abs(a) ** 2 * (1 + 2 * nbar)
 
         assert np.allclose(mean_photon, mean_ex, atol=tol, rtol=0)
         assert np.allclose(var, var_ex, atol=tol, rtol=0)

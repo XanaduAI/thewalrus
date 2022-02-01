@@ -210,7 +210,7 @@ class TestHafnian:
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = dtype(np.ones([2 * n, 2 * n]))
         haf = hafnian(A)
-        expected = fac(2 * n) / (fac(n) * (2 ** n))
+        expected = fac(2 * n) / (fac(n) * (2**n))
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])

@@ -156,7 +156,7 @@ def characteristic_function(
     if poly_corr is None or poly_corr == 0:
         f = lambda x: 1
     else:
-        f = lambda x: x ** poly_corr
+        f = lambda x: x**poly_corr
 
     if s == 0 or eta == 0:
         return f(0)
