@@ -18,6 +18,7 @@ Hafnian Python interface
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
+import warnings
 import numba
 
 import numpy as np
@@ -738,6 +739,7 @@ def hafnian(
     approx=False,
     num_samples=1000,
     glynn=True,
+    recursive=False,
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
 
@@ -755,7 +757,7 @@ def hafnian(
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note
             that the approximation algorithm can only be applied to matrices ``A`` that only have
             non-negative entries.
-        num_samples (int): if ``approx=True``, the approximation algorithm performs ``num_samples``
+        num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples``
             iterations for estimation of the hafnian of the non-negative matrix ``A``
         glynn (bool): whether to use finite difference sieve
 
@@ -805,8 +807,8 @@ def hafnian(
             )
             return result
 
-        return A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2]
-
+        return A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2] 
+    
     if approx:
         if np.any(np.iscomplex(A)):
             raise ValueError("Input matrix must be real")
@@ -818,6 +820,12 @@ def hafnian(
 
     if loop:
         return loop_hafnian(A, D=None, reps=None, glynn=glynn)
+
+    if recursive:
+        if loop:
+            raise TypeError("Recursive algorithm does not support the loop hafnian")
+
+        return recursive_hafnian(A)   
 
     return _haf(A, reps=None, glynn=glynn)
 
@@ -985,6 +993,75 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
                 )
 
     return loop_haf[tuple(range(1, n + 1))]
+
+
+@numba.jit(nopython=True)
+def recursive_hafnian(A): # pragma: no cover
+    r"""Computes the hafnian of the matrix with the recursive algorithm. It is an implementation of
+    algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
+
+    Args:
+        m (array): the input matrix
+
+    Returns:
+        float: the hafnian of the input matrix
+    """
+    nb_lines = len(A)
+    nb_columns = len(A[0])
+    if nb_lines != nb_columns:
+        raise ValueError("Matrix must be square")
+
+    if nb_lines % 2 != 0:
+        raise ValueError("Matrix size must be even")
+
+    n = int(float(len(A)) / 2)
+    z = np.zeros((n * (2 * n - 1), n + 1))
+    for j in range(1, 2 * n):
+        for k in range(j):
+            z[int(j * (j - 1) / 2 + k)][0] = A.copy()[j][k]
+    g = np.zeros(n + 1)
+    g[0] = 1
+    return solve(z, 2 * n, 1, g, n)
+
+
+@numba.jit(nopython=True)
+def solve(b, s, w, g, n): # pragma: no cover
+    r"""Implements the recursive algorithm.
+
+    Args:
+        b (array): matrix that is transformed recursively
+        s (int): size of the original matrix that changes at every recursion
+        k (int): a variable of the recursive algorithm
+        g (int): matrix that is transformed recursively
+        n (int): size of the original matrix divided by 2
+
+    Returns:
+        float: the hafnian of the input matrix
+    """
+    if s == 0:
+        return w * g[n]
+    c = np.zeros((int((s - 2) * (s - 3) / 2), n + 1))
+    i = 0
+    for j in range(1, s - 2):
+        for k in range(j):
+            c[i] = b[int((j + 1) * (j + 2) / 2 + k + 2)]
+            i += 1
+    h = solve(c, s - 2, -w, g, n)
+    e = g[:].copy()
+    for u in range(n):
+        for v in range(n - u):
+            e[u + v + 1] += g[u] * b[0][v]
+    for j in range(1, s - 2):
+        for k in range(j):
+            for u in range(n):
+                for v in range(n - u):
+                    c[int(j * (j - 1) / 2 + k)][u + v + 1] += (
+                        b[int((j + 1) * (j + 2) / 2)][u]
+                        * b[int((k + 1) * (k + 2) / 2 + 1)][v]
+                        + b[int((k + 1) * (k + 2) / 2)][u]
+                        * b[int((j + 1) * (j + 2) / 2 + 1)][v]
+                    )
+    return h + solve(c, s - 2, w, e, n)
 
 
 @numba.jit(nopython=True)
