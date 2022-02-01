@@ -139,7 +139,7 @@ def adj_scaling(A, n_mean):
                 with respect to x
         """
         vals1 = vals * x
-        dn = (2.0 / x) * np.sum((vals1 / (1 - vals1 ** 2)) ** 2)
+        dn = (2.0 / x) * np.sum((vals1 / (1 - vals1**2)) ** 2)
         return dn
 
     f = lambda x: mean_photon_number(x, ls) - n_mean

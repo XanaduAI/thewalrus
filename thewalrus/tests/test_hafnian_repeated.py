@@ -179,7 +179,7 @@ class TestHafnianRepeated:
         A = dtype(np.ones([2 * n, 2 * n]))
         rpt = np.ones([2 * n], dtype=np.int32)
         haf = hafnian_repeated(A, rpt)
-        expected = fac(2 * n) / (fac(n) * (2 ** n))
+        expected = fac(2 * n) / (fac(n) * (2**n))
         assert np.allclose(haf, expected)
 
         A = dtype([[1]])
@@ -226,5 +226,5 @@ class TestHafnianRepeated:
 
         rpt = np.ones([2 * n], dtype=np.int32)
         haf = hafnian_repeated(A, rpt)
-        expected = np.prod(x) * fac(2 * n) / (fac(n) * (2 ** n))
+        expected = np.prod(x) * fac(2 * n) / (fac(n) * (2**n))
         assert np.allclose(haf, expected)
