@@ -127,6 +127,7 @@ from ._torontonian import (
     threshold_detection_prob_displacement,
     threshold_detection_prob,
     numba_tor,
+    rec_torontonian,
 )
 from ._version import __version__
 

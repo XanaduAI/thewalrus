@@ -129,19 +129,19 @@ def test_cumulants_three_mode_random_state(hbar):  # pylint: disable=too-many-st
     assert np.allclose(photon_number_cumulant(mu, cov, [1], hbar=hbar), n1_1)
     assert np.allclose(photon_number_cumulant(mu, cov, [2], hbar=hbar), n2_1)
 
-    n0_2 = n ** 2 @ probs0
-    n1_2 = n ** 2 @ probs1
-    n2_2 = n ** 2 @ probs2
-    var0 = n0_2 - n0_1 ** 2
-    var1 = n1_2 - n1_1 ** 2
-    var2 = n2_2 - n2_1 ** 2
+    n0_2 = n**2 @ probs0
+    n1_2 = n**2 @ probs1
+    n2_2 = n**2 @ probs2
+    var0 = n0_2 - n0_1**2
+    var1 = n1_2 - n1_1**2
+    var2 = n2_2 - n2_1**2
     assert np.allclose(photon_number_cumulant(mu, cov, [0, 0], hbar=hbar), var0)
     assert np.allclose(photon_number_cumulant(mu, cov, [1, 1], hbar=hbar), var1)
     assert np.allclose(photon_number_cumulant(mu, cov, [2, 2], hbar=hbar), var2)
 
-    n0_3 = n ** 3 @ probs0 - 3 * n0_2 * n0_1 + 2 * n0_1 ** 3
-    n1_3 = n ** 3 @ probs1 - 3 * n1_2 * n1_1 + 2 * n1_1 ** 3
-    n2_3 = n ** 3 @ probs2 - 3 * n2_2 * n2_1 + 2 * n2_1 ** 3
+    n0_3 = n**3 @ probs0 - 3 * n0_2 * n0_1 + 2 * n0_1**3
+    n1_3 = n**3 @ probs1 - 3 * n1_2 * n1_1 + 2 * n1_1**3
+    n2_3 = n**3 @ probs2 - 3 * n2_2 * n2_1 + 2 * n2_1**3
     assert np.allclose(photon_number_cumulant(mu, cov, [0, 0, 0], hbar=hbar), n0_3)
     assert np.allclose(photon_number_cumulant(mu, cov, [1, 1, 1], hbar=hbar), n1_3)
     assert np.allclose(photon_number_cumulant(mu, cov, [2, 2, 2], hbar=hbar), n2_3)
@@ -162,12 +162,12 @@ def test_cumulants_three_mode_random_state(hbar):  # pylint: disable=too-many-st
     assert np.allclose(photon_number_cumulant(mu, cov, [0, 2], hbar=hbar), covar02)
     assert np.allclose(photon_number_cumulant(mu, cov, [1, 2], hbar=hbar), covar12)
 
-    kappa001 = n ** 2 @ probs01 @ n - 2 * n0n1 * n0_1 - n0_2 * n1_1 + 2 * n0_1 ** 2 * n1_1
-    kappa011 = n @ probs01 @ n ** 2 - 2 * n0n1 * n1_1 - n1_2 * n0_1 + 2 * n1_1 ** 2 * n0_1
-    kappa002 = n ** 2 @ probs02 @ n - 2 * n0n2 * n0_1 - n0_2 * n2_1 + 2 * n0_1 ** 2 * n2_1
-    kappa022 = n @ probs02 @ n ** 2 - 2 * n0n2 * n2_1 - n2_2 * n0_1 + 2 * n2_1 ** 2 * n0_1
-    kappa112 = n ** 2 @ probs12 @ n - 2 * n1n2 * n1_1 - n1_2 * n2_1 + 2 * n1_1 ** 2 * n2_1
-    kappa122 = n @ probs12 @ n ** 2 - 2 * n1n2 * n2_1 - n2_2 * n1_1 + 2 * n2_1 ** 2 * n1_1
+    kappa001 = n**2 @ probs01 @ n - 2 * n0n1 * n0_1 - n0_2 * n1_1 + 2 * n0_1**2 * n1_1
+    kappa011 = n @ probs01 @ n**2 - 2 * n0n1 * n1_1 - n1_2 * n0_1 + 2 * n1_1**2 * n0_1
+    kappa002 = n**2 @ probs02 @ n - 2 * n0n2 * n0_1 - n0_2 * n2_1 + 2 * n0_1**2 * n2_1
+    kappa022 = n @ probs02 @ n**2 - 2 * n0n2 * n2_1 - n2_2 * n0_1 + 2 * n2_1**2 * n0_1
+    kappa112 = n**2 @ probs12 @ n - 2 * n1n2 * n1_1 - n1_2 * n2_1 + 2 * n1_1**2 * n2_1
+    kappa122 = n @ probs12 @ n**2 - 2 * n1n2 * n2_1 - n2_2 * n1_1 + 2 * n2_1**2 * n1_1
 
     assert np.allclose(photon_number_cumulant(mu, cov, [0, 0, 1], hbar=hbar), kappa001)
     assert np.allclose(photon_number_cumulant(mu, cov, [0, 1, 1], hbar=hbar), kappa011)

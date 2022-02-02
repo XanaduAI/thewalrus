@@ -579,13 +579,13 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
     if out_of_bounds is False:
         probabilities = probabilities.flatten() / sum_p
-        vals = np.arange(cutoff ** num_modes, dtype=int)
+        vals = np.arange(cutoff**num_modes, dtype=int)
         return [
             np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
             for _ in range(num_samples)
         ]
 
-    upper_limit = cutoff ** num_modes
+    upper_limit = cutoff**num_modes
 
     def sorter(index):
         if index == upper_limit:
@@ -593,7 +593,7 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
         return np.unravel_index(index, [cutoff] * num_modes)
 
-    vals = np.arange(1 + cutoff ** num_modes, dtype=int)
+    vals = np.arange(1 + cutoff**num_modes, dtype=int)
     probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
     return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 

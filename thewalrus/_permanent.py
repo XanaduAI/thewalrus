@@ -59,6 +59,12 @@ def perm(A, method="bbfg"):
     if np.isnan(A).any():
         raise ValueError("Input matrix must not contain NaNs.")
 
+    if matshape[0] == 0:
+        return A.dtype.type(1.0)
+
+    if matshape[0] == 1:
+        return A[0, 0]
+
     if matshape[0] == 2:
         return A[0, 0] * A[1, 1] + A[0, 1] * A[1, 0]
 
@@ -94,6 +100,8 @@ def perm_ryser(M):  # pragma: no cover
         float or complex: the permanent of matrix ``M``
     """
     n = len(M)
+    if n == 0:
+        return M.dtype.type(1.0)
     # row_comb keeps the sum of previous subsets.
     # Every iteration, it removes a term and/or adds a new term
     # to give the term to add for the next subset
@@ -101,8 +109,8 @@ def perm_ryser(M):  # pragma: no cover
     total = 0
     old_grey = 0
     sign = +1
-    binary_power_dict = [2 ** i for i in range(n)]
-    num_loops = 2 ** n
+    binary_power_dict = [2**i for i in range(n)]
+    num_loops = 2**n
     for k in range(0, num_loops):
         bin_index = (k + 1) % num_loops
         reduced = np.prod(row_comb)
@@ -137,11 +145,13 @@ def perm_bbfg(M):  # pragma: no cover
     """
 
     n = len(M)
+    if n == 0:
+        return M.dtype.type(1.0)
     row_comb = np.sum(M, 0)
     total = 0
     old_gray = 0
     sign = +1
-    binary_power_dict = [2 ** i for i in range(n)]
+    binary_power_dict = [2**i for i in range(n)]
     num_loops = 2 ** (n - 1)
     for bin_index in range(1, num_loops + 1):
         reduced = np.prod(row_comb)
