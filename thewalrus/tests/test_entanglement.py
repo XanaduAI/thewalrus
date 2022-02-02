@@ -141,7 +141,7 @@ def test_log_negativity_two_modes(r, etaA, etaB, hbar):
     beta = cov_xpxp[2:, 2:]
     invariant = np.linalg.det(alpha) + np.linalg.det(beta) - 2 * np.linalg.det(gamma)
     detcov = np.linalg.det(cov_xpxp)
-    expected = -np.log(np.sqrt((invariant - np.sqrt(invariant ** 2 - 4 * detcov)) / 2))
+    expected = -np.log(np.sqrt((invariant - np.sqrt(invariant**2 - 4 * detcov)) / 2))
     obtained = log_negativity(cov_lossy, modes_A=[0], hbar=hbar)
     assert np.allclose(expected, obtained)
 
