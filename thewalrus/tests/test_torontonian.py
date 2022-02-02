@@ -24,12 +24,14 @@ from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xm
 from thewalrus.random import random_covariance
 from thewalrus import (
     tor,
-    threshold_detection_prob_displacement,
+    ltor,
     threshold_detection_prob,
     numba_tor,
+    numba_ltor,
     rec_torontonian,
 )
 from thewalrus.symplectic import two_mode_squeezing
+from thewalrus._torontonian import numba_vac_prob
 
 
 def gen_omats(l, nbar):

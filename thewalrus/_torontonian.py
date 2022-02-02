@@ -171,7 +171,7 @@ def quad_cholesky(L, Z, idx, mat):  # pragma: no cover
     Returns:
         np.float64 or np.complex128: the Cholesky of matrix ``mat``
     """
-    Ls = numba_ix(L, Z, Z)
+    Ls = nb_ix(L, Z, Z)
     for i in range(idx, len(mat)):
         for j in range(idx, i):
             z = 0.0
@@ -215,7 +215,7 @@ def recursiveTor(L, modes, A, n):  # pragma: no cover
         Z = np.concatenate((np.arange(idx), np.arange(idx + 2, nm * 2)), axis=0)
         nm -= 1
 
-        Az = numba_ix(A, Z, Z)
+        Az = nb_ix(A, Z, Z)
         Ls = quad_cholesky(L, Z, idx, np.eye(2 * nm) - Az)
         det = np.square(np.prod(np.diag(Ls)))
         tot += ((-1) ** len(nextModes)) / np.sqrt(det) + recursiveTor(Ls, nextModes, Az, n)
@@ -240,7 +240,7 @@ def rec_torontonian(A):  # pragma: no cover
     Z = np.empty((2 * n,), dtype=np.int_)
     Z[0::2] = np.arange(0, n)
     Z[1::2] = np.arange(n, 2 * n)
-    A = numba_ix(A, Z, Z)
+    A = nb_ix(A, Z, Z)
     L = np.linalg.cholesky(np.eye(2 * n) - A)
     det = np.square(np.prod(np.diag(L)))
     return 1 / np.sqrt(det) + recursiveTor(L, np.empty(0, dtype=np.int_), A, n)
