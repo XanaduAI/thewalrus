@@ -113,7 +113,7 @@ def threshold_detection_prob(
     I = np.eye(2 * n)
     inv_sigma = np.linalg.inv(sigma)
     O = I - inv_sigma
-    gamma = inv_sigma @ alpha
+    gamma = (inv_sigma @ alpha).conj()
 
     gamma_red, O_red = reduced_gaussian(gamma, O, np.where(np.array(det_pattern) == 1)[0])
     return numba_vac_prob(alpha, sigma) * numba_ltor(O_red, gamma_red).real
@@ -208,7 +208,7 @@ def numba_ltor(O, gamma):  # pragma: no cover
         I_m_O_XX_inv = np.linalg.inv(I_m_O_XX)
 
         gamma_X = gamma[kept_rows]
-        top = np.exp(0.5 * gamma_X.conj() @ I_m_O_XX_inv @ gamma_X)
+        top = np.exp(0.5 * gamma_X @ I_m_O_XX_inv @ gamma_X.conj())
         bottom = np.sqrt(np.linalg.det(I_m_O_XX))
 
         total += plusminus * top / bottom
