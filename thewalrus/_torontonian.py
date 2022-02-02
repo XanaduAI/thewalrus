@@ -40,9 +40,7 @@ def tor(A, recursive=True):
 
     if matshape[0] % 2 != 0:
         raise ValueError("matrix dimension must be even")
-        
     return rec_torontonian(A) if recursive else numba_tor(A)
-
 
 
 def ltor(A, gamma):
@@ -134,7 +132,7 @@ def numba_tor(O):  # pragma: no cover
     N = O.shape[0] // 2
     N_odd = N % 2
 
-    steps = 2 ** N
+    steps = 2**N
     ones = np.ones(N, dtype=np.int8)
 
     total = 0.0
@@ -153,84 +151,6 @@ def numba_tor(O):  # pragma: no cover
         total += plusminus / bottom
 
     return total
-
-
-@numba.jit(nopython=True)
-def numba_vac_prob(alpha, sigma):  # pragma: no cover
-    r"""
-    Return the vacuum probability of a Gaussian state with Q function sigma
-    and displacement vector, alpha.
-
-    Args:
-        alpha (array): a 2M-length vector describing the complex displacement
-        sigma (array): a 2Mx2M matrix describing the Q-function covariance matrix
-    Returns:
-        float: vacuum probability of Gaussian state
-    """
-    alpha = alpha.astype(np.complex128)
-    sigma = sigma.astype(np.complex128)
-    return (
-        np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha).real
-        / np.sqrt(np.linalg.det(sigma))
-    ).real
-
-
-@numba.jit(nopython=True, parallel=True)
-def numba_ltor(O, gamma):  # pragma: no cover
-    r"""Returns the loop Torontonian of a matrix using numba.
-
-    Args:
-        O (array): a square, symmetric array of even dimensions.
-        gamma (array): a vector of even dimension
-
-    Returns:
-        np.complex128: the loop torontonian of matrix O, vector gamma
-    """
-    N = O.shape[0] // 2
-    N_odd = N % 2
-
-    steps = 2 ** N
-    ones = np.ones(N, dtype=np.int8)
-
-    gamma = gamma.astype(np.complex128)
-    O = O.astype(np.complex128)
-
-    total = 0.0
-    for j in numba.prange(steps):
-        X_modes = find_kept_edges(j, ones)
-        lenX = X_modes.sum()
-        I = np.eye(2 * lenX, dtype=O.dtype)
-        plusminus = (-1) ** ((N_odd - lenX % 2) % 2)
-
-        kept_modes = np.where(X_modes != 0)[0]
-        kept_rows = np.concatenate((kept_modes, kept_modes + N))
-        O_XX = nb_ix(O, kept_rows, kept_rows)
-
-        I_m_O_XX = I - O_XX
-        I_m_O_XX_inv = np.linalg.inv(I_m_O_XX)
-
-        gamma_X = gamma[kept_rows]
-        top = np.exp(0.5 * gamma_X @ I_m_O_XX_inv @ gamma_X.conj())
-        bottom = np.sqrt(np.linalg.det(I_m_O_XX))
-
-<<<<<<< HEAD
-        total += plusminus * top / bottom
-
-    return total
-=======
-    Returns:
-        np.float64 or np.complex128: the torontonian of matrix A.
-    """
-    n_det = A.shape[0] // 2
-    p_sum = 1.0  # empty set is not included in the powerset function so we start at 1
-    for z in powerset(np.arange(n_det)):
-        Z = np.asarray(z)
-        ZZ = np.concatenate((Z, Z + n_det), axis=0)
-        A_ZZ = numba_ix(A, ZZ, ZZ)
-        n = len(Z)
-        p_sum += ((-1) ** n) / np.sqrt(np.linalg.det(np.eye(2 * n) - A_ZZ))
-
-    return p_sum * (-1) ** (n_det)
 
 
 @numba.jit(nopython=True)
@@ -324,4 +244,66 @@ def rec_torontonian(A):  # pragma: no cover
     L = np.linalg.cholesky(np.eye(2 * n) - A)
     det = np.square(np.prod(np.diag(L)))
     return 1 / np.sqrt(det) + recursiveTor(L, np.empty(0, dtype=np.int_), A, n)
->>>>>>> master
+
+
+@numba.jit(nopython=True)
+def numba_vac_prob(alpha, sigma):  # pragma: no cover
+    r"""
+    Return the vacuum probability of a Gaussian state with Q function sigma
+    and displacement vector, alpha.
+
+    Args:
+        alpha (array): a 2M-length vector describing the complex displacement
+        sigma (array): a 2Mx2M matrix describing the Q-function covariance matrix
+    Returns:
+        float: vacuum probability of Gaussian state
+    """
+    alpha = alpha.astype(np.complex128)
+    sigma = sigma.astype(np.complex128)
+    return (
+        np.exp(-0.5 * alpha.conj() @ np.linalg.inv(sigma) @ alpha).real
+        / np.sqrt(np.linalg.det(sigma))
+    ).real
+
+
+@numba.jit(nopython=True, parallel=True)
+def numba_ltor(O, gamma):  # pragma: no cover
+    r"""Returns the loop Torontonian of a matrix using numba.
+
+    Args:
+        O (array): a square, symmetric array of even dimensions.
+        gamma (array): a vector of even dimension
+
+    Returns:
+        np.complex128: the loop torontonian of matrix O, vector gamma
+    """
+    N = O.shape[0] // 2
+    N_odd = N % 2
+
+    steps = 2**N
+    ones = np.ones(N, dtype=np.int8)
+
+    gamma = gamma.astype(np.complex128)
+    O = O.astype(np.complex128)
+
+    total = 0.0
+    for j in numba.prange(steps):
+        X_modes = find_kept_edges(j, ones)
+        lenX = X_modes.sum()
+        I = np.eye(2 * lenX, dtype=O.dtype)
+        plusminus = (-1) ** ((N_odd - lenX % 2) % 2)
+
+        kept_modes = np.where(X_modes != 0)[0]
+        kept_rows = np.concatenate((kept_modes, kept_modes + N))
+        O_XX = nb_ix(O, kept_rows, kept_rows)
+
+        I_m_O_XX = I - O_XX
+        I_m_O_XX_inv = np.linalg.inv(I_m_O_XX)
+
+        gamma_X = gamma[kept_rows]
+        top = np.exp(0.5 * gamma_X @ I_m_O_XX_inv @ gamma_X.conj())
+        bottom = np.sqrt(np.linalg.det(I_m_O_XX))
+
+        total += plusminus * top / bottom
+
+    return total
