@@ -22,7 +22,17 @@ import numpy as np
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
+<<<<<<< HEAD
 from thewalrus import tor, ltor, numba_ltor, threshold_detection_prob, numba_tor, numba_vac_prob
+=======
+from thewalrus import (
+    tor,
+    threshold_detection_prob_displacement,
+    threshold_detection_prob,
+    numba_tor,
+    rec_torontonian,
+)
+>>>>>>> master
 from thewalrus.symplectic import two_mode_squeezing
 
 
@@ -198,6 +208,7 @@ def test_numba_tor(N):
     assert np.isclose(t1, t2)
 
 
+<<<<<<< HEAD
 def test_tor_exceptions():
     """test that correct exceptions are raised for tor function"""
     with pytest.raises(TypeError):
@@ -242,3 +253,14 @@ def test_probs_sum_to_1(n, scale):
         p_total += p
 
     assert np.isclose(p_total, 1)
+=======
+@pytest.mark.parametrize("N", range(1, 10))
+def test_recursive_tor(N):
+    """Tests numba implementation of the recursive torontonian against the default
+    implementation"""
+    cov = random_covariance(N)
+    O = Xmat(N) @ Amat(cov)
+    t1 = tor(O)
+    t2 = rec_torontonian(O)
+    assert np.isclose(t1, t2)
+>>>>>>> master

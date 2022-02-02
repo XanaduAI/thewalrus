@@ -121,7 +121,13 @@ from ._hermite_multidimensional import (
 )
 from ._permanent import perm, permanent_repeated
 
-from ._torontonian import tor, ltor, threshold_detection_prob, numba_tor, numba_ltor, numba_vac_prob
+from ._torontonian import (
+    tor,
+    threshold_detection_prob_displacement,
+    threshold_detection_prob,
+    numba_tor,
+    rec_torontonian,
+)
 from ._version import __version__
 
 

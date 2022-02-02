@@ -304,7 +304,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     if normalize:
         # construct the standard 2D density matrix, and take the trace
         new_ax = np.arange(2 * M).reshape([M, 2]).T.flatten()
-        tr = np.trace(rho.transpose(new_ax).reshape([cutoff ** M, cutoff ** M])).real
+        tr = np.trace(rho.transpose(new_ax).reshape([cutoff**M, cutoff**M])).real
         # renormalize
         rho /= tr
 

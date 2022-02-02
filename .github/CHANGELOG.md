@@ -7,13 +7,19 @@
 * update methods for calculating threshold detector probabilties of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 * numba_tor now can benefit from numba parallelisation [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
+* Recursive Torontonian added for faster computation based on paper ["Polynomial speedup in Torontonian calculation by a scalable recursive algorithm" by Ágoston Kaposi, Zoltán Kolarovszki, Tamás Kozsik, Zoltán Zimborás, and Péter Rakyta](https://arxiv.org/pdf/2109.04528.pdf). [#321](https://github.com/XanaduAI/thewalrus/pull/321)
+
 ### Bug fixes
+
+* Permanent algorithms handle 0x0 cases correctly. [#320](https://github.com/XanaduAI/thewalrus/pull/320)
 
 ### Breaking changes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Gregory Morse
 
 ---
 
