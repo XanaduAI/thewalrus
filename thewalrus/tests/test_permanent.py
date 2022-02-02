@@ -268,7 +268,7 @@ def test_brs_ZTL_lossy(eta):
     n = [1, 1, 1]
     d = [1, 1, 0]
 
-    p1 = eta ** 2 * (1 - eta) / 3
+    p1 = eta**2 * (1 - eta) / 3
     p2 = fock_threshold_prob(n, d, T)
 
     assert np.allclose(p1, p2)

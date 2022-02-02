@@ -212,7 +212,7 @@ def brs(A, E):  # pragma: no cover
     """
     m = A.shape[0]
 
-    steps = 2 ** m
+    steps = 2**m
     ones = np.ones(m, dtype=np.int8)
     total = 0
     for j in prange(steps):
@@ -238,7 +238,7 @@ def ubrs(A):  # pragma: no cover
         int or float or complex: the Unitary Bristol of matrix A
     """
     m = A.shape[0]
-    steps = 2 ** m
+    steps = 2**m
     ones = np.ones(m, dtype=np.int8)
     total = 0
     for j in prange(1, steps):
