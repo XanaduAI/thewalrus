@@ -61,7 +61,7 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
     mu = np.array([r * np.exp(1j * phi), -r * np.exp(-1j * phi)])
 
-    D[0, 0] = np.exp(-0.5 * r ** 2)
+    D[0, 0] = np.exp(-0.5 * r**2)
     for m in range(1, cutoff):
         D[m, 0] = mu[0] / sqrt[m] * D[m - 1, 0]
 
@@ -171,8 +171,8 @@ def grad_squeezing(T, r, phi):  # pragma: no cover
             grad_r[m, n] = (
                 -0.5 * tanhr * T[m, n]
                 - sechr * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1]
-                - 0.5 * eiphi * sechr ** 2 * sqrt[m] * sqrt[m - 1] * T[m - 2, n]
-                + 0.5 * eiphiconj * sechr ** 2 * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
+                - 0.5 * eiphi * sechr**2 * sqrt[m] * sqrt[m - 1] * T[m - 2, n]
+                + 0.5 * eiphiconj * sechr**2 * sqrt[n] * sqrt[n - 1] * T[m, n - 2]
             )
             grad_phi[m, n] = (
                 -0.5j * eiphi * tanhr * sqrt[m] * sqrt[m - 1] * T[m - 2, n]
@@ -265,7 +265,7 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
     # rank 2
     for n in range(1, cutoff):
         grad_r[n, n, 0, 0] = (
-            -tanhr * T[n, n, 0, 0] + sqrt[n] * sqrt[n] * ei * sechr ** 2 * T[n - 1, n - 1, 0, 0]
+            -tanhr * T[n, n, 0, 0] + sqrt[n] * sqrt[n] * ei * sechr**2 * T[n - 1, n - 1, 0, 0]
         )
         grad_theta[n, n, 0, 0] = 1j * ei * tanhr * sqrt[n] * sqrt[n] * T[n - 1, n - 1, 0, 0]
 
@@ -276,7 +276,7 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
             if 0 < p < cutoff:
                 grad_r[m, n, p, 0] = (
                     -tanhr * T[m, n, p, 0]
-                    + sqrt[m] * sqrt[n] * ei * sechr ** 2 * T[m - 1, n - 1, p, 0]
+                    + sqrt[m] * sqrt[n] * ei * sechr**2 * T[m - 1, n - 1, p, 0]
                     - tanhr * sechr * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, 0]
                 )
                 grad_theta[m, n, p, 0] = 1j * ei * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1, p, 0]
@@ -288,10 +288,10 @@ def grad_two_mode_squeezing(T, r, theta):  # pragma: no cover
                 for q in range(cutoff):
                     grad_r[m, n, p, q] = (
                         -tanhr * T[m, n, p, q]
-                        + sqrt[m] * sqrt[n] * ei * sechr ** 2 * T[m - 1, n - 1, p, q]
+                        + sqrt[m] * sqrt[n] * ei * sechr**2 * T[m - 1, n - 1, p, q]
                         - tanhr * sechr * sqrt[m] * sqrt[p] * T[m - 1, n, p - 1, q]
                         - tanhr * sechr * sqrt[n] * sqrt[q] * T[m, n - 1, p, q - 1]
-                        - sqrt[p] * sqrt[q] * eic * sechr ** 2 * T[m, n, p - 1, q - 1]
+                        - sqrt[p] * sqrt[q] * eic * sechr**2 * T[m, n, p - 1, q - 1]
                     )
                     grad_theta[m, n, p, q] = (
                         1j * ei * tanhr * sqrt[m] * sqrt[n] * T[m - 1, n - 1, p, q]

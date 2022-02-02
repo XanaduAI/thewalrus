@@ -328,7 +328,7 @@ def mean_photon_number(mu, cov, hbar=2):
         tuple: the photon number expectation and variance
     """
     ex = (np.trace(cov) + mu.T @ mu) / (2 * hbar) - 1 / 2
-    var = (np.trace(cov @ cov) + 2 * mu.T @ cov @ mu) / (2 * hbar ** 2) - 1 / 4
+    var = (np.trace(cov @ cov) + 2 * mu.T @ cov @ mu) / (2 * hbar**2) - 1 / 4
     return ex, var
 
 

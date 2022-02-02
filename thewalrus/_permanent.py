@@ -104,8 +104,8 @@ def perm_ryser(M):  # pragma: no cover
     total = 0
     old_grey = 0
     sign = +1
-    binary_power_dict = [2 ** i for i in range(n)]
-    num_loops = 2 ** n
+    binary_power_dict = [2**i for i in range(n)]
+    num_loops = 2**n
     for k in range(0, num_loops):
         bin_index = (k + 1) % num_loops
         reduced = np.prod(row_comb)
@@ -146,7 +146,7 @@ def perm_bbfg(M):  # pragma: no cover
     total = 0
     old_gray = 0
     sign = +1
-    binary_power_dict = [2 ** i for i in range(n)]
+    binary_power_dict = [2**i for i in range(n)]
     num_loops = 2 ** (n - 1)
     for bin_index in range(1, num_loops + 1):
         reduced = np.prod(row_comb)

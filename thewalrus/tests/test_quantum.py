@@ -85,7 +85,7 @@ def test_reduced_gaussian(n):
     m = 5
     N = 2 * m
     mu = np.arange(N)
-    cov = np.arange(N ** 2).reshape(N, N)
+    cov = np.arange(N**2).reshape(N, N)
     res = reduced_gaussian(mu, cov, n)
     assert np.all(res[0] == np.array([n, n + m]))
     assert np.all(
@@ -101,7 +101,7 @@ def test_reduced_gaussian_two_mode():
     m = 5
     N = 2 * m
     mu = np.arange(N)
-    cov = np.arange(N ** 2).reshape(N, N)
+    cov = np.arange(N**2).reshape(N, N)
     res = reduced_gaussian(mu, cov, [0, 2])
     assert np.all(res[0] == np.array([0, 2, m, m + 2]))
 
@@ -451,7 +451,7 @@ def test_mean_clicks_adj():
     tr = np.tanh(r)
     A = np.array([[0, tr], [tr, 0]])
     value = _mean_clicks_adj(A)
-    expected = 2 * tr ** 2
+    expected = 2 * tr**2
     assert np.allclose(expected, value)
 
 
@@ -602,7 +602,7 @@ def test_pure_state_amplitude_coherent(i):
     mu = np.array([1.0, 2.0])
     beta = complex_to_real_displacements(mu)
     alpha = beta[0]
-    exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i))
+    exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha**i / np.sqrt(np.math.factorial(i))
     num = pure_state_amplitude(mu, cov, [i])
     assert np.allclose(exact, num)
 
@@ -650,7 +650,7 @@ def test_pure_amplitude_tms_complex_displacement():
     laguerre_part = np.polynomial.Laguerre([0] * n + [1])(
         (alpha + alpha_c * np.tanh(r)) ** 2 / np.tanh(r)
     )
-    exp_part = np.exp(-(alpha * alpha_c + alpha_c ** 2 * np.tanh(r)))
+    exp_part = np.exp(-(alpha * alpha_c + alpha_c**2 * np.tanh(r)))
     amp2 = hyperbolic_pref * laguerre_part * exp_part
     assert np.allclose(amp1, amp2)
 
@@ -743,7 +743,7 @@ def test_state_vector_coherent():
     alpha = beta[0]
     exact = np.array(
         [
-            (np.exp(-0.5 * np.abs(alpha) ** 2) * alpha ** i / np.sqrt(np.math.factorial(i)))
+            (np.exp(-0.5 * np.abs(alpha) ** 2) * alpha**i / np.sqrt(np.math.factorial(i)))
             for i in range(cutoff)
         ]
     )
@@ -1085,7 +1085,7 @@ def test_pnd_two_mode_squeeze_vacuum(tol, r, phi, hbar):
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
     n = np.sinh(r) ** 2
     pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
-    assert np.allclose(pnd_cov, np.full((2, 2), n ** 2 + n), atol=tol, rtol=0)
+    assert np.allclose(pnd_cov, np.full((2, 2), n**2 + n), atol=tol, rtol=0)
     assert np.allclose(pnd_mean, np.array([n, n]), atol=tol, rtol=0)
 
 
@@ -1098,7 +1098,7 @@ def test_pnd_thermal(tol, n, N, hbar):
     mu = np.zeros(2 * N)
     pnd_cov = photon_number_covmat(mu, cov, hbar=hbar)
     pnd_mean = photon_number_mean_vector(mu, cov, hbar=hbar)
-    assert np.allclose(pnd_cov, np.diag([n ** 2 + n] * N), atol=tol, rtol=0)
+    assert np.allclose(pnd_cov, np.diag([n**2 + n] * N), atol=tol, rtol=0)
     mean_expected = n * np.ones([N])
     assert np.allclose(pnd_mean, mean_expected, atol=tol, rtol=0)
 
@@ -1124,7 +1124,7 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
         + np.sinh(r) ** 4
         + np.sinh(r) ** 2
         + np.abs(alpha) ** 2 * (1 + 2 * np.sinh(r) ** 2)
-        - 2 * np.real(alpha ** 2 * np.exp(-1j * phi) * np.sinh(r) * np.cosh(r))
+        - 2 * np.real(alpha**2 * np.exp(-1j * phi) * np.sinh(r) * np.cosh(r))
     )
 
     mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
@@ -1145,10 +1145,10 @@ def test_photon_number_covmat_random_state(hbar):
     n1 = np.sum(probs, axis=0) @ n
     n0 = np.sum(probs, axis=1) @ n
     covar = n0n1 - n0 * n1
-    n12 = np.sum(probs, axis=0) @ (n ** 2)
-    n02 = np.sum(probs, axis=1) @ (n ** 2)
-    varn0 = n02 - n0 ** 2
-    varn1 = n12 - n1 ** 2
+    n12 = np.sum(probs, axis=0) @ (n**2)
+    n02 = np.sum(probs, axis=1) @ (n**2)
+    varn0 = n02 - n0**2
+    varn1 = n12 - n1**2
     expected = np.array([[varn0, covar], [covar, varn1]])
     Ncov = photon_number_covmat(mu, cov, hbar=hbar)
     assert np.allclose(expected, Ncov)
@@ -1434,7 +1434,7 @@ def test_single_mode_displaced_squeezed(r, phi, x, y):
     means = real_to_complex_displacements(beta, hbar=hbar)
     a = alpha
     adxa = np.abs(alpha) ** 2 + np.sinh(r) ** 2
-    a2 = alpha ** 2 - np.exp(1j * phi) * 0.5 * np.sinh(2 * r)
+    a2 = alpha**2 - np.exp(1j * phi) * 0.5 * np.sinh(2 * r)
     patterns = [[0, 0], [1, 1], [0, 1], [1, 0], [0, 2], [2, 0]]
     expected = [1, adxa, a, np.conj(a), a2, np.conj(a2)]
 
@@ -1625,7 +1625,7 @@ def test_total_photon_number_distribution_moments(s, k, eta):
     """Test that the total photon number distribution has the correct mean and variance"""
     expectation_n = characteristic_function(s=s, k=k, eta=eta, poly_corr=1, mu=0)
     expectation_n2 = characteristic_function(s=s, k=k, eta=eta, poly_corr=2, mu=0)
-    var_n = expectation_n2 - expectation_n ** 2
+    var_n = expectation_n2 - expectation_n**2
     expected_n = eta * k * np.sinh(s) ** 2
     expected_var = expected_n * (1 + eta * (1 + 2 * np.sinh(s) ** 2))
     assert np.allclose(expectation_n, expected_n)
@@ -1672,7 +1672,7 @@ def test_photon_number_moment_all_thermal(hbar):
     """Test that photon_number_moment function gives the correct result for a product of thermal states"""
     M = 3
     N = np.random.rand(M)
-    N2 = 2 * N ** 2 + N
+    N2 = 2 * N**2 + N
     cov = 0.5 * hbar * np.diag(np.concatenate([2 * N + 1, 2 * N + 1]))
     mu = np.zeros([2 * M])
     order = 1
@@ -1718,12 +1718,12 @@ def test_photon_number_moment_two_mode_squeezed(r, theta, hbar):
     # Check expected squared photon numbers in each mode
     ind = {0: 2}
     nbar = np.sinh(r) ** 2
-    assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
+    assert np.allclose(2 * nbar**2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
     ind = {1: 2}
-    assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
+    assert np.allclose(2 * nbar**2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
     # Check expected value of the product of the photon numbers
     ind = {0: 1, 1: 1}
-    assert np.allclose(2 * nbar ** 2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
+    assert np.allclose(2 * nbar**2 + nbar, photon_number_moment(mu, cov, ind, hbar=hbar))
 
 
 @pytest.mark.parametrize("r", [0.5, 0.7, 2])
