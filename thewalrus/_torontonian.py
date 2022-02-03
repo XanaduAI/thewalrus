@@ -249,8 +249,9 @@ def rec_torontonian(A):  # pragma: no cover
 @numba.jit(nopython=True)
 def numba_vac_prob(alpha, sigma):  # pragma: no cover
     r"""
-    Return the vacuum probability of a Gaussian state with Q function sigma
-    and displacement vector, alpha.
+    Return the vacuum probability of a Gaussian state with Q function `sigma`
+    and displacement vector, `alpha`.
+
 
     Args:
         alpha (array): a 2M-length vector describing the complex displacement
