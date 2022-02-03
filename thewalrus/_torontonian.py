@@ -79,8 +79,9 @@ def threshold_detection_prob(
 ):  # pylint: disable=too-many-arguments
     r"""Threshold detection probabilities for Gaussian states.
     Formula from Jake Bulmer, Nicolas Quesada and Stefano Paesani.
-    When state is displaced, threshold_detection_prob_displacement is called.
-    Otherwise, tor is called.
+    When state is displaced, `threshold_detection_prob_displacement` is called.
+    Otherwise, `tor` is called.
+
 
     Args:
         mu (1d array) : means of xp Gaussian Wigner function
