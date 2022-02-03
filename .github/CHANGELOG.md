@@ -3,6 +3,8 @@
 ### New features
 * new function `ltor` is added which allows `threshold_detector_prob` to act more consistently on displaced and zero-mean Gaussian states. [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
+* New functions for threshold detection probabilities of Fock states, the Bristolian (brs) and the Unitary Bristolian (ubrs) [#316](https://github.com/XanaduAI/thewalrus/pull/316)
+
 ### Improvements
 * update methods for calculating threshold detector probabilties of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 * numba_tor now can benefit from numba parallelisation [#317](https://github.com/XanaduAI/thewalrus/pull/317)
@@ -19,7 +21,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Gregory Morse
+Jake Bulmer, Gregory Morse
 
 ---
 
