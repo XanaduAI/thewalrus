@@ -32,11 +32,9 @@ T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
 
 def random_banded(n, bw):
     """Generates a random matrix of a given size and bandwidth.
-
     Args:
       n (int): Size of the matrix
       bw (int): Bandwidth of the matrix
-
     Returns:
       (array): a matrix with the given properties
     """
@@ -76,7 +74,6 @@ class TestReduction:
 class TestHafnianWrapper:
     """Tests for the Python hafnian wrapper function.
     These tests should only test for:
-
     * exceptions
     * validation
     """
@@ -213,7 +210,7 @@ class TestHafnian:
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = dtype(np.ones([2 * n, 2 * n]))
         haf = hafnian(A)
-        expected = fac(2 * n) / (fac(n) * (2**n))
+        expected = fac(2 * n) / (fac(n) * (2 ** n))
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
