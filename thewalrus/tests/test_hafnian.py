@@ -138,7 +138,6 @@ class TestHafnianWrapper:
         haf = hafnian(A, loop=False)
         expected = recursive_hafnian(A)
         assert np.allclose(haf, expected)
-        
         A = np.random.random([6, 6])
         A += A.T
         A = np.array(A, dtype=np.complex128)
