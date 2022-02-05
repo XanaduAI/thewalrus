@@ -1031,7 +1031,7 @@ def recursive_hafnian(A):  # pragma: no cover
     algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
 
     Args:
-        m (array): the input matrix
+        A (array): the input matrix
 
     Returns:
         float: the hafnian of the input matrix
