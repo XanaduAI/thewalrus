@@ -80,8 +80,11 @@ Functions
     hafnian_repeated
     hafnian_batched
     tor
+    ltor
     perm
     permanent_repeated
+    brs
+    ubrs
     hermite_multidimensional
     hafnian_banded
     reduction
@@ -118,13 +121,14 @@ from ._hermite_multidimensional import (
     interferometer,
     grad_hermite_multidimensional,
 )
-from ._permanent import perm, permanent_repeated
+from ._permanent import perm, permanent_repeated, brs, ubrs
 
 from ._torontonian import (
     tor,
-    threshold_detection_prob_displacement,
+    ltor,
     threshold_detection_prob,
     numba_tor,
+    numba_ltor,
     rec_torontonian,
 )
 from ._version import __version__
@@ -139,8 +143,11 @@ __all__ = [
     "loop_hafnian",
     "matched_reps",
     "tor",
+    "ltor",
     "perm",
     "permanent_repeated",
+    "brs",
+    "ubrs",
     "reduction",
     "hermite_multidimensional",
     "grad_hermite_multidimensional",

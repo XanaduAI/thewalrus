@@ -13,20 +13,25 @@
 # limitations under the License.
 """Tests for the Torontonian"""
 # pylint: disable=no-self-use,redefined-outer-name
+from itertools import product
+
 import pytest
 
 import numpy as np
+
 from scipy.special import poch, factorial
 from thewalrus.quantum import density_matrix_element, reduced_gaussian, Qmat, Xmat, Amat
 from thewalrus.random import random_covariance
 from thewalrus import (
     tor,
-    threshold_detection_prob_displacement,
+    ltor,
     threshold_detection_prob,
     numba_tor,
+    numba_ltor,
     rec_torontonian,
 )
 from thewalrus.symplectic import two_mode_squeezing
+from thewalrus._torontonian import numba_vac_prob
 
 
 def gen_omats(l, nbar):
@@ -138,9 +143,9 @@ def test_disp_torontonian(r, alpha):
     cov = two_mode_squeezing(abs(2 * r), np.angle(2 * r))
     mu = 2 * np.array([alpha.real, alpha.real, alpha.imag, alpha.imag])
 
-    p00n = threshold_detection_prob_displacement(mu, cov, np.array([0, 0]))
-    p01n = threshold_detection_prob_displacement(mu, cov, np.array([0, 1]))
-    p11n = threshold_detection_prob_displacement(mu, cov, np.array([1, 1]))
+    p00n = threshold_detection_prob(mu, cov, np.array([0, 0]))
+    p01n = threshold_detection_prob(mu, cov, np.array([0, 1]))
+    p11n = threshold_detection_prob(mu, cov, np.array([1, 1]))
 
     assert np.isclose(p00a, p00n)
     assert np.isclose(p01a, p01n)
@@ -152,7 +157,7 @@ def test_disp_torontonian_single_mode(scale):
     """Calculates the probability of clicking for a single mode state"""
     cv = random_covariance(1)
     mu = scale * (2 * np.random.rand(2) - 1)
-    prob_click = threshold_detection_prob_displacement(mu, cv, np.array([1]))
+    prob_click = threshold_detection_prob(mu, cv, np.array([1]))
     expected = 1 - density_matrix_element(mu, cv, [0], [0])
     assert np.allclose(prob_click, expected)
 
@@ -176,28 +181,19 @@ def test_disp_torontonian_two_mode(scale):
 
 @pytest.mark.parametrize("n_modes", range(1, 10))
 def test_tor_and_threshold_displacement_prob_agree(n_modes):
-    """Tests that threshold_detection_prob_displacement and the usual tor expression agree
+    """Tests that threshold_detection_prob, ltor and the usual tor expression all agree
     when displacements are zero"""
     cv = random_covariance(n_modes)
     mu = np.zeros([2 * n_modes])
     Q = Qmat(cv)
     O = Xmat(n_modes) @ Amat(cv)
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
-    prob = threshold_detection_prob_displacement(mu, cv, np.array([1] * n_modes))
-    assert np.allclose(expected, prob)
-
-
-@pytest.mark.parametrize("n_modes", range(1, 10))
-def test_tor_and_threshold_prob_agree(n_modes):
-    """Tests that threshold_detection_prob_displacement and the usual tor expression agree
-    when displacements are zero"""
-    cv = random_covariance(n_modes)
-    mu = np.zeros([2 * n_modes])
-    Q = Qmat(cv)
-    O = Xmat(n_modes) @ Amat(cv)
-    expected = tor(O) / np.sqrt(np.linalg.det(Q))
-    prob = threshold_detection_prob(mu, cv, [1] * n_modes)
-    assert np.allclose(expected, prob)
+    prob = threshold_detection_prob(mu, cv, np.array([1] * n_modes))
+    prob2 = numba_ltor(O, mu) / np.sqrt(np.linalg.det(Q))
+    prob3 = numba_vac_prob(mu, Q) * ltor(O, mu)
+    assert np.isclose(expected, prob)
+    assert np.isclose(expected, prob2)
+    assert np.isclose(expected, prob3)
 
 
 @pytest.mark.parametrize("N", range(1, 10))
@@ -208,6 +204,52 @@ def test_numba_tor(N):
     t1 = tor(O)
     t2 = numba_tor(O)
     assert np.isclose(t1, t2)
+
+
+def test_tor_exceptions():
+    """test that correct exceptions are raised for tor function"""
+    with pytest.raises(TypeError):
+        tor("hello")
+
+    with pytest.raises(ValueError):
+        tor(np.zeros((4, 2)))
+
+    with pytest.raises(ValueError):
+        tor(np.zeros((3, 3)))
+
+
+def test_ltor_exceptions():
+    """test that correct exceptions are raised for ltor function"""
+
+    with pytest.raises(TypeError):
+        ltor("hello", np.zeros(4))
+
+    with pytest.raises(TypeError):
+        ltor(np.zeros((4, 4)), "hello")
+
+    with pytest.raises(ValueError):
+        ltor(np.zeros((4, 2)), np.zeros(4))
+
+    with pytest.raises(ValueError):
+        ltor(np.zeros((3, 3)), np.zeros(3))
+
+    with pytest.raises(ValueError):
+        ltor(np.zeros((4, 4)), np.zeros(6))
+
+
+@pytest.mark.parametrize("n", range(1, 6))
+@pytest.mark.parametrize("scale", [0, 1, 1.4])
+def test_probs_sum_to_1(n, scale):
+    """test that threshold probabilities sum to 1"""
+    cov = random_covariance(n)
+    mu = scale * (2 * np.random.rand(2 * n) - 1)
+
+    p_total = 0
+    for det_pattern in product([0, 1], repeat=n):
+        p = threshold_detection_prob(mu, cov, det_pattern)
+        p_total += p
+
+    assert np.isclose(p_total, 1)
 
 
 @pytest.mark.parametrize("N", range(1, 10))
