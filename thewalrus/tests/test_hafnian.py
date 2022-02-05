@@ -24,7 +24,7 @@ from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded, matche
 from thewalrus._hafnian import _haf as jhaf
 from thewalrus._hafnian import loop_hafnian
 from thewalrus._hafnian import bandwidth
-
+from thewalrus._hafnian import recursive_hafnian
 
 # the first 11 telephone numbers
 T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
@@ -135,6 +135,10 @@ class TestHafnianWrapper:
         expected = loop_hafnian(A)
         assert np.allclose(haf, expected)
 
+        haf = hafnian(A, loop=False)
+        expected = recursive_hafnian(A)
+        assert np.allclose(haf, expected)
+        
         A = np.random.random([6, 6])
         A += A.T
         A = np.array(A, dtype=np.complex128)
