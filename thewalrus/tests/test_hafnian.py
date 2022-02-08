@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the Python hafnian wrapper function"""
-# pylint: disable=no-self-use,redefined-outer-name
+# pylint: disable=no-self-use,redefined-outer-name, C0103, E1101
 import pytest
 
 import numpy as np
@@ -210,7 +210,7 @@ class TestHafnian:
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = dtype(np.ones([2 * n, 2 * n]))
         haf = hafnian(A)
-        expected = fac(2 * n) / (fac(n) * (2 ** n))
+        expected = fac(2 * n) / (fac(n) * (2**n))
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
