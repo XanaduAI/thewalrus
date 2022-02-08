@@ -44,7 +44,7 @@ def sample(T, rs, n_samples=100, input_cutoff=50):
     p_n = np.array([p / p.sum() for p in p_n])
 
     outputs = np.empty((n_samples, M), dtype=np.int64)
-    for sample in range(n_samples):
+    for samp in range(n_samples):
         output = np.zeros(M, dtype=np.int64)
         for i in range(M):
             n = np.random.choice(np.arange(input_cutoff), p=p_n[i])
@@ -55,7 +55,7 @@ def sample(T, rs, n_samples=100, input_cutoff=50):
                 )
                 output_i = np.bincount(output_modes_i, minlength=M)
                 output += output_i
-        outputs[sample] = output
+        outputs[samp] = output
     return outputs
 
 
@@ -95,4 +95,4 @@ def number_cov(T, rs):
     absT = np.abs(T) ** 2
     covN = (absT * np.sinh(rs) ** 4) @ absT.T
     covM = (absT * (0.5 * np.sinh(2 * rs)) ** 2) @ absT.T
-    return covN + covM + np.diag(distinguishable_number_means(T, rs))
+    return covN + covM + np.diag(number_means(T, rs))
