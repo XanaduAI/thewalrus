@@ -50,9 +50,7 @@ def sample(T, rs, n_samples=100, input_cutoff=50):
             n = np.random.choice(np.arange(input_cutoff), p=p_n[i])
             n_detected = np.random.binomial(n, min(1, detection_probs[i]))
             if n_detected > 0:
-                output_modes_i = np.random.choice(
-                    np.arange(M), p=probs[i], size=n_detected
-                )
+                output_modes_i = np.random.choice(np.arange(M), p=probs[i], size=n_detected)
                 output_i = np.bincount(output_modes_i, minlength=M)
                 output += output_i
         outputs[samp] = output
@@ -73,10 +71,7 @@ def number_means(T, rs):
     """
     n = len(rs)
     return np.array(
-        [
-            np.sum([(np.sinh(rs[k]) * np.abs(T[i, k])) ** 2 for k in range(n)])
-            for i in range(n)
-        ]
+        [np.sum([(np.sinh(rs[k]) * np.abs(T[i, k])) ** 2 for k in range(n)]) for i in range(n)]
     )
 
 
