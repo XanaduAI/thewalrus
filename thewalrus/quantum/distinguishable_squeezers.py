@@ -22,8 +22,8 @@ from .photon_number_distributions import _squeezed_state_distribution
 
 def sample(T, rs, n_samples=100, input_cutoff=50):
     """
-    Calculates a possible resultant photon number distribution when distinguishable
-    squeezers are sent into an interferometer.
+    Calculates a resultant photon number samples when distinguishable squeezers are sent into an
+    interferometer.
 
     Args:
         T (numpy.ndarray): interferometer transmission matrix
@@ -32,7 +32,7 @@ def sample(T, rs, n_samples=100, input_cutoff=50):
         input_cutoff (int): Fock basis photon number cutoff
 
     Returns:
-        outputs (numpy.ndarray): a resultant photon number distribution
+        outputs (numpy.ndarray): resultant samples
     """
     M = T.shape[0]
     abs2T = (T * T.conj()).real
@@ -59,8 +59,8 @@ def sample(T, rs, n_samples=100, input_cutoff=50):
 
 def number_means(T, rs):
     """
-    Calculates the resultant vector of mean photon numbers when distinguishable
-    squeezers are sent into an interferometer.
+    Calculates the resultant vector of mean photon numbers when distinguishable squeezers are sent
+    into an interferometer.
 
     Args:
         T (numpy.ndarray): interferometer transmission matrix
@@ -77,8 +77,8 @@ def number_means(T, rs):
 
 def number_cov(T, rs):
     """
-    Calculates the resultant photon number covariance matrix when distinguishable
-    squeezers are sent into an interferometer.
+    Calculates the resultant photon number covariance matrix when distinguishable squeezers are
+    sent into an interferometer.
 
     Args:
         T (numpy.ndarray): interferometer transmission matrix
