@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Functions for calculating properties of states of distinguihable squeezed states of
-light having passed through an interferometer.
+Functions for calculating properties of distinguihable squeezed states of light having passed
+through an interferometer.
 """
 
 import numpy as np
