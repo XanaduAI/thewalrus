@@ -1,6 +1,8 @@
 # Version 0.19.0-dev
 
 ### New features
+* New functions for calculating properties of distinguihable squeezed states of light having passed through an interferometer. [#326](https://github.com/XanaduAI/thewalrus/pull/326)
+
 * New function `ltor` is added which allows `threshold_detector_prob` to act more consistently on displaced and zero-mean Gaussian states. [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
 * New functions for threshold detection probabilities of Fock states, the Bristolian (brs) and the Unitary Bristolian (ubrs) [#316](https://github.com/XanaduAI/thewalrus/pull/316)
