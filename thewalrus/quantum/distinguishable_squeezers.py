@@ -26,13 +26,13 @@ def sample(T, rs, n_samples=100, input_cutoff=50):
     interferometer.
 
     Args:
-        T (numpy.ndarray): interferometer transmission matrix
-        rs (numpy.ndarray): input squeezing parameters
+        T (array): interferometer transmission matrix
+        rs (array): input squeezing parameters
         n_samples (int): number of samples to return
         input_cutoff (int): Fock basis photon number cutoff
 
     Returns:
-        outputs (numpy.ndarray): resultant samples
+        outputs (array): resultant samples
     """
     M = T.shape[0]
     abs2T = (T * T.conj()).real
@@ -63,11 +63,11 @@ def number_means(T, rs):
     into an interferometer.
 
     Args:
-        T (numpy.ndarray): interferometer transmission matrix
-        rs (numpy.ndarray): input squeezing parameters
+        T (array): interferometer transmission matrix
+        rs (array): input squeezing parameters
 
     Returns:
-        (numpy.ndarray): resultant mean photon numbers
+        (array): resultant mean photon numbers
     """
     n = len(rs)
     return np.array(
@@ -81,11 +81,11 @@ def number_cov(T, rs):
     sent into an interferometer.
 
     Args:
-        T (numpy.ndarray): interferometer transmission matrix
-        rs (numpy.ndarray): input squeezing parameters
+        T (array): interferometer transmission matrix
+        rs (array): input squeezing parameters
 
     Returns:
-        (numpy.ndarray): resultant covariance matrix
+        (array): resultant covariance matrix
     """
     absT = np.abs(T) ** 2
     covN = (absT * np.sinh(rs) ** 4) @ absT.T
