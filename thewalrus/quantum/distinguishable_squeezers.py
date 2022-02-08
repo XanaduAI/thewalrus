@@ -20,7 +20,7 @@ import numpy as np
 from .photon_number_distributions import _squeezed_state_distribution
 
 
-def sample_distinguishable(T, rs, n_samples=100, input_cutoff=50):
+def sample(T, rs, n_samples=100, input_cutoff=50):
     """
     Calculates a possible resultant photon number distribution when distinguishable
     squeezers are sent into an interferometer.
@@ -59,7 +59,7 @@ def sample_distinguishable(T, rs, n_samples=100, input_cutoff=50):
     return outputs
 
 
-def distinguishable_number_means(T, rs):
+def number_means(T, rs):
     """
     Calculates the resultant vector of mean photon numbers when distinguishable
     squeezers are sent into an interferometer.
@@ -80,7 +80,7 @@ def distinguishable_number_means(T, rs):
     )
 
 
-def distinguishable_number_cov(T, rs):
+def number_cov(T, rs):
     """
     Calculates the resultant photon number covariance matrix when distinguishable
     squeezers are sent into an interferometer.
