@@ -71,7 +71,7 @@ def distinguishable_number_means(T, rs):
     Returns:
         (numpy.ndarray): resultant mean photon numbers
     """
-    n = len(r)
+    n = len(rs)
     return np.array(
         [
             np.sum([(np.sinh(rs[k]) * np.abs(T[i, k])) ** 2 for k in range(n)])
