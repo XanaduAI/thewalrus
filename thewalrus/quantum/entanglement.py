@@ -42,7 +42,7 @@ def get_partition(modes_A, split, M):
         for mode in modes_A:
             if not isinstance(mode, int) or mode < 0 or mode > M - 1:
                 raise ValueError(
-                    f"Every element of ``modes_A`` must be an integer between 0 and {M - 1}"
+                    f"Every element of 'modes_A' must be an integer between 0 and {M - 1}"
                 )
 
     if modes_A is None and split is not None:
