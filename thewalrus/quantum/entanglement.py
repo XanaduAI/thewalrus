@@ -93,7 +93,7 @@ def entanglement_entropy(cov, modes_A=None, split=None, hbar=2):
         split (int): the index of the mode separating the two partitions
             (alternative to ``modes_A``)
         hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
+            relation :math:`[\x,\p]=i\hbar`
     Returns:
         (float): logarithmic negativity
     """
