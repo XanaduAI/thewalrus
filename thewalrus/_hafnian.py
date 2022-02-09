@@ -775,11 +775,11 @@ def hafnian(
 
     if recursive:
         if loop:
-            with pytest.warns(UserWarning):
-                warnings.warn("Recursive algorithm does not support the loop hafnian",UserWarning)
+            #with pytest.warns(UserWarning):
+                #warnings.warn("Recursive algorithm does not support the loop hafnian",UserWarning)
             #warnings.warn("Recursive algorithm does not support the loop hafnian")
 
-        return recursive_hafnian(A)
+            return recursive_hafnian(A)
 
     return _haf(A, reps=None, glynn=glynn)
 
