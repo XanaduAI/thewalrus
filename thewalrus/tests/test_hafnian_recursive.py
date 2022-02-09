@@ -13,10 +13,11 @@
 # limitations under the License.
 """Tests for the recursive_hafnian Python function"""
 # pylint: disable=no-self-use,redefined-outer-name
+import warnings
 import pytest
 
 import numpy as np
-import warnings
+
 from thewalrus import hafnian
 
 
@@ -40,6 +41,4 @@ def test_recursive_or_loop():
         hafnian(A, recursive=recursive, loop=loop)
 
         assert len(w) == 1
-        assert "Recursive algorithm does not support the loop hafnian" in str(
-            w[-1].message
-        )
+        assert "Recursive algorithm does not support the loop hafnian" in str(w[-1].message)
