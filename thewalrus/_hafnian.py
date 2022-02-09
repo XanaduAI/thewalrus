@@ -949,7 +949,7 @@ def recursive_hafnian(A):  # pragma: no cover
     if nb_lines % 2 != 0:
         raise ValueError("Matrix size must be even")
 
-    n = len(A) // 2
+    n = int(len(A) / 2)
     z = np.zeros((n * (2 * n - 1), n + 1), dtype=A.dtype)
     for j in range(1, 2 * n):
         ind = j * (j - 1) // 2
