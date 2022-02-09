@@ -20,6 +20,7 @@ from collections import Counter
 from itertools import chain, combinations
 import numba
 import numpy as np
+from sympy import true
 
 
 @numba.jit(nopython=True, cache=True)
@@ -690,8 +691,7 @@ def hafnian(
     atol=1e-08,
     approx=False,
     num_samples=1000,
-    glynn=True,
-    recursive=False,
+    method="glynn",
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
@@ -699,9 +699,11 @@ def hafnian(
     Args:
         A (array): a square, symmetric array of even dimensions
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
-        recursive (bool): If ``True``, the recursive algorithm is used. Note that the recursive
-            algorithm does not currently support the loop hafnian. If ``loop=True``, then this
-            keyword argument is ignored.
+        method (string): Set this to ``"glynn"`` to use the
+            `glynn formula,
+            or ``"inclexcl"`` to use the inclusion exclusion principle,
+            or ``"recursive"`` to use a recursive algorithm
+            <https://codegolf.stackexchange.com/questions/157049/calculate-the-hafnian-as-quickly-as-possible>_.
         rtol (float): the relative tolerance parameter used in ``np.allclose``
         atol (float): the absolute tolerance parameter used in ``np.allclose``
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note
@@ -709,7 +711,6 @@ def hafnian(
             non-negative entries.
         num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples``
             iterations for estimation of the hafnian of the non-negative matrix ``A``
-        glynn (bool): whether to use finite difference sieve
     Returns:
         int or float or complex: the hafnian of matrix ``A``
     """
@@ -717,6 +718,12 @@ def hafnian(
     input_validation(A, rtol=rtol, atol=atol)
 
     matshape = A.shape
+    
+    if method == "glynn":
+        glynn = True
+    
+    if method == "inclexcl":
+        glynn= False
 
     if matshape == (0, 0):
         return 1
@@ -768,11 +775,11 @@ def hafnian(
         return hafnian_approx(A, num_samples=num_samples)
 
     if loop:
-        if recursive:
+        if method=="recursive":
             warnings.warn("Recursive algorithm does not support the loop hafnian")
         return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
-    if recursive:
+    if method=="recursive":
         return recursive_hafnian(A)
 
     return _haf(A, reps=None, glynn=glynn)
