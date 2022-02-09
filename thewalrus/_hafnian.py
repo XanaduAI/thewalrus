@@ -778,16 +778,15 @@ def hafnian(
             return np.prod(np.diag(A))
         return 0
 
-    if matshape[0] % 2 != 0 and loop:
-        A = np.pad(A, pad_width=((0, 1), (0, 1)), mode="constant")
-        A[-1, -1] = 1.0
-
     matshape = A.shape
 
     if matshape[0] == 2:
         if loop:
             return A[0, 1] + A[0, 0] * A[1, 1]
         return A[0][1]
+
+    if matshape[0] == 3 and loop:
+        return A[0, 0] * A[1, 2] + A[1, 1] * A[0, 2] + A[2, 2] * A[0, 1]
 
     if matshape[0] == 4:
         if loop:
