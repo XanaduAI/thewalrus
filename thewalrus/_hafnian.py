@@ -14,12 +14,11 @@
 """
 Hafnian Python interface
 """
-
+import warnings
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
 import numba
-import warnings
 import numpy as np
 
 
