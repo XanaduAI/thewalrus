@@ -18,7 +18,6 @@ Hafnian Python interface
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
-import warnings
 import numba
 
 import numpy as np
