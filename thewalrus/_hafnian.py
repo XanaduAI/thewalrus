@@ -20,7 +20,6 @@ from collections import Counter
 from itertools import chain, combinations
 import numba
 import numpy as np
-from sympy import true
 
 
 @numba.jit(nopython=True, cache=True)
@@ -702,8 +701,7 @@ def hafnian(
         method (string): Set this to ``"glynn"`` to use the
             `glynn formula,
             or ``"inclexcl"`` to use the inclusion exclusion principle,
-            or ``"recursive"`` to use a recursive algorithm
-            <https://codegolf.stackexchange.com/questions/157049/calculate-the-hafnian-as-quickly-as-possible>_.
+            or ``"recursive"`` to use a recursive algorithm.
         rtol (float): the relative tolerance parameter used in ``np.allclose``
         atol (float): the absolute tolerance parameter used in ``np.allclose``
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note
@@ -935,6 +933,9 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
 def recursive_hafnian(A):  # pragma: no cover
     r"""Computes the hafnian of the matrix with the recursive algorithm. It is an implementation of
     algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
+    This code is a modified version of the code found here :
+    `Recursive hafnian
+    <https://codegolf.stackexchange.com/questions/157049/calculate-the-hafnian-as-quickly-as-possible>`_.
     Args:
         A (array): the input matrix
     Returns:
@@ -947,11 +948,11 @@ def recursive_hafnian(A):  # pragma: no cover
     if nb_lines % 2 != 0:
         raise ValueError("Matrix size must be even")
 
-    n = int(float(len(A)) / 2)
+    n = float(len(A)) // 2
     z = np.zeros((n * (2 * n - 1), n + 1))
     for j in range(1, 2 * n):
         for k in range(j):
-            z[int(j * (j - 1) / 2 + k)][0] = A.copy()[j][k]
+            z[j * (j - 1) // 2 + k][0] = A[j][k]
     g = np.zeros(n + 1)
     g[0] = 1
     return solve(z, 2 * n, 1, g, n)
@@ -971,11 +972,11 @@ def solve(b, s, w, g, n):  # pragma: no cover
     """
     if s == 0:
         return w * g[n]
-    c = np.zeros((int((s - 2) * (s - 3) / 2), n + 1))
+    c = np.zeros(((s - 2) * (s - 3) // 2, n + 1))
     i = 0
     for j in range(1, s - 2):
         for k in range(j):
-            c[i] = b[int((j + 1) * (j + 2) / 2 + k + 2)]
+            c[i] = b[(j + 1) * (j + 2) // 2 + k + 2]
             i += 1
     h = solve(c, s - 2, -w, g, n)
     e = g[:].copy()
@@ -986,9 +987,9 @@ def solve(b, s, w, g, n):  # pragma: no cover
         for k in range(j):
             for u in range(n):
                 for v in range(n - u):
-                    c[int(j * (j - 1) / 2 + k)][u + v + 1] += (
-                        b[int((j + 1) * (j + 2) / 2)][u] * b[int((k + 1) * (k + 2) / 2 + 1)][v]
-                        + b[int((k + 1) * (k + 2) / 2)][u] * b[int((j + 1) * (j + 2) / 2 + 1)][v]
+                    c[j * (j - 1) // 2 + k][u + v + 1] += (
+                        b[(j + 1) * (j + 2) // 2][u] * b[(k + 1) * (k + 2) // 2 + 1][v]
+                        + b[(k + 1) * (k + 2) // 2][u] * b[(j + 1) * (j + 2) // 2 + 1][v]
                     )
     return h + solve(c, s - 2, w, e, n)
 
