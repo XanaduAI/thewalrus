@@ -949,11 +949,12 @@ def recursive_hafnian(A):  # pragma: no cover
         raise ValueError("Matrix size must be even")
 
     n = len(A) // 2
-    z = np.zeros((n * (2 * n - 1), n + 1))
+    z = np.zeros((n * (2 * n - 1), n + 1), dtype=A.dtype)
     for j in range(1, 2 * n):
+        ind = j * (j - 1) // 2
         for k in range(j):
-            z[j * (j - 1) // 2 + k][0] = A[j][k]
-    g = np.zeros(n + 1)
+            z[ind + k][0] = A[j][k]
+    g = np.zeros(n + 1, dtype=A.dtype)
     g[0] = 1
     return solve(z, 2 * n, 1, g, n)
 
@@ -972,7 +973,7 @@ def solve(b, s, w, g, n):  # pragma: no cover
     """
     if s == 0:
         return w * g[n]
-    c = np.zeros(((s - 2) * (s - 3) // 2, n + 1))
+    c = np.zeros(((s - 2) * (s - 3) // 2, n + 1), dtype=g.dtype)
     i = 0
     for j in range(1, s - 2):
         for k in range(j):
