@@ -20,7 +20,6 @@ import numpy as np
 from thewalrus import hafnian
 
 
-@pytest.mark.flaky()
 @pytest.mark.parametrize("n", [6, 8, 10])
 def test_equality(n):
     """Test if recursive_hafnian gives the same as non recursive"""
