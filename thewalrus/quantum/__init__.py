@@ -125,7 +125,7 @@ Entanglement
 
 .. autosummary::
 
-    vonNeumann_entropy
+    vonneumann_entropy
     entanglement_entropy
     log_negativity
 
@@ -197,7 +197,7 @@ from .photon_number_distributions import (
 )
 
 from .entanglement import (
-    vonNeumann_entropy,
+    vonneumann_entropy,
     entanglement_entropy,
     log_negativity,
 )
@@ -244,7 +244,7 @@ __all__ = [
     "photon_number_cumulant",
     "total_photon_number_distribution",
     "characteristic_function",
-    "vonNeumann_entropy",
+    "vonneumann_entropy",
     "entanglement_entropy",
     "log_negativity",
 ]

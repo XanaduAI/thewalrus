@@ -23,7 +23,7 @@ from .conversions import reduced_gaussian
 
 def get_partition(modes_A, split, M):
     r"""Helper function to validate and, if necessary, pre-prepare the inputs
-    of ``vonNeumann_entropy()`` and ``log_negativity()``.
+    of ``vonneumann_entropy()`` and ``log_negativity()``.
 
     Args:
         modes_A (iterable or int): the subset of modes used for the bipartition
@@ -56,7 +56,7 @@ def get_partition(modes_A, split, M):
     return list(modes_A)
 
 
-def vonNeumann_entropy(cov, hbar=2):
+def vonneumann_entropy(cov, hbar=2):
     r"""Returns the vonNeumann entropy of a covariance matrix.
 
     Args:
@@ -108,7 +108,7 @@ def entanglement_entropy(cov, modes_A=None, split=None, hbar=2):
 
     _, cov_A = reduced_gaussian(np.zeros(2 * M), cov, modes_A)
 
-    E = vonNeumann_entropy(cov_A)
+    E = vonneumann_entropy(cov_A)
 
     return E
 

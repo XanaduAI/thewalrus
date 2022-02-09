@@ -41,10 +41,7 @@ def random_cov(num_modes=200, pure=False, nonclassical=True):
     M = num_modes
     O = interferometer(random_interferometer(M))
 
-    if pure:
-        eta = 1
-    elif not pure:
-        eta = 0.123
+    eta = 1 if pure else 0.123
 
     r = 1.234
     if nonclassical:

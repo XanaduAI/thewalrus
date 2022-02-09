@@ -27,6 +27,7 @@ Summary
 
 .. autosummary::
     williamson
+    symplectic_eigenvals
 
 Code details
 ------------
