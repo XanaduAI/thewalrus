@@ -121,7 +121,7 @@ Photon number distributions
     characteristic_function
 
 Entanglement
----------------------------
+------------
 
 .. autosummary::
 
