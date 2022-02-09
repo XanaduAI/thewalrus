@@ -20,7 +20,6 @@ from collections import Counter
 from itertools import chain, combinations
 import warnings
 import numba
-import pytest
 
 import numpy as np
 
