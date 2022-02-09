@@ -786,7 +786,9 @@ def hafnian(
         return A[0][1]
 
     if matshape[0] == 3 and loop:
-        return A[0, 0] * A[1, 2] + A[1, 1] * A[0, 2] + A[2, 2] * A[0, 1]
+        return (
+            A[0, 0] * A[1, 2] + A[1, 1] * A[0, 2] + A[2, 2] * A[0, 1] + A[0, 0] * A[1, 1] * A[2, 2]
+        )
 
     if matshape[0] == 4:
         if loop:
