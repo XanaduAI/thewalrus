@@ -199,28 +199,31 @@ class TestHafnian:
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_identity(self, n, dtype):
+    @pytest.mark.parametrize("method", ["glynn", "inclexcl", "recursive"])
+    def test_identity(self, n, method, dtype):
         """Check hafnian(I)=0"""
         A = dtype(np.identity(n))
-        haf = hafnian(A)
+        haf = hafnian(A, method=method)
         assert np.allclose(haf, 0)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_ones(self, n, dtype):
+    @pytest.mark.parametrize("method", ["glynn", "inclexcl", "recursive"])
+    def test_ones(self, n, method, dtype):
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = dtype(np.ones([2 * n, 2 * n]))
-        haf = hafnian(A)
+        haf = hafnian(A, method=method)
         expected = fac(2 * n) / (fac(n) * (2**n))
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_block_ones(self, n, dtype):
+    @pytest.mark.parametrize("method", ["glynn", "inclexcl", "recursive"])
+    def test_block_ones(self, n, method, dtype):
         """Check hafnian([[0, I_n], [I_n, 0]])=n!"""
         O = np.zeros([n, n])
         B = np.ones([n, n])
         A = np.vstack([np.hstack([O, B]), np.hstack([B, O])])
         A = dtype(A)
-        haf = hafnian(A)
+        haf = hafnian(A, method=method)
         expected = float(fac(n))
         assert np.allclose(haf, expected)
 
