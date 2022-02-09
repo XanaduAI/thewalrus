@@ -768,7 +768,7 @@ def hafnian(
             raise ValueError("Input matrix must not have negative entries")
 
         return hafnian_approx(A, num_samples=num_samples)
-
+"""
     if loop:
         return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
@@ -779,7 +779,14 @@ def hafnian(
         return recursive_hafnian(A)
 
     return _haf(A, reps=None, glynn=glynn)
-
+"""
+    if recursive and loop:
+        with pytest.warns(UserWarning, match=r"The probabilities for parameter group"):
+            return recursive_hafnian(A)
+    elif recursive:
+        return recursive_hafnian(A)
+    elif loop:
+        return loop_hafnian(A)
 
 def hafnian_sparse(A, D=None, loop=False):
     r"""Returns the hafnian of a sparse symmetric matrix.
