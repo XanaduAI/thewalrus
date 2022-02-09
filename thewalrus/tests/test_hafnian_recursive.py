@@ -16,17 +16,17 @@
 import pytest
 
 import numpy as np
-
+import warnings
 from thewalrus import hafnian
 
 
 @pytest.mark.parametrize("n", [6, 8, 10])
 def test_equality(n):
     """Test if recursive_hafnian gives the same as non recursive"""
-    A = np.random.rand(n,n)
+    A = np.random.rand(n, n)
     A += A.T
     exact = hafnian(A)
-    recursive = hafnian(A, recursive = True)
+    recursive = hafnian(A, recursive=True)
     assert np.allclose(recursive, exact, rtol=2e-1, atol=0)
 
 
@@ -34,10 +34,12 @@ def test_recursive_or_loop():
     """Check exception raised if chosen loop and recursive"""
     loop = True
     recursive = True
-    A = np.random.rand(3,3)
+    A = np.random.rand(3, 3)
     A += A.T
-    warnings.catch_warnings(record=True) as w:
-        hafnian(A, recursive = recursive, loop = loop)
-        
+    with warnings.catch_warnings(record=True) as w:
+        hafnian(A, recursive=recursive, loop=loop)
+
         assert len(w) == 1
-        assert "Recursive algorithm does not support the loop hafnian" in str(w[-1].message)
+        assert "Recursive algorithm does not support the loop hafnian" in str(
+            w[-1].message
+        )
