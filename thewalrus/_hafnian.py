@@ -20,6 +20,7 @@ from collections import Counter
 from itertools import chain, combinations
 import warnings
 import numba
+import pytest
 
 import numpy as np
 
@@ -769,24 +770,17 @@ def hafnian(
 
         return hafnian_approx(A, num_samples=num_samples)
 
-    #if loop:
-    #    return loop_hafnian(A, D=None, reps=None, glynn=glynn)
+    if loop:
+        return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
-    #if recursive:
-    #    if loop:
-    #        warnings.warn("Recursive algorithm does not support the loop hafnian")
+    if recursive:
+        if loop:
+            with pytest.warns(UserWarning):
+                warnings.warn("Recursive algorithm does not support the loop hafnian",UserWarning)
+            #warnings.warn("Recursive algorithm does not support the loop hafnian")
 
-    #    return recursive_hafnian(A)
-
-    #return _haf(A, reps=None, glynn=glynn)
-
-    if recursive and loop:
-        warnings.warn("Recursive algorithm does not support the loop hafnian")
         return recursive_hafnian(A)
-    elif recursive:
-        return recursive_hafnian(A)
-    elif loop:
-        return loop_hafnian(A)
+
     return _haf(A, reps=None, glynn=glynn)
 
 def hafnian_sparse(A, D=None, loop=False):
