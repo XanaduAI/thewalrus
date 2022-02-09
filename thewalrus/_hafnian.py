@@ -940,8 +940,7 @@ def recursive_hafnian(A):  # pragma: no cover
     Returns:
         float: the hafnian of the input matrix
     """
-    nb_lines = len(A)
-    nb_columns = len(A[0])
+    nb_lines, nb_columns = A.shape
     if nb_lines != nb_columns:
         raise ValueError("Matrix must be square")
 
