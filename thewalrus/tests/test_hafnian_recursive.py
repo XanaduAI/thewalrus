@@ -28,7 +28,7 @@ def test_equality(n):
     A += A.T
     exact = hafnian(A)
     recursive = hafnian(A, method="recursive")
-    assert np.allclose(recursive, exact, rtol=2e-1, atol=0)
+    assert np.allclose(recursive, exact)
 
 
 def test_recursive_or_loop():
