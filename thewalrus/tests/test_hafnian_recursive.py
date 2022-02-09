@@ -35,5 +35,5 @@ def test_recursive_or_loop():
     """Check exception raised if chosen loop and recursive"""
     A = np.random.rand((3,3))
     hafn = hafnian(A, recursive = True, loop = True)
-    with pytest.raises(ValueError, match="Recursive algorithm cannot support loop"):
+    with pytest.raises(TypeError, match="Recursive algorithm cannot support loop"):
         hafnian(A, recursive = True)
