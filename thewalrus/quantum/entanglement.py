@@ -62,7 +62,7 @@ def vonNeumann_entropy(cov, hbar=2):
     Args:
         cov (array): a covariance matrix
         hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
+            relation :math:`[\x,\p]=i\hbar`
 
     Returns:
         (float): vonNeumann entropy
