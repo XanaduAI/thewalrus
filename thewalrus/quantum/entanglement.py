@@ -47,11 +47,11 @@ def get_partition(modes_A, split, M):
 
     if modes_A is None and split is not None:
         if not isinstance(split, int) or split > M - 1:
-            raise ValueError("``split`` must be an integer smaller than the number of modes.")
+            raise ValueError("'split' must be an integer smaller than the number of modes.")
         modes_A = range(split)
 
     if modes_A is None and split is None:
-        raise TypeError("A bipartition must be defined, either by ``modes_A`` or ``split``.")
+        raise TypeError("A bipartition must be defined, either by 'modes_A' or 'split'.")
 
     return list(modes_A)
 
@@ -62,7 +62,7 @@ def vonneumann_entropy(cov, hbar=2):
     Args:
         cov (array): a covariance matrix
         hbar (float): the value of :math:`\hbar` in the commutation
-            relation :math:`[\x,\p]=i\hbar`.
+            relation :math:`[\x,\p]=i\hbar`
 
     Returns:
         (float): vonNeumann entropy
