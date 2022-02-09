@@ -23,7 +23,7 @@ from thewalrus import hafnian
 @pytest.mark.parametrize("n", [6, 8, 10])
 def test_equality(n):
     """Test if recursive_hafnian gives the same as non recursive"""
-    A = np.random.rand((n, n))
+    A = np.random.rand(n,n)
     A += A.T
     exact = hafnian(A)
     recursive = hafnian(A, recursive = True)
