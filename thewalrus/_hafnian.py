@@ -781,7 +781,7 @@ def hafnian(
     return _haf(A, reps=None, glynn=glynn)
 """
     if recursive and loop:
-        with pytest.warns(UserWarning, match=r"The probabilities for parameter group"):
+        warnings.warn("Recursive algorithm does not support the loop hafnian")
             return recursive_hafnian(A)
     elif recursive:
         return recursive_hafnian(A)
