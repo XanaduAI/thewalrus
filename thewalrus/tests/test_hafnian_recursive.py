@@ -36,5 +36,8 @@ def test_recursive_or_loop():
     recursive = True
     A = np.random.rand(3,3)
     A += A.T
-    with pytest.raises(TypeError, match="Recursive algorithm cannot support loop"):
+    warnings.catch_warnings(record=True) as w:
         hafnian(A, recursive = recursive, loop = loop)
+        
+        assert len(w) == 1
+        assert "Recursive algorithm does not support the loop hafnian" in str(w[-1].message)
