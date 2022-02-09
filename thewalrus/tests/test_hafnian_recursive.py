@@ -27,18 +27,18 @@ def test_equality(n):
     A = np.random.rand(n, n)
     A += A.T
     exact = hafnian(A)
-    recursive = hafnian(A, recursive=True)
+    recursive = hafnian(A, method="recursive")
     assert np.allclose(recursive, exact, rtol=2e-1, atol=0)
 
 
 def test_recursive_or_loop():
     """Check exception raised if chosen loop and recursive"""
     loop = True
-    recursive = True
+    method = "recursive"
     A = np.random.rand(5, 5)
     A += A.T
     with warnings.catch_warnings(record=True) as w:
-        hafnian(A, recursive=recursive, loop=loop)
+        hafnian(A, method=method, loop=loop)
 
         assert len(w) == 1
         assert "Recursive algorithm does not support the loop hafnian" in str(w[-1].message)
