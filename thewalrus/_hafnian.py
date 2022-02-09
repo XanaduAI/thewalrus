@@ -787,6 +787,7 @@ def hafnian(
         return recursive_hafnian(A)
     elif loop:
         return loop_hafnian(A)
+    return _haf(A, reps=None, glynn=glynn)
 
 def hafnian_sparse(A, D=None, loop=False):
     r"""Returns the hafnian of a sparse symmetric matrix.
