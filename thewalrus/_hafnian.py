@@ -718,12 +718,12 @@ def hafnian(
     input_validation(A, rtol=rtol, atol=atol)
 
     matshape = A.shape
-    
+
     if method == "glynn":
         glynn = True
-    
+
     if method == "inclexcl":
-        glynn= False
+        glynn = False
 
     if matshape == (0, 0):
         return 1
@@ -775,11 +775,11 @@ def hafnian(
         return hafnian_approx(A, num_samples=num_samples)
 
     if loop:
-        if method=="recursive":
+        if method == "recursive":
             warnings.warn("Recursive algorithm does not support the loop hafnian")
         return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
-    if method=="recursive":
+    if method == "recursive":
         return recursive_hafnian(A)
 
     return _haf(A, reps=None, glynn=glynn)
