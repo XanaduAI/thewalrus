@@ -47,7 +47,7 @@ def get_partition(modes_A, split, M):
 
     if modes_A is None and split is not None:
         if not isinstance(split, int) or split > M - 1:
-            raise ValueError("``split`` must be an integer smaller than the number of modes.")
+            raise ValueError("'split' must be an integer smaller than the number of modes.")
         modes_A = range(split)
 
     if modes_A is None and split is None:
