@@ -51,7 +51,7 @@ def get_partition(modes_A, split, M):
         modes_A = range(split)
 
     if modes_A is None and split is None:
-        raise TypeError("A bipartition must be defined, either by ``modes_A`` or ``split``.")
+        raise TypeError("A bipartition must be defined, either by 'modes_A' or 'split'.")
 
     return list(modes_A)
 
