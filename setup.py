@@ -15,6 +15,7 @@
 #!/usr/bin/env python3
 from setuptools import find_packages, setup
 
+
 def get_version():
     with open("thewalrus/_version.py") as f:
         return f.readlines()[-1].split()[-1].strip("\"'")
@@ -36,7 +37,7 @@ info = {
         "numba>=0.49.1,<0.54",
         "scipy>=1.2.1",
         "sympy>=1.5.1",
-        "numpy>=1.19.2"
+        "numpy>=1.19.2",
     ],
     "setup_requires": ["numpy"],
     "ext_package": "thewalrus",
