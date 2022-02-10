@@ -981,7 +981,7 @@ def solve(b, s, w, g, n):  # pragma: no cover
             c[i] = b[(j + 1) * (j + 2) // 2 + k + 2]
             i += 1
     h = solve(c, s - 2, -w, g, n)
-    e = g[:].copy()
+    e = g.copy()
     for u in range(n):
         for v in range(n - u):
             e[u + v + 1] += g[u] * b[0][v]
