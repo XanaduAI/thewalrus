@@ -699,7 +699,7 @@ def hafnian(
         A (array): a square, symmetric array of even dimensions
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         method (string): Set this to ``"glynn"`` to use the
-            `glynn formula,
+            glynn formula,
             or ``"inclexcl"`` to use the inclusion exclusion principle,
             or ``"recursive"`` to use a recursive algorithm.
         rtol (float): the relative tolerance parameter used in ``np.allclose``
