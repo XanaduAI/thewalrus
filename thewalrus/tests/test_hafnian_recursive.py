@@ -26,7 +26,7 @@ def test_equality(n):
     """Test if recursive_hafnian gives the same as non recursive"""
     A = np.random.rand(n, n)
     A += A.T
-    exact = hafnian(A)
+    exact = hafnian(A, method="glynn")
     recursive = hafnian(A, method="recursive")
     assert np.allclose(recursive, exact)
 
