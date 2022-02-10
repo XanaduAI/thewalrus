@@ -934,7 +934,7 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
 def recursive_hafnian(A):  # pragma: no cover
     r"""Computes the hafnian of the matrix with the recursive algorithm. It is an implementation of
     algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
-    This code is a modified version of the code found here :
+    This code is a modified version of the code found here:
     `Recursive hafnian
     <https://codegolf.stackexchange.com/questions/157049/calculate-the-hafnian-as-quickly-as-possible>`_.
     Args:
