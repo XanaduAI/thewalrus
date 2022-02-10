@@ -776,7 +776,7 @@ def hafnian(
     if loop:
         if method == "recursive":
             warnings.warn("Recursive algorithm does not support the loop hafnian")
-        return loop_hafnian(A, D=None, reps=None, glynn=glynn)
+        return loop_hafnian(A, D=None, reps=None, glynn=True)
 
     if method == "recursive":
         return recursive_hafnian(A)
