@@ -14,20 +14,24 @@
 """
 Hafnian Python interface
 """
+
 import warnings
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
 import numba
+
 import numpy as np
 
 
 @numba.jit(nopython=True, cache=True)
 def nb_binom(n, k):  # pragma: no cover
     """Numba version of binomial coefficient function.
+
     Args:
         n (int): how many options
         k (int): how many are chosen
+
     Returns:
         int: how many ways of choosing
     """
@@ -45,8 +49,10 @@ def nb_binom(n, k):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def precompute_binoms(max_binom):  # pragma: no cover
     """Precompute binomial coefficients, return as a 2d array.
+
     Args:
         max_binom (int): max value of n in the binomial
+
     Returns:
         array: ``max_binom + 1 * max_binom + 1`` array of binomial coefficients
     """
@@ -60,10 +66,12 @@ def precompute_binoms(max_binom):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def nb_ix(arr, rows, cols):  # pragma: no cover
     """Numba implementation of ``np.ix_``.
+
     Args:
         arr (2d array): matrix to take submatrix of
         rows (array): rows to be selected in submatrix
         cols (array): columns to be selected in submatrix
+
     Return:
         array: selected submatrix of ``arr`` with dimension ``len(rows) * len(cols)``
     """
@@ -73,8 +81,10 @@ def nb_ix(arr, rows, cols):  # pragma: no cover
 def matched_reps(reps):  # pylint: disable = too-many-branches
     """Takes the repeated rows and find a way to pair them up to create a perfect
     matching with many repeated edges.
+
     Args:
         reps (list): list of repeated rows/cols
+
     Returns:
         tuple[array, array, int]: tuple with vertex pairs (length ``2N`` for ``N`` edges; index
         ``i`` is matched with ``i + N``), length ``N`` array for how many times each edge is
@@ -154,9 +164,11 @@ def matched_reps(reps):  # pylint: disable = too-many-branches
 def find_kept_edges(j, reps):  # pragma: no cover
     """Write ``j`` as a string where the ith digit is in base ``reps[i]+1``
     decides which edges are included given index of the inclusion/exclusion sum.
+
     Args:
         j (int): index of sum
         reps (list): number of repetitions of each edge
+
     Returns:
         array: number of repetitions kept for the current inclusion/exclusion step
     """
@@ -172,9 +184,11 @@ def find_kept_edges(j, reps):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def f(E, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
+
     Args:
         E (array): eigenvalues of ``AX``
         n (int): number of polynomial coefficients to compute
+
     Returns:
         array: polynomial coefficients
     """
@@ -200,12 +214,14 @@ def f(E, n):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def f_loop(E, AX_S, XD_S, D_S, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
+
     Args:
         E (array): eigenvalues of ``AX``
         AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
         XD_S (array): diagonal multiplied by ``X``
         D_S (array): diagonal
         n (int): number of polynomial coefficients to compute
+
     Returns:
         array: polynomial coefficients
     """
@@ -234,6 +250,7 @@ def f_loop(E, AX_S, XD_S, D_S, n):  # pragma: no cover
 def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula
     when there is a self-edge in the fixed perfect matching.
+
     Args:
         E (array): eigenvalues of ``AX``
         AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
@@ -242,6 +259,7 @@ def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
         n (int): number of polynomial coefficients to compute
         oddloop (float): weight of self-edge
         oddVX_S (array): vector corresponding to matrix at the index of the self-edge
+
     Returns:
         array: polynomial coefficients
     """
@@ -274,9 +292,11 @@ def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def get_AX_S(kept_edges, A):  # pragma: no cover
     """Given the kept edges, return the appropriate scaled submatrices to compute ``f``.
+
     Args:
         kept_edges (array): number of repetitions of each edge
         A (array): matrix before repetitions applied
+
     Returns:
         array: scaled ``A @ X``, where ``X = ((0, I), (I, 0))``
     """
@@ -290,8 +310,12 @@ def get_AX_S(kept_edges, A):  # pragma: no cover
     A_nonzero = nb_ix(A, nonzero_rows, nonzero_rows)
 
     AX_nonzero = np.empty_like(A_nonzero, dtype=np.complex128)
-    AX_nonzero[:, :n_nonzero_edges] = kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-    AX_nonzero[:, n_nonzero_edges:] = kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    AX_nonzero[:, :n_nonzero_edges] = (
+        kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+    )
+    AX_nonzero[:, n_nonzero_edges:] = (
+        kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    )
 
     return AX_nonzero
 
@@ -299,16 +323,17 @@ def get_AX_S(kept_edges, A):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     """Given the kept edges, return the appropriate scaled submatrices to compute ``f``.
+
     Args:
         kept_edges (array): number of repetitions of each edge
         A (array): matrix before repetitions applied
         D (array): diagonal before repetitions applied
         oddV (array): Row of matrix at index of self-edge. ``None`` is no self-edge.
+
     Returns:
         tuple[array, array, array, array]: scaled ``A @ X `` (where ``X = ((0, I), (I, 0))``),
         scaled ``X @ D``, scaled ``D``, and scaled ``oddV @ X``
     """
-
     z = np.concatenate((kept_edges, kept_edges))
     nonzero_rows = np.where(z != 0)[0]
     n_nonzero_edges = len(nonzero_rows) // 2
@@ -318,8 +343,12 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     A_nonzero = nb_ix(A, nonzero_rows, nonzero_rows)
 
     AX_nonzero = np.empty_like(A_nonzero, dtype=np.complex128)
-    AX_nonzero[:, :n_nonzero_edges] = kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-    AX_nonzero[:, n_nonzero_edges:] = kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    AX_nonzero[:, :n_nonzero_edges] = (
+        kept_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+    )
+    AX_nonzero[:, n_nonzero_edges:] = (
+        kept_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
+    )
 
     D_nonzero = D[nonzero_rows]
 
@@ -330,8 +359,12 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
     if oddV is not None:
         oddV_nonzero = oddV[nonzero_rows]
         oddVX_nonzero = np.empty_like(oddV_nonzero, dtype=np.complex128)
-        oddVX_nonzero[:n_nonzero_edges] = kept_edges_nonzero * oddV_nonzero[n_nonzero_edges:]
-        oddVX_nonzero[n_nonzero_edges:] = kept_edges_nonzero * oddV_nonzero[:n_nonzero_edges]
+        oddVX_nonzero[:n_nonzero_edges] = (
+            kept_edges_nonzero * oddV_nonzero[n_nonzero_edges:]
+        )
+        oddVX_nonzero[n_nonzero_edges:] = (
+            kept_edges_nonzero * oddV_nonzero[:n_nonzero_edges]
+        )
     else:
         oddVX_nonzero = None
 
@@ -342,9 +375,11 @@ def get_submatrices(kept_edges, A, D, oddV):  # pragma: no cover
 def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     """Find ``oddVX_nonzero0`` for batching (sometimes different vertices are
     identified as self edges).
+
     Args:
         kept_edges (array): number of repetitions of each edge
         oddV0 (array): Row of matrix at index of self-edge. ``None`` is no self-edge.
+
     Returns:
         array: scaled ``oddV0 @ X``
     """
@@ -355,8 +390,12 @@ def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     kept_edges_nonzero = kept_edges[np.where(kept_edges != 0)]
     oddV_nonzero0 = oddV0[nonzero_rows]
     oddVX_nonzero0 = np.empty_like(oddV_nonzero0, dtype=np.complex128)
-    oddVX_nonzero0[:n_nonzero_edges] = kept_edges_nonzero * oddV_nonzero0[n_nonzero_edges:]
-    oddVX_nonzero0[n_nonzero_edges:] = kept_edges_nonzero * oddV_nonzero0[:n_nonzero_edges]
+    oddVX_nonzero0[:n_nonzero_edges] = (
+        kept_edges_nonzero * oddV_nonzero0[n_nonzero_edges:]
+    )
+    oddVX_nonzero0[n_nonzero_edges:] = (
+        kept_edges_nonzero * oddV_nonzero0[:n_nonzero_edges]
+    )
 
     return oddVX_nonzero0
 
@@ -364,7 +403,6 @@ def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def get_Dsubmatrices(kept_edges, D):  # pragma: no cover
     """Find submatrices for batch gamma functions."""
-
     z = np.concatenate((kept_edges, kept_edges))
     nonzero_rows = np.where(z != 0)[0]
     n_nonzero_edges = len(nonzero_rows) // 2
@@ -383,8 +421,10 @@ def get_Dsubmatrices(kept_edges, D):  # pragma: no cover
 @numba.jit(nopython=True, cache=True)
 def eigvals(M):  # pragma: no cover
     """Computes the eigenvalues of a matrix.
+
     Args:
         M (array): square matrix
+
     Returns:
         array: eigenvalues of the matrix ``M``
     """
@@ -395,14 +435,15 @@ def eigvals(M):  # pragma: no cover
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
     r"""Compute hafnian, using inputs as prepared by frontend hafnian function compiled with Numba.
+
     Args:
         A (array): matrix ordered according to the chosen perfect matching
         edge_reps (array): how many times each edge in the perfect matching is repeated
         glynn (bool): whether to use finite difference sieve
+
     Returns:
         complex: value of hafnian
     """
-
     n = A.shape[0]
     N = 2 * edge_reps.sum()  # number of photons
 
@@ -433,7 +474,7 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
 
         E = eigvals(AX_S)  # O(n^3) step
 
-        prefac = (-1.0) ** (N // 2 - edge_sum) * binom_prod
+        prefac = (-1.0)**(N // 2 - edge_sum) * binom_prod
 
         if glynn and kept_edges[0] == 0:
             prefac *= 0.5
@@ -442,7 +483,7 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
         H += Hnew
 
     if glynn:
-        H = H * 0.5 ** (N // 2 - 1)
+        H = H * 0.5**(N // 2 - 1)
 
     return H
 
@@ -451,12 +492,14 @@ def _haf(A, reps=None, glynn=True):
     r"""Calculate hafnian with (optional) repeated rows and columns.
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): N x N matrix.
         reps (list): Length-N list of repetitions of each row/col (optional). If not provided,
             each row/column assumed to be repeated once.
         glynn (bool): If ``True``, use Glynn-style finite difference sieve formula. If ``False``,
             use Ryser style inclusion/exclusion principle.
+
     Returns
         complex: result of hafnian calculation
     """
@@ -488,11 +531,14 @@ def _haf(A, reps=None, glynn=True):
 
 # pylint: disable=too-many-arguments, redefined-outer-name, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  # pragma: no cover
+def _calc_loop_hafnian(
+    A, D, edge_reps, oddloop=None, oddV=None, glynn=True
+):  # pragma: no cover
     """Compute loop hafnian, using inputs as prepared by frontend loop_hafnian function
     compiled with Numba.
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): matrix ordered according to the chosen perfect matching.
         D (array): diagonals ordered according to the chosen perfect matchin
@@ -500,6 +546,7 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
         oddloop (float): weight of self-loop in perfect matching, None if no self-loops
         oddV (array): row of matrix corresponding to the odd loop in the perfect matching
         glynn (bool): whether to use finite difference sieve
+
     Returns:
         complex: value of loop hafnian
     """
@@ -535,7 +582,7 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
 
         E = eigvals(AX_S)  # O(n^3) step
 
-        prefac = (-1.0) ** (N // 2 - edge_sum) * binom_prod
+        prefac = (-1.0)**(N // 2 - edge_sum) * binom_prod
 
         if oddloop is not None:
             Hnew = prefac * f_loop_odd(E, AX_S, XD_S, D_S, N, oddloop, oddVX_S)[N]
@@ -548,9 +595,9 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
 
     if glynn:
         if oddloop is None:
-            H = H * 0.5 ** (N // 2 - 1)
+            H = H * 0.5**(N // 2 - 1)
         else:
-            H = H * 0.5 ** (N // 2)
+            H = H * 0.5**(N // 2)
 
     return H
 
@@ -560,6 +607,7 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
     """Calculate loop hafnian with (optional) repeated rows and columns.
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): N x N matrix.
         D (array): Diagonal entries of matrix (optional). If not provided, ``D`` is the diagonal of ``A``.
@@ -568,6 +616,7 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
             row/column assumed to be repeated once.
         glynn (bool): If ``True``, use Glynn-style finite difference sieve formula, if ``False``,
             use Ryser style inclusion/exclusion principle.
+
     Returns
         complex: result of loop hafnian calculation
     """
@@ -609,15 +658,19 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
+
     These include:
+
     * That the ``A`` is a NumPy array
     * That ``A`` is square
     * That ``A`` does not contain any NaNs
     * That ``A`` is symmetric
+
     Args:
         A (array): a NumPy array.
         rtol (float): the relative tolerance parameter used in ``np.allclose``
         atol (float): the absolute tolerance parameter used in ``np.allclose``
+
     Returns:
         bool: returns ``True`` if the matrix satisfies all requirements
     """
@@ -641,8 +694,10 @@ def input_validation(A, rtol=1e-05, atol=1e-08):
 
 def bandwidth(A):
     """Calculates the upper bandwidth of the matrix A.
+
     Args:
         A (array): input matrix
+
     Returns:
         int: bandwidth of matrix
     """
@@ -656,21 +711,28 @@ def bandwidth(A):
 
 def powerset(iterable):
     """Calculates the powerset of a list.
+
     Args:
         iterable (iterable): input list
+
     Returns:
         chain: chain of all subsets of input list
     """
-    return chain.from_iterable(combinations(iterable, r) for r in range(len(iterable) + 1))
+    return chain.from_iterable(
+        combinations(iterable, r) for r in range(len(iterable) + 1)
+    )
 
 
 def reduction(A, rpt):
     r"""Calculates the reduction of an array by a vector of indices.
+
     This is equivalent to repeating the ith row/column of :math:`A`, :math:`rpt_i` times.
+
     Args:
         A (array): matrix of size ``[N, N]``
         rpt (Sequence): sequence of N positive integers indicating the corresponding rows/columns
             of ``A`` to be repeated.
+
     Returns:
         array: the reduction of ``A`` by the index vector ``rpt``
     """
@@ -693,13 +755,15 @@ def hafnian(
     method="glynn",
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
+
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     Args:
         A (array): a square, symmetric array of even dimensions
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
         method (string): Set this to ``"glynn"`` to use the
-            glynn formula,
+            `glynn formula,
             or ``"inclexcl"`` to use the inclusion exclusion principle,
             or ``"recursive"`` to use a recursive algorithm.
         rtol (float): the relative tolerance parameter used in ``np.allclose``
@@ -709,6 +773,7 @@ def hafnian(
             non-negative entries.
         num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples``
             iterations for estimation of the hafnian of the non-negative matrix ``A``
+
     Returns:
         int or float or complex: the hafnian of matrix ``A``
     """
@@ -734,17 +799,16 @@ def hafnian(
             return np.prod(np.diag(A))
         return 0
 
+    if matshape[0] % 2 != 0 and loop:
+        A = np.pad(A, pad_width=((0, 1), (0, 1)), mode="constant")
+        A[-1, -1] = 1.0
+
     matshape = A.shape
 
     if matshape[0] == 2:
         if loop:
             return A[0, 1] + A[0, 0] * A[1, 1]
         return A[0][1]
-
-    if matshape[0] == 3 and loop:
-        return (
-            A[0, 0] * A[1, 2] + A[1, 1] * A[0, 2] + A[2, 2] * A[0, 1] + A[0, 0] * A[1, 1] * A[2, 2]
-        )
 
     if matshape[0] == 4:
         if loop:
@@ -776,7 +840,7 @@ def hafnian(
     if loop:
         if method == "recursive":
             warnings.warn("Recursive algorithm does not support the loop hafnian")
-        return loop_hafnian(A, D=None, reps=None, glynn=True)
+        return loop_hafnian(A, D=None, reps=None, glynn=glynn)
 
     if method == "recursive":
         return recursive_hafnian(A)
@@ -786,13 +850,17 @@ def hafnian(
 
 def hafnian_sparse(A, D=None, loop=False):
     r"""Returns the hafnian of a sparse symmetric matrix.
+
     This pure python implementation is very slow on full matrices, but faster the sparser a matrix is.
+
     As a rule of thumb, the crossover in runtime with respect to :func:`~.hafnian` happens around 50% sparsity.
+
     Args:
         A (array): the symmetric matrix of which we want to compute the hafnian
         D (set): Set of indices that identify a submatrix. If ``None`` (default) it computes
             the hafnian of the whole matrix.
         loop (bool): If ``True``, the loop hafnian is returned. Default is ``False``.
+
     Returns:
         float: hafnian of ``A`` or of the submatrix of ``A`` defined by the set of indices ``D``
     """
@@ -827,20 +895,31 @@ def hafnian_sparse(A, D=None, loop=False):
 
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=True):
     r"""Returns the hafnian of matrix with repeated rows/columns.
+
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
+
     The :func:`reduction` function may be used to show the resulting matrix
     with repeated rows and columns as per ``rpt``.
+
     As a result, the following are identical:
+
     .. code:
+
         >>> hafnian_repeated(A, rpt)
         >>> hafnian(reduction(A, rpt))
+
     However, using ``hafnian_repeated`` in the case where there are a large number
     of repeated rows and columns (:math:`\sum_{i}rpt_i \gg N`) can be
     significantly faster.
+
     .. note::
+
         If :math:`rpt=(1, 1, \dots, 1)`, then
+
         >>> hafnian_repeated(A, rpt) == hafnian(A)
+
+
     Args:
         A (array): a square, symmetric :math:`N\times N` array
         rpt (Sequence): a length-:math:`N` positive integer sequence, corresponding
@@ -852,6 +931,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
         rtol (float): the relative tolerance parameter used in ``np.allclose``
         atol (float): the absolute tolerance parameter used in ``np.allclose``
         glynn (bool): whether to use finite difference sieve
+
     Returns:
         int or float or complex: the hafnian of matrix A
     """
@@ -859,7 +939,9 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     input_validation(A, atol=atol, rtol=rtol)
 
     if len(rpt) != len(A):
-        raise ValueError("the rpt argument must be 1-dimensional sequence of length len(A).")
+        raise ValueError(
+            "the rpt argument must be 1-dimensional sequence of length len(A)."
+        )
 
     nud = np.array(rpt, dtype=np.int32)
 
@@ -881,7 +963,9 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
         return 0
 
     if len(mu) != len(A):
-        raise ValueError("Length of means vector must be the same length as the matrix A.")
+        raise ValueError(
+            "Length of means vector must be the same length as the matrix A."
+        )
 
     if loop:
         return loop_hafnian(A, D=mu, reps=rpt, glynn=glynn)
@@ -891,10 +975,13 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
 
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
+
     For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical
     circuits with local interactions', Qi et al. <https://arxiv.org/abs/2009.11824>`_.
+
     Args:
         A (array): a square, symmetric array of even dimensions
+
     Returns:
         int or float or complex: the loop hafnian of matrix ``A``
     """
@@ -917,10 +1004,19 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
         lower_end = tuple(lower_end)
         for D in ps:
             if lower_end + D not in loop_haf:
+                # pylint: disable=consider-using-generator
                 loop_haf[lower_end + D] = sum(
                     [
                         A[i - 1, t - 1]
-                        * loop_haf[tuple(item for item in lower_end + D if item not in set((i, t)))]
+                        * loop_haf[
+                            tuple(
+                                [
+                                    item
+                                    for item in lower_end + D
+                                    if item not in set((i, t))
+                                ]
+                            )
+                        ]
                         for i in D
                     ]
                 )
@@ -930,13 +1026,18 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
 
 @numba.jit(nopython=True)
 def recursive_hafnian(A):  # pragma: no cover
-    r"""Computes the hafnian of the matrix with the recursive algorithm. It is an implementation of
-    algorithm 2 in *Counting perfect matchings as fast as Ryser* :cite:`bjorklund2012counting`.
-    This code is a modified version of the code found here:
+    r"""Computes the hafnian of the matrix with the recursive algorithm.
+
+    It is an implementation of algorithm 2 in *Counting perfect matchings
+    as fast as Ryser* :cite:`bjorklund2012counting`.
+
+    This code is a modified version of the code found here :
     `Recursive hafnian
     <https://codegolf.stackexchange.com/questions/157049/calculate-the-hafnian-as-quickly-as-possible>`_.
+
     Args:
         A (array): the input matrix
+
     Returns:
         float: the hafnian of the input matrix
     """
@@ -947,13 +1048,12 @@ def recursive_hafnian(A):  # pragma: no cover
     if nb_lines % 2 != 0:
         raise ValueError("Matrix size must be even")
 
-    n = len(A) // 2
-    z = np.zeros((n * (2 * n - 1), n + 1), dtype=A.dtype)
+    n = float(len(A)) // 2
+    z = np.zeros((n * (2 * n - 1), n + 1))
     for j in range(1, 2 * n):
-        ind = j * (j - 1) // 2
         for k in range(j):
-            z[ind + k][0] = A[j][k]
-    g = np.zeros(n + 1, dtype=A.dtype)
+            z[j * (j - 1) // 2 + k][0] = A[j][k]
+    g = np.zeros(n + 1)
     g[0] = 1
     return solve(z, 2 * n, 1, g, n)
 
@@ -961,25 +1061,27 @@ def recursive_hafnian(A):  # pragma: no cover
 @numba.jit(nopython=True)
 def solve(b, s, w, g, n):  # pragma: no cover
     r"""Implements the recursive algorithm.
+
     Args:
         b (array): matrix that is transformed recursively
         s (int): size of the original matrix that changes at every recursion
         k (int): a variable of the recursive algorithm
         g (int): matrix that is transformed recursively
         n (int): size of the original matrix divided by 2
+
     Returns:
         float: the hafnian of the input matrix
     """
     if s == 0:
         return w * g[n]
-    c = np.zeros(((s - 2) * (s - 3) // 2, n + 1), dtype=g.dtype)
+    c = np.zeros(((s - 2) * (s - 3) // 2), n + 1)
     i = 0
     for j in range(1, s - 2):
         for k in range(j):
             c[i] = b[(j + 1) * (j + 2) // 2 + k + 2]
             i += 1
     h = solve(c, s - 2, -w, g, n)
-    e = g.copy()
+    e = g[:].copy()
     for u in range(n):
         for v in range(n - u):
             e[u + v + 1] += g[u] * b[0][v]
@@ -988,8 +1090,10 @@ def solve(b, s, w, g, n):  # pragma: no cover
             for u in range(n):
                 for v in range(n - u):
                     c[j * (j - 1) // 2 + k][u + v + 1] += (
-                        b[(j + 1) * (j + 2) // 2][u] * b[(k + 1) * (k + 2) // 2 + 1][v]
-                        + b[(k + 1) * (k + 2) // 2][u] * b[(j + 1) * (j + 2) // 2 + 1][v]
+                        b[(j + 1) * (j + 2) // 2][u]
+                        * b[(k + 1) * (k + 2) // 2 + 1][v]
+                        + b[(k + 1) * (k + 2) // 2][u]
+                        * b[(j + 1) * (j + 2) // 2 + 1][v]
                     )
     return h + solve(c, s - 2, w, e, n)
 
@@ -999,8 +1103,10 @@ def _one_det(B):  # pragma: no cover
     """Calculates the determinant of an antisymmetric matrix with entries distributed
     according to a normal distribution, with scale equal to the entries of the symmetric matrix
     given as input.
+
     Args:
         B (array[float]): symmetric matrix
+
     Returns:
         float: determinant of the samples antisymmetric matrix
     """
@@ -1016,11 +1122,15 @@ def _one_det(B):  # pragma: no cover
 @numba.jit(nopython=True)
 def hafnian_approx(A, num_samples=1000):  # pragma: no cover
     """Returns the approximation to the hafnian of a matrix with non-negative entries.
+
     The approximation follows the stochastic Barvinok's approximation allowing the
     hafnian can be approximated as the sum of determinants of matrices.
+
     The accuracy of the approximation increases with increasing number of iterations.
+
     Args:
         B (array[float]): a symmetric matrix
+
     Returns:
         float: approximate hafnian of the input
     """
