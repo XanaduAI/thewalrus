@@ -807,11 +807,11 @@ def hafnian_sparse(A, D=None, loop=False):
     r, _ = np.nonzero(A)
     m = max(Counter(r).values())  # max nonzero values per row/column
 
-    @lru_cache(maxsize=2**m)
+    @lru_cache(maxsize=2 ** m)
     def indices(d, k):
         return d.intersection(set(np.nonzero(A[k])[0]))
 
-    @lru_cache(maxsize=2**m)
+    @lru_cache(maxsize=2 ** m)
     def lhaf(d: frozenset) -> float:
         if not d:
             return 1
@@ -874,7 +874,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
 
     if np.allclose(A, 0, rtol=rtol, atol=atol):
         if loop:
-            return np.prod(mu**rpt)
+            return np.prod(mu ** rpt)
         return 0
 
     if len(mu) != len(A):
