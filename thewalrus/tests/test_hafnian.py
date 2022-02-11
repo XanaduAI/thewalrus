@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the Python hafnian wrapper function"""
-# pylint: disable=no-self-use,redefined-outer-name
+# pylint: disable=no-self-use,redefined-outer-name,invalid-name,no-member
 import pytest
 
 import numpy as np
@@ -24,7 +24,7 @@ from thewalrus import hafnian, reduction, hafnian_sparse, hafnian_banded, matche
 from thewalrus._hafnian import _haf as jhaf
 from thewalrus._hafnian import loop_hafnian
 from thewalrus._hafnian import bandwidth
-
+from thewalrus._hafnian import recursive_hafnian
 
 # the first 11 telephone numbers
 T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
@@ -32,11 +32,9 @@ T = [1, 1, 2, 4, 10, 26, 76, 232, 764, 2620, 9496]
 
 def random_banded(n, bw):
     """Generates a random matrix of a given size and bandwidth.
-
     Args:
       n (int): Size of the matrix
       bw (int): Bandwidth of the matrix
-
     Returns:
       (array): a matrix with the given properties
     """
@@ -76,7 +74,6 @@ class TestReduction:
 class TestHafnianWrapper:
     """Tests for the Python hafnian wrapper function.
     These tests should only test for:
-
     * exceptions
     * validation
     """
@@ -135,6 +132,9 @@ class TestHafnianWrapper:
         expected = loop_hafnian(A)
         assert np.allclose(haf, expected)
 
+        haf = hafnian(A, loop=False)
+        expected = recursive_hafnian(A)
+        assert np.allclose(haf, expected)
         A = np.random.random([6, 6])
         A += A.T
         A = np.array(A, dtype=np.complex128)
@@ -199,28 +199,31 @@ class TestHafnian:
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_identity(self, n, dtype):
+    @pytest.mark.parametrize("method", ["glynn", "inclexcl", "recursive"])
+    def test_identity(self, n, method, dtype):
         """Check hafnian(I)=0"""
         A = dtype(np.identity(n))
-        haf = hafnian(A)
+        haf = hafnian(A, method=method)
         assert np.allclose(haf, 0)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_ones(self, n, dtype):
+    @pytest.mark.parametrize("method", ["glynn", "inclexcl", "recursive"])
+    def test_ones(self, n, method, dtype):
         """Check hafnian(J_2n)=(2n)!/(n!2^n)"""
         A = dtype(np.ones([2 * n, 2 * n]))
-        haf = hafnian(A)
+        haf = hafnian(A, method=method)
         expected = fac(2 * n) / (fac(n) * (2**n))
         assert np.allclose(haf, expected)
 
     @pytest.mark.parametrize("n", [6, 8])
-    def test_block_ones(self, n, dtype):
+    @pytest.mark.parametrize("method", ["glynn", "inclexcl", "recursive"])
+    def test_block_ones(self, n, method, dtype):
         """Check hafnian([[0, I_n], [I_n, 0]])=n!"""
         O = np.zeros([n, n])
         B = np.ones([n, n])
         A = np.vstack([np.hstack([O, B]), np.hstack([B, O])])
         A = dtype(A)
-        haf = hafnian(A)
+        haf = hafnian(A, method=method)
         expected = float(fac(n))
         assert np.allclose(haf, expected)
 
