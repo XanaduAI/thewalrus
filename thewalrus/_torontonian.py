@@ -293,22 +293,26 @@ def recursiveLTor(L, modes, A, n, gammaL):  # pragma: no cover
         np.float64 or np.complex128: the recursive loop torontonian
         sub-computation of matrix ``A`` and vector ``gammaL``
     """
-    tor, start = 0.0, 0 if len(modes) == 0 else modes[-1] + 1
+    tot = 0.0
+    if len(modes) == 0:
+        start = 0
+    else:
+        start = modes[-1] + 1
     for i in range(start, n):
         nextModes = np.append(modes, i)
         nm, idx = len(A) >> 1, (i - len(modes)) * 2
         Z = np.concatenate((np.arange(idx), np.arange(idx + 2, nm * 2)), axis=0)
         nm -= 1
-        Az = numba_ix(A, Z, Z)
-        Ls = quad_cholesky_np(L, Z, idx, np.eye(2 * nm) - Az)
+        Az = nb_ix(A, Z, Z)
+        Ls = quad_cholesky(L, Z, idx, np.eye(2 * nm) - Az)
         det = np.square(np.prod(np.diag(Ls)))
         gammaX = gammaL[Z]
         Lsinv = solve_triangular(Ls, gammaX)
         lc = Lsinv.conj().T @ Lsinv
-        tor += ((-1) ** len(nextModes)) * np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor(
+        tot += ((-1) ** len(nextModes)) * np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor(
             Ls, nextModes, Az, n, gammaX
         )
-    return tor
+    return tot
 
 
 @numba.jit(nopython=True)
@@ -331,7 +335,7 @@ def rec_ltorontonian(A, gamma):  # pragma: no cover
     Z = np.empty((2 * n,), dtype=np.int_)
     Z[0::2] = np.arange(0, n)
     Z[1::2] = np.arange(n, 2 * n)
-    A = numba_ix(A, Z, Z)
+    A = nb_ix(A, Z, Z)
     gamma = gamma[Z]
     L = np.linalg.cholesky(np.eye(2 * n) - A)
     det = np.square(np.prod(np.diag(L)))
