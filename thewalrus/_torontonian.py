@@ -249,26 +249,28 @@ def rec_torontonian(A):  # pragma: no cover
 
 @numba.jit(nopython=True)
 def solve_triangular(L, y):  # pragma: no cover
-    """Returns the solution to the inverse of a lower non-unit 
+    """Returns the solution to the inverse of a lower non-unit
     triangular matrix times a vector like the dtrsv function of
     LAPACK/BLAS or scipy solve_triangular
-    
+
     Args:
         L (array): invertible triangular matrix
         y (array): vector
-        
+
     Returns:
         np.float64 or np.complex128: solution of L^(-1)y
     """
     n = len(y)
     x = np.copy(y)
     for j in range(0, n):
-       if x[j] == 0: continue
-       x[j] = x[j] / L[j, j]
-       temp = x[j]
-       for i in range(j + 1, n):
-           x[i] -= temp * L[i, j]
+        if x[j] == 0:
+            continue
+        x[j] = x[j] / L[j, j]
+        temp = x[j]
+        for i in range(j + 1, n):
+            x[i] -= temp * L[i, j]
     return x
+
 
 @numba.jit(nopython=True)
 def recursiveLTor_np(L, modes, A, n, gammaL):  # pragma: no cover
@@ -290,10 +292,10 @@ def recursiveLTor_np(L, modes, A, n, gammaL):  # pragma: no cover
         np.float64 or np.complex128: the recursive loop torontonian
         sub-computation of matrix ``A`` and vector ``gammaL``
     """
-    tor, start = 0., 0 if len(modes) == 0 else modes[-1] + 1
+    tor, start = 0.0, 0 if len(modes) == 0 else modes[-1] + 1
     for i in range(start, n):
         nextModes = np.append(modes, i)
-        nm, idx = len(A) >> 1, (i - len(modes))*2
+        nm, idx = len(A) >> 1, (i - len(modes)) * 2
         Z = np.concatenate((np.arange(idx), np.arange(idx + 2, nm * 2)), axis=0)
         nm -= 1
         Az = numba_ix(A, Z, Z)
@@ -302,8 +304,11 @@ def recursiveLTor_np(L, modes, A, n, gammaL):  # pragma: no cover
         gammaX = gammaL[Z]
         Lsinv = solve_triangular(Ls, gammaX)
         lc = Lsinv.conj().T @ Lsinv
-        tor += ((-1) ** len(nextModes))*np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor_np(Ls, nextModes, Az, n, gammaX)
-  return tor
+        tor += ((-1) ** len(nextModes)) * np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor_np(
+            Ls, nextModes, Az, n, gammaX
+        )
+    return tor
+
 
 @numba.jit(nopython=True)
 def rec_ltorontonian_np(A, gamma):  # pragma: no cover
@@ -322,7 +327,7 @@ def rec_ltorontonian_np(A, gamma):  # pragma: no cover
         and vector ``gamma``
     """
     n = A.shape[0] >> 1
-    Z = np.empty((2*n,), dtype=np.int_)
+    Z = np.empty((2 * n,), dtype=np.int_)
     Z[0::2] = np.arange(0, n)
     Z[1::2] = np.arange(n, 2 * n)
     A = numba_ix(A, Z, Z)
@@ -331,7 +336,10 @@ def rec_ltorontonian_np(A, gamma):  # pragma: no cover
     det = np.square(np.prod(np.diag(L)))
     Ls = solve_triangular(L, gamma)
     lc = Ls.conj().T @ Ls
-    return np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor_np(L, np.empty(0, dtype=np.int_), A, n, gamma)
+    return np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor_np(
+        L, np.empty(0, dtype=np.int_), A, n, gamma
+    )
+
 
 @numba.jit(nopython=True)
 def numba_vac_prob(alpha, sigma):  # pragma: no cover
