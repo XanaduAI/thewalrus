@@ -247,6 +247,7 @@ def rec_torontonian(A):  # pragma: no cover
     det = np.square(np.prod(np.diag(L)))
     return 1 / np.sqrt(det) + recursiveTor(L, np.empty(0, dtype=np.int_), A, n)
 
+
 @numba.jit(nopython=True)
 def solve_triangular(L, y):  # pragma: no cover
     """Returns the solution to the inverse of a lower non-unit
