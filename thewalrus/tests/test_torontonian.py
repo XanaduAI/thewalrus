@@ -29,6 +29,7 @@ from thewalrus import (
     numba_tor,
     numba_ltor,
     rec_torontonian,
+    rec_ltorontonian,
 )
 from thewalrus.symplectic import two_mode_squeezing
 from thewalrus._torontonian import numba_vac_prob
@@ -190,10 +191,12 @@ def test_tor_and_threshold_displacement_prob_agree(n_modes):
     expected = tor(O) / np.sqrt(np.linalg.det(Q))
     prob = threshold_detection_prob(mu, cv, np.array([1] * n_modes))
     prob2 = numba_ltor(O, mu) / np.sqrt(np.linalg.det(Q))
-    prob3 = numba_vac_prob(mu, Q) * ltor(O, mu)
+    prob3 = rec_ltorontonian(O, mu) / np.sqrt(np.linalg.det(Q))
+    prob4 = numba_vac_prob(mu, Q) * ltor(O, mu)
     assert np.isclose(expected, prob)
     assert np.isclose(expected, prob2)
     assert np.isclose(expected, prob3)
+    assert np.isclose(expected, prob4)
 
 
 @pytest.mark.parametrize("N", range(1, 10))
