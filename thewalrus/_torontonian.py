@@ -148,7 +148,7 @@ def numba_tor(O):  # pragma: no cover
         kept_rows = np.concatenate((kept_modes, kept_modes + N))
         O_XX = nb_ix(O, kept_rows, kept_rows)
 
-        bottom = np.sqrt(np.linalg.det(I - O_XX))
+        bottom = np.sqrt(np.real(np.linalg.det(I - O_XX) + 0j))
 
         total += plusminus / bottom
 
@@ -183,7 +183,7 @@ def quad_cholesky(L, Z, idx, mat):  # pragma: no cover
         z = 0.0
         for k in range(i):
             z += Ls[i, k] * Ls[i, k].conjugate()
-        Ls[i, i] = np.sqrt(mat[i, i] - z)
+        Ls[i, i] = np.real(np.sqrt(mat[i, i] - z)) + 0j
     return Ls
 
 
@@ -403,7 +403,7 @@ def numba_ltor(O, gamma):  # pragma: no cover
 
         gamma_X = gamma[kept_rows]
         top = np.exp(0.5 * gamma_X @ I_m_O_XX_inv @ gamma_X.conj())
-        bottom = np.sqrt(np.linalg.det(I_m_O_XX))
+        bottom = np.sqrt(np.real(np.linalg.det(I_m_O_XX)) + 0j)
 
         total += plusminus * top / bottom
 
