@@ -274,7 +274,7 @@ def solve_triangular(L, y):  # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def recursiveLTor_np(L, modes, A, n, gammaL):  # pragma: no cover
+def recursiveLTor(L, modes, A, n, gammaL):  # pragma: no cover
     """Returns the recursive loop Torontonian sub-computation of a matrix
     using numba.
 
@@ -305,14 +305,14 @@ def recursiveLTor_np(L, modes, A, n, gammaL):  # pragma: no cover
         gammaX = gammaL[Z]
         Lsinv = solve_triangular(Ls, gammaX)
         lc = Lsinv.conj().T @ Lsinv
-        tor += ((-1) ** len(nextModes)) * np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor_np(
+        tor += ((-1) ** len(nextModes)) * np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor(
             Ls, nextModes, Az, n, gammaX
         )
     return tor
 
 
 @numba.jit(nopython=True)
-def rec_ltorontonian_np(A, gamma):  # pragma: no cover
+def rec_ltorontonian(A, gamma):  # pragma: no cover
     """Returns the loop Torontonian of a matrix using numba.
 
     Combines algorithm from papers:
@@ -337,7 +337,7 @@ def rec_ltorontonian_np(A, gamma):  # pragma: no cover
     det = np.square(np.prod(np.diag(L)))
     Ls = solve_triangular(L, gamma)
     lc = Ls.conj().T @ Ls
-    return np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor_np(
+    return np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor(
         L, np.empty(0, dtype=np.int_), A, n, gamma
     )
 
