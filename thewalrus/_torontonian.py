@@ -335,8 +335,8 @@ def rec_ltorontonian(A, gamma):  # pragma: no cover
     Z = np.empty((2 * n,), dtype=np.int_)
     Z[0::2] = np.arange(0, n)
     Z[1::2] = np.arange(n, 2 * n)
-    A = nb_ix(A, Z, Z)
-    gamma = gamma[Z]
+    A = nb_ix(A.astype(np.complex128), Z, Z)
+    gamma = gamma[Z].astype(np.complex128)
     L = np.linalg.cholesky(np.eye(2 * n) - A)
     det = np.square(np.prod(np.diag(L)))
     Ls = solve_triangular(L, gamma)
