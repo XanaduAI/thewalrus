@@ -252,7 +252,7 @@ def rec_torontonian(A):  # pragma: no cover
 def solve_triangular(L, y):  # pragma: no cover
     """Returns the solution to the inverse of a lower non-unit
     triangular matrix times a vector like the dtrsv function of
-    LAPACK/BLAS or scipy solve_triangular
+    LAPACK/BLAS or scipy solve_triangular.
 
     Args:
         L (array): invertible triangular matrix
