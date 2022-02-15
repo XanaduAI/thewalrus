@@ -402,8 +402,13 @@ def numba_ltor(O, gamma):  # pragma: no cover
         I_m_O_XX_inv = np.linalg.inv(I_m_O_XX)
 
         gamma_X = gamma[kept_rows]
-        top = O.dtype.type(np.real(np.exp(0.5 * gamma_X @ I_m_O_XX_inv @ gamma_X.conj())))
-        bottom = np.sqrt(O.dtype.type(np.real(np.linalg.det(I_m_O_XX))))
+        array_type = O.dtype.type
+
+        top_complex = np.exp(0.5 * gamma_X @ I_m_O_XX_inv @ gamma_X.conj())
+        top = array_type(top_complex.real)
+
+        bottom_complex = np.linalg.det(I_m_O_XX)
+        bottom = np.sqrt(array_type(bottom_complex.real))
 
         total += plusminus * top / bottom
 
