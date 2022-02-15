@@ -49,7 +49,7 @@ def ltor(A, gamma, recursive=True):
     Args:
         A (array): an NxN array of even dimensions.
         gamma (array): an N-length vector of even dimensions
-        recursive: use the faster recursive implementation.
+        recursive: use the faster recursive implementation
 
     Returns:
         np.float64 or np.complex128: the loop torontonian of matrix A, vector gamma
