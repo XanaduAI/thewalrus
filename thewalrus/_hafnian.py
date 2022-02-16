@@ -184,14 +184,14 @@ def f(A, n):  # pragma: no cover
     count = 0
     comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
     comb[0, 0] = 1
-    factor = charpoly.powertrace(A, n // 2 + 1)
+    powtrace = charpoly.powertrace(A, n // 2 + 1)
     for i in range(1, n // 2 + 1):
-        factor[i] = factor[i] / (2 * i)
+        factor = powtrace[i] / (2 * i)
         powfactor = 1
         count = 1 - count
         comb[count, :] = comb[1 - count, :]
         for j in range(1, n // (2 * i) + 1):
-            powfactor *= factor[i] / j
+            powfactor *= factor / j
             for k in range(i * j + 1, n // 2 + 2):
                 comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
     return comb[count, :]
@@ -214,15 +214,15 @@ def f_loop(AX, AX_S, XD_S, D_S, n):  # pragma: no cover
     count = 0
     comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
     comb[0, 0] = 1
-    factor = charpoly.powertrace(AX, n // 2 + 1)
+    powtrace = charpoly.powertrace(AX, n // 2 + 1)
     for i in range(1, n // 2 + 1):
-        factor[i] = factor[i] / (2 * i) + (XD_S @ D_S) / 2
+        factor = powtrace[i] / (2 * i) + (XD_S @ D_S) / 2
         XD_S = XD_S @ AX_S
         powfactor = 1
         count = 1 - count
         comb[count, :] = comb[1 - count, :]
         for j in range(1, n // (2 * i) + 1):
-            powfactor *= factor[i] / j
+            powfactor *= factor / j
             for k in range(i * j + 1, n // 2 + 2):
                 comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
     return comb[count, :]
@@ -230,11 +230,11 @@ def f_loop(AX, AX_S, XD_S, D_S, n):  # pragma: no cover
 
 # pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True)
-def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
+def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula
     when there is a self-edge in the fixed perfect matching.
     Args:
-        E (array): eigenvalues of ``AX``
+        AX (2d array): matrix
         AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
         XD_S (array): diagonal multiplied by ``X``
         D_S (array): diagonal
@@ -244,17 +244,16 @@ def f_loop_odd(E, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     Returns:
         array: polynomial coefficients
     """
-    E_k = E.copy()
 
     count = 0
     comb = np.zeros((2, n + 1), dtype=np.complex128)
     comb[0, 0] = 1
+    powtrace = charpoly.powertrace(AX, n + 1)
     for i in range(1, n + 1):
         if i == 1:
             factor = oddloop
         elif i % 2 == 0:
-            factor = E_k.sum() / i + (XD_S @ D_S) / 2
-            E_k *= E
+            factor = powtrace[i] / i + (XD_S @ D_S) / 2
         else:
             factor = oddVX_S @ D_S
             D_S = AX_S @ D_S
@@ -533,7 +532,7 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
         prefac = (-1.0) ** (N // 2 - edge_sum) * binom_prod
 
         if oddloop is not None:
-            Hnew = prefac * f_loop_odd(E, AX_S, XD_S, D_S, N, oddloop, oddVX_S)[N]
+            Hnew = prefac * f_loop_odd(AX_S, AX_S, XD_S, D_S, N, oddloop, oddVX_S)[N]
         else:
             if glynn and kept_edges[0] == 0:
                 prefac *= 0.5
