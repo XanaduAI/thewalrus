@@ -307,7 +307,7 @@ def recursiveLTor(L, modes, A, n, gammaL):  # pragma: no cover
         Ls = quad_cholesky(L, Z, idx, np.eye(2 * nm) - Az)
         det = np.square(np.prod(np.diag(Ls)))
         gammaX = gammaL[Z]
-        Lsinv = solve_triangular(Ls, gammaX)
+        Lsinv = solve_triangular(Ls, gammaX.conj())
         lc = Lsinv.conj().T @ Lsinv
         tot += ((-1) ** len(nextModes)) * np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor(
             Ls, nextModes, Az, n, gammaX
@@ -339,7 +339,7 @@ def rec_ltorontonian(A, gamma):  # pragma: no cover
     gamma = gamma[Z].astype(np.complex128)
     L = np.linalg.cholesky(np.eye(2 * n) - A)
     det = np.square(np.prod(np.diag(L)))
-    Ls = solve_triangular(L, gamma)
+    Ls = solve_triangular(L, gamma.conj())
     lc = Ls.conj().T @ Ls
     return np.exp(0.5 * lc) / np.sqrt(det) + recursiveLTor(
         L, np.empty(0, dtype=np.int_), A, n, gamma
