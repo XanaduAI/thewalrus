@@ -201,12 +201,14 @@ def test_tor_and_threshold_displacement_prob_agree(n_modes):
 
 @pytest.mark.parametrize("N", range(1, 10))
 def test_numba_tor(N):
-    """Tests numba implementation of the torontonian against the default implementation"""
+    """Tests numba implementations of the torontonian against the default implementation"""
     cov = random_covariance(N)
     O = Xmat(N) @ Amat(cov)
     t1 = tor(O)
     t2 = numba_tor(O)
+    t3 = rec_torontonian(O)
     assert np.isclose(t1, t2)
+    assert np.isclose(t1, t3)
 
 
 def test_tor_exceptions():
@@ -256,11 +258,16 @@ def test_probs_sum_to_1(n, scale):
 
 
 @pytest.mark.parametrize("N", range(1, 10))
-def test_recursive_tor(N):
-    """Tests numba implementation of the recursive torontonian against the default
+def test_numba_ltor(N):
+    """Tests numba implementations of the loop torontonian against the default
     implementation"""
+    alpha = np.random.random(N)+np.random.random(N)*1j
+    alpha = np.concatenate((alpha, alpha.conj()))
     cov = random_covariance(N)
     O = Xmat(N) @ Amat(cov)
-    t1 = tor(O)
-    t2 = rec_torontonian(O)
+    mu = O @ alpha
+    t1 = ltor(O, mu)
+    t2 = numba_ltor(O, mu)
+    t3 = ltor_torontonian(O, mu)
     assert np.isclose(t1, t2)
+    assert np.isclose(t1, t3)
