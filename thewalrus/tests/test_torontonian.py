@@ -268,6 +268,6 @@ def test_numba_ltor(N):
     mu = O @ alpha
     t1 = ltor(O, mu)
     t2 = numba_ltor(O, mu)
-    t3 = ltor_torontonian(O, mu)
+    t3 = rec_ltorontonian(O, mu)
     assert np.isclose(t1, t2)
     assert np.isclose(t1, t3)
