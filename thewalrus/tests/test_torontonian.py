@@ -261,7 +261,7 @@ def test_probs_sum_to_1(n, scale):
 def test_numba_ltor(N):
     """Tests numba implementations of the loop torontonian against the default
     implementation"""
-    alpha = np.random.random(N)+np.random.random(N)*1j
+    alpha = np.random.random(N) + np.random.random(N) * 1j
     alpha = np.concatenate((alpha, alpha.conj()))
     cov = random_covariance(N)
     O = Xmat(N) @ Amat(cov)
