@@ -186,6 +186,7 @@ def f(A, n):  # pragma: no cover
     comb[0, 0] = 1
     powtrace = charpoly.powertrace(A, n // 2 + 1)
     for i in range(1, n // 2 + 1):
+        # Maybe try powtrace[i-1] instead
         factor = powtrace[i] / (2 * i)
         powfactor = 1
         count = 1 - count
@@ -253,7 +254,7 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
         if i == 1:
             factor = oddloop
         elif i % 2 == 0:
-            factor = powtrace[i] / i + (XD_S @ D_S) / 2
+            factor = powtrace[i//2] / i + (XD_S @ D_S) / 2
         else:
             factor = oddVX_S @ D_S
             D_S = AX_S @ D_S
