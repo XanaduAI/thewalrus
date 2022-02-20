@@ -171,7 +171,7 @@ def find_kept_edges(j, reps):  # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def f(E, n):  # pragma: no cover
+def f(A, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
     Args:
         A (2d array): matrix
