@@ -205,9 +205,9 @@ The torontonian can be thought of as a generating function for hafnians (cf. the
 The loop Torontonian is defined as
 
 .. math::
-	\text{ltor}(\bm{O}, \bm{\gamma}) = \sum_{S \in P([\ell])} (-1)^{|S|} \frac{\frac{1}{2} \gamma_{(S)} \det\left(\mathbb{I} - \bm{O}_{(S)}\right)^{-1} \gamma_{(S)}^* }{\sqrt{\det\left(\mathbb{I} - \bm{O}_{(S)}\right)}}
+	\text{ltor}(\bm{O}, \bm{\gamma}) = \sum_{S \in P([\ell])} (-1)^{|S|} \frac{exp \{\frac{1}{2} \gamma_{(S)} \det\left(\mathbb{I} - \bm{O}_{(S)}\right)^{-1} \gamma_{(S)}^* \}}{\sqrt{\det\left(\mathbb{I} - \bm{O}_{(S)}\right)}}
 
-where :math:`\text{ltor}` is the loop Torontonian, and :math:`O=\mathbb{I}-\sigma^{-1}` and `\gamma=(\sigma^{-1}\alpha)^*` where :math:`\alpha` is a :math:`2 \ell \times 2 \ell` vector. 
+where :math:`\text{ltor}` is the loop Torontonian, and :math:`\gamma=(\Sigma^{-1}\alpha)^*` where :math:`\alpha` is a :math:`2 \ell \times 2 \ell` vector :cite: `bulmer2022threshold`.
 
 .. tip::
 
