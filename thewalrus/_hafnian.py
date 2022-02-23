@@ -18,9 +18,9 @@ import warnings
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
-from thewalrus import charpoly
 import numba
 import numpy as np
+from thewalrus import charpoly
 
 
 @numba.jit(nopython=True, cache=True)
