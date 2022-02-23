@@ -181,9 +181,9 @@ def is_symplectic(S, rtol=1e-05, atol=1e-08):
     D = S[n : 2 * n, n : 2 * n]
     # The equations below are equivalent to S.T @ Omega @ S = Omega where Omega is the symplectic form
     if (
-        np.allclose(A.T @ C, C.T @ A)
-        and np.allclose(B.T @ D, D.T @ B)
-        and np.allclose(A.T @ D - C.T @ B, np.eye(n))
+        np.allclose(A.T @ C, C.T @ A, rtol = rtol, atol = atol)
+        and np.allclose(B.T @ D, D.T @ B, rtol = rtol, atol = atol)
+        and np.allclose(A.T @ D - C.T @ B, np.eye(n), rtol = rtol, atol = atol)
     ):
         return True
 
