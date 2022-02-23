@@ -254,7 +254,7 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
         if i == 1:
             factor = oddloop
         elif i % 2 == 0:
-            factor = powtrace[i//2] / i + (XD_S @ D_S) / 2
+            factor = powtrace[i//2+1] / i + (XD_S @ D_S) / 2
         else:
             factor = oddVX_S @ D_S
             D_S = AX_S @ D_S
@@ -529,15 +529,16 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
             kept_edges = 2 * kept_edges - edge_reps
 
         AX_S, XD_S, D_S, oddVX_S = get_submatrices(kept_edges, A, D, oddV)
+        AX = AX_S.copy()
 
         prefac = (-1.0) ** (N // 2 - edge_sum) * binom_prod
 
         if oddloop is not None:
-            Hnew = prefac * f_loop_odd(AX_S, AX_S, XD_S, D_S, N, oddloop, oddVX_S)[N]
+            Hnew = prefac * f_loop_odd(AX, AX_S, XD_S, D_S, N, oddloop, oddVX_S)[N]
         else:
             if glynn and kept_edges[0] == 0:
                 prefac *= 0.5
-            Hnew = prefac * f_loop(AX_S, AX_S, XD_S, D_S, N)[N // 2]
+            Hnew = prefac * f_loop(AX, AX_S, XD_S, D_S, N)[N // 2]
 
         H += Hnew
 
