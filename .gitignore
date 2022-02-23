@@ -26,3 +26,5 @@ docs/code/api/*
 .idea
 .mypy_cache/
 .DS_Store
+
+venv
