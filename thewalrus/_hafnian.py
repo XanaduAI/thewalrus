@@ -254,7 +254,7 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
         if i == 1:
             factor = oddloop
         elif i % 2 == 0:
-            factor = powtrace[i//2+1] / i + (XD_S @ D_S) / 2
+            factor = powtrace[i//2] / i + (XD_S @ D_S) / 2
         else:
             factor = oddVX_S @ D_S
             D_S = AX_S @ D_S
