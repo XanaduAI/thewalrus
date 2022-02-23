@@ -61,3 +61,5 @@
 * [Gregory Morse](https://github.com/GregoryMorse) (Eötvös Loránd University) - :volcano: Low level code perfector
 
 * [Fabian Laudenbach](https://github.com/fab1an-q) (Xanadu) - :revolving_hearts: Entangler of hearts
+
+* [Martin Houde](https://github.com/MHoude2) (Polytechnique Montréal) - :upside_down: Minister of amplification

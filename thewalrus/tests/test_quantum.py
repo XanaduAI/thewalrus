@@ -30,7 +30,7 @@ from thewalrus.symplectic import (
     expand,
 )
 
-from thewalrus.random import random_covariance, random_interferometer
+from thewalrus.random import random_covariance, random_interferometer, random_symplectic
 from thewalrus import threshold_detection_prob
 from thewalrus.quantum.fock_tensors import _prefactor
 from thewalrus.quantum.photon_number_distributions import _squeezed_state_distribution
@@ -76,6 +76,7 @@ from thewalrus.quantum import (
     photon_number_moment,
     n_body_marginals,
     click_cumulant,
+    is_symplectic,
 )
 
 
@@ -1854,3 +1855,28 @@ def test_single_mode_first_and_second_cumulant(hbar):
     obtained_var = click_cumulant(mu, cov, [0, 0], hbar=hbar)
     assert np.allclose(expected_mean, obtained_mean)
     assert np.allclose(expected_var, obtained_var)
+
+
+@pytest.mark.parametrize("N", range(2, 20, 2))
+def test_is_symplectic(N):
+    """Tests the is_symplectic function for different matrix sizes"""
+    S = random_symplectic(N)
+    assert is_symplectic(S)
+
+
+def test_is_symplectic_rect():
+    """Testing that rectangular matrices return False in is_symplectic"""
+    S = np.random.rand(2, 3)
+    assert not is_symplectic(S)
+
+
+def test_is_symplectic_odd():
+    """Testing that odd-sized matrices return False in is_symplectic"""
+    S = np.random.rand(3, 3)
+    assert not is_symplectic(S)
+
+
+def test_is_symplectic_false():
+    """Testing that non-symplectic matrices return False in is_symplectic"""
+    S = np.random.rand(4, 4)
+    assert not is_symplectic(S)

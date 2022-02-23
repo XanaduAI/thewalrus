@@ -9,6 +9,8 @@
 
 * Entanglement measures `entanglement_entropy` and `log_negativity` for bipartite Gaussian states are added to the quantum submodule. [#332](https://github.com/XanaduAI/thewalrus/pull/322)
 
+* New function to check if a matrix is symplectic `is_symplectic`.
+
 ### Improvements
 * Update methods for calculating threshold detector probabilties of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 * `numba_tor` now can benefit from numba parallelisation [#317](https://github.com/XanaduAI/thewalrus/pull/317)
@@ -27,7 +29,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Fabian Laudenbach, Gregory Morse, Nicolas Quesada
+Jake Bulmer, Martin Houde, Fabian Laudenbach, Gregory Morse, Nicolas Quesada
 
 ---
 

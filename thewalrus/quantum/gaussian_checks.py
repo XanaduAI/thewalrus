@@ -157,3 +157,34 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     # as opposed to 0.25 in Brask. This is because this function returns the square
     # of their fidelities.
     return f
+
+
+def is_symplectic(S, rtol=1e-05, atol=1e-08):
+    """Checks if the matrix is symplectic
+    Args:
+        S (array): a matrix
+        rtol (float): the relative tolerance parameter used in `np.allclose`
+        atol (float): the absolute tolerance parameter used in `np.allclose`
+    Returns:
+        (bool): whether the given matrix is symplectic
+    """
+    (n, m) = S.shape
+    if n != m:
+        return False
+    if n % 2 != 0:
+        return False
+
+    n = n // 2
+    A = S[0:n, 0:n]
+    B = S[0:n, n : 2 * n]
+    C = S[n : 2 * n, 0:n]
+    D = S[n : 2 * n, n : 2 * n]
+    # The equations below are equivalent to S.T @ Omega @ S = Omega where Omega is the symplectic form
+    if (
+        np.allclose(A.T @ C, C.T @ A)
+        and np.allclose(B.T @ D, D.T @ B)
+        and np.allclose(A.T @ D - C.T @ B, np.eye(n))
+    ):
+        return True
+
+    return False
