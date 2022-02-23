@@ -885,6 +885,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     As a result, the following are identical:
 
     .. code:
+
         >>> hafnian_repeated(A, rpt)
         >>> hafnian(reduction(A, rpt))
 
@@ -893,7 +894,9 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     significantly faster.
 
     .. note::
+
         If :math:`rpt=(1, 1, \dots, 1)`, then
+
         >>> hafnian_repeated(A, rpt) == hafnian(A)
 
     Args:
