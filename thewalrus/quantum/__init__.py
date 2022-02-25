@@ -78,6 +78,7 @@ Gaussian checks
     is_pure_cov
     is_classical_cov
     fidelity
+    is_symplectic
 
 Conversions
 -----------
@@ -162,6 +163,7 @@ from .gaussian_checks import (
     is_pure_cov,
     is_classical_cov,
     fidelity,
+    is_symplectic,
 )
 
 from .conversions import (
@@ -220,6 +222,7 @@ __all__ = [
     "is_pure_cov",
     "is_classical_cov",
     "fidelity",
+    "is_symplectic",
     "reduced_gaussian",
     "Xmat",
     "Qmat",
