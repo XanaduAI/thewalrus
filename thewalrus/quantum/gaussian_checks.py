@@ -160,13 +160,15 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
 
 
 def is_symplectic(S, rtol=1e-05, atol=1e-08):
-    """Checks if the matrix is symplectic
+    """Checks if the matrix is symplectic.
+
     Args:
         S (array): a matrix
-        rtol (float): the relative tolerance parameter used in `np.allclose`
-        atol (float): the absolute tolerance parameter used in `np.allclose`
+        rtol (float): the relative tolerance parameter used in ``np.allclose``
+        atol (float): the absolute tolerance parameter used in ``np.allclose``
+
     Returns:
-        (bool): whether the given matrix is symplectic
+        bool: whether the given matrix is symplectic
     """
     (n, m) = S.shape
     if n != m:
