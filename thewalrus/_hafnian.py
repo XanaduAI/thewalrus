@@ -214,7 +214,7 @@ def f_loop(AX, AX_S, XD_S, D_S, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
 
     Args:
-        AX (2d array): matrix
+        AX (array): two-dimensional matrix
         AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
         XD_S (array): diagonal multiplied by ``X``
         D_S (array): diagonal
