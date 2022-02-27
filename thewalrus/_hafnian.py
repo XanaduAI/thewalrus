@@ -185,7 +185,7 @@ def f(A, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
 
     Args:
-        A (2d array): matrix
+        A (array): a two-dimensional matrix
         n (int): number of polynomial coefficients to compute
 
     Returns:
