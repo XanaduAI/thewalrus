@@ -734,7 +734,6 @@ def hafnian(
     method="glynn",
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
-
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
 
