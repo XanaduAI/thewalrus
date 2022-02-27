@@ -704,7 +704,6 @@ def powerset(iterable):
 
 def reduction(A, rpt):
     r"""Calculates the reduction of an array by a vector of indices.
-
     This is equivalent to repeating the ith row/column of :math:`A`, :math:`rpt_i` times.
 
     Args:
