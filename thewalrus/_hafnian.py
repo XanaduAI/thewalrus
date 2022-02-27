@@ -198,7 +198,6 @@ def f(A, n):  # pragma: no cover
     comb[0, 0] = 1
     powtrace = charpoly.powertrace(A, n // 2 + 1)
     for i in range(1, n // 2 + 1):
-        # Maybe try powtrace[i-1] instead
         factor = powtrace[i] / (2 * i)
         powfactor = 1
         count = 1 - count
