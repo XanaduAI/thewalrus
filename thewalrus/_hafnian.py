@@ -249,7 +249,7 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     when there is a self-edge in the fixed perfect matching.
 
     Args:
-        AX (2d array): matrix
+        AX (array): two-dimensional matrix
         AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
         XD_S (array): diagonal multiplied by ``X``
         D_S (array): diagonal
