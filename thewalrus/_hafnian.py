@@ -364,7 +364,6 @@ def get_submatrix_batch_odd0(kept_edges, oddV0):  # pragma: no cover
     Args:
         kept_edges (array): number of repetitions of each edge
         oddV0 (array): Row of matrix at index of self-edge. ``None`` is no self-edge.
-
     Returns:
         array: scaled ``oddV0 @ X``
     """
