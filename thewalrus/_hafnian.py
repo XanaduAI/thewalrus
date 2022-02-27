@@ -639,7 +639,6 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
 
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
-
     These include:
 
     * That the ``A`` is a NumPy array
