@@ -470,7 +470,6 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
 
 def _haf(A, reps=None, glynn=True):
     r"""Calculate hafnian with (optional) repeated rows and columns.
-
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
 
@@ -515,7 +514,6 @@ def _haf(A, reps=None, glynn=True):
 def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  # pragma: no cover
     """Compute loop hafnian, using inputs as prepared by frontend loop_hafnian function
     compiled with Numba.
-
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
 
@@ -584,7 +582,6 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
 # pylint: disable=redefined-outer-name
 def loop_hafnian(A, D=None, reps=None, glynn=True):
     """Calculate loop hafnian with (optional) repeated rows and columns.
-
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2108.01622>`_.
 
@@ -639,7 +636,6 @@ def loop_hafnian(A, D=None, reps=None, glynn=True):
 def input_validation(A, rtol=1e-05, atol=1e-08):
     """Checks that the matrix A satisfies the requirements for Hafnian calculation.
     These include:
-
     * That the ``A`` is a NumPy array
     * That ``A`` is square
     * That ``A`` does not contain any NaNs
@@ -944,7 +940,6 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
 
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
-
     For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical
     circuits with local interactions', Qi et al. <https://arxiv.org/abs/2009.11824>`_.
 
