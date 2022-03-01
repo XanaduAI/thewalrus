@@ -20,7 +20,7 @@ from collections import Counter
 from itertools import chain, combinations
 import numba
 import numpy as np
-from thewalrus import charpoly
+from thewalrus import charpoly 
 
 
 @numba.jit(nopython=True, cache=True)
