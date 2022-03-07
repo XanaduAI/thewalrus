@@ -17,6 +17,8 @@
 
 * Recursive Torontonian added for faster computation based on paper ["Polynomial speedup in Torontonian calculation by a scalable recursive algorithm" by Ágoston Kaposi, Zoltán Kolarovszki, Tamás Kozsik, Zoltán Zimborás, and Péter Rakyta](https://arxiv.org/pdf/2109.04528.pdf). [#321](https://github.com/XanaduAI/thewalrus/pull/321)
 
+* Recursive Loop Torontonian added for faster computation based on combining recursive Torontonian improvement and new loop Torontonian feature. [#332](https://github.com/XanaduAI/thewalrus/pull/332)
+
 * Hafnians of odd-sized matrices are calculated roughly twice as fast. [#329](https://github.com/XanaduAI/thewalrus/pull/329)
 
 ### Bug fixes

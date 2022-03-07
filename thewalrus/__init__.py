@@ -130,6 +130,7 @@ from ._torontonian import (
     numba_tor,
     numba_ltor,
     rec_torontonian,
+    rec_ltorontonian,
 )
 from ._version import __version__
 
