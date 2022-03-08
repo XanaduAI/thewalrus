@@ -39,6 +39,7 @@ def indexconversion(j, k, njs):
     """
     return k + np.sum(njs[:j])
 
+
 def swap_matrix(M, R):
     r"""
     Computes the matrix that swaps the ordering of modes from grouped by orthonormal modes to grouped by spatial modes.
@@ -53,9 +54,10 @@ def swap_matrix(M, R):
     """
     P = np.zeros((M * R, M * R), dtype=int)
     in_modes = range(M * R)
-    out_modes = list(chain.from_iterable(range(i, M*R, M) for i in range(M)))
+    out_modes = list(chain.from_iterable(range(i, M * R, M) for i in range(M)))
     P[out_modes, in_modes] = 1
     return P
+
 
 def vacuum_state(M, hbar=2):
     r"""
@@ -70,6 +72,7 @@ def vacuum_state(M, hbar=2):
     """
 
     return np.zeros(2 * M), np.identity(2 * M) * hbar / 2
+
 
 def orthonormal_basis(O, rjs, thr=1e-3):
     r"""
@@ -124,6 +127,7 @@ def orthonormal_basis(O, rjs, thr=1e-3):
         W.append(WT_temp.T)
     return eps, W
 
+
 def state_prep(eps, W, thresh=1e-3, hbar=2.0):
     r"""
     Computes the total covariance matrix (assuming zero displacement) of the initial state as determined by orthonormalization parameters.
@@ -160,7 +164,7 @@ def state_prep(eps, W, thresh=1e-3, hbar=2.0):
     muVac, covVac = vacuum_state(M, hbar=hbar)
 
     # Getting rid of any system of orthonormal modes (i.e. in M spatial modes) that are very close to an M-mode vacuum state
-    if R > 1:  
+    if R > 1:
         keep_modes = np.array([])
         for k in range(R):
             muTemp, QTemp = reduced_state(
@@ -178,7 +182,8 @@ def state_prep(eps, W, thresh=1e-3, hbar=2.0):
 
     return interferometer(swap_matrix(M, R).T) @ Qswap @ interferometer(swap_matrix(M, R).T).T
 
-def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2.):
+
+def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2.0):
     """
     prepare multimode covariance matrix using Lowdin orthonormalisation
 
@@ -209,14 +214,12 @@ def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2.):
     eps, W = orthonormal_basis(O, rjs)
     Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
 
-
     M = T.shape[0]
     K = Qinit.shape[0] // (2 * M)
-    T_K = np.zeros((M*K, M*K), dtype=np.complex128)
+    T_K = np.zeros((M * K, M * K), dtype=np.complex128)
     for i in range(K):
-        T_K[i::K,i::K] = T
+        T_K[i::K, i::K] = T
     mu = np.zeros(Qinit.shape[0])
     mu, Qu = passive_transformation(mu, Qinit, T_K, hbar=hbar)
 
     return Qu
-
