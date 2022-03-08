@@ -124,12 +124,12 @@ def orthonormal_basis(O, rjs, thr=1e-3):
         W.append(WT_temp.T)
     return eps, W
 
-def state_prep(eps, W, thresh=1e-2, hbar=2.0):
+def state_prep(eps, W, thresh=1e-3, hbar=2.0):
     r"""
     Computes the total covariance matrix (assuming zero displacement) of the initial state as determined by orthonormalization parameters.
     Modes are ordered first by orthonormalization modes, then spatial modes, i.e. for R orthonormalization modes the 1st R modes of the
     covariance matrix are for the first spatial mode, the next R lot of modes for the 2nd spatial mode, etc. If an orthonormal mode has
-    a fidelity with vacuum of 1 - thresh or higher then it is traced over
+    a fidelity with vacuum of 1 - thresh or higher then it is traced over, unless every mode is like that then the whole system is returned.
 
     Args:
         eps (list[array]): list of arrays of squeezing parameters for each spatial mode as determined by the orthonormalization procedure
@@ -172,12 +172,13 @@ def state_prep(eps, W, thresh=1e-2, hbar=2.0):
         keep_modes = keep_modes.astype(int)
         keep_modes = keep_modes.tolist()
 
-        R = int(len(keep_modes) / M)
-        _, Qswap = reduced_state(np.zeros(len(Qswap)), Qswap, keep_modes)
+        if len(keep_modes) > 0:
+            R = int(len(keep_modes) / M)
+            _, Qswap = reduced_state(np.zeros(len(Qswap)), Qswap, keep_modes)
 
     return interferometer(swap_matrix(M, R).T) @ Qswap @ interferometer(swap_matrix(M, R).T).T
 
-def prepare_cov(rjs, O, T, thresh=1e-2, hbar=2.):
+def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2.):
     """
     prepare multimode covariance matrix using Lowdin orthonormalisation
 
@@ -187,7 +188,7 @@ def prepare_cov(rjs, O, T, thresh=1e-2, hbar=2.):
         rjs (list[list/array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode
         O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
         T (array): (unitary if lossless) matrix expressing the spatial mode interferometer
-        thresh(float): threshold for ignoring states (default 1e-2)
+        thresh(float): threshold for ignoring states (default 1e-3)
         hbar (float): the value of hbar (default 2.0)
 
     Returns:
