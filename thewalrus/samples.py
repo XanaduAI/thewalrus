@@ -253,7 +253,7 @@ def _hafnian_sample(args):
     while j < samples:
         result = generate_hafnian_sample(
             cov,
-            mu=mean,
+            mean=mean,
             hbar=hbar,
             cutoff=cutoff,
             max_photons=max_photons
