@@ -123,7 +123,7 @@ def _calc_loop_hafnian_batch_odd(A, D, fixed_edge_reps,
         if kept_edges[0] == 0 and kept_edges[1] == 0:
             oddVX_S0 = get_submatrix_batch_odd0(delta, oddV0)
             plus_minus = (-1) ** (N_fixed // 2 - edges_sum)
-            f = f_loop_odd(E, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[N_fixed]
+            f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[N_fixed]
             H_batch[0] += binom_prod * plus_minus * f 
 
         f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
