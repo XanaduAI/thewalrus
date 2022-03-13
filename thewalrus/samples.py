@@ -187,9 +187,9 @@ def generate_hafnian_sample(
         det_outcome_i = np.random.choice(det_outcomes, p=probs)
         det_pattern[mode] = det_outcome_i
         
-    if result[-1] == cutoff:
+    if det_pattern[order_inv][-1] == cutoff:
         return -1
-    if det_pattern[mode].sum() > max_photons:
+    if det_pattern[order_inv].sum() > max_photons:
         return -1
     return det_pattern[order_inv]
 
