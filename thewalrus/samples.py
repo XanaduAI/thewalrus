@@ -58,6 +58,8 @@ from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, reduction
 from ._torontonian import threshold_detection_prob
+from loop_hafnian_batch import loop_hafnian_batch
+from strawberryfields.decompositions import williamson
 from .quantum import (
     Amat,
     Covmat,
@@ -66,7 +68,10 @@ from .quantum import (
     is_classical_cov,
     reduced_gaussian,
     density_matrix_element,
+    photon_number_mean_vector, 
+    mean_clicks,
 )
+
 
 __all__ = [
     "generate_hafnian_sample",
@@ -87,9 +92,50 @@ __all__ = [
 # ===============================================================================================
 
 # pylint: disable=too-many-branches
+def decompose_cov(cov):
+    m = cov.shape[0] // 2
+    D, S = williamson(cov)
+    T = S @ S.T 
+    DmI = D - np.eye(2*m)
+    DmI[abs(DmI) < 1e-11] = 0. # remove slightly negative values
+    sqrtW = S @ np.sqrt(DmI)
+    return T, sqrtW
+
+def mu_to_alpha(mu, hbar=2):
+    M = len(mu) // 2
+    # mean displacement of each mode
+    alpha = (mu[:M] + 1j * mu[M:]) / np.sqrt(2 * hbar)
+    return alpha
+
+def invert_permutation(p):
+    s = np.empty_like(p, dtype=int)
+    s[p] = np.arange(p.size, dtype=int)
+    return s
+
+def photon_means_order(mu, cov):
+    means = photon_number_mean_vector(mu, cov)
+    order = [x for _, x in sorted(zip(means, range(len(means))))]
+    return np.asarray(order)
+
+def click_means_order(cov):
+
+    M = cov.shape[0] // 2 
+    mu = np.zeros(2*M)
+
+    means = np.zeros(M)
+
+    for i in range(M):
+        mu_i, cov_i = reduced_gaussian(mu, cov, [i])
+        means[i] = mean_clicks(cov_i)
+
+    order = [x for _, x in sorted(zip(means, range(len(means))))]
+    return np.asarray(order)
+
+ # pylint: disable=too-many-branches
 def generate_hafnian_sample(
-    cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
-):  # pylint: disable=too-many-branches
+    cov, mean=None, hbar=2, cutoff=6, max_photons=30
+): 
+    #approx=False, approx_samples=1e5
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -109,63 +155,43 @@ def generate_hafnian_sample(
     Returns:
         np.array[int]: a photon number sample from the Gaussian states.
     """
-    N = len(cov) // 2
-    result = []
-    prev_prob = 1.0
-    nmodes = N
-    if mean is None:
-        local_mu = np.zeros(2 * N)
-    else:
-        local_mu = mean
-    A = Amat(Qmat(cov), hbar=hbar)
+    M = cov.shape[0] // 2
 
-    for k in range(nmodes):
-        probs1 = np.zeros([cutoff + 1], dtype=np.float64)
-        kk = np.arange(k + 1)
-        mu_red, V_red = reduced_gaussian(local_mu, cov, kk)
+    order = photon_means_order(mu, cov)
+    order_inv = invert_permutation(order)
+    oo = np.concatenate((order, order+M))
 
-        if approx:
-            Q = Qmat(V_red, hbar=hbar)
-            A = Amat(Q, hbar=hbar, cov_is_qmat=True)
+    mu = mu[oo]
+    cov = cov[np.ix_(oo, oo)]
 
-        for i in range(cutoff):
-            indices = result + [i]
-            ind2 = indices + indices
-            if approx:
-                factpref = np.prod(fac(indices))
-                mat = reduction(A, ind2)
-                probs1[i] = (
-                    hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
-                )
-            else:
-                probs1[i] = density_matrix_element(
-                    mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar
-                ).real
+    T, sqrtW = decompose_cov(cov)
+    chol_T_I = np.linalg.cholesky(T+np.eye(2*M))   
+    B = Amat(T)[:M,:M] 
+    det_outcomes = np.arange(cutoff+1)\
+    
+    ### Test zone
+    det_pattern = np.zeros(M, dtype=int)
+    pure_mu = mu + sqrtW @ np.random.normal(size=2*M)
+    pure_alpha = mu_to_alpha(pure_mu)
+    heterodyne_mu = pure_mu + chol_T_I @ np.random.normal(size=2*M)
+    heterodyne_alpha = mu_to_alpha(heterodyne_mu)
+    gamma = pure_alpha.conj() + B @ (heterodyne_alpha - pure_alpha)
+    for mode in range(M):
+        m = mode + 1
+        gamma -= heterodyne_alpha[mode] * B[:, mode]
+        lhafs = loop_hafnian_batch(B[:m,:m], gamma[:m], det_pattern[:mode], cutoff)
+        probs = (lhafs * lhafs.conj()).real / fac(det_outcomes)
+        norm_probs = probs.sum()
+        probs /= norm_probs 
 
-        if approx:
-            probs1 = probs1 / np.sqrt(np.linalg.det(Q).real)
-
-        probs2 = probs1 / prev_prob
-        probs3 = np.maximum(
-            probs2, np.zeros_like(probs2)
-        )  # pylint: disable=assignment-from-no-return
-        ssum = np.sum(probs3)
-        if ssum < 1.0:
-            probs3[-1] = 1.0 - ssum
-
-        # The following normalization of probabilities is needed to prevent np.random.choice error
-        if ssum > 1.0:
-            probs3 = probs3 / ssum
-
-        result.append(np.random.choice(a=range(len(probs3)), p=probs3))
-        if result[-1] == cutoff:
-            return -1
-        if np.sum(result) > max_photons:
-            return -1
-        prev_prob = probs1[result[-1]]
-
-    return result
-
+        det_outcome_i = np.random.choice(det_outcomes, p=probs)
+        det_pattern[mode] = det_outcome_i
+        
+    if result[-1] == cutoff:
+        return -1
+    if det_pattern[mode].sum() > max_photons:
+        return -1
+    return det_pattern[order_inv]
 
 def _hafnian_sample(args):
     r"""Returns samples from the Hafnian of a Gaussian state.
@@ -229,9 +255,7 @@ def _hafnian_sample(args):
             mean=mean,
             hbar=hbar,
             cutoff=cutoff,
-            max_photons=max_photons,
-            approx=approx,
-            approx_samples=approx_samples,
+            max_photons=max_photons
         )
 
         if result != -1:
