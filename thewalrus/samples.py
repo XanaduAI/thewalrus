@@ -192,7 +192,7 @@ def generate_hafnian_sample(
         return -1
     if det_pattern[order_inv].sum() > max_photons:
         return -1
-    return det_pattern[order_inv]
+    return list(det_pattern[order_inv])
 
 def _hafnian_sample(args):
     r"""Returns samples from the Hafnian of a Gaussian state.
