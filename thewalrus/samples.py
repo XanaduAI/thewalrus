@@ -133,7 +133,7 @@ def click_means_order(cov):
 
  # pylint: disable=too-many-branches
 def generate_hafnian_sample(
-    cov, mean=None, hbar=2, cutoff=6, max_photons=30
+    cov, mean=None, hbar=2, cutoff=12, max_photons=8
 ): 
     #approx=False, approx_samples=1e5
     r"""Returns a single sample from the Hafnian of a Gaussian state.
