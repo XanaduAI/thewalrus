@@ -58,7 +58,7 @@ from scipy.special import factorial as fac
 
 from ._hafnian import hafnian, reduction
 from ._torontonian import threshold_detection_prob
-from loop_hafnian_batch import loop_hafnian_batch
+from thewalrus.loop_hafnian_batch import loop_hafnian_batch
 from strawberryfields.decompositions import williamson
 from .quantum import (
     Amat,
