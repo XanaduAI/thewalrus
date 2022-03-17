@@ -11,6 +11,8 @@
 
 * New function to check if a matrix is symplectic `is_symplectic`. [#334](https://github.com/XanaduAI/thewalrus/pull/334).
 
+* Adds support for Python 3.10. [#](https://github.com/XanaduAI/thewalrus/pull/)
+
 ### Improvements
 * Update methods for calculating threshold detector probabilties of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 * `numba_tor` now can benefit from numba parallelisation [#317](https://github.com/XanaduAI/thewalrus/pull/317)
@@ -31,7 +33,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Martin Houde, Fabian Laudenbach, Gregory Morse, Nicolas Quesada
+Jake Bulmer, Martin Houde, Theodor Isacsson, Fabian Laudenbach, Gregory Morse, Nicolas Quesada
 
 ---
 

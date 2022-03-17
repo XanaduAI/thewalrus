@@ -44,19 +44,8 @@ Features
 Installation
 ============
 
-Pre-built binary wheels are available for the following platforms:
-
-+------------+-------------+------------------+---------------+
-|            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |
-+============+=============+==================+===============+
-| Python 3.7 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
-| Python 3.8 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
-| Python 3.9 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
-
-To install, simply run
+The Walrus requires Python version 3.7, 3.8, 3.9, or 3.10. Installation of The Walrus, as
+well as all dependencies, can be done using pip:
 
 .. code-block:: bash
 

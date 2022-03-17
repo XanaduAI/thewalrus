@@ -34,7 +34,7 @@ info = {
     "provides": ["thewalrus"],
     "install_requires": [
         "dask[delayed]",
-        "numba>=0.49.1,<0.54",
+        "numba>=0.49.1",
         "scipy>=1.2.1",
         "sympy>=1.5.1",
         "numpy>=1.19.2",
@@ -58,6 +58,7 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering :: Physics",
 ]
