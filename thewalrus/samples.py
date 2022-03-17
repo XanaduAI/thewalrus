@@ -132,6 +132,20 @@ def click_means_order(cov):
     order = [x for _, x in sorted(zip(means, range(len(means))))]
     return np.asarray(order)
 
+def get_heterodyne_fanout(alpha, fanout):
+    M = len(alpha)
+
+    alpha_fanout = np.zeros((M, fanout), dtype=np.complex128)
+    for j in range(M):
+        alpha_j = np.zeros(fanout, dtype=np.complex128)
+        alpha_j[0] = alpha[j] # put the coherent state in 0th mode 
+        alpha_j[1:] = (np.random.normal(size=fanout-1) +
+                 1j * np.random.normal(size=fanout-1))
+
+        alpha_fanout[j,:] = np.fft.fft(alpha_j, norm='ortho')
+
+    return alpha_fanout
+
  # pylint: disable=too-many-branches
 def generate_hafnian_sample(
     cov, mean=None, hbar=2, cutoff=12, max_photons=8
