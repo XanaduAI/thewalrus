@@ -368,7 +368,7 @@ def hafnian_sample_graph(
 # Torontonian sampling
 # ===============================================================================================
 
-
+# In Jake's code, there are arguments of cutoff and fanout. If those can be removed, the implementation is fairly straightforward
 def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
