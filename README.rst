@@ -72,7 +72,17 @@ You can compile the latest development version by cloning the git repository, an
 Software tests
 ==============
 
-To ensure that The Walrus library is working correctly after installation, the test suite can be run by navigating to the source code folder and running
+To ensure that The Walrus library is working correctly after installation, the test
+suite can be run locally using pytest.
+
+Additional packages are required to run the tests. These dependencies can be found in
+`requirements-dev.txt` and can be installed using `pip`:
+
+.. code-block:: console
+
+    $ pip install -r requirements-dev.txt
+
+To run the tests, navigate to the source code folder and run the command
 
 .. code-block:: console
 
@@ -90,7 +100,7 @@ These packages can be installed using:
 .. code-block:: console
 
     $ sudo apt install pandoc
-    $ pip3 install -r docs/requirements.txt
+    $ pip install -r docs/requirements.txt
 
 To build the HTML documentation, go to the top-level directory and run the command
 
