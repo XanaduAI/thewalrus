@@ -1,7 +1,7 @@
 # Version 0.19.0-dev
 
 ### New features
-* New functions for calculating properties of distinguihable squeezed states of light having passed through an interferometer. [#326](https://github.com/XanaduAI/thewalrus/pull/326)
+* New functions for calculating properties of distinguishable squeezed states of light having passed through an interferometer. [#326](https://github.com/XanaduAI/thewalrus/pull/326)
 
 * New function `ltor` is added which allows `threshold_detector_prob` to act more consistently on displaced and zero-mean Gaussian states. [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
@@ -11,11 +11,11 @@
 
 * New function to check if a matrix is symplectic `is_symplectic`. [#334](https://github.com/XanaduAI/thewalrus/pull/334).
 
-* Adds support for Python 3.10. [#](https://github.com/XanaduAI/thewalrus/pull/)
+* Adds support for Python 3.10. [#337](https://github.com/XanaduAI/thewalrus/pull/337)
 
 ### Improvements
-* Update methods for calculating threshold detector probabilties of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
-* `numba_tor` now can benefit from numba parallelisation [#317](https://github.com/XanaduAI/thewalrus/pull/317)
+* Update methods for calculating threshold detector probabilities of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
+* `numba_tor` now can benefit from numba parallelization [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
 * Recursive Torontonian added for faster computation based on paper ["Polynomial speedup in Torontonian calculation by a scalable recursive algorithm" by Ágoston Kaposi, Zoltán Kolarovszki, Tamás Kozsik, Zoltán Zimborás, and Péter Rakyta](https://arxiv.org/pdf/2109.04528.pdf). [#321](https://github.com/XanaduAI/thewalrus/pull/321)
 
