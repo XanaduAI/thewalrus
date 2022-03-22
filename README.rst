@@ -98,7 +98,7 @@ Documentation
 
 The Walrus documentation is available online on `Read the Docs <https://the-walrus.readthedocs.io>`_.
 
-Additional packages are required to build the documentation locally as specified in `doc/requirements.txt`.
+Additional packages are required to build the documentation locally as specified in ``doc/requirements.txt``.
 These packages can be installed using:
 
 .. code-block:: console
