@@ -9,6 +9,8 @@
 
 * Entanglement measures `entanglement_entropy` and `log_negativity` for bipartite Gaussian states are added to the quantum submodule. [#332](https://github.com/XanaduAI/thewalrus/pull/322)
 
+* New functions, ``recursive_hafnian`` and ``solve`` added in the ``_hafnian`` module. [#325](https://github.com/XanaduAI/thewalrus/pull/325)
+
 * New function to check if a matrix is symplectic `is_symplectic`. [#334](https://github.com/XanaduAI/thewalrus/pull/334).
 
 * Adds support for Python 3.10. [#337](https://github.com/XanaduAI/thewalrus/pull/337)
