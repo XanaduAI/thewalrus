@@ -55,9 +55,10 @@ Code details
 import dask
 import numpy as np
 from scipy.special import factorial as fac
-from thewalrus.loop_hafnian_batch import loop_hafnian_batch
-from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
-from thewalrus.decompositions import williamson
+
+from  thewalrus.loop_hafnian_batch import loop_hafnian_batch
+from  thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
+from  thewalrus.decompositions import williamson
 
 from ._torontonian import threshold_detection_prob
 from .quantum import (
