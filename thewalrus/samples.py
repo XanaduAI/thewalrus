@@ -467,7 +467,7 @@ def _torontonian_sample(args):
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
-    cov, samples, mu, hbar, max_photons = args
+    cov, samples, mu, hbar, max_photons, fanout, cutoff = args
 
     if not isinstance(cov, np.ndarray):
         raise TypeError("Covariance matrix must be a NumPy array.")
@@ -484,7 +484,7 @@ def _torontonian_sample(args):
     j = 0
 
     while j < samples:
-        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons)
+        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons, fanout=fanout, cutoff=cutoff)
         if result != -1:
             samples_array.append(result)
             j = j + 1
@@ -492,7 +492,7 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, parallel=False):
+def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1, parallel=False):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -529,7 +529,7 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
 
         return np.vstack(results)
 
-    params = [cov, samples, mu, hbar, max_photons]
+    params = [cov, samples, mu, hbar, max_photons, fanout, cutoff]
     return _torontonian_sample(params)
 
 
