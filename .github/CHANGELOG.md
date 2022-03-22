@@ -9,7 +9,7 @@
 
 * Entanglement measures `entanglement_entropy` and `log_negativity` for bipartite Gaussian states are added to the quantum submodule. [#332](https://github.com/XanaduAI/thewalrus/pull/322)
 
-* New functions, ``recursive_hafnian`` and ``solve`` added in the ``_hafnian`` module. [#325](https://github.com/XanaduAI/thewalrus/pull/325)
+* New functions, `recursive_hafnian` and `solve` added in the `_hafnian` module. [#325](https://github.com/XanaduAI/thewalrus/pull/325)
 
 * New function to check if a matrix is symplectic `is_symplectic`. [#334](https://github.com/XanaduAI/thewalrus/pull/334).
 
@@ -131,11 +131,11 @@ Josh Izaac, Filippo Miatto, Nicolas Quesada.
 
 * Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure Python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
 
-* The ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* The `symplectic.squeezing` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* Adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* Adds a function `symplectic.passive_transformation` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* The ``torontonian_sample_state`` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
+* The `torontonian_sample_state` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
 
 * Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix. [#246](https://github.com/XanaduAI/thewalrus/pull/246)
 
