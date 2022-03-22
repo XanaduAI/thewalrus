@@ -55,13 +55,17 @@ well as all dependencies, can be done using pip:
 Compiling from source
 =====================
 
-The Walrus depends on the following Python packages:
+The Walrus has the following dependencies:
 
 * `Python <http://python.org/>`_ >= 3.7
 * `NumPy <http://numpy.org/>`_  >= 1.19.2
-* `Numba <https://numba.pydata.org/>`_ >= 0.48.0
+* `Numba <https://numba.pydata.org/>`_ >= 0.49.1
+* `SciPy <https://scipy.org/>`_ >=1.2.1
+* `SymPy <https://www.sympy.org/>`_ >=1.5.1
+* `Dask[delayed] <https://docs.dask.org/>`
 
-You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
+You can compile the latest development version by cloning the git repository, and installing using
+pip in development mode.
 
 .. code-block:: console
 
@@ -76,7 +80,7 @@ To ensure that The Walrus library is working correctly after installation, the t
 suite can be run locally using pytest.
 
 Additional packages are required to run the tests. These dependencies can be found in
-`requirements-dev.txt` and can be installed using `pip`:
+``requirements-dev.txt`` and can be installed using ``pip``:
 
 .. code-block:: console
 
