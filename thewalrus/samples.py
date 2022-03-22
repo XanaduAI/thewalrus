@@ -386,42 +386,61 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     Returns:
         np.array[int]: a threshold sample from the Gaussian state.
     """
-    results = []
-    n1, n2 = cov.shape
+    # Does not give same sampling results as with generate torontonian sample
 
-    if mu is None:
-        mu = np.zeros(n1, dtype=np.float64)
+    M = cov.shape[0] // 2
+    fanout = 10
+    cutoff=1
+    
+    order = photon_means_order(mu, cov)
+    order_inv = invert_permutation(order)
+    oo = np.concatenate((order, order+M))
 
-    if n1 != n2:
-        raise ValueError("Covariance matrix must be square.")
+    mu = mu[oo]
+    cov = cov[np.ix_(oo, oo)]
+    T, sqrtW = decompose_cov(cov)
+    chol_T_I = np.linalg.cholesky(T+np.eye(2*M))   
+    B = Amat(T)[:M,:M] / fanout
 
-    nmodes = n1 // 2
-    prev_prob = 1.0
+    det_outcomes = np.arange(cutoff+1)
 
-    for k in range(nmodes):
-        probs = np.zeros([2], dtype=np.float64)
-        kk = np.arange(k + 1)
-        mu_red, V_red = reduced_gaussian(mu, cov, kk)
+    det_pattern = np.zeros(M, dtype=int)
+    click_pattern = np.zeros(M, dtype=np.int8)
+    fanout_clicks = np.zeros(M, dtype=int)
 
-        indices0 = results + [0]
-        probs[0] = threshold_detection_prob(mu_red, V_red, indices0, hbar=hbar)
+    pure_mu = mu + sqrtW @ np.random.normal(size=2*M)
+    pure_alpha = mu_to_alpha(pure_mu)
+    het_mu = pure_mu + chol_T_I @ np.random.normal(size=2*M)
+    het_alpha = mu_to_alpha(het_mu)
 
-        indices1 = results + [1]
-        probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar)
+    het_alpha_fanout = get_heterodyne_fanout(het_alpha, fanout)
+    het_alpha_sum = het_alpha_fanout.sum(axis=1)
 
-        probs = np.real_if_close(probs)
-        probs = np.maximum(probs, 0)
-        local_p = probs / prev_prob
-        local_p /= np.sum(local_p)
-        result = np.random.choice(range(2), p=local_p)
+    gamma = (pure_alpha.conj() / np.sqrt(fanout) + 
+                B @ (het_alpha_sum - np.sqrt(fanout) * pure_alpha))
+    gamma_fanout = np.zeros((fanout, M), dtype=np.complex128)
 
-        results.append(result)
-        prev_prob = probs[result]
+    for mode in range(M):
+        gamma_fanout[0,:] = gamma - het_alpha_fanout[mode, 0] * B[:, mode]
+        for k in range(1, fanout):
+            gamma_fanout[k,:] = gamma_fanout[k-1,:] - het_alpha_fanout[mode,k] * B[:,mode]
+        lhafs = loop_hafnian_batch_gamma(B[:mode+1,:mode+1], gamma_fanout[:,:mode+1], 
+                                        det_pattern[:mode], cutoff)
+        probs = (lhafs * lhafs.conj()).real / factorial(det_outcomes)
 
-        if np.sum(results) > max_photons:
+        for k in range(fanout):
+            gamma = gamma_fanout[k,:]
+            probs_k = probs[k,:] / probs[k,:].sum()
+            det_outcome = np.random.choice(det_outcomes, p=probs_k)
+            det_pattern[mode] += det_outcome
+            if det_outcome > 0:
+                click_pattern[mode] = 1
+                fanout_clicks[mode] = k
+                break
+        if sum(click_pattern[order_inv]) > max_photons:
             return -1
 
-    return results
+    return click_pattern[order_inv]
 
 
 def _torontonian_sample(args):
