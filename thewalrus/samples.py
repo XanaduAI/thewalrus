@@ -56,6 +56,7 @@ import dask
 import numpy as np
 from scipy.special import factorial as fac
 
+from thewalrus._hafnian import nb_ix
 from thewalrus.loop_hafnian_batch import loop_hafnian_batch
 from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
 from thewalrus.decompositions import williamson
@@ -237,7 +238,7 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     oo = np.concatenate((order, order + M))
 
     mu = mu[oo]
-    cov = cov[np.ix_(oo, oo)]
+    cov = cov[nb_ix(oo, oo)]
 
     T, sqrtW = decompose_cov(cov)
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
@@ -429,7 +430,7 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10,
     oo = np.concatenate((order, order + M))
 
     mu = mu[oo]
-    cov = cov[np.ix_(oo, oo)]
+    cov = cov[nb_ix(oo, oo)]
     T, sqrtW = decompose_cov(cov)
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
     B = Amat(T)[:M, :M] / fanout
