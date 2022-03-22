@@ -202,12 +202,11 @@ def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
         return _calc_loop_hafnian_batch_even(
             Ax, Dx, fixed_m_reps, batch_max, odd_cutoff, glynn=glynn
         )
-    else:
-        edges = add_batch_edges_odd(fixed_edges, oddmode)
-        Ax = Anz[nb_ix(edges, edges)].astype(np.complex128)
-        Dx = Dnz[edges].astype(np.complex128)
-        batch_max = (N_cutoff - 1) // 2
-        even_cutoff = 1 - (N_cutoff % 2)
-        return _calc_loop_hafnian_batch_odd(
-            Ax, Dx, fixed_m_reps, batch_max, even_cutoff, oddmode, glynn=glynn
-        )
+    edges = add_batch_edges_odd(fixed_edges, oddmode)
+    Ax = Anz[nb_ix(edges, edges)].astype(np.complex128)
+    Dx = Dnz[edges].astype(np.complex128)
+    batch_max = (N_cutoff - 1) // 2
+    even_cutoff = 1 - (N_cutoff % 2)
+    return _calc_loop_hafnian_batch_odd(
+        Ax, Dx, fixed_m_reps, batch_max, even_cutoff, oddmode, glynn=glynn
+    )
