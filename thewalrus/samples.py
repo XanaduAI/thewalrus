@@ -55,22 +55,17 @@ Code details
 import dask
 import numpy as np
 from scipy.special import factorial as fac
-
-from ._hafnian import hafnian, reduction
-from ._torontonian import threshold_detection_prob
 from thewalrus.loop_hafnian_batch import loop_hafnian_batch
 from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
-
-# from strawberryfields.decompositions import williamson
 from thewalrus.decompositions import williamson
+
+from ._torontonian import threshold_detection_prob
 from .quantum import (
     Amat,
     Covmat,
-    Qmat,
     gen_Qmat_from_graph,
     is_classical_cov,
     reduced_gaussian,
-    density_matrix_element,
     photon_number_mean_vector,
     mean_clicks,
 )
@@ -155,7 +150,6 @@ def get_heterodyne_fanout(alpha, fanout):
 
 # pylint: disable=too-many-branches
 def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
-    # approx=False, approx_samples=1e5
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -189,12 +183,11 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
     B = Amat(T)[:M, :M]
     det_outcomes = np.arange(cutoff + 1)
-    ### Test zone
     det_pattern = np.zeros(M, dtype=int)
     pure_mu = mu + sqrtW @ np.random.normal(size=2 * M)
-    pure_alpha = mu_to_alpha(pure_mu)
+    pure_alpha = mu_to_alpha(pure_mu, hbar=hbar)
     heterodyne_mu = pure_mu + chol_T_I @ np.random.normal(size=2 * M)
-    heterodyne_alpha = mu_to_alpha(heterodyne_mu)
+    heterodyne_alpha = mu_to_alpha(heterodyne_mu, hbar=hbar)
     gamma = pure_alpha.conj() + B @ (heterodyne_alpha - pure_alpha)
     for mode in range(M):
         m = mode + 1
@@ -369,8 +362,8 @@ def hafnian_sample_graph(
 # Torontonian sampling
 # ===============================================================================================
 
-# In Jake's code, there are arguments of cutoff and fanout. If those can be removed, the implementation is fairly straightforward
-def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
+
+def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -387,11 +380,8 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     Returns:
         np.array[int]: a threshold sample from the Gaussian state.
     """
-    # Does not give same sampling results as with generate torontonian sample
 
     M = cov.shape[0] // 2
-    fanout = 10
-    cutoff = 1
 
     order = photon_means_order(mu, cov)
     order_inv = invert_permutation(order)
@@ -410,9 +400,9 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     fanout_clicks = np.zeros(M, dtype=int)
 
     pure_mu = mu + sqrtW @ np.random.normal(size=2 * M)
-    pure_alpha = mu_to_alpha(pure_mu)
+    pure_alpha = mu_to_alpha(pure_mu, hbar=hbar)
     het_mu = pure_mu + chol_T_I @ np.random.normal(size=2 * M)
-    het_alpha = mu_to_alpha(het_mu)
+    het_alpha = mu_to_alpha(het_mu, hbar=hbar)
 
     het_alpha_fanout = get_heterodyne_fanout(het_alpha, fanout)
     het_alpha_sum = het_alpha_fanout.sum(axis=1)
