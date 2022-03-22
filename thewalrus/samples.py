@@ -427,7 +427,7 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
             gamma_fanout[k,:] = gamma_fanout[k-1,:] - het_alpha_fanout[mode,k] * B[:,mode]
         lhafs = loop_hafnian_batch_gamma(B[:mode+1,:mode+1], gamma_fanout[:,:mode+1], 
                                         det_pattern[:mode], cutoff)
-        probs = (lhafs * lhafs.conj()).real / factorial(det_outcomes)
+        probs = (lhafs * lhafs.conj()).real / fac(det_outcomes)
 
         for k in range(fanout):
             gamma = gamma_fanout[k,:]
