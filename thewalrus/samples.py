@@ -56,9 +56,9 @@ import dask
 import numpy as np
 from scipy.special import factorial as fac
 
-from  thewalrus.loop_hafnian_batch import loop_hafnian_batch
-from  thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
-from  thewalrus.decompositions import williamson
+from thewalrus.loop_hafnian_batch import loop_hafnian_batch
+from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
+from thewalrus.decompositions import williamson
 
 from ._torontonian import threshold_detection_prob
 from .quantum import (
@@ -163,9 +163,6 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        approx (bool): if ``True``, the approximate hafnian algorithm is used.
-            Note that this can only be used for real, non-negative matrices.
-        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
 
     Returns:
         np.array[int]: a photon number sample from the Gaussian states.
@@ -238,17 +235,11 @@ def _hafnian_sample(args):
             max_photons (int)
                 specifies the maximum number of photons that can be counted.
 
-            approx (bool)
-                if ``True``, the approximate hafnian algorithm is used.
-                Note that this can only be used for real, non-negative matrices.
-
-            approx_samples (int)
-                the number of samples used to approximate the hafnian if ``approx=True``.
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
-    cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples = args
+    cov, samples, mean, hbar, cutoff, max_photons = args
 
     if not isinstance(cov, np.ndarray):
         raise TypeError("Covariance matrix must be a NumPy array.")
@@ -284,8 +275,6 @@ def hafnian_sample_state(
     hbar=2,
     cutoff=5,
     max_photons=30,
-    approx=False,
-    approx_samples=1e5,
     parallel=False,
 ):
     r"""Returns samples from the Hafnian of a Gaussian state.
@@ -301,17 +290,13 @@ def hafnian_sample_state(
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        approx (bool): if ``True``, the :func:`~.hafnian_approx` function is used
-            to approximate the hafnian. Note that this can only be used for
-            real, non-negative matrices.
-        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
         parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel:
-        params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
+        params = [[cov, 1, mean, hbar, cutoff, max_photons]] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_hafnian_sample)(p))
@@ -320,13 +305,11 @@ def hafnian_sample_state(
 
         return np.vstack(results)
 
-    params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
+    params = [cov, samples, mean, hbar, cutoff, max_photons]
     return _hafnian_sample(params)
 
 
-def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
-):
+def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, parallel=False):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -336,9 +319,6 @@ def hafnian_sample_graph(
         samples (int): the number of samples to return.
         cutoff (int): the Fock basis truncation.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        approx (bool): if ``True``, the approximate hafnian algorithm is used.
-            Note that this can only be used for real, non-negative matrices.
-        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
         parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
@@ -353,8 +333,6 @@ def hafnian_sample_graph(
         hbar=2,
         cutoff=cutoff,
         max_photons=max_photons,
-        approx=approx,
-        approx_samples=approx_samples,
         parallel=parallel,
     )
 
