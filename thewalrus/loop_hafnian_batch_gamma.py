@@ -55,13 +55,13 @@ def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps,
 
         AX_S, XD_S, D_S, oddVX_S = get_submatrices(delta, A, D[0,:], oddV)
 
-        E = eigvals(AX_S) # O(n^3) step
+        AX_S_copy = AX_S.copy()
         
         for k in range(n_D):
             XD_S,D_S=get_Dsubmatrices(delta,D[k,:])
             
-            f_even = f_loop(E, AX_S, XD_S, D_S, N_max)
-            f_odd = f_loop_odd(E, AX_S, XD_S, D_S, N_max, oddloop[k], oddVX_S)
+            f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
+            f_odd = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_max, oddloop[k], oddVX_S)
     
             for N_det in range(2*kept_edges[0], 2*batch_max+odd_cutoff+1):
                 N = N_fixed + N_det
@@ -127,7 +127,7 @@ def _calc_loop_hafnian_batch_gamma_odd(A, D, fixed_edge_reps,
 
         AX_S, XD_S, D_S, oddVX_S = get_submatrices(delta, A, D[0,:], oddV)
 
-        E = eigvals(AX_S) # O(n^3) step
+        AX_S_copy = AX_S.copy()
 
         for k in range(n_D):
             XD_S,D_S=get_Dsubmatrices(delta,D[k,:])
@@ -135,11 +135,11 @@ def _calc_loop_hafnian_batch_gamma_odd(A, D, fixed_edge_reps,
             if kept_edges[0] == 0 and kept_edges[1] == 0:
                 oddVX_S0 = get_submatrix_batch_odd0(delta, oddV0)
                 plus_minus = (-1) ** (N_fixed // 2 - edges_sum)
-                f = f_loop_odd(E, AX_S, XD_S, D_S, N_fixed, oddloop0[k], oddVX_S0)[N_fixed]
+                f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0[k], oddVX_S0)[N_fixed]
                 Hnew[k,0] += binom_prod * plus_minus * f 
     
-            f_even = f_loop(E, AX_S, XD_S, D_S, N_max)
-            f_odd = f_loop_odd(E, AX_S, XD_S, D_S, N_max, oddloop[k], oddVX_S)
+            f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
+            f_odd = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_max, oddloop[k], oddVX_S)
     
             for N_det in range(2*kept_edges[0]+1, 2*batch_max+even_cutoff+2):
                 N = N_fixed + N_det
