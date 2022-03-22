@@ -1,13 +1,15 @@
-# Version 0.19.0-dev
+# Version 0.19.0
 
 ### New features
 * New functions for calculating properties of distinguishable squeezed states of light having passed through an interferometer. [#326](https://github.com/XanaduAI/thewalrus/pull/326)
 
 * New function `ltor` is added which allows `threshold_detector_prob` to act more consistently on displaced and zero-mean Gaussian states. [#317](https://github.com/XanaduAI/thewalrus/pull/317)
 
-* New functions for threshold detection probabilities of Fock states, the Bristolian (brs) and the Unitary Bristolian (ubrs) [#316](https://github.com/XanaduAI/thewalrus/pull/316)
+* New functions for threshold detection probabilities of Fock states, the Bristolian (brs) and the Unitary Bristolian (ubrs). [#316](https://github.com/XanaduAI/thewalrus/pull/316)
 
 * Entanglement measures `entanglement_entropy` and `log_negativity` for bipartite Gaussian states are added to the quantum submodule. [#332](https://github.com/XanaduAI/thewalrus/pull/322)
+
+* New functions, `recursive_hafnian` and `solve` added in the `_hafnian` module. [#325](https://github.com/XanaduAI/thewalrus/pull/325)
 
 * New function to check if a matrix is symplectic `is_symplectic`. [#334](https://github.com/XanaduAI/thewalrus/pull/334).
 
@@ -24,17 +26,17 @@
 
 * Hafnians of odd-sized matrices are calculated roughly twice as fast. [#329](https://github.com/XanaduAI/thewalrus/pull/329)
 
+* The new Hafnian functions now use the Labudde method to calculate power traces instead of using diagonalization. [#333](https://github.com/XanaduAI/thewalrus/pull/333)
+
 ### Bug fixes
 
 * Permanent algorithms handle 0x0 cases correctly. [#320](https://github.com/XanaduAI/thewalrus/pull/320)
-
-### Breaking changes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Martin Houde, Theodor Isacsson, Fabian Laudenbach, Gregory Morse, Nicolas Quesada
+Jake Bulmer, Luke Helt, Martin Houde, Theodor Isacsson, Benjamin Lanthier, Fabian Laudenbach, Dominic Leclerc, Gregory Morse, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
@@ -129,11 +131,11 @@ Josh Izaac, Filippo Miatto, Nicolas Quesada.
 
 * Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure Python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
 
-* The ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* The `symplectic.squeezing` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* Adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* Adds a function `symplectic.passive_transformation` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* The ``torontonian_sample_state`` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
+* The `torontonian_sample_state` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
 
 * Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix. [#246](https://github.com/XanaduAI/thewalrus/pull/246)
 
