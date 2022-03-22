@@ -62,7 +62,7 @@ The Walrus has the following dependencies:
 * `Numba <https://numba.pydata.org/>`_ >= 0.49.1
 * `SciPy <https://scipy.org/>`_ >=1.2.1
 * `SymPy <https://www.sympy.org/>`_ >=1.5.1
-* `Dask[delayed] <https://docs.dask.org/>`
+* `Dask[delayed] <https://docs.dask.org/>`_
 
 You can compile the latest development version by cloning the git repository, and installing using
 pip in development mode.
