@@ -169,7 +169,7 @@ def loop_hafnian_batch_gamma(A, D, fixed_reps, N_cutoff, glynn=True):
     assert len(fixed_reps) == n - 1
 
     nz = np.nonzero(list(fixed_reps) + [1])[0]
-    Anz = A[np.ix_(nz, nz)]
+    Anz = A[nb_ix(nz, nz)]
     Dnz = D[:, nz]
 
     fixed_reps = np.asarray(fixed_reps)
@@ -181,14 +181,14 @@ def loop_hafnian_batch_gamma(A, D, fixed_reps, N_cutoff, glynn=True):
         batch_max = N_cutoff // 2
         odd_cutoff = N_cutoff % 2
         edges = add_batch_edges_even(fixed_edges)
-        Ax = Anz[np.ix_(edges, edges)].astype(np.complex128)
+        Ax = Anz[nb_ix(edges, edges)].astype(np.complex128)
         Dx = Dnz[:, edges].astype(np.complex128)
         return _calc_loop_hafnian_batch_gamma_even(
             Ax, Dx, fixed_m_reps, batch_max, odd_cutoff, glynn=glynn
         )
     else:
         edges = add_batch_edges_odd(fixed_edges, oddmode)
-        Ax = Anz[np.ix_(edges, edges)].astype(np.complex128)
+        Ax = Anz[nb_ix(edges, edges)].astype(np.complex128)
         Dx = Dnz[:, edges].astype(np.complex128)
         batch_max = (N_cutoff - 1) // 2
         even_cutoff = 1 - (N_cutoff % 2)
