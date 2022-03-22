@@ -1,4 +1,4 @@
-# Version 0.19.0-dev
+# Version 0.19.0
 
 ### New features
 * New functions for calculating properties of distinguishable squeezed states of light having passed through an interferometer. [#326](https://github.com/XanaduAI/thewalrus/pull/326)
@@ -24,17 +24,17 @@
 
 * Hafnians of odd-sized matrices are calculated roughly twice as fast. [#329](https://github.com/XanaduAI/thewalrus/pull/329)
 
+* The new Hafnian functions now use the Labudde method to calculate power traces instead of using diagonalization. [#333](https://github.com/XanaduAI/thewalrus/pull/333)
+
 ### Bug fixes
 
 * Permanent algorithms handle 0x0 cases correctly. [#320](https://github.com/XanaduAI/thewalrus/pull/320)
-
-### Breaking changes
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Jake Bulmer, Martin Houde, Theodor Isacsson, Fabian Laudenbach, Gregory Morse, Nicolas Quesada
+Jake Bulmer, Luke Helt, Martin Houde, Theodor Isacsson, Benjamin Lanthier, Fabian Laudenbach, Dominic Leclerc, Gregory Morse, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
