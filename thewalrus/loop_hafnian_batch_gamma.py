@@ -11,9 +11,8 @@ from thewalrus._hafnian import (
     get_submatrices,
     get_submatrix_batch_odd0,
     get_Dsubmatrices,
-    eigvals,
 )
-from loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_even
+from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_even
 
 
 @numba.jit(nopython=True, cache=True, parallel=True)

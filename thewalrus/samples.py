@@ -56,9 +56,9 @@ import dask
 import numpy as np
 from scipy.special import factorial as fac
 
-from  thewalrus.loop_hafnian_batch import loop_hafnian_batch
-from  thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
-from  thewalrus.decompositions import williamson
+from thewalrus.loop_hafnian_batch import loop_hafnian_batch
+from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
+from thewalrus.decompositions import williamson
 
 from ._torontonian import threshold_detection_prob
 from .quantum import (
@@ -92,6 +92,17 @@ __all__ = [
 
 # pylint: disable=too-many-branches
 def decompose_cov(cov):
+    r"""Decompose the convariance matrix using the Williamson decomposition method.
+
+    Args:
+        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+
+    Return:
+        T (array): Result of S x S.T.
+        sqrtW (array): Result of S x (D-I).
+    """
     m = cov.shape[0] // 2
     D, S = williamson(cov)
     T = S @ S.T
@@ -102,6 +113,17 @@ def decompose_cov(cov):
 
 
 def mu_to_alpha(mu, hbar=2):
+    r"""Convert displacement into the mean displacement of each mode.
+
+    Args:
+        mu (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+            state.
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+
+    Returns:
+        alpha (array): mean displacement of each mode.
+    """
     M = len(mu) // 2
     # mean displacement of each mode
     alpha = (mu[:M] + 1j * mu[M:]) / np.sqrt(2 * hbar)
@@ -109,18 +131,49 @@ def mu_to_alpha(mu, hbar=2):
 
 
 def invert_permutation(p):
+    r"""Getting a permutation invertion array.
+
+    Args:
+        p (arrary): input vector.
+
+    Returns:
+        s (array): inverted permutation array.
+
+    """
     s = np.empty_like(p, dtype=int)
     s[p] = np.arange(p.size, dtype=int)
     return s
 
 
 def photon_means_order(mu, cov):
+    r"""Evaluating the order of the means of photons in each modes.
+
+    Args:
+        mu (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+            state.
+        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+
+    Returns:
+        order (array): the order of the means of photons in each modes.
+    """
     means = photon_number_mean_vector(mu, cov)
     order = [x for _, x in sorted(zip(means, range(len(means))))]
     return np.asarray(order)
 
 
 def click_means_order(cov):
+    r"""Evaluate the order of the click means.
+
+    Args:
+        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+
+    Returns:
+        order (array): order of the click means.
+    """
 
     M = cov.shape[0] // 2
     mu = np.zeros(2 * M)
@@ -136,6 +189,15 @@ def click_means_order(cov):
 
 
 def get_heterodyne_fanout(alpha, fanout):
+    r"""Get the heterodyne fanout using the mean displacement of each modes.
+
+    Args:
+        alpha (array): mean displacement of each modes.
+        fanout (int): number of channels in which a state is splitted.
+
+    Returns:
+        alpha_fanout (array): mean displacement of each modes with fanout.
+    """
     M = len(alpha)
 
     alpha_fanout = np.zeros((M, fanout), dtype=np.complex128)
