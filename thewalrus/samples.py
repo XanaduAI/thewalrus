@@ -56,7 +56,6 @@ import dask
 import numpy as np
 from scipy.special import factorial as fac
 
-from thewalrus._hafnian import nb_ix
 from thewalrus.loop_hafnian_batch import loop_hafnian_batch
 from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
 from thewalrus.decompositions import williamson
@@ -569,7 +568,7 @@ def torontonian_sample_state(
         mu = np.zeros(2 * M, dtype=np.float64)
 
     if parallel:
-        params = [[cov, 1, mu, hbar, max_photons]] * samples
+        params = [[cov, 1, mu, hbar, max_photons, fanout, cutoff]] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_torontonian_sample)(p))
