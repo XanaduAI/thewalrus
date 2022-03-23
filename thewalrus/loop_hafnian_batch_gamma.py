@@ -3,7 +3,6 @@ import numba
 from numba import prange
 from thewalrus._hafnian import (
     precompute_binoms,
-    nb_ix,
     matched_reps,
     find_kept_edges,
     f_loop,
@@ -14,7 +13,7 @@ from thewalrus._hafnian import (
 )
 from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_even
 
-
+# pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True):
 
@@ -81,6 +80,7 @@ def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cu
     return H_batch
 
 
+# pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, oddmode, glynn=True
@@ -186,12 +186,11 @@ def loop_hafnian_batch_gamma(A, D, fixed_reps, N_cutoff, glynn=True):
         return _calc_loop_hafnian_batch_gamma_even(
             Ax, Dx, fixed_m_reps, batch_max, odd_cutoff, glynn=glynn
         )
-    else:
-        edges = add_batch_edges_odd(fixed_edges, oddmode)
-        Ax = Anz[np.ix_(edges, edges)].astype(np.complex128)
-        Dx = Dnz[:, edges].astype(np.complex128)
-        batch_max = (N_cutoff - 1) // 2
-        even_cutoff = 1 - (N_cutoff % 2)
-        return _calc_loop_hafnian_batch_gamma_odd(
-            Ax, Dx, fixed_m_reps, batch_max, even_cutoff, oddmode, glynn=glynn
-        )
+    edges = add_batch_edges_odd(fixed_edges, oddmode)
+    Ax = Anz[np.ix_(edges, edges)].astype(np.complex128)
+    Dx = Dnz[:, edges].astype(np.complex128)
+    batch_max = (N_cutoff - 1) // 2
+    even_cutoff = 1 - (N_cutoff % 2)
+    return _calc_loop_hafnian_batch_gamma_odd(
+        Ax, Dx, fixed_m_reps, batch_max, even_cutoff, oddmode, glynn=glynn
+    )

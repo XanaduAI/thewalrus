@@ -2,7 +2,6 @@ import numpy as np
 import numba
 from thewalrus._hafnian import (
     precompute_binoms,
-    nb_ix,
     matched_reps,
     find_kept_edges,
     f_loop,
@@ -11,7 +10,7 @@ from thewalrus._hafnian import (
     get_submatrix_batch_odd0,
 )
 
-
+# pylint: disable = too-many-arguments
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True):
 
@@ -75,6 +74,7 @@ def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, 
     return H_batch
 
 
+# pylint: disable = too-many-arguments
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, oddmode, glynn=True
