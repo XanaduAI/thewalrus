@@ -232,13 +232,15 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     """
     mu = mean
     M = cov.shape[0] // 2
+    if mu is None:
+        mu = np.zeros(2 * M)
 
     order = photon_means_order(mu, cov)
     order_inv = invert_permutation(order)
     oo = np.concatenate((order, order + M))
 
     mu = mu[oo]
-    cov = cov[nb_ix(oo, oo)]
+    cov = cov[np.ix_(oo, oo)]
 
     T, sqrtW = decompose_cov(cov)
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
@@ -424,13 +426,14 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10,
     """
 
     M = cov.shape[0] // 2
-
+    if mu is None:
+        mu = np.zeros(2 * M)
     order = photon_means_order(mu, cov)
     order_inv = invert_permutation(order)
     oo = np.concatenate((order, order + M))
 
     mu = mu[oo]
-    cov = cov[nb_ix(oo, oo)]
+    cov = cov[np.ix_(oo, oo)]
     T, sqrtW = decompose_cov(cov)
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
     B = Amat(T)[:M, :M] / fanout
@@ -579,7 +582,9 @@ def torontonian_sample_state(
     return _torontonian_sample(params)
 
 
-def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=False):
+def torontonian_sample_graph(
+    A, n_mean, samples=1, max_photons=30, fanout=10, cutoff=1, parallel=False
+):
     r"""Returns samples from the Torontonian of a Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -596,7 +601,13 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=Fals
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return torontonian_sample_state(
-        cov, samples, hbar=2, max_photons=max_photons, parallel=parallel
+        cov,
+        samples,
+        hbar=2,
+        max_photons=max_photons,
+        fanout=fanout,
+        cutoff=cutoff,
+        parallel=parallel,
     )
 
 
