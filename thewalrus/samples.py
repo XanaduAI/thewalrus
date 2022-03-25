@@ -475,7 +475,7 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10,
         if sum(click_pattern[order_inv]) > max_photons:
             return -1
 
-    return click_pattern[order_inv]
+    return list(click_pattern[order_inv])
 
 
 def _torontonian_sample(args):
