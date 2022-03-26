@@ -82,9 +82,7 @@ def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cu
 
 # pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True, parallel=True)
-def _calc_loop_hafnian_batch_gamma_odd(
-    A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
-):
+def _calc_loop_hafnian_batch_gamma_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True):
 
     oddloop = D[:, 0]
     oddV = A[0, :]
