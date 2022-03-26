@@ -47,7 +47,7 @@ from thewalrus._hafnian import (
 )
 from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_even
 
-# pylint: disable = too-many-arguments
+# pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch gamma for even modes.
@@ -126,7 +126,7 @@ def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cu
     return H_batch
 
 
-# pylint: disable = too-many-arguments
+# pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch gamma for odd modes.
