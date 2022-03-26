@@ -181,7 +181,7 @@ def click_means_order(cov):
     means = np.zeros(M)
 
     for i in range(M):
-        mu_i, cov_i = reduced_gaussian(mu, cov, [i])
+        _, cov_i = reduced_gaussian(mu, cov, [i])
         means[i] = mean_clicks(cov_i)
 
     order = [x for _, x in sorted(zip(means, range(len(means))))]
