@@ -1,3 +1,37 @@
+# Copyright 2022 Xanadu Quantum Technologies Inc.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Sampling algorithms
+===================
+
+**Module name:** :mod:`thewalrus.loop_hafnian_batch_gamma`
+
+.. currentmodule:: thewalrus.loop_hafnian_batch_gamma
+
+Tools to evaluate the loop hafnian batch gamma to do gaussian boson sampling.
+
+Summary
+-------
+
+.. autosummary::
+    _calc_loop_hafnian_batch_gamma_even
+    _calc_loop_hafnian_batch_gamma_odd
+    loop_hafnian_batch_gamma
+
+Code details
+------------
+"""
 import numpy as np
 import numba
 from numba import prange
@@ -16,7 +50,19 @@ from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_ev
 # pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True):
+    r"""Calculate the loop hafnian batch gamma for even modes.
 
+    Args:
+        A (array): input matrix.
+        D (array): diagonal.
+        fixed_edge_reps (array): fixed number of edge repetition.
+        batch_max (array): maximum batch.
+        odd_cutoff (array): cutoff for odd modes.
+        glynn (boolean): determines the method used to evaluate the loop hafnian batch.
+
+    Returns:
+        H_batch (array): matrix result.
+    """
     oddloop = D[:, 0]
     oddV = A[0, :]
 
@@ -83,6 +129,19 @@ def _calc_loop_hafnian_batch_gamma_even(A, D, fixed_edge_reps, batch_max, odd_cu
 # pylint: disable = too-many-arguments
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True):
+    r"""Calculate the loop hafnian batch gamma for odd modes.
+
+    Args:
+        A (array): input matrix.
+        D (array): diagonal.
+        fixed_edge_reps (array): fixed number of edge repetition.
+        batch_max (array): maximum batch.
+        even_cutoff (array): cutoff for even modes.
+        glynn (boolean): determines the method used to evaluate the loop hafnian batch.
+
+    Returns:
+        H_batch (array): matrix result.
+    """
 
     oddloop = D[:, 0]
     oddV = A[0, :]
@@ -160,6 +219,19 @@ def _calc_loop_hafnian_batch_gamma_odd(A, D, fixed_edge_reps, batch_max, even_cu
 
 
 def loop_hafnian_batch_gamma(A, D, fixed_reps, N_cutoff, glynn=True):
+    r"""Calculate the loop hafnian batch gamma.
+
+    Args:
+        A (array): input matrix.
+        D (array): diagonal.
+        fixed_edge_reps (array): fixed number of edge repetition.
+        N_cutoff (int):
+        glynn (boolean): determines the method used to evaluate the loop hafnian batch.
+
+    Returns:
+        loop hafnian batch gamma (array):
+    """
+
     # checks
     n = A.shape[0]
     assert A.shape[1] == n
