@@ -259,11 +259,11 @@ def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
         A (array): input matrix.
         D (array): diagonal.
         fixed_edge_reps (array): fixed number of edge repetition.
-        N_cutoff (int): 
-        glynn (boolean): 
+        N_cutoff (int):
+        glynn (boolean):
 
     Returns:
-        loop hafnian batch (array): 
+        loop hafnian batch (array):
     """
     # checks
     n = A.shape[0]
