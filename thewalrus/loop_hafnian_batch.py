@@ -77,7 +77,7 @@ def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, 
 # pylint: disable = too-many-arguments
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_odd(
-    A, D, fixed_edge_reps, batch_max, even_cutoff, oddmode, glynn=True
+    A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
 ):
 
     oddloop = D[0]
@@ -208,5 +208,5 @@ def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
     batch_max = (N_cutoff - 1) // 2
     even_cutoff = 1 - (N_cutoff % 2)
     return _calc_loop_hafnian_batch_odd(
-        Ax, Dx, fixed_m_reps, batch_max, even_cutoff, oddmode, glynn=glynn
+        Ax, Dx, fixed_m_reps, batch_max, even_cutoff, glynn=glynn
     )
