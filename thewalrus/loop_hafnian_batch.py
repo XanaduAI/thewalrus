@@ -46,7 +46,7 @@ from thewalrus._hafnian import (
     get_submatrix_batch_odd0,
 )
 
-# pylint: disable = too-many-arguments
+# pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch for even modes.
@@ -122,7 +122,7 @@ def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, 
     return H_batch
 
 
-# pylint: disable = too-many-arguments
+# pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch for odd modes.
