@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2022 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -260,7 +260,7 @@ def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
         D (array): diagonal.
         fixed_edge_reps (array): fixed number of edge repetition.
         N_cutoff (int):
-        glynn (boolean):
+        glynn (boolean): determines the method used to evaluate the loop hafnian batch.
 
     Returns:
         loop hafnian batch (array):
