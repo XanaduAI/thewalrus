@@ -48,7 +48,7 @@ from thewalrus._hafnian import (
 
 # pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True):
+def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True): # pragma: no cover
     r"""Calculate the loop hafnian batch for even modes.
 
     Args:
@@ -124,7 +124,7 @@ def _calc_loop_hafnian_batch_even(A, D, fixed_edge_reps, batch_max, odd_cutoff, 
 
 # pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _calc_loop_hafnian_batch_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True):
+def _calc_loop_hafnian_batch_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True): # pragma: no cover
     r"""Calculate the loop hafnian batch for odd modes.
 
     Args:
@@ -207,7 +207,7 @@ def _calc_loop_hafnian_batch_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, 
     return H_batch
 
 
-def add_batch_edges_even(fixed_edges):
+def add_batch_edges_even(fixed_edges): #pragma: no cover
     r"""Add batch even.
 
     Args:
@@ -252,7 +252,7 @@ def add_batch_edges_odd(fixed_edges, oddmode):
     return edges
 
 
-def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
+def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True): #pragma: no cover
     r"""Calculate the loop hafnian batch.
 
     Args:
