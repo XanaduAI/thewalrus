@@ -163,31 +163,6 @@ def photon_means_order(mu, cov):
     return np.asarray(order)
 
 
-def click_means_order(cov):
-    r"""Evaluate the order of the click means.
-
-    Args:
-        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
-            representing an :math:`N` mode quantum state. This can be obtained
-            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
-
-    Returns:
-        order (array): order of the click means.
-    """
-
-    M = cov.shape[0] // 2
-    mu = np.zeros(2 * M)
-
-    means = np.zeros(M)
-
-    for i in range(M):
-        _, cov_i = reduced_gaussian(mu, cov, [i])
-        means[i] = mean_clicks(cov_i)
-
-    order = [x for _, x in sorted(zip(means, range(len(means))))]
-    return np.asarray(order)
-
-
 def get_heterodyne_fanout(alpha, fanout):
     r"""Get the heterodyne fanout using the mean displacement of each modes.
 
