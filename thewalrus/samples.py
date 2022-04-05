@@ -66,9 +66,7 @@ from .quantum import (
     Covmat,
     gen_Qmat_from_graph,
     is_classical_cov,
-    reduced_gaussian,
     photon_number_mean_vector,
-    mean_clicks,
 )
 
 
