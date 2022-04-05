@@ -207,7 +207,7 @@ def _calc_loop_hafnian_batch_odd(A, D, fixed_edge_reps, batch_max, even_cutoff, 
     return H_batch
 
 
-def add_batch_edges_even(fixed_edges): #pragma: no cover
+def add_batch_edges_even(fixed_edges):
     r"""Add batch even.
 
     Args:
@@ -252,7 +252,7 @@ def add_batch_edges_odd(fixed_edges, oddmode):
     return edges
 
 
-def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True): #pragma: no cover
+def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch.
 
     Args:
