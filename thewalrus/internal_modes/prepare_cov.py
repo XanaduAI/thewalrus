@@ -98,7 +98,8 @@ def orthonormal_basis(O, rjs, thr=1e-3):
     R = len(O)
     M = len(rjs)
     njs = np.array([len(rjs[i]) for i in range(M)])
-    lambd, V = np.linalg.eigh(O)
+    rs = np.array([r for rj in rjs for r in rj])
+    lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
     X = np.fliplr(np.identity(len(lambd)))
     lambd, V = X @ lambd, V @ X
     inds = np.arange(len(lambd))[lambd > thr]
@@ -113,8 +114,7 @@ def orthonormal_basis(O, rjs, thr=1e-3):
                 Rtemp[l, m] = np.sum(
                     np.array(
                         [
-                            rjs[j][k]
-                            * V[indexconversion(j, k, njs), l].conj()
+                            V[indexconversion(j, k, njs), l].conj()
                             * V[indexconversion(j, k, njs), m].conj()
                             * np.sqrt(lambd[l])
                             * np.sqrt(lambd[m])
