@@ -20,22 +20,18 @@ provided by The Walrus, including the hafnian, loop hafnian,
 the permanent and the torontonian.
 
 .. gallery-item::
-    :tooltip: Basics of hafnians and loop hafnians
     :description: :doc:`basics`
     :figure: gallery/hafnian.png
 
 .. gallery-item::
-    :tooltip: Benchmarking the hafnian
     :description: :doc:`hafnian_tutorial`
     :figure: gallery/haf_benchmark.png
 
 .. gallery-item::
-    :tooltip: Benchmarking the permanent
     :description: :doc:`permanent_tutorial`
     :figure: gallery/perm_benchmark.png
 
 .. gallery-item::
-    :tooltip: Benchmarking the torontonian
     :description: :doc:`torontonian_tutorial`
     :figure: gallery/tor_benchmark.png
 
@@ -72,37 +68,30 @@ If you develop a new circuit and measurement scheme to prepare a non-Gaussian st
 .. Copy the template below in order to create a link to your notebook, and a thumbnail.
 
 .. gallery-item::
-    :tooltip: Fock states
     :description: :doc:`Fock states <fock>`
     :figure: gallery/fock.png
 
 .. gallery-item::
-    :tooltip: Kitten states
     :description: :doc:`Kitten states <kitten>`
     :figure: gallery/kitten.png
 
 .. gallery-item::
-    :tooltip: Cubic phase states
     :description: :doc:`Cubic phase states <cubic>`
     :figure: gallery/cubic.png
 
 .. gallery-item::
-    :tooltip: Photon added states
     :description: :doc:`Photon added states <photon_added>`
     :figure: gallery/photon_added.png
 
 .. gallery-item::
-    :tooltip: Cat states
     :description: :doc:`Cat states <cat>`
     :figure: gallery/cat.png
 
 .. gallery-item::
-    :tooltip: Four-headed cat states
     :description: :doc:`Four-headed cat states <four_cat>`
     :figure: gallery/four_cat.png
 
 .. gallery-item::
-    :tooltip: GKP states
     :description: :doc:`GKP states <gkp>`
     :figure: gallery/gkp.png
 
