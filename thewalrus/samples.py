@@ -144,9 +144,8 @@ def invert_permutation(p):
 
 
 def photon_means_order(mu, cov):
-    r"""Give which mode is which ranking (from 0 to length of vector) according 
+    r"""Give which mode is which ranking (from 0 to length of vector) according
     to the number of mean photons of each mode.
-    
 
     Args:
         mu (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
@@ -179,9 +178,7 @@ def get_heterodyne_fanout(alpha, fanout):
     for j in range(M):
         alpha_j = np.zeros(fanout, dtype=np.complex128)
         alpha_j[0] = alpha[j]  # put the coherent state in 0th mode
-        alpha_j[1:] = np.random.normal(size=fanout - 1) + 1j * np.random.normal(
-            size=fanout - 1
-        )
+        alpha_j[1:] = np.random.normal(size=fanout - 1) + 1j * np.random.normal(size=fanout - 1)
 
         alpha_fanout[j, :] = np.fft.fft(alpha_j, norm="ortho")
 
@@ -310,7 +307,13 @@ def _hafnian_sample(args):
 
 
 def hafnian_sample_state(
-    cov, samples, mean=None, hbar=2, cutoff=5, max_photons=30, parallel=False,
+    cov,
+    samples,
+    mean=None,
+    hbar=2,
+    cutoff=5,
+    max_photons=30,
+    parallel=False,
 ):
     r"""Returns samples from the Hafnian of a Gaussian state.
 
@@ -344,9 +347,7 @@ def hafnian_sample_state(
     return _hafnian_sample(params)
 
 
-def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, parallel=False
-):
+def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, parallel=False):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -379,9 +380,7 @@ def hafnian_sample_graph(
 # ===============================================================================================
 
 
-def generate_torontonian_sample(
-    cov, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1
-):
+def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
     Args:
@@ -426,17 +425,13 @@ def generate_torontonian_sample(
     het_alpha_fanout = get_heterodyne_fanout(het_alpha, fanout)
     het_alpha_sum = het_alpha_fanout.sum(axis=1)
 
-    gamma = pure_alpha.conj() / np.sqrt(fanout) + B @ (
-        het_alpha_sum - np.sqrt(fanout) * pure_alpha
-    )
+    gamma = pure_alpha.conj() / np.sqrt(fanout) + B @ (het_alpha_sum - np.sqrt(fanout) * pure_alpha)
     gamma_fanout = np.zeros((fanout, M), dtype=np.complex128)
 
     for mode in range(M):
         gamma_fanout[0, :] = gamma - het_alpha_fanout[mode, 0] * B[:, mode]
         for k in range(1, fanout):
-            gamma_fanout[k, :] = (
-                gamma_fanout[k - 1, :] - het_alpha_fanout[mode, k] * B[:, mode]
-            )
+            gamma_fanout[k, :] = gamma_fanout[k - 1, :] - het_alpha_fanout[mode, k] * B[:, mode]
         lhafs = loop_hafnian_batch_gamma(
             B[: mode + 1, : mode + 1],
             gamma_fanout[:, : mode + 1],
@@ -645,8 +640,7 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
     return np.where(
-        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol)
-        > 0,
+        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0,
         1,
         0,
     )
@@ -670,15 +664,13 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
     if out_of_bounds is False:
         probabilities = probabilities.flatten() / sum_p
-        vals = np.arange(cutoff ** num_modes, dtype=int)
+        vals = np.arange(cutoff**num_modes, dtype=int)
         return [
-            np.unravel_index(
-                np.random.choice(vals, p=probabilities), [cutoff] * num_modes
-            )
+            np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
             for _ in range(num_samples)
         ]
 
-    upper_limit = cutoff ** num_modes
+    upper_limit = cutoff**num_modes
 
     def sorter(index):
         if index == upper_limit:
@@ -686,7 +678,7 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
 
         return np.unravel_index(index, [cutoff] * num_modes)
 
-    vals = np.arange(1 + cutoff ** num_modes, dtype=int)
+    vals = np.arange(1 + cutoff**num_modes, dtype=int)
     probabilities = np.append(probabilities.flatten(), 1.0 - sum_p)
     return [sorter(np.random.choice(vals, p=probabilities)) for _ in range(num_samples)]
 
