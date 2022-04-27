@@ -117,8 +117,8 @@ class TestHafnianRepeatedWrapper:
         assert np.allclose(haf, expected)
 
     def test_loop_true(self):
-        """Check hafnian_repeated(A)=0 if A is a zero matrix and
-        loop is true.
+        """Check `hafnian_repeated(A)=0` if `A` is a zero matrix and
+        `loop` is true.
         """
         A = np.zeros((6, 6))
         haf = hafnian_repeated(A, [1] * 6)
