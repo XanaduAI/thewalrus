@@ -19,6 +19,7 @@ coverage.xml
 .coverage*
 
 docs/_build
+docs/_static/thumbs
 docs/doxyoutput/*
 docs/.ipynb_checkpoints/*
 docs/code/api/*
