@@ -454,6 +454,58 @@ def _grad_hermite_multidimensional_renorm(R, y, G, dG_dR, dG_dy):  # pragma: no 
         dG_dy[idx] = dy / SQRT[idx[i]]
     return dG_dR, dG_dy
 
+###  we want to compute dL_dG @ dG_dR 
+    indices = np.ndindex(G.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        u = y[i] * G[ki]   # 
+        for l, kl in remove(ki):
+            u -= SQRT[ki[l]] * R[i, l] * G[kl]
+        G[idx] = u / SQRT[idx[i]]
+    return G
+###
+
+@jit(nopython=True)
+def _vjp_hermite_multidimensional_renorm(R, y, G, dL_dG, dL_dR, dL_dy):  # pragma: no cover
+    r"""
+    Numba-compiled function to fill two arrays (dL_dR, dL_dy) with the gradients of the cost function
+    with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
+
+    Args:
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        G (array[complex]): array of the multidimensional Hermite polynomials
+        dL_dG (array[complex]): upstream gradient of the cost function with respect to the multidimensional Hermite polynomials
+        dL_dR (array[complex]): array to be filled with the gradients of the cost function with respect to R
+        dL_dy (array[complex]): array to be filled with the gradients of the cost function with respect to y
+
+    Returns:
+        dL_dR[complex], dL_dy[complex]: the gradients of the cost function with respect to R and y
+    """
+    indices = np.ndindex(G.shape)
+    next(indices)  # skip the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        dy = y[i] * dG_dy[ki]
+        dy[i] += G[ki]
+        dR = y[i] * dG_dR[ki]
+        for l, kl in remove(ki):
+            dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
+            dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
+            dR[i, l] -= SQRT[ki[l]] * G[kl]
+        dG_dR[idx] = dR / SQRT[idx[i]]
+        dG_dy[idx] = dy / SQRT[idx[i]]
+    return dG_dR, dG_dy
+
 
 @jit(nopython=True)
 def _grad_hermite_multidimensional(R, y, G, dG_dR, dG_dy):  # pragma: no cover
