@@ -114,7 +114,7 @@ def mu_to_alpha(mu, hbar=2):
     r"""Convert displacement into the mean displacement of each mode.
 
     Args:
-        mu (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+        mu (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
             state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -148,7 +148,7 @@ def photon_means_order(mu, cov):
     to the number of mean photons of each mode.
 
     Args:
-        mu (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+        mu (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
             state.
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
@@ -193,7 +193,7 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
-        mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+        mean (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
             state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
@@ -261,7 +261,7 @@ def _hafnian_sample(args):
             samples (int)
                 the number of samples to return.
 
-            mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+            mean (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
                 state.
 
             hbar (float)
@@ -322,7 +322,7 @@ def hafnian_sample_state(
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): the number of samples to return.
-        mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+        mean (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
                 state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
