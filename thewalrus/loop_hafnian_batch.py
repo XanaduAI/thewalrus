@@ -184,9 +184,7 @@ def _calc_loop_hafnian_batch_odd(
         if kept_edges[0] == 0 and kept_edges[1] == 0:
             oddVX_S0 = get_submatrix_batch_odd0(delta, oddV0)
             plus_minus = (-1) ** (N_fixed // 2 - edges_sum)
-            f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[
-                N_fixed
-            ]
+            f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[N_fixed]
             H_batch[0] += binom_prod * plus_minus * f
 
         f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
@@ -300,6 +298,4 @@ def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
     Dx = Dnz[edges].astype(np.complex128)
     batch_max = (N_cutoff - 1) // 2
     even_cutoff = 1 - (N_cutoff % 2)
-    return _calc_loop_hafnian_batch_odd(
-        Ax, Dx, fixed_m_reps, batch_max, even_cutoff, glynn=glynn
-    )
+    return _calc_loop_hafnian_batch_odd(Ax, Dx, fixed_m_reps, batch_max, even_cutoff, glynn=glynn)
