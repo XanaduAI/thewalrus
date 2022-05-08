@@ -51,18 +51,18 @@ from thewalrus._hafnian import (
 def _calc_loop_hafnian_batch_even(
     A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True
 ):  # pragma: no cover
-    r"""Calculate the loop hafnian batch for even modes.
+    r"""Calculate the batched loop hafnian for paired mode.
 
     Args:
         A (array): input matrix.
-        D (array): diagonal.
-        fixed_edge_reps (array): fixed number of edge repetition.
-        batch_max (array): maximum batch.
+        D (array): vector to find loop hafnian.
+        fixed_edge_reps (list): fixed numbers of edge repetition.
+        batch_max (array): maximum number of photons for m mode.
         odd_cutoff (array): cutoff for odd modes.
         glynn (boolean): determines the method used to evaluate the loop hafnian batch.
 
     Returns:
-        H_batch (array): matrix result.
+        H_batch (array): vector giving loop hafnian for every photon number.
     """
     oddloop = D[0]
     oddV = A[0, :]
@@ -129,18 +129,18 @@ def _calc_loop_hafnian_batch_even(
 def _calc_loop_hafnian_batch_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
 ):  # pragma: no cover
-    r"""Calculate the loop hafnian batch for odd modes.
+    r"""Calculate the batched loop hafnian for unpaired mode.
 
     Args:
         A (array): input matrix.
-        D (array): diagonal.
-        fixed_edge_reps (array): fixed number of edge repetition.
-        batch_max (array): maximum batch.
+        D (array): vector to find loop hafnian.
+        fixed_edge_reps (list): fixed numbers of edge repetition.
+        batch_max (array): maximum number of photons for m mode.
         even_cutoff (array): cutoff for even modes.
         glynn (boolean): determines the method used to evaluate the loop hafnian batch.
 
     Returns:
-        H_batch (array): matrix result.
+        H_batch (array): vector giving loop hafnian for every photon number.
     """
     oddloop = D[0]
     oddV = A[0, :]
@@ -184,7 +184,9 @@ def _calc_loop_hafnian_batch_odd(
         if kept_edges[0] == 0 and kept_edges[1] == 0:
             oddVX_S0 = get_submatrix_batch_odd0(delta, oddV0)
             plus_minus = (-1) ** (N_fixed // 2 - edges_sum)
-            f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[N_fixed]
+            f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[
+                N_fixed
+            ]
             H_batch[0] += binom_prod * plus_minus * f
 
         f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
@@ -212,13 +214,13 @@ def _calc_loop_hafnian_batch_odd(
 
 
 def add_batch_edges_even(fixed_edges):
-    r"""Add batch even.
+    r"""Get edges for batched algorithm if there are paired modes.
 
     Args:
         fixed_edges (array): fixed number of edge repetition.
 
     Returns:
-        edges (array): edges for even modes.
+        edges (array): edges for paired modes.
     """
     if len(fixed_edges) == 0:
         return np.array([0, 0], dtype=int)
@@ -233,14 +235,14 @@ def add_batch_edges_even(fixed_edges):
 
 
 def add_batch_edges_odd(fixed_edges, oddmode):
-    r""".
+    r"""Get edges for batched algorithm if there are unpaired modes.
 
     Args:
         fixed_edges (array): fixed number of edge repetition.
-        oddmode (int): number of odd modes.
+        oddmode (int): which mode is unpaired.
 
     Returns:
-        edges (array): edges for odd modes.
+        edges (array): edges for unpaired mode.
     """
     if len(fixed_edges) == 0:
         return np.array([1, oddmode, 1, 1], dtype=int)
@@ -298,4 +300,6 @@ def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
     Dx = Dnz[edges].astype(np.complex128)
     batch_max = (N_cutoff - 1) // 2
     even_cutoff = 1 - (N_cutoff % 2)
-    return _calc_loop_hafnian_batch_odd(Ax, Dx, fixed_m_reps, batch_max, even_cutoff, glynn=glynn)
+    return _calc_loop_hafnian_batch_odd(
+        Ax, Dx, fixed_m_reps, batch_max, even_cutoff, glynn=glynn
+    )
