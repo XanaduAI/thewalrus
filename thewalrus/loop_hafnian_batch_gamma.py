@@ -52,18 +52,18 @@ from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_ev
 def _calc_loop_hafnian_batch_gamma_even(
     A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True
 ):  # pragma: no cover
-    r"""Calculate the loop hafnian batch gamma for even modes.
+    r"""Calculate the loop hafnian batch for paired modes with threshould detectors.
 
     Args:
         A (array): input matrix.
-        D (array): diagonal.
+        D (array): vector to find loop hafnian batch.
         fixed_edge_reps (array): fixed number of edge repetition.
-        batch_max (array): maximum batch.
-        odd_cutoff (array): cutoff for odd modes.
+        batch_max (array): maximum number of photons for m mode.
+        odd_cutoff (array): cutoff for unpaired modes.
         glynn (boolean): determines the method used to evaluate the loop hafnian batch.
 
     Returns:
-        H_batch (array): matrix result.
+        H_batch (array): matrix that contains batched loop hafnian with threshold detectors.
     """
     oddloop = D[:, 0]
     oddV = A[0, :]
@@ -133,18 +133,18 @@ def _calc_loop_hafnian_batch_gamma_even(
 def _calc_loop_hafnian_batch_gamma_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
 ):  # pragma: no cover
-    r"""Calculate the loop hafnian batch gamma for odd modes.
+    r"""Calculate the loop hafnian batch for unpaired modes with threshould detectors.
 
     Args:
         A (array): input matrix.
-        D (array): diagonal.
+        D (array): vector to find loop hafnian batch.
         fixed_edge_reps (array): fixed number of edge repetition.
-        batch_max (array): maximum batch.
-        even_cutoff (array): cutoff for even modes.
+        batch_max (array): maximum number of photons for m mode.
+        odd_cutoff (array): cutoff for paired modes.
         glynn (boolean): determines the method used to evaluate the loop hafnian batch.
 
     Returns:
-        H_batch (array): matrix result.
+        H_batch (array): matrix that contains batched loop hafnian with threshold detectors.
     """
 
     oddloop = D[:, 0]
@@ -223,17 +223,17 @@ def _calc_loop_hafnian_batch_gamma_odd(
 
 
 def loop_hafnian_batch_gamma(A, D, fixed_reps, N_cutoff, glynn=True):
-    r"""Calculate the loop hafnian batch gamma.
+    r"""Calculate the loop hafnian batch when there are threshold detectors.
 
     Args:
         A (array): input matrix.
-        D (array): diagonal.
+        D (array): vector to find loop hafnian batch.
         fixed_edge_reps (array): fixed number of edge repetition.
-        N_cutoff (int):
+        N_cutoff (int): max number of photons for m mode
         glynn (boolean): determines the method used to evaluate the loop hafnian batch.
 
     Returns:
-        loop hafnian batch gamma (array):
+        loop hafnian batch gamma (array): matrix that contains the batched loop hafnian with threshold detectors
     """
 
     # checks
