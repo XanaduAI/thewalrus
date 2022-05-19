@@ -9,10 +9,9 @@ examples/*ipynp*
 .eggs/*
 *.egg-info*
 thewalrus.egg-info
-thewalrus/__pycache__/*
+*/__pycache__/*
 thewalrus/*.so
 
-tests/__pycache__/*
 tests/*.o
 coverage_html_report
 coverage.xml
