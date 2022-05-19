@@ -53,5 +53,5 @@ def test_ones_approx(n):
     """Check hafnian_approx(J_2n)=(2n)!/(n!2^n)"""
     A = np.float64(np.ones([2 * n, 2 * n]))
     haf = hafnian(A, approx=True, num_samples=10000)
-    expected = fac(2 * n) / (fac(n) * (2 ** n))
+    expected = fac(2 * n) / (fac(n) * (2**n))
     assert np.abs(haf - expected) / expected < 0.2

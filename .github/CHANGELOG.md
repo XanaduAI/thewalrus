@@ -1,16 +1,66 @@
-# Version 0.19.0-dev
+# Release 0.20.0-dev
 
 ### New features
+
+### Breaking changes
 
 ### Improvements
 
 ### Bug fixes
 
-### Breaking changes
+### Documentation
+
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
+  is now used to style the Sphinx documentation.
+  [(#341)](https://github.com/XanaduAI/thewalrus/pull/341)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Mikhail Andrenkov
+
+---
+
+# Version 0.19.0
+
+### New features
+* New functions for calculating properties of distinguishable squeezed states of light having passed through an interferometer. [#326](https://github.com/XanaduAI/thewalrus/pull/326)
+
+* New function `ltor` is added which allows `threshold_detector_prob` to act more consistently on displaced and zero-mean Gaussian states. [#317](https://github.com/XanaduAI/thewalrus/pull/317)
+
+* New functions for threshold detection probabilities of Fock states, the Bristolian (brs) and the Unitary Bristolian (ubrs). [#316](https://github.com/XanaduAI/thewalrus/pull/316)
+
+* Entanglement measures `entanglement_entropy` and `log_negativity` for bipartite Gaussian states are added to the quantum submodule. [#332](https://github.com/XanaduAI/thewalrus/pull/322)
+
+* New functions, `recursive_hafnian` and `solve` added in the `_hafnian` module. [#325](https://github.com/XanaduAI/thewalrus/pull/325)
+
+* New function to check if a matrix is symplectic `is_symplectic`. [#334](https://github.com/XanaduAI/thewalrus/pull/334).
+
+* Adds support for Python 3.10. [#337](https://github.com/XanaduAI/thewalrus/pull/337)
+
+### Improvements
+* Update methods for calculating threshold detector probabilities of Gaussian states, now using `ltor` function within `threshold_detection_prob` [#317](https://github.com/XanaduAI/thewalrus/pull/317)
+
+* `numba_tor` now can benefit from numba parallelization [#317](https://github.com/XanaduAI/thewalrus/pull/317)
+
+* Recursive Torontonian added for faster computation based on paper ["Polynomial speedup in Torontonian calculation by a scalable recursive algorithm" by Ágoston Kaposi, Zoltán Kolarovszki, Tamás Kozsik, Zoltán Zimborás, and Péter Rakyta](https://arxiv.org/pdf/2109.04528.pdf). [#321](https://github.com/XanaduAI/thewalrus/pull/321)
+
+* Recursive Loop Torontonian added for faster computation based on combining recursive Torontonian improvement and new loop Torontonian feature. [#332](https://github.com/XanaduAI/thewalrus/pull/332)
+
+* Hafnians of odd-sized matrices are calculated roughly twice as fast. [#329](https://github.com/XanaduAI/thewalrus/pull/329)
+
+* The new Hafnian functions now use the Labudde method to calculate power traces instead of using diagonalization. [#333](https://github.com/XanaduAI/thewalrus/pull/333)
+
+### Bug fixes
+
+* Permanent algorithms handle 0x0 cases correctly. [#320](https://github.com/XanaduAI/thewalrus/pull/320)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Jake Bulmer, Luke Helt, Martin Houde, Theodor Isacsson, Benjamin Lanthier, Fabian Laudenbach, Dominic Leclerc, Gregory Morse, Nicolas Quesada, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
@@ -105,11 +155,11 @@ Josh Izaac, Filippo Miatto, Nicolas Quesada.
 
 * Adds the function `hafnian_sparse` to compute sparse loop hafnians (pure Python implementation). [#245](https://github.com/XanaduAI/thewalrus/pull/245)
 
-* The ``symplectic.squeezing`` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* The `symplectic.squeezing` function is now generalized to multiple modes of single mode squeezing. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* Adds a function ``symplectic.passive_transformation`` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
+* Adds a function `symplectic.passive_transformation` which allows for Gaussian states to be transformed by arbitrary non-unitary, non-square linear optical transformations. [#249](https://github.com/XanaduAI/thewalrus/pull/249)
 
-* The ``torontonian_sample_state`` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
+* The `torontonian_sample_state` function now can sample displaced Gaussian states. [#248](https://github.com/XanaduAI/thewalrus/pull/248)
 
 * Adds the function `hafnian_banded` to calculate the hafnian of a banded matrix. [#246](https://github.com/XanaduAI/thewalrus/pull/246)
 

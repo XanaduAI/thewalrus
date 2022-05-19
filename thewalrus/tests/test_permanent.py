@@ -13,12 +13,19 @@
 # limitations under the License.
 """Tests for the Python permanent wrapper function"""
 # pylint: disable=no-self-use
+
+from itertools import chain, product
+
 import pytest
 
 import numpy as np
-from scipy.special import factorial as fac
 
-from thewalrus import perm, permanent_repeated
+from scipy.special import factorial as fac
+from scipy.linalg import sqrtm
+from scipy.stats import unitary_group
+
+from thewalrus import perm, permanent_repeated, brs, ubrs
+from thewalrus._permanent import fock_prob, fock_threshold_prob
 
 perm_real = perm
 perm_complex = perm
@@ -45,6 +52,26 @@ class TestPermanentWrapper:
         A = np.array([[2, 1], [1, np.nan]])
         with pytest.raises(ValueError):
             perm(A)
+
+    def test_0x0(self):
+        """Check 0x0 permanent returns 1"""
+        A = np.zeros((0, 0))
+        p = perm(A, method="ryser")
+        expected = 1
+        assert p == expected
+
+        p = perm(A, method="bbfg")
+        assert p == expected
+
+    def test_1x1(self, random_matrix):
+        """Check 1x1 permanent"""
+        A = np.array([[random_matrix(1)]])
+        p = perm(A, method="ryser")
+        expected = A[0, 0]
+        assert p == expected
+
+        p = perm(A, method="bbfg")
+        assert p == expected
 
     def test_2x2(self, random_matrix):
         """Check 2x2 permanent"""
@@ -161,3 +188,185 @@ class TestPermanentRepeated:
         A = np.array([[1]])
         p = permanent_repeated(A, [n])
         assert np.allclose(p, fac(n))
+
+
+def test_brs_HOM():
+    """HOM test"""
+
+    U = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
+
+    n = [1, 1]
+    d = [1, 1]
+
+    assert np.isclose(fock_threshold_prob(n, d, U), fock_prob(n, d, U))
+
+    d = [1, 0]
+    m = [2, 0]
+
+    assert np.isclose(fock_threshold_prob(n, d, U), fock_prob(n, m, U))
+
+
+@pytest.mark.parametrize("eta", [0.2, 0.5, 0.9, 1])
+def test_brs_HOM_lossy(eta):
+    """lossy HOM dip test"""
+    T = np.sqrt(eta / 2) * np.array([[1, 1], [1, -1]])
+
+    n = [1, 1]
+    d = [1, 1]
+
+    assert np.isclose(fock_prob(n, d, T), fock_threshold_prob(n, d, T))
+
+
+def test_brs_ZTL():
+    """test 3-mode ZTL suppression"""
+
+    U = np.fft.fft(np.eye(3)) / np.sqrt(3)
+
+    n = [1, 1, 1]
+    d = [1, 1, 0]
+
+    p1 = fock_threshold_prob(n, d, U)
+    p2 = fock_prob(n, [1, 2, 0], U) + fock_prob(n, [2, 1, 0], U)
+    assert np.isclose(p1, p2)
+
+    n = [1, 1, 1]
+    d = [1, 1, 1]
+
+    p1 = fock_threshold_prob(n, d, U)
+    p2 = fock_prob(n, d, U)
+    assert np.isclose(p1, p2)
+
+    T = U[:2, :]
+    d = [1, 1]
+
+    p1 = fock_threshold_prob(n, d, T)
+    p2 = fock_prob(n, [1, 1, 1], U)
+
+    assert np.isclose(p1, p2)
+
+    d = [1, 0, 0]
+
+    p1 = fock_threshold_prob(n, d, U)
+    p2 = fock_prob(n, [3, 0, 0], U)
+
+    assert np.isclose(p1, p2)
+
+    n = [1, 2, 0]
+    d = [0, 1, 1]
+
+    p1 = fock_threshold_prob(n, d, U)
+    p2 = fock_prob(n, [0, 2, 1], U) + fock_prob(n, [0, 1, 2], U)
+
+    assert np.isclose(p1, p2)
+
+
+@pytest.mark.parametrize("eta", [0.2, 0.5, 0.9, 1])
+def test_brs_ZTL_lossy(eta):
+    """test lossy 3-mode ZTL suppression"""
+    T = np.sqrt(eta) * np.fft.fft(np.eye(3)) / np.sqrt(3)
+
+    n = [1, 1, 1]
+    d = [1, 1, 0]
+
+    p1 = eta**2 * (1 - eta) / 3
+    p2 = fock_threshold_prob(n, d, T)
+
+    assert np.allclose(p1, p2)
+
+
+@pytest.mark.parametrize("d", [[1, 1, 1], [1, 1, 0], [1, 0, 0]])
+def test_brs_ubrs(d):
+    """test that brs and ubrs give same results for unitary transformation"""
+
+    U = np.fft.fft(np.eye(3)) / np.sqrt(3)
+
+    n = np.array([2, 1, 0])
+    d = np.array(d)
+
+    in_modes = np.array(list(chain(*[[i] * j for i, j in enumerate(n) if j > 0])))
+    click_modes = np.where(d > 0)[0]
+
+    U_dn = U[np.ix_(click_modes, in_modes)]
+
+    b1 = ubrs(U_dn)
+
+    R = sqrtm(np.eye(U.shape[1]) - U.conj().T @ U)[:, in_modes]
+    E = R.conj().T @ R
+
+    b2 = brs(U_dn, E)
+
+    assert np.allclose(b1, b2)
+
+
+@pytest.mark.parametrize("M", range(2, 7))
+def test_brs_random(M):
+    """test that brs and per agree for random matices"""
+
+    n = np.ones(M, dtype=int)
+    n[np.random.randint(0, M)] = 0
+    d = np.ones(M, dtype=int)
+    d[np.random.randint(0, M)] = 0
+
+    loss_in = np.random.random(M)
+    loss_out = np.random.random(M)
+    U = unitary_group.rvs(M)
+    T = np.diag(loss_in) @ U @ np.diag(loss_out)
+
+    p1 = fock_threshold_prob(n, d, T)
+    p2 = fock_prob(n, d, T)
+
+    assert np.isclose(p1, p2)
+
+
+@pytest.mark.parametrize("M", range(2, 5))
+def test_brs_prob_normed(M):
+    """test that fock threshold probability is normalised"""
+
+    N = M + 1  # guarentee at least some bunching
+
+    in_modes = np.random.choice(np.arange(M), N)
+    n = np.bincount(in_modes, minlength=M)
+
+    loss_in = np.random.random(M)
+    loss_out = np.random.random(M)
+    U = unitary_group.rvs(M)
+    T = np.diag(loss_in) @ U @ np.diag(loss_out)
+
+    p_total = 0
+    for det_pattern in product([0, 1], repeat=M):
+        p = fock_threshold_prob(n, det_pattern, T)
+        p_total += p
+
+    assert np.isclose(p_total, 1)
+
+
+def test_fock_thresh_valueerror():
+    """test that input checks are raised"""
+    with pytest.raises(ValueError):
+        n = [1, 1, 1]
+        T = np.ones((2, 2))
+        d = [1, 1]
+        fock_threshold_prob(n, d, T)
+
+    with pytest.raises(ValueError):
+        n = [1, 1]
+        d = [1, 1, 1]
+        T = np.ones((2, 2))
+        fock_threshold_prob(n, d, T)
+
+    with pytest.raises(ValueError):
+        n = [1, 1]
+        d = [1, 1, 1]
+        T = np.ones((3, 2))
+        fock_threshold_prob(n, d, T)
+
+
+def test_fock_prob_valueerror():
+    """test that input checks are raised"""
+    with pytest.raises(ValueError):
+        n = [1, 1, 2, 1]
+        m = [1, 1, 1, 3]
+
+        U = np.eye((4))
+
+        fock_prob(n, m, U)

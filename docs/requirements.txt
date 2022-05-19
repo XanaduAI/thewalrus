@@ -11,3 +11,5 @@ Jinja2==2.11.3
 version_information
 sphinx-copybutton
 dask[delayed]
+markupsafe==2.0.1
+xanadu-sphinx-theme==0.1.0

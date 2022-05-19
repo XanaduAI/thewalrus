@@ -57,3 +57,9 @@
 * [Benjamin Lanthier](https://github.com/benjaminlanthier) (Polytechnique Montréal) :mage: Warlock of eigenvalues
 
 * [Brandon Turcotte](https://github.com/brandonpolymtl) (Polytechnique Montréal) - :star2: The Quantum-plators
+
+* [Gregory Morse](https://github.com/GregoryMorse) (Eötvös Loránd University) - :volcano: Low level code perfector
+
+* [Fabian Laudenbach](https://github.com/fab1an-q) (Xanadu) - :revolving_hearts: Entangler of hearts
+
+* [Martin Houde](https://github.com/MHoude2) (Polytechnique Montréal) - :upside_down: Minister of amplification

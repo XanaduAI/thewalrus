@@ -109,7 +109,7 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
         mu, cov = reduced_gaussian(mu, cov, [j])
         term_1 = 0.5 * np.trace(cov) ** 2 - np.linalg.det(cov)
         term_2 = mu @ cov @ mu
-        return ((term_1 + term_2) / hbar ** 2) - 0.25
+        return ((term_1 + term_2) / hbar**2) - 0.25
 
     mu, cov = reduced_gaussian(mu, cov, [j, k])
     term_1 = cov[0, 1] ** 2 + cov[0, 3] ** 2 + cov[2, 1] ** 2 + cov[2, 3] ** 2
@@ -120,7 +120,7 @@ def photon_number_covar(mu, cov, j, k, hbar=2):
         + cov[2, 3] * mu[2] * mu[3]
     )
 
-    return (term_1 + 2 * term_2) / (2 * hbar ** 2)
+    return (term_1 + 2 * term_2) / (2 * hbar**2)
 
 
 def photon_number_covmat(mu, cov, hbar=2):
@@ -320,7 +320,7 @@ def _coeff_normal_ordered(m, k):
 
     return sum(
         [
-            (1 / (factorial(mu) * factorial(k - mu))) * ((-1) ** (k - mu) * (mu ** m))
+            (1 / (factorial(mu) * factorial(k - mu))) * ((-1) ** (k - mu) * (mu**m))
             for mu in range(0, k + 1)
         ]
     )

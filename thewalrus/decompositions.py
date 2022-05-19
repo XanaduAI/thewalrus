@@ -27,6 +27,7 @@ Summary
 
 .. autosummary::
     williamson
+    symplectic_eigenvals
 
 Code details
 ------------
@@ -97,3 +98,17 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     Db = np.diag(dd + dd)
     S = Mm12 @ Ktt @ sqrtm(Db)
     return Db, np.linalg.inv(S).T
+
+
+def symplectic_eigenvals(cov):
+    r"""Returns the symplectic eigenvalues of a covariance matrix.
+
+    Args:
+        cov (array): a covariance matrix
+
+    Returns:
+        (array): symplectic eigenvalues
+    """
+    M = int(len(cov) / 2)
+    D, _ = williamson(cov)
+    return np.diag(D)[:M]

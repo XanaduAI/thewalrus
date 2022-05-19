@@ -198,13 +198,20 @@ For an :math:`\ell` mode Gaussian state with zero mean, the outcome of threshold
 where :math:`\text{tor}` is the Torontonian. For :math:`2 \ell \times 2 \ell` matrix :math:`\bm{O}` the Torontonian is defined as
 
 .. math::
-	\text{tor}(\bm{O}) = \sum_{S \in P([\ell])} (-1)^{|S|} \frac{1}{\sqrt{\det\left(\mathbb{I} - \bm{O}_{(S)}\right)}}
+	\text{ltor}(\bm{O}) = \sum_{S \in P([\ell])} (-1)^{|S|} \frac{1}{\sqrt{\det\left(\mathbb{I} - \bm{O}_{(S)}\right)}}
 
-The torontonian can be thought of as a generating function for hafnians (cf. the trace algorithm formula in :ref:`algorithms <algorithms>` section).
+The torontonian can be thought of as a generating function for hafnians (cf. the trace algorithm formula in :ref:`algorithms <algorithms>` section). The torontonian algorithm can be specified recursively to improve its performance :cite:`kaposi2021polynomial`.
+
+The loop Torontonian is defined as
+
+.. math::
+	\text{ltor}(\bm{O}, \bm{\gamma}) = \sum_{S \in P([\ell])} (-1)^{|S|} \frac{exp \{\frac{1}{2} \gamma_{(S)} \det\left(\mathbb{I} - \bm{O}_{(S)}\right)^{-1} \gamma_{(S)}^* \}}{\sqrt{\det\left(\mathbb{I} - \bm{O}_{(S)}\right)}}
+
+where :math:`\text{ltor}` is the loop Torontonian, and :math:`\gamma=(\Sigma^{-1}\alpha)^*` where :math:`\alpha` is a :math:`2 \ell \times 2 \ell` vector :cite: `bulmer2022threshold`.
 
 .. tip::
 
-   The torontonian is implemented as :func:`thewalrus.tor`.
+   The torontonian and loop torontonian are implemented as :func:`thewalrus.tor` and :func:`thewalrus.ltor` respectively.
 
 
 

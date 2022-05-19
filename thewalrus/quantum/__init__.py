@@ -78,6 +78,7 @@ Gaussian checks
     is_pure_cov
     is_classical_cov
     fidelity
+    is_symplectic
 
 Conversions
 -----------
@@ -120,6 +121,15 @@ Photon number distributions
     total_photon_number_distribution
     characteristic_function
 
+Entanglement
+------------
+
+.. autosummary::
+
+    vonneumann_entropy
+    entanglement_entropy
+    log_negativity
+
 
 Code details
 ------------
@@ -153,6 +163,7 @@ from .gaussian_checks import (
     is_pure_cov,
     is_classical_cov,
     fidelity,
+    is_symplectic,
 )
 
 from .conversions import (
@@ -187,6 +198,12 @@ from .photon_number_distributions import (
     characteristic_function,
 )
 
+from .entanglement import (
+    vonneumann_entropy,
+    entanglement_entropy,
+    log_negativity,
+)
+
 __all__ = [
     "pure_state_amplitude",
     "state_vector",
@@ -205,6 +222,7 @@ __all__ = [
     "is_pure_cov",
     "is_classical_cov",
     "fidelity",
+    "is_symplectic",
     "reduced_gaussian",
     "Xmat",
     "Qmat",
@@ -229,6 +247,9 @@ __all__ = [
     "photon_number_cumulant",
     "total_photon_number_distribution",
     "characteristic_function",
+    "vonneumann_entropy",
+    "entanglement_entropy",
+    "log_negativity",
 ]
 
 
