@@ -10,9 +10,15 @@
 
 ### Documentation
 
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
+  is now used to style the Sphinx documentation.
+  [(#341)](https://github.com/XanaduAI/thewalrus/pull/341)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Mikhail Andrenkov
 
 ---
 
