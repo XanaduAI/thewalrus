@@ -20,9 +20,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Antonín Hoskovec
-
-Mikhail Andrenkov
+Mikhail Andrenkov, Antonín Hoskovec
 
 ---
 
