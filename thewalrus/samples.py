@@ -117,7 +117,6 @@ def generate_hafnian_sample(
         local_mu = np.zeros(2 * N)
     else:
         local_mu = mean
-    A = Amat(Qmat(cov), hbar=hbar)
 
     for k in range(nmodes):
         probs1 = np.zeros([cutoff + 1], dtype=np.float64)
