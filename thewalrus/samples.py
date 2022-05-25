@@ -203,7 +203,7 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     Returns:
         np.array[int]: a photon number sample from the Gaussian states.
     """
- 
+
     mu = mean
     M = cov.shape[0] // 2
     if mu is None:
