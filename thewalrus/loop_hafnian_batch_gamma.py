@@ -133,7 +133,7 @@ def _calc_loop_hafnian_batch_gamma_even(
 def _calc_loop_hafnian_batch_gamma_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
 ):  # pragma: no cover
-    r"""Calculate the loop hafnian batch for unpaired modes with threshould detectors.
+    r"""Calculate the loop hafnian batch for unpaired modes with threshold detectors.
 
     Args:
         A (array): input matrix.
