@@ -91,10 +91,7 @@ def _calc_loop_hafnian_batch_even(
         for i in range(1, n // 2):
             binom_prod *= binoms[edge_reps[i], kept_edges[i]]
 
-        if glynn:
-            delta = 2 * kept_edges - edge_reps
-        else:
-            delta = kept_edges
+        delta = 2 * kept_edges - edge_reps if glynn else kept_edges
 
         AX_S, XD_S, D_S, oddVX_S = get_submatrices(delta, A, D, oddV)
 
