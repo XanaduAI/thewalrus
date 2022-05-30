@@ -91,6 +91,8 @@ __all__ = [
 # pylint: disable=too-many-branches
 def decompose_cov(cov):
     r"""Decompose the convariance matrix using the Williamson decomposition method.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -112,6 +114,8 @@ def decompose_cov(cov):
 
 def mu_to_alpha(mu, hbar=2):
     r"""Convert displacement into the mean displacement of each mode.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         mu (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
@@ -130,6 +134,8 @@ def mu_to_alpha(mu, hbar=2):
 
 def invert_permutation(p):
     r"""Gives an array with p[0]th position 0, p[1]th position 1m p[2]th position 2 and so on.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         p (arrary): input vector.
@@ -146,6 +152,8 @@ def invert_permutation(p):
 def photon_means_order(mu, cov):
     r"""Give which mode is which ranking (from 0 to length of vector) according
     to the number of mean photons of each mode.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         mu (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
@@ -164,6 +172,8 @@ def photon_means_order(mu, cov):
 
 def get_heterodyne_fanout(alpha, fanout):
     r"""Get the heterodyne fanout using the mean displacement of each modes.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         alpha (array): mean displacement of each modes.
@@ -188,6 +198,8 @@ def get_heterodyne_fanout(alpha, fanout):
 # pylint: disable=too-many-branches
 def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -383,6 +395,8 @@ def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, paralle
 
 def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
