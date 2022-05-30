@@ -53,6 +53,8 @@ def _calc_loop_hafnian_batch_gamma_even(
     A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True
 ):  # pragma: no cover
     r"""Calculate the loop hafnian batch for paired modes with threshold detectors.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         A (array): input matrix.
@@ -131,6 +133,8 @@ def _calc_loop_hafnian_batch_gamma_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
 ):  # pragma: no cover
     r"""Calculate the loop hafnian batch for unpaired modes with threshold detectors.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         A (array): input matrix.
@@ -218,6 +222,8 @@ def _calc_loop_hafnian_batch_gamma_odd(
 
 def loop_hafnian_batch_gamma(A, D, fixed_reps, N_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch when there are threshold detectors.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         A (array): input matrix.
