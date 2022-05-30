@@ -52,6 +52,8 @@ def _calc_loop_hafnian_batch_even(
     A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True
 ):  # pragma: no cover
     r"""Calculate the batched loop hafnian for paired mode.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         A (array): input matrix.
@@ -127,6 +129,8 @@ def _calc_loop_hafnian_batch_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
 ):  # pragma: no cover
     r"""Calculate the batched loop hafnian for unpaired mode.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         A (array): input matrix.
@@ -207,6 +211,8 @@ def _calc_loop_hafnian_batch_odd(
 
 def add_batch_edges_even(fixed_edges):
     r"""Get edges for batched algorithm if there are paired modes.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         fixed_edges (array): fixed number of edge repetition.
@@ -228,6 +234,8 @@ def add_batch_edges_even(fixed_edges):
 
 def add_batch_edges_odd(fixed_edges, oddmode):
     r"""Get edges for batched algorithm if there are unpaired modes.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         fixed_edges (array): fixed number of edge repetition.
@@ -252,6 +260,8 @@ def add_batch_edges_odd(fixed_edges, oddmode):
 
 def loop_hafnian_batch(A, D, fixed_reps, N_cutoff, glynn=True):
     r"""Calculate the loop hafnian batch.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         A (array): input matrix.
