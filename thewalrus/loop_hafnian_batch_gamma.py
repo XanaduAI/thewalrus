@@ -52,7 +52,7 @@ from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_ev
 def _calc_loop_hafnian_batch_gamma_even(
     A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True
 ):  # pragma: no cover
-    r"""Calculate the loop hafnian batch for paired modes with threshould detectors.
+    r"""Calculate the loop hafnian batch for paired modes with threshold detectors.
 
     Args:
         A (array): input matrix.
