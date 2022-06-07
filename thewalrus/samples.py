@@ -95,7 +95,7 @@ def decompose_cov(cov):
     `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
-        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+        cov (array): a :math:`2N\times 2N` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
 
@@ -118,7 +118,7 @@ def mu_to_alpha(mu, hbar=2):
     `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
-        mu (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
+        mu (array): a :math:`2N` vector of means representing the Gaussian
             state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
