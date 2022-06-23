@@ -2,6 +2,8 @@
 
 ### New features
 
+* Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#343)](https://github.com/XanaduAI/thewalrus/pull/338)
+
 ### Breaking changes
 
 ### Improvements
@@ -12,15 +14,14 @@
 
 ### Documentation
 
-* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
-  is now used to style the Sphinx documentation.
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme) is now used to style the Sphinx documentation.
   [(#341)](https://github.com/XanaduAI/thewalrus/pull/341)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov, Antonín Hoskovec
+Mikhail Andrenkov, Antonín Hoskovec, Martin Houde, Benjamin Lanthier, Dominic Leclerc, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
