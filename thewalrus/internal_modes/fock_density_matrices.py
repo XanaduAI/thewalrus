@@ -18,6 +18,7 @@ Set of functions for calculating Fock basis density matrices for heralded states
 import numpy as np 
 import numba
 
+from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges
 from .useful_tools import (
     nb_block, 
@@ -37,7 +38,7 @@ def _density_matrix_single_mode(cov, pattern, cutoff=13):
 
     Args:
         cov (array): 2M x 2M covariance matrix
-        pattern (list): M-1 length list of the heralding pattern
+        pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
     """
 
@@ -45,12 +46,27 @@ def _density_matrix_single_mode(cov, pattern, cutoff=13):
 
     K = cov.shape[0] // (2 * M)
 
+    if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
+        raise ValueError("Keys of pattern must correspond to all but one spatial mode")
+    N_nums = np.array(list(pattern.values()))
+    HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
+
+    #swapping the spatial modes around such that we are heralding in spatial mode 0
+    Uswap = np.zeros((M, M))
+    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM+1, M)))
+    for j, k in enumerate(swapV):
+        Uswap[j][k] = 1
+    U_K = np.zeros((M * K, M * K))
+    for i in range(K):
+        U_K[i::K, i::K] = Uswap
+    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K)
+
     #filter out all unwanted schmidt modes in heralded spatial mode
     
     #create passive transformation of filter
     T = np.zeros((M*K, M*K), dtype=np.float64)
-    T[0,0] = 1 
-    T[K:,K:] = np.eye((M-1)*K, dtype=np.float64)
+    T[0, 0] = 1
+    T[K:, K:] = np.eye((M-1)*K, dtype=np.float64)
 
     #apply channel of filter
     P = nb_block(((T, np.zeros_like(T)), (np.zeros_like(T), T)))
@@ -71,13 +87,13 @@ def _density_matrix_single_mode(cov, pattern, cutoff=13):
     x = np.array(x)
     Ax = nb_ix(A, x, x) #A[np.ix_(x, x)]
 
-    edge_reps = np.array([half_c, half_c, 1] + list(pattern))
-    n_edges = 3 + K * len(pattern)
+    edge_reps = np.array([half_c, half_c, 1] + list(N_nums))
+    n_edges = 3 + K * len(N_nums)
 
     assert n_edges == Ax.shape[0] // 2 == 3 + K * (M - 1)
 
     N_max = 2 * edge_reps.sum()
-    N_fixed = 2 * np.sum(pattern)
+    N_fixed = 2 * np.sum(N_nums)
 
     steps = np.prod(edge_reps + 1)
 
@@ -121,7 +137,7 @@ def _density_matrix_single_mode(cov, pattern, cutoff=13):
 
         haf_arr += haf_arr_new
 
-    rho = (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
+    rho = (-1) ** N_nums.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[N_nums]))
 
     for n in range(cutoff+1):
         for m in range(cutoff+1):
@@ -136,12 +152,11 @@ def density_matrix_single_mode(cov, pattern, cutoff=13):
 
     Args:
         cov (array): 2MK x 2MK covariance matrix
-        pattern (list): M-1 length list of the heralding pattern
+        pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
     Returns:
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
 
     cov = np.array(cov).astype(np.float64)
-    pattern = np.array(pattern)
     return _density_matrix_single_mode(cov, pattern, cutoff)
