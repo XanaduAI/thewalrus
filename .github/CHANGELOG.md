@@ -8,6 +8,8 @@
 
 ### Bug fixes
 
+* Remove redundant call of `Qmat`, `Amat` from `generate_hafnian_sample`. [(#343)](https://github.com/XanaduAI/thewalrus/pull/343)
+
 ### Documentation
 
 * The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
@@ -18,7 +20,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov
+Mikhail Andrenkov, Antonín Hoskovec
 
 ---
 
