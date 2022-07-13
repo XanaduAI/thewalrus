@@ -55,6 +55,8 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
             raise ValueError(
                 "Number of overlaps with LO must match number of internal modes"
             )
+        if not np.linalg.norm(LO_overlap) <= 1:
+            raise ValueError("Norm of overlaps must not be greater than 1")
 
     N_nums = np.array(list(pattern.values()))
     HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
