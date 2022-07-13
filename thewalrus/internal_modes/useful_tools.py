@@ -1,15 +1,16 @@
-import numpy as np 
+import numpy as np
 from scipy.special import factorial
-import numba 
+import numba
 from ..charpoly import powertrace
 
 fact = np.array([factorial(i) for i in range(110)], dtype=np.float64)
 
+
 @numba.jit(nopython=True, cache=True)
 def spatial_modes_to_schmidt_modes(spatial_modes, K):
     """
-    returns index of schmidt modes corresponding to the give spatial modes. 
-    e.g. if there are K=3 schmidt modes and spatial_modes=[0,2] 
+    returns index of schmidt modes corresponding to the give spatial modes.
+    e.g. if there are K=3 schmidt modes and spatial_modes=[0,2]
     then schmidt_modes=[0,1,2,6,7,8]
 
     Args:
@@ -28,11 +29,12 @@ def spatial_modes_to_schmidt_modes(spatial_modes, K):
 
     return schmidt_modes
 
+
 @numba.jit(nopython=True, cache=True)
 def spatial_reps_to_schmidt_reps(spatial_reps, K):
     """
-    returns reps of schmidt modes corresponding to the give spatial reps. 
-    e.g. if there are K=3 schmidt modes and spatial_reps=[1,2] 
+    returns reps of schmidt modes corresponding to the give spatial reps.
+    e.g. if there are K=3 schmidt modes and spatial_reps=[1,2]
     then schmidt_reps=[1,1,1,2,2,2]
 
     Args:
@@ -46,12 +48,13 @@ def spatial_reps_to_schmidt_reps(spatial_reps, K):
     M = len(spatial_reps)
     schmidt_reps = np.empty(M * K, dtype=spatial_reps.dtype)
     for i, r in enumerate(spatial_reps):
-        schmidt_reps[i*K:(i+1)*K] = r
+        schmidt_reps[i * K : (i + 1) * K] = r
 
     return schmidt_reps
 
+
 @numba.jit(nopython=True, cache=True)
-def nb_Qmat(cov, hbar=2): # pragma: no cover
+def nb_Qmat(cov, hbar=2):  # pragma: no cover
     r"""Numba compatible version of `thewalrus.quantum.Qmat`
     Returns the :math:`Q` Husimi matrix of the Gaussian state.
     Args:
@@ -65,9 +68,9 @@ def nb_Qmat(cov, hbar=2): # pragma: no cover
     N = len(cov) // 2
     I = np.identity(N)
 
-    x = cov[:N, :N] * (2. / hbar)
-    xp = cov[:N, N:] * (2. / hbar)
-    p = cov[N:, N:] * (2. / hbar)
+    x = cov[:N, :N] * (2.0 / hbar)
+    xp = cov[:N, N:] * (2.0 / hbar)
+    p = cov[N:, N:] * (2.0 / hbar)
     # the (Hermitian) matrix elements <a_i^\dagger a_j>
     aidaj = (x + p + 1j * (xp - xp.T) - 2 * I) / 4
     # the (symmetric) matrix elements <a_i a_j>
@@ -79,7 +82,7 @@ def nb_Qmat(cov, hbar=2): # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def nb_block(X): # pragma: no cover
+def nb_block(X):  # pragma: no cover
     """Numba implementation of `np.block`.
     Only suitable for 2x2 blocks.
     Taken from: https://stackoverflow.com/a/57562911
@@ -91,6 +94,7 @@ def nb_block(X): # pragma: no cover
     xtmp1 = np.concatenate(X[0], axis=1)
     xtmp2 = np.concatenate(X[1], axis=1)
     return np.concatenate((xtmp1, xtmp2), axis=0)
+
 
 @numba.jit(nopython=True, cache=True)
 def f_all_charpoly(H, n):

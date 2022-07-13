@@ -21,7 +21,12 @@ from itertools import chain
 from scipy.linalg import block_diag
 from strawberryfields.decompositions import takagi
 from ..quantum import fidelity
-from ..symplectic import interferometer, reduced_state, squeezing, passive_transformation
+from ..symplectic import (
+    interferometer,
+    reduced_state,
+    squeezing,
+    passive_transformation,
+)
 
 
 def indexconversion(j, k, njs):
@@ -128,7 +133,7 @@ def orthonormal_basis(O, rjs, thr=1e-3):
     return eps, W
 
 
-def state_prep(eps, W, thresh=1e-3, hbar=2.0):
+def state_prep(eps, W, thresh=1e-3, hbar=2):
     r"""
     Computes the total covariance matrix (assuming zero displacement) of the initial state as determined by orthonormalization parameters.
     Modes are ordered first by orthonormalization modes, then spatial modes, i.e. for R orthonormalization modes the 1st R modes of the
@@ -180,10 +185,14 @@ def state_prep(eps, W, thresh=1e-3, hbar=2.0):
             R = int(len(keep_modes) / M)
             _, Qswap = reduced_state(np.zeros(len(Qswap)), Qswap, keep_modes)
 
-    return interferometer(swap_matrix(M, R).T) @ Qswap @ interferometer(swap_matrix(M, R).T).T
+    return (
+        interferometer(swap_matrix(M, R).T)
+        @ Qswap
+        @ interferometer(swap_matrix(M, R).T).T
+    )
 
 
-def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2.0):
+def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2):
     """
     prepare multimode covariance matrix using Lowdin orthonormalisation
 
@@ -194,7 +203,7 @@ def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2.0):
         O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
         T (array): (unitary if lossless) matrix expressing the spatial mode interferometer
         thresh(float): threshold for ignoring states (default 1e-3)
-        hbar (float): the value of hbar (default 2.0)
+        hbar (float): the value of hbar (default 2)
 
     Returns:
         array[:,:]: covariance matrix over all spatial modes and (Lowdin) internal modes

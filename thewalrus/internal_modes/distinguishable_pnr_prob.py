@@ -14,13 +14,14 @@
 """
 Function for calculating probability of distinguishable squeezing Gaussian Boson sampling experiments
 """
-import numpy as np 
-import numba 
+import numpy as np
+import numba
 
 from ..symplectic import passive_transformation, squeezing
 from ..quantum import Qmat
 from .._hafnian import nb_binom, f
 from .useful_tools import nb_Qmat, nb_block, fact
+
 
 @numba.jit(nopython=True, cache=True)
 def guan_code(n):
@@ -33,12 +34,12 @@ def guan_code(n):
         j_new (int): index of the changed digit
         j_pm (int): +1 / -1 depending on whether the index increases or decreases
     """
-    n = n[::-1] # maximum for each digit
+    n = n[::-1]  # maximum for each digit
     K = len(n)
-    g = np.zeros(K+1, dtype=np.uint8) #the guan code
-    u = np.ones(K+1, dtype=np.int8)
+    g = np.zeros(K + 1, dtype=np.uint8)  # the guan code
+    u = np.ones(K + 1, dtype=np.int8)
     while g[K] == 0:
-        #enumerate next gray code
+        # enumerate next gray code
         i = 0
         k = g[0] + u[0]
         while k > n[i] or k < 0:
@@ -48,12 +49,13 @@ def guan_code(n):
             if i >= K:
                 break
         g[i] = k
-        
+
         if i < K:
-            yield K-i-1, u[i], g[-2::-1]
+            yield K - i - 1, u[i], g[-2::-1]
+
 
 @numba.jit(nopython=True, cache=True)
-def _dist_prob_gray(pattern, covs, M):
+def _dist_prob_gray(pattern, covs, M, hbar=2):
     r"""
     probability for distinguishable squeezing GBS.
 
@@ -65,36 +67,37 @@ def _dist_prob_gray(pattern, covs, M):
         pattern (array[int]): photon number outcome
         covs (array[:,:,:]): array of covariance matrices, one for each squeezer
         M (int): number of modes
+        hbar (float): the value of hbar (default 2)
     """
 
     N = 2 * pattern.sum()
 
     D = len(covs)
 
-    vac_prob = np.float64(1.)
+    vac_prob = np.float64(1.0)
 
     AXs = []
     abs2_AXs = []
     assert len(pattern) == M
     for cov in covs:
-        assert cov.shape[0] == 2 * M 
-        Q = nb_Qmat(cov)
+        assert cov.shape[0] == 2 * M
+        Q = nb_Qmat(cov, hbar=hbar)
         O = np.identity(2 * M) - np.linalg.inv(Q)
         A = np.empty_like(O)
-        A[:M,:] = O[M:,:].conj()
-        A[M:,:] = O[:M,:].conj()
+        A[:M, :] = O[M:, :].conj()
+        A[M:, :] = O[:M, :].conj()
         AX = np.empty_like(O)
-        AX[:,:M] = A[:,M:]
-        AX[:,M:] = A[:,:M]
+        AX[:, :M] = A[:, M:]
+        AX[:, M:] = A[:, :M]
         # As.append(A)
         AXs.append(AX)
-        
+
         abs2_AX = np.real(AX * AX.conj()).astype(np.float64)
         abs2_AXs.append(abs2_AX)
 
         vac_prob /= np.sqrt(np.linalg.det(Q).real)
 
-    fac_prod = np.float64(1.)
+    fac_prod = np.float64(1.0)
     for p in pattern:
         fac_prod = fac_prod * np.float64(fact[p])
 
@@ -108,7 +111,7 @@ def _dist_prob_gray(pattern, covs, M):
 
     edges_sum = np.int64(0)
 
-    H = np.float64(0.)
+    H = np.float64(0.0)
     for j_new, j_pm, kept_edges in guan_code(pattern):
         edges_sum += j_pm
 
@@ -117,14 +120,14 @@ def _dist_prob_gray(pattern, covs, M):
             nonzero_rows.append(j_new + M)
         else:
             nonzero_rows.remove(j_new)
-            nonzero_rows.remove(j_new+M)
+            nonzero_rows.remove(j_new + M)
 
         # this could be done a tiny bit faster using gray code tricks
-        binom_prod = 1.
+        binom_prod = 1.0
         for i in range(M):
             binom_prod *= nb_binom(pattern[i], kept_edges[i])
 
-        prefac = (-1) ** ((N//2 - edges_sum) % 2) * binom_prod
+        prefac = (-1) ** ((N // 2 - edges_sum) % 2) * binom_prod
 
         E = []
         for i, (AX, abs2_AX) in enumerate(zip(AXs, abs2_AXs)):
@@ -133,30 +136,32 @@ def _dist_prob_gray(pattern, covs, M):
                 traces[i] += AX[j_new, j_new].real + AX[j_new + M, j_new + M].real
 
                 # add new off-diagonal elements of submatrix
-                sum_i = abs2_AX[j_new, j_new+M]
+                sum_i = abs2_AX[j_new, j_new + M]
                 for r in prev_nonzero_rows:
-                    sum_i += abs2_AX[j_new, r] + abs2_AX[j_new+M, r]
-                sum_i *= 2 # abs2_O is ortogonal so we add half the new elements then x2
+                    sum_i += abs2_AX[j_new, r] + abs2_AX[j_new + M, r]
+                sum_i *= (
+                    2  # abs2_O is ortogonal so we add half the new elements then x2
+                )
                 # add new diagonal elements of submatrix
-                sum_i += abs2_AX[j_new, j_new] + abs2_AX[j_new+M, j_new+M]
+                sum_i += abs2_AX[j_new, j_new] + abs2_AX[j_new + M, j_new + M]
                 abs2_AX_sums[i] += sum_i
             else:
                 traces[i] -= AX[j_new, j_new].real + AX[j_new + M, j_new + M].real
 
-                sum_i = abs2_AX[j_new, j_new+M]
+                sum_i = abs2_AX[j_new, j_new + M]
                 for r in nonzero_rows:
-                    sum_i += abs2_AX[j_new, r] + abs2_AX[j_new+M, r]
-                sum_i *= 2 
-                sum_i += abs2_AX[j_new, j_new] + abs2_AX[j_new+M, j_new+M]
+                    sum_i += abs2_AX[j_new, r] + abs2_AX[j_new + M, r]
+                sum_i *= 2
+                sum_i += abs2_AX[j_new, j_new] + abs2_AX[j_new + M, j_new + M]
                 abs2_AX_sums[i] -= sum_i
 
             # avoid errors by not allowing negative square root
             frob_norm = np.sqrt(max(abs2_AX_sums[i], 0))
-            disc = np.sqrt(max(2 * frob_norm ** 2 - traces[i] ** 2, 0))
+            disc = np.sqrt(max(2 * frob_norm**2 - traces[i] ** 2, 0))
             x = 0.5 * (traces[i] + disc)
             y = 0.5 * (traces[i] - disc)
 
-            E.extend([x,y])
+            E.extend([x, y])
 
         E = np.array(E)
         Hnew = prefac * f(E, N)[N // 2].real
@@ -169,27 +174,29 @@ def _dist_prob_gray(pattern, covs, M):
 
     return prob
 
-def _vac_prob(covs, M):
+
+def _vac_prob(covs, M, hbar=2):
     """
     vacuum probability
 
     Args
         covs (list[array[:,:]]): each array is 2MKx2MK length array of means, for each seperable schmidt mode
         M (int): number of spatial modes
-
+        hbar (float): the value of hbar (default 2)
     Returns:
-        float: vacuum probability 
+        float: vacuum probability
     """
 
-    vac_prob = 1.
+    vac_prob = 1.0
 
     for cov in covs:
-        assert cov.shape[0] == 2 * M 
-        Q = Qmat(cov)
+        assert cov.shape[0] == 2 * M
+        Q = Qmat(cov, hbar=hbar)
 
         vac_prob /= np.sqrt(np.linalg.det(Q).real)
 
     return vac_prob
+
 
 def distinguishable_pnr_prob(pattern, rs, T):
     """

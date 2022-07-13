@@ -30,7 +30,7 @@ from .useful_tools import (
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
+def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2):
     """
     numba function (use the wrapper function: density_matrix_multimode)
 
@@ -38,10 +38,11 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
     and allows for herald modes to contain multiple internal modes per PNR detector.
 
     Args:
-        cov (array): 2M x 2M covariance matrix
+        cov (array): 2MK x 2MK covariance matrix
         pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
+        hbar (float): the value of hbar (default 2)
     """
 
     M = len(pattern) + 1
@@ -69,22 +70,22 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
     U_K = np.zeros((M * K, M * K))
     for i in range(K):
         U_K[i::K, i::K] = Uswap
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K)
+    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
 
     # filter out all unwanted schmidt modes in heralded spatial mode
 
     # create passive transformation of filter
-    T = np.zeros((M * K, M * K), dtype=np.float64)
+    T = np.zeros((M * K, M * K), dtype=np.complex128)
     if LO_overlap is not None:
         T[0][:K] = LO_overlap
     else:
         T[0, 0] = 1
-    T[K:, K:] = np.eye((M - 1) * K, dtype=np.float64)
+    T[K:, K:] = np.eye((M - 1) * K, dtype=np.complex128)
 
     # apply channel of filter
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, T)
+    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, T, hbar=hbar)
 
-    Q = nb_Qmat(cov)
+    Q = nb_Qmat(cov, hbar=hbar)
     O = np.identity(2 * M * K) - np.linalg.inv(Q)
     A = np.empty_like(O, dtype=np.complex128)
     A[: M * K, :] = O[M * K :, :].conj()
@@ -172,7 +173,7 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
     return rho
 
 
-def density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
+def density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2):
     """
     calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
     where each mode contains K internal modes.
@@ -182,9 +183,10 @@ def density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13):
         pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
+        hbar (float): the value of hbar (default 2)
     Returns:
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
 
     cov = np.array(cov).astype(np.float64)
-    return _density_matrix_single_mode(cov, pattern, LO_overlap, cutoff)
+    return _density_matrix_single_mode(cov, pattern, LO_overlap, cutoff, hbar)
