@@ -73,12 +73,13 @@ def O_matrix(F):
     Returns:
         (array): the overlap matrix
     """
-    F = [f for fj in F for f in fj]
-    O = np.eye(len(F), dtype=np.complex128)
-    for j in range(len(F)):
-        for k in range(len(F)):
+    Fs = [f for fj in F for f in fj]
+    R = len(Fs)
+    O = np.eye(R, dtype=np.complex128)
+    for j in range(R):
+        for k in range(R):
             O[j, k] = np.inner(
-                F[j].conj() / np.linalg.norm(F[j]), F[k] / np.linalg.norm(F[k])
+                Fs[j].conj() / np.linalg.norm(Fs[j]), Fs[k] / np.linalg.norm(Fs[k])
             )
     return O
 
@@ -138,9 +139,9 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     M = len(rjs)
     njs = np.array([len(rjs[i]) for i in range(M)])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
-    X = np.fliplr(np.eye(len(lambd)))
+    X = np.fliplr(np.eye(lambd.shape[0]))
     lambd, V = X @ lambd, -V @ X
-    inds = np.arange(len(lambd))[lambd > thr]
+    inds = np.arange(lambd.shape[0])[lambd > thr]
     lambd = lambd[inds]
     R = lambd.shape[0]
     eps = []
@@ -201,7 +202,7 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
         epsBig = np.append(epsBig, i)
 
     M = len(eps)
-    R = len(eps[0])
+    R = eps[0].shape[0]
 
     Qvac = (hbar / 2) * np.eye(2 * M * R)
     S = squeezing(epsBig)
@@ -220,7 +221,7 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
         keep_modes = np.array([])
         for k in range(R):
             muTemp, QTemp = reduced_state(
-                np.zeros(len(Qswap)), Qswap, np.arange(M * k, M * (k + 1))
+                np.zeros(Qswap.shape[0]), Qswap, np.arange(M * k, M * (k + 1))
             )
             if 1 - fidelity(muVac, covVac, muTemp, QTemp) > thresh:
                 keep_modes = np.append(keep_modes, np.arange(M * k, M * (k + 1)))
@@ -229,8 +230,8 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
         keep_modes = keep_modes.tolist()
 
         if len(keep_modes) > 0:
-            R = int(len(keep_modes) / M)
-            _, Qswap = reduced_state(np.zeros(len(Qswap)), Qswap, keep_modes)
+            R = len(keep_modes) // M
+            _, Qswap = reduced_state(np.zeros(Qswap.shape[0]), Qswap, keep_modes)
 
     return (
         interferometer(swap_matrix(M, R).T)
