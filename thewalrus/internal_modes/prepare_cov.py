@@ -64,6 +64,25 @@ def swap_matrix(M, R):
     return P
 
 
+def O_matrix(F):
+    r"""The overlap matrix of all of the Schmidt modes in each spatial mode.
+
+    Args:
+        F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
+                                    Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
+    Returns:
+        (array): the overlap matrix
+    """
+    F = [f for fj in F for f in fj]
+    O = np.eye(len(F), dtype=np.complex128)
+    for j in range(len(F)):
+        for k in range(len(F)):
+            O[j, k] = np.inner(
+                F[j].conj() / np.linalg.norm(F[j]), F[k] / np.linalg.norm(F[k])
+            )
+    return O
+
+
 def vacuum_state(M, hbar=2):
     r"""
     Returns the displacement vector and covariance matrix for an M mode vacuum state.
@@ -76,44 +95,58 @@ def vacuum_state(M, hbar=2):
         tuple[array]: the displacement vector and covariance matrix of an M mode vacuum state
     """
 
-    return np.zeros(2 * M), np.identity(2 * M) * hbar / 2
+    return np.zeros(2 * M), np.eye(2 * M) * hbar / 2
 
 
-def orthonormal_basis(O, rjs, thr=1e-3):
+def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     r"""
     Finds an orthonormal basis in operator space based on the total number of Schmidt modes in the whole system of multiple spatial modes.
     Using the overlap matrix and the squeezing parameters of each Schmidt mode in each waveguide it finds R orthonormal modes for each spatial mode,
     where R is less than or equal to the total combined number of Schmidt modes in the whole system of multiple spatial modes.
 
     Args:
-        O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
         rjs (list[list]): list for each spatial mode of list of squeezing parameters in that spatial mode
+        O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
+        F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
+                                    Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
+        thr (float): eigenvalue threshold under which orthonormal mode is discounted
 
     Returns:
-        tuple (eps, W): eps is a list of arrays, in each array is the effective squeezing parameters for the orthonormal modes in each spatial mode
-                        W is a list of arrays, each array is an R x R matrix for each spatial mode for the amplitude of each orthonormal mode.
+        tuple (chis, eps, W): chis is a list of the temporal functions for the new orthonormal basis, only returned when F is given
+                              eps is a list of arrays, in each array is the effective squeezing parameters for the orthonormal modes in each spatial mode
+                              W is a list of arrays, each array is an R x R matrix for each spatial mode for the amplitude of each orthonormal mode.
     """
-
-    if not np.allclose(O, O.conj().T):
-        raise ValueError("O must be a Hermitian matrix")
-    if not np.allclose(len(O), sum([len(listElem) for listElem in rjs])):
-        raise ValueError(
-            "Length of O must equal the total number of Schmidt modes accross all spatial modes"
-        )
-    R = len(O)
+    rs = np.array([r for rj in rjs for r in rj])
+    if F is not None:
+        Fs = [f for fj in F for f in fj]
+        Fs = [Fs[j] / np.linalg.norm(Fs[j]) for j in range(len(Fs))]
+        if not np.allclose(len(Fs), rs.shape[0]):
+            raise ValueError(
+                "Length of F must equal the total number of Schmidt modes accross all spatial modes"
+            )
+        O = O_matrix(F)
+    elif O is not None:
+        if not np.allclose(O, O.conj().T):
+            raise ValueError("O must be a Hermitian matrix")
+        if not np.allclose(O.shape[0], rs.shape[0]):
+            raise ValueError(
+                "Length of O must equal the total number of Schmidt modes accross all spatial modes"
+            )
+    else:
+        raise ValueError("Either F or O must be given")
+    R = O.shape[0]
     M = len(rjs)
     njs = np.array([len(rjs[i]) for i in range(M)])
-    rs = np.array([r for rj in rjs for r in rj])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
-    X = np.fliplr(np.identity(len(lambd)))
-    lambd, V = X @ lambd, V @ X
+    X = np.fliplr(np.eye(len(lambd)))
+    lambd, V = X @ lambd, -V @ X
     inds = np.arange(len(lambd))[lambd > thr]
     lambd = lambd[inds]
-    R = len(lambd)
+    R = lambd.shape[0]
     eps = []
     W = []
     for j in range(M):
-        Rtemp = np.identity(R, dtype=np.complex128)
+        Rtemp = np.eye(R, dtype=np.complex128)
         for l in range(R):
             for m in range(R):
                 Rtemp[l, m] = np.sum(
@@ -130,6 +163,20 @@ def orthonormal_basis(O, rjs, thr=1e-3):
         eps_temp, WT_temp = takagi(Rtemp)
         eps.append(eps_temp)
         W.append(WT_temp.T)
+    if F is not None:
+        chis = []
+        for k in range(R):
+            chi = np.sum(
+                np.array(
+                    [
+                        np.sqrt(rs[j]) * Fs[j] * V[j, k] / np.sqrt(lambd[k])
+                        for j in range(len(Fs))
+                    ]
+                ),
+                axis=0,
+            )
+            chis.append(chi / np.linalg.norm(chi))
+        return chis, eps, W
     return eps, W
 
 
@@ -156,11 +203,11 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
     M = len(eps)
     R = len(eps[0])
 
-    Qvac = (hbar / 2) * np.identity(2 * M * R)
+    Qvac = (hbar / 2) * np.eye(2 * M * R)
     S = squeezing(epsBig)
     Qinit = S @ Qvac @ S.T
 
-    Wbig = np.identity(M * R, dtype=np.complex128)
+    Wbig = np.eye(M * R, dtype=np.complex128)
     for j in range(M):
         Wbig[R * j : R * (j + 1), R * j : R * (j + 1)] = W[j]
 
@@ -192,35 +239,59 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
     )
 
 
-def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2):
-    """
-    prepare multimode covariance matrix using Lowdin orthonormalisation
-
-    Lowdin modes which have a fidelity to vacuum of 1-thresh are traced over
+def LO_overlaps(chis, LO_shape):
+    r"""
+    Computes the overlap integral between the
 
     Args:
-        rjs (list[list/array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode
-        O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
-        T (array): (unitary if lossless) matrix expressing the spatial mode interferometer
-        thresh(float): threshold for ignoring states (default 1e-3)
-        hbar (float): the value of hbar (default 2)
+        chis (list[array]): list of the temporal functions for the new orthonormal basis
+        LO_shape (array): temporal profile of local oscillator
 
     Returns:
-        array[:,:]: covariance matrix over all spatial modes and (Lowdin) internal modes
+        array: overlaps between temporal mode shapes and local oscillator
+    """
+    return np.array(
+        [
+            np.inner(
+                LO_shape.conj() / np.linalg.norm(LO_shape),
+                chis[j] / np.linalg.norm(chis[j]),
+            )
+            for j in range(len(chis))
+        ]
+    )
+
+
+def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-3, hbar=2):
+    """
+    prepare multimode covariance matrix using Lowdin orthonormalisation
+    Lowdin modes which have a fidelity to vacuum of 1-thresh are traced over
+    Args:
+        rjs (list[list/array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode
+        T (array): (unitary if lossless) matrix expressing the spatial mode interferometer
+        O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
+        F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
+                                    Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
+        thr (float): eigenvalue threshold under which orthonormal mode is discounted
+        thresh(float): threshold for ignoring states (default 1e-3)
+        hbar (float): the value of hbar (default 2)
+    Returns:
+        tuple(array[:, :], list[array]): covariance matrix over all spatial modes and (Lowdin) internal modes
+                                         if temporal modes are given, the orthonormal modes are returned
+
     """
     # TODO: also return first Lowdin mode
 
-    if not np.allclose(len(T), len(rjs)):
+    if not np.allclose(T.shape[0], len(rjs)):
         raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
-    if not np.allclose(len(O), sum([len(listElem) for listElem in rjs])):
-        raise ValueError(
-            "Length of O must equal the total number of Schmidt modes accross all spatial modes"
-        )
     s = np.linalg.svd(T, compute_uv=False)
     if max(s) > 1:
         raise ValueError("T must be have singular values <= 1")
-
-    eps, W = orthonormal_basis(O, rjs)
+    if O is not None:
+        eps, W = orthonormal_basis(rjs, O=O, thr=thr)
+    elif F is not None:
+        chis, eps, W = orthonormal_basis(rjs, F=F, thr=thr)
+    else:
+        raise ValueError("Either O or F must be supplied")
     Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
 
     M = T.shape[0]
@@ -228,7 +299,8 @@ def prepare_cov(rjs, O, T, thresh=1e-3, hbar=2):
     T_K = np.zeros((M * K, M * K), dtype=np.complex128)
     for i in range(K):
         T_K[i::K, i::K] = T
-    mu = np.zeros(Qinit.shape[0])
-    mu, Qu = passive_transformation(mu, Qinit, T_K, hbar=hbar)
+    _, Qu = passive_transformation(np.zeros(Qinit.shape[0]), Qinit, T_K, hbar=hbar)
 
+    if F is not None:
+        return Qu, chis
     return Qu

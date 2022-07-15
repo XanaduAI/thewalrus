@@ -30,7 +30,9 @@ from .useful_tools import (
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2):
+def _density_matrix_single_mode(
+    cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2
+):
     """
     numba function (use the wrapper function: density_matrix_multimode)
 
@@ -39,7 +41,8 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2
 
     Args:
         cov (array): 2MK x 2MK covariance matrix
-        pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
+        pattern (array): M-1 length array of the heralding pattern
+        normalize (bool): whether to normalise the output density matrix
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
         hbar (float): the value of hbar (default 2)
@@ -49,28 +52,13 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2
 
     K = cov.shape[0] // (2 * M)
 
-    if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
-        raise ValueError("Keys of pattern must correspond to all but one spatial mode")
     if LO_overlap is not None:
-        if not np.allclose(K, LO_overlap.shape[0]):
+        if not K == LO_overlap.shape[0]:
             raise ValueError(
                 "Number of overlaps with LO must match number of internal modes"
             )
-        if not np.linalg.norm(LO_overlap) <= 1:
+        if not np.linalg.norm(LO_overlap) <= 1.0001:
             raise ValueError("Norm of overlaps must not be greater than 1")
-
-    N_nums = np.array(list(pattern.values()))
-    HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
-
-    # swapping the spatial modes around such that we are heralding in spatial mode 0
-    Uswap = np.zeros((M, M))
-    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
-    for j, k in enumerate(swapV):
-        Uswap[j][k] = 1
-    U_K = np.zeros((M * K, M * K))
-    for i in range(K):
-        U_K[i::K, i::K] = Uswap
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
 
     # filter out all unwanted schmidt modes in heralded spatial mode
 
@@ -83,10 +71,12 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2
     T[K:, K:] = np.eye((M - 1) * K, dtype=np.complex128)
 
     # apply channel of filter
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, T, hbar=hbar)
+    P = nb_block(((T.real, -T.imag), (T.imag, T.real)))
+    L = (hbar / 2) * (np.eye(P.shape[0]) - P @ P.T)
+    cov = P @ cov @ P.T + L
 
     Q = nb_Qmat(cov, hbar=hbar)
-    O = np.identity(2 * M * K) - np.linalg.inv(Q)
+    O = np.eye(2 * M * K) - np.linalg.inv(Q)
     A = np.empty_like(O, dtype=np.complex128)
     A[: M * K, :] = O[M * K :, :].conj()
     A[M * K :, :] = O[: M * K, :].conj()
@@ -108,13 +98,13 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2
     x = np.array(x)
     Ax = nb_ix(A, x, x)  # A[np.ix_(x, x)]
 
-    edge_reps = np.array([half_c, half_c, 1] + list(N_nums))
-    n_edges = 3 + K * len(N_nums)
+    edge_reps = np.array([half_c, half_c, 1] + list(pattern))
+    n_edges = 3 + K * len(pattern)
 
     assert n_edges == Ax.shape[0] // 2 == 3 + K * (M - 1)
 
     N_max = 2 * edge_reps.sum()
-    N_fixed = 2 * np.sum(N_nums)
+    N_fixed = 2 * np.sum(pattern)
 
     steps = np.prod(edge_reps + 1)
 
@@ -161,19 +151,23 @@ def _density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2
         haf_arr += haf_arr_new
 
     rho = (
-        (-1) ** N_nums.sum()
+        (-1) ** pattern.sum()
         * haf_arr
-        / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[N_nums]))
+        / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
     )
 
     for n in range(cutoff + 1):
         for m in range(cutoff + 1):
             rho[n, m] /= np.sqrt(fact[n] * fact[m]) * (2 ** ((N_fixed + n + m) // 2))
 
+    if normalize:
+        return rho / np.trace(rho).real
     return rho
 
 
-def density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2):
+def density_matrix_single_mode(
+    cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2
+):
     """
     calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
     where each mode contains K internal modes.
@@ -181,6 +175,7 @@ def density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2)
     Args:
         cov (array): 2MK x 2MK covariance matrix
         pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
+        normalize (bool): whether to normalise the output density matrix
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
         hbar (float): the value of hbar (default 2)
@@ -189,4 +184,20 @@ def density_matrix_single_mode(cov, pattern, LO_overlap=None, cutoff=13, hbar=2)
     """
 
     cov = np.array(cov).astype(np.float64)
-    return _density_matrix_single_mode(cov, pattern, LO_overlap, cutoff, hbar)
+    M = len(pattern) + 1
+    K = cov.shape[0] // (2 * M)
+    if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
+        raise ValueError("Keys of pattern must correspond to all but one spatial mode")
+    N_nums = np.array(list(pattern.values()))
+    HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
+
+    # swapping the spatial modes around such that we are heralding in spatial mode 0
+    Uswap = np.zeros((M, M))
+    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
+    for j, k in enumerate(swapV):
+        Uswap[j][k] = 1
+    U_K = np.zeros((M * K, M * K))
+    for i in range(K):
+        U_K[i::K, i::K] = Uswap
+    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
+    return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
