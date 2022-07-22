@@ -20,6 +20,7 @@ from scipy.linalg import block_diag
 
 from thewalrus import symplectic
 from thewalrus.quantum import is_valid_cov
+from thewalrus.random import random_symplectic
 
 
 # pylint: disable=too-few-public-methods
@@ -699,6 +700,22 @@ class TestSymplecticExpansion:
         expected[m2 + N, m1 + N] = S[3, 2]
 
         assert np.allclose(res, expected, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("N", range(3,6))
+    def test_expand_one_mode_gate_to_many_modes(self, N, tol):
+        """Test that passing a single mode symplectic along with many modes
+        makes the gate act on those modes."""
+
+        modes = np.random.choice(N, N-1, replace=False)
+
+        S = random_symplectic(1)
+        res = symplectic.expand(S, modes=modes, N=N)
+
+        for m in range(N):
+            if m in modes:
+                assert np.allclose(res[2*m:2*m+2, 2*m:2*m+2], S, atol=tol, rtol=0)
+            else:
+                assert np.allclose(res[2*m:2*m+2, 2*m:2*m+2], np.zeros((2,2)), atol=tol, rtol=0)
 
 
 class TestIntegration:
