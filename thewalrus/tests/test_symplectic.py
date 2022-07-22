@@ -701,21 +701,23 @@ class TestSymplecticExpansion:
 
         assert np.allclose(res, expected, atol=tol, rtol=0)
 
-    @pytest.mark.parametrize("N", range(3,6))
+    @pytest.mark.parametrize("N", range(3, 6))
     def test_extend_single_mode_symplectic(self, N, tol):
         """Test that passing a single mode symplectic along with many modes
         makes the gate act on those modes."""
 
-        modes = np.random.choice(N, N-1, replace=False)
+        modes = np.random.choice(N, N - 1, replace=False)
 
         S = random_symplectic(1)
         res = symplectic.extend(S, modes=modes, N=N)
 
         for m in range(N):
             if m in modes:
-                assert np.allclose(res[2*m:2*m+2, 2*m:2*m+2], S, atol=tol, rtol=0)
+                assert np.allclose(res[2 * m : 2 * m + 2, 2 * m : 2 * m + 2], S, atol=tol, rtol=0)
             else:
-                assert np.allclose(res[2*m:2*m+2, 2*m:2*m+2], np.zeros((2,2)), atol=tol, rtol=0)
+                assert np.allclose(
+                    res[2 * m : 2 * m + 2, 2 * m : 2 * m + 2], np.zeros((2, 2)), atol=tol, rtol=0
+                )
 
 
 class TestIntegration:
