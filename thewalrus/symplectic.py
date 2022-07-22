@@ -57,6 +57,8 @@ Code details
 ------------
 """
 import numpy as np
+from scipy.linalg import block_diag
+from sympy import true
 
 
 def expand(S, modes, N):
@@ -72,7 +74,11 @@ def expand(S, modes, N):
     """
     M = len(S) // 2
     S2 = np.identity(2 * N, dtype=S.dtype)
-    w = np.array(modes)
+    w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
+
+    if M == 1 and w.shape[0] > M:
+        # Extend single-mode gate to repeatedly act on several modes
+        return block_diag(*[S.copy() if mode in w else np.zeros((2,2)) for mode in range(N)])
 
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
     S2[(w + N).reshape(-1, 1), (w + N).reshape(1, -1)] = S[M:, M:].copy()  # P
