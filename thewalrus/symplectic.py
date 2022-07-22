@@ -63,10 +63,6 @@ from sympy import true
 
 def expand(S, modes, N):
     r"""Expands a Symplectic matrix S to act on the entire subsystem.
-    If the symplectic is single mode :math:`2\times 2` and the number
-    of modes is more than one, then the single-mode gate is made
-    to repeatedly act on the relevant ``modes``.
-
 
     Args:
         S (array): a :math:`2M\times 2M` Symplectic matrix
@@ -80,9 +76,10 @@ def expand(S, modes, N):
     S2 = np.identity(2 * N, dtype=S.dtype)
     w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
 
-    if M == 1 and w.shape[0] > M:
-        # Extend single-mode gate to repeatedly act on several modes
-        return block_diag(*[S.copy() if mode in w else np.zeros((2,2)) for mode in range(N)])
+    if w.shape[0] != M:
+        raise ValueError(
+            "The size of the symplectic and the number of modes on which it is acting on do not match."
+        )
 
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
     S2[(w + N).reshape(-1, 1), (w + N).reshape(1, -1)] = S[M:, M:].copy()  # P
@@ -91,6 +88,28 @@ def expand(S, modes, N):
 
     return S2
 
+def extend(S, modes, N):
+    r"""Extends a single mode symplectic to act on multiple modes.
+
+    Args:
+        S (array): a :math:`2\times 2` Symplectic matrix
+        modes (Sequence[int]): the list of modes S acts on
+        N (int): full size of the subsystem
+
+    Returns:
+        array: the resulting :math:`2N\times 2N` Symplectic matrix
+    """
+    M = len(S) // 2
+
+    if M > 1:
+        raise ValueError(f"`extend` expects a symplectic of size 1, got size {M}.")
+
+    S2 = np.identity(2 * N, dtype=S.dtype)
+    w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
+
+    if M == 1 and w.shape[0] > M:
+        # Extend single-mode gate to repeatedly act on several modes
+        return block_diag(*[S.copy() if mode in w else np.zeros((2,2)) for mode in range(N)])
 
 def expand_vector(alpha, mode, N, hbar=2.0):
     """Returns the phase-space displacement vector associated to a displacement.
