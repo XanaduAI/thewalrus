@@ -63,6 +63,10 @@ from sympy import true
 
 def expand(S, modes, N):
     r"""Expands a Symplectic matrix S to act on the entire subsystem.
+    If the symplectic is single mode :math:`2\times 2` and the number
+    of modes is more than one, then the single-mode gate is made
+    to repeatedly act on the relevant ``modes``.
+
 
     Args:
         S (array): a :math:`2M\times 2M` Symplectic matrix
