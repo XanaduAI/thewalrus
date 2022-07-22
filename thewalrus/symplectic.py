@@ -58,7 +58,6 @@ Code details
 """
 import numpy as np
 from scipy.linalg import block_diag
-from sympy import true
 
 
 def expand(S, modes, N):
@@ -100,16 +99,14 @@ def extend(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = len(S) // 2
-
-    if M > 1:
-        raise ValueError(f"`extend` expects a symplectic of size 1, got size {M}.")
-
-    S2 = np.identity(2 * N, dtype=S.dtype)
     w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
 
-    if M == 1 and w.shape[0] > M:
-        # Extend single-mode gate to repeatedly act on several modes
-        return block_diag(*[S.copy() if mode in w else np.zeros((2,2)) for mode in range(N)])
+    if not(M == 1 and w.shape[0] > M):
+        raise ValueError(f"`extend` expects a symplectic of size 1, got size {M}.")
+
+    # Extend single-mode gate to repeatedly act on several modes
+    return block_diag(*[S.copy() if mode in w else np.zeros((2,2)) for mode in range(N)])
+
 
 def expand_vector(alpha, mode, N, hbar=2.0):
     """Returns the phase-space displacement vector associated to a displacement.
