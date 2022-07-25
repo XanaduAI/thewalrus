@@ -26,7 +26,6 @@ from scipy.sparse import (
     coo_array,
     dia_array,
     issparse,
-    isspmatrix_bsr,
 )
 
 from thewalrus import symplectic
