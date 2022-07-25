@@ -17,6 +17,7 @@ import pytest
 
 import numpy as np
 from scipy.linalg import block_diag
+from scipy.sparse import csr_matrix
 
 from thewalrus import symplectic
 from thewalrus.quantum import is_valid_cov
@@ -701,23 +702,28 @@ class TestSymplecticExpansion:
 
         assert np.allclose(res, expected, atol=tol, rtol=0)
 
-    @pytest.mark.parametrize("N", range(3, 6))
+    @pytest.mark.parametrize("N", range(1, 6))
     def test_extend_single_mode_symplectic(self, N, tol):
         """Test that passing a single mode symplectic along with many modes
         makes the gate act on those modes."""
 
         modes = np.random.choice(N, N - 1, replace=False)
-
         S = random_symplectic(1)
-        res = symplectic.extend(S, modes=modes, N=N)
+        res = symplectic.expand(S, modes=modes, N=N)
 
         for m in range(N):
             if m in modes:
-                assert np.allclose(res[2 * m : 2 * m + 2, 2 * m : 2 * m + 2], S, atol=tol, rtol=0)
+                # check the symplectic acts on the mode m
+                assert np.allclose(res[m, m], S[0, 0], atol=tol, rtol=0)   # X
+                assert np.allclose(res[m + N, m + N], S[1, 1], atol=tol, rtol=0)   # P
+                assert np.allclose(res[m, m + N], S[0, 1], atol=tol, rtol=0)   # XP
+                assert np.allclose(res[m + N, m], S[1, 0], atol=tol, rtol=0)   # PX
             else:
-                assert np.allclose(
-                    res[2 * m : 2 * m + 2, 2 * m : 2 * m + 2], np.zeros((2, 2)), atol=tol, rtol=0
-                )
+                # check the identity acts on the mode m
+                assert np.allclose(res[m, m], 1, atol=tol, rtol=0)   # X
+                assert np.allclose(res[m + N, m + N], 1, atol=tol, rtol=0)   # P
+                assert np.allclose(res[m, m + N], 0, atol=tol, rtol=0)   # XP
+                assert np.allclose(res[m + N, m], 0, atol=tol, rtol=0)   # PX
 
 
 class TestIntegration:
