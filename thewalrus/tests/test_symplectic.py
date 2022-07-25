@@ -714,16 +714,16 @@ class TestSymplecticExpansion:
         for m in range(N):
             if m in modes:
                 # check the symplectic acts on the mode m
-                assert np.allclose(res[m, m], S[0, 0], atol=tol, rtol=0)   # X
-                assert np.allclose(res[m + N, m + N], S[1, 1], atol=tol, rtol=0)   # P
-                assert np.allclose(res[m, m + N], S[0, 1], atol=tol, rtol=0)   # XP
-                assert np.allclose(res[m + N, m], S[1, 0], atol=tol, rtol=0)   # PX
+                assert np.allclose(res[m, m], S[0, 0], atol=tol, rtol=0)  # X
+                assert np.allclose(res[m + N, m + N], S[1, 1], atol=tol, rtol=0)  # P
+                assert np.allclose(res[m, m + N], S[0, 1], atol=tol, rtol=0)  # XP
+                assert np.allclose(res[m + N, m], S[1, 0], atol=tol, rtol=0)  # PX
             else:
                 # check the identity acts on the mode m
-                assert np.allclose(res[m, m], 1, atol=tol, rtol=0)   # X
-                assert np.allclose(res[m + N, m + N], 1, atol=tol, rtol=0)   # P
-                assert np.allclose(res[m, m + N], 0, atol=tol, rtol=0)   # XP
-                assert np.allclose(res[m + N, m], 0, atol=tol, rtol=0)   # PX
+                assert np.allclose(res[m, m], 1, atol=tol, rtol=0)  # X
+                assert np.allclose(res[m + N, m + N], 1, atol=tol, rtol=0)  # P
+                assert np.allclose(res[m, m + N], 0, atol=tol, rtol=0)  # XP
+                assert np.allclose(res[m + N, m], 0, atol=tol, rtol=0)  # PX
 
 
 class TestIntegration:
