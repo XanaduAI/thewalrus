@@ -56,6 +56,7 @@ Gates and operations
 Code details
 ------------
 """
+import warnings
 import numpy as np
 from scipy.sparse import issparse, coo_array, dia_array, bsr_array, csr_array
 
@@ -65,8 +66,11 @@ def expand(S, modes, N):
     If the input is a single mode symplectic, then extends it to act
     on multiple modes.
 
+    Supports scipy sparse matrices. Instances of ``coo_array``, ``dia_array``,
+    ``bsr_array`` will be transformed into `csr_array``.
+
     Args:
-        S (array): a :math:`2M\times 2M` Symplectic matrix
+        S (ndarray or spmatrix): a :math:`2M\times 2M` Symplectic matrix
         modes (Sequence[int]): the list of modes S acts on
         N (int): full size of the subsystem
 
@@ -79,6 +83,9 @@ def expand(S, modes, N):
     if issparse(S):
         # cast to sparse matrix that supports slicing and indexing
         if isinstance(S, (coo_array, dia_array, bsr_array)):
+            warnings.warn(
+                "Unsupported sparse matrix type, returning a Compressed Sparse Row matrix."
+            )
             S = csr_array(S)
         sparse_type = type(S)
         S2 = sparse_type(S2, dtype=S.dtype)
