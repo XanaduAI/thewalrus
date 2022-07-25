@@ -17,7 +17,17 @@ import pytest
 
 import numpy as np
 from scipy.linalg import block_diag
-from scipy.sparse import csr_matrix
+from scipy.sparse import (
+    csc_array,
+    csr_array,
+    bsr_array,
+    lil_array,
+    dok_array,
+    coo_array,
+    dia_array,
+    issparse,
+    isspmatrix_bsr,
+)
 
 from thewalrus import symplectic
 from thewalrus.quantum import is_valid_cov
@@ -703,14 +713,22 @@ class TestSymplecticExpansion:
         assert np.allclose(res, expected, atol=tol, rtol=0)
 
     @pytest.mark.parametrize("N", range(1, 6))
-    def test_extend_single_mode_symplectic(self, N, tol):
+    @pytest.mark.parametrize(
+        "matrix_type",
+        [np.array, csc_array, csr_array, bsr_array, lil_array, dok_array, coo_array, dia_array],
+    )
+    def test_extend_single_mode_symplectic(self, N, matrix_type, tol):
         """Test that passing a single mode symplectic along with many modes
         makes the gate act on those modes."""
 
         modes = np.random.choice(N, N - 1, replace=False)
         S = random_symplectic(1)
+        S = matrix_type(S, dtype=S.dtype)
+
         res = symplectic.expand(S, modes=modes, N=N)
 
+        if issparse(S):
+            S = S.toarray()
         for m in range(N):
             if m in modes:
                 # check the symplectic acts on the mode m

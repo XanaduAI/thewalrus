@@ -57,8 +57,7 @@ Code details
 ------------
 """
 import numpy as np
-from scipy.linalg import block_diag
-from scipy.sparse import block_diag as block_diag_sparse, issparse, csr_matrix
+from scipy.sparse import issparse, coo_array, dia_array, bsr_array, csr_array
 
 
 def expand(S, modes, N):
@@ -74,19 +73,30 @@ def expand(S, modes, N):
     Returns:
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
-    M = len(S) // 2
-    S2 = np.identity(2 * N, dtype=S.dtype)
+    M = S.shape[0] // 2
+    S2 = np.identity(2 * N)
+
+    if issparse(S):
+        # cast to sparse matrix that supports slicing and indexing
+        if isinstance(S, (coo_array, dia_array, bsr_array)):
+            S = csr_array(S)
+        sparse_type = type(S)
+        S2 = sparse_type(S2, dtype=S.dtype)
+
     w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
 
+    # extend single mode symplectic to act on selected modes
     if M == 1:
-        S2 = block_diag(*[S.copy() if mode in w else np.identity(2) for mode in range(N)])
-        return xpxp_to_xxpp(S2)
+        for m in w:
+            S2[m, m], S2[m + N, m + N] = S[0, 0], S[1, 1]  # X, P
+            S2[m, m + N], S2[m + N, m] = S[0, 1], S[1, 0]  # XP, PX
+        return S2
 
+    # make symplectic act on the selected subsystems
     S2[w.reshape(-1, 1), w.reshape(1, -1)] = S[:M, :M].copy()  # X
     S2[(w + N).reshape(-1, 1), (w + N).reshape(1, -1)] = S[M:, M:].copy()  # P
     S2[w.reshape(-1, 1), (w + N).reshape(1, -1)] = S[:M, M:].copy()  # XP
     S2[(w + N).reshape(-1, 1), w.reshape(1, -1)] = S[M:, :M].copy()  # PX
-
     return S2
 
 
