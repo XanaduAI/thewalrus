@@ -153,6 +153,7 @@ __all__ = [
     "hermite_multidimensional",
     "grad_hermite_multidimensional",
     "version",
+    "hermite_multidimensional_vjp"
 ]
 
 

@@ -276,6 +276,41 @@ def _hermite_multidimensional_renorm(R, y, G):  # pragma: no cover
 
 
 @jit(nopython=True)
+def hermite_multidimensional_vjp(dLdG, dCdR, dCdy, C, G):  # pragma: no cover
+    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
+    initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
+
+    Args:
+        dLdG (array[complex]): derivative of the loss with respect to the conjugate of the Hermite polynomials
+        R (array[complex]): square matrix parametrizing the Hermite polynomial
+        y (vector[complex]): vector argument of the Hermite polynomial
+        G (array[complex]): array with the *conjugate* of the Hermite polynomials
+
+    Returns:
+        dLdR, dLdy, dLdC (array[complex]): the derivatives of the loss with respect to the conjugate of R, y and C
+    """
+    # contributions from (0,0,...,0)
+    indices = np.ndindex(G.shape)
+    first = next(indices)
+    dLdC = dLdG[first]#np.sum(dLdG * G) / np.conj(C) # note that G is already conjugated
+    dLdR = dLdG[first] * np.conj(dCdR)
+    dLdy = dLdG[first] * np.conj(dCdy)
+
+    # skipped the first index (0,...,0)
+    for idx in indices:
+        i = 0
+        for i, val in enumerate(idx):
+            if val > 0:
+                break
+        ki = dec(idx, i)
+        dLdy[i] += dLdG[idx] * G[ki] / SQRT[idx[i]] # contribution from dGdy[idx,i]
+        for l, kl in remove(ki):
+            dLdR[i, l] -= dLdG[idx] * SQRT[ki[l]] * G[kl] / SQRT[idx[i]]
+        # dLdC += dLdG[idx] * G[idx] / np.conj(C)
+    return dLdR, dLdy, dLdC
+
+
+@jit(nopython=True)
 def _hermite_multidimensional(R, y, G):  # pragma: no cover
     r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
     initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
