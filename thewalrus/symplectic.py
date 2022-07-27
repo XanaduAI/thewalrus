@@ -84,7 +84,7 @@ def expand(S, modes, N):
         # cast to sparse matrix that supports slicing and indexing
         if isinstance(S, (coo_array, dia_array, bsr_array)):
             warnings.warn(
-                "Unsupported sparse matrix type, returning a Compressed Sparse Row matrix."
+                "Unsupported sparse matrix type, returning a Compressed Sparse Row (CSR) matrix."
             )
             S = csr_array(S)
         sparse_type = type(S)
