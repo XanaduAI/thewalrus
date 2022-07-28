@@ -58,7 +58,14 @@ Code details
 """
 import warnings
 import numpy as np
-from scipy.sparse import identity, issparse, coo_array, dia_array, bsr_array, csr_array
+from scipy.sparse import (
+    identity as sparse_identity,
+    issparse,
+    coo_array,
+    dia_array,
+    bsr_array,
+    csr_array,
+)
 
 
 def expand(S, modes, N):
@@ -78,16 +85,16 @@ def expand(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = S.shape[0] // 2
+    S2 = np.identity(2 * N, dtype=S.dtype)
+
     if issparse(S):
         # cast to sparse matrix that supports slicing and indexing
+        S2 = sparse_identity(2 * N, dtype=S.dtype, format="csr")
         if isinstance(S, (coo_array, dia_array, bsr_array)):
             warnings.warn(
                 "Unsupported sparse matrix type, returning a Compressed Sparse Row (CSR) matrix."
             )
             S = csr_array(S)
-            S2 = identity(2 * N, dtype=S.dtype, format="csr")
-    else:
-        S2 = np.identity(2 * N, dtype=S.dtype)
 
     w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
 
