@@ -17,9 +17,20 @@ import pytest
 
 import numpy as np
 from scipy.linalg import block_diag
+from scipy.sparse import (
+    csc_array,
+    csr_array,
+    bsr_array,
+    lil_array,
+    dok_array,
+    coo_array,
+    dia_array,
+    issparse,
+)
 
 from thewalrus import symplectic
 from thewalrus.quantum import is_valid_cov
+from thewalrus.random import random_symplectic
 
 
 # pylint: disable=too-few-public-methods
@@ -636,11 +647,15 @@ class TestExpandPassive:
             symplectic.expand_passive(np.ones((3, 3)), [0, 1, 2, 3, 4], 8)
 
 
+@pytest.mark.parametrize(
+    "matrix_type",
+    [np.array, csc_array, csr_array, bsr_array, lil_array, dok_array, coo_array, dia_array],
+)
 class TestSymplecticExpansion:
     """Tests for the expanding a symplectic matrix"""
 
     @pytest.mark.parametrize("mode", range(3))
-    def test_expand_one(self, mode, tol):
+    def test_expand_one(self, mode, matrix_type, tol):
         """Test expanding a one mode gate"""
         r = 0.1
         phi = 0.423
@@ -652,8 +667,11 @@ class TestSymplecticExpansion:
                 [-np.sin(phi) * np.sinh(r), np.cosh(r) + np.cos(phi) * np.sinh(r)],
             ]
         )
+        S = matrix_type(S, dtype=S.dtype)
 
         res = symplectic.expand(S, modes=mode, N=N)
+        if issparse(S):
+            S, res = S.toarray(), res.toarray()
 
         expected = np.identity(2 * N)
         expected[mode, mode] = S[0, 0]
@@ -664,14 +682,18 @@ class TestSymplecticExpansion:
         assert np.allclose(res, expected, atol=tol, rtol=0)
 
     @pytest.mark.parametrize("m1, m2", [[0, 1], [0, 2], [1, 2], [2, 1]])
-    def test_expand_two(self, m1, m2, tol):
+    def test_expand_two(self, m1, m2, matrix_type, tol):
         """Test expanding a two mode gate"""
         r = 0.1
         phi = 0.423
         N = 4
 
         S = symplectic.two_mode_squeezing(r, phi)
+        S = matrix_type(S, dtype=S.dtype)
+
         res = symplectic.expand(S, modes=[m1, m2], N=N)
+        if issparse(S):
+            S, res = S.toarray(), res.toarray()
 
         expected = np.identity(2 * N)
 
@@ -699,6 +721,33 @@ class TestSymplecticExpansion:
         expected[m2 + N, m1 + N] = S[3, 2]
 
         assert np.allclose(res, expected, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("N", range(1, 6))
+    def test_extend_single_mode_symplectic(self, N, matrix_type, tol):
+        """Test that passing a single mode symplectic along with many modes
+        makes the gate act on those modes."""
+
+        modes = np.random.choice(N, N - 1, replace=False)
+        S = random_symplectic(1)
+        S = matrix_type(S, dtype=S.dtype)
+
+        res = symplectic.expand(S, modes=modes, N=N)
+
+        if issparse(S):
+            S = S.toarray()
+        for m in range(N):
+            if m in modes:
+                # check the symplectic acts on the mode m
+                assert np.allclose(res[m, m], S[0, 0], atol=tol, rtol=0)  # X
+                assert np.allclose(res[m + N, m + N], S[1, 1], atol=tol, rtol=0)  # P
+                assert np.allclose(res[m, m + N], S[0, 1], atol=tol, rtol=0)  # XP
+                assert np.allclose(res[m + N, m], S[1, 0], atol=tol, rtol=0)  # PX
+            else:
+                # check the identity acts on the mode m
+                assert np.allclose(res[m, m], 1, atol=tol, rtol=0)  # X
+                assert np.allclose(res[m + N, m + N], 1, atol=tol, rtol=0)  # P
+                assert np.allclose(res[m, m + N], 0, atol=tol, rtol=0)  # XP
+                assert np.allclose(res[m + N, m], 0, atol=tol, rtol=0)  # PX
 
 
 class TestIntegration:
