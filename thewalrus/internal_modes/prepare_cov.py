@@ -285,7 +285,7 @@ def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-3, hbar=2):
     if not np.allclose(T.shape[0], len(rjs)):
         raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
     s = np.linalg.svd(T, compute_uv=False)
-    if max(s) > 1:
+    if not (max(s) <= 1 or np.allclose(max(s), 1)):
         raise ValueError("T must be have singular values <= 1")
     if O is not None:
         eps, W = orthonormal_basis(rjs, O=O, thr=thr)
