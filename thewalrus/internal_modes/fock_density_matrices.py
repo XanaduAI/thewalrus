@@ -52,15 +52,7 @@ def _density_matrix_single_mode(
 
     K = cov.shape[0] // (2 * M)
 
-    if LO_overlap is not None:
-        if not K == LO_overlap.shape[0]:
-            raise ValueError(
-                "Number of overlaps with LO must match number of internal modes"
-            )
-        if not np.linalg.norm(LO_overlap) <= 1.0001:
-            raise ValueError("Norm of overlaps must not be greater than 1")
-
-    # filter out all unwanted schmidt modes in heralded spatial mode
+    # filter out all unwanted Schmidt modes in heralded spatial mode
 
     # create passive transformation of filter
     T = np.zeros((M * K, M * K), dtype=np.complex128)
@@ -190,7 +182,14 @@ def density_matrix_single_mode(
         raise ValueError("Keys of pattern must correspond to all but one spatial mode")
     N_nums = np.array(list(pattern.values()))
     HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
-
+    if LO_overlap is not None:
+        if not K == LO_overlap.shape[0]:
+            raise ValueError(
+                "Number of overlaps with LO must match number of internal modes"
+            )
+        if not (np.linalg.norm(LO_overlap) < 1 or np.allclose(np.linalg.norm(LO_overlap), 1)):
+            raise ValueError("Norm of overlaps must not be greater than 1")
+            
     # swapping the spatial modes around such that we are heralding in spatial mode 0
     Uswap = np.zeros((M, M))
     swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
