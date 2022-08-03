@@ -64,4 +64,4 @@
 
 * [Martin Houde](https://github.com/MHoude2) (Polytechnique Montréal) - :upside_down: Minister of amplification
 
-* [Javier Martínez](https://github.com/ajmartinezc) (Polytechnique Montréal) - 😧: Lord of uncertainty
+* [Javier Martínez](https://github.com/ajmartinezc) (Polytechnique Montréal) - 😧 Lord of uncertainty
