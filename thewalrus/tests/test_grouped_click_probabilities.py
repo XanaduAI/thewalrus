@@ -6,7 +6,7 @@ from thewalrus.random import random_interferometer
 from thewalrus.symplectic import passive_transformation, squeezing
 from thewalrus.quantum import mean_clicks, variance_clicks
 from thewalrus._torontonian import threshold_detection_prob
-from grouped_click_probabilities import grouped_click_probabilities_squeezed
+from thewalrus.grouped_click_probabilities import grouped_click_probabilities_squeezed
 
 
 @pytest.mark.parametrize("num_modes", [4, 6, 8])
