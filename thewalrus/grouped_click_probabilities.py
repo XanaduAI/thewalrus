@@ -2,12 +2,12 @@
 import numpy as np
 from numba import jit
 
+
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-locals
 @jit(nopython=True)
 def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, seed=1990):
     """Computes click probabilities and errors for input states sent into a lossy interferometer
-
     Args:
         phn (array): mean photon numbers of input modes
         chn (array): coherences of input modes
@@ -15,10 +15,8 @@ def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, see
         num_samples (int): number of samples
         num_groups (int): number of groups into which the samples are divided for error computation
         seed (int): seed of the random number generator
-
     Returns:
         tuple (prob, error): array of grouped click probabilities and array of corresponding errors
-
     """
     np.random.seed(seed)
     samp_per_group = num_samples // num_groups
@@ -57,17 +55,14 @@ def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, see
 @jit(nopython=True)
 def grouped_click_probabilities_squeezed(input_sq, t_matrix, num_samples, num_groups, seed=1990):
     """Computes click probabilities for input squeezed states sent into a lossy interferometer
-
     Args:
         input_sq (array): input squeezing parameters
         t_matrix (array): transfer matrix
         num_samples (int): number of samples
         num_groups (int): number of groups into which the samples are divided for error computation
         seed (int): seed of the random number generator
-
     Returns:
         tuple (prob, error): array of grouped click probabilities and array of corresponding errors
-
     """
     phn = np.sinh(input_sq) ** 2
     chn = 0.5 * np.sinh(2 * input_sq)
