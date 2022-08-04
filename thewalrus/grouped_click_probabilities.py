@@ -21,6 +21,7 @@ def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, see
 
     """
     np.random.seed(seed)
+    samp_per_group = num_samples // num_groups
     num_modes, num_input = max(t_matrix.shape), min(t_matrix.shape)
     drp = np.array([(0.5 * np.complex128(phn[i] + chn[i])) ** 0.5 for i in range(num_input)])
     drm = np.array([(0.5 * np.complex128(phn[i] - chn[i])) ** 0.5 for i in range(num_input)])
@@ -46,9 +47,9 @@ def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, see
                 np.exp(-alpha * beta) + np.exp(-1j * k * delta) * (1 - np.exp(-alpha * beta))
             )
         acc = acc + (f_mat @ gth).real
-        if (j + 1) % (num_samples // num_groups) == 0:
-            bcc = bcc + (acc - fix) / (num_samples // num_groups)
-            qcc = qcc + ((acc - fix) / (num_samples // num_groups)) ** 2
+        if (j + 1) % samp_per_group == 0:
+            bcc = bcc + (acc - fix) / samp_per_group
+            qcc = qcc + ((acc - fix) / samp_per_group) ** 2
             fix = acc
     return bcc / num_groups, (qcc / num_groups - (bcc / num_groups) ** 2) ** 0.5
 
