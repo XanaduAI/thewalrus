@@ -24,8 +24,9 @@ def test_mean_var(num_modes, eta, num_samples, num_groups):
     probs = grouped_click_probabilities_squeezed(sq_vec, tmat, num_samples, num_groups)[0]
     mean_np = probs @ np.arange(num_modes + 1)
     var_np = probs @ (np.arange(num_modes + 1)) ** 2 - mean_np ** 2
-    assert np.allclose(mean_n, mean_np, rtol=10 * (num_samples) ** (-0.5))
-    assert np.allclose(var_n, var_np, rtol=10 * (num_samples) ** (-0.5))
+    std_10 = 10 * (num_samples) ** (-0.5)
+    assert np.allclose(mean_n, mean_np, rtol=std_10)
+    assert np.allclose(var_n, var_np, rtol=std_10)
     assert np.allclose(probs.sum(), 1.0)
 
 
@@ -44,4 +45,5 @@ def test_probs(num_modes, eta, num_samples, num_groups):
         prob = threshold_detection_prob(out_mu, out_cov, np.array(cmb)).real
         t_probs[sum(cmb)] += prob
     s_probs = grouped_click_probabilities_squeezed(sq_vec, tmat, num_samples, num_groups)[0]
-    assert np.allclose(t_probs, s_probs, rtol=10 * (num_samples) ** (-0.5), atol=min(t_probs))
+    std_10 = 10 * (num_samples) ** (-0.5)
+    assert np.allclose(t_probs, s_probs, rtol=std_10, atol=min(t_probs))
