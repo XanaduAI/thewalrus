@@ -282,19 +282,20 @@ def hermite_multidimensional_vjp(dLdG, dCdR, dCdy, C, G):  # pragma: no cover
 
     Args:
         dLdG (array[complex]): derivative of the loss with respect to the conjugate of the Hermite polynomials
-        R (array[complex]): square matrix parametrizing the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
+        dCdR
+        dCdy
+        C
         G (array[complex]): array with the *conjugate* of the Hermite polynomials
 
     Returns:
         dLdR, dLdy, dLdC (array[complex]): the derivatives of the loss with respect to the conjugate of R, y and C
     """
-    # contributions from (0,0,...,0)
+    # contribution from (0,0,...,0)
     indices = np.ndindex(G.shape)
     first = next(indices)
     dLdC = dLdG[first]#np.sum(dLdG * G) / np.conj(C) # note that G is already conjugated
-    dLdR = dLdG[first] * np.conj(dCdR)
-    dLdy = dLdG[first] * np.conj(dCdy)
+    dLdR = dLdC * np.conj(dCdR)
+    dLdy = dLdC * np.conj(dCdy)
 
     # skipped the first index (0,...,0)
     for idx in indices:
