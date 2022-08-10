@@ -88,7 +88,13 @@ __all__ = [
 
 # pylint: disable=too-many-branches
 def generate_hafnian_sample(
-    cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
+    cov,
+    mean=None,
+    hbar=2,
+    cutoff=None,
+    max_photons=30,
+    approx=False,
+    approx_samples=1e5,
 ):  # pylint: disable=too-many-branches
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
@@ -112,6 +118,8 @@ def generate_hafnian_sample(
     N = len(cov) // 2
     result = []
     prev_prob = 1.0
+    if cutoff is None:
+        cutoff = max_photons + 1
     if mean is None:
         local_mu = np.zeros(2 * N)
     else:
