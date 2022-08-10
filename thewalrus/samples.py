@@ -269,7 +269,9 @@ def hafnian_sample_state(
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel:
-        params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
+        params = [
+            [cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]
+        ] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_hafnian_sample)(p))
@@ -283,7 +285,14 @@ def hafnian_sample_state(
 
 
 def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
+    A,
+    n_mean,
+    samples=1,
+    cutoff=5,
+    max_photons=30,
+    approx=False,
+    approx_samples=1e5,
+    parallel=False,
 ):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
@@ -427,7 +436,9 @@ def _torontonian_sample(args):
     j = 0
 
     while j < samples:
-        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons)
+        result = generate_torontonian_sample(
+            cov, mu, hbar=hbar, max_photons=max_photons
+        )
         if result != -1:
             samples_array.append(result)
             j = j + 1
@@ -435,7 +446,9 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, parallel=False):
+def torontonian_sample_state(
+    cov, samples, mu=None, hbar=2, max_photons=30, parallel=False
+):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -550,7 +563,10 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
     return np.where(
-        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
+        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol)
+        > 0,
+        1,
+        0,
     )
 
 
@@ -574,7 +590,9 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
         probabilities = probabilities.flatten() / sum_p
         vals = np.arange(cutoff**num_modes, dtype=int)
         return [
-            np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
+            np.unravel_index(
+                np.random.choice(vals, p=probabilities), [cutoff] * num_modes
+            )
             for _ in range(num_samples)
         ]
 
