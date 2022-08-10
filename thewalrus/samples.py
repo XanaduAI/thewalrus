@@ -112,56 +112,50 @@ def generate_hafnian_sample(
     N = len(cov) // 2
     result = []
     prev_prob = 1.0
-    nmodes = N
     if mean is None:
         local_mu = np.zeros(2 * N)
     else:
         local_mu = mean
 
-    for k in range(nmodes):
-        probs1 = np.zeros([cutoff + 1], dtype=np.float64)
+    for k in range(N):
+        total_photons = int(np.sum(result))
+        prob_cumulative = 0
         kk = np.arange(k + 1)
         mu_red, V_red = reduced_gaussian(local_mu, cov, kk)
+        sample = np.random.random()
 
         if approx:
             Q = Qmat(V_red, hbar=hbar)
             A = Amat(Q, hbar=hbar, cov_is_qmat=True)
+            A = np.real_if_close(A)
+            A[np.where((-1e-8 < A) & (A < 0))] = 0
+            normalisation = np.sqrt(np.linalg.det(Q).real)
 
-        for i in range(cutoff):
+        for i in range(min(max_photons + 1 - total_photons, cutoff) + 1):
+            if i == min(max_photons + 1 - total_photons, cutoff) + 0:
+                return -1
             indices = result + [i]
             ind2 = indices + indices
             if approx:
                 factpref = np.prod(fac(indices))
                 mat = reduction(A, ind2)
-                probs1[i] = (
-                    hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
+                prob_i = (
+                    hafnian(mat, approx=True, num_samples=int(approx_samples))
+                    / factpref
+                    / normalisation
                 )
             else:
-                probs1[i] = density_matrix_element(
+                prob_i = density_matrix_element(
                     mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar
                 ).real
 
-        if approx:
-            probs1 = probs1 / np.sqrt(np.linalg.det(Q).real)
+            prob_cumulative += prob_i / prev_prob
+            if prob_cumulative >= sample:
+                result.append(i)
+                prev_prob = prob_i
+                break
 
-        probs2 = probs1 / prev_prob
-        probs3 = np.maximum(
-            probs2, np.zeros_like(probs2)
-        )  # pylint: disable=assignment-from-no-return
-        ssum = np.sum(probs3)
-        if ssum < 1.0:
-            probs3[-1] = 1.0 - ssum
-
-        # The following normalization of probabilities is needed to prevent np.random.choice error
-        if ssum > 1.0:
-            probs3 = probs3 / ssum
-
-        result.append(np.random.choice(a=range(len(probs3)), p=probs3))
-        if result[-1] == cutoff:
-            return -1
-        if np.sum(result) > max_photons:
-            return -1
-        prev_prob = probs1[result[-1]]
+        prev_prob = prob_i
 
     return result
 
