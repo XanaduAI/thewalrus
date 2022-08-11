@@ -149,8 +149,10 @@ class TestWilliamsonDecomposition:
         # check S is symplectic
         assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
 
+
 class TestBlochMessiahDecomposition:
     """Tests for the Williamson decomposition"""
+
     @pytest.mark.parametrize("N", range(50, 500, 50))
     def test_blochmessiah_rand(N):
         """Tests blochmessiah function for different matrix sizes."""
@@ -176,5 +178,3 @@ class TestBlochMessiahDecomposition:
         """Tests that non-symplectic mattrices return False in blochmessiah"""
         S = np.random.rand(4, 4)
         assert not blochmessiah(S)
-
-    

@@ -39,6 +39,7 @@ from scipy.linalg import block_diag, sqrtm, schur
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
+
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
@@ -153,9 +154,7 @@ def blochmessiah(S):
     u2, d2, v2 = np.linalg.svd(beta)
     sval = np.arcsinh(d2)
     takagibeta = u2 @ sqrtm(np.conjugate(u2).T @ (v2.T))
-    uf = np.block(
-        [[takagibeta, 0 * takagibeta], [0 * takagibeta, np.conjugate(takagibeta)]]
-    )
+    uf = np.block([[takagibeta, 0 * takagibeta], [0 * takagibeta, np.conjugate(takagibeta)]])
     vf = np.block(
         [
             [np.conjugate(takagibeta).T @ alpha, 0 * takagibeta],
@@ -176,4 +175,3 @@ def blochmessiah(S):
     vff = np.real_if_close(vff)
     uff = np.real_if_close(uff)
     return uff, dff, vff
-    
