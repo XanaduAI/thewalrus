@@ -66,6 +66,8 @@ from .quantum import (
     is_classical_cov,
     reduced_gaussian,
     density_matrix_element,
+    is_pure_cov,
+    pure_state_amplitude,
 )
 
 __all__ = [
@@ -124,6 +126,7 @@ def generate_hafnian_sample(
         local_mu = np.zeros(2 * N)
     else:
         local_mu = mean
+    pure_cov = is_pure_cov(cov, hbar=hbar)
 
     for k in range(N):
         total_photons = int(np.sum(result))
@@ -153,9 +156,20 @@ def generate_hafnian_sample(
                     / normalisation
                 )
             else:
-                prob_i = density_matrix_element(
-                    mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar
-                ).real
+                if (k == N - 1) and (pure_cov == True):
+                    amp_i = pure_state_amplitude(
+                        mu_red, cov, indices, hbar=hbar, check_purity=False
+                    )
+                    prob_i = np.abs(amp_i) ** 2
+                else:
+                    prob_i = density_matrix_element(
+                        mu_red,
+                        V_red,
+                        indices,
+                        indices,
+                        include_prefactor=True,
+                        hbar=hbar,
+                    ).real
 
             prob_cumulative += prob_i / prev_prob
             if prob_cumulative >= sample:
