@@ -18,6 +18,7 @@ import pytest
 from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
+from thewalrus.random import random_symplectic
 from thewalrus.decompositions import williamson, blochmessiah
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
@@ -154,7 +155,7 @@ class TestBlochMessiahDecomposition:
     """Tests for the Williamson decomposition"""
 
     @pytest.mark.parametrize("N", range(50, 500, 50))
-    def test_blochmessiah_rand(N):
+    def test_blochmessiah_rand(self, N):
         """Tests blochmessiah function for different matrix sizes."""
         S = random_symplectic(N)
         u, d, v = blochmessiah(S)
@@ -164,17 +165,17 @@ class TestBlochMessiahDecomposition:
         is_symplectic(u)
         is_symplectic(v)
 
-    def test_blochmessiah_odd():
+    def test_blochmessiah_odd(self):
         """Tests that odd matrices return False in blochmessiah."""
         S = np.random.rand(5, 5)
         assert not blochmessiah(S)
 
-    def test_blochmessiah_rect():
+    def test_blochmessiah_rect(self):
         """Tests that rectangular matrices return False in blochmessiah"""
         S = np.random.rand(4, 5)
         assert not blochmessiah(S)
 
-    def test_blochmessiah_false():
+    def test_blochmessiah_false(self):
         """Tests that non-symplectic mattrices return False in blochmessiah"""
         S = np.random.rand(4, 4)
         assert not blochmessiah(S)
