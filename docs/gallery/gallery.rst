@@ -19,23 +19,19 @@ The following tutorials introduce core mathematical concepts
 provided by The Walrus, including the hafnian, loop hafnian,
 the permanent and the torontonian.
 
-.. customgalleryitem::
-    :tooltip: Basics of hafnians and loop hafnians
+.. gallery-item::
     :description: :doc:`basics`
     :figure: gallery/hafnian.png
 
-.. customgalleryitem::
-    :tooltip: Benchmarking the hafnian
+.. gallery-item::
     :description: :doc:`hafnian_tutorial`
     :figure: gallery/haf_benchmark.png
 
-.. customgalleryitem::
-    :tooltip: Benchmarking the permanent
+.. gallery-item::
     :description: :doc:`permanent_tutorial`
     :figure: gallery/perm_benchmark.png
 
-.. customgalleryitem::
-    :tooltip: Benchmarking the torontonian
+.. gallery-item::
     :description: :doc:`torontonian_tutorial`
     :figure: gallery/tor_benchmark.png
 
@@ -71,38 +67,31 @@ If you develop a new circuit and measurement scheme to prepare a non-Gaussian st
 
 .. Copy the template below in order to create a link to your notebook, and a thumbnail.
 
-.. customgalleryitem::
-    :tooltip: Fock states
+.. gallery-item::
     :description: :doc:`Fock states <fock>`
     :figure: gallery/fock.png
 
-.. customgalleryitem::
-    :tooltip: Kitten states
+.. gallery-item::
     :description: :doc:`Kitten states <kitten>`
     :figure: gallery/kitten.png
 
-.. customgalleryitem::
-    :tooltip: Cubic phase states
+.. gallery-item::
     :description: :doc:`Cubic phase states <cubic>`
     :figure: gallery/cubic.png
 
-.. customgalleryitem::
-    :tooltip: Photon added states
+.. gallery-item::
     :description: :doc:`Photon added states <photon_added>`
     :figure: gallery/photon_added.png
 
-.. customgalleryitem::
-    :tooltip: Cat states
+.. gallery-item::
     :description: :doc:`Cat states <cat>`
     :figure: gallery/cat.png
 
-.. customgalleryitem::
-    :tooltip: Four-headed cat states
+.. gallery-item::
     :description: :doc:`Four-headed cat states <four_cat>`
     :figure: gallery/four_cat.png
 
-.. customgalleryitem::
-    :tooltip: GKP states
+.. gallery-item::
     :description: :doc:`GKP states <gkp>`
     :figure: gallery/gkp.png
 

@@ -57,18 +57,16 @@ needs_sphinx = "1.5"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "edit_on_github",
+    "nbsphinx",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.todo",
     "sphinx.ext.coverage",
     "sphinx.ext.mathjax",
-    # 'sphinx.ext.imgmath',
     "sphinx.ext.napoleon",
-    # 'sphinx.ext.inheritance_diagram',
     "sphinx.ext.viewcode",
     "sphinxcontrib.bibtex",
-    "edit_on_github",
-    "nbsphinx",
     "sphinx_copybutton",
 ]
 
@@ -89,7 +87,7 @@ mathjax_path = (
 nbsphinx_requirejs_path = ""
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates", "xanadu_theme"]
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -101,7 +99,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "The Walrus"
-copyright = "2019, Xanadu Quantum Technologies Inc"
+copyright = "2022, Xanadu Quantum Technologies"
 author = "Xanadu Inc."
 
 # The version info for the project you're documenting, acts as replacement for
@@ -211,24 +209,10 @@ html_static_path = ["_static"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
-#
-# This is required for the alabaster theme
-# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-# html_sidebars = {
-#    '**': [
-#        'about.html',
-#        'navigation.html',
-#        'relations.html',  # needs 'show_related': True theme option to display
-#        'searchbox.html',
-#        'donate.html',
-#    ]
-# }
 html_sidebars = {
     "**": [
-        "logo-text.html",
         "searchbox.html",
         "globaltoc.html",
-        # 'sourcelink.html'
     ]
 }
 
@@ -277,38 +261,41 @@ html_sidebars = {
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "thewalrusdoc"
+htmlhelp_basename = "TheWalrusdoc"
 
 # # -- Xanadu theme ---------------------------------------------------------
-html_theme = "xanadu_theme"
-html_theme_path = ["."]
+html_theme = "xanadu"
 
-# Register the theme as an extension to generate a sitemap.xml
-# extensions.append("guzzle_sphinx_theme")
-
-# xanadu theme options (see theme.conf for more information)
+# Xanadu theme options (see theme.conf for more information).
 html_theme_options = {
-    # Set the path to a special layout to include for the homepage
-    # "homepage": "special_index.html",
-    # Set the name of the project to appear in the left sidebar.
-    "project_nav_name": "The Walrus",
-    "touch_icon": "_static/logo_new.png",
-    # Set GA account ID to enable tracking
-    "google_analytics_account": "UA-116279123-2",
-    # colors
-    "navigation_button": "#3a8ab1",
-    "navigation_button_hover": "#2b5071",
-    "toc_caption": "#2C96CC",
-    "toc_hover": "#2C96CC",
-    "table_header_bg": "#ffdce5",
-    "table_header_border": "#2C96CC",
-    "download_button": "#2C96CC",
+    "navbar_name": "The Walrus",
+    "navbar_logo_colour": "#2C96CC",
+
+    "navbar_right_links": [
+        {
+            "name": "Paper",
+            "href": "https://joss.theoj.org/papers/10.21105/joss.01705",
+            "icon": "fas fa-book",
+        },
+        {
+            "name": "GitHub",
+            "href": "https://github.com/XanaduAI/thewalrus",
+            "icon": "fab fa-github",
+        }
+    ],
+
+    "google_analytics_tracking_id": "UA-116279123-2",
+
+    "border_colour": "#2C96CC",
+    "prev_next_button_colour": "#3a8ab1",
+    "prev_next_button_hover_colour": "#2b5071",
+    "table_header_background_colour": "#ffdce5",
+    "toc_marker_colour": "#2C96CC",
+    "text_accent_colour": "#2C96CC",
 }
 
 edit_on_github_project = "XanaduAI/thewalrus"
 edit_on_github_branch = "master/docs"
-
-from custom_directives import CustomGalleryItemDirective
 
 
 def process_numba_signature(app, what, name, obj, options, signature, return_annotation):
@@ -328,5 +315,3 @@ def process_numba_signature(app, what, name, obj, options, signature, return_ann
 
 def setup(app):
     app.connect("autodoc-process-signature", process_numba_signature)
-    app.add_directive("customgalleryitem", CustomGalleryItemDirective)
-    app.add_css_file("xanadu_gallery.css")
