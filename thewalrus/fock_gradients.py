@@ -58,14 +58,14 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
     alpha = r * np.exp(1j * phi)
+
+    factorial = np.arange(0, cutoff)
+    factorial[0] = 1
+    factorial_sqrt = np.cumprod(np.sqrt(factorial))
+
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
-
         L = _laguerre(r**2.0, m_max, n_minus_m)
-
-        factorial = np.arange(0, cutoff)
-        factorial[0] = 1
-        factorial_sqrt = np.cumprod(np.sqrt(factorial))
 
         alpha_nmm = alpha**n_minus_m
         e_alpha = np.exp(-np.abs(alpha) ** 2.0 / 2.0)
