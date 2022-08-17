@@ -57,7 +57,6 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         array[complex]: matrix representing the displacement operation.
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
-    alpha = r * np.exp(1j * phi)
 
     factorial = np.arange(0, cutoff)
     factorial[0] = 1
@@ -67,14 +66,12 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         m_max = cutoff - n_minus_m
         L = _laguerre(r**2.0, m_max, n_minus_m)
 
-        alpha_nmm = alpha**n_minus_m
-        e_alpha = np.exp(-np.abs(alpha) ** 2.0 / 2.0)
+        alpha_n_minus_m = (r**n_minus_m) * np.exp(1j * phi * n_minus_m)
+        e_r = np.exp(-(r**2.0) / 2.0)
         for m in range(m_max):
             n = n_minus_m + m
-            D[n, m] = (
-                (factorial_sqrt[m] / factorial_sqrt[m + n_minus_m]) * alpha_nmm * e_alpha * L[m]
-            )
-            D[m, n] = (-1.0) ** n_minus_m * D[n, m]
+            D[n, m] = (factorial_sqrt[m] / factorial_sqrt[n]) * alpha_n_minus_m * e_r * L[m]
+            D[m, n] = (-1.0) ** n_minus_m * np.conj(D[n, m])
 
     return D
 
@@ -111,20 +108,23 @@ def grad_displacement(T, r, phi):  # pragma: no cover
     """
     cutoff = T.shape[0]
     dtype = T.dtype
-    ei = np.exp(1j * phi)
-    eic = np.exp(-1j * phi)
-    alpha = r * ei
-    alphac = r * eic
-    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
     grad_r = np.zeros((cutoff, cutoff), dtype=dtype)
     grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
 
-    for m in range(cutoff):
-        for n in range(cutoff):
-            grad_r[m, n] = -r * T[m, n] + sqrt[m] * ei * T[m - 1, n] - sqrt[n] * eic * T[m, n - 1]
-            grad_phi[m, n] = (
-                sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
-            )
+    L = _laguerre(r**2.0, m_max, n_minus_m)
+
+    for n_minus_m in range(cutoff):
+        m_max = cutoff - n_minus_m
+        L_p1 = _laguerre(r**2.0, m_max, n_minus_m + 1)
+        L = _laguerre(r**2.0, m_max, n_minus_m)
+
+        for m in range(1, m_max):
+            n = n_minus_m + m
+            grad_r[m, n] = r * T[m, n] * ((n - m - 1) - 2 * (L_p1[m - 1] / L[m]))
+            grad_r[n, m] = r * T[n, m] * ((m - n - 1) - 2 * (L_p1[n - 1] / L[n]))
+
+            grad_phi[n, m] = 1j * (m - n) * T[m, n]
+            grad_phi[m, n] = -1j * (m - n) * T[m, n]
 
     return grad_r, grad_phi
 
