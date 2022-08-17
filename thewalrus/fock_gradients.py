@@ -40,25 +40,8 @@ Code details
 ------------
 """
 import numpy as np
-
 from numba import jit
 
-@jit(nopython=True, cache=True)
-def laguerre(x, N, alpha, dtype=np.complex128):
-    """Returns the N first generalized Laguerre polynomials evaluated at x.
-
-    Args:
-        x (float): point at which to evaluate the polynomials
-        N (int): maximum Laguerre polynomial to calculate
-        alpha (float): continuous parameter for the generalized Laguerre polynomials
-    """
-    L = np.zeros(N, dtype=dtype)
-    L[0] = 1.0
-    if N > 1:
-        L[1] = 1 + alpha - x
-        for m in range(1, N - 1):
-            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] - (m + alpha) * L[m - 1]) / (m + 1)
-    return L
 
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
@@ -74,24 +57,44 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         array[complex]: matrix representing the displacement operation.
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
-    ee = np.exp(-r ** 2.0 / 2.0)
-
-    factorial = np.zeros((cutoff,), dtype=dtype)
-    factorial[0] = 1
-    for n in range(1, cutoff):
-        factorial[n] = n*factorial[n-1]
-
+    alpha = r * np.exp(1j * phi)
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
-        L = laguerre(r, m_max, n_minus_m)
-        alpha_n_minus_m = r ** n_minus_m * np.exp(1j*phi*n_minus_m)
 
+        L = _laguerre(r**2.0, m_max, n_minus_m)
+
+        factorial = np.arange(0, cutoff)
+        factorial[0] = 1
+        factorial_sqrt = np.cumprod(np.sqrt(factorial))
+
+        alpha_nmm = alpha**n_minus_m
+        e_alpha = np.exp(-np.abs(alpha) ** 2.0 / 2.0)
         for m in range(m_max):
             n = n_minus_m + m
-            D[n, m] = alpha_n_minus_m * ee * np.sqrt(factorial[m]/factorial[n]) * L[m]
+            D[n, m] = (
+                (factorial_sqrt[m] / factorial_sqrt[m + n_minus_m]) * alpha_nmm * e_alpha * L[m]
+            )
             D[m, n] = (-1.0) ** n_minus_m * D[n, m]
 
     return D
+
+
+@jit(nopython=True, cache=True)
+def _laguerre(x, N, alpha, dtype=np.complex128):
+    """Returns the N first generalized Laguerre polynomials evaluated at x.
+
+    Args:
+        x (float): point at which to evaluate the polynomials
+        N (int): maximum Laguerre polynomial to calculate
+        alpha (float): continuous parameter for the generalized Laguerre polynomials
+    """
+    L = np.zeros(N, dtype=dtype)
+    L[0] = 1.0
+    if N > 1:
+        L[1] = 1 + alpha - x
+        for m in range(1, N - 1):
+            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] - (m + alpha) * L[m - 1]) / (m + 1)
+    return L
 
 
 @jit(nopython=True)
