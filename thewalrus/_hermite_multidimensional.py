@@ -15,7 +15,7 @@
 Hermite Multidimensional Python interface
 """
 from typing import Tuple, Generator, Iterable
-from numba import jit
+from numba import jit, njit
 from numba.cpython.unsafe.tuple import tuple_setitem
 import numpy as np
 
@@ -234,6 +234,7 @@ def remove(
     pattern: Tuple[int, ...]
 ) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
+    without going below 0.
     Args:
         pattern (Tuple[int, ...]): the pattern given to be decreased
     Returns:
@@ -261,54 +262,18 @@ def _hermite_multidimensional_renorm(R, y, G):  # pragma: no cover
         array[complex]: the multidimensional Hermite polynomials
     """
     indices = np.ndindex(G.shape)
-    next(indices)  # skip the first index (0,...,0)
+    next(indices)  # skip the first index (0,0,...,0) because G[0,0,...,0] is already filled with C
     for idx in indices:
         i = 0
         for i, val in enumerate(idx):
             if val > 0:
                 break
-        ki = dec(idx, i)
+        ki = dec(idx, i)  # ki is the pivot index
         u = y[i] * G[ki]
         for l, kl in remove(ki):
             u -= SQRT[ki[l]] * R[i, l] * G[kl]
         G[idx] = u / SQRT[idx[i]]
     return G
-
-
-@jit(nopython=True)
-def hermite_multidimensional_vjp(dLdG, dCdR, dCdy, C, G):  # pragma: no cover
-    r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
-    initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
-
-    Args:
-        dLdG (array[complex]): derivative of the loss with respect to the conjugate of the Hermite polynomials
-        dCdR
-        dCdy
-        C
-        G (array[complex]): array with the *conjugate* of the Hermite polynomials
-
-    Returns:
-        dLdR, dLdy, dLdC (array[complex]): the derivatives of the loss with respect to the conjugate of R, y and C
-    """
-    # contribution from (0,0,...,0)
-    indices = np.ndindex(G.shape)
-    first = next(indices)
-    dLdC = dLdG[first]#np.sum(dLdG * G) / np.conj(C) # note that G is already conjugated
-    dLdR = dLdC * np.conj(dCdR)
-    dLdy = dLdC * np.conj(dCdy)
-
-    # skipped the first index (0,...,0)
-    for idx in indices:
-        i = 0
-        for i, val in enumerate(idx):
-            if val > 0:
-                break
-        ki = dec(idx, i)
-        dLdy[i] += dLdG[idx] * G[ki] / SQRT[idx[i]] # contribution from dGdy[idx,i]
-        for l, kl in remove(ki):
-            dLdR[i, l] -= dLdG[idx] * SQRT[ki[l]] * G[kl] / SQRT[idx[i]]
-        # dLdC += dLdG[idx] * G[idx] / np.conj(C)
-    return dLdR, dLdy, dLdC
 
 
 @jit(nopython=True)
@@ -491,66 +456,72 @@ def _grad_hermite_multidimensional_renorm(R, y, G, dG_dR, dG_dy):  # pragma: no 
     return dG_dR, dG_dy
 
 
+@njit
+def pick_pivot(idx):
+    for i, val in enumerate(idx):
+        if val > 0:
+            return i
 
-@jit(nopython=True)
-def _vjp_hermite_multidimensional_renorm(R, y, G, dL_dG):  # pragma: no cover
+from numba.cpython.unsafe.tuple import tuple_setitem
+@njit
+def down(idx, i):
+    return tuple_setitem(idx, i, idx[i] - 1)
+
+__t = tuple([(slice(None),)*n for n in range(100)])  # tuples up to 100 elements (overkill, but meh)
+
+@njit
+def _shift(A, axis, shift):
+    'shifts the elements of an array along an axis'
+    return A[tuple_setitem(__t[A.ndim], axis, slice(shift))]
+
+@njit
+def shifted_products(G, dL_dG):
+    d = len(G.shape)
+    D0 = np.sum(G * dL_dG)
+    Dm = np.zeros(d, dtype=np.complex128)
+    Dmn = np.zeros((d, d), dtype=np.complex128)
+    for k in np.ndindex(G.shape):
+        for m in range(d):
+            km = down(k,m)
+            Dm[m] += G[km] * dL_dG[k] * SQRT[k[m]]
+            for n in range(d):
+                Dmn[m, n] += G[down(km,n)] * dL_dG[k] * SQRT[k[m]] * SQRT[k[n]-np.int(m==n)]
+    return D0, Dm, Dmn
+
+@njit
+def vjp_hermite_renormalized(XQT, beta, G, dL_dG, full: bool):  # pragma: no cover
     r"""
-    Numba-compiled function to fill two arrays (dL_dR, dL_dy) with the gradients of the cost function
-    with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
+    Vector-Jacobian product of the upstream gradient of the cost function with respect to the hermite polynomials (i.e. dL_dG) with the 
+    gradient of the hermite polynomials with respect to the parameters (i.e. dG_dx where x = R,y,C).
+    Effectively it computes dL_dR, dL_dy and dL_dC more efficiently than going through the full Jacobian.
 
     Args:
-        R (array[complex]): square matrix parametrizing the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
+        XQT (array[complex]): X @ Q^T matrix where Q is the Husimi covariance matrix in the a,adagger basis.
+            If full is false, then XQT is the bottom-right block of the XQT matrix.
+        beta (array[complex]): vector of complex displacements. If full is false, then beta is the bottom half of the beta vector.
         G (array[complex]): array of the multidimensional Hermite polynomials
         dL_dG (array[complex]): upstream gradient of the cost function with respect to the multidimensional Hermite polynomials
+        full (bool): ``True`` if G is a dm or Choi state, ``False`` if G is a ket or unitary.
 
     Returns:
         dL_dR[complex], dL_dy[complex]: the gradients of the cost function with respect to R and y
     """
-    dL_dR = np.zeros(R.shape, dtype=R.dtype)
-    dL_dy = np.zeros(y.shape, dtype=y.dtype)
-    indices = np.ndindex(G.shape)
-    next(indices)  # skip the first index (0,...,0)
-    for idx in indices:
-        i = 0
-        for i, val in enumerate(idx):
-            if val > 0:
-                break
-        ki = dec(idx, i)
-        dL_dy[i] += dL_dG[ki] * G[ki] / SQRT[idx[i]]
-        for l, kl in remove(ki):
-            dL_dR[i, l] -= SQRT[ki[l]] * dL_dG[kl] * G[kl] / SQRT[idx[i]]
-    return dL_dR, dL_dy
+    D0, D1, D2 = shifted_products(G, dL_dG)
+    dL_dR = np.zeros(XQT.shape, dtype=np.complex128)
+    dL_dy = np.zeros(beta.shape, dtype=np.complex128)
+    dL_dC = D0/G[next(np.ndindex(G.shape))]
+    # if full:
+    for m in range(beta.shape[-1]):
+        dL_dy[m] = -0.5*beta[m]*D0 + D1[m]
+        for n in range(beta.shape[-1]):
+            dL_dR[m, n] = -0.5*XQT[m,n]*D0 - beta[n]*D1[m] + D2[m,n]
+    # else:
+    #     for m in range(beta.shape[-1]):
+    #         dL_dy[m] = -0.5*beta[m] * D0 + 2*np.real(D1[m])
+    #         for n in range(beta.shape[-1]):
+    #             dL_dR[m, n] = -0.5*XQT[m,n]*D0 - np.conj(beta[n])*2*np.real(D1[m]) + 2*np.real(D2[m,n])
+    return np.conj(dL_dR), np.conj(dL_dy), np.conj(dL_dC)
 
-@jit(nopython=True)
-def _vjp_hermite_multidimensional(R, y, G, dL_dG):  # pragma: no cover
-    r"""
-    Numba-compiled function to fill two arrays (dL_dR, dL_dy) with the gradients of the cost function
-    with respect to its parameters :math:`R` and :math:`y`. It needs the `array` of the multidimensional Hermite polynomials.
-
-    Args:
-        R (array[complex]): square matrix parametrizing the Hermite polynomial
-        y (vector[complex]): vector argument of the Hermite polynomial
-        G (array[complex]): array of the multidimensional Hermite polynomials
-        dL_dG (array[complex]): upstream gradient of the cost function with respect to the multidimensional Hermite polynomials
-
-    Returns:
-        dL_dR[complex], dL_dy[complex]: the gradients of the cost function with respect to R and y
-    """
-    dL_dR = np.zeros(R.shape, dtype=R.dtype)
-    dL_dy = np.zeros(y.shape, dtype=y.dtype)
-    indices = np.ndindex(G.shape)
-    next(indices)  # skip the first index (0,...,0)
-    for idx in indices:
-        i = 0
-        for i, val in enumerate(idx):
-            if val > 0:
-                break
-        ki = dec(idx, i)
-        dL_dy[i] += dL_dG[ki] * G[ki]
-        for l, kl in remove(ki):
-            dL_dR[i, l] -= ki[l] * dL_dG[kl] * G[kl]
-    return dL_dR, dL_dy
 
 
 @jit(nopython=True)
