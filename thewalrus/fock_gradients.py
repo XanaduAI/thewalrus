@@ -90,7 +90,8 @@ def _laguerre_renormalized(x, N, alpha, dtype=np.complex128):
     if N > 1:
         L[1] = (1 + alpha - x) * L[0] / np.sqrt(alpha+1)
         for m in range(1, N - 1):
-            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] * np.sqrt((m + 1)/(alpha+m+1)) - (m + alpha) * L[m - 1] * np.sqrt(m*(m + 1)/((alpha+m+1)*(alpha+m)))) / (m + 1)
+            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] * np.sqrt((m + 1)/(alpha+m+1))
+                    - (m + alpha) * L[m - 1] * np.sqrt(m*(m + 1)/((alpha+m+1)*(alpha+m)))) / (m + 1)
     return L
 
 
