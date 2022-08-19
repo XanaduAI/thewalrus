@@ -64,16 +64,34 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
-        L = _laguerre(r**2.0, m_max, n_minus_m)
+        L = _laguerre_renormalized(r**2.0, m_max, n_minus_m)
 
         alpha_n_minus_m = (r**n_minus_m) * np.exp(1j * phi * n_minus_m)
         e_r = np.exp(-(r**2.0) / 2.0)
         for m in range(m_max):
             n = n_minus_m + m
-            D[n, m] = (factorial_sqrt[m] / factorial_sqrt[n]) * alpha_n_minus_m * e_r * L[m]
+            D[n, m] = alpha_n_minus_m * e_r * L[m]
             D[m, n] = (-1.0) ** n_minus_m * np.conj(D[n, m])
 
     return D
+
+
+@jit(nopython=True, cache=True)
+def _laguerre_renormalized(x, N, alpha, dtype=np.complex128):
+    """Returns the N first generalized "renormalized" Laguerre polynomials evaluated at x.
+
+    Args:
+        x (float): point at which to evaluate the polynomials
+        N (int): maximum Laguerre polynomial to calculate
+        alpha (int): integer parameter for the generalized Laguerre polynomials
+    """
+    L = np.zeros(N, dtype=dtype)
+    L[0] = 1.0/np.sqrt(np.prod(np.arange(1.0, alpha+1)))
+    if N > 1:
+        L[1] = (1 + alpha - x) * L[0] / np.sqrt(alpha+1)
+        for m in range(1, N - 1):
+            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] * np.sqrt((m + 1)/(alpha+m+1)) - (m + alpha) * L[m - 1] * np.sqrt(m*(m + 1)/((alpha+m+1)*(alpha+m)))) / (m + 1)
+    return L
 
 
 @jit(nopython=True, cache=True)
@@ -110,8 +128,6 @@ def grad_displacement(T, r, phi):  # pragma: no cover
     dtype = T.dtype
     grad_r = np.zeros((cutoff, cutoff), dtype=dtype)
     grad_phi = np.zeros((cutoff, cutoff), dtype=dtype)
-
-    L = _laguerre(r**2.0, m_max, n_minus_m)
 
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
