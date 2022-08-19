@@ -510,16 +510,14 @@ def vjp_hermite_renormalized(XQT, beta, G, dL_dG, full: bool):  # pragma: no cov
     dL_dR = np.zeros(XQT.shape, dtype=np.complex128)
     dL_dy = np.zeros(beta.shape, dtype=np.complex128)
     dL_dC = D0/G[next(np.ndindex(G.shape))]
-    # if full:
+    
     for m in range(beta.shape[-1]):
         dL_dy[m] = -0.5*beta[m]*D0 + D1[m]
         for n in range(beta.shape[-1]):
-            dL_dR[m, n] = -0.5*XQT[m,n]*D0 - beta[n]*D1[m] + D2[m,n]
-    # else:
-    #     for m in range(beta.shape[-1]):
-    #         dL_dy[m] = -0.5*beta[m] * D0 + 2*np.real(D1[m])
-    #         for n in range(beta.shape[-1]):
-    #             dL_dR[m, n] = -0.5*XQT[m,n]*D0 - np.conj(beta[n])*2*np.real(D1[m]) + 2*np.real(D2[m,n])
+            if full:
+                dL_dR[m, n] = -0.5*XQT[m,n]*D0 - beta[n]*D1[m] + D2[m,n]
+            else:
+                dL_dR[m, n] = -0.5*np.real(XQT[m,n]*D0) - beta[n]*D1[m] + D2[m,n]
     return np.conj(dL_dR), np.conj(dL_dy), np.conj(dL_dC)
 
 
