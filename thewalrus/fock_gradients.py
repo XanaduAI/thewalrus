@@ -59,43 +59,23 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         array[complex]: matrix representing the displacement operation.
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
-
+    rng = np.arange(cutoff)
+    rng[0] = 1
+    log_k_fac = np.cumsum(np.log(rng))
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
-        L = _laguerre_renormalized(r**2.0, m_max, n_minus_m)
-
-        alpha_n_minus_m = (r**n_minus_m) * np.exp(1j * phi * n_minus_m)
-        e_r = np.exp(-(r**2.0) / 2.0)
+        L = np.log(_laguerre(r**2.0, m_max, n_minus_m))
         for m in range(m_max):
             n = n_minus_m + m
-            D[n, m] = alpha_n_minus_m * e_r * L[m]
+            D[n, m] = np.exp(0.5*(log_k_fac[m] - log_k_fac[n]) + n_minus_m * np.log(r) - (r**2.0) / 2.0 + 1j * phi * n_minus_m + L[m])
             D[m, n] = (-1.0) ** (n_minus_m % 2) * np.conj(D[n, m])
 
     return D
 
 
 @jit(nopython=True, cache=True)
-def _laguerre_renormalized(x, N, alpha, dtype=np.complex128):
-    """Returns the N first generalized "renormalized" Laguerre polynomials evaluated at x.
-
-    Args:
-        x (float): point at which to evaluate the polynomials
-        N (int): maximum Laguerre polynomial to calculate
-        alpha (int): integer parameter for the generalized Laguerre polynomials
-    """
-    L = np.zeros(N, dtype=dtype)
-    L[0] = 1.0/np.sqrt(np.prod(np.arange(1.0, alpha+1)))
-    if N > 1:
-        L[1] = (1 + alpha - x) * L[0] / SQRT[alpha+1]
-        for m in range(1, N - 1):
-            L[m + 1] = (((2 * m + 1 + alpha - x) * L[m] * SQRT[m + 1]/SQRT[alpha+m+1]
-                    - (m + alpha) * L[m - 1] * SQRT[m]*SQRT[m + 1]/(SQRT[alpha+m+1]*SQRT[alpha+m])) / (m + 1))
-    return L
-
-
-@jit(nopython=True, cache=True)
 def _laguerre(x, N, alpha, dtype=np.complex128):
-    """Returns the N first generalized Laguerre polynomials evaluated at x.
+    r"""Returns the N first generalized Laguerre polynomials evaluated at x.
 
     Args:
         x (float): point at which to evaluate the polynomials
