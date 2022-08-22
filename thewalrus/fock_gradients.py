@@ -48,6 +48,7 @@ SQRT = np.sqrt(np.arange(1E6))
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     r"""Calculates the matrix elements of the displacement gate using a recurrence relation.
+    Uses the log of the matrix elements to avoid numerical issues and then takes the exponential.
 
     Args:
         r (float): displacement magnitude
@@ -64,12 +65,11 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     log_k_fac = np.cumsum(np.log(rng))
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
-        L = np.log(_laguerre(r**2.0, m_max, n_minus_m))
+        logL = np.log(_laguerre(r**2.0, m_max, n_minus_m))
         for m in range(m_max):
             n = n_minus_m + m
-            D[n, m] = np.exp(0.5*(log_k_fac[m] - log_k_fac[n]) + n_minus_m * np.log(r) - (r**2.0) / 2.0 + 1j * phi * n_minus_m + L[m])
+            D[n, m] = np.exp(0.5*(log_k_fac[m] - log_k_fac[n]) + n_minus_m * np.log(r) - (r**2.0) / 2.0 + 1j * phi * n_minus_m + logL[m])
             D[m, n] = (-1.0) ** (n_minus_m % 2) * np.conj(D[n, m])
-
     return D
 
 
