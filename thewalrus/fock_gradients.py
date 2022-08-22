@@ -42,6 +42,8 @@ Code details
 import numpy as np
 from numba import jit
 
+SQRT = np.sqrt(np.arange(1E6))
+
 
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
@@ -58,10 +60,6 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
 
-    factorial = np.arange(0, cutoff)
-    factorial[0] = 1
-    factorial_sqrt = np.cumprod(np.sqrt(factorial))
-
     for n_minus_m in range(cutoff):
         m_max = cutoff - n_minus_m
         L = _laguerre_renormalized(r**2.0, m_max, n_minus_m)
@@ -71,7 +69,7 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         for m in range(m_max):
             n = n_minus_m + m
             D[n, m] = alpha_n_minus_m * e_r * L[m]
-            D[m, n] = (-1.0) ** n_minus_m * np.conj(D[n, m])
+            D[m, n] = (-1.0) ** (n_minus_m % 2) * np.conj(D[n, m])
 
     return D
 
@@ -88,10 +86,10 @@ def _laguerre_renormalized(x, N, alpha, dtype=np.complex128):
     L = np.zeros(N, dtype=dtype)
     L[0] = 1.0/np.sqrt(np.prod(np.arange(1.0, alpha+1)))
     if N > 1:
-        L[1] = (1 + alpha - x) * L[0] / np.sqrt(alpha+1)
+        L[1] = (1 + alpha - x) * L[0] / SQRT[alpha+1]
         for m in range(1, N - 1):
-            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] * np.sqrt((m + 1)/(alpha+m+1))
-                    - (m + alpha) * L[m - 1] * np.sqrt(m*(m + 1)/((alpha+m+1)*(alpha+m)))) / (m + 1)
+            L[m + 1] = (((2 * m + 1 + alpha - x) * L[m] * SQRT[m + 1]/SQRT[alpha+m+1]
+                    - (m + alpha) * L[m - 1] * SQRT[m]*SQRT[m + 1]/(SQRT[alpha+m+1]*SQRT[alpha+m])) / (m + 1))
     return L
 
 
