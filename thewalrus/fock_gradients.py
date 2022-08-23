@@ -42,7 +42,7 @@ Code details
 import numpy as np
 from numba import jit
 
-SQRT = np.sqrt(np.arange(1E6))
+SQRT = np.sqrt(np.arange(1e6))
 
 
 @jit(nopython=True)
@@ -68,7 +68,13 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         logL = np.log(_laguerre(r**2.0, m_max, n_minus_m))
         for m in range(m_max):
             n = n_minus_m + m
-            D[n, m] = np.exp(0.5*(log_k_fac[m] - log_k_fac[n]) + n_minus_m * np.log(r) - (r**2.0) / 2.0 + 1j * phi * n_minus_m + logL[m])
+            D[n, m] = np.exp(
+                0.5 * (log_k_fac[m] - log_k_fac[n])
+                + n_minus_m * np.log(r)
+                - (r**2.0) / 2.0
+                + 1j * phi * n_minus_m
+                + logL[m]
+            )
             D[m, n] = (-1.0) ** (n_minus_m) * np.conj(D[n, m])
     return D
 
@@ -85,8 +91,7 @@ def _laguerre(x, N, alpha, dtype=np.complex128):
     L = np.zeros(N, dtype=dtype)
     L[0] = 1.0
     if N > 1:
-        L[1] = 1 + alpha - x
-        for m in range(1, N - 1):
+        for m in range(0, N - 1):
             L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] - (m + alpha) * L[m - 1]) / (m + 1)
     return L
 
@@ -116,9 +121,12 @@ def grad_displacement(T, r, phi):  # pragma: no cover
     for m in range(cutoff):
         for n in range(cutoff):
             grad_r[m, n] = -r * T[m, n] + sqrt[m] * ei * T[m - 1, n] - sqrt[n] * eic * T[m, n - 1]
-            grad_phi[m, n] = (sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1])
+            grad_phi[m, n] = (
+                sqrt[m] * 1j * alpha * T[m - 1, n] + sqrt[n] * 1j * alphac * T[m, n - 1]
+            )
 
     return grad_r, grad_phi
+
 
 @jit(nopython=True)
 def squeezing(r, theta, cutoff, dtype=np.complex128):  # pragma: no cover
