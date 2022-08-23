@@ -24,8 +24,10 @@ from thewalrus.fock_gradients import (
     grad_beamsplitter,
     mzgate,
     grad_mzgate,
+    _laguerre,
 )
 import numpy as np
+from scipy.special import genlaguerre
 import pytest
 
 
@@ -175,6 +177,17 @@ def test_displacement_values(tol):
     )
     T = displacement(np.abs(alpha), np.angle(alpha), cutoff)
     assert np.allclose(T, expected, atol=tol, rtol=0)
+
+
+@pytest.mark.parametrize("alpha", np.linspace(-0.9, 10, 15))
+@pytest.mark.parametrize("x", np.linspace(-5, 10, 15))
+def test_laguerre_values(tol, x, alpha):
+    """Test recursive calculation of laguerre polynomials give the correct result"""
+    N = 10
+    res = _laguerre(x, N, alpha)
+    expected = np.array([genlaguerre(n=ni, alpha=alpha)(x) for ni in range(N)])
+
+    assert np.allclose(res, expected, atol=tol)
 
 
 def test_squeezing_values(tol):
