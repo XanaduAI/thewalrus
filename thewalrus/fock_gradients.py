@@ -80,7 +80,7 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
 
 
 @jit(nopython=True, cache=True)
-def _laguerre(x, N, alpha, dtype=np.complex128):
+def _laguerre(x, N, alpha, dtype=np.complex128):  # pragma: no cover
     r"""Returns the N first generalized Laguerre polynomials evaluated at x.
 
     Args:
