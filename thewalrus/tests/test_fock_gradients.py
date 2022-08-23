@@ -187,7 +187,7 @@ def test_laguerre_values(tol, x, alpha):
     res = _laguerre(x, N, alpha)
     expected = np.array([genlaguerre(n=ni, alpha=alpha)(x) for ni in range(N)])
 
-    assert np.allclose(res, expected)
+    assert np.allclose(res, expected, atol=tol)
 
 
 def test_squeezing_values(tol):
