@@ -467,7 +467,7 @@ from numba.cpython.unsafe.tuple import tuple_setitem
 def down(idx, i):
     return tuple_setitem(idx, i, idx[i] - 1)
 
-__t = tuple([(slice(None),)*n for n in range(100)])  # tuples up to 100 elements (overkill, but meh)
+__t = tuple([(slice(None),)*n for n in range(100)])  # tuples (:,:,...) up to 100 elements (overkill, but meh)
 
 @njit
 def _shift(A, axis, shift):
