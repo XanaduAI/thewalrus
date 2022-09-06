@@ -2,6 +2,8 @@
 
 ### New features
 
+* New function to produce Bloch-Messiah decomposition of symplectic matrices.
+
 ### Breaking changes
 
 ### Improvements
@@ -25,7 +27,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov, Sebastián Duque, Jacon Hastrup, Antonín Hoskovec, Filippo Miatto
+Mikhail Andrenkov, Sebastián Duque, Jacob Hastrup, Antonín Hoskovec, Filippo Miatto
 
 ---
 
