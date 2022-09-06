@@ -130,14 +130,11 @@ def blochmessiah(S):
                array[float])  : orthogonal symplectic matrix vff
     """
 
-    N, m = S.shape
+    N, _ = S.shape
 
-    if N != m:
-        return False
-    if N % 2 != 0:
-        return False
     if not is_symplectic(S):
-        return False
+        raise ValueError("Input matrix is not symplectic.")
+
     # Changing Basis
     R = (1 / np.sqrt(2)) * np.block(
         [[np.eye(N // 2), 1j * np.eye(N // 2)], [np.eye(N // 2), -1j * np.eye(N // 2)]]
