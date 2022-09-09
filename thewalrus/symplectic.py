@@ -85,16 +85,18 @@ def expand(S, modes, N):
         array: the resulting :math:`2N\times 2N` Symplectic matrix
     """
     M = S.shape[0] // 2
-    S2 = np.identity(2 * N, dtype=S.dtype)
+    S2 = (
+        np.identity(2 * N, dtype=S.dtype)
+        if not issparse(S)
+        else sparse_identity(2 * N, dtype=S.dtype, format="csr")
+    )
 
-    if issparse(S):
+    if issparse(S) and isinstance(S, (coo_array, dia_array, bsr_array)):
         # cast to sparse matrix that supports slicing and indexing
-        S2 = sparse_identity(2 * N, dtype=S.dtype, format="csr")
-        if isinstance(S, (coo_array, dia_array, bsr_array)):
-            warnings.warn(
-                "Unsupported sparse matrix type, returning a Compressed Sparse Row (CSR) matrix."
-            )
-            S = csr_array(S)
+        warnings.warn(
+            "Unsupported sparse matrix type, returning a Compressed Sparse Row (CSR) matrix."
+        )
+        S = csr_array(S)
 
     w = np.array([modes]) if isinstance(modes, int) else np.array(modes)
 

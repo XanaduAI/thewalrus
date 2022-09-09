@@ -2,12 +2,16 @@
 
 ### New features
 
+* New function to produce Bloch-Messiah decomposition of symplectic matrices.
+
 ### Breaking changes
 
 ### Improvements
 
 * Added function to extend single mode symplectic to act on multiple modes. [(#347)](https://github.com/XanaduAI/thewalrus/pull/347)
 * Added function to compute grouped (total) click probabilities for GBS setups using threshold detectors. The function uses the positive P-distribution simulation method of [Drummond et al.](https://arxiv.org/pdf/2102.10341.pdf) [(#348)](https://github.com/XanaduAI/thewalrus/pull/348)
+
+* The displacement function now calculates the displacement operator's matrix elements with respect to the Fock basis using the Laguerre polynomials. This provides enhanced numerical stability for larger cutoff values. [(#351)](https://github.com/XanaduAI/thewalrus/pull/351)
 
 ### Bug fixes
 
@@ -23,7 +27,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov, Antonín Hoskovec
+Mikhail Andrenkov, Sebastián Duque, Jacob Hastrup, Antonín Hoskovec, Filippo Miatto, Will McCutcheon
 
 ---
 
