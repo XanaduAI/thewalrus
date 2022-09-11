@@ -53,7 +53,7 @@ def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, see
 
 
 @jit(nopython=True)
-def grouped_click_probabilities_squeezed(input_sq, t_matrix, num_samples, num_groups, seed=1990):
+def grouped_click_probabilities_squeezed(input_sq, t_matrix, num_samples, num_groups, seed=1990): # pragma: no cover
     """Computes click probabilities for input squeezed states sent into a lossy interferometer
     Args:
         input_sq (array): input squeezing parameters
