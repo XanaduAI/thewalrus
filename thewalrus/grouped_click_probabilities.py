@@ -6,7 +6,7 @@ from numba import jit
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-locals
 @jit(nopython=True)
-def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, seed=1990):
+def grouped_click_probabilities(phn, chn, t_matrix, num_samples, num_groups, seed=1990): # pragma: no cover
     """Computes click probabilities and errors for input states sent into a lossy interferometer
     Args:
         phn (array): mean photon numbers of input modes
