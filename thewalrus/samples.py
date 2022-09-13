@@ -66,6 +66,8 @@ from .quantum import (
     is_classical_cov,
     reduced_gaussian,
     density_matrix_element,
+    is_pure_cov,
+    pure_state_amplitude,
 )
 
 __all__ = [
@@ -88,7 +90,13 @@ __all__ = [
 
 # pylint: disable=too-many-branches
 def generate_hafnian_sample(
-    cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
+    cov,
+    mean=None,
+    hbar=2,
+    cutoff=None,
+    max_photons=30,
+    approx=False,
+    approx_samples=1e5,
 ):  # pylint: disable=too-many-branches
     r"""Returns a single sample from the Hafnian of a Gaussian state.
 
@@ -112,56 +120,64 @@ def generate_hafnian_sample(
     N = len(cov) // 2
     result = []
     prev_prob = 1.0
-    nmodes = N
+    if cutoff is None:
+        cutoff = max_photons + 1
     if mean is None:
         local_mu = np.zeros(2 * N)
     else:
         local_mu = mean
+    pure_cov = is_pure_cov(cov, hbar=hbar)
 
-    for k in range(nmodes):
-        probs1 = np.zeros([cutoff + 1], dtype=np.float64)
+    for k in range(N):
+        total_photons = int(np.sum(result))
+        prob_cumulative = 0
         kk = np.arange(k + 1)
         mu_red, V_red = reduced_gaussian(local_mu, cov, kk)
+        sample = np.random.random()
 
         if approx:
             Q = Qmat(V_red, hbar=hbar)
             A = Amat(Q, hbar=hbar, cov_is_qmat=True)
+            A = np.real_if_close(A)
+            A[np.where((-1e-8 < A) & (A < 0))] = 0
+            normalisation = np.sqrt(np.linalg.det(Q).real)
 
-        for i in range(cutoff):
+        for i in range(min(max_photons + 1 - total_photons, cutoff) + 1):
+            if i == min(max_photons + 1 - total_photons, cutoff) + 0:
+                return -1
             indices = result + [i]
             ind2 = indices + indices
             if approx:
                 factpref = np.prod(fac(indices))
                 mat = reduction(A, ind2)
-                probs1[i] = (
-                    hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
+                prob_i = (
+                    hafnian(mat, approx=True, num_samples=int(approx_samples))
+                    / factpref
+                    / normalisation
                 )
             else:
-                probs1[i] = density_matrix_element(
-                    mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar
-                ).real
+                if (k == N - 1) and (pure_cov == True):
+                    amp_i = pure_state_amplitude(
+                        mu_red, cov, indices, hbar=hbar, check_purity=False
+                    )
+                    prob_i = np.abs(amp_i) ** 2
+                else:
+                    prob_i = density_matrix_element(
+                        mu_red,
+                        V_red,
+                        indices,
+                        indices,
+                        include_prefactor=True,
+                        hbar=hbar,
+                    ).real
 
-        if approx:
-            probs1 = probs1 / np.sqrt(np.linalg.det(Q).real)
+            prob_cumulative += prob_i / prev_prob
+            if prob_cumulative >= sample:
+                result.append(i)
+                prev_prob = prob_i
+                break
 
-        probs2 = probs1 / prev_prob
-        probs3 = np.maximum(
-            probs2, np.zeros_like(probs2)
-        )  # pylint: disable=assignment-from-no-return
-        ssum = np.sum(probs3)
-        if ssum < 1.0:
-            probs3[-1] = 1.0 - ssum
-
-        # The following normalization of probabilities is needed to prevent np.random.choice error
-        if ssum > 1.0:
-            probs3 = probs3 / ssum
-
-        result.append(np.random.choice(a=range(len(probs3)), p=probs3))
-        if result[-1] == cutoff:
-            return -1
-        if np.sum(result) > max_photons:
-            return -1
-        prev_prob = probs1[result[-1]]
+        prev_prob = prob_i
 
     return result
 
@@ -275,7 +291,9 @@ def hafnian_sample_state(
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel:
-        params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
+        params = [
+            [cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]
+        ] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_hafnian_sample)(p))
@@ -289,7 +307,14 @@ def hafnian_sample_state(
 
 
 def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
+    A,
+    n_mean,
+    samples=1,
+    cutoff=5,
+    max_photons=30,
+    approx=False,
+    approx_samples=1e5,
+    parallel=False,
 ):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
@@ -433,7 +458,9 @@ def _torontonian_sample(args):
     j = 0
 
     while j < samples:
-        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons)
+        result = generate_torontonian_sample(
+            cov, mu, hbar=hbar, max_photons=max_photons
+        )
         if result != -1:
             samples_array.append(result)
             j = j + 1
@@ -441,7 +468,9 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, parallel=False):
+def torontonian_sample_state(
+    cov, samples, mu=None, hbar=2, max_photons=30, parallel=False
+):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -556,7 +585,10 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
     return np.where(
-        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
+        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol)
+        > 0,
+        1,
+        0,
     )
 
 
@@ -580,7 +612,9 @@ def photon_number_sampler(probabilities, num_samples, out_of_bounds=False):
         probabilities = probabilities.flatten() / sum_p
         vals = np.arange(cutoff**num_modes, dtype=int)
         return [
-            np.unravel_index(np.random.choice(vals, p=probabilities), [cutoff] * num_modes)
+            np.unravel_index(
+                np.random.choice(vals, p=probabilities), [cutoff] * num_modes
+            )
             for _ in range(num_samples)
         ]
 
