@@ -116,6 +116,14 @@ class TestHafnianRepeatedWrapper:
         expected = jhaf(np.complex128(A), np.ones([6], dtype=np.int32))
         assert np.allclose(haf, expected)
 
+    def test_loop_true(self):
+        """Check `hafnian_repeated(A)=0` if `A` is a zero matrix and
+        `loop` is true.
+        """
+        A = np.zeros((6, 6))
+        haf = hafnian_repeated(A, [1] * 6)
+        assert np.allclose(haf, 0)
+
 
 @pytest.mark.parametrize("dtype", [np.complex128, np.float64])
 class TestHafnianRepeated:
