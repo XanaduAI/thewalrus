@@ -447,76 +447,90 @@ def implement_U(cov, U):
     return Usymp @ cov @ Usymp.T
 
 def heralded_density_matrix(
-    rjs, O, U, N, efficiency=None, noise=None, Ncutoff=None, MD=True, normalize=True, hbar=2.0
-):
-    r"""Returns the density matrix of mode M when heralding on N (list/array of size M-1) photons in modes 1 to M-1 for the given inupt parameters.
+    rjs: list,
+    O: np.ndarray,
+    U: np.ndarray,
+    N: dict,
+    efficiency: Optional[np.ndarray] = None,
+    noise: Optional[np.ndarray] = None,
+    Ncutoff: Optional[int] = None,
+    MD: bool = True,
+    normalize: bool = True,
+    thr: float = 1e-3,
+    thresh: float = 1e-3,
+    hbar: Union[float, int] = 2,
+) -> np.ndarray:
+    r"""Returns the density matrix of the specified spatial mode when heralding on N (dict) photons in defined spatial modes for the given inupt parameters.
     The initial state has squeezing parameters rjs (list for each spatial mode of squeezing parameters of each Schmidt mode for that spatial mode),
     and mode overlaps described by the O matrix. The whole system is evolved under a unitary U on the spatial modes.
     Output density matrix has dimensions for each orthonormal mode.
-
     Args:
-        rjs (list[list/array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode
-        O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
-        U (array): unitary matrix expressing the three spatial mode interferometer
-        N (array-like): post selection total photon number in the spatial modes
-        efficiency (array): total efficiency/transmission of the three spatial modes
-        noise (array): Poissonian noise amplitude in each spatial mode after loss (sqrt of <n>)
-        Ncutoff (int): cutoff dimension for each density matrix
-        MD (bool): return multidimensional density matrix
-        normalize (bool): whether to normalise the output density matrix
-        hbar (float): the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0)
-
+        rjs: list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode.
+        O: 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined.
+        U: unitary matrix expressing the three spatial mode interferometer.
+        N: post selection total photon number in the spatial modes (int), indexed by spatial mode.
+        efficiency: total efficiency/transmission of the three spatial modes.
+        noise: Poissonian noise amplitude in each spatial mode after loss (sqrt of <n>).
+        Ncutoff: cutoff dimension for each density matrix.
+        MD: return multidimensional density matrix.
+        normalize: whether to normalise the output density matrix.
+        thr: eigenvalue threshold under which orthonormal mode is discounted.
+        thresh: fidelity distance away from vacuum for an orthonormal mode to be discarded.
+        hbar: the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0).
     Returns:
-        (array): density matrix of spatial mode M
+        density matrix of heralded spatial mode.
     """
 
-    if not np.allclose(len(U), len(rjs)):
+    if not np.allclose(U.shape[0], len(rjs)):
         raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
-    if not np.allclose(len(U), len(N) + 1):
+    if not np.allclose(U.shape[0], len(N) + 1):
         raise ValueError("Mismatch between expected system size and heralding modes")
-    if not np.allclose(len(O), sum([len(listElem) for listElem in rjs])):
+    if not set(list(N.keys())).issubset(set(list(np.arange(U.shape[0])))):
+        raise ValueError("Keys of N must correspond to all but one spatial mode")
+    if not np.allclose(O.shape[0], sum([len(listElem) for listElem in rjs])):
         raise ValueError(
             "Length of O must equal the total number of Schmidt modes accross all spatial modes"
         )
     if not np.allclose(U @ U.T.conj(), np.identity(len(rjs))):
         raise ValueError("U must be a unitary matrix")
     if efficiency is not None:
-        if not np.allclose(len(U), len(efficiency)):
+        if not np.allclose(U.shape[0], efficiency.shape[0]):
             raise ValueError(
                 "If giving an efficiency, a value for each spatial mode must be provided"
             )
     if noise is not None:
-        if not np.allclose(len(U), len(noise)):
+        if not np.allclose(U.shape[0], noise.shape[0]):
             raise ValueError(
                 "If giving a noise values, a value for each spatial mode must be provided"
             )
-    M = len(U)
+    M = U.shape[0]
+    N_nums = list(N.values())
+    HM = list(set(list(np.arange(M))).difference(list(N.keys())))[0]
     if efficiency is None:
         efficiency = np.ones(M)
-    eps, W = orthonormal_basis(O, rjs)
-    Qinit = state_prep(eps, W, thresh=1e-2, hbar=hbar)
-    R = int((len(Qinit) / 2) / M)
+    eps, W = orthonormal_basis(rjs, O=O, thr=thr)
+    Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
+    R = Qinit.shape[0] // (2 * M)
     Qu = implement_U(Qinit, U)
-
     Qfinal = loss(Qu, efficiency, hbar=hbar)
 
     combos_list = []
     totals = []
     if noise is not None:
-        for ii in range(M - 1):
-            combos_temp = combos(N[ii], R + 1)
+        for ii in N_nums:
+            combos_temp = combos(ii, R + 1)
             combos_list.append(combos_temp)
             totals.append(len(combos_temp))
     else:
-        for ii in range(M - 1):
-            combos_temp = combos(N[ii], R)
+        for ii in N_nums:
+            combos_temp = combos(ii, R)
             combos_list.append(combos_temp)
             totals.append(len(combos_temp))
 
     list_of_lists = [list(range(i)) for i in totals]
     indices = product(*list_of_lists)
 
-    Nmax = max(N)
+    Nmax = max(N_nums)
     if Ncutoff is None:
         Ncutoff = int(np.ceil(2 * Nmax))
 
@@ -527,19 +541,26 @@ def heralded_density_matrix(
     for idx in indices:
         temp_dict_sig = {}
         for jj in range(M - 1):
-            for kk in range(R):
-                temp_dict_sig[kk + jj * R] = combos_list[jj][idx[jj]][kk]
+            if jj < HM:
+                for kk in range(R):
+                    temp_dict_sig[kk + jj * R] = combos_list[jj][idx[jj]][kk]
+            else:
+                for kk in range(R):
+                    temp_dict_sig[kk + (jj + 1) * R] = combos_list[jj][idx[jj]][kk]
         post_select_dicts_sig.append(temp_dict_sig)
         if noise is not None:
             temp_dict_noise = {}
             for mm in range(M - 1):
-                temp_dict_noise[mm] = combos_list[mm][idx[mm]][-1]
+                if mm < HM:
+                    temp_dict_noise[mm] = combos_list[mm][idx[mm]][-1]
+                else:
+                    temp_dict_noise[mm + 1] = combos_list[mm][idx[mm]][-1]
             post_select_dicts_noise.append(temp_dict_noise)
 
     total_dm_list = []
-    for i in range(len(post_select_dicts_sig)):
+    for i in tqdm(range(len(post_select_dicts_sig))):
         dm_temp = density_matrix(
-            np.zeros(len(Qfinal)),
+            np.zeros(Qfinal.shape[0]),
             Qfinal,
             post_select=post_select_dicts_sig[i],
             normalize=False,
@@ -783,7 +804,7 @@ def test_pure_gkp():
     rho2 /= np.trace(rho2)
 
     # get density matrix using new code
-    rho3 = density_matrix_single_mode(cov, [5, 7], cutoff=cutoff - 1)
+    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho3 /= np.trace(rho3)
 
     assert np.allclose(rho1, rho2, atol=1e-6)
@@ -847,7 +868,7 @@ def test_lossy_gkp():
     rho_loss1 /= np.trace(rho_loss1)
 
     # get density matrix using new code
-    rho_loss2 = density_matrix_single_mode(cov_lossy, [5, 7], cutoff=cutoff - 1)
+    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho_loss2 /= np.trace(rho_loss2)
 
     assert np.allclose(rho_loss1, rho_loss2, atol=1e-6)
@@ -908,7 +929,7 @@ def test_vac_schmidt_modes_gkp():
     big_cov = np.eye(2 * M * K, dtype=np.complex128)
     big_cov[::K, ::K] = cov
 
-    rho_big = density_matrix_single_mode(big_cov, [5, 7], cutoff=cutoff - 1)
+    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=1e-4)
@@ -919,7 +940,7 @@ def test_density_matrix():
     """
     U = unitary_group.rvs(2)
 
-    N = [3]
+    N = {0: 3}
 
     efficiency = 1 * np.ones(2)
 
