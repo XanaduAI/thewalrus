@@ -4,9 +4,15 @@
 
 * Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#343)](https://github.com/XanaduAI/thewalrus/pull/338)
 
+* New function to produce Bloch-Messiah decomposition of symplectic matrices. [(#352)](https://github.com/XanaduAI/thewalrus/pull/352)
+
 ### Breaking changes
 
 ### Improvements
+
+* Added function to extend single mode symplectic to act on multiple modes. [(#347)](https://github.com/XanaduAI/thewalrus/pull/347)
+
+* The displacement function now calculates the displacement operator's matrix elements with respect to the Fock basis using the Laguerre polynomials. This provides enhanced numerical stability for larger cutoff values. [(#351)](https://github.com/XanaduAI/thewalrus/pull/351)
 
 ### Bug fixes
 
@@ -21,7 +27,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov, Antonín Hoskovec, Martin Houde, Benjamin Lanthier, Dominic Leclerc, Brandon Turcotte, Jiaqi Zhao
+Mikhail Andrenkov, Sebastián Duque, Jacob Hastrup, Antonín Hoskovec, Martin Houde, Benjamin Lanthier, Dominic Leclerc, Filippo Miatto, Will McCutcheon, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
