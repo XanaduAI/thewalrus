@@ -2,7 +2,9 @@
 
 ### New features
 
-* New function to produce Bloch-Messiah decomposition of symplectic matrices.
+* Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#343)](https://github.com/XanaduAI/thewalrus/pull/338)
+
+* New function to produce Bloch-Messiah decomposition of symplectic matrices. [(#352)](https://github.com/XanaduAI/thewalrus/pull/352)
 
 ### Breaking changes
 
@@ -19,15 +21,14 @@
 
 ### Documentation
 
-* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
-  is now used to style the Sphinx documentation.
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme) is now used to style the Sphinx documentation.
   [(#341)](https://github.com/XanaduAI/thewalrus/pull/341)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-Mikhail Andrenkov, Sebastián Duque, Jacob Hastrup, Antonín Hoskovec, Filippo Miatto, Will McCutcheon
+Mikhail Andrenkov, Sebastián Duque, Jacob Hastrup, Antonín Hoskovec, Martin Houde, Benjamin Lanthier, Dominic Leclerc, Filippo Miatto, Will McCutcheon, Brandon Turcotte, Jiaqi Zhao
 
 ---
 
