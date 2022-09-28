@@ -17,8 +17,7 @@ tests for code in thewalrus.internal_modes
 
 import pytest
 
-import numpy as np 
-import strawberryfields as sf 
+import numpy as np
 
 from scipy.stats import unitary_group
 from scipy.special import factorial
@@ -31,27 +30,13 @@ from itertools import combinations_with_replacement, product
 
 from thewalrus import low_rank_hafnian, reduction
 
-from thewalrus.internal_modes import (
-    pnr_prob,
-    distinguishable_pnr_prob,
-    density_matrix_single_mode
-    )
-from thewalrus.internal_modes.prepare_cov import (
-    orthonormal_basis,
-    state_prep)
+from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep
 
 from thewalrus.random import random_covariance
-from thewalrus.quantum import (
-    density_matrix_element, 
-    density_matrix, 
-    Amat, 
-    Qmat, 
-    state_vector
-    )
+from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
 from thewalrus.symplectic import squeezing, passive_transformation, interferometer
 from thewalrus.symplectic import autonne as takagi
-
-from strawberryfields.ops import BSgate, Interferometer, Sgate
 
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
@@ -317,7 +302,9 @@ def prob_distinguishable_lossy(T, input_labels, input_squeezing, events):
         net_sum += term
     return net_sum
 
+
 ### David Phillip's code for combinatorial approach to internal mode calculations ###
+
 
 def loss(cov, efficiency, hbar=2):
     r"""Implements spatial mode loss on a covariance matrix whose modes are grouped by spatial modes.
@@ -337,6 +324,7 @@ def loss(cov, efficiency, hbar=2):
         T = np.append(T, np.array(R * [np.sqrt(efficiency[i])]))
     T = np.diag(np.append(T, T))
     return T @ cov @ T + (hbar / 2) * (np.identity(len(cov)) - T @ T)
+
 
 @lru_cache(maxsize=1000000)
 def combos(N, R):
@@ -360,6 +348,7 @@ def combos(N, R):
     new_combos.reverse()
     return new_combos
 
+
 def dm_MD_2D(dm_MD):
     r"""For R effective modes and when computing up to Ncutoff, this function converts a 2R-dimensional
     density matrix (i.e. 2 dimensions for each Schmidt mode) into a 2-dimensional density matrix.
@@ -377,7 +366,7 @@ def dm_MD_2D(dm_MD):
         return dm_MD
     Ncutoff = len(dm_MD)
     new_ax = np.arange(2 * R).reshape([R, 2]).T.flatten()
-    dm_2D = dm_MD.transpose(new_ax).reshape([Ncutoff ** R, Ncutoff ** R])
+    dm_2D = dm_MD.transpose(new_ax).reshape([Ncutoff**R, Ncutoff**R])
     return dm_2D
 
 
@@ -403,6 +392,7 @@ def dm_2D_MD(dm_2D, R):
     dm_MD = np.reshape(dm_2D, dim).transpose(new_ax)
     return dm_MD
 
+
 def swap_matrix(M, R):
     r"""Computes the matrix that swaps the ordering of modes from grouped by orthonormal modes to grouped by spatial modes.
     The inverse of the swap matrix is its transpose.
@@ -426,6 +416,7 @@ def swap_matrix(M, R):
         ver.append(ver[-1][:, perm])
     return np.concatenate(ver)
 
+
 def implement_U(cov, U):
     r"""Implements a spatial mode linear optical transofrmation (flat in orthonormal modes) described by U on a covariance matrix.
     Assumes the modes of the input covariance matrix are grouped by spatial modes.
@@ -445,6 +436,7 @@ def implement_U(cov, U):
     X = swap_matrix(M, R)
     Usymp = interferometer(X.T @ Ubig @ X)
     return Usymp @ cov @ Usymp.T
+
 
 def heralded_density_matrix(
     rjs: list,
@@ -590,7 +582,8 @@ def heralded_density_matrix(
 
 #### Test functions start here ####
 
-@pytest.mark.parametrize("M", [3,4,5,6])
+
+@pytest.mark.parametrize("M", [3, 4, 5, 6])
 def test_pnr_prob_single_internal_mode(M):
     """
     test internal modes functionality against standard method for pnr probabilities
@@ -599,25 +592,26 @@ def test_pnr_prob_single_internal_mode(M):
     cov = random_covariance(M)
     mu = np.zeros(2 * M)
 
-    pattern = [2,3,0] + [1] * (M - 3)
-        
+    pattern = [2, 3, 0] + [1] * (M - 3)
+
     p1 = pnr_prob(cov, pattern)
     p2 = density_matrix_element(mu, cov, pattern, pattern).real
-    
+
     assert np.isclose(p1, p2)
 
-@pytest.mark.parametrize("M", [3,4,5,6])
+
+@pytest.mark.parametrize("M", [3, 4, 5, 6])
 def test_distinguishable_pnr_prob(M):
     hbar = 2
 
-    pattern = [3,2,0] + [1] * (M - 3)
+    pattern = [3, 2, 0] + [1] * (M - 3)
 
     mu = np.zeros(2 * M)
 
     rs = [1] * M
     T = 0.5 * unitary_group.rvs(M)
 
-    big_cov = np.zeros((2*M**2, 2*M**2))
+    big_cov = np.zeros((2 * M**2, 2 * M**2))
     covs = []
     for i, r in enumerate(rs):
         r_vec = np.zeros(M)
@@ -626,15 +620,15 @@ def test_distinguishable_pnr_prob(M):
         cov = 0.5 * hbar * S @ S.T
         mu, cov = passive_transformation(mu, cov, T)
         covs.append(cov)
-        big_cov[i::M,i::M] = cov
+        big_cov[i::M, i::M] = cov
 
     p1 = pnr_prob(covs, pattern, hbar=hbar)
     p2 = pnr_prob(big_cov, pattern, hbar=hbar)
     p3 = distinguishable_pnr_prob(pattern, rs, T)
 
-    assert np.isclose(p1,p2)
-    assert np.isclose(p1,p3)
-    assert np.isclose(p2,p3)
+    assert np.isclose(p1, p2)
+    assert np.isclose(p1, p3)
+    assert np.isclose(p2, p3)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
@@ -656,6 +650,7 @@ def test_distinguishable_probs(M):
 
     assert np.allclose(p1, p2, atol=1e-6)
 
+
 @pytest.mark.parametrize("M", range(2, 7))
 def test_distinguishable_vacuum_probs(M):
     """test distinguishability code against combinatorial version for vacuum outcome"""
@@ -675,6 +670,7 @@ def test_distinguishable_vacuum_probs(M):
 
     assert np.allclose(p1, p2, atol=1e-6)
 
+
 @pytest.mark.parametrize("M", range(2, 7))
 def test_distinguishable_probs_collisions(M):
     """test distinguishability code against combinatorial version"""
@@ -691,6 +687,7 @@ def test_distinguishable_probs_collisions(M):
     p2 = distinguishable_pnr_prob(pattern, rs, U)
 
     assert np.allclose(p1, p2, atol=1e-6)
+
 
 @pytest.mark.parametrize("M", range(2, 7))
 @pytest.mark.parametrize("collisions", [False, True])
@@ -718,6 +715,7 @@ def test_distinguishable_probabilitites_single_input(M, collisions):
     obtained = distinguishable_pnr_prob(pattern, rs, T)
     assert np.allclose(expected, obtained)
 
+
 @pytest.mark.parametrize("M", range(2, 10))
 def test_distinguishable_vacuum_probs_lossy(M):
     """test distinguishability code against combinatorial version for vacuum outcome (with loss)"""
@@ -729,6 +727,7 @@ def test_distinguishable_vacuum_probs_lossy(M):
     p2 = distinguishable_pnr_prob(pattern, rs, T)
 
     assert np.allclose(p1, p2, atol=1e-6)
+
 
 @pytest.mark.parametrize("M", range(7, 15))
 @pytest.mark.parametrize("pat_dict", [{1: 3, 2: 2}, {1: 1, 2: 1, 3: 1, 4: 1}])
@@ -747,6 +746,7 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     obtained = distinguishable_pnr_prob(pat_list, rs_vec, T)
     assert np.allclose(expected, obtained)
     assert np.allclose(expected, obtained)
+
 
 def test_pure_gkp():
     """test pure gkp state density matrix using 2 methods from the walrus against
@@ -772,26 +772,33 @@ def test_pure_gkp():
     bs_phi1, bs_phi2, bs_phi3 = params[6:9]
     sq_virt = params[9]
 
-    nmodes = 3
-    prog = sf.Program(nmodes)
-    eng = sf.Engine("gaussian")
-
-    with prog.context as q:
-        for k in range(3):
-            Sgate(sq_r[k]) | q[k]
-
-        BSgate(bs_theta1, bs_phi1) | (q[0], q[1])
-        BSgate(bs_theta2, bs_phi2) | (q[1], q[2])
-        BSgate(bs_theta3, bs_phi3) | (q[0], q[1])
-
-        Sgate(sq_virt) | q[2]
-
-        Interferometer(
-            np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
-        ) | q  # state comes out of top mode
-
-    state = eng.run(prog).state
-    mu, cov = state.means(), state.cov()
+    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    U1 = np.array(
+        [
+            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
+            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
+            [0, 0, 1],
+        ]
+    )
+    U2 = np.array(
+        [
+            [1, 0, 0],
+            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
+            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
+        ]
+    )
+    U3 = np.array(
+        [
+            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
+            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
+            [0, 0, 1],
+        ]
+    )
+    Usymp = interferometer(U3 @ U2 @ U1)
+    r2 = np.array([0, 0, sq_virt])
+    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    Z = S2 @ Usymp @ S1
+    cov = Z @ Z.T
 
     cutoff = 26
     psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, normalize=False, cutoff=cutoff)
@@ -810,6 +817,7 @@ def test_pure_gkp():
     assert np.allclose(rho1, rho2, atol=1e-6)
     assert np.allclose(rho1, rho3, atol=1e-6)
     assert np.allclose(rho2, rho3, atol=1e-6)
+
 
 def test_lossy_gkp():
     """
@@ -836,32 +844,33 @@ def test_lossy_gkp():
     bs_phi1, bs_phi2, bs_phi3 = params[6:9]
     sq_virt = params[9]
 
-    nmodes = 3
-    prog = sf.Program(nmodes)
-    eng = sf.Engine("gaussian")
-
-    with prog.context as q:
-        for k in range(3):
-            Sgate(sq_r[k]) | q[k]
-
-        BSgate(bs_theta1, bs_phi1) | (q[0], q[1])
-        BSgate(bs_theta2, bs_phi2) | (q[1], q[2])
-        BSgate(bs_theta3, bs_phi3) | (q[0], q[1])
-
-        Sgate(sq_virt) | q[2]
-
-        Interferometer(
-            np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
-        ) | q  # state comes out of top mode
-
-    state = eng.run(prog).state
-    mu, cov = state.means(), state.cov()
-
-    cutoff = 26
-
-    eta = 0.95
-    T = np.diag([np.sqrt(eta)] * 3)
-    mu, cov_lossy = passive_transformation(mu, cov, T)
+    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    U1 = np.array(
+        [
+            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
+            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
+            [0, 0, 1],
+        ]
+    )
+    U2 = np.array(
+        [
+            [1, 0, 0],
+            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
+            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
+        ]
+    )
+    U3 = np.array(
+        [
+            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
+            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
+            [0, 0, 1],
+        ]
+    )
+    Usymp = interferometer(U3 @ U2 @ U1)
+    r2 = np.array([0, 0, sq_virt])
+    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    Z = S2 @ Usymp @ S1
+    cov = Z @ Z.T
 
     # get density matrix using The Walrus
     rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
@@ -872,6 +881,7 @@ def test_lossy_gkp():
     rho_loss2 /= np.trace(rho_loss2)
 
     assert np.allclose(rho_loss1, rho_loss2, atol=1e-6)
+
 
 def test_vac_schmidt_modes_gkp():
     """
@@ -897,26 +907,33 @@ def test_vac_schmidt_modes_gkp():
     bs_phi1, bs_phi2, bs_phi3 = params[6:9]
     sq_virt = params[9]
 
-    nmodes = 3
-    prog = sf.Program(nmodes)
-    eng = sf.Engine("gaussian")
-
-    with prog.context as q:
-        for k in range(3):
-            Sgate(sq_r[k]) | q[k]
-
-        BSgate(bs_theta1, bs_phi1) | (q[0], q[1])
-        BSgate(bs_theta2, bs_phi2) | (q[1], q[2])
-        BSgate(bs_theta3, bs_phi3) | (q[0], q[1])
-
-        Sgate(sq_virt) | q[2]
-
-        Interferometer(
-            np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
-        ) | q  # state comes out of top mode
-
-    state = eng.run(prog).state
-    mu, cov = state.means(), state.cov()
+    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    U1 = np.array(
+        [
+            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
+            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
+            [0, 0, 1],
+        ]
+    )
+    U2 = np.array(
+        [
+            [1, 0, 0],
+            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
+            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
+        ]
+    )
+    U3 = np.array(
+        [
+            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
+            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
+            [0, 0, 1],
+        ]
+    )
+    Usymp = interferometer(U3 @ U2 @ U1)
+    r2 = np.array([0, 0, sq_virt])
+    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    Z = S2 @ Usymp @ S1
+    cov = Z @ Z.T
 
     cutoff = 26
     psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, normalize=False, cutoff=cutoff)
@@ -933,6 +950,7 @@ def test_vac_schmidt_modes_gkp():
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=1e-4)
+
 
 def test_density_matrix():
     """
@@ -985,4 +1003,3 @@ def test_density_matrix():
     rho2_norm = rho2 / np.trace(rho2)
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-4, rtol=1e-4)
-
