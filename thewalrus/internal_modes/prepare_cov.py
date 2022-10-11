@@ -18,7 +18,6 @@ Set of functions for forming a covariance matrix over multiple modes, based on o
 import numpy as np
 from itertools import chain
 
-from scipy.linalg import block_diag
 from strawberryfields.decompositions import takagi
 from ..quantum import fidelity
 from ..symplectic import (
@@ -139,8 +138,8 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     M = len(rjs)
     njs = np.array([len(rjs[i]) for i in range(M)])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
-    X = np.fliplr(np.eye(lambd.shape[0]))
-    lambd, V = X @ lambd, -V @ X
+    lambd, V = lambd[::-1], (V.T[::-1]).T
+    V = (V.T / np.real_if_close(np.exp(1j * np.angle(V)[0]))).T
     inds = np.arange(lambd.shape[0])[lambd > thr]
     lambd = lambd[inds]
     R = lambd.shape[0]
@@ -162,6 +161,11 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
                     )
                 )
         eps_temp, WT_temp = takagi(Rtemp)
+        signs = np.sign(WT_temp.real)[0]
+        for n, s in enumerate(signs):
+            if np.allclose(s, 0):
+                signs[n] = 1
+        WT_temp = (WT_temp.T / signs).T
         eps.append(eps_temp)
         W.append(WT_temp.T)
     if F is not None:
