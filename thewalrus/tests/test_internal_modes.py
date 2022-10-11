@@ -306,62 +306,62 @@ def prob_distinguishable_lossy(T, input_labels, input_squeezing, events):
 ### David Phillip's code for combinatorial approach to internal mode calculations ###
 
 
-def loss(cov, efficiency, hbar=2):
+def loss(cov: np.ndarray, efficiency: np.ndarray, hbar: Union[float, int] = 2) -> np.ndarray:
     r"""Implements spatial mode loss on a covariance matrix whose modes are grouped by spatial modes.
     Works for any number of Schmidt/orthonormal modes.
-
+    
     Args:
-        cov (array): covariance matrix
-        efficiency (array): array of efficiencies of each spatial mode
-
+        cov: covariance matrix
+        efficiency: array of efficiencies of each spatial mode
+    
     Returns:
-        (array): covariance matrix updated for loss
+        covariance matrix updated for loss
     """
-    M = len(efficiency)
-    R = int((len(cov) / 2) / M)
+    M = efficiency.shape[0]
+    R = cov.shape[0] // (2 * M)
     T = np.array([])
     for i in range(M):
         T = np.append(T, np.array(R * [np.sqrt(efficiency[i])]))
     T = np.diag(np.append(T, T))
-    return T @ cov @ T + (hbar / 2) * (np.identity(len(cov)) - T @ T)
+    return T @ cov @ T + (hbar / 2) * (np.identity(cov.shape[0]) - T @ T)
 
 
 @lru_cache(maxsize=1000000)
-def combos(N, R):
-    """Returns a list of all partitions of detecting N photons with a mode-insensitive detector into R modes.
-
+def combos(N: int, R: int) -> list:
+    r"""Returns a list of all partitions of detecting N photons with a mode-insensitive detector into R modes.
+    
     Args:
-        N (int): total number of detected photons
-        R (int): number of modes in which to split the photons
-
+        N: total number of detected photons
+        R: number of modes in which to split the photons
+    
     Returns:
-        (list): all of the possible partitions
+        all of the possible partitions
     """
     if R == 1:
         return [[N]]
+    else:
+        new_combos = []
+        for first_val in range(N + 1):
+            rest = combos(N - first_val, R - 1)
+            new = [p[0] + p[1] for p in product([[first_val]], rest)]
+            new_combos += new
+        new_combos.reverse()
+        return new_combos
 
-    new_combos = []
-    for first_val in range(N + 1):
-        rest = combos(N - first_val, R - 1)
-        new = [p[0] + p[1] for p in product([[first_val]], rest)]
-        new_combos += new
-    new_combos.reverse()
-    return new_combos
 
-
-def dm_MD_2D(dm_MD):
+def dm_MD_2D(dm_MD: np.ndarray) -> np.ndarray:
     r"""For R effective modes and when computing up to Ncutoff, this function converts a 2R-dimensional
     density matrix (i.e. 2 dimensions for each Schmidt mode) into a 2-dimensional density matrix.
     The initial density matrix dm_MD has entries dm_MD[j_{0}, k_{0}, ..., j_{R-1}, k_{R-1}] where j_{0} etc. run from 0 to Ncutoff-1.
     The final matrix dm_2D has Ncutoff**R x Ncutoff**R entries.
-
+    
     Args:
-        dm_MD (array): 2R-dimensional density matrix
-
+        dm_MD: 2R-dimensional density matrix
+    
     Returns:
-        (array): 2-dimensional density matrix
+        2-dimensional density matrix
     """
-    R = int(len(dm_MD.shape) / 2)
+    R = len(dm_MD.shape) // 2
     if np.allclose(R, 1):
         return dm_MD
     Ncutoff = len(dm_MD)
@@ -370,66 +370,60 @@ def dm_MD_2D(dm_MD):
     return dm_2D
 
 
-def dm_2D_MD(dm_2D, R):
+def dm_2D_MD(dm_2D: np.ndarray, R: int) -> np.ndarray:
     r"""Converts a 2-dimensional density matrix into a 2R-dimensional density matrix (i.e. 2 dimensions for each effective mode).
     When computing for up to Ncutoff photons with R effective modes, the initial matrix has Ncutoff**R x Ncutoff**R entries.
     The final density matrix dm_MD has entries dm_MD[j_{0}, k_{0}, ..., j_{R-1}, k_{R-1}] where j_{0} etc. run from 0 to Ncutoff-1.
-
+    
     Args:
-        dm_2D (array): 2-dimensional density matrix
-        R (int): effective number of modes
-
+        dm_2D: 2-dimensional density matrix
+        R: effective number of modes
+    
     Returns:
-        (array): 2R-dimensional density matrix
+        2R-dimensional density matrix
     """
     if np.allclose(R, 1):
         return dm_2D
     Ncutoff = len(dm_2D) ** (1 / R)
-    assert Ncutoff.is_integer()
-    Ncutoff = int(Ncutoff)
+    assert abs(round(Ncutoff) - Ncutoff) < 1e-5
+    Ncutoff = round(Ncutoff)
     dim = 2 * R * [Ncutoff]
     new_ax = np.arange(2 * R).reshape([R, 2]).T.flatten()
     dm_MD = np.reshape(dm_2D, dim).transpose(new_ax)
     return dm_MD
 
 
-def swap_matrix(M, R):
+def swap_matrix(M: int, R: int) -> np.ndarray:
     r"""Computes the matrix that swaps the ordering of modes from grouped by orthonormal modes to grouped by spatial modes.
     The inverse of the swap matrix is its transpose.
-
+    
     Args:
-        M (int): number of spatial modes
-        R (int): number of orthonormal modes in each spatial mode
-
+        M: number of spatial modes.
+        R: number of orthonormal modes in each spatial mode.
+    
     Returns:
-        (array): M*R x M*R swap matrix
+        M*R x M*R swap matrix.
     """
-    block = []
-    for i in range(M):
-        arr = [0] * M * R
-        arr[i * R] = 1
-        block.append(arr)
-    hor = np.array(block)
-    ver = [hor]
-    perm = np.append(np.array([-1]), np.arange(M * R - 1))
-    for _ in range(1, R):
-        ver.append(ver[-1][:, perm])
-    return np.concatenate(ver)
+    P = np.zeros((M * R, M * R), dtype=int)
+    in_modes = range(M * R)
+    out_modes = list(chain.from_iterable(range(i, M * R, M) for i in range(M)))
+    P[out_modes, in_modes] = 1
+    return P
 
 
-def implement_U(cov, U):
+def implement_U(cov: np.ndarray, U: np.ndarray) -> np.ndarray:
     r"""Implements a spatial mode linear optical transofrmation (flat in orthonormal modes) described by U on a covariance matrix.
     Assumes the modes of the input covariance matrix are grouped by spatial modes.
-
+    
     Args:
-        cov (array): covariance matrix
-        U (array): unitary transformation of spatial modes
-
+        cov: covariance matrix.
+        U: unitary transformation of spatial modes.
+    
     Returns:
-        (array): transformed covariance matrix
+        transformed covariance matrix.
     """
-    M = len(U)
-    R = int((len(cov) / 2) / M)
+    M = U.shape[0]
+    R = cov.shape[0] // (2 * M)
     Ubig = np.identity(M * R, dtype=np.complex128)
     for j in range(R):
         Ubig[M * j : M * (j + 1), M * j : M * (j + 1)] = U
@@ -456,6 +450,7 @@ def heralded_density_matrix(
     The initial state has squeezing parameters rjs (list for each spatial mode of squeezing parameters of each Schmidt mode for that spatial mode),
     and mode overlaps described by the O matrix. The whole system is evolved under a unitary U on the spatial modes.
     Output density matrix has dimensions for each orthonormal mode.
+    
     Args:
         rjs: list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode.
         O: 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined.
@@ -469,6 +464,7 @@ def heralded_density_matrix(
         thr: eigenvalue threshold under which orthonormal mode is discounted.
         thresh: fidelity distance away from vacuum for an orthonormal mode to be discarded.
         hbar: the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0).
+    
     Returns:
         density matrix of heralded spatial mode.
     """
