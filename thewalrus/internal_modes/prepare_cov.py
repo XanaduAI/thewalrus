@@ -139,7 +139,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     njs = np.array([len(rjs[i]) for i in range(M)])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
     lambd, V = lambd[::-1], (V.T[::-1]).T
-    V = (V.T / np.real_if_close(np.exp(1j * np.angle(V)[0]))).T
+    V /= np.real_if_close(np.exp(1j * np.angle(V)[0]))
     inds = np.arange(lambd.shape[0])[lambd > thr]
     lambd = lambd[inds]
     R = lambd.shape[0]
@@ -165,7 +165,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
         for n, s in enumerate(signs):
             if np.allclose(s, 0):
                 signs[n] = 1
-        WT_temp = (WT_temp.T / signs).T
+        WT_temp /= signs
         eps.append(eps_temp)
         W.append(WT_temp.T)
     if F is not None:
