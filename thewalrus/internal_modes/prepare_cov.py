@@ -18,9 +18,9 @@ Set of functions for forming a covariance matrix over multiple modes, based on o
 import numpy as np
 from itertools import chain
 
-from strawberryfields.decompositions import takagi
 from ..quantum import fidelity
 from ..symplectic import (
+    autonne,
     interferometer,
     reduced_state,
     squeezing,
@@ -139,7 +139,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     njs = np.array([len(rjs[i]) for i in range(M)])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
     lambd, V = lambd[::-1], (V.T[::-1]).T
-    V /= np.real_if_close(np.exp(1j * np.angle(V)[0]))
+    V = np.real_if_close(V / np.exp(1j * np.angle(V)[0]))
     inds = np.arange(lambd.shape[0])[lambd > thr]
     lambd = lambd[inds]
     R = lambd.shape[0]
@@ -160,12 +160,8 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
                         ]
                     )
                 )
-        eps_temp, WT_temp = takagi(Rtemp)
-        signs = np.sign(WT_temp.real)[0]
-        for n, s in enumerate(signs):
-            if np.allclose(s, 0):
-                signs[n] = 1
-        WT_temp /= signs
+        eps_temp, WT_temp = autonne(np.real_if_close(Rtemp))
+        WT_temp = np.real_if_close(WT_temp / np.exp(1j * np.angle(WT_temp)[0]))
         eps.append(eps_temp)
         W.append(WT_temp.T)
     if F is not None:
