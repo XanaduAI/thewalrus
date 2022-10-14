@@ -161,9 +161,8 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
                     )
                 )
         eps_temp, WT_temp = autonne(np.real_if_close(Rtemp))
-        WT_temp = np.real_if_close(WT_temp / np.exp(1j * np.angle(WT_temp)[0]))
         eps.append(eps_temp)
-        W.append(WT_temp.T)
+        W.append(np.real_if_close(WT_temp).T)
     if F is not None:
         chis = []
         for k in range(R):
