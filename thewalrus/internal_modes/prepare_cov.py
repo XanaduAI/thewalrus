@@ -20,11 +20,11 @@ from itertools import chain
 
 from ..quantum import fidelity
 from ..symplectic import (
-    autonne,
     interferometer,
+    passive_transformation,
     reduced_state,
     squeezing,
-    passive_transformation,
+    takagi,
 )
 
 
@@ -138,7 +138,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     M = len(rjs)
     njs = np.array([len(rjs[i]) for i in range(M)])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
-    lambd, V = lambd[::-1], (V.T[::-1]).T
+    lambd, V = lambd[::-1], V[:, ::-1]
     V = np.real_if_close(V / np.exp(1j * np.angle(V)[0]))
     inds = np.arange(lambd.shape[0])[lambd > thr]
     lambd = lambd[inds]
@@ -160,7 +160,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
                         ]
                     )
                 )
-        eps_temp, WT_temp = autonne(np.real_if_close(Rtemp))
+        eps_temp, WT_temp = takagi(Rtemp)
         eps.append(eps_temp)
         W.append(np.real_if_close(WT_temp).T)
     if F is not None:
