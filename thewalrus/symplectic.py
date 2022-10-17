@@ -57,7 +57,9 @@ Code details
 ------------
 """
 import warnings
+from itertools import groupby
 import numpy as np
+from scipy.linalg import block_diag, sqrtm
 from scipy.sparse import (
     identity as sparse_identity,
     issparse,
@@ -469,6 +471,80 @@ def autonne(A, rtol=1e-05, atol=1e-08, svd_order=True):
     if svd_order:
         return (vals[n : 2 * n])[::-1], U[:, ::-1]
     return vals[n : 2 * n], U
+
+
+def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
+    r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix, this is the strawberryfields version.
+    Note that singular values of A are considered equal if they are equal after np.round(values, rounding).
+    See :cite:`cariolaro2016` and references therein for a derivation.
+    Args:
+        A (array[complex]): square, symmetric matrix
+        rounding (int): the number of decimal places to use when rounding the singular values of A
+        rtol (float): the relative tolerance parameter between ``A`` and ``A.T``
+        atol (float): the absolute tolerance parameter between ``A`` and ``A.T``
+        svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or asceding (``False``) order.
+    Returns:
+        tuple[array, array]: (rl, U), where rl are the (rounded) singular values,
+            and U is the Takagi unitary, such that :math:`N = U \diag(rl) U^T`.
+    """
+    n, m = A.shape
+    if n != m:
+        raise ValueError("The input matrix is not square")
+    if not np.allclose(A, A.T, rtol=rtol, atol=atol):
+        raise ValueError("The input matrix is not symmetric")
+
+    A = np.real_if_close(A)
+
+    if np.allclose(A, 0):
+        return np.zeros(n), np.eye(n)
+
+    if np.isrealobj(A):
+        # If the matrix A is real one can be more clever and use its eigendecomposition
+        ls, U = np.linalg.eigh(A)
+        U = U / np.exp(1j*np.angle(U)[0])
+        ls = np.round(ls, rounding)
+        vals = np.abs(ls)  # These are the Takagi eigenvalues
+        phases = np.sqrt(np.complex128([-1 if l < 0 else 1 for l in ls]))
+        Uc = U @ np.diag(phases)  # One needs to readjust the phases
+        list_vals = [(vals[i], i) for i in range(len(vals))]
+        # And also rearrange the unitary and values so that they are decreasingly ordered
+        list_vals.sort(reverse=svd_order)
+        sorted_ls, permutation = zip(*list_vals)
+        return np.array(sorted_ls), np.real_if_close(Uc[:, np.array(permutation)])
+
+    v, l, ws = np.linalg.svd(A)
+    w = np.transpose(np.conjugate(ws))
+    rl = np.round(l, rounding)
+
+    # Generate list with degenerancies
+    result = []
+    for k, g in groupby(rl):
+        result.append(list(g))
+
+    # Generate lists containing the columns that correspond to degenerancies
+    kk = 0
+    for k in result:
+        for ind, j in enumerate(k):  # pylint: disable=unused-variable
+            k[ind] = kk
+            kk = kk + 1
+
+    # Generate the lists with the degenerate column subspaces
+    vas = []
+    was = []
+    for i in result:
+        vas.append(v[:, i])
+        was.append(w[:, i])
+
+    # Generate the matrices qs of the degenerate subspaces
+    qs = []
+    for i in range(len(result)):
+        qs.append(sqrtm(np.transpose(vas[i]) @ was[i]))
+
+    # Construct the Takagi unitary
+    qb = block_diag(*qs)
+
+    U = v @ np.conj(qb)
+    return rl, U
 
 
 def xxpp_to_xpxp(S):
