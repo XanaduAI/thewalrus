@@ -25,12 +25,14 @@ Auxiliary functions
 -------------------
 
 .. autosummary::
+    autonne
     expand
     expand_vector
     expand_passive
     reduced_state
     is_symplectic
     sympmat
+    takagi
     xxpp_to_xpxp
     xpxp_to_xxpp
 
