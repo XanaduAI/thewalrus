@@ -31,7 +31,7 @@ from itertools import combinations_with_replacement, product
 from thewalrus import low_rank_hafnian, reduction
 
 from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
-from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep
+from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep, prepare_cov
 
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
@@ -775,6 +775,26 @@ def test_state_prep(r, S, phi):
     U = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
     Qorth = interferometer(U) @ Qinit @ interferometer(U).T
     assert np.allclose(Qsp, Qorth)
+
+
+@pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
+@pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
+@pytest.mark.parametrize("phi", [0.0, 0.9 2.1, 3.1])
+def test_prepare_cov(r, S, phi):
+    """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
+    hbar = 2
+    rjs = [np.array([r]), np.array([r])]
+    O = np.array([[1, S*np.exp(-1j*phi)], [S*np.exp(1j*phi), 1]])
+    U = unitary_group.rvs(len(rjs))
+    Q = prepare_cov(rjs, U, O=O, hbar=hbar)
+    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(2)
+    W1 = np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]]) * np.exp(-1j*phi) / np.sqrt(2)
+    eps, W = [np.array([r, 0]), np.array([r, 0])], [W0, W1]
+    Qinit = (hbar / 2) * np.diag(np.array([np.exp(-2*r), 1, np.exp(-2*r), 1, np.exp(2*r), 1, np.exp(2*r), 1]))
+    Uw = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
+    Qorth = interferometer(Uw) @ Qinit @ interferometer(Uw).T
+    Qu = implement_U(Qorth, U)
+    assert np.allclose(Q, Qu)
 
 
 def test_pure_gkp():
