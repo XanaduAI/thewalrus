@@ -870,7 +870,7 @@ def test_autonne(n, datatype, svd_order):
 
 
 def test_autonne_error():
-    """Tests the value errors of autonne"""
+    """Tests the value errors of Autonne"""
     n = 10
     m = 20
     A = np.random.rand(n, m)
@@ -881,6 +881,39 @@ def test_autonne_error():
     A = np.random.rand(n, m)
     with pytest.raises(ValueError, match="The input matrix is not symmetric"):
         symplectic.autonne(A)
+
+
+@pytest.mark.parametrize("n", [5, 10, 50])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_takagi(n, datatype, svd_order):
+    """Checks the correctness of the Takagi decomposition function"""
+    if datatype is np.complex128:
+        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    if datatype is np.float64:
+        A = np.random.rand(n, n)
+    A += A.T
+    r, U = symplectic.takagi(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.all(r >= 0)
+    if svd_order is True:
+        assert np.all(np.diff(r) <= 0)
+    else:
+        assert np.all(np.diff(r) >= 0)
+
+
+def test_takagi_error():
+    """Tests the value errors of Takagi"""
+    n = 10
+    m = 20
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not square"):
+        symplectic.takagi(A)
+    n = 10
+    m = 10
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not symmetric"):
+        symplectic.takagi(A)
 
 
 class TestPhaseSpaceFunctions:
