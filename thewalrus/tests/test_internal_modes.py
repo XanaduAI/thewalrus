@@ -36,7 +36,7 @@ from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
 from thewalrus.symplectic import squeezing, passive_transformation, interferometer
-from thewalrus.symplectic import autonne as takagi
+from thewalrus.symplectic import takagi
 
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
@@ -742,6 +742,39 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     obtained = distinguishable_pnr_prob(pat_list, rs_vec, T)
     assert np.allclose(expected, obtained)
     assert np.allclose(expected, obtained)
+
+
+@pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
+@pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
+@pytest.mark.parametrize("phi", [0.0, 0.9 2.1, 3.1])
+def test_orthonormal_basis(r, S, phi):
+    """test code for forming orthonormal basis with two spatial modes with a single temporal mode squeezer in each with the same squeezing parameter.
+    Variable overlap and phase."""
+    rjs = [np.array([r]), np.array([r])]
+    O = np.array([[1, S*np.exp(-1j*phi)], [S*np.exp(1j*phi), 1]])
+    eps, W = orthonormal_basis(rjs, O=O)
+    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(2)
+    W1 = np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]]) * np.exp(-1j*phi) / np.sqrt(2)
+    assert np.allclose(np.array([r, 0]), eps[0])
+    assert np.allclose(np.array([r, 0]), eps[1])
+    assert np.allclose(np.abs(W0), np.abs(W[0]))
+    assert np.allclose(np.abs(W1), np.abs(W[1]))
+
+
+@pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
+@pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
+@pytest.mark.parametrize("phi", [0.0, 0.9 2.1, 3.1])
+def test_state_prep(r, S, phi):
+    """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
+    hbar = 2
+    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(2)
+    W1 = np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]]) * np.exp(-1j*phi) / np.sqrt(2)
+    eps, W = [np.array([r, 0]), np.array([r, 0])], [W0, W1]
+    Qsp = state_prep(eps, W, hbar=hbar)
+    Qinit = (hbar / 2) * np.diag(np.array([np.exp(-2*r), 1, np.exp(-2*r), 1, np.exp(2*r), 1, np.exp(2*r), 1]))
+    U = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
+    Qorth = interferometer(U) @ Qinit @ interferometer(U).T
+    assert np.allclose(Qsp, Qorth)
 
 
 def test_pure_gkp():
