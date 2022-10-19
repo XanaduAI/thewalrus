@@ -161,6 +161,11 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
                     )
                 )
         eps_temp, WT_temp = takagi(Rtemp)
+        signs = np.sign(WT_temp.real)[0]
+        for j, s in enumerate(signs):
+            if np.allclose(s, 0):
+                signs[j] = 1
+        WT_temp /= signs
         eps.append(eps_temp)
         W.append(np.real_if_close(WT_temp).T)
     if F is not None:
@@ -189,7 +194,7 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
 
     Args:
         eps (list[array]): list of arrays of squeezing parameters for each spatial mode as determined by the orthonormalization procedure
-        W (list): list of arrays of the orthonormalization amplitude matrix, one for each spatial mode
+        W (list[array]): list of arrays of the orthonormalization amplitude matrix, one for each spatial mode
 
     Returns:
         (array): covariance matrix of the output state
