@@ -526,7 +526,7 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
     phi = np.angle(A[0, 0])
     Amr = np.real_if_close(np.exp(-1j * phi) * A)
     if np.isrealobj(Amr):
-        # If the matrix A is real one can be more clever and use its eigendecomposition
+        # If the matrix A has just a global phase we can also use an eigendecomposition
         ls, U = np.linalg.eigh(Amr)
         U = U / np.exp(1j * np.angle(U)[0])
         ls = np.round(ls, rounding)
