@@ -503,15 +503,50 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
     if np.isrealobj(A):
         # If the matrix A is real one can be more clever and use its eigendecomposition
         ls, U = np.linalg.eigh(A)
-        U = U / np.exp(1j*np.angle(U)[0])
+        U = U / np.exp(1j * np.angle(U)[0])
         ls = np.round(ls, rounding)
         vals = np.abs(ls)  # These are the Takagi eigenvalues
-        phases = np.sqrt(np.complex128([-1 if l < 0 else 1 for l in ls]))
+        phases = -np.ones(vals.shape[0])
+        for j, l in enumerate(ls):
+            if np.allclose(l, 0) or l > 0:
+                phases[j] = 1
+        phases = np.sqrt(phases)
         Uc = U @ np.diag(phases)  # One needs to readjust the phases
+        signs = np.sign(Uc.real)[0]
+        for k, s in enumerate(signs):
+            if np.allclose(s, 0):
+                signs[k] = 1
+        Uc = np.real_if_close(Uc / signs)
         list_vals = [(vals[i], i) for i in range(len(vals))]
         # And also rearrange the unitary and values so that they are decreasingly ordered
         list_vals.sort(reverse=svd_order)
         sorted_ls, permutation = zip(*list_vals)
+        return np.array(sorted_ls), Uc[:, np.array(permutation)]
+
+    phi = np.angle(A[0, 0])
+    Amr = np.real_if_close(np.exp(-1j * phi) * A)
+    if np.isrealobj(Amr):
+        # If the matrix A is real one can be more clever and use its eigendecomposition
+        ls, U = np.linalg.eigh(Amr)
+        U = U / np.exp(1j * np.angle(U)[0])
+        ls = np.round(ls, rounding)
+        vals = np.abs(ls)  # These are the Takagi eigenvalues
+        phases = -np.ones(vals.shape[0])
+        for j, l in enumerate(ls):
+            if np.allclose(l, 0) or l > 0:
+                phases[j] = 1
+        phases = np.sqrt(phases)
+        Uc = U @ np.diag(phases)  # One needs to readjust the phases
+        signs = np.sign(Uc.real)[0]
+        for k, s in enumerate(signs):
+            if np.allclose(s, 0):
+                signs[k] = 1
+        Uc = np.real_if_close(Uc / signs)
+        list_vals = [(vals[i], i) for i in range(len(vals))]
+        # And also rearrange the unitary and values so that they are decreasingly ordered
+        list_vals.sort(reverse=svd_order)
+        sorted_ls, permutation = zip(*list_vals)
+        Uc = Uc * np.exp(1j * phi / 2)
         return np.array(sorted_ls), np.real_if_close(Uc[:, np.array(permutation)])
 
     v, l, ws = np.linalg.svd(A)
