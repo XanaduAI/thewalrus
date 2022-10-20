@@ -303,7 +303,9 @@ def prob_distinguishable_lossy(T, input_labels, input_squeezing, events):
     return net_sum
 
 
-### David Phillip's code for combinatorial approach to internal mode calculations ###
+#################################################################################
+# David Phillip's code for combinatorial approach to internal mode calculations #
+#################################################################################
 
 
 def loss(cov: np.ndarray, efficiency: np.ndarray, hbar: Union[float, int] = 2) -> np.ndarray:
@@ -576,7 +578,9 @@ def heralded_density_matrix(
     return dm_tot
 
 
-#### Test functions start here ####
+#############################
+# Test functions start here #
+#############################
 
 
 @pytest.mark.parametrize("M", [3, 4, 5, 6])
