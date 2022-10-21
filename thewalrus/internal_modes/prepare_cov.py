@@ -18,13 +18,13 @@ Set of functions for forming a covariance matrix over multiple modes, based on o
 import numpy as np
 from itertools import chain
 
+from ..decompositions import takagi
 from ..quantum import fidelity
 from ..symplectic import (
     interferometer,
     passive_transformation,
     reduced_state,
     squeezing,
-    takagi,
 )
 
 

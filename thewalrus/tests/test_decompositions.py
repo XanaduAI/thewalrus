@@ -19,9 +19,113 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import williamson, blochmessiah
+from thewalrus.decompositions import autonne, blochmessiah, takagi, williamson
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
+
+
+class TestBlochMessiahDecomposition:
+    """Tests for the Bloch Messiah decomposition"""
+
+    @pytest.fixture
+    def create_transform(self):
+        """create a symplectic transform for use in testing.
+
+        Args:
+            n (int): number of modes
+            passive (bool): whether transform should be passive or not
+
+        Returns:
+            array: symplectic matrix
+        """
+
+        def _create_transform(n, passive=True):
+            """wrapped function"""
+            O = omega(n)
+
+            # interferometer 1
+            U1 = haar_measure(n)
+            S1 = np.vstack([np.hstack([U1.real, -U1.imag]), np.hstack([U1.imag, U1.real])])
+
+            Sq = np.identity(2 * n)
+            if not passive:
+                # squeezing
+                r = np.log(0.2 * np.arange(n) + 2)
+                Sq = block_diag(np.diag(np.exp(-r)), np.diag(np.exp(r)))
+
+            # interferometer 2
+            U2 = haar_measure(n)
+            S2 = np.vstack([np.hstack([U2.real, -U2.imag]), np.hstack([U2.imag, U2.real])])
+
+            # final symplectic
+            S_final = S2 @ Sq @ S1
+
+            # check valid symplectic transform
+            assert np.allclose(S_final.T @ O @ S_final, O)
+            return S_final
+
+        return _create_transform
+
+    @pytest.mark.parametrize("N", range(50, 500, 50))
+    def test_blochmessiah_rand(self, N):
+        """Tests blochmessiah function for different matrix sizes."""
+        S = random_symplectic(N)
+        u, d, v = blochmessiah(S)
+        assert np.allclose(u @ d @ v, S)
+        assert np.allclose(u.T @ u, np.eye(len(u)))
+        assert np.allclose(v.T @ v, np.eye(len(v)))
+        assert is_symplectic(u)
+        assert is_symplectic(v)
+
+    @pytest.mark.parametrize("M", [np.random.rand(4, 5), np.random.rand(4, 4)])
+    def test_blochmessiah_error(self, M):
+        """Tests that non-symplectic matrices raise a ValueError in blochmessiah."""
+        with pytest.raises(ValueError, match="Input matrix is not symplectic."):
+            blochmessiah(M)
+
+    def test_identity(self, tol):
+        """Test identity"""
+        n = 2
+        S_in = np.identity(2 * n)
+        O1, S, O2 = blochmessiah(S_in)
+
+        assert np.allclose(O1 @ O2, np.identity(2 * n), atol=tol, rtol=0)
+        assert np.allclose(S, np.identity(2 * n), atol=tol, rtol=0)
+
+        # test orthogonality
+        assert np.allclose(O1.T, O1, atol=tol, rtol=0)
+        assert np.allclose(O2.T, O2, atol=tol, rtol=0)
+
+        # test symplectic
+        O = omega(n)
+        assert np.allclose(O1 @ O @ O1.T, O, atol=tol, rtol=0)
+        assert np.allclose(O2 @ O @ O2.T, O, atol=tol, rtol=0)
+
+    @pytest.mark.parametrize("passive", [True, False])
+    def test_transform(self, passive, create_transform, tol):
+        """Test decomposition agrees with transform. also checks that passive transform has no squeezing.
+        Note: this test also tests the case with degenerate symplectic values"""
+        n = 3
+        S_in = create_transform(3, passive=passive)
+        O1, S, O2 = blochmessiah(S_in)
+
+        # test decomposition
+        assert np.allclose(O1 @ S @ O2, S_in, atol=tol, rtol=0)
+
+        # test no squeezing
+        if passive:
+            assert np.allclose(O1 @ O2, S_in, atol=tol, rtol=0)
+            assert np.allclose(S, np.identity(2 * n), atol=tol, rtol=0)
+
+        # test orthogonality
+        assert np.allclose(O1.T @ O1, np.identity(2 * n), atol=tol, rtol=0)
+        assert np.allclose(O2.T @ O2, np.identity(2 * n), atol=tol, rtol=0)
+
+        # test symplectic
+        O = omega(n)
+        assert np.allclose(O1.T @ O @ O1, O, atol=tol, rtol=0)
+        assert np.allclose(O2.T @ O @ O2, O, atol=tol, rtol=0)
+        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
 
 
 class TestWilliamsonDecomposition:
@@ -151,105 +255,67 @@ class TestWilliamsonDecomposition:
         assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
 
 
-class TestBlochMessiahDecomposition:
-    """Tests for the Bloch Messiah decomposition"""
+@pytest.mark.parametrize("n", [5, 10, 50])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_autonne(n, datatype, svd_order):
+    """Checks the correctness of the Autonne decomposition function"""
+    if datatype is np.complex128:
+        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    if datatype is np.float64:
+        A = np.random.rand(n, n)
+    A += A.T
+    r, U = autonne(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.all(r >= 0)
+    if svd_order is True:
+        assert np.all(np.diff(r) <= 0)
+    else:
+        assert np.all(np.diff(r) >= 0)
 
-    @pytest.fixture
-    def create_transform(self):
-        """create a symplectic transform for use in testing.
 
-        Args:
-            n (int): number of modes
-            passive (bool): whether transform should be passive or not
+def test_autonne_error():
+    """Tests the value errors of Autonne"""
+    n = 10
+    m = 20
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not square"):
+        autonne(A)
+    n = 10
+    m = 10
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not symmetric"):
+        autonne(A)
 
-        Returns:
-            array: symplectic matrix
-        """
 
-        def _create_transform(n, passive=True):
-            """wrapped function"""
-            O = omega(n)
+@pytest.mark.parametrize("n", [5, 10, 50])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_takagi(n, datatype, svd_order):
+    """Checks the correctness of the Takagi decomposition function"""
+    if datatype is np.complex128:
+        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    if datatype is np.float64:
+        A = np.random.rand(n, n)
+    A += A.T
+    r, U = takagi(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.all(r >= 0)
+    if svd_order is True:
+        assert np.all(np.diff(r) <= 0)
+    else:
+        assert np.all(np.diff(r) >= 0)
 
-            # interferometer 1
-            U1 = haar_measure(n)
-            S1 = np.vstack([np.hstack([U1.real, -U1.imag]), np.hstack([U1.imag, U1.real])])
 
-            Sq = np.identity(2 * n)
-            if not passive:
-                # squeezing
-                r = np.log(0.2 * np.arange(n) + 2)
-                Sq = block_diag(np.diag(np.exp(-r)), np.diag(np.exp(r)))
-
-            # interferometer 2
-            U2 = haar_measure(n)
-            S2 = np.vstack([np.hstack([U2.real, -U2.imag]), np.hstack([U2.imag, U2.real])])
-
-            # final symplectic
-            S_final = S2 @ Sq @ S1
-
-            # check valid symplectic transform
-            assert np.allclose(S_final.T @ O @ S_final, O)
-            return S_final
-
-        return _create_transform
-
-    @pytest.mark.parametrize("N", range(50, 500, 50))
-    def test_blochmessiah_rand(self, N):
-        """Tests blochmessiah function for different matrix sizes."""
-        S = random_symplectic(N)
-        u, d, v = blochmessiah(S)
-        assert np.allclose(u @ d @ v, S)
-        assert np.allclose(u.T @ u, np.eye(len(u)))
-        assert np.allclose(v.T @ v, np.eye(len(v)))
-        assert is_symplectic(u)
-        assert is_symplectic(v)
-
-    @pytest.mark.parametrize("M", [np.random.rand(4, 5), np.random.rand(4, 4)])
-    def test_blochmessiah_error(self, M):
-        """Tests that non-symplectic matrices raise a ValueError in blochmessiah."""
-        with pytest.raises(ValueError, match="Input matrix is not symplectic."):
-            blochmessiah(M)
-
-    def test_identity(self, tol):
-        """Test identity"""
-        n = 2
-        S_in = np.identity(2 * n)
-        O1, S, O2 = blochmessiah(S_in)
-
-        assert np.allclose(O1 @ O2, np.identity(2 * n), atol=tol, rtol=0)
-        assert np.allclose(S, np.identity(2 * n), atol=tol, rtol=0)
-
-        # test orthogonality
-        assert np.allclose(O1.T, O1, atol=tol, rtol=0)
-        assert np.allclose(O2.T, O2, atol=tol, rtol=0)
-
-        # test symplectic
-        O = omega(n)
-        assert np.allclose(O1 @ O @ O1.T, O, atol=tol, rtol=0)
-        assert np.allclose(O2 @ O @ O2.T, O, atol=tol, rtol=0)
-
-    @pytest.mark.parametrize("passive", [True, False])
-    def test_transform(self, passive, create_transform, tol):
-        """Test decomposition agrees with transform. also checks that passive transform has no squeezing.
-        Note: this test also tests the case with degenerate symplectic values"""
-        n = 3
-        S_in = create_transform(3, passive=passive)
-        O1, S, O2 = blochmessiah(S_in)
-
-        # test decomposition
-        assert np.allclose(O1 @ S @ O2, S_in, atol=tol, rtol=0)
-
-        # test no squeezing
-        if passive:
-            assert np.allclose(O1 @ O2, S_in, atol=tol, rtol=0)
-            assert np.allclose(S, np.identity(2 * n), atol=tol, rtol=0)
-
-        # test orthogonality
-        assert np.allclose(O1.T @ O1, np.identity(2 * n), atol=tol, rtol=0)
-        assert np.allclose(O2.T @ O2, np.identity(2 * n), atol=tol, rtol=0)
-
-        # test symplectic
-        O = omega(n)
-        assert np.allclose(O1.T @ O @ O1, O, atol=tol, rtol=0)
-        assert np.allclose(O2.T @ O @ O2, O, atol=tol, rtol=0)
-        assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+def test_takagi_error():
+    """Tests the value errors of Takagi"""
+    n = 10
+    m = 20
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not square"):
+        takagi(A)
+    n = 10
+    m = 10
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not symmetric"):
+        takagi(A)
