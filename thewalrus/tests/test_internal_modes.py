@@ -767,7 +767,7 @@ def test_orthonormal_basis(r, S, phi):
 
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
 @pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
-@pytest.mark.parametrize("phi", [0.0, 0.9 2.1, 3.1])
+@pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
 def test_state_prep(r, S, phi):
     """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
     hbar = 2
@@ -783,7 +783,7 @@ def test_state_prep(r, S, phi):
 
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
 @pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
-@pytest.mark.parametrize("phi", [0.0, 0.9 2.1, 3.1])
+@pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
 def test_prepare_cov(r, S, phi):
     """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
     hbar = 2
