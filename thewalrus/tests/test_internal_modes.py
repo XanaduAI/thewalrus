@@ -750,7 +750,7 @@ def test_distinguishable_probs_lossy(M, pat_dict):
 
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
 @pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
-@pytest.mark.parametrize("phi", [0.0, 0.9 2.1, 3.1])
+@pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
 def test_orthonormal_basis(r, S, phi):
     """test code for forming orthonormal basis with two spatial modes with a single temporal mode squeezer in each with the same squeezing parameter.
     Variable overlap and phase."""
