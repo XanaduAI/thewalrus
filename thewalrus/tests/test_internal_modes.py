@@ -26,7 +26,7 @@ from copy import deepcopy
 
 from repoze.lru import lru_cache
 
-from itertools import combinations_with_replacement, product
+from itertools import chain, combinations_with_replacement, product
 
 from thewalrus import low_rank_hafnian, reduction
 
