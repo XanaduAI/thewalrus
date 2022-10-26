@@ -99,10 +99,10 @@ def blochmessiah(S):
     R = (1 / np.sqrt(2)) * np.block(
         [[np.eye(N // 2), 1j * np.eye(N // 2)], [np.eye(N // 2), -1j * np.eye(N // 2)]]
     )
-    Sc = R @ S @ np.conjugate(R).T
+    Sc = R @ S @ R.conj().T
     # Polar Decomposition
     u1, d1, v1 = np.linalg.svd(Sc)
-    Sig = u1 @ np.diag(d1) @ np.conjugate(u1).T
+    Sig = u1 @ np.diag(d1) @ u1.conj().T
     Unitary = u1 @ v1
     # Blocks of Unitary and Hermitian symplectics
     alpha = Unitary[0 : N // 2, 0 : N // 2]
@@ -110,12 +110,12 @@ def blochmessiah(S):
     # Bloch-Messiah in this Basis
     u2, d2, v2 = np.linalg.svd(beta)
     sval = np.arcsinh(d2)
-    takagibeta = u2 @ sqrtm(np.conjugate(u2).T @ (v2.T))
-    uf = np.block([[takagibeta, 0 * takagibeta], [0 * takagibeta, np.conjugate(takagibeta)]])
+    takagibeta = u2 @ sqrtm(u2.conj().T @ (v2.T))
+    uf = np.block([[takagibeta, 0 * takagibeta], [0 * takagibeta, takagibeta.conj()]])
     vf = np.block(
         [
-            [np.conjugate(takagibeta).T @ alpha, 0 * takagibeta],
-            [0 * takagibeta, np.conjugate(np.conjugate(takagibeta).T @ alpha)],
+            [takagibeta.conj().T @ alpha, 0 * takagibeta],
+            [0 * takagibeta, (takagibeta.conj().T @ alpha).conj()],
         ]
     )
     df = np.block(
@@ -125,9 +125,9 @@ def blochmessiah(S):
         ]
     )
     # Rotating Back to Original Basis
-    uff = np.conjugate(R).T @ uf @ R
-    vff = np.conjugate(R).T @ vf @ R
-    dff = np.conjugate(R).T @ df @ R
+    uff = R.conj().T @ uf @ R
+    vff = R.conj().T @ vf @ R
+    dff = R.conj().T @ df @ R
     dff = np.real_if_close(dff)
     vff = np.real_if_close(vff)
     uff = np.real_if_close(uff)
@@ -223,7 +223,9 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
         return np.array(sorted_ls), np.real_if_close(Uc[:, np.array(permutation)])
 
     v, l, ws = np.linalg.svd(A)
-    w = np.transpose(np.conjugate(ws))
+    if not svd_order:
+        v, l, ws = v[:, ::-1], l[::-1], ws[::-1, :]
+    w = ws.conj().T
     rl = np.round(l, rounding)
 
     # Generate list with degenerancies
