@@ -33,10 +33,10 @@ from thewalrus import low_rank_hafnian, reduction
 from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
 from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep, prepare_cov
 
+from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
 from thewalrus.symplectic import squeezing, passive_transformation, interferometer
-from thewalrus.symplectic import takagi
 
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
