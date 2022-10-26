@@ -308,13 +308,14 @@ def prob_distinguishable_lossy(T, input_labels, input_squeezing, events):
 #################################################################################
 
 
-def loss(cov: np.ndarray, efficiency: np.ndarray, hbar: Union[float, int] = 2) -> np.ndarray:
+def loss(cov, efficiency, hbar=2):
     r"""Implements spatial mode loss on a covariance matrix whose modes are grouped by spatial modes.
     Works for any number of Schmidt/orthonormal modes.
     
     Args:
-        cov: covariance matrix
-        efficiency: array of efficiencies of each spatial mode
+        cov (array): covariance matrix
+        efficiency (array): array of efficiencies of each spatial mode
+        hbar (int/float): the value of hbar, either 0.5, 1 or 2 (default 2)
     
     Returns:
         covariance matrix updated for loss
@@ -329,12 +330,12 @@ def loss(cov: np.ndarray, efficiency: np.ndarray, hbar: Union[float, int] = 2) -
 
 
 @lru_cache(maxsize=1000000)
-def combos(N: int, R: int) -> list:
+def combos(N, R):
     r"""Returns a list of all partitions of detecting N photons with a mode-insensitive detector into R modes.
     
     Args:
-        N: total number of detected photons
-        R: number of modes in which to split the photons
+        N (int): total number of detected photons
+        R (int): number of modes in which to split the photons
     
     Returns:
         all of the possible partitions
@@ -351,14 +352,14 @@ def combos(N: int, R: int) -> list:
         return new_combos
 
 
-def dm_MD_2D(dm_MD: np.ndarray) -> np.ndarray:
+def dm_MD_2D(dm_MD):
     r"""For R effective modes and when computing up to Ncutoff, this function converts a 2R-dimensional
     density matrix (i.e. 2 dimensions for each Schmidt mode) into a 2-dimensional density matrix.
     The initial density matrix dm_MD has entries dm_MD[j_{0}, k_{0}, ..., j_{R-1}, k_{R-1}] where j_{0} etc. run from 0 to Ncutoff-1.
     The final matrix dm_2D has Ncutoff**R x Ncutoff**R entries.
     
     Args:
-        dm_MD: 2R-dimensional density matrix
+        dm_MD (array): 2R-dimensional density matrix
     
     Returns:
         2-dimensional density matrix
@@ -372,14 +373,14 @@ def dm_MD_2D(dm_MD: np.ndarray) -> np.ndarray:
     return dm_2D
 
 
-def dm_2D_MD(dm_2D: np.ndarray, R: int) -> np.ndarray:
+def dm_2D_MD(dm_2D, R):
     r"""Converts a 2-dimensional density matrix into a 2R-dimensional density matrix (i.e. 2 dimensions for each effective mode).
     When computing for up to Ncutoff photons with R effective modes, the initial matrix has Ncutoff**R x Ncutoff**R entries.
     The final density matrix dm_MD has entries dm_MD[j_{0}, k_{0}, ..., j_{R-1}, k_{R-1}] where j_{0} etc. run from 0 to Ncutoff-1.
     
     Args:
-        dm_2D: 2-dimensional density matrix
-        R: effective number of modes
+        dm_2D (array): 2-dimensional density matrix
+        R (int): effective number of modes
     
     Returns:
         2R-dimensional density matrix
@@ -395,13 +396,13 @@ def dm_2D_MD(dm_2D: np.ndarray, R: int) -> np.ndarray:
     return dm_MD
 
 
-def swap_matrix(M: int, R: int) -> np.ndarray:
+def swap_matrix(M, R):
     r"""Computes the matrix that swaps the ordering of modes from grouped by orthonormal modes to grouped by spatial modes.
     The inverse of the swap matrix is its transpose.
     
     Args:
-        M: number of spatial modes.
-        R: number of orthonormal modes in each spatial mode.
+        M (int): number of spatial modes.
+        R (int): number of orthonormal modes in each spatial mode.
     
     Returns:
         M*R x M*R swap matrix.
@@ -413,13 +414,13 @@ def swap_matrix(M: int, R: int) -> np.ndarray:
     return P
 
 
-def implement_U(cov: np.ndarray, U: np.ndarray) -> np.ndarray:
+def implement_U(cov, U):
     r"""Implements a spatial mode linear optical transofrmation (flat in orthonormal modes) described by U on a covariance matrix.
     Assumes the modes of the input covariance matrix are grouped by spatial modes.
     
     Args:
-        cov: covariance matrix.
-        U: unitary transformation of spatial modes.
+        cov (array): covariance matrix.
+        U (array): unitary transformation of spatial modes.
     
     Returns:
         transformed covariance matrix.
@@ -435,37 +436,37 @@ def implement_U(cov: np.ndarray, U: np.ndarray) -> np.ndarray:
 
 
 def heralded_density_matrix(
-    rjs: list,
-    O: np.ndarray,
-    U: np.ndarray,
-    N: dict,
-    efficiency: Optional[np.ndarray] = None,
-    noise: Optional[np.ndarray] = None,
-    Ncutoff: Optional[int] = None,
-    MD: bool = True,
-    normalize: bool = True,
-    thr: float = 1e-3,
-    thresh: float = 1e-3,
-    hbar: Union[float, int] = 2,
-) -> np.ndarray:
+    rjs,
+    O,
+    U,
+    N,
+    efficiency=None,
+    noise=None,
+    Ncutoff=None,
+    MD=True,
+    normalize=True,
+    thr=1e-3,
+    thresh=1e-3,
+    hbar=2,
+):
     r"""Returns the density matrix of the specified spatial mode when heralding on N (dict) photons in defined spatial modes for the given inupt parameters.
     The initial state has squeezing parameters rjs (list for each spatial mode of squeezing parameters of each Schmidt mode for that spatial mode),
     and mode overlaps described by the O matrix. The whole system is evolved under a unitary U on the spatial modes.
     Output density matrix has dimensions for each orthonormal mode.
     
     Args:
-        rjs: list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode.
-        O: 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined.
-        U: unitary matrix expressing the three spatial mode interferometer.
-        N: post selection total photon number in the spatial modes (int), indexed by spatial mode.
-        efficiency: total efficiency/transmission of the three spatial modes.
-        noise: Poissonian noise amplitude in each spatial mode after loss (sqrt of <n>).
-        Ncutoff: cutoff dimension for each density matrix.
-        MD: return multidimensional density matrix.
-        normalize: whether to normalise the output density matrix.
-        thr: eigenvalue threshold under which orthonormal mode is discounted.
-        thresh: fidelity distance away from vacuum for an orthonormal mode to be discarded.
-        hbar: the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0).
+        rjs (list[array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode.
+        O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined.
+        U (array): unitary matrix expressing the three spatial mode interferometer.
+        N (dict): post selection total photon number in the spatial modes (int), indexed by spatial mode.
+        efficiency (array): total efficiency/transmission of the three spatial modes.
+        noise (array): Poissonian noise amplitude in each spatial mode after loss (sqrt of <n>).
+        Ncutoff (int): cutoff dimension for each density matrix.
+        MD (bool): return multidimensional density matrix.
+        normalize (bool): whether to normalise the output density matrix.
+        thr (float): eigenvalue threshold under which orthonormal mode is discounted.
+        thresh (float): fidelity distance away from vacuum for an orthonormal mode to be discarded.
+        hbar (int/float): the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0).
     
     Returns:
         density matrix of heralded spatial mode.
