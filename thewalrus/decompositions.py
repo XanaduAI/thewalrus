@@ -204,7 +204,7 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
         U = U / np.exp(1j * np.angle(U)[0])
         ls = np.round(ls, rounding)
         vals = np.abs(ls)  # These are the Takagi eigenvalues
-        phases = -np.ones(vals.shape[0])
+        phases = -np.ones(vals.shape[0], dtype=np.complex128)
         for j, l in enumerate(ls):
             if np.allclose(l, 0) or l > 0:
                 phases[j] = 1
