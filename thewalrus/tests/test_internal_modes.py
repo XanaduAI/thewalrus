@@ -438,6 +438,7 @@ def implement_U(cov, U):
     Usymp = interferometer(X.T @ Ubig @ X)
     return Usymp @ cov @ Usymp.T
 
+
 # pylint: disable=too-many-statements, too-many-branches
 def heralded_density_matrix(
     rjs,
@@ -926,13 +927,13 @@ def test_lossy_gkp():
     sq_virt = params[9]
 
     # S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    #U1 = np.array(
+    # U1 = np.array(
     #    [
     #        [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
     #        [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
     #        [0, 0, 1],
     #    ]
-    #)
+    # )
     # U2 = np.array(
     #    [
     #        [1, 0, 0],
@@ -946,7 +947,7 @@ def test_lossy_gkp():
     #        [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
     #        [0, 0, 1],
     #    ]
-    #)
+    # )
     # Usymp = interferometer(U3 @ U2 @ U1)
     # r2 = np.array([0, 0, sq_virt])
     # S2 = squeezing(np.abs(r2), phi=np.angle(r2))
