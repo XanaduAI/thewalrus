@@ -96,6 +96,7 @@ def vacuum_state(M, hbar=2):
 
     return np.zeros(2 * M), np.eye(2 * M) * hbar / 2
 
+
 # pylint: disable=too-many-branches
 def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     r"""

@@ -96,6 +96,7 @@ def generate_origins_unpaired(keys, num_pairs):
 ####################################################################
 class Box:
     """A class to represent boxes"""
+
     def __init__(self, size: int):
         self.size = size
         self.contents = ""
@@ -928,13 +929,13 @@ def test_lossy_gkp():
             [0, 0, 1],
         ]
     )
-    #U2 = np.array(
+    # U2 = np.array(
     #    [
     #        [1, 0, 0],
     #        [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
     #        [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
     #    ]
-    #)
+    # )
     U3 = np.array(
         [
             [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
