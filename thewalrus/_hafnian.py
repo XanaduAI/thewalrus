@@ -311,6 +311,7 @@ def f_from_powertrace(powertraces, n):
 
     return comb[count, n // 2]
 
+
 @numba.jit(nopython=True, cache=True)
 def get_AX_S(kept_edges, A):  # pragma: no cover
     """Given the kept edges, return the appropriate scaled submatrices to compute ``f``.

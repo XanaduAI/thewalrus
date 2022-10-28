@@ -965,7 +965,7 @@ def test_lossy_gkp():
     # get density matrix using new code
     rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho_loss2 /= np.trace(rho_loss2)
-    print(np.max(np.abs(rho_loss1 -  rho_loss2)))
+    print(np.max(np.abs(rho_loss1 - rho_loss2)))
     assert np.allclose(rho_loss1, rho_loss2, atol=2.5e-4)
 
 
