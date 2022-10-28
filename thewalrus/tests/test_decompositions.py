@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Decomposition tests"""
-# pylint: disable=no-self-use, assignment-from-no-return
+# pylint: disable=assignment-from-no-return
 import numpy as np
 import pytest
 from scipy.linalg import block_diag

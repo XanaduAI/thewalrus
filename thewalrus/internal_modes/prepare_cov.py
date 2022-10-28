@@ -15,8 +15,9 @@
 Set of functions for forming a covariance matrix over multiple modes, based on overlaps of the squeezer schmidt modes
 """
 
-import numpy as np
 from itertools import chain
+
+import numpy as np
 
 from ..decompositions import takagi
 from ..quantum import fidelity
@@ -95,7 +96,7 @@ def vacuum_state(M, hbar=2):
 
     return np.zeros(2 * M), np.eye(2 * M) * hbar / 2
 
-
+# pylint: disable=too-many-branches
 def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     r"""
     Finds an orthonormal basis in operator space based on the total number of Schmidt modes in the whole system of multiple spatial modes.

@@ -20,7 +20,7 @@ import numba
 from ..symplectic import passive_transformation, squeezing
 from ..quantum import Qmat
 from .._hafnian import nb_binom, f
-from .useful_tools import nb_Qmat, nb_block, fact
+from .useful_tools import nb_Qmat, fact
 
 
 @numba.jit(nopython=True, cache=True)
@@ -69,6 +69,7 @@ def _dist_prob_gray(pattern, covs, M, hbar=2):
         M (int): number of modes
         hbar (float): the value of hbar (default 2)
     """
+    # pylint: disable=too-many-statements
 
     N = 2 * pattern.sum()
 
@@ -100,8 +101,6 @@ def _dist_prob_gray(pattern, covs, M, hbar=2):
     fac_prod = np.float64(1.0)
     for p in pattern:
         fac_prod = fac_prod * np.float64(fact[p])
-
-    steps = np.prod(pattern + 1)
 
     traces = np.zeros(D, dtype=np.float64)
     abs2_AX_sums = np.zeros(D, dtype=np.float64)

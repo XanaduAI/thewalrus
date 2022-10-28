@@ -95,6 +95,7 @@ def generate_origins_unpaired(keys, num_pairs):
 # Mikhail's magic OOP way of dealing with boxes and coloured balls #
 ####################################################################
 class Box:
+    """A class to represent boxes"""
     def __init__(self, size: int):
         self.size = size
         self.contents = ""
@@ -601,6 +602,7 @@ def test_pnr_prob_single_internal_mode(M):
 
 @pytest.mark.parametrize("M", [3, 4, 5, 6])
 def test_distinguishable_pnr_prob(M):
+    """Testing the photon number distribution of fully distinguishable squeezed states"""
     hbar = 2
 
     pattern = [3, 2, 0] + [1] * (M - 3)
@@ -926,13 +928,13 @@ def test_lossy_gkp():
             [0, 0, 1],
         ]
     )
-    U2 = np.array(
-        [
-            [1, 0, 0],
-            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
-            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
-        ]
-    )
+    #U2 = np.array(
+    #    [
+    #        [1, 0, 0],
+    #        [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
+    #        [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
+    #    ]
+    #)
     U3 = np.array(
         [
             [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],

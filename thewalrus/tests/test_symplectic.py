@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Symplectic tests"""
-# pylint: disable=no-self-use, assignment-from-no-return
+# pylint: disable=assignment-from-no-return
 import pytest
 
 import numpy as np

@@ -162,6 +162,7 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
         tuple[array, array]: (rl, U), where rl are the (rounded) singular values,
             and U is the Takagi unitary, such that :math:`N = U \diag(rl) U^T`.
     """
+    # pylint: disable=too-many-statements,too-many-branches
     n, m = A.shape
     if n != m:
         raise ValueError("The input matrix is not square")
@@ -236,7 +237,7 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
     # Generate lists containing the columns that correspond to degenerancies
     kk = 0
     for k in result:
-        for ind, j in enumerate(k):  # pylint: disable=unused-variable
+        for ind, _ in enumerate(k):
             k[ind] = kk
             kk = kk + 1
 

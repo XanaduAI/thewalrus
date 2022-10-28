@@ -1,3 +1,17 @@
+# Copyright 2019 Xanadu Quantum Technologies Inc.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Useful tools for dealing with internal modes"""
 import numpy as np
 from scipy.special import factorial
 import numba
@@ -98,7 +112,17 @@ def nb_block(X):  # pragma: no cover
 
 @numba.jit(nopython=True, cache=True)
 def f_all_charpoly(H, n):
+    """
+    Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
 
+    Args:
+        H (array): matrix
+        n (int): number of polynomial coefficients to compute
+
+    Returns:
+        array: polynomial coefficients
+
+    """
     pow_traces = powertrace(H, n // 2 + 1)
     count = 0
     comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)

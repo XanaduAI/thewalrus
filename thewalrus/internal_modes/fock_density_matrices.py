@@ -28,7 +28,7 @@ from .useful_tools import (
     fact,
 )
 
-
+# pylint: disable=too-many-arguments, too-many-statements
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2):
     """
