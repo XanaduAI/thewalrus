@@ -469,7 +469,7 @@ def heralded_density_matrix(
     Returns:
         density matrix of heralded spatial mode.
     """
-    #pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
     if not np.allclose(U.shape[0], len(rjs)):
         raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
     if not np.allclose(U.shape[0], len(N) + 1):
@@ -918,7 +918,7 @@ def test_lossy_gkp():
     bs_phi1, bs_phi2, bs_phi3 = params[6:9]
     sq_virt = params[9]
 
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    # S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
     U1 = np.array(
         [
             [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
@@ -940,9 +940,9 @@ def test_lossy_gkp():
             [0, 0, 1],
         ]
     )
-    Usymp = interferometer(U3 @ U2 @ U1)
+    # Usymp = interferometer(U3 @ U2 @ U1)
     r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    # S2 = squeezing(np.abs(r2), phi=np.angle(r2))
     # Z = S2 @ Usymp @ S1
     # cov = Z @ Z.T
 
