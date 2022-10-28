@@ -193,20 +193,21 @@ def f(A, n):  # pragma: no cover
     """
     # Compute combinations in O(n^2log n) time
     # code translated from thewalrus matlab script
-    count = 0
-    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
-    comb[0, 0] = 1
+    # count = 0
+    # comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
+    # comb[0, 0] = 1
     powtrace = charpoly.powertrace(A, n // 2 + 1)
-    for i in range(1, n // 2 + 1):
-        factor = powtrace[i] / (2 * i)
-        powfactor = 1
-        count = 1 - count
-        comb[count, :] = comb[1 - count, :]
-        for j in range(1, n // (2 * i) + 1):
-            powfactor *= factor / j
-            for k in range(i * j + 1, n // 2 + 2):
-                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-    return comb[count, :]
+    return f_from_powertrace(powtrace, n)
+    #for i in range(1, n // 2 + 1):
+    #    factor = powtrace[i] / (2 * i)
+    #    powfactor = 1
+    #    count = 1 - count
+    #    comb[count, :] = comb[1 - count, :]
+    #    for j in range(1, n // (2 * i) + 1):
+    #        powfactor *= factor / j
+    #        for k in range(i * j + 1, n // 2 + 2):
+    #            comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
+    #return comb[count, :]
 
 
 @numba.jit(nopython=True, cache=True)
