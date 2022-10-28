@@ -311,12 +311,12 @@ def prob_distinguishable_lossy(T, input_labels, input_squeezing, events):
 def loss(cov, efficiency, hbar=2):
     r"""Implements spatial mode loss on a covariance matrix whose modes are grouped by spatial modes.
     Works for any number of Schmidt/orthonormal modes.
-    
+
     Args:
         cov (array): covariance matrix
         efficiency (array): array of efficiencies of each spatial mode
         hbar (int/float): the value of hbar, either 0.5, 1 or 2 (default 2)
-    
+
     Returns:
         covariance matrix updated for loss
     """
@@ -332,11 +332,11 @@ def loss(cov, efficiency, hbar=2):
 @lru_cache(maxsize=1000000)
 def combos(N, R):
     r"""Returns a list of all partitions of detecting N photons with a mode-insensitive detector into R modes.
-    
+
     Args:
         N (int): total number of detected photons
         R (int): number of modes in which to split the photons
-    
+
     Returns:
         all of the possible partitions
     """
@@ -357,10 +357,10 @@ def dm_MD_2D(dm_MD):
     density matrix (i.e. 2 dimensions for each Schmidt mode) into a 2-dimensional density matrix.
     The initial density matrix dm_MD has entries dm_MD[j_{0}, k_{0}, ..., j_{R-1}, k_{R-1}] where j_{0} etc. run from 0 to Ncutoff-1.
     The final matrix dm_2D has Ncutoff**R x Ncutoff**R entries.
-    
+
     Args:
         dm_MD (array): 2R-dimensional density matrix
-    
+
     Returns:
         2-dimensional density matrix
     """
@@ -377,11 +377,11 @@ def dm_2D_MD(dm_2D, R):
     r"""Converts a 2-dimensional density matrix into a 2R-dimensional density matrix (i.e. 2 dimensions for each effective mode).
     When computing for up to Ncutoff photons with R effective modes, the initial matrix has Ncutoff**R x Ncutoff**R entries.
     The final density matrix dm_MD has entries dm_MD[j_{0}, k_{0}, ..., j_{R-1}, k_{R-1}] where j_{0} etc. run from 0 to Ncutoff-1.
-    
+
     Args:
         dm_2D (array): 2-dimensional density matrix
         R (int): effective number of modes
-    
+
     Returns:
         2R-dimensional density matrix
     """
@@ -399,11 +399,11 @@ def dm_2D_MD(dm_2D, R):
 def swap_matrix(M, R):
     r"""Computes the matrix that swaps the ordering of modes from grouped by orthonormal modes to grouped by spatial modes.
     The inverse of the swap matrix is its transpose.
-    
+
     Args:
         M (int): number of spatial modes.
         R (int): number of orthonormal modes in each spatial mode.
-    
+
     Returns:
         M*R x M*R swap matrix.
     """
@@ -417,11 +417,11 @@ def swap_matrix(M, R):
 def implement_U(cov, U):
     r"""Implements a spatial mode linear optical transofrmation (flat in orthonormal modes) described by U on a covariance matrix.
     Assumes the modes of the input covariance matrix are grouped by spatial modes.
-    
+
     Args:
         cov (array): covariance matrix.
         U (array): unitary transformation of spatial modes.
-    
+
     Returns:
         transformed covariance matrix.
     """
@@ -453,7 +453,7 @@ def heralded_density_matrix(
     The initial state has squeezing parameters rjs (list for each spatial mode of squeezing parameters of each Schmidt mode for that spatial mode),
     and mode overlaps described by the O matrix. The whole system is evolved under a unitary U on the spatial modes.
     Output density matrix has dimensions for each orthonormal mode.
-    
+
     Args:
         rjs (list[array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode.
         O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined.
@@ -467,7 +467,7 @@ def heralded_density_matrix(
         thr (float): eigenvalue threshold under which orthonormal mode is discounted.
         thresh (float): fidelity distance away from vacuum for an orthonormal mode to be discarded.
         hbar (int/float): the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0).
-    
+
     Returns:
         density matrix of heralded spatial mode.
     """
@@ -756,10 +756,16 @@ def test_orthonormal_basis(r, S, phi):
     """test code for forming orthonormal basis with two spatial modes with a single temporal mode squeezer in each with the same squeezing parameter.
     Variable overlap and phase."""
     rjs = [np.array([r]), np.array([r])]
-    O = np.array([[1, S*np.exp(-1j*phi)], [S*np.exp(1j*phi), 1]])
+    O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     eps, W = orthonormal_basis(rjs, O=O)
-    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(2)
-    W1 = np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]]) * np.exp(-1j*phi) / np.sqrt(2)
+    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
+        2
+    )
+    W1 = (
+        np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]])
+        * np.exp(-1j * phi)
+        / np.sqrt(2)
+    )
     assert np.allclose(np.array([r, 0]), eps[0])
     assert np.allclose(np.array([r, 0]), eps[1])
     assert np.allclose(np.abs(W0), np.abs(W[0]))
@@ -772,11 +778,19 @@ def test_orthonormal_basis(r, S, phi):
 def test_state_prep(r, S, phi):
     """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
     hbar = 2
-    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(2)
-    W1 = np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]]) * np.exp(-1j*phi) / np.sqrt(2)
+    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
+        2
+    )
+    W1 = (
+        np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]])
+        * np.exp(-1j * phi)
+        / np.sqrt(2)
+    )
     eps, W = [np.array([r, 0]), np.array([r, 0])], [W0, W1]
     Qsp = state_prep(eps, W, hbar=hbar)
-    Qinit = (hbar / 2) * np.diag(np.array([np.exp(-2*r), 1, np.exp(-2*r), 1, np.exp(2*r), 1, np.exp(2*r), 1]))
+    Qinit = (hbar / 2) * np.diag(
+        np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
+    )
     U = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
     Qorth = interferometer(U) @ Qinit @ interferometer(U).T
     assert np.allclose(Qsp, Qorth)
@@ -789,13 +803,21 @@ def test_prepare_cov(r, S, phi):
     """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
     hbar = 2
     rjs = [np.array([r]), np.array([r])]
-    O = np.array([[1, S*np.exp(-1j*phi)], [S*np.exp(1j*phi), 1]])
+    O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     U = unitary_group.rvs(len(rjs))
     Q = prepare_cov(rjs, U, O=O, hbar=hbar)
-    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(2)
-    W1 = np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]]) * np.exp(-1j*phi) / np.sqrt(2)
+    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
+        2
+    )
+    W1 = (
+        np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]])
+        * np.exp(-1j * phi)
+        / np.sqrt(2)
+    )
     eps, W = [np.array([r, 0]), np.array([r, 0])], [W0, W1]
-    Qinit = (hbar / 2) * np.diag(np.array([np.exp(-2*r), 1, np.exp(-2*r), 1, np.exp(2*r), 1, np.exp(2*r), 1]))
+    Qinit = (hbar / 2) * np.diag(
+        np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
+    )
     Uw = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
     Qorth = interferometer(Uw) @ Qinit @ interferometer(Uw).T
     Qu = implement_U(Qorth, U)

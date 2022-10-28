@@ -77,9 +77,7 @@ def O_matrix(F):
     O = np.eye(R, dtype=np.complex128)
     for j in range(R):
         for k in range(R):
-            O[j, k] = np.inner(
-                Fs[j].conj() / np.linalg.norm(Fs[j]), Fs[k] / np.linalg.norm(Fs[k])
-            )
+            O[j, k] = np.inner(Fs[j].conj() / np.linalg.norm(Fs[j]), Fs[k] / np.linalg.norm(Fs[k]))
     return O
 
 
@@ -173,10 +171,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
         for k in range(R):
             chi = np.sum(
                 np.array(
-                    [
-                        np.sqrt(rs[j]) * Fs[j] * V[j, k] / np.sqrt(lambd[k])
-                        for j in range(len(Fs))
-                    ]
+                    [np.sqrt(rs[j]) * Fs[j] * V[j, k] / np.sqrt(lambd[k]) for j in range(len(Fs))]
                 ),
                 axis=0,
             )
@@ -237,11 +232,7 @@ def state_prep(eps, W, thresh=1e-3, hbar=2):
             R = len(keep_modes) // M
             _, Qswap = reduced_state(np.zeros(Qswap.shape[0]), Qswap, keep_modes)
 
-    return (
-        interferometer(swap_matrix(M, R).T)
-        @ Qswap
-        @ interferometer(swap_matrix(M, R).T).T
-    )
+    return interferometer(swap_matrix(M, R).T) @ Qswap @ interferometer(swap_matrix(M, R).T).T
 
 
 def LO_overlaps(chis, LO_shape):

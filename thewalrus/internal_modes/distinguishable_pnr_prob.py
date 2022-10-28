@@ -139,9 +139,7 @@ def _dist_prob_gray(pattern, covs, M, hbar=2):
                 sum_i = abs2_AX[j_new, j_new + M]
                 for r in prev_nonzero_rows:
                     sum_i += abs2_AX[j_new, r] + abs2_AX[j_new + M, r]
-                sum_i *= (
-                    2  # abs2_O is ortogonal so we add half the new elements then x2
-                )
+                sum_i *= 2  # abs2_O is ortogonal so we add half the new elements then x2
                 # add new diagonal elements of submatrix
                 sum_i += abs2_AX[j_new, j_new] + abs2_AX[j_new + M, j_new + M]
                 abs2_AX_sums[i] += sum_i

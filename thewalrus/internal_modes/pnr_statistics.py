@@ -62,9 +62,7 @@ def hafkd(As, edge_reps, K=1):
         n_nonzero_edges = K * len(nonzero_rows) // 2
 
         glynn_edges_nonzero = glynn_edges[np.where(glynn_edges != 0)]
-        glynn_schmidt_edges_nonzero = spatial_reps_to_schmidt_reps(
-            glynn_edges_nonzero, K
-        )
+        glynn_schmidt_edges_nonzero = spatial_reps_to_schmidt_reps(glynn_edges_nonzero, K)
 
         nonzero_schmidt_modes = spatial_modes_to_schmidt_modes(nonzero_rows, K)
         prefac = (-1.0) ** (N // 2 - edges_sum) * binom_prod
@@ -73,12 +71,8 @@ def hafkd(As, edge_reps, K=1):
         for A in As:
             A_nonzero = nb_ix(A, nonzero_schmidt_modes, nonzero_schmidt_modes)
             AX_S = np.empty_like(A_nonzero, dtype=np.complex128)
-            AX_S[:, :n_nonzero_edges] = (
-                glynn_schmidt_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
-            )
-            AX_S[:, n_nonzero_edges:] = (
-                glynn_schmidt_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
-            )
+            AX_S[:, :n_nonzero_edges] = glynn_schmidt_edges_nonzero * A_nonzero[:, n_nonzero_edges:]
+            AX_S[:, n_nonzero_edges:] = glynn_schmidt_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
             powertraces += powertrace(AX_S, N // 2 + 1)[: N // 2 + 1]
 
         f_j = f_from_powertrace(powertraces, N)

@@ -30,9 +30,7 @@ from .useful_tools import (
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _density_matrix_single_mode(
-    cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2
-):
+def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2):
     """
     numba function (use the wrapper function: density_matrix_multimode)
 
@@ -113,9 +111,7 @@ def _density_matrix_single_mode(
 
         glynn_edges = 2 * kept_edges - edge_reps
 
-        glynn_edges_heralding = spatial_reps_to_schmidt_reps(glynn_edges[3:], K) - (
-            K - 1
-        )
+        glynn_edges_heralding = spatial_reps_to_schmidt_reps(glynn_edges[3:], K) - (K - 1)
         edge_weights = np.concatenate((glynn_edges[:3], glynn_edges_heralding))
         assert len(edge_weights) == n_edges
 
@@ -143,9 +139,7 @@ def _density_matrix_single_mode(
         haf_arr += haf_arr_new
 
     rho = (
-        (-1) ** pattern.sum()
-        * haf_arr
-        / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
+        (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
     )
 
     for n in range(cutoff + 1):
@@ -157,9 +151,7 @@ def _density_matrix_single_mode(
     return rho
 
 
-def density_matrix_single_mode(
-    cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2
-):
+def density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, cutoff=13, hbar=2):
     """
     calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
     where each mode contains K internal modes.
@@ -184,12 +176,10 @@ def density_matrix_single_mode(
     HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
     if LO_overlap is not None:
         if not K == LO_overlap.shape[0]:
-            raise ValueError(
-                "Number of overlaps with LO must match number of internal modes"
-            )
+            raise ValueError("Number of overlaps with LO must match number of internal modes")
         if not (np.linalg.norm(LO_overlap) < 1 or np.allclose(np.linalg.norm(LO_overlap), 1)):
             raise ValueError("Norm of overlaps must not be greater than 1")
-            
+
     # swapping the spatial modes around such that we are heralding in spatial mode 0
     Uswap = np.zeros((M, M))
     swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
