@@ -197,7 +197,6 @@ def f(A, n):  # pragma: no cover
     comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
     comb[0, 0] = 1
     powtrace = charpoly.powertrace(A, n // 2 + 1)
-
     for i in range(1, n // 2 + 1):
         factor = powtrace[i] / (2 * i)
         powfactor = 1
