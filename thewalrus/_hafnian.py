@@ -36,7 +36,7 @@ def nb_binom(n, k):  # pragma: no cover
     """
     if k < 0 or k > n:
         return 0
-    if k == (0, n):
+    if k in (0, n):
         return 1
     binom = 1
     for i in range(min(k, n - k)):
@@ -310,34 +310,6 @@ def f_from_powertrace(powertraces, n):
                 comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
 
     return comb[count, n // 2]
-
-
-@numba.jit(nopython=True, cache=True)
-def f_all_from_powertrace(powertraces, n):
-    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula, using the powertraces.
-
-    Args:
-        pow_traces (array): power traces of some matrix
-        n (int): number of polynomial coefficients to compute
-
-    Returns:
-        array: polynomial coefficients
-    """
-    count = 0
-    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
-    comb[0, 0] = 1
-    for i in range(1, n // 2 + 1):
-        factor = powertraces[i] / (2 * i)
-        powfactor = 1.0
-        count = 1 - count
-        comb[count, :] = comb[1 - count, :]
-        for j in range(1, n // (2 * i) + 1):
-            powfactor = powfactor * factor / j
-            for k in range(i * j + 1, n // 2 + 2):
-                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-
-    return comb[count, :]
-
 
 @numba.jit(nopython=True, cache=True)
 def get_AX_S(kept_edges, A):  # pragma: no cover
