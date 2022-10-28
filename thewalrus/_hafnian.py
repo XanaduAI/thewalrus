@@ -198,7 +198,7 @@ def f(A, n):  # pragma: no cover
     # comb[0, 0] = 1
     powtrace = charpoly.powertrace(A, n // 2 + 1)
     return f_from_powertrace(powtrace, n)
-    #for i in range(1, n // 2 + 1):
+    # for i in range(1, n // 2 + 1):
     #    factor = powtrace[i] / (2 * i)
     #    powfactor = 1
     #    count = 1 - count
@@ -207,7 +207,7 @@ def f(A, n):  # pragma: no cover
     #        powfactor *= factor / j
     #        for k in range(i * j + 1, n // 2 + 2):
     #            comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-    #return comb[count, :]
+    # return comb[count, :]
 
 
 @numba.jit(nopython=True, cache=True)
