@@ -554,7 +554,7 @@ def heralded_density_matrix(
             post_select_dicts_noise.append(temp_dict_noise)
 
     total_dm_list = []
-    for i in tqdm(range(len(post_select_dicts_sig))):
+    for i in range(len(post_select_dicts_sig)):
         dm_temp = density_matrix(
             np.zeros(Qfinal.shape[0]),
             Qfinal,
@@ -921,39 +921,43 @@ def test_lossy_gkp():
             0.1958,
         ]
     )
-    # sq_r = params[:3]
-    bs_theta1, _, bs_theta3 = params[3:6]
-    bs_phi1, _, bs_phi3 = params[6:9]
+    sq_r = params[:3]
+    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
+    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
     sq_virt = params[9]
 
-    # S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    # U1 = np.array(
-    #    [
-    #        [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
-    #        [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
-    #        [0, 0, 1],
-    #    ]
-    # )
-    # U2 = np.array(
-    #    [
-    #        [1, 0, 0],
-    #        [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
-    #        [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
-    #    ]
-    # )
-    # U3 = np.array(
-    #    [
-    #        [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
-    #        [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
-    #        [0, 0, 1],
-    #    ]
-    # )
-    # Usymp = interferometer(U3 @ U2 @ U1)
-    # r2 = np.array([0, 0, sq_virt])
-    # S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    # Z = S2 @ Usymp @ S1
-    # cov = Z @ Z.T
-
+    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    U1 = np.array(
+        [
+            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
+            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
+            [0, 0, 1],
+        ]
+    )
+    U2 = np.array(
+        [
+            [1, 0, 0],
+            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
+            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
+        ]
+    )
+    U3 = np.array(
+        [
+            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
+            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
+            [0, 0, 1],
+        ]
+    )
+    Usymp = interferometer(U3 @ U2 @ U1)
+    r2 = np.array([0, 0, sq_virt])
+    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    Z = S2 @ Usymp @ S1
+    cov = Z @ Z.T
+    eta = 0.95
+    T = np.diag([np.sqrt(eta)] * 3)
+    mu = np.zeros([len(cov)])
+    mu, cov_lossy = passive_transformation(mu, cov, T)
+    cutoff = 26
     # get density matrix using The Walrus
     rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
     rho_loss1 /= np.trace(rho_loss1)
