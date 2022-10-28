@@ -14,19 +14,18 @@
 """
 tests for code in thewalrus.internal_modes
 """
+from copy import deepcopy
 
 import pytest
+
+from itertools import chain, combinations_with_replacement, product
 
 import numpy as np
 
 from scipy.stats import unitary_group
 from scipy.special import factorial
 
-from copy import deepcopy
-
 from repoze.lru import lru_cache
-
-from itertools import chain, combinations_with_replacement, product
 
 from thewalrus import low_rank_hafnian, reduction
 
@@ -36,7 +35,7 @@ from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep, 
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
-from thewalrus.symplectic import squeezing, passive_transformation, interferometer
+from thewalrus.symplectic import squeezing, passive_transformation, interferometer, expand_vector
 
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
@@ -946,7 +945,6 @@ def test_lossy_gkp():
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
     Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
 
     # get density matrix using The Walrus
     rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
@@ -1070,7 +1068,7 @@ def test_density_matrix():
 
     rho_norm = rho / np.trace(rho)
 
-    eps, W = orthonormal_basis(O, rjs)
+    eps, _ = orthonormal_basis(O, rjs)
     Q = state_prep(eps, W, thresh=5e-3)
     U2 = np.array([[0, 1], [1, 0]]) @ U
     Q_U2 = implement_U(Q, U2)
