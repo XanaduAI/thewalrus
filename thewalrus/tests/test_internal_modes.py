@@ -15,10 +15,9 @@
 tests for code in thewalrus.internal_modes
 """
 from copy import deepcopy
+from itertools import chain, combinations_with_replacement, product
 
 import pytest
-
-from itertools import chain, combinations_with_replacement, product
 
 import numpy as np
 
@@ -470,7 +469,7 @@ def heralded_density_matrix(
     Returns:
         density matrix of heralded spatial mode.
     """
-
+    #pylint: disable=too-many-arguments
     if not np.allclose(U.shape[0], len(rjs)):
         raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
     if not np.allclose(U.shape[0], len(N) + 1):
@@ -944,7 +943,8 @@ def test_lossy_gkp():
     Usymp = interferometer(U3 @ U2 @ U1)
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
+    # Z = S2 @ Usymp @ S1
+    # cov = Z @ Z.T
 
     # get density matrix using The Walrus
     rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
@@ -1068,7 +1068,7 @@ def test_density_matrix():
 
     rho_norm = rho / np.trace(rho)
 
-    eps, _ = orthonormal_basis(O, rjs)
+    eps, W = orthonormal_basis(O, rjs)
     Q = state_prep(eps, W, thresh=5e-3)
     U2 = np.array([[0, 1], [1, 0]]) @ U
     Q_U2 = implement_U(Q, U2)
