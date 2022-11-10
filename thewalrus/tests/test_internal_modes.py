@@ -783,13 +783,11 @@ def test_orthonormal_basis(r, S, phi):
 @pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
 def test_state_prep(r, S, phi):
     """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
-    ### This test fails 
+    ### This test fails
     ### r = 0.1, S = 0.9, phi = 0.0
     ### r = 0.1, S = 0.9, phi = 0.9
     ### r = 0.1, S = 0.9, phi = 2.1
     ### r = 0.1, S = 0.9, phi = 3.1
-
-
 
     hbar = 2
     W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
@@ -816,7 +814,7 @@ def test_state_prep(r, S, phi):
 @pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
 def test_prepare_cov(r, S, phi):
     """test code for forming state from orthonormalised system of 2 squeezers. Variable overlap and phase."""
-    ### This test fails 
+    ### This test fails
     ### r = 0.1, S = 0.9, phi = 0.0
     ### r = 0.1, S = 0.9, phi = 0.9
     ### r = 0.1, S = 0.9, phi = 2.1
@@ -910,11 +908,12 @@ def test_pure_gkp():
     # get density matrix using new code
     rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho3 /= np.trace(rho3)
-    print(np.max(np.abs(rho2-rho3)))
+    print(np.max(np.abs(rho2 - rho3)))
     assert np.allclose(rho1, rho2, atol=2.5e-4)
     assert np.allclose(rho1, rho3, atol=4.5e-4)
     assert np.allclose(rho2, rho3, atol=4.5e-4)
     #### Note that the tolerances are higher than they should be.
+
 
 def test_lossy_gkp():
     """

@@ -22,6 +22,7 @@ from ..quantum import Qmat
 from .._hafnian import nb_binom, f
 from .useful_tools import nb_Qmat, fact
 
+
 @numba.jit(nopython=True, cache=True)
 def f_all(E, n):
     """
@@ -49,6 +50,7 @@ def f_all(E, n):
             for k in range(i * j + 1, n // 2 + 2):
                 comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
     return comb[count, :]
+
 
 @numba.jit(nopython=True)
 def guan_code(n):
@@ -81,7 +83,7 @@ def guan_code(n):
             yield K - i - 1, u[i], g[-2::-1]
 
 
-#@numba.jit(nopython=True, cache=True)
+# @numba.jit(nopython=True, cache=True)
 def _dist_prob_gray(pattern, covs, M, hbar=2):
     r"""
     probability for distinguishable squeezing GBS.
