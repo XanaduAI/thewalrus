@@ -200,7 +200,7 @@ def takagi(A, rtol=1e-05, atol=1e-08, rounding=13, svd_order=True):
     phi = np.angle(A[0, 0])
     Amr = np.real_if_close(np.exp(-1j * phi) * A)
     if np.isrealobj(Amr):
-        vals, U = takagi(A, rtol=rtol, atol=atol, rounding=rounding, svd_order=svd_order)
+        vals, U = takagi(Amr, rtol=rtol, atol=atol, rounding=rounding, svd_order=svd_order)
         return vals, U * np.exp(1j * phi / 2)
 
     v, l, ws = np.linalg.svd(A)
