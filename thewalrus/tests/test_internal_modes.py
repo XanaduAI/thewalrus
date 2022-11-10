@@ -225,7 +225,9 @@ def prob_distinguishable(U, input_labels, input_squeezing, events):
         [{i: y.count(label) for i, y in zip(modes, origin)} for label in input_labels]
         for origin in origins
     ]
-    mappable_dict_to_pattern = lambda x: dict_to_pattern(x, n_modes)
+    def mappable_dict_to_pattern(x):
+        """Convenience function"""
+        return dict_to_pattern(x, n_modes)
     patterns = [list(map(mappable_dict_to_pattern, l)) for l in lists]
     net_sum = 0.0
     for pattern in patterns:
@@ -346,14 +348,14 @@ def combos(N, R):
     """
     if R == 1:
         return [[N]]
-    else:
-        new_combos = []
-        for first_val in range(N + 1):
-            rest = combos(N - first_val, R - 1)
-            new = [p[0] + p[1] for p in product([[first_val]], rest)]
-            new_combos += new
-        new_combos.reverse()
-        return new_combos
+
+    new_combos = []
+    for first_val in range(N + 1):
+        rest = combos(N - first_val, R - 1)
+        new = [p[0] + p[1] for p in product([[first_val]], rest)]
+        new_combos += new
+    new_combos.reverse()
+    return new_combos
 
 
 def dm_MD_2D(dm_MD):
@@ -554,7 +556,7 @@ def heralded_density_matrix(
             post_select_dicts_noise.append(temp_dict_noise)
 
     total_dm_list = []
-    for i in range(len(post_select_dicts_sig)):
+    for i,_ in enumerate(post_select_dicts_sig):
         dm_temp = density_matrix(
             np.zeros(Qfinal.shape[0]),
             Qfinal,
@@ -798,14 +800,14 @@ def test_state_prep(r, S, phi):
         * np.exp(-1j * phi)
         / np.sqrt(2)
     )
-    eps, W = [np.array([r, 0]), np.array([r, 0])], [W0, W1]
+    eps = [np.array([r, 0]), np.array([r, 0])]
+    W = [W0, W1]
     Qsp = state_prep(eps, W, hbar=hbar)
     Qinit = (hbar / 2) * np.diag(
         np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
     )
     U = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
     Qorth = interferometer(U) @ Qinit @ interferometer(U).T
-    print(Qsp.shape, Qorth.shape)
     assert np.allclose(Qsp, Qorth)
 
 
@@ -908,7 +910,6 @@ def test_pure_gkp():
     # get density matrix using new code
     rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho3 /= np.trace(rho3)
-    print(np.max(np.abs(rho2 - rho3)))
     assert np.allclose(rho1, rho2, atol=2.5e-4)
     assert np.allclose(rho1, rho3, atol=4.5e-4)
     assert np.allclose(rho2, rho3, atol=4.5e-4)
@@ -979,7 +980,6 @@ def test_lossy_gkp():
     # get density matrix using new code
     rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho_loss2 /= np.trace(rho_loss2)
-    print(np.max(np.abs(rho_loss1 - rho_loss2)))
     assert np.allclose(rho_loss1, rho_loss2, atol=2.5e-4)
 
 

@@ -19,7 +19,7 @@ import numba
 
 from ..symplectic import passive_transformation, squeezing
 from ..quantum import Qmat
-from .._hafnian import nb_binom, f
+from .._hafnian import nb_binom
 from .useful_tools import nb_Qmat, fact
 
 
