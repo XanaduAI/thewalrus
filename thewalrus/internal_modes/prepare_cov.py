@@ -182,7 +182,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     return eps, W
 
 
-def state_prep(eps, W, thresh=1e-3, hbar=2):
+def state_prep(eps, W, thresh=1e-4, hbar=2):
     r"""
     Computes the total covariance matrix (assuming zero displacement) of the initial state as determined by orthonormalization parameters.
     Modes are ordered first by orthonormalization modes, then spatial modes, i.e. for R orthonormalization modes the 1st R modes of the
