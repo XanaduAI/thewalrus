@@ -1087,7 +1087,7 @@ def test_density_matrix():
     cutoff = 8
 
     dm = heralded_density_matrix(
-        rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, hbar=2, normalize=True
+        rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
     )
 
     rho = np.zeros((cutoff, cutoff), dtype=np.complex128)
@@ -1097,10 +1097,12 @@ def test_density_matrix():
 
     rho_norm = rho / np.trace(rho)
 
-    eps, W = orthonormal_basis(rjs, O=O)
-    Q = state_prep(eps, W, thresh=5e-3)
-    U2 = np.array([[0, 1], [1, 0]]) @ U
-    Q_U2 = implement_U(Q, U2)
+    # eps, W = orthonormal_basis(rjs, O=O)
+    # Q = state_prep(eps, W, thresh=5e-3)
+    # U2 = np.array([[0, 1], [1, 0]]) @ U
+    # Q_U2 = implement_U(Q, U2)
+
+    Q_U2 = prepare_cov(rjs, U2, O=O, thresh=5e-3)
 
     rho2 = density_matrix_single_mode(Q_U2, N, cutoff - 1)
     rho2_norm = rho2 / np.trace(rho2)
