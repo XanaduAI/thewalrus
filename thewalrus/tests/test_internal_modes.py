@@ -1069,14 +1069,8 @@ def test_density_matrix():
 
     n0 = 2.9267754749886055
     n1 = 2.592138225047742
-    K = 1.0
-    maximum = 1
-    zs0 = np.arcsinh(
-        np.sqrt((2 * n0 / (K + 1)) * np.array([((K - 1) / (K + 1)) ** i for i in range(maximum)]))
-    )
-    zs1 = np.arcsinh(
-        np.sqrt((2 * n1 / (K + 1)) * np.array([((K - 1) / (K + 1)) ** i for i in range(maximum)]))
-    )
+    zs0 = np.array([np.arcsinh(np.sqrt(n0))])
+    zs1 = np.array([np.arcsinh(np.sqrt(n0))])
     rjs = [zs0, zs1]
 
     O = np.identity(2, dtype=np.complex128)
@@ -1097,14 +1091,8 @@ def test_density_matrix():
 
     rho_norm = rho / np.trace(rho)
 
-    # eps, W = orthonormal_basis(rjs, O=O)
-    # Q = state_prep(eps, W, thresh=5e-3)
-    # U2 = np.array([[0, 1], [1, 0]]) @ U
-    # Q_U2 = implement_U(Q, U2)
+    Q = prepare_cov(rjs, U, O=O, thresh=5e-3)
 
-    Q_U2 = prepare_cov(rjs, U, O=O, thresh=5e-3)
+    rho2_norm = density_matrix_single_mode(Q, N, cutoff=cutoff - 1)
 
-    rho2 = density_matrix_single_mode(Q_U2, N, cutoff=cutoff - 1)
-    rho2_norm = rho2 / np.trace(rho2)
-
-    assert np.allclose(rho_norm, rho2_norm, atol=1e-4, rtol=1e-4)
+    assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
