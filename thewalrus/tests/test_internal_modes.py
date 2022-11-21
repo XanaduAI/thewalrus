@@ -804,7 +804,7 @@ def test_state_prep(r, S, phi):
     )
     eps = [np.array([r, 0]), np.array([r, 0])]
     W = [W0, W1]
-    Qsp = state_prep(eps, W, thresh=0., hbar=hbar)
+    Qsp = state_prep(eps, W, thresh=0.0, hbar=hbar)
     Qinit = (hbar / 2) * np.diag(
         np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
     )
