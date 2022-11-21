@@ -259,7 +259,7 @@ def LO_overlaps(chis, LO_shape):
     )
 
 
-def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-3, hbar=2):
+def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-4, hbar=2):
     """
     prepare multimode covariance matrix using Lowdin orthonormalisation
     Lowdin modes which have a fidelity to vacuum of 1-thresh are traced over
@@ -270,7 +270,7 @@ def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-3, hbar=2):
         F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
                                     Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
         thr (float): eigenvalue threshold under which orthonormal mode is discounted
-        thresh(float): threshold for ignoring states (default 1e-3)
+        thresh(float): threshold for ignoring states (default 1e-4)
         hbar (float): the value of hbar (default 2)
     Returns:
         tuple(array[:, :], list[array]): covariance matrix over all spatial modes and (Lowdin) internal modes

@@ -827,7 +827,7 @@ def test_prepare_cov(r, S, phi):
     rjs = [np.array([r]), np.array([r])]
     O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     U = unitary_group.rvs(len(rjs))
-    Q = prepare_cov(rjs, U, O=O, thr=0.0, hbar=hbar)
+    Q = prepare_cov(rjs, U, O=O, thresh=0.0, hbar=hbar)
     W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
         2
     )
