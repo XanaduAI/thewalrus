@@ -1104,7 +1104,7 @@ def test_density_matrix():
 
     Q_U2 = prepare_cov(rjs, U, O=O, thresh=5e-3)
 
-    rho2 = density_matrix_single_mode(Q_U2, N, cutoff - 1)
+    rho2 = density_matrix_single_mode(Q_U2, N, cutoff=cutoff - 1)
     rho2_norm = rho2 / np.trace(rho2)
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-4, rtol=1e-4)
