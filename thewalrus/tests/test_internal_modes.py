@@ -1097,7 +1097,7 @@ def test_density_matrix():
 
     rho_norm = rho / np.trace(rho)
 
-    eps, W = orthonormal_basis(O, rjs)
+    eps, W = orthonormal_basis(rjs, O=O)
     Q = state_prep(eps, W, thresh=5e-3)
     U2 = np.array([[0, 1], [1, 0]]) @ U
     Q_U2 = implement_U(Q, U2)
