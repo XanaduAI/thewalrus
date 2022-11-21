@@ -455,7 +455,7 @@ def heralded_density_matrix(
     MD=True,
     normalize=True,
     thr=1e-3,
-    thresh=1e-3,
+    thresh=1e-4,
     hbar=2,
 ):
     r"""Returns the density matrix of the specified spatial mode when heralding on N (dict) photons in defined spatial modes for the given inupt parameters.
@@ -827,7 +827,7 @@ def test_prepare_cov(r, S, phi):
     rjs = [np.array([r]), np.array([r])]
     O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     U = unitary_group.rvs(len(rjs))
-    Q = prepare_cov(rjs, U, O=O, hbar=hbar)
+    Q = prepare_cov(rjs, U, O=O, thr=0.0, hbar=hbar)
     W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
         2
     )
