@@ -225,9 +225,11 @@ def prob_distinguishable(U, input_labels, input_squeezing, events):
         [{i: y.count(label) for i, y in zip(modes, origin)} for label in input_labels]
         for origin in origins
     ]
+
     def mappable_dict_to_pattern(x):
         """Convenience function"""
         return dict_to_pattern(x, n_modes)
+
     patterns = [list(map(mappable_dict_to_pattern, l)) for l in lists]
     net_sum = 0.0
     for pattern in patterns:
@@ -556,7 +558,7 @@ def heralded_density_matrix(
             post_select_dicts_noise.append(temp_dict_noise)
 
     total_dm_list = []
-    for i,_ in enumerate(post_select_dicts_sig):
+    for i, _ in enumerate(post_select_dicts_sig):
         dm_temp = density_matrix(
             np.zeros(Qfinal.shape[0]),
             Qfinal,
