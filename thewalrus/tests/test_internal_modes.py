@@ -21,6 +21,8 @@ import pytest
 
 import numpy as np
 
+import random
+
 from scipy.stats import unitary_group
 from scipy.special import factorial
 
@@ -28,13 +30,18 @@ from repoze.lru import lru_cache
 
 from thewalrus import low_rank_hafnian, reduction
 
-from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
-from thewalrus.internal_modes.prepare_cov import orthonormal_basis, state_prep, prepare_cov
-
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
 from thewalrus.symplectic import squeezing, passive_transformation, interferometer, expand_vector
+
+from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes.prepare_cov import (
+    orthonormal_basis,
+    state_prep,
+    prepare_cov,
+    LO_overlaps,
+)
 
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
@@ -588,6 +595,162 @@ def heralded_density_matrix(
     return dm_tot
 
 
+def heralded_density_matrix_LO(
+    rjs,
+    F,
+    U,
+    N,
+    LO_shape,
+    efficiency=None,
+    noise=None,
+    Ncutoff=None,
+    normalize=True,
+    thr=1e-3,
+    thresh=1e-4,
+    hbar=2,
+):
+    r"""Returns the density matrix of the specified spatial mode when heralding on N (dict) photons in defined spatial modes for the given inupt parameters.
+    The initial state has squeezing parameters rjs (list for each spatial mode of squeezing parameters of each Schmidt mode for that spatial mode),
+    and mode overlaps described by the O matrix. The whole system is evolved under a unitary U on the spatial modes. The resulting density matrix
+    is single-mode in the local oscillator basis.
+    Args:
+        rjs: list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode.
+        F: List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and
+           ordered by spatial mode.
+        U: unitary matrix expressing the three spatial mode interferometer.
+        N: post selection total photon number in the spatial modes (int), indexed by spatial mode.
+        LO_shape: temporal profile of local oscillator.
+        efficiency: total efficiency/transmission of the three spatial modes.
+        noise: Poissonian noise amplitude in each spatial mode after loss (sqrt of <n>).
+        Ncutoff: cutoff dimension for each density matrix.
+        normalize: whether to normalise the output density matrix.
+        thr: eigenvalue threshold under which orthonormal mode is discounted.
+        thresh: fidelity distance away from vacuum for an orthonormal mode to be discarded.
+        hbar: the value of hbar, either 0.5, 1.0 or 2.0 (default 2.0).
+    Returns:
+        density matrix of heralded spatial mode in local oscillator basis.
+    """
+
+    if not np.allclose(U.shape[0], len(rjs)):
+        raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
+    if not np.allclose(U.shape[0], len(N) + 1):
+        raise ValueError("Mismatch between expected system size and heralding modes")
+    if not set(list(N.keys())).issubset(set(list(np.arange(U.shape[0])))):
+        raise ValueError("Keys of N must correspond to all but one spatial mode")
+    Fs = [f for fj in F for f in fj]
+    if not np.allclose(len(Fs), sum([len(listElem) for listElem in rjs])):
+        raise ValueError(
+            "Length of F must equal the total number of Schmidt modes accross all spatial modes"
+        )
+    if not np.allclose(Fs[0].shape[0], LO_shape.shape[0]):
+        raise ValueError(
+            "Schmidt temporal functions and LO temporal profile must have the same number of components"
+        )
+    if not np.allclose(U @ U.T.conj(), np.identity(len(rjs))):
+        raise ValueError("U must be a unitary matrix")
+    if efficiency is not None:
+        if not np.allclose(U.shape[0], efficiency.shape[0]):
+            raise ValueError(
+                "If giving an efficiency, a value for each spatial mode must be provided"
+            )
+    if noise is not None:
+        if not np.allclose(U.shape[0], noise.shape[0]):
+            raise ValueError(
+                "If giving a noise values, a value for each spatial mode must be provided"
+            )
+    M = U.shape[0]
+    N_nums = list(N.values())
+    HM = list(set(list(np.arange(M))).difference(list(N.keys())))[0]
+    if efficiency is None:
+        efficiency = np.ones(M)
+    chis, eps, W = orthonormal_basis(rjs, F=F, thr=thr)
+    Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
+    R = Qinit.shape[0] // (2 * M)
+    Qu = implement_U(Qinit, U)
+    Qfinal = loss(Qu, efficiency, hbar=hbar)
+
+    Uswap = np.zeros((M, M))
+    swapV = np.concatenate((np.arange(HM), np.arange(HM + 1, M), np.array([HM])))
+    for j, k in enumerate(swapV):
+        Uswap[j][k] = 1
+    Qreordered = implement_U(Qfinal, Uswap)  # Putting heralded spatial mode in position M
+
+    LO_shape /= np.linalg.norm(LO_shape)
+    T_LO = np.identity(R, dtype=np.complex128)
+    T_LO[0] = np.array([np.inner(LO_shape.conj(), chis[j]) for j in range(R)])
+    T_tot = np.identity(M * R, dtype=np.complex128)
+    T_tot[(M - 1) * R : M * R, (M - 1) * R : M * R] = T_LO
+    _, Qlo = passive_transformation(np.zeros(Qreordered.shape[0]), Qreordered, T_tot, hbar=hbar)
+    if R > 1:
+        _, Qtraced = reduced_state(np.zeros(Qlo.shape[0]), Qlo, np.arange((M - 1) * R + 1))
+    else:
+        Qtraced = Qlo[:]
+
+    combos_list = []
+    totals = []
+    if noise is not None:
+        for ii in range(M - 1):
+            combos_temp = combos(N_nums[ii], R + 1)
+            combos_list.append(combos_temp)
+            totals.append(len(combos_temp))
+    else:
+        for ii in range(M - 1):
+            combos_temp = combos(N_nums[ii], R)
+            combos_list.append(combos_temp)
+            totals.append(len(combos_temp))
+
+    list_of_lists = [list(range(i)) for i in totals]
+    indices = product(*list_of_lists)
+
+    Nmax = max(N_nums)
+    if Ncutoff is None:
+        Ncutoff = int(np.ceil(2 * Nmax))
+
+    post_select_dicts_sig = []
+    if noise is not None:
+        post_select_dicts_noise = []
+
+    for idx in indices:
+        temp_dict_sig = {}
+        for jj in range(M - 1):
+            for kk in range(R):
+                temp_dict_sig[kk + jj * R] = combos_list[jj][idx[jj]][kk]
+        post_select_dicts_sig.append(temp_dict_sig)
+        if noise is not None:
+            temp_dict_noise = {}
+            for mm in range(M - 1):
+                temp_dict_noise[mm] = combos_list[mm][idx[mm]][-1]
+            post_select_dicts_noise.append(temp_dict_noise)
+
+    total_dm_list = []
+    for i in tqdm(range(len(post_select_dicts_sig))):
+        dm_temp = density_matrix(
+            np.zeros(Qtraced.shape[0]),
+            Qtraced,
+            post_select=post_select_dicts_sig[i],
+            normalize=False,
+            cutoff=Ncutoff,
+            hbar=hbar,
+        )
+        if noise is not None:
+            dm_temp *= np.trace(
+                density_matrix(
+                    expand_vector(noise, hbar=hbar),
+                    (hbar / 2) * np.identity(2 * M),
+                    post_select=post_select_dicts_noise[i],
+                    normalize=False,
+                    cutoff=Ncutoff,
+                    hbar=hbar,
+                )
+            )
+        total_dm_list.append(dm_temp)
+
+    dm_tot = sum(total_dm_list)
+    if normalize:
+        return dm_tot / np.trace(dm_tot)
+    return dm_tot
+
+
 #############################
 # Test functions start here #
 #############################
@@ -851,6 +1014,26 @@ def test_prepare_cov(r, S, phi):
     assert np.allclose(Q, Qu)
 
 
+@pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
+@pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
+@pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
+def test_LO_overlaps(r, S, phi):
+    """test code for local oscillator overlaps from orthonormalised system of 2 squeezers with a random LO shape. Variable overlap and phase"""
+    F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
+    chis, _, _ = orthonormal_basis([np.array([r]), np.array([r])], F=F)
+    LO_shape = np.array(
+        [
+            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
+            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
+        ]
+    )
+    LO_shape /= np.linalg.norm(LO_shape)
+    assert np.allclose(
+        LO_overlaps(chis, LO_shape),
+        np.array([np.inner(LO_shape.conj(), chis[j]) for j in range(len(chis))]),
+    )
+
+
 def test_pure_gkp():
     """test pure gkp state density matrix using 2 methods from the walrus against
     internal_modes.density_matrix_single_mode (but with only 1 temporal mode)"""
@@ -1075,7 +1258,7 @@ def test_density_matrix():
     n0 = 2.9267754749886055
     n1 = 2.592138225047742
     zs0 = np.array([np.arcsinh(np.sqrt(n0))])
-    zs1 = np.array([np.arcsinh(np.sqrt(n0))])
+    zs1 = np.array([np.arcsinh(np.sqrt(n1))])
     rjs = [zs0, zs1]
 
     O = np.identity(2, dtype=np.complex128)
