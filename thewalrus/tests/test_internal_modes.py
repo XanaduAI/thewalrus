@@ -766,7 +766,7 @@ def test_orthonormal_basis(r, S, phi):
     """test code for forming orthonormal basis with two spatial modes with a single temporal mode squeezer in each with the same squeezing parameter.
     Variable overlap and phase."""
     rjs = [np.array([r]), np.array([r])]
-    F = [[np.array([np.exp(1j * phi), 0])], np.array([S, np.sqrt(1 - S**2)])]
+    F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
     # O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     chis, eps, W = orthonormal_basis(rjs, F=F)
     chi0 = np.exp(1j * phi) * np.array([np.sqrt(1 + S), np.sqrt(1 - S)]) / np.sqrt(2)
