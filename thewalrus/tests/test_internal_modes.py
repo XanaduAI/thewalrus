@@ -1284,3 +1284,46 @@ def test_density_matrix():
     rho2_norm = density_matrix_single_mode(Q, N, cutoff=cutoff - 1)
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
+
+
+def test_density_matrix_LO():
+    """
+    test generation of heralded density matrix in LO basis against combinatorial calculation
+    """
+    U = unitary_group.rvs(2)
+
+    N = {0: 3}
+
+    efficiency = 1 * np.ones(2)
+
+    noise = None
+
+    n0 = 2.9267754749886055
+    n1 = 2.592138225047742
+    zs0 = np.array([np.arcsinh(np.sqrt(n0))])
+    zs1 = np.array([np.arcsinh(np.sqrt(n1))])
+    rjs = [zs0, zs1]
+
+    S = 0.8
+    phi = 0.5
+    F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
+    LO_shape = np.array(
+        [
+            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
+            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
+        ]
+    )
+    LO_shape /= np.linalg.norm(LO_shape)
+
+    cutoff = 8
+
+    rho = heralded_density_matrix_LO(
+        rjs, F, U, N, LO_shape, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
+    )
+
+    Q, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
+    LO_overlap = LO_overlaps(chis, LO_shape)
+
+    rho2 = density_matrix_single_mode(Q, N, LO_overlap=LO_overlap, cutoff=cutoff - 1)
+
+    assert np.allclose(rho, rho2, atol=1e-6, rtol=1e-6)
