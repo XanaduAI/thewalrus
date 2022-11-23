@@ -33,7 +33,13 @@ from thewalrus import low_rank_hafnian, reduction
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
-from thewalrus.symplectic import squeezing, passive_transformation, interferometer, expand_vector
+from thewalrus.symplectic import (
+    expand_vector,
+    interferometer,
+    passive_transformation,
+    reduced_state,
+    squeezing,
+)
 
 from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
 from thewalrus.internal_modes.prepare_cov import (
