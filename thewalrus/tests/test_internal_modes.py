@@ -16,6 +16,7 @@ tests for code in thewalrus.internal_modes
 """
 from copy import deepcopy
 from itertools import chain, combinations_with_replacement, product
+from tqdm import tqdm
 
 import pytest
 
