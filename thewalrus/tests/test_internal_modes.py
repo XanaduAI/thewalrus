@@ -16,7 +16,6 @@ tests for code in thewalrus.internal_modes
 """
 from copy import deepcopy
 from itertools import chain, combinations_with_replacement, product
-from tqdm import tqdm
 
 import pytest
 
@@ -730,7 +729,7 @@ def heralded_density_matrix_LO(
             post_select_dicts_noise.append(temp_dict_noise)
 
     total_dm_list = []
-    for i in tqdm(range(len(post_select_dicts_sig))):
+    for i in range(len(post_select_dicts_sig)):
         dm_temp = density_matrix(
             np.zeros(Qtraced.shape[0]),
             Qtraced,
