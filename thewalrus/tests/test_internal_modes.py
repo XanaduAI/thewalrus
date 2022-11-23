@@ -766,8 +766,11 @@ def test_orthonormal_basis(r, S, phi):
     """test code for forming orthonormal basis with two spatial modes with a single temporal mode squeezer in each with the same squeezing parameter.
     Variable overlap and phase."""
     rjs = [np.array([r]), np.array([r])]
-    O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
-    eps, W = orthonormal_basis(rjs, O=O)
+    F = [[np.array([np.exp(1j * phi), 0])], np.array([S, np.sqrt(1 - S**2)])]
+    # O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
+    chis, eps, W = orthonormal_basis(rjs, F=F)
+    chi0 = np.exp(1j * phi) * np.array([np.sqrt(1 + S), np.sqrt(1 - S)]) / np.sqrt(2)
+    chi1 = np.exp(1j * phi) * np.array([np.sqrt(1 - S), -np.sqrt(1 + S)]) / np.sqrt(2)
     W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
         2
     )
@@ -776,6 +779,8 @@ def test_orthonormal_basis(r, S, phi):
         * np.exp(-1j * phi)
         / np.sqrt(2)
     )
+    assert np.allclose(chi0, chis[0])
+    assert np.allclose(chi1, chis[1])
     assert np.allclose(np.array([r, 0]), eps[0])
     assert np.allclose(np.array([r, 0]), eps[1])
     assert np.allclose(np.abs(W0), np.abs(W[0]))
