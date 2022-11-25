@@ -188,9 +188,7 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
     """
     if not np.allclose(len(eps), len(W)):
         raise ValueError("len of eps must be equal to len of W")
-    epsBig = np.array([])
-    for i in eps:
-        epsBig = np.append(epsBig, i)
+    epsBig = np.concatenate(eps, axis=0)
 
     M = len(eps)
     R = eps[0].shape[0]
