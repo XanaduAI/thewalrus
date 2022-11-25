@@ -126,7 +126,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
         raise ValueError("Either F or O must be given")
     R = O.shape[0]
     M = len(rjs)
-    njs = np.array([len(i) for i in rjs])
+    njs = np.array([len(rj) for rj in rjs])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
     lambd, V = lambd[::-1], V[:, ::-1]
     V = np.real_if_close(V / np.exp(1j * np.angle(V)[0]))
@@ -202,11 +202,11 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
         Wbig[R * j : R * (j + 1), R * j : R * (j + 1)] = W[j]
 
     cov = interferometer(Wbig.T.conj()) @ covinit @ interferometer(Wbig.T.conj()).T
-    covswap = interferometer(swap_matrix(M, R)) @ cov @ interferometer(swap_matrix(M, R)).T
-    [muVac, covVac] = vacuum_state(M, hbar=hbar)
 
     # Getting rid of any system of orthonormal modes (i.e. in M spatial modes) that are very close to an M-mode vacuum state
     if R > 1:
+        covswap = interferometer(swap_matrix(M, R)) @ cov @ interferometer(swap_matrix(M, R)).T
+        [muVac, covVac] = vacuum_state(M, hbar=hbar)
         keep_modes = np.array([])
         for k in range(R):
             muTemp, covTemp = reduced_state(
@@ -222,12 +222,14 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
             R = len(keep_modes) // M
             _, covswap = reduced_state(np.zeros(covswap.shape[0]), covswap, keep_modes)
 
-    return interferometer(swap_matrix(M, R).T) @ covswap @ interferometer(swap_matrix(M, R).T).T
+        cov = interferometer(swap_matrix(M, R).T) @ covswap @ interferometer(swap_matrix(M, R).T).T
+
+    return cov
 
 
 def LO_overlaps(chis, LO_shape):
     r"""
-    Computes the overlap integral between the
+    Computes the overlap integral between the orthonormal moes and the local oscillator shape
 
     Args:
         chis (list[array]): list of the temporal functions for the new orthonormal basis
@@ -238,11 +240,8 @@ def LO_overlaps(chis, LO_shape):
     """
     return np.array(
         [
-            np.inner(
-                LO_shape.conj() / np.linalg.norm(LO_shape),
-                chis[j] / np.linalg.norm(chis[j]),
-            )
-            for j in range(len(chis))
+            np.inner(LO_shape.conj() / np.linalg.norm(LO_shape), chi / np.linalg.norm(chi))
+            for chi in chis
         ]
     )
 
