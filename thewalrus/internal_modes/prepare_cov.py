@@ -126,7 +126,7 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
         raise ValueError("Either F or O must be given")
     R = O.shape[0]
     M = len(rjs)
-    njs = np.array([len(rjs[i]) for i in range(M)])
+    njs = np.array([len(i) for i in rjs])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
     lambd, V = lambd[::-1], V[:, ::-1]
     V = np.real_if_close(V / np.exp(1j * np.angle(V)[0]))
