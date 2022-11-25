@@ -522,10 +522,10 @@ def heralded_density_matrix(
     if efficiency is None:
         efficiency = np.ones(M)
     eps, W = orthonormal_basis(rjs, O=O, thr=thr)
-    Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
-    R = Qinit.shape[0] // (2 * M)
-    Qu = implement_U(Qinit, U)
-    Qfinal = loss(Qu, efficiency, hbar=hbar)
+    covinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
+    R = covinit.shape[0] // (2 * M)
+    covu = implement_U(covinit, U)
+    covfinal = loss(covu, efficiency, hbar=hbar)
 
     combos_list = []
     totals = []
@@ -573,8 +573,8 @@ def heralded_density_matrix(
     total_dm_list = []
     for i, _ in enumerate(post_select_dicts_sig):
         dm_temp = density_matrix(
-            np.zeros(Qfinal.shape[0]),
-            Qfinal,
+            np.zeros(covfinal.shape[0]),
+            covfinal,
             post_select=post_select_dicts_sig[i],
             normalize=False,
             cutoff=Ncutoff,
@@ -670,27 +670,29 @@ def heralded_density_matrix_LO(
     if efficiency is None:
         efficiency = np.ones(M)
     chis, eps, W = orthonormal_basis(rjs, F=F, thr=thr)
-    Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
-    R = Qinit.shape[0] // (2 * M)
-    Qu = implement_U(Qinit, U)
-    Qfinal = loss(Qu, efficiency, hbar=hbar)
+    covinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
+    R = covinit.shape[0] // (2 * M)
+    covu = implement_U(covinit, U)
+    covfinal = loss(covu, efficiency, hbar=hbar)
 
     Uswap = np.zeros((M, M))
     swapV = np.concatenate((np.arange(HM), np.arange(HM + 1, M), np.array([HM])))
     for j, k in enumerate(swapV):
         Uswap[j][k] = 1
-    Qreordered = implement_U(Qfinal, Uswap)  # Putting heralded spatial mode in position M
+    covreordered = implement_U(covfinal, Uswap)  # Putting heralded spatial mode in position M
 
     LO_shape /= np.linalg.norm(LO_shape)
     T_LO = np.identity(R, dtype=np.complex128)
     T_LO[0] = np.array([np.inner(LO_shape.conj(), chis[j]) for j in range(R)])
     T_tot = np.identity(M * R, dtype=np.complex128)
     T_tot[(M - 1) * R : M * R, (M - 1) * R : M * R] = T_LO
-    _, Qlo = passive_transformation(np.zeros(Qreordered.shape[0]), Qreordered, T_tot, hbar=hbar)
+    _, covlo = passive_transformation(
+        np.zeros(covreordered.shape[0]), covreordered, T_tot, hbar=hbar
+    )
     if R > 1:
-        _, Qtraced = reduced_state(np.zeros(Qlo.shape[0]), Qlo, np.arange((M - 1) * R + 1))
+        _, covtraced = reduced_state(np.zeros(covlo.shape[0]), covlo, np.arange((M - 1) * R + 1))
     else:
-        Qtraced = Qlo[:]
+        covtraced = covlo[:]
 
     combos_list = []
     totals = []
@@ -731,8 +733,8 @@ def heralded_density_matrix_LO(
     total_dm_list = []
     for i in range(len(post_select_dicts_sig)):
         dm_temp = density_matrix(
-            np.zeros(Qtraced.shape[0]),
-            Qtraced,
+            np.zeros(covtraced.shape[0]),
+            covtraced,
             post_select=post_select_dicts_sig[i],
             normalize=False,
             cutoff=Ncutoff,
@@ -978,13 +980,13 @@ def test_state_prep(r, S, phi):
     )
     eps = [np.array([r, 0]), np.array([r, 0])]
     W = [W0, W1]
-    Qsp = state_prep(eps, W, thresh=0.0, hbar=hbar)
-    Qinit = (hbar / 2) * np.diag(
+    covsp = state_prep(eps, W, thresh=0.0, hbar=hbar)
+    covinit = (hbar / 2) * np.diag(
         np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
     )
     U = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
-    Qorth = interferometer(U) @ Qinit @ interferometer(U).T
-    assert np.allclose(Qsp, Qorth)
+    covorth = interferometer(U) @ covinit @ interferometer(U).T
+    assert np.allclose(covsp, covorth)
 
 
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
@@ -1001,7 +1003,7 @@ def test_prepare_cov(r, S, phi):
     rjs = [np.array([r]), np.array([r])]
     O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     U = unitary_group.rvs(len(rjs))
-    Q = prepare_cov(rjs, U, O=O, thresh=0.0, hbar=hbar)
+    cov = prepare_cov(rjs, U, O=O, thresh=0.0, hbar=hbar)
     W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
         2
     )
@@ -1010,14 +1012,13 @@ def test_prepare_cov(r, S, phi):
         * np.exp(-1j * phi)
         / np.sqrt(2)
     )
-    eps, W = [np.array([r, 0]), np.array([r, 0])], [W0, W1]
-    Qinit = (hbar / 2) * np.diag(
+    covinit = (hbar / 2) * np.diag(
         np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
     )
     Uw = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
-    Qorth = interferometer(Uw) @ Qinit @ interferometer(Uw).T
-    Qu = implement_U(Qorth, U)
-    assert np.allclose(Q, Qu)
+    covorth = interferometer(Uw) @ covinit @ interferometer(Uw).T
+    covu = implement_U(covorth, U)
+    assert np.allclose(cov, covu)
 
 
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
@@ -1319,9 +1320,9 @@ def test_density_matrix():
 
     rho_norm = rho / np.trace(rho)
 
-    Q = prepare_cov(rjs, U, O=O, thresh=5e-3)
+    cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
 
-    rho2_norm = density_matrix_single_mode(Q, N, cutoff=cutoff - 1)
+    rho2_norm = density_matrix_single_mode(cov, N, cutoff=cutoff - 1)
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
 
@@ -1361,9 +1362,9 @@ def test_density_matrix_LO():
         rjs, F, U, N, LO_shape, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
     )
 
-    Q, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
+    cov, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
     LO_overlap = LO_overlaps(chis, LO_shape)
 
-    rho2 = density_matrix_single_mode(Q, N, LO_overlap=LO_overlap, cutoff=cutoff - 1)
+    rho2 = density_matrix_single_mode(cov, N, LO_overlap=LO_overlap, cutoff=cutoff - 1)
 
     assert np.allclose(rho, rho2, atol=1e-6, rtol=1e-6)
