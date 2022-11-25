@@ -193,26 +193,26 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
     M = len(eps)
     R = eps[0].shape[0]
 
-    Qvac = (hbar / 2) * np.eye(2 * M * R)
+    [_, covvac] = vacuum_state(M * R, hbar=hbar)
     S = squeezing(epsBig)
-    Qinit = S @ Qvac @ S.T
+    covinit = S @ covvac @ S.T
 
     Wbig = np.eye(M * R, dtype=np.complex128)
     for j in range(M):
         Wbig[R * j : R * (j + 1), R * j : R * (j + 1)] = W[j]
 
-    Q = interferometer(Wbig.T.conj()) @ Qinit @ interferometer(Wbig.T.conj()).T
-    Qswap = interferometer(swap_matrix(M, R)) @ Q @ interferometer(swap_matrix(M, R)).T
+    cov = interferometer(Wbig.T.conj()) @ covinit @ interferometer(Wbig.T.conj()).T
+    covswap = interferometer(swap_matrix(M, R)) @ cov @ interferometer(swap_matrix(M, R)).T
     [muVac, covVac] = vacuum_state(M, hbar=hbar)
 
     # Getting rid of any system of orthonormal modes (i.e. in M spatial modes) that are very close to an M-mode vacuum state
     if R > 1:
         keep_modes = np.array([])
         for k in range(R):
-            muTemp, QTemp = reduced_state(
-                np.zeros(Qswap.shape[0]), Qswap, np.arange(M * k, M * (k + 1))
+            muTemp, covTemp = reduced_state(
+                np.zeros(covswap.shape[0]), covswap, np.arange(M * k, M * (k + 1))
             )
-            if 1 - fidelity(muVac, covVac, muTemp, QTemp) > thresh:
+            if 1 - fidelity(muVac, covVac, muTemp, covTemp) > thresh:
                 keep_modes = np.append(keep_modes, np.arange(M * k, M * (k + 1)))
 
         keep_modes = keep_modes.astype(int)
@@ -220,9 +220,9 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
 
         if len(keep_modes) > 0:
             R = len(keep_modes) // M
-            _, Qswap = reduced_state(np.zeros(Qswap.shape[0]), Qswap, keep_modes)
+            _, covswap = reduced_state(np.zeros(covswap.shape[0]), covswap, keep_modes)
 
-    return interferometer(swap_matrix(M, R).T) @ Qswap @ interferometer(swap_matrix(M, R).T).T
+    return interferometer(swap_matrix(M, R).T) @ covswap @ interferometer(swap_matrix(M, R).T).T
 
 
 def LO_overlaps(chis, LO_shape):
@@ -278,15 +278,15 @@ def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-4, hbar=2):
         chis, eps, W = orthonormal_basis(rjs, F=F, thr=thr)
     else:
         raise ValueError("Either O or F must be supplied")
-    Qinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
+    covinit = state_prep(eps, W, thresh=thresh, hbar=hbar)
 
     M = T.shape[0]
-    K = Qinit.shape[0] // (2 * M)
+    K = covinit.shape[0] // (2 * M)
     T_K = np.zeros((M * K, M * K), dtype=np.complex128)
     for i in range(K):
         T_K[i::K, i::K] = T
-    _, Qu = passive_transformation(np.zeros(Qinit.shape[0]), Qinit, T_K, hbar=hbar)
+    _, covu = passive_transformation(np.zeros(covinit.shape[0]), covinit, T_K, hbar=hbar)
 
     if F is not None:
-        return Qu, chis
-    return Qu
+        return covu, chis
+    return covu
