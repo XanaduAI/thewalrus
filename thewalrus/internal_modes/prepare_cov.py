@@ -26,6 +26,7 @@ from ..symplectic import (
     passive_transformation,
     reduced_state,
     squeezing,
+    vacuum_state,
 )
 
 
@@ -68,8 +69,8 @@ def O_matrix(F):
     r"""The overlap matrix of all of the Schmidt modes in each spatial mode.
 
     Args:
-        F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
-                                    Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
+        F (list[list/array[array]]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
+                                     Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
     Returns:
         (array): the overlap matrix
     """
@@ -82,21 +83,6 @@ def O_matrix(F):
     return O
 
 
-def vacuum_state(M, hbar=2):
-    r"""
-    Returns the displacement vector and covariance matrix for an M mode vacuum state.
-
-    Args:
-        M (int): number of modes (spatial, Schmidt, other etc.)
-        hbar (float): (default 2) the value of :math:`\hbar` in the commutation relation :math:`[\x,\p]=i\hbar`
-
-    Returns:
-        tuple[array]: the displacement vector and covariance matrix of an M mode vacuum state
-    """
-
-    return np.zeros(2 * M), np.eye(2 * M) * hbar / 2
-
-
 # pylint: disable=too-many-branches
 def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     r"""
@@ -107,8 +93,8 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     Args:
         rjs (list[list]): list for each spatial mode of list of squeezing parameters in that spatial mode
         O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
-        F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
-                                    Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
+        F (list[list/array[array]]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
+                                     Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
         thr (float): eigenvalue threshold under which orthonormal mode is discounted
 
     Returns:
@@ -124,7 +110,11 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
             raise ValueError(
                 "Length of F must equal the total number of Schmidt modes accross all spatial modes"
             )
-        O = O_matrix(F)
+        if O is not None:
+            if not np.allclose(O, O_matrix(F)):
+                raise ValueError("Both O and F were given but are not compatible")
+        else:
+            O = O_matrix(F)
     elif O is not None:
         if not np.allclose(O, O.conj().T):
             raise ValueError("O must be a Hermitian matrix")
@@ -215,7 +205,7 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
 
     Q = interferometer(Wbig.T.conj()) @ Qinit @ interferometer(Wbig.T.conj()).T
     Qswap = interferometer(swap_matrix(M, R)) @ Q @ interferometer(swap_matrix(M, R)).T
-    muVac, covVac = vacuum_state(M, hbar=hbar)
+    [muVac, covVac] = vacuum_state(M, hbar=hbar)
 
     # Getting rid of any system of orthonormal modes (i.e. in M spatial modes) that are very close to an M-mode vacuum state
     if R > 1:
@@ -267,8 +257,8 @@ def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-4, hbar=2):
         rjs (list[list/array]): list for each spatial mode of list/array of squeezing parameters for each Schmidt mode in that spatial mode
         T (array): (unitary if lossless) matrix expressing the spatial mode interferometer
         O (array): 2-dimensional matrix of the overlaps between each Schmidt mode in all spatial modes combined
-        F (list[list/array[array]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
-                                    Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
+        F (list[list/array[array]]): List of arrays of the temporal modes of the Schmidt modes in each spatial mode, must be normalized and ordered by spatial mode.
+                                     Sufficient to put the output temporal modes from yellowsubmaring in a list ordered by spatial mode.
         thr (float): eigenvalue threshold under which orthonormal mode is discounted
         thresh(float): threshold for ignoring states (default 1e-4)
         hbar (float): the value of hbar (default 2)
