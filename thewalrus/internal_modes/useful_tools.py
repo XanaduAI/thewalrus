@@ -59,12 +59,13 @@ def spatial_reps_to_schmidt_reps(spatial_reps, K):
         array: reps of schmidt modes
     """
 
-    M = len(spatial_reps)
-    schmidt_reps = np.empty(M * K, dtype=spatial_reps.dtype)
-    for i, r in enumerate(spatial_reps):
-        schmidt_reps[i * K : (i + 1) * K] = r
+    # M = len(spatial_reps)
+    # schmidt_reps = np.empty(M * K, dtype=spatial_reps.dtype)
+    # for i, r in enumerate(spatial_reps):
+    #     schmidt_reps[i * K : (i + 1) * K] = r
 
-    return schmidt_reps
+    # return schmidt_reps
+    return np.repeat(spatial_reps, K)
 
 
 @numba.jit(nopython=True, cache=True)
