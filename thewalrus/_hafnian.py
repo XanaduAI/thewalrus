@@ -36,7 +36,7 @@ def nb_binom(n, k):  # pragma: no cover
     """
     if k < 0 or k > n:
         return 0
-    if k in (0, n):
+    if k == 0 or k == n:
         return 1
     binom = 1
     for i in range(min(k, n - k)):
