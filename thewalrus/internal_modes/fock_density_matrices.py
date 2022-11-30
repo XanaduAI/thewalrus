@@ -20,7 +20,7 @@ import numba
 
 from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges
-from .useful_tools import (
+from .utils import (
     nb_block,
     nb_Qmat,
     f_all_charpoly,

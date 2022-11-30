@@ -25,7 +25,7 @@ from ..quantum import Qmat
 from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix
 from ..charpoly import powertrace
 
-from .useful_tools import spatial_reps_to_schmidt_reps, spatial_modes_to_schmidt_modes
+from .utils import spatial_reps_to_schmidt_reps, spatial_modes_to_schmidt_modes
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
