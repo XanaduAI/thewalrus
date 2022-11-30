@@ -264,8 +264,6 @@ def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-4, hbar=2):
                                          if temporal modes are given, the orthonormal modes are returned
 
     """
-    # TODO: also return first Lowdin mode
-
     if not np.allclose(T.shape[0], len(rjs)):
         raise ValueError("Unitary is the wrong size, it must act on all spatial modes")
     s = np.linalg.svd(T, compute_uv=False)
