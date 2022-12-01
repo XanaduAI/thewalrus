@@ -34,6 +34,8 @@ from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
 from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
 from thewalrus.symplectic import (
+    beam_splitter,
+    expand,
     expand_vector,
     interferometer,
     passive_transformation,
@@ -1100,28 +1102,13 @@ def test_pure_gkp():
     sq_virt = params[9]
 
     S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    U1 = np.array(
-        [
-            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
-            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
-            [0, 0, 1],
-        ]
+    BS1, BS2, BS3 = (
+        beam_splitter(bs_theta1, bs_phi1),
+        beam_splitter(bs_theta2, bs_phi2),
+        beam_splitter(bs_theta3, bs_phi3),
     )
-    U2 = np.array(
-        [
-            [1, 0, 0],
-            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
-            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
-        ]
-    )
-    U3 = np.array(
-        [
-            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
-            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
-            [0, 0, 1],
-        ]
-    )
-    Usymp = interferometer(U3 @ U2 @ U1)
+    Usymp1, Usymp2, Usymp3 = expand(BS1, [0, 1], 3), expand(BS2, [1, 2], 3), expand(BS3, [0, 1], 3)
+    Usymp = Usymp3 @ Usymp2 @ Usymp1
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
     Z = S2 @ Usymp @ S1
@@ -1173,28 +1160,13 @@ def test_lossy_gkp():
     sq_virt = params[9]
 
     S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    U1 = np.array(
-        [
-            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
-            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
-            [0, 0, 1],
-        ]
+    BS1, BS2, BS3 = (
+        beam_splitter(bs_theta1, bs_phi1),
+        beam_splitter(bs_theta2, bs_phi2),
+        beam_splitter(bs_theta3, bs_phi3),
     )
-    U2 = np.array(
-        [
-            [1, 0, 0],
-            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
-            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
-        ]
-    )
-    U3 = np.array(
-        [
-            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
-            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
-            [0, 0, 1],
-        ]
-    )
-    Usymp = interferometer(U3 @ U2 @ U1)
+    Usymp1, Usymp2, Usymp3 = expand(BS1, [0, 1], 3), expand(BS2, [1, 2], 3), expand(BS3, [0, 1], 3)
+    Usymp = Usymp3 @ Usymp2 @ Usymp1
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
     Z = S2 @ Usymp @ S1
@@ -1239,28 +1211,13 @@ def test_vac_schmidt_modes_gkp():
     sq_virt = params[9]
 
     S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    U1 = np.array(
-        [
-            [np.cos(bs_theta1), -np.exp(-1j * bs_phi1) * np.sin(bs_theta1), 0],
-            [np.exp(1j * bs_phi1) * np.sin(bs_theta1), np.cos(bs_theta1), 0],
-            [0, 0, 1],
-        ]
+    BS1, BS2, BS3 = (
+        beam_splitter(bs_theta1, bs_phi1),
+        beam_splitter(bs_theta2, bs_phi2),
+        beam_splitter(bs_theta3, bs_phi3),
     )
-    U2 = np.array(
-        [
-            [1, 0, 0],
-            [0, np.cos(bs_theta2), -np.exp(-1j * bs_phi2) * np.sin(bs_theta2)],
-            [0, np.exp(1j * bs_phi2) * np.sin(bs_theta2), np.cos(bs_theta2)],
-        ]
-    )
-    U3 = np.array(
-        [
-            [np.cos(bs_theta3), -np.exp(-1j * bs_phi3) * np.sin(bs_theta3), 0],
-            [np.exp(1j * bs_phi3) * np.sin(bs_theta3), np.cos(bs_theta3), 0],
-            [0, 0, 1],
-        ]
-    )
-    Usymp = interferometer(U3 @ U2 @ U1)
+    Usymp1, Usymp2, Usymp3 = expand(BS1, [0, 1], 3), expand(BS2, [1, 2], 3), expand(BS3, [0, 1], 3)
+    Usymp = Usymp3 @ Usymp2 @ Usymp1
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
     Z = S2 @ Usymp @ S1
