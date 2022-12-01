@@ -173,6 +173,7 @@ def prob_low_rank(r, vec, pattern, norm=True):
     return pref * np.abs(amp) ** 2 / denom
 
 
+# pylint: disable=consider-using-generator
 def generate_all_origins(input_labels, events):
     """Generate all the possible combinations of photon events/photon colour (label) origins
     This is returnes as dictionary.
@@ -195,6 +196,7 @@ def generate_all_origins(input_labels, events):
     return [[list(map(ord, list(x.contents))) for x in y] for y in flat_list]
 
 
+# pylint: disable=consider-using-generator
 def generate_all_origins_unpaired(input_labels, events):
     """Generate all the possible combinations of photon events/photon colour (label) origins
     This is returnes as dictionary.
@@ -224,6 +226,7 @@ def dict_to_pattern(input_dict, num_modes):
     return pattern
 
 
+# pylint: disable=consider-using-generator
 def prob_distinguishable(U, input_labels, input_squeezing, events):
     """Calculate the probability of distinguishable event when an interferometer U is used.
     input_labels tell the function where the squeezed light was injected while
@@ -459,7 +462,7 @@ def implement_U(cov, U):
     return Usymp @ cov @ Usymp.T
 
 
-# pylint: disable=too-many-statements, too-many-branches
+# pylint: disable=too-many-statements, too-many-branches, consider-using-generator
 def heralded_density_matrix(
     rjs,
     O,

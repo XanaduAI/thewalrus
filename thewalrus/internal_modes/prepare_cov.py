@@ -246,6 +246,7 @@ def LO_overlaps(chis, LO_shape):
     )
 
 
+# pylint: disable=too-many-arguments
 def prepare_cov(rjs, T, O=None, F=None, thr=1e-3, thresh=1e-4, hbar=2):
     """
     prepare multimode covariance matrix using Lowdin orthonormalisation
