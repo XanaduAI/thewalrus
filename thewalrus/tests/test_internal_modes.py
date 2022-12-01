@@ -45,6 +45,7 @@ from thewalrus.symplectic import (
 
 from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
 from thewalrus.internal_modes.prepare_cov import (
+    O_matrix,
     orthonormal_basis,
     state_prep,
     prepare_cov,
@@ -932,6 +933,16 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     assert np.allclose(expected, obtained)
 
 
+@pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
+@pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
+def test_O_matrix(S, phi):
+    """test code for forming O matrix from temporal modes"""
+    F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
+    O_direct = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
+    O = O_matrix(F)
+    assert np.allclose(O_direct, O)
+
+
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
 @pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
 @pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
@@ -940,8 +951,8 @@ def test_orthonormal_basis(r, S, phi):
     Variable overlap and phase."""
     rjs = [np.array([r]), np.array([r])]
     F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
-    # O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
-    chis, eps, W = orthonormal_basis(rjs, F=F)
+    O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
+    chis, eps, W = orthonormal_basis(rjs, F=F, O=O)
     chi0 = np.exp(1j * phi) * np.array([np.sqrt(1 + S), np.sqrt(1 - S)]) / np.sqrt(2)
     chi1 = np.exp(1j * phi) * np.array([np.sqrt(1 - S), -np.sqrt(1 + S)]) / np.sqrt(2)
     W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
