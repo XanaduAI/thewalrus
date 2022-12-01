@@ -21,7 +21,7 @@ import pytest
 
 import numpy as np
 
-import random
+from random import gauss
 
 from scipy.stats import unitary_group
 from scipy.special import factorial
@@ -733,8 +733,9 @@ def heralded_density_matrix_LO(
                 temp_dict_noise[mm] = combos_list[mm][idx[mm]][-1]
             post_select_dicts_noise.append(temp_dict_noise)
 
+    L = len(post_select_dicts_sig)
     total_dm_list = []
-    for i in range(len(post_select_dicts_sig)):
+    for i in range(L):
         dm_temp = density_matrix(
             np.zeros(covtraced.shape[0]),
             covtraced,
@@ -1042,10 +1043,7 @@ def test_LO_overlaps(r, S, phi):
     F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
     chis, _, _ = orthonormal_basis([np.array([r]), np.array([r])], F=F)
     LO_shape = np.array(
-        [
-            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
-            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
-        ]
+        [gauss(0, 1) * np.exp(1j * gauss(0, 1)), gauss(0, 1) * np.exp(1j * gauss(0, 1))]
     )
     LO_shape /= np.linalg.norm(LO_shape)
     assert np.allclose(
@@ -1317,10 +1315,7 @@ def test_density_matrix_LO():
     phi = 0.5
     F = [[np.array([np.exp(1j * phi), 0])], [np.array([S, np.sqrt(1 - S**2)])]]
     LO_shape = np.array(
-        [
-            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
-            random.gauss(0, 1) * np.exp(1j * random.gauss(0, 1)),
-        ]
+        [gauss(0, 1) * np.exp(1j * gauss(0, 1)), gauss(0, 1) * np.exp(1j * gauss(0, 1))]
     )
     LO_shape /= np.linalg.norm(LO_shape)
 
