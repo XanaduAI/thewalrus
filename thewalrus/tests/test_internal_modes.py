@@ -17,11 +17,11 @@ tests for code in thewalrus.internal_modes
 from copy import deepcopy
 from itertools import chain, combinations_with_replacement, product
 
+from random import gauss
+
 import pytest
 
 import numpy as np
-
-from random import gauss
 
 from scipy.stats import unitary_group
 from scipy.special import factorial
@@ -604,6 +604,7 @@ def heralded_density_matrix(
     return dm_tot
 
 
+# pylint: disable=too-many-arguments, consider-using-generator
 def heralded_density_matrix_LO(
     rjs,
     F,
