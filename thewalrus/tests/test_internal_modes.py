@@ -1196,7 +1196,7 @@ def test_lossy_gkp():
     # get density matrix using new code
     rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff - 1)
     rho_loss2 /= np.trace(rho_loss2)
-    assert np.allclose(rho_loss1, rho_loss2, atol=2.5e-4)
+    assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
 
 
 def test_vac_schmidt_modes_gkp():
@@ -1254,7 +1254,8 @@ def test_vac_schmidt_modes_gkp():
     assert np.allclose(rho1, rho_big, atol=4e-4)
 
 
-def test_density_matrix():
+@pytest.mark.parametrize("cutoff", [7, 8])
+def test_density_matrix(cutoff):
     """
     test generation of heralded density matrix against combinatorial calculation
     """
@@ -1276,8 +1277,6 @@ def test_density_matrix():
     S = 0.8 * np.exp(0 * 1j)
     O[0, 1] = S.conj()
     O[1, 0] = S
-
-    cutoff = 8
 
     dm = heralded_density_matrix(
         rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
