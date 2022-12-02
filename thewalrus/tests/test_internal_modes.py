@@ -1083,8 +1083,8 @@ def test_mixed_heralded_photon():
     cov, chis = prepare_cov([rs, rs], U_TMSV, F=[F, F])
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
-    rho_a = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapa, cutoff=1)
-    rho_b = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapb, cutoff=1)
+    rho_a = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapa, cutoff=2)
+    rho_b = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapb, cutoff=2)
 
     assert np.allclose(dm_modea, rho_a)
     assert np.allclose(dm_modeb, rho_b)
@@ -1139,7 +1139,7 @@ def test_pure_gkp():
     rho2 /= np.trace(rho2)
 
     # get density matrix using new code
-    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
+    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff)
     rho3 /= np.trace(rho3)
     assert np.allclose(rho1, rho2, atol=2.5e-4)
     assert np.allclose(rho1, rho3, atol=4.5e-4)
@@ -1194,7 +1194,7 @@ def test_lossy_gkp():
     rho_loss1 /= np.trace(rho_loss1)
 
     # get density matrix using new code
-    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff - 1)
+    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff)
     rho_loss2 /= np.trace(rho_loss2)
     assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
 
@@ -1248,7 +1248,7 @@ def test_vac_schmidt_modes_gkp():
     big_cov = np.eye(2 * M * K, dtype=np.complex128)
     big_cov[::K, ::K] = cov
 
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
+    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff)
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
@@ -1291,7 +1291,7 @@ def test_density_matrix(cutoff):
 
     cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
 
-    rho2_norm = density_matrix_single_mode(cov, N, cutoff=cutoff - 1)
+    rho2_norm = density_matrix_single_mode(cov, N, cutoff=cutoff)
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
 
@@ -1331,6 +1331,6 @@ def test_density_matrix_LO():
     cov, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
     LO_overlap = LO_overlaps(chis, LO_shape)
 
-    rho2 = density_matrix_single_mode(cov, N, LO_overlap=LO_overlap, cutoff=cutoff - 1)
+    rho2 = density_matrix_single_mode(cov, N, LO_overlap=LO_overlap, cutoff=cutoff)
 
     assert np.allclose(rho, rho2, atol=1e-6, rtol=1e-6)

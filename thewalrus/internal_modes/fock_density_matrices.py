@@ -71,12 +71,8 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
     A[: M * K, :] = O[M * K :, :].conj()
     A[M * K :, :] = O[: M * K, :].conj()
 
-    if cutoff % 2 == 0:
-        cutoff_odd = cutoff + 1
-    else:
-        cutoff_odd = cutoff
+    half_c = (cutoff-1) // 2
 
-    half_c = cutoff_odd // 2
     x = (
         [0]
         + [M * K]
@@ -100,7 +96,7 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
 
     steps = np.prod(edge_reps + 1)
 
-    haf_arr = np.zeros((cutoff_odd + 1, cutoff_odd + 1), dtype=np.complex128)
+    haf_arr = np.zeros((cutoff + 1, cutoff + 1), dtype=np.complex128)
     for j in numba.prange(steps):
         haf_arr_new = np.zeros_like(haf_arr)
         kept_edges = find_kept_edges(j, edge_reps)
@@ -144,11 +140,11 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
         (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
     )
 
-    for n in range(cutoff + 1):
-        for m in range(cutoff + 1):
+    for n in range(cutoff):
+        for m in range(cutoff):
             rho[n, m] /= np.sqrt(fact[n] * fact[m]) * (2 ** ((N_fixed + n + m) // 2))
     
-    rho = rho[: cutoff + 1, : cutoff + 1]
+    rho = rho[:cutoff, :cutoff]
 
     if normalize:
         return rho / np.trace(rho).real
