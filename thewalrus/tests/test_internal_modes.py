@@ -1254,7 +1254,7 @@ def test_vac_schmidt_modes_gkp():
     assert np.allclose(rho1, rho_big, atol=4e-4)
 
 
-@pytest.mark.parametrize("cutoff", [7, 8])
+@pytest.mark.parametrize("cutoff", [8, 9])
 def test_density_matrix(cutoff):
     """
     test generation of heralded density matrix against combinatorial calculation

@@ -105,30 +105,3 @@ def nb_block(X):  # pragma: no cover
     xtmp1 = np.concatenate(X[0], axis=1)
     xtmp2 = np.concatenate(X[1], axis=1)
     return np.concatenate((xtmp1, xtmp2), axis=0)
-
-
-@numba.jit(nopython=True, cache=True)
-def f_all_charpoly(H, n):
-    """
-    Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
-    Args:
-        H (array): matrix
-        n (int): number of polynomial coefficients to compute
-    Returns:
-        array: polynomial coefficients
-    """
-    pow_traces = powertrace(H, n // 2 + 1)
-    count = 0
-    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
-    comb[0, 0] = 1
-    for i in range(1, n // 2 + 1):
-        factor = pow_traces[i] / (2 * i)
-        powfactor = 1
-        count = 1 - count
-        comb[count, :] = comb[1 - count, :]
-        for j in range(1, n // (2 * i) + 1):
-            powfactor *= factor / j
-            for k in range(i * j + 1, n // 2 + 2):
-                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-
-    return comb[count, :]

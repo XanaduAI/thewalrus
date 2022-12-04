@@ -75,7 +75,7 @@ def hafkd(As, edge_reps, K=1):
             AX_S[:, n_nonzero_edges:] = glynn_schmidt_edges_nonzero * A_nonzero[:, :n_nonzero_edges]
             powertraces += powertrace(AX_S, N // 2 + 1)[: N // 2 + 1]
 
-        f_j = f_from_powertrace(powertraces, N)
+        f_j = f_from_powertrace(powertraces, N)[N // 2]
 
         Hnew = prefac * f_j
         H += Hnew

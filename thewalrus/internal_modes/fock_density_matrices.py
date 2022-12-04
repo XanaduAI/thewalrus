@@ -19,11 +19,10 @@ import numpy as np
 import numba
 
 from ..symplectic import passive_transformation
-from .._hafnian import nb_binom, nb_ix, find_kept_edges
+from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
 from .utils import (
     nb_block,
     nb_Qmat,
-    f_all_charpoly,
     spatial_reps_to_schmidt_reps,
     fact,
 )
@@ -117,7 +116,7 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
         AX_S[:, :n_edges] = edge_weights * Ax[:, n_edges:]
         AX_S[:, n_edges:] = edge_weights * Ax[:, :n_edges]
 
-        f_j = f_all_charpoly(AX_S, N_max)
+        f_j = f_from_matrix(AX_S, N_max)
 
         for i_n in range(kept_edges[0], edge_reps[0] + 1):
             for i_m in range(kept_edges[1], edge_reps[1] + 1):
