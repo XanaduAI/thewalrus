@@ -202,11 +202,11 @@ def powertrace_eigenvalues(E, n):
 @numba.jit(nopython=True, cache=True)
 def f_from_eigenvalues(E, n):
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from the eigenvalues of a matrix.
-        
+
     Args:
         E (array): a one-dimensional matrix of eigenvalues
         n (int): number of polynomial coefficients to compute
-        
+
     Returns:
         array: polynomial coefficients
     """
@@ -217,11 +217,11 @@ def f_from_eigenvalues(E, n):
 @numba.jit(nopython=True, cache=True)
 def f_from_matrix(A, n):
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from a general matrix.
-        
+
     Args:
         A (array): a two-dimensional matrix
         n (int): number of polynomial coefficients to compute
-        
+
     Returns:
         array: polynomial coefficients
     """

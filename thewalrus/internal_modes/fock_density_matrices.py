@@ -70,7 +70,7 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
     A[: M * K, :] = O[M * K :, :].conj()
     A[M * K :, :] = O[: M * K, :].conj()
 
-    half_c = (cutoff-1) // 2
+    half_c = (cutoff - 1) // 2
 
     x = (
         [0]
@@ -142,7 +142,7 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
     for n in range(cutoff):
         for m in range(cutoff):
             rho[n, m] /= np.sqrt(fact[n] * fact[m]) * (2 ** ((N_fixed + n + m) // 2))
-    
+
     rho = rho[:cutoff, :cutoff]
 
     if normalize:
