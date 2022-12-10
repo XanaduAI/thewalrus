@@ -83,7 +83,7 @@ def guan_code(n):
             yield K - i - 1, u[i], g[-2::-1]
 
 
-# @numba.jit(nopython=True, cache=True)
+@numba.jit(nopython=True, cache=True)
 def _dist_prob_gray(pattern, covs, M, hbar=2):
     r"""
     probability for distinguishable squeezing GBS.
