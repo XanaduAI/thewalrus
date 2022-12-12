@@ -811,6 +811,8 @@ def test_pnr_prob_fully_distinguishable(M):
         mu, cov = passive_transformation(mu, cov, T)
         covs.append(cov)
         big_cov[i::M, i::M] = cov
+    # big_cov_2 = prepare_cov([[r] for r in rs], T, O=np.identity(M))
+    # assert np.allclose(big_cov,big_cov_2)
 
     p1 = pnr_prob(covs, pattern, hbar=hbar)
     p2 = pnr_prob(big_cov, pattern, hbar=hbar)
@@ -819,38 +821,8 @@ def test_pnr_prob_fully_distinguishable(M):
 
 
 @pytest.mark.parametrize("M", range(2, 7))
-def test_distinguishable_probs(M):
-    """test distinguishability code against combinatorial version"""
-    U = unitary_group.rvs(M)
-    r = 0.4
-
-    rs = r * np.ones(M)
-    input_labels = np.arange(M)
-
-    pattern = [1] * M
-
-    events = dict(enumerate(pattern))
-
-    p1 = prob_distinguishable(U, input_labels, rs, events)
-
-    hbar = 2
-    mu = np.zeros(2 * M)
-    covs = []
-    for i, r in enumerate(rs):
-        r_vec = np.zeros(M)
-        r_vec[i] = r
-        S = squeezing(r_vec)
-        cov = 0.5 * hbar * S @ S.T
-        mu, cov = passive_transformation(mu, cov, U)
-        covs.append(cov)
-
-    p2 = pnr_prob(covs, pattern, hbar=hbar)
-
-    assert np.isclose(p1, p2, atol=1e-6)
-
-
-@pytest.mark.parametrize("M", range(2, 7))
-def test_distinguishable_vacuum_probs(M):
+@pytest.mark.parametrize("pat", [0,1,[2,2]])
+def test_distinguishable_probs(M, pat):
     """test distinguishability code against combinatorial version for vacuum outcome"""
     U = unitary_group.rvs(M)
     r = 0.4
@@ -858,7 +830,10 @@ def test_distinguishable_vacuum_probs(M):
     rs = r * np.ones(M)
     input_labels = np.arange(M)
 
-    pattern = [0] * M
+    if type(pat) is int:
+        pattern = [pat] * M
+    else:
+        pattern = pat + [0] * (M-len(pat))
 
     events = dict(enumerate(pattern))
 
@@ -876,35 +851,12 @@ def test_distinguishable_vacuum_probs(M):
         covs.append(cov)
     p2 = pnr_prob(covs, pattern, hbar=hbar)
 
-    assert np.allclose(p1, p2, atol=1e-6)
-
-
-@pytest.mark.parametrize("M", range(2, 7))
-def test_distinguishable_probs_collisions(M):
-    """test distinguishability code against combinatorial version"""
-    U = unitary_group.rvs(M)
-    r = 0.4
-
-    rs = r * np.ones(M)
-    input_labels = np.arange(M)
-
-    pattern = [2] * 2 + [0] * (M - 2)
-    events = dict(enumerate(pattern))
-    p1 = prob_distinguishable(U, input_labels, rs, events)
-
-    hbar = 2
-    mu = np.zeros(2 * M)
-    covs = []
-    for i, r in enumerate(rs):
-        r_vec = np.zeros(M)
-        r_vec[i] = r
-        S = squeezing(r_vec)
-        cov = 0.5 * hbar * S @ S.T
-        mu, cov = passive_transformation(mu, cov, U)
-        covs.append(cov)
-    p2 = pnr_prob(covs, pattern, hbar=hbar)
-
-    assert np.allclose(p1, p2, atol=1e-6)
+    assert np.isclose(p1, p2, atol=1e-6)
+    
+    if sum(pattern)==0:
+        p3 = vacuum_prob_distinguishable(rs, U)
+        assert np.isclose(p1, p3, atol=1e-6)
+        assert np.isclose(p2, p3, atol=1e-6)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
@@ -930,17 +882,7 @@ def test_distinguishable_probabilitites_single_input(M, collisions):
     expected = np.real_if_close(
         density_matrix_element(mu_out, cov_out, list(pattern), list(pattern))
     )
-    hbar = 2
-    mu = np.zeros(2 * M)
-    covs = []
-    for i, r in enumerate(rs):
-        r_vec = np.zeros(M)
-        r_vec[i] = r
-        S = squeezing(r_vec)
-        cov = 0.5 * hbar * S @ S.T
-        mu, cov = passive_transformation(mu, cov, T)
-        covs.append(cov)
-    obtained = pnr_prob(covs, pattern, hbar=hbar)
+    obtained = pnr_prob(cov_out, pattern, hbar=2)
     assert np.allclose(expected, obtained)
 
 
