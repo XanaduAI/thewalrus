@@ -181,40 +181,6 @@ def find_kept_edges(j, reps):  # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def powertrace_eigenvalues(E, n):
-    """Evaluate the trace of a matrix with eigenvalues E to the power k, from k=0 to k=n-1.
-
-    Args:
-        E (array): one-dimensional array of eigenvalues
-        n (int): the highest power of the matrix will be n-1
-
-    Returns:
-        array: the trace of the matrix to each power
-    """
-    E_k = E.copy()
-    powtrace = [len(E), E.sum()]
-    for i in range(2, n // 2 + 1):
-        E_k *= E
-        powtrace += [E_k.sum()]
-    return np.array(powtrace, dtype=E.dtype)
-
-
-@numba.jit(nopython=True, cache=True)
-def f_from_eigenvalues(E, n):
-    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from the eigenvalues of a matrix.
-
-    Args:
-        E (array): a one-dimensional matrix of eigenvalues
-        n (int): number of polynomial coefficients to compute
-
-    Returns:
-        array: polynomial coefficients
-    """
-    powertraces = powertrace_eigenvalues(E, n)
-    return f_from_powertrace(powertraces, n)
-
-
-@numba.jit(nopython=True, cache=True)
 def f_from_matrix(A, n):
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from a general matrix.
 

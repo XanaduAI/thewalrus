@@ -43,7 +43,7 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -790,7 +790,7 @@ def test_pnr_prob_single_internal_mode(M):
 
 
 @pytest.mark.parametrize("M", [3, 4, 5, 6])
-def test_distinguishable_pnr_prob(M):
+def test_pnr_prob_fully_distinguishable(M):
     """Testing the photon number distribution of fully distinguishable squeezed states"""
     hbar = 2
 
@@ -814,11 +814,8 @@ def test_distinguishable_pnr_prob(M):
 
     p1 = pnr_prob(covs, pattern, hbar=hbar)
     p2 = pnr_prob(big_cov, pattern, hbar=hbar)
-    p3 = distinguishable_pnr_prob(pattern, rs, T)
 
     assert np.isclose(p1, p2)
-    assert np.isclose(p1, p3)
-    assert np.isclose(p2, p3)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
@@ -835,10 +832,21 @@ def test_distinguishable_probs(M):
     events = dict(enumerate(pattern))
 
     p1 = prob_distinguishable(U, input_labels, rs, events)
+    
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, U)
+        covs.append(cov)
 
-    p2 = distinguishable_pnr_prob(pattern, rs, U)
+    p2 = pnr_prob(covs, pattern, hbar=hbar)
 
-    assert np.allclose(p1, p2, atol=1e-6)
+    assert np.isclose(p1, p2, atol=1e-6)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
@@ -856,7 +864,17 @@ def test_distinguishable_vacuum_probs(M):
 
     p1 = prob_distinguishable(U, input_labels, rs, events)
 
-    p2 = distinguishable_pnr_prob(pattern, rs, U)
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, U)
+        covs.append(cov)
+    p2 = pnr_prob(covs, pattern, hbar=hbar)
 
     assert np.allclose(p1, p2, atol=1e-6)
 
@@ -874,7 +892,17 @@ def test_distinguishable_probs_collisions(M):
     events = dict(enumerate(pattern))
     p1 = prob_distinguishable(U, input_labels, rs, events)
 
-    p2 = distinguishable_pnr_prob(pattern, rs, U)
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, U)
+        covs.append(cov)
+    p2 = pnr_prob(covs, pattern, hbar=hbar)
 
     assert np.allclose(p1, p2, atol=1e-6)
 
@@ -902,7 +930,17 @@ def test_distinguishable_probabilitites_single_input(M, collisions):
     expected = np.real_if_close(
         density_matrix_element(mu_out, cov_out, list(pattern), list(pattern))
     )
-    obtained = distinguishable_pnr_prob(pattern, rs, T)
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, T)
+        covs.append(cov)
+    obtained = pnr_prob(covs, pattern, hbar=hbar)
     assert np.allclose(expected, obtained)
 
 
@@ -914,7 +952,18 @@ def test_distinguishable_vacuum_probs_lossy(M):
 
     p1 = vacuum_prob_distinguishable(rs, T)
     pattern = [0] * M
-    p2 = distinguishable_pnr_prob(pattern, rs, T)
+    
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, T)
+        covs.append(cov)
+    p2 = pnr_prob(covs, pattern, hbar=hbar)
 
     assert np.allclose(p1, p2, atol=1e-6)
 
@@ -933,8 +982,18 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     for val in pat_dict:
         pat_list[val] = pat_dict[val]
     expected = prob_distinguishable_lossy(T, rs_ind, rs_vals, pat_dict)
-    obtained = distinguishable_pnr_prob(pat_list, rs_vec, T)
-    assert np.allclose(expected, obtained)
+    
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs_vals):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, T)
+        covs.append(cov)
+    obtained = pnr_prob(covs, pat_list, hbar=hbar)
     assert np.allclose(expected, obtained)
 
 
