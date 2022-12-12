@@ -832,7 +832,7 @@ def test_distinguishable_probs(M):
     events = dict(enumerate(pattern))
 
     p1 = prob_distinguishable(U, input_labels, rs, events)
-    
+
     hbar = 2
     mu = np.zeros(2 * M)
     covs = []
@@ -952,7 +952,7 @@ def test_distinguishable_vacuum_probs_lossy(M):
 
     p1 = vacuum_prob_distinguishable(rs, T)
     pattern = [0] * M
-    
+
     hbar = 2
     mu = np.zeros(2 * M)
     covs = []
@@ -982,7 +982,7 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     for val in pat_dict:
         pat_list[val] = pat_dict[val]
     expected = prob_distinguishable_lossy(T, rs_ind, rs_vals, pat_dict)
-    
+
     hbar = 2
     mu = np.zeros(2 * M)
     covs = []
