@@ -821,7 +821,7 @@ def test_pnr_prob_fully_distinguishable(M):
 
 
 @pytest.mark.parametrize("M", range(2, 7))
-@pytest.mark.parametrize("pat", [0,1,[2,2]])
+@pytest.mark.parametrize("pat", [0, 1, [2, 2]])
 def test_distinguishable_probs(M, pat):
     """test distinguishability code against combinatorial version for vacuum outcome"""
     U = unitary_group.rvs(M)
@@ -833,7 +833,7 @@ def test_distinguishable_probs(M, pat):
     if type(pat) is int:
         pattern = [pat] * M
     else:
-        pattern = pat + [0] * (M-len(pat))
+        pattern = pat + [0] * (M - len(pat))
 
     events = dict(enumerate(pattern))
 
@@ -852,8 +852,8 @@ def test_distinguishable_probs(M, pat):
     p2 = pnr_prob(covs, pattern, hbar=hbar)
 
     assert np.isclose(p1, p2, atol=1e-6)
-    
-    if sum(pattern)==0:
+
+    if sum(pattern) == 0:
         p3 = vacuum_prob_distinguishable(rs, U)
         assert np.isclose(p1, p3, atol=1e-6)
         assert np.isclose(p2, p3, atol=1e-6)
