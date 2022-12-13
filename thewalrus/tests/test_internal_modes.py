@@ -811,13 +811,15 @@ def test_pnr_prob_fully_distinguishable(M):
         mu, cov = passive_transformation(mu, cov, T)
         covs.append(cov)
         big_cov[i::M, i::M] = cov
-    # big_cov_2 = prepare_cov([[r] for r in rs], T, O=np.identity(M))
-    # assert np.allclose(big_cov,big_cov_2)
+    big_cov2 = prepare_cov([[r] for r in rs], T, O=np.identity(M))
+    assert np.allclose(big_cov, big_cov2)
 
     p1 = pnr_prob(covs, pattern, hbar=hbar)
     p2 = pnr_prob(big_cov, pattern, hbar=hbar)
+    p3 = pnr_prob(big_cov2, pattern, hbar=hbar)
 
     assert np.isclose(p1, p2)
+    assert np.isclose(p2, p3)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
