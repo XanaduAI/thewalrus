@@ -1257,6 +1257,39 @@ def test_vac_schmidt_modes_gkp():
     assert np.allclose(rho1, rho_big, atol=4e-4)
 
 
+def test_density_matrix_error():
+    """Testing value errors in density_matrix_single_mode"""
+    U = unitary_group.rvs(2)
+    zs0 = np.array([np.arcsinh(np.sqrt(2.927))])
+    zs1 = np.array([np.arcsinh(np.sqrt(2.592))])
+    rjs = [zs0, zs1]
+
+    O = np.identity(2, dtype=np.complex128)
+    S = 0.8 * np.exp(0 * 1j)
+    O[0, 1] = S.conj()
+    O[1, 0] = S
+
+    cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
+    pattern = {0: 1, 3:2}
+
+    with pytest.raises(ValueError, match="Keys of pattern must correspond to all but one spatial mode"):
+        density_matrix_single_mode(cov, pattern)
+
+    K = cov.shape[0] // (2 * len(pattern))
+
+    N = {0: 3}
+    LO_overlap1 = np.ones(K+1)
+    LO_overlap1 /= np.linalg.norm(LO_overlap1)
+
+    with pytest.raises(ValueError, match="Number of overlaps with LO must match number of internal modes"):
+        density_matrix_single_mode(cov, N, LO_overlap=LO_overlap1)
+
+    LO_overlap2 = 2 * np.ones(K)
+
+    with pytest.raises(ValueError, match="Norm of overlaps must not be greater than 1"):
+        density_matrix_single_mode(cov, N, LO_overlap=LO_overlap2)
+
+
 @pytest.mark.parametrize("cutoff", [8, 9])
 def test_density_matrix(cutoff):
     """
