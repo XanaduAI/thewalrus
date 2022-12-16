@@ -979,6 +979,41 @@ def test_orthonormal_basis(r, S, phi):
     assert np.allclose(np.abs(W1), np.abs(W[1]))
 
 
+def test_orthonormal_basis_error():
+    """Tests the value errors of orthonormal_basis"""
+
+    rjs = [np.ones(2), np.ones(2)]
+    f = np.ones(5)
+    F1 = [[f, f, f], [f, f]]
+
+    with pytest.raises(
+        ValueError,
+        match="Length of F must equal the total number of Schmidt modes accross all spatial modes",
+    ):
+        orthonormal_basis(rjs, F=F1)
+
+    F2 = [[f, f], [f, f]]
+    O1 = unitary_group.rvs(4)
+    with pytest.raises(ValueError, match="Both O and F were given but are not compatible"):
+        orthonormal_basis(rjs, O=O1, F=F2)
+
+    U1 = unitary_group.rvs(4)
+    O2 = U1 + U1.T
+    with pytest.raises(ValueError, match="O must be a Hermitian matrix"):
+        orthonormal_basis(rjs, O=O2)
+
+    U2 = unitary_group.rvs(5)
+    O3 = U2 + U2.conj().T
+    with pytest.raises(
+        ValueError,
+        match="Length of O must equal the total number of Schmidt modes accross all spatial modes",
+    ):
+        orthonormal_basis(rjs, O=O3)
+
+    with pytest.raises(ValueError, match="Either F or O must be given"):
+        orthonormal_basis(rjs)
+
+
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
 @pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
 @pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
