@@ -181,7 +181,7 @@ def find_kept_edges(j, reps):  # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def f_from_matrix(A, n):
+def f_from_matrix(A, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from a general matrix.
 
     Args:
