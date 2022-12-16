@@ -982,10 +982,9 @@ def test_orthonormal_basis(r, S, phi):
 def test_orthonormal_basis_error():
     """Tests the value errors of orthonormal_basis"""
 
-    rjs = [np.ones(2), np.ones(2)]
+    rjs = 2 * [np.ones(2)]
     f = np.ones(5)
     F1 = [[f, f, f], [f, f]]
-
     with pytest.raises(
         ValueError,
         match="Length of F must equal the total number of Schmidt modes accross all spatial modes",
@@ -1085,6 +1084,24 @@ def test_prepare_cov(r, S, phi):
     covorth = interferometer(Uw) @ covinit @ interferometer(Uw).T
     covu = implement_U(covorth, U)
     assert np.allclose(cov, covu)
+
+
+def prepare_cov_error():
+    """Tests the value errors of state_prep"""
+
+    U = unitary_group.rvs(2)
+    rjs1 = 3 * [np.ones(2)]
+    with pytest.raises(
+        ValueError, match="Unitary is the wrong size, it must act on all spatial modes"
+    ):
+        prepare_cov(rjs1, U)
+
+    rjs2 = 2 * [np.ones(2)]
+    with pytest.raises(ValueError, match="T must be have singular values <= 1"):
+        prepare_cov(rjs2, 2 * U)
+
+    with pytest.raises(ValueError, match="Either O or F must be supplied"):
+        prepare_cov(rjs2, 0.9 * U)
 
 
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
