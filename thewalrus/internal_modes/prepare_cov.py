@@ -128,7 +128,8 @@ def orthonormal_basis(rjs, O=None, F=None, thr=1e-3):
     M = len(rjs)
     njs = np.array([len(rj) for rj in rjs])
     lambd, V = np.linalg.eigh(np.outer(np.sqrt(rs).conj(), np.sqrt(rs)) * O)
-    lambd, V = lambd[::-1], V[:, ::-1]
+    indices = np.argsort(-lambd)
+    lambd, V = lambd[indices], V[:, indices]
     V = np.real_if_close(V / np.exp(1j * np.angle(V)[0]))
     inds = np.arange(lambd.shape[0])[lambd > thr]
     lambd = lambd[inds]

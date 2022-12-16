@@ -43,7 +43,7 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, distinguishable_pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -790,7 +790,7 @@ def test_pnr_prob_single_internal_mode(M):
 
 
 @pytest.mark.parametrize("M", [3, 4, 5, 6])
-def test_distinguishable_pnr_prob(M):
+def test_pnr_prob_fully_distinguishable(M):
     """Testing the photon number distribution of fully distinguishable squeezed states"""
     hbar = 2
 
@@ -811,38 +811,20 @@ def test_distinguishable_pnr_prob(M):
         mu, cov = passive_transformation(mu, cov, T)
         covs.append(cov)
         big_cov[i::M, i::M] = cov
+    big_cov2 = prepare_cov([[r] for r in rs], T, O=np.identity(M))
+    assert np.allclose(big_cov, big_cov2)
 
     p1 = pnr_prob(covs, pattern, hbar=hbar)
     p2 = pnr_prob(big_cov, pattern, hbar=hbar)
-    p3 = distinguishable_pnr_prob(pattern, rs, T)
+    p3 = pnr_prob(big_cov2, pattern, hbar=hbar)
 
     assert np.isclose(p1, p2)
-    assert np.isclose(p1, p3)
     assert np.isclose(p2, p3)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
-def test_distinguishable_probs(M):
-    """test distinguishability code against combinatorial version"""
-    U = unitary_group.rvs(M)
-    r = 0.4
-
-    rs = r * np.ones(M)
-    input_labels = np.arange(M)
-
-    pattern = [1] * M
-
-    events = dict(enumerate(pattern))
-
-    p1 = prob_distinguishable(U, input_labels, rs, events)
-
-    p2 = distinguishable_pnr_prob(pattern, rs, U)
-
-    assert np.allclose(p1, p2, atol=1e-6)
-
-
-@pytest.mark.parametrize("M", range(2, 7))
-def test_distinguishable_vacuum_probs(M):
+@pytest.mark.parametrize("pat", [0, 1, [2, 2]])
+def test_distinguishable_probs(M, pat):
     """test distinguishability code against combinatorial version for vacuum outcome"""
     U = unitary_group.rvs(M)
     r = 0.4
@@ -850,33 +832,33 @@ def test_distinguishable_vacuum_probs(M):
     rs = r * np.ones(M)
     input_labels = np.arange(M)
 
-    pattern = [0] * M
+    if type(pat) is int:
+        pattern = [pat] * M
+    else:
+        pattern = pat + [0] * (M - len(pat))
 
     events = dict(enumerate(pattern))
 
     p1 = prob_distinguishable(U, input_labels, rs, events)
 
-    p2 = distinguishable_pnr_prob(pattern, rs, U)
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, U)
+        covs.append(cov)
+    p2 = pnr_prob(covs, pattern, hbar=hbar)
 
-    assert np.allclose(p1, p2, atol=1e-6)
+    assert np.isclose(p1, p2, atol=1e-6)
 
-
-@pytest.mark.parametrize("M", range(2, 7))
-def test_distinguishable_probs_collisions(M):
-    """test distinguishability code against combinatorial version"""
-    U = unitary_group.rvs(M)
-    r = 0.4
-
-    rs = r * np.ones(M)
-    input_labels = np.arange(M)
-
-    pattern = [2] * 2 + [0] * (M - 2)
-    events = dict(enumerate(pattern))
-    p1 = prob_distinguishable(U, input_labels, rs, events)
-
-    p2 = distinguishable_pnr_prob(pattern, rs, U)
-
-    assert np.allclose(p1, p2, atol=1e-6)
+    if sum(pattern) == 0:
+        p3 = vacuum_prob_distinguishable(rs, U)
+        assert np.isclose(p1, p3, atol=1e-6)
+        assert np.isclose(p2, p3, atol=1e-6)
 
 
 @pytest.mark.parametrize("M", range(2, 7))
@@ -902,7 +884,7 @@ def test_distinguishable_probabilitites_single_input(M, collisions):
     expected = np.real_if_close(
         density_matrix_element(mu_out, cov_out, list(pattern), list(pattern))
     )
-    obtained = distinguishable_pnr_prob(pattern, rs, T)
+    obtained = pnr_prob(cov_out, pattern, hbar=2)
     assert np.allclose(expected, obtained)
 
 
@@ -914,7 +896,18 @@ def test_distinguishable_vacuum_probs_lossy(M):
 
     p1 = vacuum_prob_distinguishable(rs, T)
     pattern = [0] * M
-    p2 = distinguishable_pnr_prob(pattern, rs, T)
+
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, T)
+        covs.append(cov)
+    p2 = pnr_prob(covs, pattern, hbar=hbar)
 
     assert np.allclose(p1, p2, atol=1e-6)
 
@@ -933,8 +926,18 @@ def test_distinguishable_probs_lossy(M, pat_dict):
     for val in pat_dict:
         pat_list[val] = pat_dict[val]
     expected = prob_distinguishable_lossy(T, rs_ind, rs_vals, pat_dict)
-    obtained = distinguishable_pnr_prob(pat_list, rs_vec, T)
-    assert np.allclose(expected, obtained)
+
+    hbar = 2
+    mu = np.zeros(2 * M)
+    covs = []
+    for i, r in enumerate(rs_vals):
+        r_vec = np.zeros(M)
+        r_vec[i] = r
+        S = squeezing(r_vec)
+        cov = 0.5 * hbar * S @ S.T
+        mu, cov = passive_transformation(mu, cov, T)
+        covs.append(cov)
+    obtained = pnr_prob(covs, pat_list, hbar=hbar)
     assert np.allclose(expected, obtained)
 
 
@@ -1083,8 +1086,8 @@ def test_mixed_heralded_photon():
     cov, chis = prepare_cov([rs, rs], U_TMSV, F=[F, F])
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
-    rho_a = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapa, cutoff=1)
-    rho_b = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapb, cutoff=1)
+    rho_a = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapa, cutoff=2)
+    rho_b = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapb, cutoff=2)
 
     assert np.allclose(dm_modea, rho_a)
     assert np.allclose(dm_modeb, rho_b)
@@ -1139,11 +1142,11 @@ def test_pure_gkp():
     rho2 /= np.trace(rho2)
 
     # get density matrix using new code
-    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
+    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff)
     rho3 /= np.trace(rho3)
     assert np.allclose(rho1, rho2, atol=2.5e-4)
-    assert np.allclose(rho1, rho3, atol=4.5e-4)
-    assert np.allclose(rho2, rho3, atol=4.5e-4)
+    assert np.allclose(rho1, rho3, atol=4.7e-4)
+    assert np.allclose(rho2, rho3, atol=4.8e-4)
     #### Note that the tolerances are higher than they should be.
 
 
@@ -1194,9 +1197,9 @@ def test_lossy_gkp():
     rho_loss1 /= np.trace(rho_loss1)
 
     # get density matrix using new code
-    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff - 1)
+    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff)
     rho_loss2 /= np.trace(rho_loss2)
-    assert np.allclose(rho_loss1, rho_loss2, atol=2.5e-4)
+    assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
 
 
 def test_vac_schmidt_modes_gkp():
@@ -1248,13 +1251,14 @@ def test_vac_schmidt_modes_gkp():
     big_cov = np.eye(2 * M * K, dtype=np.complex128)
     big_cov[::K, ::K] = cov
 
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff - 1)
+    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff)
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
 
 
-def test_density_matrix():
+@pytest.mark.parametrize("cutoff", [8, 9])
+def test_density_matrix(cutoff):
     """
     test generation of heralded density matrix against combinatorial calculation
     """
@@ -1277,8 +1281,6 @@ def test_density_matrix():
     O[0, 1] = S.conj()
     O[1, 0] = S
 
-    cutoff = 8
-
     dm = heralded_density_matrix(
         rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
     )
@@ -1292,7 +1294,7 @@ def test_density_matrix():
 
     cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
 
-    rho2_norm = density_matrix_single_mode(cov, N, cutoff=cutoff - 1)
+    rho2_norm = density_matrix_single_mode(cov, N, cutoff=cutoff)
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
 
@@ -1332,6 +1334,6 @@ def test_density_matrix_LO():
     cov, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
     LO_overlap = LO_overlaps(chis, LO_shape)
 
-    rho2 = density_matrix_single_mode(cov, N, LO_overlap=LO_overlap, cutoff=cutoff - 1)
+    rho2 = density_matrix_single_mode(cov, N, LO_overlap=LO_overlap, cutoff=cutoff)
 
     assert np.allclose(rho, rho2, atol=1e-6, rtol=1e-6)

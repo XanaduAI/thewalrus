@@ -19,11 +19,10 @@ import numpy as np
 import numba
 
 from ..symplectic import passive_transformation
-from .._hafnian import nb_binom, nb_ix, find_kept_edges
+from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
 from .utils import (
     nb_block,
     nb_Qmat,
-    f_all_charpoly,
     spatial_reps_to_schmidt_reps,
     fact,
 )
@@ -71,10 +70,8 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
     A[: M * K, :] = O[M * K :, :].conj()
     A[M * K :, :] = O[: M * K, :].conj()
 
-    if cutoff % 2 == 0:
-        cutoff += 1
+    half_c = (cutoff - 1) // 2
 
-    half_c = cutoff // 2
     x = (
         [0]
         + [M * K]
@@ -119,7 +116,7 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
         AX_S[:, :n_edges] = edge_weights * Ax[:, n_edges:]
         AX_S[:, n_edges:] = edge_weights * Ax[:, :n_edges]
 
-        f_j = f_all_charpoly(AX_S, N_max)
+        f_j = f_from_matrix(AX_S, N_max)
 
         for i_n in range(kept_edges[0], edge_reps[0] + 1):
             for i_m in range(kept_edges[1], edge_reps[1] + 1):
@@ -142,9 +139,11 @@ def _density_matrix_single_mode(cov, pattern, normalize=True, LO_overlap=None, c
         (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
     )
 
-    for n in range(cutoff + 1):
-        for m in range(cutoff + 1):
+    for n in range(cutoff):
+        for m in range(cutoff):
             rho[n, m] /= np.sqrt(fact[n] * fact[m]) * (2 ** ((N_fixed + n + m) // 2))
+
+    rho = rho[:cutoff, :cutoff]
 
     if normalize:
         return rho / np.trace(rho).real
