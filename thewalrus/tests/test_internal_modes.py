@@ -1270,18 +1270,22 @@ def test_density_matrix_error():
     O[1, 0] = S
 
     cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
-    pattern = {0: 1, 3:2}
+    pattern = {0: 1, 3: 2}
 
-    with pytest.raises(ValueError, match="Keys of pattern must correspond to all but one spatial mode"):
+    with pytest.raises(
+        ValueError, match="Keys of pattern must correspond to all but one spatial mode"
+    ):
         density_matrix_single_mode(cov, pattern)
 
     K = cov.shape[0] // (2 * len(pattern))
 
     N = {0: 3}
-    LO_overlap1 = np.ones(K+1)
+    LO_overlap1 = np.ones(K + 1)
     LO_overlap1 /= np.linalg.norm(LO_overlap1)
 
-    with pytest.raises(ValueError, match="Number of overlaps with LO must match number of internal modes"):
+    with pytest.raises(
+        ValueError, match="Number of overlaps with LO must match number of internal modes"
+    ):
         density_matrix_single_mode(cov, N, LO_overlap=LO_overlap1)
 
     LO_overlap2 = 2 * np.ones(K)
