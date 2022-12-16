@@ -1045,6 +1045,16 @@ def test_state_prep(r, S, phi):
     assert np.allclose(covsp, covorth)
 
 
+def test_state_prep_error():
+    """Tests the value errors of state_prep"""
+
+    Wtemp = unitary_group.rvs(2)
+    eps = [np.array([1, 0]), np.array([1, 0])]
+    W = [Wtemp, Wtemp, Wtemp]
+    with pytest.raises(ValueError, match="len of eps must be equal to len of W"):
+        state_prep(eps, W)
+
+
 @pytest.mark.parametrize("r", [0.1, 0.6, 1.3, 2.6])
 @pytest.mark.parametrize("S", [0.1, 0.4, 0.7, 0.9])
 @pytest.mark.parametrize("phi", [0.0, 0.9, 2.1, 3.1])
