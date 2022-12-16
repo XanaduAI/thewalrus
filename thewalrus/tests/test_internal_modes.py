@@ -1145,8 +1145,8 @@ def test_pure_gkp():
     rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff)
     rho3 /= np.trace(rho3)
     assert np.allclose(rho1, rho2, atol=2.5e-4)
-    assert np.allclose(rho1, rho3, atol=4.5e-4)
-    assert np.allclose(rho2, rho3, atol=4.5e-4)
+    assert np.allclose(rho1, rho3, atol=4.7e-4)
+    assert np.allclose(rho2, rho3, atol=4.8e-4)
     #### Note that the tolerances are higher than they should be.
 
 
