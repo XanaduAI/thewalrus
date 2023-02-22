@@ -866,7 +866,6 @@ def hafnian_sparse(A, D=None, loop=False):
     def indices(d, k):
         return d.intersection(set(np.nonzero(A[k])[0]))
 
-    # pylint: disable=consider-using-generator
     @lru_cache(maxsize=2**m)
     def lhaf(d: frozenset) -> float:
         if not d:
@@ -953,6 +952,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     return _haf(A, reps=rpt, glynn=glynn)
 
 
+# pylint: disable=consider-using-generator
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
     For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical
