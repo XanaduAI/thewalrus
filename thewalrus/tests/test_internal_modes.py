@@ -110,6 +110,8 @@ def generate_origins_unpaired(keys, num_pairs):
 ####################################################################
 # Mikhail's magic OOP way of dealing with boxes and coloured balls #
 ####################################################################
+
+# pylint: disable=too-few-public-methods
 class Box:
     """A class to represent boxes"""
 

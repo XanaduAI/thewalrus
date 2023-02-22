@@ -23,6 +23,7 @@ import numpy as np
 from thewalrus import charpoly
 
 
+# pylint: disable=consider-using-in
 @numba.jit(nopython=True, cache=True)
 def nb_binom(n, k):  # pragma: no cover
     """Numba version of binomial coefficient function.
@@ -865,6 +866,7 @@ def hafnian_sparse(A, D=None, loop=False):
     def indices(d, k):
         return d.intersection(set(np.nonzero(A[k])[0]))
 
+    # pylint: disable=consider-using-generator
     @lru_cache(maxsize=2**m)
     def lhaf(d: frozenset) -> float:
         if not d:
