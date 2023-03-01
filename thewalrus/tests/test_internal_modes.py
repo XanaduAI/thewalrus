@@ -32,7 +32,13 @@ from thewalrus import low_rank_hafnian, reduction
 
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
-from thewalrus.quantum import density_matrix_element, density_matrix, Amat, Qmat, state_vector
+from thewalrus.quantum import (
+    density_matrix_element,
+    density_matrix,
+    Amat,
+    Qmat,
+    state_vector,
+)
 from thewalrus.symplectic import (
     beam_splitter,
     expand,
@@ -96,14 +102,17 @@ def duplicate(x):
 def generate_origins(keys, num_pairs):
     """Find all the possible ways in which num_pairs could have come from a number of different squeezed source specified in keys"""
     origins = [
-        _list_to_freq_dict(duplicate(x)) for x in combinations_with_replacement(keys, num_pairs)
+        _list_to_freq_dict(duplicate(x))
+        for x in combinations_with_replacement(keys, num_pairs)
     ]
     return origins
 
 
 def generate_origins_unpaired(keys, num_pairs):
     """Find all the possible ways in which num_pairs could have come from a number of different squeezed source specified in keys"""
-    origins = [_list_to_freq_dict(x) for x in combinations_with_replacement(keys, num_pairs)]
+    origins = [
+        _list_to_freq_dict(x) for x in combinations_with_replacement(keys, num_pairs)
+    ]
     return origins
 
 
@@ -256,7 +265,9 @@ def prob_distinguishable(U, input_labels, input_squeezing, events):
     for pattern in patterns:
         term = np.prod(
             [
-                prob_low_rank(input_squeezing[i], U[:, input_labels[i]], pattern[i], norm=False)
+                prob_low_rank(
+                    input_squeezing[i], U[:, input_labels[i]], pattern[i], norm=False
+                )
                 for i in range(len(input_squeezing))
             ]
         )
@@ -474,7 +485,7 @@ def heralded_density_matrix(
     noise=None,
     Ncutoff=None,
     MD=True,
-    normalize=True,
+    normalize=False,
     thr=1e-3,
     thresh=1e-4,
     hbar=2,
@@ -584,7 +595,6 @@ def heralded_density_matrix(
             np.zeros(covfinal.shape[0]),
             covfinal,
             post_select=post_select_dicts_sig[i],
-            normalize=False,
             cutoff=Ncutoff,
             hbar=hbar,
         )
@@ -594,7 +604,6 @@ def heralded_density_matrix(
                     expand_vector(noise, hbar=hbar),
                     (hbar / 2) * np.identity(2 * M),
                     post_select=post_select_dicts_noise[i],
-                    normalize=False,
                     cutoff=Ncutoff,
                     hbar=hbar,
                 )
@@ -688,7 +697,9 @@ def heralded_density_matrix_LO(
     swapV = np.concatenate((np.arange(HM), np.arange(HM + 1, M), np.array([HM])))
     for j, k in enumerate(swapV):
         Uswap[j][k] = 1
-    covreordered = implement_U(covfinal, Uswap)  # Putting heralded spatial mode in position M
+    covreordered = implement_U(
+        covfinal, Uswap
+    )  # Putting heralded spatial mode in position M
 
     LO_shape /= np.linalg.norm(LO_shape)
     T_LO = np.identity(R, dtype=np.complex128)
@@ -699,7 +710,9 @@ def heralded_density_matrix_LO(
         np.zeros(covreordered.shape[0]), covreordered, T_tot, hbar=hbar
     )
     if R > 1:
-        _, covtraced = reduced_state(np.zeros(covlo.shape[0]), covlo, np.arange((M - 1) * R + 1))
+        _, covtraced = reduced_state(
+            np.zeros(covlo.shape[0]), covlo, np.arange((M - 1) * R + 1)
+        )
     else:
         covtraced = covlo[:]
 
@@ -746,7 +759,6 @@ def heralded_density_matrix_LO(
             np.zeros(covtraced.shape[0]),
             covtraced,
             post_select=post_select_dicts_sig[i],
-            normalize=False,
             cutoff=Ncutoff,
             hbar=hbar,
         )
@@ -756,7 +768,6 @@ def heralded_density_matrix_LO(
                     expand_vector(noise, hbar=hbar),
                     (hbar / 2) * np.identity(2 * M),
                     post_select=post_select_dicts_noise[i],
-                    normalize=False,
                     cutoff=Ncutoff,
                     hbar=hbar,
                 )
@@ -965,9 +976,9 @@ def test_orthonormal_basis(r, S, phi):
     chis, eps, W = orthonormal_basis(rjs, F=F, O=O)
     chi0 = np.exp(1j * phi) * np.array([np.sqrt(1 + S), np.sqrt(1 - S)]) / np.sqrt(2)
     chi1 = np.exp(1j * phi) * np.array([np.sqrt(1 - S), -np.sqrt(1 + S)]) / np.sqrt(2)
-    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
-        2
-    )
+    W0 = np.array(
+        [[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]
+    ) / np.sqrt(2)
     W1 = (
         np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]])
         * np.exp(-1j * phi)
@@ -995,7 +1006,9 @@ def test_orthonormal_basis_error():
 
     F2 = [[f, f], [f, f]]
     O1 = unitary_group.rvs(4)
-    with pytest.raises(ValueError, match="Both O and F were given but are not compatible"):
+    with pytest.raises(
+        ValueError, match="Both O and F were given but are not compatible"
+    ):
         orthonormal_basis(rjs, O=O1, F=F2)
 
     U1 = unitary_group.rvs(4)
@@ -1027,9 +1040,9 @@ def test_state_prep(r, S, phi):
     ### r = 0.1, S = 0.9, phi = 3.1
 
     hbar = 2
-    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
-        2
-    )
+    W0 = np.array(
+        [[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]
+    ) / np.sqrt(2)
     W1 = (
         np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]])
         * np.exp(-1j * phi)
@@ -1039,7 +1052,9 @@ def test_state_prep(r, S, phi):
     W = [W0, W1]
     covsp = state_prep(eps, W, thresh=0.0, hbar=hbar)
     covinit = (hbar / 2) * np.diag(
-        np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
+        np.array(
+            [np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1]
+        )
     )
     U = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
     covorth = interferometer(U) @ covinit @ interferometer(U).T
@@ -1071,18 +1086,22 @@ def test_prepare_cov(r, S, phi):
     O = np.array([[1, S * np.exp(-1j * phi)], [S * np.exp(1j * phi), 1]])
     U = unitary_group.rvs(len(rjs))
     cov = prepare_cov(rjs, U, O=O, thresh=0.0, hbar=hbar)
-    W0 = np.array([[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]) / np.sqrt(
-        2
-    )
+    W0 = np.array(
+        [[np.sqrt(1 + S), np.sqrt(1 - S)], [np.sqrt(1 - S), -np.sqrt(1 + S)]]
+    ) / np.sqrt(2)
     W1 = (
         np.array([[np.sqrt(1 + S), -np.sqrt(1 - S)], [np.sqrt(1 - S), np.sqrt(1 + S)]])
         * np.exp(-1j * phi)
         / np.sqrt(2)
     )
     covinit = (hbar / 2) * np.diag(
-        np.array([np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1])
+        np.array(
+            [np.exp(-2 * r), 1, np.exp(-2 * r), 1, np.exp(2 * r), 1, np.exp(2 * r), 1]
+        )
     )
-    Uw = np.block([[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]])
+    Uw = np.block(
+        [[W0.T.conj(), np.zeros(W0.shape)], [np.zeros(W1.shape), W1.T.conj()]]
+    )
     covorth = interferometer(Uw) @ covinit @ interferometer(Uw).T
     covu = implement_U(covorth, U)
     assert np.allclose(cov, covu)
@@ -1133,7 +1152,9 @@ def test_mixed_heralded_photon():
     cutoff = 5
     ps = np.array([g ** np.arange(cutoff) / (1 + n) for g, n in zip(gs, ns)])
     herald_val = 1
-    dm_modea = np.array([ps[0, i] * ps[1, herald_val - i] for i in range(herald_val + 1)])
+    dm_modea = np.array(
+        [ps[0, i] * ps[1, herald_val - i] for i in range(herald_val + 1)]
+    )
     dm_modeb = dm_modea[::-1]
     dm_modea = np.diag(dm_modea) / np.sum(dm_modea)
     dm_modeb = np.diag(dm_modeb) / np.sum(dm_modeb)
@@ -1187,7 +1208,11 @@ def test_pure_gkp():
         beam_splitter(bs_theta2, bs_phi2),
         beam_splitter(bs_theta3, bs_phi3),
     )
-    Usymp1, Usymp2, Usymp3 = expand(BS1, [0, 1], 3), expand(BS2, [1, 2], 3), expand(BS3, [0, 1], 3)
+    Usymp1, Usymp2, Usymp3 = (
+        expand(BS1, [0, 1], 3),
+        expand(BS2, [1, 2], 3),
+        expand(BS3, [0, 1], 3),
+    )
     Usymp = Usymp3 @ Usymp2 @ Usymp1
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
@@ -1197,7 +1222,7 @@ def test_pure_gkp():
     cutoff = 26
     mu = np.zeros([len(cov)])
 
-    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, normalize=False, cutoff=cutoff)
+    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
 
     rho1 = np.outer(psi, psi.conj())
     rho1 /= np.trace(rho1)
@@ -1245,7 +1270,11 @@ def test_lossy_gkp():
         beam_splitter(bs_theta2, bs_phi2),
         beam_splitter(bs_theta3, bs_phi3),
     )
-    Usymp1, Usymp2, Usymp3 = expand(BS1, [0, 1], 3), expand(BS2, [1, 2], 3), expand(BS3, [0, 1], 3)
+    Usymp1, Usymp2, Usymp3 = (
+        expand(BS1, [0, 1], 3),
+        expand(BS2, [1, 2], 3),
+        expand(BS3, [0, 1], 3),
+    )
     Usymp = Usymp3 @ Usymp2 @ Usymp1
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
@@ -1296,7 +1325,11 @@ def test_vac_schmidt_modes_gkp():
         beam_splitter(bs_theta2, bs_phi2),
         beam_splitter(bs_theta3, bs_phi3),
     )
-    Usymp1, Usymp2, Usymp3 = expand(BS1, [0, 1], 3), expand(BS2, [1, 2], 3), expand(BS3, [0, 1], 3)
+    Usymp1, Usymp2, Usymp3 = (
+        expand(BS1, [0, 1], 3),
+        expand(BS2, [1, 2], 3),
+        expand(BS3, [0, 1], 3),
+    )
     Usymp = Usymp3 @ Usymp2 @ Usymp1
     r2 = np.array([0, 0, sq_virt])
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
@@ -1305,7 +1338,7 @@ def test_vac_schmidt_modes_gkp():
     mu = np.zeros([len(cov)])
 
     cutoff = 26
-    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, normalize=False, cutoff=cutoff)
+    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
 
     rho1 = np.outer(psi, psi.conj())
     rho1 /= np.trace(rho1)
@@ -1348,7 +1381,8 @@ def test_density_matrix_error():
     LO_overlap1 /= np.linalg.norm(LO_overlap1)
 
     with pytest.raises(
-        ValueError, match="Number of overlaps with LO must match number of internal modes"
+        ValueError,
+        match="Number of overlaps with LO must match number of internal modes",
     ):
         density_matrix_single_mode(cov, N, LO_overlap=LO_overlap1)
 
@@ -1429,7 +1463,15 @@ def test_density_matrix_LO():
     cutoff = 8
 
     rho = heralded_density_matrix_LO(
-        rjs, F, U, N, LO_shape, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
+        rjs,
+        F,
+        U,
+        N,
+        LO_shape,
+        efficiency=efficiency,
+        noise=noise,
+        Ncutoff=cutoff,
+        thresh=5e-3,
     )
 
     cov, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
