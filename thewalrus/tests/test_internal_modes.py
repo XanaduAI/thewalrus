@@ -1152,8 +1152,8 @@ def test_mixed_heralded_photon():
     cov, chis = prepare_cov([rs, rs], U_TMSV, F=[F, F])
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
-    rho_a = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapa, cutoff=2)
-    rho_b = density_matrix_single_mode(cov, {1: 1}, LO_overlap=LO_overlapb, cutoff=2)
+    rho_a = density_matrix_single_mode(cov, {1: 1}, normalize=True, LO_overlap=LO_overlapa, cutoff=2)
+    rho_b = density_matrix_single_mode(cov, {1: 1}, normalize=True, LO_overlap=LO_overlapb, cutoff=2)
 
     assert np.allclose(dm_modea, rho_a)
     assert np.allclose(dm_modeb, rho_b)
