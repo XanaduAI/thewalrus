@@ -1410,7 +1410,8 @@ def test_density_matrix(cutoff):
 
     cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
 
-    rho2_norm = density_matrix_single_mode(cov, N, cutoff=cutoff)
+    rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff)
+    rho2_norm = rho2 / np.trace(rho2).real
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
 
@@ -1454,10 +1455,12 @@ def test_density_matrix_LO():
         Ncutoff=cutoff,
         thresh=5e-3,
     )
+    rho_norm = rho / np.trace(rho).real
 
     cov, chis = prepare_cov(rjs, U, F=F, thresh=5e-3)
     LO_overlap = LO_overlaps(chis, LO_shape)
 
     rho2 = density_matrix_single_mode(cov, N, LO_overlap=LO_overlap, cutoff=cutoff)
+    rho2_norm = rho2 / np.trace(rho2).real
 
-    assert np.allclose(rho, rho2, atol=1e-6, rtol=1e-6)
+    assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
