@@ -88,6 +88,7 @@ __all__ = [
 # Hafnian sampling
 # ===============================================================================================
 
+
 # pylint: disable=too-many-branches
 def decompose_cov(cov):
     r"""Decompose the convariance matrix using the Williamson decomposition method.
