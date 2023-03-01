@@ -12,8 +12,6 @@
 
 * Added function to extend single mode symplectic to act on multiple modes. [(#347)](https://github.com/XanaduAI/thewalrus/pull/347)
 
-* The displacement function now calculates the displacement operator's matrix elements with respect to the Fock basis using the Laguerre polynomials. This provides enhanced numerical stability for larger cutoff values. [(#351)](https://github.com/XanaduAI/thewalrus/pull/351)
-
 ### Bug fixes
 
 * Remove redundant call of `Qmat`, `Amat` from `generate_hafnian_sample`. [(#343)](https://github.com/XanaduAI/thewalrus/pull/343)
