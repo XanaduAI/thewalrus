@@ -46,6 +46,7 @@ from thewalrus._hafnian import (
     get_submatrix_batch_odd0,
 )
 
+
 # pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_even(
@@ -83,7 +84,6 @@ def _calc_loop_hafnian_batch_even(
     H_batch = np.zeros(2 * batch_max + odd_cutoff + 1, dtype=np.complex128)
     # prange to range
     for j in numba.prange(steps):
-
         Hnew = np.zeros(2 * batch_max + odd_cutoff + 1, dtype=np.complex128)
 
         kept_edges = find_kept_edges(j, edge_reps)
@@ -163,7 +163,6 @@ def _calc_loop_hafnian_batch_odd(
 
     H_batch = np.zeros(2 * batch_max + even_cutoff + 2, dtype=np.complex128)
     for j in numba.prange(steps):
-
         Hnew = np.zeros(2 * batch_max + even_cutoff + 2, dtype=np.complex128)
 
         kept_edges = find_kept_edges(j, edge_reps)
