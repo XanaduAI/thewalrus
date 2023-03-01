@@ -47,6 +47,7 @@ from thewalrus._hafnian import (
 )
 from thewalrus.loop_hafnian_batch import add_batch_edges_odd, add_batch_edges_even
 
+
 # pylint: disable = too-many-arguments, not-an-iterable
 @numba.jit(nopython=True, cache=True, parallel=True)
 def _calc_loop_hafnian_batch_gamma_even(
@@ -85,7 +86,6 @@ def _calc_loop_hafnian_batch_gamma_even(
     H_batch = np.zeros((n_D, 2 * batch_max + odd_cutoff + 1), dtype=np.complex128)
 
     for j in prange(steps):
-
         Hnew = np.zeros((n_D, 2 * batch_max + odd_cutoff + 1), dtype=np.complex128)
 
         kept_edges = find_kept_edges(j, edge_reps)
@@ -171,7 +171,6 @@ def _calc_loop_hafnian_batch_gamma_odd(
     H_batch = np.zeros((n_D, 2 * batch_max + even_cutoff + 2), dtype=np.complex128)
     # for j in range(rank, steps, size):
     for j in prange(steps):
-
         Hnew = np.zeros((n_D, 2 * batch_max + even_cutoff + 2), dtype=np.complex128)
 
         kept_edges = find_kept_edges(j, edge_reps)
