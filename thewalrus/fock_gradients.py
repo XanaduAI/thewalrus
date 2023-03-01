@@ -40,15 +40,13 @@ Code details
 ------------
 """
 import numpy as np
-from numba import jit
 
-SQRT = np.sqrt(np.arange(1e6))
+from numba import jit
 
 
 @jit(nopython=True)
 def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
     r"""Calculates the matrix elements of the displacement gate using a recurrence relation.
-    Uses the log of the matrix elements to avoid numerical issues and then takes the exponential.
 
     Args:
         r (float): displacement magnitude
@@ -60,40 +58,18 @@ def displacement(r, phi, cutoff, dtype=np.complex128):  # pragma: no cover
         array[complex]: matrix representing the displacement operation.
     """
     D = np.zeros((cutoff, cutoff), dtype=dtype)
-    rng = np.arange(cutoff)
-    rng[0] = 1
-    log_k_fac = np.cumsum(np.log(rng))
-    for n_minus_m in range(cutoff):
-        m_max = cutoff - n_minus_m
-        logL = np.log(_laguerre(r**2.0, m_max, n_minus_m))
-        for m in range(m_max):
-            n = n_minus_m + m
-            D[n, m] = np.exp(
-                0.5 * (log_k_fac[m] - log_k_fac[n])
-                + n_minus_m * np.log(r)
-                - (r**2.0) / 2.0
-                + 1j * phi * n_minus_m
-                + logL[m]
-            )
-            D[m, n] = (-1.0) ** (n_minus_m) * np.conj(D[n, m])
+    sqrt = np.sqrt(np.arange(cutoff, dtype=dtype))
+    mu = np.array([r * np.exp(1j * phi), -r * np.exp(-1j * phi)])
+
+    D[0, 0] = np.exp(-0.5 * r**2)
+    for m in range(1, cutoff):
+        D[m, 0] = mu[0] / sqrt[m] * D[m - 1, 0]
+
+    for m in range(cutoff):
+        for n in range(1, cutoff):
+            D[m, n] = mu[1] / sqrt[n] * D[m, n - 1] + sqrt[m] / sqrt[n] * D[m - 1, n - 1]
+
     return D
-
-
-@jit(nopython=True, cache=True)
-def _laguerre(x, N, alpha, dtype=np.complex128):  # pragma: no cover
-    r"""Returns the N first generalized Laguerre polynomials evaluated at x.
-
-    Args:
-        x (float): point at which to evaluate the polynomials
-        N (int): maximum Laguerre polynomial to calculate
-        alpha (float): continuous parameter for the generalized Laguerre polynomials
-    """
-    L = np.zeros(N, dtype=dtype)
-    L[0] = 1.0
-    if N > 1:
-        for m in range(0, N - 1):
-            L[m + 1] = ((2 * m + 1 + alpha - x) * L[m] - (m + alpha) * L[m - 1]) / (m + 1)
-    return L
 
 
 @jit(nopython=True)
