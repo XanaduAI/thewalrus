@@ -56,17 +56,19 @@ import dask
 import numpy as np
 from scipy.special import factorial as fac
 
-from ._hafnian import hafnian, reduction
+from thewalrus.loop_hafnian_batch import loop_hafnian_batch
+from thewalrus.loop_hafnian_batch_gamma import loop_hafnian_batch_gamma
+from thewalrus.decompositions import williamson
+
 from ._torontonian import threshold_detection_prob
 from .quantum import (
     Amat,
     Covmat,
-    Qmat,
     gen_Qmat_from_graph,
     is_classical_cov,
-    reduced_gaussian,
-    density_matrix_element,
+    photon_number_mean_vector,
 )
+
 
 __all__ = [
     "generate_hafnian_sample",
@@ -86,84 +88,173 @@ __all__ = [
 # Hafnian sampling
 # ===============================================================================================
 
+
 # pylint: disable=too-many-branches
-def generate_hafnian_sample(
-    cov, mean=None, hbar=2, cutoff=6, max_photons=30, approx=False, approx_samples=1e5
-):  # pylint: disable=too-many-branches
+def decompose_cov(cov):
+    r"""Decompose the convariance matrix using the Williamson decomposition method.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
+
+    Args:
+        cov (array): a :math:`2N\times 2N` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+
+    Return:
+        T (array): Result of S x S.T.
+        sqrtW (array): Result of S x (D-I).
+    """
+    m = cov.shape[0] // 2
+    D, S = williamson(cov)
+    T = S @ S.T
+    DmI = D - np.eye(2 * m)
+    DmI[abs(DmI) < 1e-11] = 0.0  # remove slightly negative values
+    sqrtW = S @ np.sqrt(DmI)
+    return T, sqrtW
+
+
+def mu_to_alpha(mu, hbar=2):
+    r"""Convert displacement into the mean displacement of each mode.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
+
+    Args:
+        mu (array): a :math:`2N` vector of means representing the Gaussian
+            state.
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
+
+    Returns:
+        alpha (array): mean displacement of each mode.
+    """
+    M = len(mu) // 2
+    # mean displacement of each mode
+    alpha = (mu[:M] + 1j * mu[M:]) / np.sqrt(2 * hbar)
+    return alpha
+
+
+def invert_permutation(p):
+    r"""Gives an array with p[0]th position 0, p[1]th position 1m p[2]th position 2 and so on.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
+
+    Args:
+        p (arrary): input vector.
+
+    Returns:
+        s (array): reordered vector.
+
+    """
+    s = np.empty_like(p, dtype=int)
+    s[p] = np.arange(p.size, dtype=int)
+    return s
+
+
+def photon_means_order(mu, cov):
+    r"""Give which mode is which ranking (from 0 to length of vector) according
+    to the number of mean photons of each mode.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
+
+    Args:
+        mu (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
+            state.
+        cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
+            representing an :math:`N` mode quantum state. This can be obtained
+            via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+
+    Returns:
+        order (array): vector telling which mode is which ranking on increasing mean number of photons.
+    """
+    means = photon_number_mean_vector(mu, cov)
+    order = [x for _, x in sorted(zip(means, range(len(means))))]
+    return np.asarray(order)
+
+
+def get_heterodyne_fanout(alpha, fanout):
+    r"""Get the heterodyne fanout using the mean displacement of each modes.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
+
+    Args:
+        alpha (array): mean displacement of each modes.
+        fanout (int): number of channels in which a state is splitted.
+
+    Returns:
+        alpha_fanout (array): mean displacement of each modes with fanout.
+    """
+    M = len(alpha)
+
+    alpha_fanout = np.zeros((M, fanout), dtype=np.complex128)
+    for j in range(M):
+        alpha_j = np.zeros(fanout, dtype=np.complex128)
+        alpha_j[0] = alpha[j]  # put the coherent state in 0th mode
+        alpha_j[1:] = np.random.normal(size=fanout - 1) + 1j * np.random.normal(size=fanout - 1)
+
+        alpha_fanout[j, :] = np.fft.fft(alpha_j, norm="ortho")
+
+    return alpha_fanout
+
+
+# pylint: disable=too-many-branches
+def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
-        mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+        mean (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
             state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        approx (bool): if ``True``, the approximate hafnian algorithm is used.
-            Note that this can only be used for real, non-negative matrices.
-        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
 
     Returns:
         np.array[int]: a photon number sample from the Gaussian states.
     """
-    N = len(cov) // 2
-    result = []
-    prev_prob = 1.0
-    nmodes = N
-    if mean is None:
-        local_mu = np.zeros(2 * N)
-    else:
-        local_mu = mean
 
-    for k in range(nmodes):
-        probs1 = np.zeros([cutoff + 1], dtype=np.float64)
-        kk = np.arange(k + 1)
-        mu_red, V_red = reduced_gaussian(local_mu, cov, kk)
+    mu = mean
+    M = cov.shape[0] // 2
+    if mu is None:
+        mu = np.zeros(2 * M)
 
-        if approx:
-            Q = Qmat(V_red, hbar=hbar)
-            A = Amat(Q, hbar=hbar, cov_is_qmat=True)
+    order = photon_means_order(mu, cov)
+    order_inv = invert_permutation(order)
+    oo = np.concatenate((order, order + M))
 
-        for i in range(cutoff):
-            indices = result + [i]
-            ind2 = indices + indices
-            if approx:
-                factpref = np.prod(fac(indices))
-                mat = reduction(A, ind2)
-                probs1[i] = (
-                    hafnian(np.abs(mat.real), approx=True, num_samples=approx_samples) / factpref
-                )
-            else:
-                probs1[i] = density_matrix_element(
-                    mu_red, V_red, indices, indices, include_prefactor=True, hbar=hbar
-                ).real
+    mu = mu[oo]
+    cov = cov[np.ix_(oo, oo)]
 
-        if approx:
-            probs1 = probs1 / np.sqrt(np.linalg.det(Q).real)
+    T, sqrtW = decompose_cov(cov)
+    chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
+    B = Amat(T)[:M, :M]
+    det_outcomes = np.arange(cutoff + 1)
+    det_pattern = np.zeros(M, dtype=int)
+    pure_mu = mu + sqrtW @ np.random.normal(size=2 * M)
+    pure_alpha = mu_to_alpha(pure_mu, hbar=hbar)
+    heterodyne_mu = pure_mu + chol_T_I @ np.random.normal(size=2 * M)
+    heterodyne_alpha = mu_to_alpha(heterodyne_mu, hbar=hbar)
+    gamma = pure_alpha.conj() + B @ (heterodyne_alpha - pure_alpha)
+    for mode in range(M):
+        m = mode + 1
+        gamma -= heterodyne_alpha[mode] * B[:, mode]
+        lhafs = loop_hafnian_batch(B[:m, :m], gamma[:m], det_pattern[:mode], cutoff)
+        probs = (lhafs * lhafs.conj()).real / fac(det_outcomes)
+        norm_probs = probs.sum()
+        probs /= norm_probs
 
-        probs2 = probs1 / prev_prob
-        probs3 = np.maximum(
-            probs2, np.zeros_like(probs2)
-        )  # pylint: disable=assignment-from-no-return
-        ssum = np.sum(probs3)
-        if ssum < 1.0:
-            probs3[-1] = 1.0 - ssum
+        det_outcome_i = np.random.choice(det_outcomes, p=probs)
+        det_pattern[mode] = det_outcome_i
 
-        # The following normalization of probabilities is needed to prevent np.random.choice error
-        if ssum > 1.0:
-            probs3 = probs3 / ssum
-
-        result.append(np.random.choice(a=range(len(probs3)), p=probs3))
-        if result[-1] == cutoff:
-            return -1
-        if np.sum(result) > max_photons:
-            return -1
-        prev_prob = probs1[result[-1]]
-
-    return result
+    if det_pattern[order_inv][-1] == cutoff:
+        return -1
+    if det_pattern[order_inv].sum() > max_photons:
+        return -1
+    return list(det_pattern[order_inv])
 
 
 def _hafnian_sample(args):
@@ -184,7 +275,7 @@ def _hafnian_sample(args):
             samples (int)
                 the number of samples to return.
 
-            mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+            mean (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
                 state.
 
             hbar (float)
@@ -196,17 +287,11 @@ def _hafnian_sample(args):
             max_photons (int)
                 specifies the maximum number of photons that can be counted.
 
-            approx (bool)
-                if ``True``, the approximate hafnian algorithm is used.
-                Note that this can only be used for real, non-negative matrices.
-
-            approx_samples (int)
-                the number of samples used to approximate the hafnian if ``approx=True``.
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
-    cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples = args
+    cov, samples, mean, hbar, cutoff, max_photons = args
 
     if not isinstance(cov, np.ndarray):
         raise TypeError("Covariance matrix must be a NumPy array.")
@@ -224,13 +309,7 @@ def _hafnian_sample(args):
 
     while j < samples:
         result = generate_hafnian_sample(
-            cov,
-            mean=mean,
-            hbar=hbar,
-            cutoff=cutoff,
-            max_photons=max_photons,
-            approx=approx,
-            approx_samples=approx_samples,
+            cov, mean=mean, hbar=hbar, cutoff=cutoff, max_photons=max_photons
         )
 
         if result != -1:
@@ -248,8 +327,6 @@ def hafnian_sample_state(
     hbar=2,
     cutoff=5,
     max_photons=30,
-    approx=False,
-    approx_samples=1e5,
     parallel=False,
 ):
     r"""Returns samples from the Hafnian of a Gaussian state.
@@ -259,23 +336,19 @@ def hafnian_sample_state(
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
         samples (int): the number of samples to return.
-        mean (array): a :math:`2N`` ``np.float64`` vector of means representing the Gaussian
+        mean (array): a :math:`2N` ``np.float64`` vector of means representing the Gaussian
                 state.
         hbar (float): (default 2) the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
         cutoff (int): the Fock basis truncation.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        approx (bool): if ``True``, the :func:`~.hafnian_approx` function is used
-            to approximate the hafnian. Note that this can only be used for
-            real, non-negative matrices.
-        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
         parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel:
-        params = [[cov, 1, mean, hbar, cutoff, max_photons, approx, approx_samples]] * samples
+        params = [[cov, 1, mean, hbar, cutoff, max_photons]] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_hafnian_sample)(p))
@@ -284,13 +357,11 @@ def hafnian_sample_state(
 
         return np.vstack(results)
 
-    params = [cov, samples, mean, hbar, cutoff, max_photons, approx, approx_samples]
+    params = [cov, samples, mean, hbar, cutoff, max_photons]
     return _hafnian_sample(params)
 
 
-def hafnian_sample_graph(
-    A, n_mean, samples=1, cutoff=5, max_photons=30, approx=False, approx_samples=1e5, parallel=False
-):
+def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, parallel=False):
     r"""Returns samples from the Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -300,9 +371,6 @@ def hafnian_sample_graph(
         samples (int): the number of samples to return.
         cutoff (int): the Fock basis truncation.
         max_photons (int): specifies the maximum number of photons that can be counted.
-        approx (bool): if ``True``, the approximate hafnian algorithm is used.
-            Note that this can only be used for real, non-negative matrices.
-        approx_samples: the number of samples used to approximate the hafnian if ``approx=True``.
         parallel (bool): if ``True``, uses ``dask`` for parallelization of samples
 
     Returns:
@@ -317,8 +385,6 @@ def hafnian_sample_graph(
         hbar=2,
         cutoff=cutoff,
         max_photons=max_photons,
-        approx=approx,
-        approx_samples=approx_samples,
         parallel=parallel,
     )
 
@@ -328,8 +394,10 @@ def hafnian_sample_graph(
 # ===============================================================================================
 
 
-def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
+def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1):
     r"""Returns a single sample from the Hafnian of a Gaussian state.
+    Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
+    `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
 
     Args:
         cov (array): a :math:`2N\times 2N` ``np.float64`` covariance matrix
@@ -345,42 +413,62 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30):
     Returns:
         np.array[int]: a threshold sample from the Gaussian state.
     """
-    results = []
-    n1, n2 = cov.shape
 
+    M = cov.shape[0] // 2
     if mu is None:
-        mu = np.zeros(n1, dtype=np.float64)
+        mu = np.zeros(2 * M)
+    order = photon_means_order(mu, cov)
+    order_inv = invert_permutation(order)
+    oo = np.concatenate((order, order + M))
 
-    if n1 != n2:
-        raise ValueError("Covariance matrix must be square.")
+    mu = mu[oo]
+    cov = cov[np.ix_(oo, oo)]
+    T, sqrtW = decompose_cov(cov)
+    chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
+    B = Amat(T)[:M, :M] / fanout
 
-    nmodes = n1 // 2
-    prev_prob = 1.0
+    det_outcomes = np.arange(cutoff + 1)
 
-    for k in range(nmodes):
-        probs = np.zeros([2], dtype=np.float64)
-        kk = np.arange(k + 1)
-        mu_red, V_red = reduced_gaussian(mu, cov, kk)
+    det_pattern = np.zeros(M, dtype=int)
+    click_pattern = np.zeros(M, dtype=np.int8)
+    fanout_clicks = np.zeros(M, dtype=int)
 
-        indices0 = results + [0]
-        probs[0] = threshold_detection_prob(mu_red, V_red, indices0, hbar=hbar)
+    pure_mu = mu + sqrtW @ np.random.normal(size=2 * M)
+    pure_alpha = mu_to_alpha(pure_mu, hbar=hbar)
+    het_mu = pure_mu + chol_T_I @ np.random.normal(size=2 * M)
+    het_alpha = mu_to_alpha(het_mu, hbar=hbar)
 
-        indices1 = results + [1]
-        probs[1] = threshold_detection_prob(mu_red, V_red, indices1, hbar=hbar)
+    het_alpha_fanout = get_heterodyne_fanout(het_alpha, fanout)
+    het_alpha_sum = het_alpha_fanout.sum(axis=1)
 
-        probs = np.real_if_close(probs)
-        probs = np.maximum(probs, 0)
-        local_p = probs / prev_prob
-        local_p /= np.sum(local_p)
-        result = np.random.choice(range(2), p=local_p)
+    gamma = pure_alpha.conj() / np.sqrt(fanout) + B @ (het_alpha_sum - np.sqrt(fanout) * pure_alpha)
+    gamma_fanout = np.zeros((fanout, M), dtype=np.complex128)
 
-        results.append(result)
-        prev_prob = probs[result]
+    for mode in range(M):
+        gamma_fanout[0, :] = gamma - het_alpha_fanout[mode, 0] * B[:, mode]
+        for k in range(1, fanout):
+            gamma_fanout[k, :] = gamma_fanout[k - 1, :] - het_alpha_fanout[mode, k] * B[:, mode]
+        lhafs = loop_hafnian_batch_gamma(
+            B[: mode + 1, : mode + 1],
+            gamma_fanout[:, : mode + 1],
+            det_pattern[:mode],
+            cutoff,
+        )
+        probs = (lhafs * lhafs.conj()).real / fac(det_outcomes)
 
-        if np.sum(results) > max_photons:
+        for k in range(fanout):
+            gamma = gamma_fanout[k, :]
+            probs_k = probs[k, :] / probs[k, :].sum()
+            det_outcome = np.random.choice(det_outcomes, p=probs_k)
+            det_pattern[mode] += det_outcome
+            if det_outcome > 0:
+                click_pattern[mode] = 1
+                fanout_clicks[mode] = k
+                break
+        if sum(click_pattern[order_inv]) > max_photons:
             return -1
 
-    return results
+    return list(click_pattern[order_inv])
 
 
 def _torontonian_sample(args):
@@ -416,7 +504,7 @@ def _torontonian_sample(args):
     Returns:
         np.array[int]:  threshold samples from the Gaussian state.
     """
-    cov, samples, mu, hbar, max_photons = args
+    cov, samples, mu, hbar, max_photons, fanout, cutoff = args
 
     if not isinstance(cov, np.ndarray):
         raise TypeError("Covariance matrix must be a NumPy array.")
@@ -433,7 +521,9 @@ def _torontonian_sample(args):
     j = 0
 
     while j < samples:
-        result = generate_torontonian_sample(cov, mu, hbar=hbar, max_photons=max_photons)
+        result = generate_torontonian_sample(
+            cov, mu, hbar=hbar, max_photons=max_photons, fanout=fanout, cutoff=cutoff
+        )
         if result != -1:
             samples_array.append(result)
             j = j + 1
@@ -441,7 +531,9 @@ def _torontonian_sample(args):
     return np.vstack(samples_array)
 
 
-def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, parallel=False):
+def torontonian_sample_state(
+    cov, samples, mu=None, hbar=2, max_photons=30, fanout=10, cutoff=1, parallel=False
+):
     r"""Returns samples from the Torontonian of a Gaussian state
 
     Args:
@@ -469,7 +561,7 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
         mu = np.zeros(2 * M, dtype=np.float64)
 
     if parallel:
-        params = [[cov, 1, mu, hbar, max_photons]] * samples
+        params = [[cov, 1, mu, hbar, max_photons, fanout, cutoff]] * samples
         compute_list = []
         for p in params:
             compute_list.append(dask.delayed(_torontonian_sample)(p))
@@ -478,11 +570,13 @@ def torontonian_sample_state(cov, samples, mu=None, hbar=2, max_photons=30, para
 
         return np.vstack(results)
 
-    params = [cov, samples, mu, hbar, max_photons]
+    params = [cov, samples, mu, hbar, max_photons, fanout, cutoff]
     return _torontonian_sample(params)
 
 
-def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=False):
+def torontonian_sample_graph(
+    A, n_mean, samples=1, max_photons=30, fanout=10, cutoff=1, parallel=False
+):
     r"""Returns samples from the Torontonian of a Gaussian state specified by the adjacency matrix :math:`A`
     and with total mean photon number :math:`n_{mean}`
 
@@ -499,7 +593,13 @@ def torontonian_sample_graph(A, n_mean, samples=1, max_photons=30, parallel=Fals
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return torontonian_sample_state(
-        cov, samples, hbar=2, max_photons=max_photons, parallel=parallel
+        cov,
+        samples,
+        hbar=2,
+        max_photons=max_photons,
+        fanout=fanout,
+        cutoff=cutoff,
+        parallel=parallel,
     )
 
 
@@ -556,7 +656,9 @@ def torontonian_sample_classical_state(cov, samples, mean=None, hbar=2, atol=1e-
         np.array[int]: threshold samples from the Gaussian state with covariance cov and vector means mean.
     """
     return np.where(
-        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0, 1, 0
+        hafnian_sample_classical_state(cov, samples, mean=mean, hbar=hbar, atol=atol) > 0,
+        1,
+        0,
     )
 
 

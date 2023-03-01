@@ -238,7 +238,6 @@ class TestHafnianSampling:
         in the special case of a graph with one single perfect matching
         """
         n = 10  # size of the graph
-        approx_samples = 1000  # number of samples in the hafnian approximation
         A = np.eye(n)[::-1]
         n_mean = 2
         nr_samples = 10
@@ -246,8 +245,6 @@ class TestHafnianSampling:
             A,
             n_mean,
             cutoff=5,
-            approx=True,
-            approx_samples=approx_samples,
             samples=nr_samples,
             parallel=parallel,
         )
@@ -265,7 +262,6 @@ class TestHafnianSampling:
         """Tests that the probability of zero photons is correct"""
 
         n = 4  # n is the size of the graph
-        approx_samples = 1000  # number of samples in the hafnian approximation
         A = np.random.binomial(1, 0.5, (n, n))
 
         A = np.triu(A)
@@ -275,9 +271,7 @@ class TestHafnianSampling:
         prob0 = np.abs(1 / (np.sqrt(np.linalg.det(Q))))
 
         nr_samples = 100
-        samples = hafnian_sample_graph(
-            A, n_mean, cutoff=5, approx=True, approx_samples=approx_samples, samples=nr_samples
-        )
+        samples = hafnian_sample_graph(A, n_mean, cutoff=5, samples=nr_samples)
         nr_zeros = 0
 
         for i in range(nr_samples):
