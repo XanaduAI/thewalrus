@@ -441,7 +441,6 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
     H = np.complex128(0)  # start running total for the hafnian
 
     for j in numba.prange(steps):
-
         kept_edges = find_kept_edges(j, edge_reps)
         edge_sum = kept_edges.sum()
 
@@ -545,7 +544,6 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
     H = np.complex128(0)  # Start running total for the hafnian
 
     for j in numba.prange(steps):
-
         kept_edges = find_kept_edges(j, edge_reps)
         edge_sum = kept_edges.sum()
 
