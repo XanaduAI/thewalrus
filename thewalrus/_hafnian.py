@@ -967,11 +967,9 @@ def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
         for D in ps:
             if lower_end + D not in loop_haf:
                 loop_haf[lower_end + D] = sum(
-                    [
-                        A[i - 1, t - 1]
-                        * loop_haf[tuple(item for item in lower_end + D if item not in set((i, t)))]
-                        for i in D
-                    ]
+                    A[i - 1, t - 1]
+                    * loop_haf[tuple(item for item in lower_end + D if item not in set((i, t)))]
+                    for i in D
                 )
 
     return loop_haf[tuple(range(1, n + 1))]
