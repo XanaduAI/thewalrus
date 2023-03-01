@@ -61,6 +61,7 @@ from thewalrus.internal_modes.prepare_cov import (
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
 
+
 ### Nico's code for combinatorial approach for distinguishable calculations ###
 def vacuum_prob_distinguishable(rs, T):
     """Calculates the vacuum probability when distinguishable squeezed states go into an interferometer.
@@ -116,6 +117,7 @@ def generate_origins_unpaired(keys, num_pairs):
 ####################################################################
 # Mikhail's magic OOP way of dealing with boxes and coloured balls #
 ####################################################################
+
 
 # pylint: disable=too-few-public-methods
 class Box:
