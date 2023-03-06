@@ -1,4 +1,4 @@
-# Release 0.20.0-dev
+# Release 0.20.0
 
 ### New features
 
@@ -11,7 +11,7 @@
 ### Improvements
 
 * Added function to extend single mode symplectic to act on multiple modes. [(#347)](https://github.com/XanaduAI/thewalrus/pull/347)
-* Added function to compute grouped (total) click probabilities for GBS setups using threshold detectors. The function uses the positive P-distribution simulation method of [Drummond et al.](https://arxiv.org/pdf/2102.10341.pdf) [(#348)](https://github.com/XanaduAI/thewalrus/pull/348)
+* Added function to compute grouped (total) click probabilities for GBS setups using threshold detectors. The function uses the positive P-distribution simulation method of [Drummond et al.](https://arxiv.org/pdf/2102.10341.pdf). [(#348)](https://github.com/XanaduAI/thewalrus/pull/348)
 
 ### Bug fixes
 
