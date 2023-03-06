@@ -62,6 +62,10 @@
 
 * [Fabian Laudenbach](https://github.com/fab1an-q) (Xanadu) - :revolving_hearts: Entangler of hearts
 
+* [Martin Houde](https://github.com/MHoude2) (Polytechnique Montréal) - :upside_down: Minister of amplification
+
+* [Javier Martínez](https://github.com/ajmartinezc) (Polytechnique Montréal) - 😧 Lord of uncertainty
+
 * [Martin Houde](https://github.com/MHoude2) (Polytechnique Montréal) - 🙃 Minister of amplification
 
 * Will McCutcheon (Heriot-Watt University) - 🧅 Gaussian Onion Merchant
