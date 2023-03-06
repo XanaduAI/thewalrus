@@ -2,7 +2,7 @@
 
 ### New features
 
-* Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#343)](https://github.com/XanaduAI/thewalrus/pull/338)
+* Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#338)](https://github.com/XanaduAI/thewalrus/pull/338)
 
 * New function to produce Bloch-Messiah decomposition of symplectic matrices. [(#352)](https://github.com/XanaduAI/thewalrus/pull/352)
 
