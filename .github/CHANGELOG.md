@@ -1,8 +1,26 @@
-# Release 0.20.0-dev
+# Release 0.21.0-dev
 
 ### New features
 
-* Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#343)](https://github.com/XanaduAI/thewalrus/pull/338)
+### Breaking changes
+
+### Improvements
+
+### Bug fixes
+
+### Documentation
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+---
+
+# Release 0.20.0
+
+### New features
+
+* Implementation of gaussian boson sampling and gaussian boson sampling with threshold detectors. [(#338)](https://github.com/XanaduAI/thewalrus/pull/338)
 
 * New function to produce Bloch-Messiah decomposition of symplectic matrices. [(#352)](https://github.com/XanaduAI/thewalrus/pull/352)
 
@@ -11,7 +29,7 @@
 ### Improvements
 
 * Added function to extend single mode symplectic to act on multiple modes. [(#347)](https://github.com/XanaduAI/thewalrus/pull/347)
-* Added function to compute grouped (total) click probabilities for GBS setups using threshold detectors. The function uses the positive P-distribution simulation method of [Drummond et al.](https://arxiv.org/pdf/2102.10341.pdf) [(#348)](https://github.com/XanaduAI/thewalrus/pull/348)
+* Added function to compute grouped (total) click probabilities for GBS setups using threshold detectors. The function uses the positive P-distribution simulation method of [Drummond et al.](https://arxiv.org/pdf/2102.10341.pdf). [(#348)](https://github.com/XanaduAI/thewalrus/pull/348)
 
 ### Bug fixes
 
