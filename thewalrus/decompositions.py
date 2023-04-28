@@ -125,9 +125,9 @@ def blochmessiah(S):
         S (array[float]): 2N x 2N real symplectic matrix
 
     Returns:
-        tupple(array[float],  : orthogonal symplectic matrix uff
-               array[float],  : diagional matrix dff
-               array[float])  : orthogonal symplectic matrix vff
+        tuple(array[float],  : orthogonal symplectic matrix uff
+              array[float],  : diagonal matrix dff
+              array[float])  : orthogonal symplectic matrix vff
     """
 
     N, _ = S.shape
