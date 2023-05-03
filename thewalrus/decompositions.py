@@ -195,7 +195,7 @@ def takagi(A, svd_order=True):
     A = 0.5 * (A + A.T)
 
     u, d, v = np.linalg.svd(A)
-    U = u * np.sqrt(np.diag(v @ np.conjugate(u)))
+    U = u * np.sqrt(0j + np.diag(v @ np.conjugate(u)))
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U

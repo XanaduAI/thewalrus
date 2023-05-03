@@ -1,4 +1,4 @@
-# Copyright 2019 Xanadu Quantum Technologies Inc.
+# Copyright 2023 Xanadu Quantum Technologies Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import williamson, blochmessiah
+from thewalrus.decompositions import williamson, blochmessiah, takagi
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -253,3 +253,32 @@ class TestBlochMessiahDecomposition:
         assert np.allclose(O1.T @ O @ O1, O, atol=tol, rtol=0)
         assert np.allclose(O2.T @ O @ O2, O, atol=tol, rtol=0)
         assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
+
+
+
+@pytest.mark.parametrize("n", [5, 10, 50])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_takagi(n, datatype, svd_order):
+    """Checks the correctness of the Takagi decomposition function"""
+    if datatype is np.complex128:
+        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    if datatype is np.float64:
+        A = np.random.rand(n, n)
+    A += A.T
+    r, U = takagi(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.all(r >= 0)
+    if svd_order is True:
+        assert np.all(np.diff(r) <= 0)
+    else:
+        assert np.all(np.diff(r) >= 0)
+
+
+def test_takagi_error():
+    """Tests the value errors of Takagi"""
+    n = 10
+    m = 11
+    A = np.random.rand(n, m)
+    with pytest.raises(ValueError, match="The input matrix is not square"):
+        takagi(A)
