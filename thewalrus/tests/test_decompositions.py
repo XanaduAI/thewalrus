@@ -273,6 +273,33 @@ def test_takagi(n, datatype, svd_order):
     else:
         assert np.all(np.diff(r) >= 0)
 
+@pytest.mark.parametrize("n", [5, 10, 50])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_degenerate(n, datatype, svd_order):
+    """Tests Takagi produces the correct result for very degenerate cases"""
+    nhalf = n//2
+    diags = [np.random.rand()]*nhalf + [np.random.rand()]*(n-nhalf)
+    U = haar_measure(n)
+    A = U @ np.diag(diags) @ U.T
+    r, U = takagi(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.all(r >= 0)
+    if svd_order is True:
+        assert np.all(np.diff(r) <= 0)
+    else:
+        assert np.all(np.diff(r) >= 0)
+
+
+def test_zeros():
+    """Verify that the Takagi decomposition returns a zero vector and identity matrix when
+    input a matrix of zeros"""
+    dim = 4
+    a = np.zeros((dim, dim))
+    rl, U = takagi(a)
+    assert np.allclose(rl, np.zeros(dim))
+    assert np.allclose(U, np.eye(dim))
+
 
 def test_takagi_error():
     """Tests the value errors of Takagi"""
