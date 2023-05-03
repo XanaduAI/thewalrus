@@ -172,3 +172,29 @@ def blochmessiah(S):
     vff = np.real_if_close(vff)
     uff = np.real_if_close(uff)
     return uff, dff, vff
+
+
+def takagi(A, svd_order=True):
+    r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
+    Note that the input matrix is internally symmetrized. If the input matrix is indeed symmetric this leaves it unchanged.
+
+    Args:
+        A (array): square, symmetric matrix
+        svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or ascending (``False``) order.
+
+    Returns:
+        tuple[array, array]: (r, U), where r are the singular values,
+        and U is the Autonne-Takagi unitary, such that :math:`A = U \diag(r) U^T`.
+    """
+
+    n, m = A.shape
+    if n != m:
+        raise ValueError("The input matrix is not square")
+    # Here we force symmetrize the matrix
+    A = 0.5 * (A + A.T)
+
+    u, d, v = np.linalg.svd(A)
+    U = u * np.sqrt(np.diag(v @ np.conjugate(u)))
+    if svd_order is False:
+        return d[::-1], U[:, ::-1]
+    return d, U
