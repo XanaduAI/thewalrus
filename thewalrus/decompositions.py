@@ -177,6 +177,7 @@ def blochmessiah(S):
 def takagi(A, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized. If the input matrix is indeed symmetric this leaves it unchanged.
+    See `Carl Caves note. <http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf>`_
 
     Args:
         A (array): square, symmetric matrix
