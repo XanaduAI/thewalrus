@@ -255,7 +255,6 @@ class TestBlochMessiahDecomposition:
         assert np.allclose(S @ O @ S.T, O, atol=tol, rtol=0)
 
 
-
 @pytest.mark.parametrize("n", [5, 10, 50])
 @pytest.mark.parametrize("datatype", [np.complex128, np.float64])
 @pytest.mark.parametrize("svd_order", [True, False])
