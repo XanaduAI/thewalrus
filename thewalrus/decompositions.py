@@ -148,16 +148,11 @@ def blochmessiah(S):
     alpha = Unitary[0 : N // 2, 0 : N // 2]
     beta = Sig[0 : N // 2, N // 2 : N]
     # Bloch-Messiah in this Basis
-    u2, d2, v2 = np.linalg.svd(beta)
+    d2, takagibeta = takagi(beta)
     sval = np.arcsinh(d2)
-    takagibeta = u2 @ sqrtm(np.conjugate(u2).T @ (v2.T))
-    uf = np.block([[takagibeta, 0 * takagibeta], [0 * takagibeta, np.conjugate(takagibeta)]])
-    vf = np.block(
-        [
-            [np.conjugate(takagibeta).T @ alpha, 0 * takagibeta],
-            [0 * takagibeta, np.conjugate(np.conjugate(takagibeta).T @ alpha)],
-        ]
-    )
+    uf = block_diag(takagibeta, takagibeta.conj())
+    blc = np.conjugate(takagibeta).T @ alpha
+    vf = block_diag(blc, blc.conj())
     df = np.block(
         [
             [np.diag(np.cosh(sval)), np.diag(np.sinh(sval))],
