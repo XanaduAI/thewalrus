@@ -278,7 +278,7 @@ def test_takagi(n, datatype, svd_order):
 @pytest.mark.parametrize("datatype", [np.complex128, np.float64])
 @pytest.mark.parametrize("svd_order", [True, False])
 @pytest.mark.parametrize("half_rank", [0, 1])
-@pytest.mark.parametrize("phase", 0, 1)
+@pytest.mark.parametrize("phase", [0, 1])
 def test_degenerate(n, datatype, svd_order, half_rank, phase):
     """Tests Takagi produces the correct result for very degenerate cases"""
     nhalf = n // 2
