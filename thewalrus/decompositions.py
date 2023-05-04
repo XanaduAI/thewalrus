@@ -189,9 +189,45 @@ def takagi(A, svd_order=True):
     # Here we force symmetrize the matrix
     A = 0.5 * (A + A.T)
 
+    A = np.real_if_close(A)
+
+    if np.allclose(A, 0):
+        return np.zeros(n), np.eye(n)
+
+    if np.isrealobj(A):
+        # If the matrix A is real one can be more clever and use its eigendecomposition
+        ls, U = np.linalg.eigh(A)
+        U = U / np.exp(1j * np.angle(U)[0])
+        vals = np.abs(ls)  # These are the Takagi eigenvalues
+        phases = -np.ones(vals.shape[0], dtype=np.complex128)
+        for j, l in enumerate(ls):
+            if np.allclose(l, 0) or l > 0:
+                phases[j] = 1
+        phases = np.sqrt(phases)
+        Uc = U @ np.diag(phases)  # One needs to readjust the phases
+        signs = np.sign(Uc.real)[0]
+        for k, s in enumerate(signs):
+            if np.allclose(s, 0):
+                signs[k] = 1
+        Uc = np.real_if_close(Uc / signs)
+        list_vals = [(vals[i], i) for i in range(len(vals))]
+        # And also rearrange the unitary and values so that they are decreasingly ordered
+        list_vals.sort(reverse=svd_order)
+        sorted_ls, permutation = zip(*list_vals)
+        return np.array(sorted_ls), Uc[:, np.array(permutation)]
+
+    phi = np.angle(A[0, 0])
+    Amr = np.real_if_close(np.exp(-1j * phi) * A)
+    if np.isrealobj(Amr):
+        vals, U = takagi(Amr, rtol=rtol, atol=atol, rounding=rounding, svd_order=svd_order)
+        return vals, U * np.exp(1j * phi / 2)
+
     u, d, v = np.linalg.svd(A)
-    U = sqrtm(v @ np.conjugate(u)).T
-    #U = u * np.sqrt(0j + np.diag(v @ np.conjugate(u)))
+    U = u @ sqrtm((v @ np.conjugate(u)).T)
+    # The line above could be simplifed to the line below if the product v @ np.conjugate(u) is diagonal
+    # Which it should be according to Caves http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf
+    # U = u * np.sqrt(0j + np.diag(v @ np.conjugate(u)))
+    # This however breaks test_degenerate
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U

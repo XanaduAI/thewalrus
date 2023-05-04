@@ -273,17 +273,20 @@ def test_takagi(n, datatype, svd_order):
     else:
         assert np.all(np.diff(r) >= 0)
 
+
 @pytest.mark.parametrize("n", [5, 10, 50])
 @pytest.mark.parametrize("datatype", [np.complex128, np.float64])
 @pytest.mark.parametrize("svd_order", [True, False])
-def test_degenerate(n, datatype, svd_order):
+@pytest.mark.parametrize("half_rank", [0, 1])
+def test_degenerate(n, datatype, svd_order, half_rank):
     """Tests Takagi produces the correct result for very degenerate cases"""
-    nhalf = n//2
-    diags = [np.random.rand()]*nhalf + [np.random.rand()]*(n-nhalf)
+    nhalf = n // 2
+    diags = [half_rank * np.random.rand()] * nhalf + [np.random.rand()] * (n - nhalf)
     U = haar_measure(n)
     A = U @ np.diag(diags) @ U.T
     r, U = takagi(A, svd_order=svd_order)
     assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.allclose(U @ U.T.conj(), np.eye(n))
     assert np.all(r >= 0)
     if svd_order is True:
         assert np.all(np.diff(r) <= 0)
@@ -308,3 +311,82 @@ def test_takagi_error():
     A = np.random.rand(n, m)
     with pytest.raises(ValueError, match="The input matrix is not square"):
         takagi(A)
+
+
+def test_real_degenerate():
+    """Verify that the Takagi decomposition returns a matrix that is unitary and results in a
+    correct decomposition when input a real but highly degenerate matrix. This test uses the
+    adjacency matrix of a balanced tree graph."""
+
+    vals = [
+        1,
+        2,
+        31,
+        34,
+        35,
+        62,
+        67,
+        68,
+        94,
+        100,
+        101,
+        125,
+        133,
+        134,
+        157,
+        166,
+        167,
+        188,
+        199,
+        200,
+        220,
+        232,
+        233,
+        251,
+        265,
+        266,
+        283,
+        298,
+        299,
+        314,
+        331,
+        332,
+        346,
+        364,
+        365,
+        377,
+        397,
+        398,
+        409,
+        430,
+        431,
+        440,
+        463,
+        464,
+        472,
+        503,
+        535,
+        566,
+        598,
+        629,
+        661,
+        692,
+        724,
+        755,
+        787,
+        818,
+        850,
+        881,
+        913,
+        944,
+    ]
+    mat = np.zeros([31 * 31])
+    mat[vals] = 1
+    mat = mat.reshape(31, 31)
+    # The lines above are equivalent to:
+    # import networkx as nx
+    # g = nx.balanced_tree(2, 4)
+    # a = nx.to_numpy_array(g)
+    rl, U = takagi(mat)
+    assert np.allclose(U @ U.conj().T, np.eye(len(mat)))
+    assert np.allclose(U @ np.diag(rl) @ U.T, mat)
