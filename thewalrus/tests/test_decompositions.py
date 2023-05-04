@@ -282,7 +282,10 @@ def test_degenerate(n, datatype, svd_order, half_rank):
     """Tests Takagi produces the correct result for very degenerate cases"""
     nhalf = n // 2
     diags = [half_rank * np.random.rand()] * nhalf + [np.random.rand()] * (n - nhalf)
-    U = haar_measure(n)
+    if datatype is np.complex128:
+        U = haar_measure(n)
+    if datatype is np.float64:
+        U = haar_measure(n, real=True)
     A = U @ np.diag(diags) @ U.T
     r, U = takagi(A, svd_order=svd_order)
     assert np.allclose(A, U @ np.diag(r) @ U.T)
