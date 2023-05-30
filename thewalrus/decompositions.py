@@ -26,7 +26,6 @@ Summary
 -------
 
 .. autosummary::
-    autonne
     blochmessiah
     symplectic_eigenvals
     takagi
