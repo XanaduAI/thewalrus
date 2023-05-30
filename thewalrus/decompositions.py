@@ -105,7 +105,6 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     return Db, np.linalg.inv(S).T
 
 
-
 def symplectic_eigenvals(cov):
     r"""Returns the symplectic eigenvalues of a covariance matrix.
 
@@ -235,4 +234,3 @@ def takagi(A, svd_order=True):
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
-
