@@ -35,7 +35,7 @@ Code details
 """
 import numpy as np
 
-from scipy.linalg import sqrtm, schur
+from scipy.linalg import block_diag, sqrtm, schur
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
