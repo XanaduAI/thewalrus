@@ -70,9 +70,8 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     omega = sympmat(n)
     vals = np.linalg.eigvalsh(V)
 
-    for val in vals:
-        if val <= 0:
-            raise ValueError("Input matrix is not positive definite")
+    if not np.all(vals > 0):
+        raise ValueError("Input matrix is not positive definite")
 
     Mm12 = sqrtm(np.linalg.inv(V)).real
     r1 = Mm12 @ omega @ Mm12
