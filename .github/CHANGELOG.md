@@ -6,6 +6,8 @@
 
 ### Improvements
 
+* Tighten power-trace bound of odd loop Hafnian. [(#362)](https://github.com/XanaduAI/thewalrus/pull/362)
+
 ### Bug fixes
 
 ### Documentation
