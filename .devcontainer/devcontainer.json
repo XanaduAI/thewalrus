@@ -10,6 +10,7 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"ms-python.pylint",
+				"ms-toolsai.jupyter",
 				"eamodio.gitlens",
 				"GitHub.vscode-pull-request-github",
 				"mutantdino.resourcemonitor",
