@@ -80,7 +80,7 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     # only positive elements above the diagonal
     # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus a permutation perm2 is used
     # to go to the ordering x_1, ..., x_n, p_1, ... , p_n
-    perm1 = np.array(range(2 * n))
+    perm1 = np.arange(2 * n)
     for i in range(n):
         if s1[2 * i, 2 * i + 1] <= 0:
             (perm1[2 * i], perm1[2 * i + 1]) = (perm1[2 * i + 1], perm1[2 * i])
