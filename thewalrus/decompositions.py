@@ -85,11 +85,9 @@ def williamson(V, rtol=1e-05, atol=1e-08):
         if s1[2 * i, 2 * i + 1] <= 0:
             (perm1[2 * i], perm1[2 * i + 1]) = (perm1[2 * i + 1], perm1[2 * i])
 
-    perm2 = np.array([2 * i for i in range(n)] + [2 * i + 1 for i in range(n)])
+    perm2 = np.array([perm1[2 * i] for i in range(n)] + [perm1[2 * i + 1] for i in range(n)])
 
-    Kt = K[:, perm1]
-
-    Ktt = Kt[:, perm2]
+    Ktt = K[:, perm2]
     s1t = s1[:, perm1][perm1]
 
     dd = np.array([1 / s1t[2 * i, 2 * i + 1] for i in range(n)])
@@ -220,11 +218,10 @@ def takagi(A, svd_order=True):
         return vals, U * np.exp(1j * phi / 2)
 
     u, d, v = np.linalg.svd(A)
-    #U = u @ sqrtm((v @ np.conjugate(u)).T)
+    U = u @ sqrtm((v @ np.conjugate(u)).T)
     # The line above could be simplifed to the line below if the product v @ np.conjugate(u) is diagonal
     # Which it should be according to Caves http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf
     # U = u * np.sqrt(0j + np.diag(np.conjugate(u) @ v))
-    U = u @ sqrtm(np.diag(v @ np.conjugate(u)).T)
     # This however breaks test_degenerate
     if svd_order is False:
         return d[::-1], U[:, ::-1]
