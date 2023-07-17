@@ -107,8 +107,8 @@ def symplectic_eigenvals(cov):
         (array): symplectic eigenvalues
     """
     M = int(len(cov) / 2)
-    D, _ = williamson(cov)
-    return np.diag(D)[:M]
+    Omega = sympmat(M)
+    return np.real_if_close(-1j * np.linalg.eigvals(Omega @ cov))[::2]
 
 
 def blochmessiah(S):
