@@ -2,11 +2,18 @@
 
 ### New features
 
+* Adds the Takagi decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/338)
+
 ### Breaking changes
 
 ### Improvements
 
+
 * Tighten power-trace bound of odd loop Hafnian. [(#362)](https://github.com/XanaduAI/thewalrus/pull/362)
+
+* Simplifies the internal working of Bloch-Messiah decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/338). 
+
+* Simplifies the internal working of Williamson decomposition [(#366)](https://github.com/XanaduAI/thewalrus/pull/338). 
 
 ### Bug fixes
 
@@ -14,7 +21,9 @@
 
 ### Contributors
 
-This release contains contributions from (in alphabetical order):
+This release contains contributions from (in alphabetical order): 
+
+Gregory Morse, Nicolas Quesada
 
 ---
 
