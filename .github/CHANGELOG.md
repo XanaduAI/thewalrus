@@ -8,6 +8,9 @@
 
 ### Improvements
 
+
+* Tighten power-trace bound of odd loop Hafnian. [(#362)](https://github.com/XanaduAI/thewalrus/pull/362)
+
 * Simplifies the internal working of Bloch-Messiah decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/338). 
 
 * Simplifies the internal working of Williamson decomposition [(#366)](https://github.com/XanaduAI/thewalrus/pull/338). 
@@ -20,7 +23,7 @@
 
 This release contains contributions from (in alphabetical order): 
 
-Nicolas Quesada
+Gregory Morse, Nicolas Quesada
 
 ---
 
