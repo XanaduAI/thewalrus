@@ -264,7 +264,7 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
     count = 0
     comb = np.zeros((2, n + 1), dtype=np.complex128)
     comb[0, 0] = 1
-    powtrace = charpoly.powertrace(AX, n + 1)
+    powtrace = charpoly.powertrace(AX, n // 2 + 1)
     for i in range(1, n + 1):
         if i == 1:
             factor = oddloop
