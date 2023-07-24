@@ -27,7 +27,11 @@ from thewalrus.symplectic import passive_transformation
 from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix, f_from_matrix, get_AX_S
 from ..charpoly import powertrace
 
-from .utils import spatial_reps_to_schmidt_reps, spatial_modes_to_schmidt_modes, project_onto_local_oscillator
+from .utils import (
+    spatial_reps_to_schmidt_reps,
+    spatial_modes_to_schmidt_modes,
+    project_onto_local_oscillator,
+)
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
@@ -134,6 +138,7 @@ def finite_difference_operator_coeffs(der_order, m, u=None, v=None):
     val = v + m * (u - v)
     return prefac, val
 
+
 def haf_blocked(A, blocks, repeats):
     """Wrapper function for _haf_blocked_numba which calculate blocked hafnian associated with photon number probabilities.
 
@@ -182,8 +187,6 @@ def _haf_blocked_numba(A, blocks, repeats_p):
     return netsum
 
 
-
-
 def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
     """
     calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
@@ -228,14 +231,16 @@ def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cu
 
     A = Amat(cov)
     Q = Qmat(cov)
-    fact = 1/np.sqrt(np.linalg.det(Q).real)
-    blocks = np.arange(K*M).reshape([M,K])
+    fact = 1 / np.sqrt(np.linalg.det(Q).real)
+    blocks = np.arange(K * M).reshape([M, K])
     probs = np.zeros([cutoff])
-    patt = [pattern[i] for i in range(1,1+len(pattern))]
+    patt = [pattern[i] for i in range(1, 1 + len(pattern))]
     for i in range(cutoff):
-        patt_long = [i]+patt
-        probs[i] = fact * np.real(haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(fac(patt_long)))
+        patt_long = [i] + patt
+        probs[i] = fact * np.real(
+            haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(fac(patt_long))
+        )
 
     if normalize:
-        probs = probs/np.sum(probs)
+        probs = probs / np.sum(probs)
     return probs

@@ -106,8 +106,6 @@ def nb_block(X):  # pragma: no cover
     return np.concatenate((xtmp1, xtmp2), axis=0)
 
 
-
-
 @numba.jit(nopython=True, parallel=True, cache=True)
 def project_onto_local_oscillator(cov, M, LO_overlap=None, hbar=2):
     """Projects a given covariance matrix into the relevant internal mode in the first external mode.
