@@ -50,11 +50,7 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import (
-    pnr_prob,
-    density_matrix_single_mode,
-    probabilities_single_mode
-)
+from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode, probabilities_single_mode
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -1133,6 +1129,7 @@ def test_LO_overlaps(r, S, phi):
         np.array([np.inner(LO_shape.conj(), chis[j]) for j in range(len(chis))]),
     )
 
+
 @pytest.mark.parametrize("nh", [1, 2, 3, 4])
 def test_mixed_heralded_photon(nh):
     """test code for generating heralded fock states from squeezed states with 2 internal modes"""
@@ -1141,7 +1138,7 @@ def test_mixed_heralded_photon(nh):
     ns = np.array([na, nb])
     rs = np.arcsinh(np.sqrt(ns))
     gs = ns / (1 + ns)
-    cutoff = nh+1
+    cutoff = nh + 1
     ps = np.array([g ** np.arange(cutoff) / (1 + n) for g, n in zip(gs, ns)])
     herald_val = nh
     dm_modea = np.array([ps[0, i] * ps[1, herald_val - i] for i in range(herald_val + 1)])
@@ -1150,30 +1147,29 @@ def test_mixed_heralded_photon(nh):
     dm_modeb = np.diag(dm_modeb) / np.sum(dm_modeb)
 
     F = [np.array([1, 0]), np.array([0, 1])]
-    U_TMSV = np.sqrt(0.5) * np.array([[1,1j],[1j,1]])
+    U_TMSV = np.sqrt(0.5) * np.array([[1, 1j], [1j, 1]])
     cov, chis = prepare_cov([rs, rs], U_TMSV, F=[F, F])
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
     rho_a = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh+1
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1
     )
     rho_b = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh+1
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1
     )
 
     p_a = probabilities_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh+1
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1
     )
     p_b = probabilities_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh+1
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1
     )
-
-
 
     assert np.allclose(dm_modea, rho_a)
     assert np.allclose(dm_modeb, rho_b)
     assert np.allclose(np.diag(dm_modea), p_a)
     assert np.allclose(np.diag(dm_modeb), p_b)
+
 
 def test_pure_gkp():
     """test pure gkp state density matrix using 2 methods from the walrus against
@@ -1233,7 +1229,7 @@ def test_pure_gkp():
     assert np.allclose(rho1, rho2, atol=2.5e-4)
     assert np.allclose(rho1, rho3, atol=4.7e-4)
     assert np.allclose(rho2, rho3, atol=4.8e-4)
-    probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff,normalize=True)
+    probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
     assert np.allclose(np.diag(rho1), probs)
 
     #### Note that the tolerances are higher than they should be.
@@ -1293,8 +1289,9 @@ def test_lossy_gkp():
     rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff)
     rho_loss2 /= np.trace(rho_loss2)
     assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
-    probs = probabilities_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff,normalize=True)
+    probs = probabilities_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
     assert np.allclose(np.diag(rho_loss1), probs)
+
 
 def test_vac_schmidt_modes_gkp():
     """
@@ -1353,7 +1350,7 @@ def test_vac_schmidt_modes_gkp():
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
-    probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff,normalize=True)
+    probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
     assert np.allclose(np.diag(rho1), probs)
 
 
