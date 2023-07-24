@@ -15,6 +15,7 @@
 Set of functions for calculating photon number resolved measurement probabilities on Gaussian states with multiple internal modes
 """
 
+
 import numpy as np
 
 import numba
@@ -22,7 +23,7 @@ import numba
 from scipy.special import factorial as fac
 
 from ..quantum import Qmat
-from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix
+from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix, f_from_matrix, get_AX_S
 from ..charpoly import powertrace
 
 from .utils import spatial_reps_to_schmidt_reps, spatial_modes_to_schmidt_modes
@@ -120,3 +121,61 @@ def pnr_prob(covs, i, hbar=2):
     prob = haf.real * vac_prob / fac_prod
 
     return prob
+
+
+@numba.jit(nopython=True, cache=True)
+def finite_difference_operator_coeffs(der_order, m, u=None, v=None):
+    if u is None:
+        u = 2 - der_order
+    if v is None:
+        v = -der_order
+    prefac = (-1) ** (der_order - m) * nb_binom(der_order, m) / (u - v) ** der_order
+    val = v + m * (u - v)
+    return prefac, val
+
+def haf_blocked(A, blocks, repeats):
+    """Wrapper function for _haf_blocked_numba which calculate blocked hafnian associated with photon number probabilities.
+
+    Args:
+        A (array): input matrix
+        blocks (list): how to block (coarse graining) different outcomes
+        repeats (list): pattern for repetition but with one added in each repetition
+
+    Returns:
+        value of the hafnian
+    """
+    # Note that the two lines below cannot be done inside numba hence the need for this function
+    repeats = tuple(val + 1 for val in repeats)
+    blocks = [np.array(val, dtype=np.int32) for val in blocks]
+    return _haf_blocked_numba(A, blocks, repeats)
+
+
+@numba.jit(nopython=True)
+def _haf_blocked_numba(A, blocks, repeats_p):
+    """Calculates the hafnian of the matrix with a given block and repetition pattern.
+
+    Args:
+        A (array): input matrix
+        blocks (list): how to block (coarse graining) different outcomes
+        repeats_p (list): pattern for repetition but with one added in each repetition
+
+    Returns:
+        value of the hafnian
+    """
+    n = sum(repeats_p) - len(repeats_p)
+    num_indices = 0
+    for block in blocks:
+        num_indices += len(block)
+    netsum = 0.0 + 0j
+    coeff_vect = np.zeros(num_indices, dtype=np.int32)
+    for index in np.ndindex(*repeats_p):
+        coeff_pref = 1.0 + 0j
+        for i, block in enumerate(blocks):
+            (coeff, val) = finite_difference_operator_coeffs(repeats_p[i] - 1, index[i])
+            coeff_pref *= coeff
+            for mode in block:
+                coeff_vect[mode] = val
+        AX_S = get_AX_S(coeff_vect, A)
+
+        netsum += coeff_pref * f_from_matrix(AX_S, 2 * n)[n]
+    return netsum

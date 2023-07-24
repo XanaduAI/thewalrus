@@ -28,6 +28,37 @@ from .utils import (
 )
 
 
+@numba.jit(nopython=True, parallel=True, cache=True)
+def project_onto_local_oscillator(cov, M, LO_overlap=None, hbar=2):
+    """Projects a given covariance matrix into the relevant internal mode in the first external mode.
+
+    Args:
+        cov (array): 2MK x 2MK covariance matrix
+        LO_overlap (array): overlap between internal modes and local oscillator
+
+    Returns:
+        (array): projected covariance matrix
+    """
+
+    K = cov.shape[0] // (2 * M)
+
+    # filter out all unwanted Schmidt modes in heralded spatial mode
+
+    # create passive transformation of filter
+    T = np.zeros((M * K, M * K), dtype=np.complex128)
+    if LO_overlap is not None:
+        T[0][:K] = LO_overlap
+    else:
+        T[0, 0] = 1
+    T[K:, K:] = np.eye((M - 1) * K, dtype=np.complex128)
+
+    # apply channel of filter
+    P = nb_block(((T.real, -T.imag), (T.imag, T.real)))
+    L = (hbar / 2) * (np.eye(P.shape[0]) - P @ P.T)
+    cov = P @ cov @ P.T + L
+
+    return cov
+
 # pylint: disable=too-many-arguments, too-many-statements
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
@@ -52,7 +83,11 @@ def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, 
 
     # filter out all unwanted Schmidt modes in heralded spatial mode
 
+    cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
+
+
     # create passive transformation of filter
+    """
     T = np.zeros((M * K, M * K), dtype=np.complex128)
     if LO_overlap is not None:
         T[0][:K] = LO_overlap
@@ -64,7 +99,7 @@ def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, 
     P = nb_block(((T.real, -T.imag), (T.imag, T.real)))
     L = (hbar / 2) * (np.eye(P.shape[0]) - P @ P.T)
     cov = P @ cov @ P.T + L
-
+    """
     Q = nb_Qmat(cov, hbar=hbar)
     O = np.eye(2 * M * K) - np.linalg.inv(Q)
     A = np.empty_like(O, dtype=np.complex128)

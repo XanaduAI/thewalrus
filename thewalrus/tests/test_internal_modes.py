@@ -38,6 +38,7 @@ from thewalrus.quantum import (
     Amat,
     Qmat,
     state_vector,
+    photon_number_mean,
 )
 from thewalrus.symplectic import (
     beam_splitter,
@@ -49,7 +50,11 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes import (
+    pnr_prob,
+    density_matrix_single_mode,
+    project_onto_local_oscillator,
+)
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -1126,39 +1131,32 @@ def test_LO_overlaps(r, S, phi):
         np.array([np.inner(LO_shape.conj(), chis[j]) for j in range(len(chis))]),
     )
 
-
-def test_mixed_heralded_photon():
-    """test code for generating heralded single photon state from squeezed states with 2 internal modes"""
+@pytest.mark.parametrize("nh", [1, 2, 3, 4])
+def test_mixed_heralded_photon(nh):
+    """test code for generating heralded fock states from squeezed states with 2 internal modes"""
     na = 1
     nb = 0.5
     ns = np.array([na, nb])
     rs = np.arcsinh(np.sqrt(ns))
     gs = ns / (1 + ns)
-    cutoff = 5
+    cutoff = nh+1
     ps = np.array([g ** np.arange(cutoff) / (1 + n) for g, n in zip(gs, ns)])
-    herald_val = 1
+    herald_val = nh
     dm_modea = np.array([ps[0, i] * ps[1, herald_val - i] for i in range(herald_val + 1)])
     dm_modeb = dm_modea[::-1]
     dm_modea = np.diag(dm_modea) / np.sum(dm_modea)
     dm_modeb = np.diag(dm_modeb) / np.sum(dm_modeb)
 
     F = [np.array([1, 0]), np.array([0, 1])]
-    theta = np.pi / 4
-    phi = -np.pi / 2
-    U_TMSV = np.array(
-        [
-            [np.cos(theta), np.exp(-1j * phi) * np.sin(theta)],
-            [-np.exp(1j * phi) * np.sin(theta), np.cos(theta)],
-        ]
-    )
+    U_TMSV = np.sqrt(0.5) * np.array([[1,1j],[1j,1]])
     cov, chis = prepare_cov([rs, rs], U_TMSV, F=[F, F])
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
     rho_a = density_matrix_single_mode(
-        cov, {1: 1}, normalize=True, LO_overlap=LO_overlapa, cutoff=2
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh+1
     )
     rho_b = density_matrix_single_mode(
-        cov, {1: 1}, normalize=True, LO_overlap=LO_overlapb, cutoff=2
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh+1
     )
 
     assert np.allclose(dm_modea, rho_a)
@@ -1470,3 +1468,13 @@ def test_density_matrix_LO():
     rho2_norm = rho2 / np.trace(rho2).real
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
+
+
+def test_project_onto_local_oscillator():
+    """Test that the mode that is orthogonal to the modes that are orthogonal to the local oscillator end up with zero photons"""
+    M = 2
+    K = 3
+    cov_test = squeezing([1] * K + [-1] * K)
+    cov_filt = project_onto_local_oscillator(cov_test, M, np.array([1, 0, 0]))
+    np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 1), 0)
+    np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 2), 0)

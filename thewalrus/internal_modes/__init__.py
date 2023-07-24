@@ -16,5 +16,5 @@ Functions to do internal modes/distinguishable GBS
 """
 
 from .pnr_statistics import pnr_prob
-from .fock_density_matrices import density_matrix_single_mode
+from .fock_density_matrices import density_matrix_single_mode, project_onto_local_oscillator
 from .prepare_cov import *
