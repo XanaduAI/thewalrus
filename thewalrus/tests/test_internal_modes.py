@@ -53,7 +53,7 @@ from thewalrus.symplectic import (
 from thewalrus.internal_modes import (
     pnr_prob,
     density_matrix_single_mode,
-    project_onto_local_oscillator,
+    probabilities_single_mode
 )
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
@@ -62,6 +62,8 @@ from thewalrus.internal_modes.prepare_cov import (
     prepare_cov,
     LO_overlaps,
 )
+
+from thewalrus.internal_modes.utils import project_onto_local_oscillator
 
 ### auxilliary functions for testing ###
 # if we want to have less auxilliary functions, we can remove a few tests and get rid of it all
@@ -1159,9 +1161,19 @@ def test_mixed_heralded_photon(nh):
         cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh+1
     )
 
+    p_a = probabilities_single_mode(
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh+1
+    )
+    p_b = probabilities_single_mode(
+        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh+1
+    )
+
+
+
     assert np.allclose(dm_modea, rho_a)
     assert np.allclose(dm_modeb, rho_b)
-
+    assert np.allclose(np.diag(dm_modea), p_a)
+    assert np.allclose(np.diag(dm_modeb), p_b)
 
 def test_pure_gkp():
     """test pure gkp state density matrix using 2 methods from the walrus against
@@ -1221,6 +1233,9 @@ def test_pure_gkp():
     assert np.allclose(rho1, rho2, atol=2.5e-4)
     assert np.allclose(rho1, rho3, atol=4.7e-4)
     assert np.allclose(rho2, rho3, atol=4.8e-4)
+    probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff,normalize=True)
+    assert np.allclose(np.diag(rho1), probs)
+
     #### Note that the tolerances are higher than they should be.
 
 
@@ -1278,7 +1293,8 @@ def test_lossy_gkp():
     rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff)
     rho_loss2 /= np.trace(rho_loss2)
     assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
-
+    probs = probabilities_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff,normalize=True)
+    assert np.allclose(np.diag(rho_loss1), probs)
 
 def test_vac_schmidt_modes_gkp():
     """
@@ -1337,6 +1353,8 @@ def test_vac_schmidt_modes_gkp():
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
+    probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff,normalize=True)
+    assert np.allclose(np.diag(rho1), probs)
 
 
 def test_density_matrix_error():
@@ -1417,7 +1435,10 @@ def test_density_matrix(cutoff):
     rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff)
     rho2_norm = rho2 / np.trace(rho2).real
 
+    # probs = probabilities_single_mode(cov, N, cutoff=cutoff, normalize=True)
+
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
+    # assert np.allclose(np.diag(rho_norm), probs)
 
 
 def test_density_matrix_LO():
