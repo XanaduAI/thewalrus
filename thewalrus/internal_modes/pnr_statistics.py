@@ -189,7 +189,7 @@ def _haf_blocked_numba(A, blocks, repeats_p):
 
 def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
     """
-    calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
+    Calculates the diagonal of the density matrix, hence the name probabilities, of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
     where each mode contains K internal modes.
 
     Args:
