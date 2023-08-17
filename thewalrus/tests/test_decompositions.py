@@ -394,3 +394,24 @@ def test_real_degenerate():
     rl, U = takagi(mat)
     assert np.allclose(U @ U.conj().T, np.eye(len(mat)))
     assert np.allclose(U @ np.diag(rl) @ U.T, mat)
+
+
+@pytest.mark.parametrize("size", [10, 20, 100])
+def test_flat_phase(size):
+    """Test that the correct decomposition is obtained even if the first entry is 0"""
+    A = np.random.rand(size, size) + 1j * np.random.rand(size, size)
+    A += A.T
+    A[0, 0] = 0
+    l, u = takagi(A)
+    assert np.allclose(A, u * l @ u.T)
+
+
+def test_real_input_edge():
+    """Adapted from https://math.stackexchange.com/questions/4418925/why-does-this-algorithm-for-the-takagi-factorization-fail-here"""
+    rng = np.random.default_rng(0)  # Important for reproducibility
+    A = (rng.random((100, 100)) - 0.5) * 114
+    A = A * A.T  # make A symmetric
+    l, u = takagi(A)
+    # Now, reconstruct A, see
+    Ar = u * l @ u.T
+    assert np.allclose(A, Ar)

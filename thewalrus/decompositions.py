@@ -210,8 +210,10 @@ def takagi(A, svd_order=True):
         list_vals.sort(reverse=svd_order)
         sorted_ls, permutation = zip(*list_vals)
         return np.array(sorted_ls), Uc[:, np.array(permutation)]
-
-    phi = np.angle(A[0, 0])
+    # Find the element with the largest absolute value
+    pos = np.unravel_index(np.argmax(np.abs(A)), (n, n))
+    # Use it to find whether the input is a global phase times a real matrix
+    phi = np.angle(A[pos])
     Amr = np.real_if_close(np.exp(-1j * phi) * A)
     if np.isrealobj(Amr):
         vals, U = takagi(Amr, svd_order=svd_order)
