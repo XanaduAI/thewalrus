@@ -34,12 +34,14 @@ Reference functions
 
 .. autosummary::
     hafnian
+    montrealer
 
 Code details
 ------------
 
 .. autofunction::
     hafnian
+    montrealer
 
 Auxiliary functions
 -------------------
@@ -49,6 +51,8 @@ Auxiliary functions
     partitions
     spm
     pmp
+    rspm
+    rpmp
     T
 
 Code details
@@ -58,7 +62,7 @@ import functools
 
 # pylint: disable=too-many-arguments
 from collections import OrderedDict
-from itertools import tee
+from itertools import tee, product, permutations, chain
 from types import GeneratorType
 
 MAXSIZE = 1000
@@ -278,3 +282,87 @@ def hafnian(M, loop=False):
         tot_sum = tot_sum + result
 
     return tot_sum
+
+
+def mapper(x, objects):
+    """Helper function to turn a permutation and bistring into an element of rpmp.
+
+    Args:
+        x (tuple): tuple containing a permutation and a bistring.
+        objects (list): list objects to permute
+
+    Returns:
+        tuple: permuted objects
+    """
+    (perm, bit) = x
+    m = len(bit)
+    Blist = [list(range(m)), list(range(m, 2 * m))]
+    for i, j in enumerate(bit):
+        if int(j):
+            (Blist[0][i], Blist[1][i]) = (Blist[1][i], Blist[0][i])
+    Blist = [Blist[0][i] for i in tuple((0,) + perm)] + [Blist[1][i] for i in tuple((0,) + perm)]
+    dico_list = {j: i + 1 for i, j in enumerate(Blist)}
+    new_mapping_list = {
+        objects[dico_list[i] - 1]: objects[dico_list[j] - 1]
+        for i, j in zip(list(range(0, m - 1)) + [m], list(range(m + 1, 2 * m)) + [m - 1])
+    }
+    return tuple(new_mapping_list.items())
+
+def bitstrings(n):
+    """Returns the bistrings from 0 to n/2
+
+    Args:
+        n (int) : Twice the highest bitstring value.
+
+    Returns:
+        (iterator) : An iterable of all bistrings.
+    """
+    for binary in map("".join, product("01", repeat=n - 1)):
+        yield "0" + binary
+
+def rpmp(s):
+    """Generates the restricted set of perfect matchings matching permutations.
+
+    Args:
+        s (tuple): tuple of labels to be used
+
+    Returns:
+        generator: the set of restricted perfect matching permutations of the tuple s
+    """
+    m = len(s) // 2
+    local_mapper = lambda x: mapper(x, s)
+    for i in product(permutations(range(1, m)), bitstrings(m)):
+        yield local_mapper(i)
+
+def splitter(elem):
+    """Takes an element from rpmp and returns all the associated elements in rspm
+
+    Args:
+        elem (tuple): tuple representing an element of rpmp
+
+    Returns:
+        (iterator): all the associated elements in rspm
+    """
+    num_elem = len(elem)
+    net =  [elem]
+    for i in range(num_elem):
+        left = (elem[j] for j in range(i))
+        middle = ((elem[i][0],elem[i][0]),(elem[i][1],elem[i][1]))
+        right = (elem[j] for j in range(i+1,num_elem))
+        net.append(tuple(left) + tuple(middle) + tuple(right))
+    for i in net:
+        yield i
+
+
+
+def rspm(s):
+    """Generates the restricted set of single-pair matchings.
+
+    Args:
+        s (tuple): tuple of labels to be used
+
+    Returns:
+        generator: the set of restricted perfect matching permutations of the tuple s
+    """
+    gen = rpmp(s)
+    return chain(*(splitter(i) for i in gen))
