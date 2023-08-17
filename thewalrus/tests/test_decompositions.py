@@ -394,3 +394,24 @@ def test_real_degenerate():
     rl, U = takagi(mat)
     assert np.allclose(U @ U.conj().T, np.eye(len(mat)))
     assert np.allclose(U @ np.diag(rl) @ U.T, mat)
+
+
+
+
+@pytest.mark.parametrize("n", [5, 10, 50])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_autonne_takagi(n, datatype, svd_order):
+    """Checks the correctness of the Autonne decomposition function"""
+    if datatype is np.complex128:
+        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    if datatype is np.float64:
+        A = np.random.rand(n, n)
+    A += A.T
+    r, U = takagi(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(r) @ U.T)
+    assert np.all(r >= 0)
+    if svd_order is True:
+        assert np.all(np.diff(r) <= 0)
+    else:
+        assert np.all(np.diff(r) >= 0)
