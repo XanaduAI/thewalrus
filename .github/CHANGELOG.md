@@ -15,6 +15,8 @@
 
 * Simplifies the internal working of Williamson decomposition [(#366)](https://github.com/XanaduAI/thewalrus/pull/338). 
 
+* Improves the handling of an edge case in Takagi [(#373)](https://github.com/XanaduAI/thewalrus/pull/373).
+
 ### Bug fixes
 
 ### Documentation
