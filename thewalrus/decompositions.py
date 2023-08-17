@@ -70,36 +70,31 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     omega = sympmat(n)
     vals = np.linalg.eigvalsh(V)
 
-    for val in vals:
-        if val <= 0:
-            raise ValueError("Input matrix is not positive definite")
+    if not np.all(vals > 0):
+        raise ValueError("Input matrix is not positive definite")
 
     Mm12 = sqrtm(np.linalg.inv(V)).real
     r1 = Mm12 @ omega @ Mm12
     s1, K = schur(r1)
-    X = np.array([[0, 1], [1, 0]])
-    I = np.identity(2)
-    seq = []
-
-    # In what follows I construct a permutation matrix p  so that the Schur matrix has
+    # In what follows a permutation matrix perm1 is constructed so that the Schur matrix has
     # only positive elements above the diagonal
-    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus I permute using perm
+    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus a permutation perm2 is used
     # to go to the ordering x_1, ..., x_n, p_1, ... , p_n
-
+    perm1 = np.arange(2 * n)
     for i in range(n):
-        if s1[2 * i, 2 * i + 1] > 0:
-            seq.append(I)
-        else:
-            seq.append(X)
-    perm = np.array([2 * i for i in range(n)] + [2 * i + 1 for i in range(n)])
-    p = block_diag(*seq)
-    Kt = K @ p
-    Ktt = Kt[:, perm]
-    s1t = p @ s1 @ p
-    dd = [1 / s1t[2 * i, 2 * i + 1] for i in range(n)]
-    Db = np.diag(dd + dd)
-    S = Mm12 @ Ktt @ sqrtm(Db)
-    return Db, np.linalg.inv(S).T
+        if s1[2 * i, 2 * i + 1] <= 0:
+            (perm1[2 * i], perm1[2 * i + 1]) = (perm1[2 * i + 1], perm1[2 * i])
+
+    perm2 = np.array([perm1[2 * i] for i in range(n)] + [perm1[2 * i + 1] for i in range(n)])
+
+    Ktt = K[:, perm2]
+    s1t = s1[:, perm1][perm1]
+
+    dd = np.array([1 / s1t[2 * i, 2 * i + 1] for i in range(n)])
+    dd = np.concatenate([dd, dd])
+    ddsqrt = np.sqrt(dd)
+    S = Mm12 @ Ktt * ddsqrt
+    return np.diag(dd), np.linalg.inv(S).T
 
 
 def symplectic_eigenvals(cov):
@@ -112,8 +107,8 @@ def symplectic_eigenvals(cov):
         (array): symplectic eigenvalues
     """
     M = int(len(cov) / 2)
-    D, _ = williamson(cov)
-    return np.diag(D)[:M]
+    Omega = sympmat(M)
+    return np.real_if_close(-1j * np.linalg.eigvals(Omega @ cov))[::2]
 
 
 def blochmessiah(S):
@@ -216,7 +211,10 @@ def takagi(A, svd_order=True):
         sorted_ls, permutation = zip(*list_vals)
         return np.array(sorted_ls), Uc[:, np.array(permutation)]
 
-    phi = np.angle(A[0, 0])
+    # Find the element with the largest absolute value
+    pos = np.unravel_index(np.argmax(np.abs(A)), (n, n))
+    # Use it to find whether the input is a global phase times a real matrix
+    phi = np.angle(A[pos])
     Amr = np.real_if_close(np.exp(-1j * phi) * A)
     if np.isrealobj(Amr):
         vals, U = takagi(Amr, svd_order=svd_order)
