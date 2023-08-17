@@ -414,6 +414,7 @@ def test_autonne_takagi(n, datatype, svd_order):
     else:
         assert np.all(np.diff(r) >= 0)
 
+
 @pytest.mark.parametrize("size", [10, 20, 100])
 def test_flat_phase(size):
     """Test that the correct decomposition is obtained even if the first entry is 0"""
@@ -433,4 +434,3 @@ def test_real_input_edge():
     # Now, reconstruct A, see
     Ar = u * l @ u.T
     assert np.allclose(A, Ar)
-
