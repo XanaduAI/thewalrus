@@ -21,7 +21,6 @@ import numba
 from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
 from .utils import (
-    nb_block,
     nb_Qmat,
     spatial_reps_to_schmidt_reps,
     fact,
@@ -55,20 +54,6 @@ def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, 
 
     cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
 
-    # create passive transformation of filter
-    """
-    T = np.zeros((M * K, M * K), dtype=np.complex128)
-    if LO_overlap is not None:
-        T[0][:K] = LO_overlap
-    else:
-        T[0, 0] = 1
-    T[K:, K:] = np.eye((M - 1) * K, dtype=np.complex128)
-
-    # apply channel of filter
-    P = nb_block(((T.real, -T.imag), (T.imag, T.real)))
-    L = (hbar / 2) * (np.eye(P.shape[0]) - P @ P.T)
-    cov = P @ cov @ P.T + L
-    """
     Q = nb_Qmat(cov, hbar=hbar)
     O = np.eye(2 * M * K) - np.linalg.inv(Q)
     A = np.empty_like(O, dtype=np.complex128)

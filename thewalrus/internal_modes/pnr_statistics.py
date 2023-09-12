@@ -130,6 +130,19 @@ def pnr_prob(covs, i, hbar=2):
 
 @numba.jit(nopython=True, cache=True)
 def finite_difference_operator_coeffs(der_order, m, u=None, v=None):
+    """ Returns the mth coefficient of the finite difference operator of given derivative order.
+    For details see:  E. T. Bax, Finite-difference algorithms for counting problems. PhD thesis, Caltech, 1998.
+
+    Args:
+        der_order (int): derivative order.
+        m (int): index of the coefficient.
+        u (int): u value from Bax.
+        v (int): v value from Bax.
+
+    Returns:
+        tuple: prefactor and value when applied to the finite difference.
+
+    """
     if u is None:
         u = 2 - der_order
     if v is None:
