@@ -158,7 +158,7 @@ def haf_blocked(A, blocks, repeats):
     Args:
         A (array): input matrix
         blocks (list): how to block (coarse graining) different outcomes
-        repeats (list): pattern for repetition but with one added in each repetition
+        repeats (list): pattern for repetition.
 
     Returns:
         value of the hafnian
@@ -216,13 +216,13 @@ def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cu
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
 
-    # The lines until A =  Amat(...) are copies from density_single_mode
+    # The lines until A = Amat(...) are copies from density_matrix_single_mode
     cov = np.array(cov).astype(np.float64)
     M = len(pattern) + 1
     K = cov.shape[0] // (2 * M)
     if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
         raise ValueError("Keys of pattern must correspond to all but one spatial mode")
-    N_nums = np.array(list(pattern.values()))
+    N_nums = list(pattern.values())
     HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
     if LO_overlap is not None:
         if not K == LO_overlap.shape[0]:
@@ -247,9 +247,8 @@ def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cu
     fact = 1 / np.sqrt(np.linalg.det(Q).real)
     blocks = np.arange(K * M).reshape([M, K])
     probs = np.zeros([cutoff])
-    patt = [pattern[i] for i in range(1, 1 + len(pattern))]
     for i in range(cutoff):
-        patt_long = [i] + patt
+        patt_long = [i] + N_nums
         probs[i] = fact * np.real(
             haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(fac(patt_long))
         )
