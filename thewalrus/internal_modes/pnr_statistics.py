@@ -23,7 +23,7 @@ import numba
 from scipy.special import factorial as fac
 
 from ..quantum import Qmat, Amat
-from thewalrus.symplectic import passive_transformation
+from ..symplectic import passive_transformation
 from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix, f_from_matrix, get_AX_S
 from ..charpoly import powertrace
 
