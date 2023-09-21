@@ -67,3 +67,5 @@
 * [Martin Houde](https://github.com/MHoude2) (Polytechnique Montréal) - 🙃 Minister of amplification
 
 * Will McCutcheon (Heriot-Watt University) - 🧅 Gaussian Onion Merchant
+
+* [Yanic Cardin](https://github.com/yaniccd) (Polytechnique Montréal) - 
