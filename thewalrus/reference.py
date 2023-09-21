@@ -332,7 +332,12 @@ def rpmp(s):
         generator: the set of restricted perfect matching permutations of the tuple s
     """
     m = len(s) // 2
-    local_mapper = lambda x: mapper(x, s)
+    def local_mapper(x):
+        """Helper function to define a local mapper based on the symbols s
+            Args:
+                x (iterable): object to be mapped
+        """
+        return mapper(x, s)
     for i in product(permutations(range(1, m)), bitstrings(m)):
         yield local_mapper(i)
 
