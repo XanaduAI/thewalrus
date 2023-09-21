@@ -33,16 +33,15 @@ def tor_input_checks(A, loops=None):
     if matshape[0] != matshape[1]:
         raise ValueError("Input matrix must be square.")
 
-
     if matshape[0] % 2 != 0:
         raise ValueError("matrix dimension must be even")
-
 
     if loops is not None:
         if not isinstance(loops, np.ndarray):
             raise TypeError("Input matrix must be a NumPy array.")
         if matshape[0] != len(loops):
             raise ValueError("gamma must be a vector matching the dimension of A")
+
 
 def tor(A, recursive=True):
     """Returns the Torontonian of a matrix.
@@ -70,7 +69,6 @@ def ltor(A, gamma, recursive=True):
         np.float64 or np.complex128: the loop torontonian of matrix A, vector gamma
     """
     tor_input_checks(A, gamma)
-
 
     return rec_ltorontonian(A, gamma) if recursive else numba_ltor(A, gamma)
 

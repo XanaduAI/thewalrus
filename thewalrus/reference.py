@@ -308,6 +308,7 @@ def mapper(x, objects):
     }
     return tuple(new_mapping_list.items())
 
+
 def bitstrings(n):
     """Returns the bistrings from 0 to n/2
 
@@ -319,6 +320,7 @@ def bitstrings(n):
     """
     for binary in map("".join, product("01", repeat=n - 1)):
         yield "0" + binary
+
 
 def rpmp(s):
     """Generates the restricted set of perfect matchings matching permutations.
@@ -334,6 +336,7 @@ def rpmp(s):
     for i in product(permutations(range(1, m)), bitstrings(m)):
         yield local_mapper(i)
 
+
 def splitter(elem):
     """Takes an element from rpmp and returns all the associated elements in rspm
 
@@ -344,15 +347,14 @@ def splitter(elem):
         (iterator): all the associated elements in rspm
     """
     num_elem = len(elem)
-    net =  [elem]
+    net = [elem]
     for i in range(num_elem):
         left = (elem[j] for j in range(i))
-        middle = ((elem[i][0],elem[i][0]),(elem[i][1],elem[i][1]))
-        right = (elem[j] for j in range(i+1,num_elem))
+        middle = ((elem[i][0], elem[i][0]), (elem[i][1], elem[i][1]))
+        right = (elem[j] for j in range(i + 1, num_elem))
         net.append(tuple(left) + tuple(middle) + tuple(right))
     for i in net:
         yield i
-
 
 
 def rspm(s):
