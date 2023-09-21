@@ -2,7 +2,7 @@
 
 ### New features
 
-* Adds the Takagi decomposition [(#373)](https://github.com/XanaduAI/thewalrus/pull/373)
+* Adds the Takagi decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/363)
 
 * Adds the Montrealer and Loop Montrealer functions [(#363)](https://github.com/XanaduAI/thewalrus/pull/374).
 ### Breaking changes
