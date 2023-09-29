@@ -30,3 +30,29 @@ def test_size_of_rspm(n):
     terms_rspm = sum(1 for _ in rspm(range(2*n)))
     terms_theo = (n+1)*factorial2(2*n-2)
     assert terms_rspm == terms_theo
+
+
+@pytest.mark.parametrize("n", range(2,8))
+def test_size_of_rpmp(n):
+    """The rpmp must for a Y-alternating walk without loops"""
+    test = True
+    for perfect in rpmp(range(1,2*n+1)):
+        last = perfect[0][1] #starting point
+        reduced_last = last-n if last>n else last
+        #different mode in every tuple
+        if reduced_last == 1: test = False
+        
+        for i in perfect[1:]:
+            reduced = i[0]-n if i[0]>n else i[0], i[1]-n if i[1]>n else i[1]
+            #different mode in every tuple
+            if reduced[0]==reduced[1]: test = False
+            #consecutive tuple contain the same mode
+            if reduced_last not in reduced: test = False
+
+            last = i[0] if reduced[1] == reduced_last else i[1]
+            reduced_last = last-n if last>n else last
+        
+        #last mode most coincide with the first one
+        if reduced_last != 1: test=False
+
+    assert test
