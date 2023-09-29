@@ -12,5 +12,4 @@ def test_montrealer_all_ones(n):
     A = np.ones([2*n, 2*n])
     mtl_val = mtl(A)
     mtl_expect = factorial2(2*n-2)
-    x = 2+2
     assert np.allclose(mtl_val, mtl_expect)
