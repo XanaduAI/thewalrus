@@ -3,8 +3,8 @@ import numpy as np
 from thewalrus import mtl, lmtl
 #from thewalrus._montrealer import montrealer, lmontrealer
 from thewalrus.reference import rspm, rpmp
-from thewalrus.reference import mtl as mtl_reference
-from thewalrus.reference import lmtl as lmtl_reference
+from thewalrus.reference import mtl as mtl_symb
+from thewalrus.reference import lmtl as lmtl_symb
 #from thewalrus.quantum import
 from scipy.special import factorial2
 from scipy.stats import unitary_group
@@ -66,7 +66,7 @@ def test_mtl_functions_agree(n):
     """Make sure both mtl functions agree with one another"""
     A = unitary_group.rvs(n)
     A = A + A.T
-    assert np.allcolose(mtl_reference(A), mtl(A))
+    assert np.allcolose(mtl_symb(A), mtl(A))
 
 
 @pytest.mark.parametrize("n", range(2,8))
