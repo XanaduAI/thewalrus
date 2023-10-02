@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from thewalrus import mtl, lmtl
 #from thewalrus._montrealer import montrealer, lmontrealer
-from thewalrus.reference import rspm, rpmp, mtl_symbolic, lmtl_symbolic
+from thewalrus.reference import rspm, rpmp,mtl_symbolic, lmtl_symbolic
 #from thewalrus.quantum import
 from scipy.special import factorial2
 from scipy.stats import unitary_group
