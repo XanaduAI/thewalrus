@@ -5,6 +5,7 @@ from thewalrus._montrealer import montrealer, lmontrealer
 from thewalrus.reference import rspm, rpmp
 #from thewalrus.quantum import
 from scipy.special import factorial2
+from scipy.stats import unitary_group
 
 
 @pytest.mark.parametrize("n", range(1,6))
@@ -34,7 +35,7 @@ def test_size_of_rspm(n):
 
 @pytest.mark.parametrize("n", range(2,8))
 def test_size_of_rpmp(n):
-    """The rpmp must for a Y-alternating walk without loops"""
+    """The rpmp must form a Y-alternating walk without loops"""
     test = True
     for perfect in rpmp(range(1,2*n+1)):
         last = perfect[0][1] #starting point
@@ -56,3 +57,23 @@ def test_size_of_rpmp(n):
         if reduced_last != 1: test=False
 
     assert test
+
+
+@pytest.mark.parametrize("n", range(2,8))
+def test_mtl_functions_agree(n):
+    """Make sure both mtl functions agree with one another"""
+
+
+@pytest.mark.parametrize("n", range(2,8))
+def test_lmtl_functions_agree(n):
+    """Make sure both lmtl functions agree with one another"""
+
+
+@pytest.mark.parametrize("n", range(2,8))
+def test_mtl_lmtl_agree(n):
+    """Make sure mtl and lmtl give the same result if zeta = 0"""
+
+
+@pytest.mark.parametrize("n", range(2,8))
+def test_mtl_lmtl_agree(n):
+    """Make sure mtl and lmtl from .reference give the same result if zeta = 0"""
