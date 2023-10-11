@@ -378,7 +378,7 @@ def rspm(s):
     return chain(*(splitter(i) for i in gen))
 
 
-def mtl_symbolic(A):
+def mtl(A):
     n,_ = A.shape
     net_sum = 0
 
@@ -393,7 +393,7 @@ def mtl_symbolic(A):
     return net_sum
 
 
-def lmtl_symbolic(A, zeta):
+def lmtl(A, zeta):
     """Returns the loop Montrealer of an NxN matrix and an N-length vector.
 
     Args:

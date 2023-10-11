@@ -1,8 +1,9 @@
 import pytest
 import numpy as np
 from thewalrus import mtl, lmtl
-#from thewalrus._montrealer import montrealer, lmontrealer
-from thewalrus.reference import rspm, rpmp, mtl_symbolic, lmtl_symbolic
+from thewalrus.reference import rspm, rpmp
+from thewalrus.reference import mtl as mtl_symb
+from thewalrus.reference import lmtl as lmtl_symb
 #from thewalrus.quantum import
 from scipy.special import factorial2
 from scipy.stats import unitary_group
@@ -62,14 +63,17 @@ def test_size_of_rpmp(n):
 @pytest.mark.parametrize("n", range(2,8))
 def test_mtl_functions_agree(n):
     """Make sure both mtl functions agree with one another"""
-    A = unitary_group.rvs(n)
-    A = A + A.T
-    assert np.allcolose(mtl_symbolic(A), mtl(A))
+    A = unitary_group.rvs(2*n)
+    A = A + A.T #random symetric matrix
+    assert np.allclose(mtl_symb(A), mtl(A))
 
 
 @pytest.mark.parametrize("n", range(2,8))
 def test_lmtl_functions_agree(n):
     """Make sure both lmtl functions agree with one another"""
+    A = unitary_group.rvs(2*n)
+    A = A + A.T
+    assert np.allclose(lmtl_symb(A, np.diagonal(A)), lmtl(A, np.diagonal(A)))
 
 
 @pytest.mark.parametrize("n", range(2,8))
