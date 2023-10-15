@@ -94,9 +94,9 @@ def test_lmtl_functions_agree(n):
     u_n = u_n + u_n.conj().T
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
-    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.diag(adj)
-    assert np.allclose(lmtl(adj, zeta), lmtl_symb(adj, zeta))
+    A = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    zeta = np.diag(A)
+    assert np.allclose(lmtl(A, zeta), lmtl_symb(A, zeta))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
