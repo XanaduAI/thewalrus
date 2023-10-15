@@ -74,7 +74,6 @@ def test_mtl_functions_agree(n):
 @pytest.mark.parametrize("n", range(2,8))
 def test_lmtl_functions_agree(n):
     """Make sure both lmtl functions agree with one another"""
-    n = 4
     U_N = np.matrix(unitary_group.rvs(n))
     U_N = U_N + U_N.conj().T 
     U_M = np.matrix(unitary_group.rvs(n))
@@ -87,8 +86,22 @@ def test_lmtl_functions_agree(n):
 @pytest.mark.parametrize("n", range(2,8))
 def test_mtl_lmtl_agree(n):
     """Make sure mtl and lmtl give the same result if zeta = 0"""
+    U_N = np.matrix(unitary_group.rvs(n))
+    U_N = U_N + U_N.conj().T 
+    U_M = np.matrix(unitary_group.rvs(n))
+    U_M = U_M + U_M.T
+    A = np.block([[U_M.conj(), U_N], [U_N.T, U_M]])
+    zeta = np.zeros(2*n)
+    assert np.allclose(lmtl(A, zeta), mtl(A))
 
 
 @pytest.mark.parametrize("n", range(2,8))
 def test_mtl_lmtl_agree(n):
     """Make sure mtl and lmtl from .reference give the same result if zeta = 0"""
+    U_N = np.matrix(unitary_group.rvs(n))
+    U_N = U_N + U_N.conj().T 
+    U_M = np.matrix(unitary_group.rvs(n))
+    U_M = U_M + U_M.T
+    A = np.block([[U_M.conj(), U_N], [U_N.T, U_M]])
+    zeta = np.zeros(2*n)
+    assert np.allclose(lmtl_symb(A, zeta), mtl_symb(A))
