@@ -2,7 +2,7 @@
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# You may obtain adj copy of the License at
 
 #     http://www.apache.org/licenses/LICENSE-2.0
 
@@ -24,8 +24,8 @@ from scipy.stats import unitary_group
 @pytest.mark.parametrize("n", range(1, 6))
 def test_montrealer_all_ones(n):
     """Test that the Montrealer of a matrix of ones gives (2n-2)!!"""
-    A = np.ones([2 * n, 2 * n])
-    mtl_val = mtl(A)
+    adj = np.ones([2 * n, 2 * n])
+    mtl_val = mtl(adj)
     mtl_expect = factorial2(2 * n - 2)
     assert np.allclose(mtl_val, mtl_expect)
 
@@ -83,8 +83,8 @@ def test_mtl_functions_agree(n):
     u_n = u_n + u_n.conj().T
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
-    A = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    assert np.allclose(mtl_symb(A), mtl(A))
+    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    assert np.allclose(mtl_symb(adj), mtl(adj))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
@@ -94,9 +94,9 @@ def test_lmtl_functions_agree(n):
     u_n = u_n + u_n.conj().T
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
-    A = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.diag(A)
-    assert np.allclose(lmtl(A, zeta), lmtl_symb(A, zeta))
+    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    zeta = np.diag(adj)
+    assert np.allclose(lmtl(adj, zeta), lmtl_symb(adj, zeta))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
@@ -106,9 +106,9 @@ def test_mtl_lmtl_agree(n):
     u_n = u_n + u_n.conj().T
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
-    A = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
     zeta = np.zeros(2 * n)
-    assert np.allclose(lmtl(A, zeta), mtl(A))
+    assert np.allclose(lmtl(adj, zeta), mtl(adj))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
@@ -118,6 +118,6 @@ def test_mtl_lmtl_agree(n):
     u_n = u_n + u_n.conj().T
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
-    A = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
     zeta = np.zeros(2 * n)
-    assert np.allclose(lmtl_symb(A, zeta), mtl_symb(A))
+    assert np.allclose(lmtl_symb(adj, zeta), mtl_symb(adj))
