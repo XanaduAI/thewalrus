@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Montrealer tests"""
-# pylint: disable=no-self-use,redefined-outer-name
 
 import pytest
 import numpy as np
@@ -95,9 +94,9 @@ def test_lmtl_functions_agree(n):
     u_n = u_n + u_n.conj().T
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
-    A = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.diag(A)
-    assert np.allclose(lmtl(A, zeta), lmtl_symb(A, zeta))
+    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    zeta = np.diag(adj)
+    assert np.allclose(lmtl(adj, zeta), lmtl_symb(adj, zeta))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
