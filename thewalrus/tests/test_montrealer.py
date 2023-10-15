@@ -102,9 +102,9 @@ def test_lmtl_functions_agree(n):
 @pytest.mark.parametrize("n", range(2, 8))
 def test_mtl_lmtl_agree(n):
     """Make sure mtl and lmtl give the same result if zeta = 0"""
-    u_n = unitary_group.rvs(n)
+    u_n = np.matrix(unitary_group.rvs(n))
     u_n = u_n + u_n.conj().T
-    u_m = unitary_group.rvs(n)
+    u_m = np.matrix(unitary_group.rvs(n))
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
     zeta = np.zeros(2 * n)
