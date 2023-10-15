@@ -108,6 +108,7 @@ def test_mtl_lmtl_agree(n):
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
     zeta = np.zeros(2 * n)
+    zeta = [complex(i) for i in zeta]
     assert np.allclose(lmtl(adj, zeta), mtl(adj))
 
 
