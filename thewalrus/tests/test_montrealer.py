@@ -107,9 +107,8 @@ def test_mtl_lmtl_agree(n):
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.zeros(2 * n)
-    zeta = [complex(i) for i in zeta]
-    assert np.allclose(lmtl(adj, zeta), mtl(adj))
+    zeta = np.zeros(2 * n, dtype=np.complex128)
+    assert np.allclose(lmtl(adj, zeta), lmtl(adj, zeta))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
@@ -120,5 +119,5 @@ def test_mtl_lmtl_reference_agree(n):
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.zeros(2 * n)
+    zeta = np.zeros(2 * n, dtype=np.complex128)
     assert np.allclose(lmtl_symb(adj, zeta), mtl_symb(adj))
