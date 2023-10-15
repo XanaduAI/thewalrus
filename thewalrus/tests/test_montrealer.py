@@ -63,17 +63,25 @@ def test_size_of_rpmp(n):
 @pytest.mark.parametrize("n", range(2,8))
 def test_mtl_functions_agree(n):
     """Make sure both mtl functions agree with one another"""
-    A = unitary_group.rvs(2*n)
-    A = A + A.T #random symetric matrix
+    U_N = np.matrix(unitary_group.rvs(n))
+    U_N = U_N + U_N.conj().T 
+    U_M = np.matrix(unitary_group.rvs(n))
+    U_M = U_M + U_M.T
+    A = np.block([[U_M.conj(), U_N], [U_N.T, U_M]])
     assert np.allclose(mtl_symb(A), mtl(A))
 
 
 @pytest.mark.parametrize("n", range(2,8))
 def test_lmtl_functions_agree(n):
     """Make sure both lmtl functions agree with one another"""
-    A = unitary_group.rvs(2*n)
-    A = A + A.T
-    assert np.allclose(lmtl_symb(A, np.diagonal(A)), lmtl(A, np.diagonal(A)))
+    n = 4
+    U_N = np.matrix(unitary_group.rvs(n))
+    U_N = U_N + U_N.conj().T 
+    U_M = np.matrix(unitary_group.rvs(n))
+    U_M = U_M + U_M.T
+    A = np.block([[U_M.conj(), U_N], [U_N.T, U_M]])
+    zeta = np.diag(A)
+    assert np.allclose(lmtl(A, zeta), lmtl_symb(A, zeta))
 
 
 @pytest.mark.parametrize("n", range(2,8))

@@ -386,7 +386,7 @@ def mtl(A):
         net_prod = 1
         for a in s:
             a = sorted(a)
-            net_prod *= A[a[0]][a[1]]
+            net_prod *= A[a[0],a[1]]
             
         net_sum += net_prod
 
@@ -404,15 +404,14 @@ def lmtl(A, zeta):
         np.float64, np.complex128 or sympy.core.add.Add: the loop Montrealer of matrix A, vector zeta
     """
 
-    fill_diagonal(A, zeta)
+    fill_diagonal(A, zeta.conj())
     n,_ = A.shape
     net_sum = 0
 
     for s in rspm(range(n)):
         net_prod = 1
         for a in s:
-            a = sorted(a)
-            net_prod *= A[a[0]][a[1]]
+            net_prod *= A[a[0],a[1]]
             
         net_sum += net_prod
 
