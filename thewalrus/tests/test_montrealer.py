@@ -75,7 +75,7 @@ def test_mtl_functions_agree(n):
 def test_lmtl_functions_agree(n):
     """Make sure both lmtl functions agree with one another"""
     U_N = np.matrix(unitary_group.rvs(n))
-    U_N = U_N + U_N.conj().T 
+    U_N = U_N + U_N.conj().T
     U_M = np.matrix(unitary_group.rvs(n))
     U_M = U_M + U_M.T
     A = np.block([[U_M.conj(), U_N], [U_N.T, U_M]])
