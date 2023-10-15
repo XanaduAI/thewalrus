@@ -63,7 +63,7 @@ def test_size_of_rpmp(n):
 @pytest.mark.parametrize("n", range(2,8))
 def test_mtl_functions_agree(n):
     """Make sure both mtl functions agree with one another"""
-    U_N = np.matrix(unitary_group.rvs(n))
+    U_N = unitary_group.rvs(n)
     U_N = U_N + U_N.conj().T 
     U_M = np.matrix(unitary_group.rvs(n))
     U_M = U_M + U_M.T
