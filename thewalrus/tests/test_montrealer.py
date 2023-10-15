@@ -16,14 +16,20 @@
 import pytest
 import numpy as np
 from thewalrus import mtl, lmtl
-from thewalrus.reference import rspm, rpmp
-from thewalrus.reference import mtl as mtl_symb
-from thewalrus.reference import lmtl as lmtl_symb
+#from thewalrus.reference import rspm, rpmp
+#from thewalrus.reference import mtl as mtl_symb
+#from thewalrus.reference import lmtl as lmtl_symb
+from thewalrus.reference import (
+    rspm,
+    rpmp,
+    mtl as mtl_symb,
+    lmtl as lmtl_symb
+)
 from scipy.special import factorial2
 from scipy.stats import unitary_group
 
 
-@pytest.mark.parametrize("n", range(1,6))
+@pytest.mark.parametrize("n", range(1,7))
 def test_montrealer_all_ones(n):
     """Test that the Montrealer of a matrix of ones gives (2n-2)!!"""
     A = np.ones([2*n, 2*n])
