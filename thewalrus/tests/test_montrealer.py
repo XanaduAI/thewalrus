@@ -112,7 +112,7 @@ def test_mtl_lmtl_agree(n):
 
 
 @pytest.mark.parametrize("n", range(2, 8))
-def test_mtl_lmtl_agree(n):
+def test_mtl_lmtl_reference_agree(n):
     """Make sure mtl and lmtl from .reference give the same result if zeta = 0"""
     u_n = unitary_group.rvs(n)
     u_n = u_n + u_n.conj().T
