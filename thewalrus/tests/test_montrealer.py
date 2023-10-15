@@ -107,7 +107,8 @@ def test_mtl_lmtl_agree(n):
     u_m = np.matrix(unitary_group.rvs(n))
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.zeros(2 * n)
+    #zeta = np.zeros(2 * n)
+    zeta = 2*n*[0]
     assert np.allclose(lmtl(adj, zeta), mtl(adj))
 
 
