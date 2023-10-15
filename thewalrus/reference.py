@@ -379,6 +379,14 @@ def rspm(s):
 
 
 def mtl(A):
+    """Returns the Montrealer of an NxN matrix and an N-length vector.
+
+    Args:
+        A (array): an NxN array of even dimensions. Can be symbolic.
+
+    Returns:
+        np.float64, np.complex128 or sympy.core.add.Add: the Montrealer of matrix A.
+    """
     n,_ = A.shape
     net_sum = 0
 
@@ -398,7 +406,7 @@ def lmtl(A, zeta):
 
     Args:
         A (array): an NxN array of even dimensions. Can be symbolic.
-        zeta (array): an N-length vector of even dimensions. Can be symbolic
+        zeta (array): an N-length vector of even dimensions. Can be symbolic.
 
     Returns:
         np.float64, np.complex128 or sympy.core.add.Add: the loop Montrealer of matrix A, vector zeta
