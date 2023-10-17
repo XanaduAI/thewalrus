@@ -16,12 +16,12 @@
 import pytest
 import numpy as np
 from thewalrus import mtl, lmtl
-from thewalrus.reference import rspm, rpmp, mtl as mtl_symb, lmtl as lmtl_symb
+from thewalrus.reference import rspm, rpmp, mtl as mtl_symb
 from scipy.special import factorial2
 from scipy.stats import unitary_group
 
 
-@pytest.mark.parametrize("n", range(1, 6))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_montrealer_all_ones(n):
     """Test that the Montrealer of a matrix of ones gives (2n-2)!!"""
     adj = np.ones([2 * n, 2 * n])
@@ -30,9 +30,13 @@ def test_montrealer_all_ones(n):
     assert np.allclose(mtl_val, mtl_expect)
 
 
-@pytest.mark.parametrize("n", range(1, 6))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_loop_montrealer_all_ones(n):
-    """Test that the Montrealer of a matrix of ones gives (2n-2)!!"""
+    """Test that the Montrealer of a matrix of ones gives (n+1)(2n-2)!!"""
+    adj = np.ones([2 * n, 2 * n])
+    lmtl_val = lmtl(adj, zeta = np.diag(adj))
+    lmtl_expect = (n+1)*factorial2(2 * n - 2)
+    assert np.allclose(lmtl_val, lmtl_expect)
 
 
 @pytest.mark.parametrize("n", range(1, 8))

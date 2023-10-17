@@ -64,7 +64,6 @@ import functools
 from collections import OrderedDict
 from itertools import tee, product, permutations, chain
 from types import GeneratorType
-from numpy import fill_diagonal
 
 MAXSIZE = 1000
 Tee = tee([], 1)[0].__class__
@@ -395,31 +394,6 @@ def mtl(A, loop=False):
         net_prod = 1
         for a in s:
             a = sorted(a)
-            net_prod *= A[a[0],a[1]]
-            
-        net_sum += net_prod
-
-    return net_sum
-
-
-def lmtl(A, zeta):
-    """Returns the loop Montrealer of an NxN matrix and an N-length vector.
-
-    Args:
-        A (array): an NxN array of even dimensions. Can be symbolic.
-        zeta (array): an N-length vector of even dimensions. Can be symbolic.
-
-    Returns:
-        np.float64, np.complex128 or sympy.core.add.Add: the loop Montrealer of matrix A, vector zeta
-    """
-
-    fill_diagonal(A, zeta.conj())
-    n,_ = A.shape
-    net_sum = 0
-
-    for s in rspm(range(n)):
-        net_prod = 1
-        for a in s:
             net_prod *= A[a[0],a[1]]
             
         net_sum += net_prod
