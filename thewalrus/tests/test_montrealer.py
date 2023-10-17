@@ -30,6 +30,11 @@ def test_montrealer_all_ones(n):
     assert np.allclose(mtl_val, mtl_expect)
 
 
+@pytest.mark.parametrize("n", range(1, 6))
+def test_loop_montrealer_all_ones(n):
+    """Test that the Montrealer of a matrix of ones gives (2n-2)!!"""
+
+
 @pytest.mark.parametrize("n", range(1, 8))
 def test_size_of_pmpr(n):
     """rpmp(2n) should have (2n-2)!! elements"""
@@ -95,8 +100,8 @@ def test_lmtl_functions_agree(n):
     u_m = unitary_group.rvs(n)
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.diag(adj)
-    assert np.allclose(lmtl(adj, zeta), lmtl_symb(adj, zeta))
+    zeta = np.diag(adj).conj()
+    assert np.allclose(lmtl(adj, zeta), mtl_symb(adj, loop=True))
 
 
 @pytest.mark.parametrize("n", range(2, 8))
@@ -120,4 +125,5 @@ def test_mtl_lmtl_reference_agree(n):
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
     zeta = np.zeros(2 * n, dtype=np.complex128)
-    assert np.allclose(lmtl_symb(adj, zeta), mtl_symb(adj))
+    np.fill_diagonal(adj, zeta)
+    assert np.allclose(mtl_symb(adj, loop=True), mtl_symb(adj))

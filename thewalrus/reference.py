@@ -378,7 +378,7 @@ def rspm(s):
     return chain(*(splitter(i) for i in gen))
 
 
-def mtl(A):
+def mtl(A, loop=False):
     """Returns the Montrealer of an NxN matrix and an N-length vector.
 
     Args:
@@ -390,7 +390,8 @@ def mtl(A):
     n,_ = A.shape
     net_sum = 0
 
-    for s in rpmp(range(n)):
+    perm = rspm(range(n)) if loop else rpmp(range(n))
+    for s in perm:
         net_prod = 1
         for a in s:
             a = sorted(a)
