@@ -136,6 +136,7 @@ def test_mtl_lmtl_reference_agree(n):
 @pytest.mark.parametrize("n", range(2, 8))
 def test_mtl_permutation(n):
     """Make sure the mtl is invariant under permutation"""
+    #np.random.permutation()
 
 
 @pytest.mark.parametrize("n", range(2,5))
@@ -176,8 +177,6 @@ def test_mtl_diagonal_trace(n):
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
 
-    adj_gamma = gamma @ adj @ gamma.conj
+    adj_gamma = gamma @ adj @ gamma.conj()
 
-    assert np.allclose(mtl(ajd_gamma), product * mtl(adj))
-
-
+    assert np.allclose(mtl(adj_gamma), product * mtl(adj))
