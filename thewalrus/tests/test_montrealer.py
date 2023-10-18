@@ -131,3 +131,13 @@ def test_mtl_lmtl_reference_agree(n):
     zeta = np.zeros(2 * n, dtype=np.complex128)
     np.fill_diagonal(adj, zeta)
     assert np.allclose(mtl_symb(adj, loop=True), mtl_symb(adj))
+
+
+@pytest.mark.parametrize("n", range(2, 8))
+def test_mtl_permutation(n):
+    """Make sure the mtl is invariant under permutation"""
+
+
+@pytest.mark.parametrize("n", range(2, 4))
+def test_mtl_permutation(n):
+    """Make sure the mtl of the associated adjacency matrix is 0"""

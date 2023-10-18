@@ -382,6 +382,7 @@ def mtl(A, loop=False):
 
     Args:
         A (array): an NxN array of even dimensions. Can be symbolic.
+        loop (boolean): if set to ``True``, the loop montrealer is returned
 
     Returns:
         np.float64, np.complex128 or sympy.core.add.Add: the Montrealer of matrix A.
