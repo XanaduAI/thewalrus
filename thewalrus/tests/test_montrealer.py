@@ -138,6 +138,33 @@ def test_mtl_permutation(n):
     """Make sure the mtl is invariant under permutation"""
 
 
-@pytest.mark.parametrize("n", range(2, 4))
-def test_mtl_permutation(n):
+@pytest.mark.parametrize("n", range(2,5))
+def test_mtl_associated_adjacency(n):
     """Make sure the mtl of the associated adjacency matrix is 0"""
+    u_zero = np.zeros((n,n), dtype = np.complex128)
+
+    u_n1 = unitary_group.rvs(n)
+    u_n2 = unitary_group.rvs(n)
+    u_n = np.block([[u_n1, u_zero], [u_zero, u_n2]])
+    u_n = u_n + u_n.conj().T
+
+    u_m1 = unitary_group.rvs(n)
+    u_m2 = unitary_group.rvs(n)
+    u_m = np.block([[u_m1, u_zero], [u_zero, u_m2]])
+    u_m_r = u_m + u_m.T
+
+    u_m3 = unitary_group.rvs(n)
+    u_m4= unitary_group.rvs(n)
+    u_m = np.block([[u_m3, u_zero], [u_zero, u_m4]])
+    u_m_l = u_m + u_m.T
+
+    adj = np.block([[u_m_r, u_n], [u_n.T, u_m_l]])
+
+    assert np.allclose(mtl(adj), 0)
+
+
+@pytest.mark.parametrize("n", range(2, 4))
+def test_mtl_diagonal_trace(n):
+    """Make sure the mtl of A time a diagonal matrix gives the trace times the mtl of A"""
+    gamma = np.diag([])
+
