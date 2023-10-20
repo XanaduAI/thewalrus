@@ -160,7 +160,7 @@ def test_mtl_associated_adjacency(n):
 
 @pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_diagonal_trace(n):
-    """Make sure the mtl of A time a diagonal matrix gives the trace times the mtl of A"""
+    """Make sure the mtl of A times a diagonal matrix gives the product of the norms of the diagonal matrix times the mtl of A"""
     gamma = np.random.uniform(-1, 1, n) + 1.j * np.random.uniform(-1, 1, n)
     product = np.prod([abs(i)**2 for i in gamma])
     gamma = np.diag(np.concatenate((gamma, gamma.conj())))
