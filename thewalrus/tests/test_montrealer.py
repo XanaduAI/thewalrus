@@ -16,7 +16,9 @@
 import pytest
 import numpy as np
 from thewalrus import mtl, lmtl
+from thewalrus.quantum import Qmat, Xmat
 from thewalrus.reference import rspm, rpmp, mtl as mtl_symb
+from thewalrus.random import random_covariance
 from scipy.special import factorial2
 from scipy.stats import unitary_group
 
@@ -85,58 +87,50 @@ def test_size_of_rpmp(n):
     assert test
 
 
-@pytest.mark.parametrize("n", range(2, 8))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_functions_agree(n):
     """Make sure both mtl functions agree with one another"""
-    u_n = unitary_group.rvs(n)
-    u_n = u_n + u_n.conj().T
-    u_m = unitary_group.rvs(n)
-    u_m = u_m + u_m.T
-    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    assert np.allclose(mtl_symb(adj), mtl(adj))
+    V = random_covariance(n)
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    assert np.allclose(mtl_symb(Aad), mtl(Aad))
 
 
-@pytest.mark.parametrize("n", range(2, 8))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_lmtl_functions_agree(n):
     """Make sure both lmtl functions agree with one another"""
-    u_n = unitary_group.rvs(n)
-    u_n = u_n + u_n.conj().T
-    u_m = unitary_group.rvs(n)
-    u_m = u_m + u_m.T
-    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-    zeta = np.diag(adj).conj()
-    assert np.allclose(lmtl(adj, zeta), mtl_symb(adj, loop=True))
+    V = random_covariance(n)
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    zeta = np.diag(Aad).conj()
+    assert np.allclose(lmtl(Aad, zeta), mtl_symb(Aad, loop=True))
 
 
-@pytest.mark.parametrize("n", range(2, 8))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_lmtl_agree(n):
     """Make sure mtl and lmtl give the same result if zeta = 0"""
-    u_n = unitary_group.rvs(n)
-    u_n = u_n + u_n.conj().T
-    u_m = unitary_group.rvs(n)
-    u_m = u_m + u_m.T
-    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    V = random_covariance(n)
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
     zeta = np.zeros(2 * n, dtype=np.complex128)
-    assert np.allclose(lmtl(adj, zeta), lmtl(adj, zeta))
+    assert np.allclose(lmtl(Aad, zeta), lmtl(Aad, zeta))
 
 
-@pytest.mark.parametrize("n", range(2, 8))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_lmtl_reference_agree(n):
     """Make sure mtl and lmtl from .reference give the same result if zeta = 0"""
-    u_n = unitary_group.rvs(n)
-    u_n = u_n + u_n.conj().T
-    u_m = unitary_group.rvs(n)
-    u_m = u_m + u_m.T
-    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
+    V = random_covariance(n)
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
     zeta = np.zeros(2 * n, dtype=np.complex128)
-    np.fill_diagonal(adj, zeta)
-    assert np.allclose(mtl_symb(adj, loop=True), mtl_symb(adj))
+    np.fill_diagonal(Aad, zeta)
+    assert np.allclose(mtl_symb(Aad, loop=True), mtl_symb(Aad))
 
 
-@pytest.mark.parametrize("n", range(2, 8))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_permutation(n):
     """Make sure the mtl is invariant under permutation"""
-    #np.random.permutation()
+    V = random_covariance(n)
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    perm = np.random.permutation(n)
+    perm = np.concatenate((perm, [i+n for i in perm]))
+    assert np.allclose(mtl(Aad), mtl(Aad[perm][:,perm]))
 
 
 @pytest.mark.parametrize("n", range(2,5))
@@ -164,17 +158,12 @@ def test_mtl_associated_adjacency(n):
     assert np.allclose(mtl(adj), 0)
 
 
-@pytest.mark.parametrize("n", range(2, 8))
+@pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_diagonal_trace(n):
     """Make sure the mtl of A time a diagonal matrix gives the trace times the mtl of A"""
     gamma = np.random.uniform(-1, 1, n) + 1.j * np.random.uniform(-1, 1, n)
     product = np.prod([abs(i)**2 for i in gamma])
     gamma = np.diag(np.concatenate((gamma, gamma.conj())))
-
-    u_n = unitary_group.rvs(n)
-    u_n = u_n + u_n.conj().T
-    u_m = unitary_group.rvs(n)
-    u_m = u_m + u_m.T
-    adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
-
-    assert np.allclose(mtl(gamma @ adj @ gamma), product * mtl(adj))
+    V = random_covariance(n)
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    assert np.allclose(mtl(gamma @ Aad @ gamma), product * mtl(Aad))
