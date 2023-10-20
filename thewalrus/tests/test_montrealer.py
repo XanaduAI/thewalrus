@@ -164,7 +164,7 @@ def test_mtl_associated_adjacency(n):
     assert np.allclose(mtl(adj), 0)
 
 
-@pytest.mark.parametrize("n", range(2, 5))
+@pytest.mark.parametrize("n", range(2, 8))
 def test_mtl_diagonal_trace(n):
     """Make sure the mtl of A time a diagonal matrix gives the trace times the mtl of A"""
     gamma = np.random.uniform(-1, 1, n) + 1.j * np.random.uniform(-1, 1, n)
@@ -177,6 +177,4 @@ def test_mtl_diagonal_trace(n):
     u_m = u_m + u_m.T
     adj = np.block([[u_m.conj(), u_n], [u_n.T, u_m]])
 
-    adj_gamma = gamma @ adj @ gamma.conj()
-
-    assert np.allclose(mtl(adj_gamma), product * mtl(adj))
+    assert np.allclose(mtl(gamma @ adj @ gamma), product * mtl(adj))
