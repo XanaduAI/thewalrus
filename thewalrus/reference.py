@@ -388,15 +388,15 @@ def mtl(A, loop=False):
     Returns:
         np.float64, np.complex128 or sympy.core.add.Add: the Montrealer of matrix A.
     """
-    n,_ = A.shape
+    n, _ = A.shape
     net_sum = 0
 
     perm = rspm(range(n)) if loop else rpmp(range(n))
     for s in perm:
         net_prod = 1
         for a in s:
-            net_prod *= A[a[0],a[1]]
-            
+            net_prod *= A[a[0], a[1]]
+
         net_sum += net_prod
 
     return net_sum
