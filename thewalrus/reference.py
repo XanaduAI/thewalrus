@@ -357,9 +357,10 @@ def splitter(elem):
     net = [elem]
     for i in range(num_elem):
         left = (elem[j] for j in range(i))
-        middle = ((elem[i][0], elem[i][0]), (elem[i][1], elem[i][1]))
+        middle_left = ((elem[i][0], elem[i][0]),)
+        middle_right = ((elem[i][1], elem[i][1]),)
         right = (elem[j] for j in range(i + 1, num_elem))
-        net.append(tuple(left) + tuple(middle) + tuple(right))
+        net.append(tuple(middle_right) + tuple(right) + tuple(left) + tuple(middle_left))
     for i in net:
         yield i
 
