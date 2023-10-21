@@ -34,10 +34,10 @@ def test_montrealer_all_ones(n):
 
 @pytest.mark.parametrize("n", range(1, 8))
 def test_loop_montrealer_all_ones(n):
-    """Test that the Montrealer of a matrix of ones gives (n+1)(2n-2)!!"""
+    """Test that the loop Montrealer of a matrix of ones gives (n+1)(2n-2)!!"""
     adj = np.ones([2 * n, 2 * n])
-    lmtl_val = lmtl(adj, zeta = np.diag(adj))
-    lmtl_expect = (n+1)*factorial2(2 * n - 2)
+    lmtl_val = lmtl(adj, zeta=np.diag(adj))
+    lmtl_expect = (n + 1) * factorial2(2 * n - 2)
     assert np.allclose(lmtl_val, lmtl_expect)
 
 
@@ -91,7 +91,7 @@ def test_rpmp_alternating_walk(n):
 def test_mtl_functions_agree(n):
     """Make sure both mtl functions agree with one another"""
     V = random_covariance(n)
-    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     assert np.allclose(mtl_symb(Aad), mtl(Aad))
 
 
@@ -99,7 +99,7 @@ def test_mtl_functions_agree(n):
 def test_lmtl_functions_agree(n):
     """Make sure both lmtl functions agree with one another"""
     V = random_covariance(n)
-    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     zeta = np.diag(Aad).conj()
     assert np.allclose(lmtl(Aad, zeta), mtl_symb(Aad, loop=True))
 
@@ -108,7 +108,7 @@ def test_lmtl_functions_agree(n):
 def test_mtl_lmtl_agree(n):
     """Make sure mtl and lmtl give the same result if zeta = 0"""
     V = random_covariance(n)
-    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     zeta = np.zeros(2 * n, dtype=np.complex128)
     assert np.allclose(lmtl(Aad, zeta), lmtl(Aad, zeta))
 
@@ -117,7 +117,7 @@ def test_mtl_lmtl_agree(n):
 def test_mtl_lmtl_reference_agree(n):
     """Make sure mtl and lmtl from .reference give the same result if zeta = 0"""
     V = random_covariance(n)
-    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     zeta = np.zeros(2 * n, dtype=np.complex128)
     np.fill_diagonal(Aad, zeta)
     assert np.allclose(mtl_symb(Aad, loop=True), mtl_symb(Aad))
@@ -127,16 +127,16 @@ def test_mtl_lmtl_reference_agree(n):
 def test_mtl_permutation(n):
     """Make sure the mtl is invariant under permutation"""
     V = random_covariance(n)
-    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     perm = np.random.permutation(n)
-    perm = np.concatenate((perm, [i+n for i in perm]))
-    assert np.allclose(mtl(Aad), mtl(Aad[perm][:,perm]))
+    perm = np.concatenate((perm, [i + n for i in perm]))
+    assert np.allclose(mtl(Aad), mtl(Aad[perm][:, perm]))
 
 
-@pytest.mark.parametrize("n", range(2,5))
+@pytest.mark.parametrize("n", range(2, 5))
 def test_mtl_associated_adjacency(n):
     """Make sure the mtl of the associated adjacency matrix is 0"""
-    u_zero = np.zeros((n,n), dtype = np.complex128)
+    u_zero = np.zeros((n, n), dtype=np.complex128)
 
     u_n1 = unitary_group.rvs(n)
     u_n2 = unitary_group.rvs(n)
@@ -149,7 +149,7 @@ def test_mtl_associated_adjacency(n):
     u_m_r = u_m + u_m.T
 
     u_m3 = unitary_group.rvs(n)
-    u_m4= unitary_group.rvs(n)
+    u_m4 = unitary_group.rvs(n)
     u_m = np.block([[u_m3, u_zero], [u_zero, u_m4]])
     u_m_l = u_m + u_m.T
 
@@ -161,9 +161,9 @@ def test_mtl_associated_adjacency(n):
 @pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_diagonal_trace(n):
     """Make sure the mtl of A times a diagonal matrix gives the product of the norms of the diagonal matrix times the mtl of A"""
-    gamma = np.random.uniform(-1, 1, n) + 1.j * np.random.uniform(-1, 1, n)
-    product = np.prod([abs(i)**2 for i in gamma])
+    gamma = np.random.uniform(-1, 1, n) + 1.0j * np.random.uniform(-1, 1, n)
+    product = np.prod([abs(i) ** 2 for i in gamma])
     gamma = np.diag(np.concatenate((gamma, gamma.conj())))
     V = random_covariance(n)
-    Aad = Xmat(n) @ (Qmat(V) - np.identity(2*n))
+    Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     assert np.allclose(mtl(gamma @ Aad @ gamma), product * mtl(Aad))

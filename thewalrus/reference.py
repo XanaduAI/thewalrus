@@ -394,7 +394,6 @@ def mtl(A, loop=False):
     for s in perm:
         net_prod = 1
         for a in s:
-            a = sorted(a)
             net_prod *= A[a[0],a[1]]
             
         net_sum += net_prod

@@ -117,7 +117,7 @@ def lmtl(A, zeta):
 
 
 def mtl(A):
-    """Returns the montrealer of an NxN matrix and an N-length vector.
+    """Returns the montrealer of an NxN matrix.
 
     Args:
         A (array): an NxN array of even dimensions.
