@@ -42,7 +42,7 @@ def test_loop_montrealer_all_ones(n):
 
 
 @pytest.mark.parametrize("n", range(1, 8))
-def test_size_of_pmpr(n):
+def test_size_of_rpmp(n):
     """rpmp(2n) should have (2n-2)!! elements"""
     terms_rpmp = sum(1 for _ in rpmp(range(2 * n)))
     terms_theo = factorial2(2 * n - 2)
@@ -58,7 +58,7 @@ def test_size_of_rspm(n):
 
 
 @pytest.mark.parametrize("n", range(2, 8))
-def test_size_of_rpmp(n):
+def test_rpmp_alternating_walk(n):
     """The rpmp must form a Y-alternating walk without loops"""
     test = True
     for perfect in rpmp(range(1, 2 * n + 1)):
