@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Montrealer tests"""
+"""Montrealer tests
+Yanic Cardin and Nicolás Quesada. "Photon-number moments and cumulants of Gaussian states"
+`arxiv:12212.06067 (2023) <https://arxiv.org/abs/arxiv:2212.06067v2>`_
+"""
 
 import pytest
 import numpy as np
@@ -125,7 +128,8 @@ def test_mtl_lmtl_reference_agree(n):
 
 @pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_permutation(n):
-    """Make sure the mtl is invariant under permutation"""
+    """Make sure the mtl is invariant under permutation
+    cf. Eq. 44 of `arxiv:12212.06067 (2023) <https://arxiv.org/abs/arxiv:2212.06067v2>`_"""
     V = random_covariance(n)
     Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     perm = np.random.permutation(n)
@@ -135,7 +139,8 @@ def test_mtl_permutation(n):
 
 @pytest.mark.parametrize("n", range(2, 5))
 def test_mtl_associated_adjacency(n):
-    """Make sure the mtl of a matrix in which each block is block diaognal is zero"""
+    """Make sure the mtl of a matrix in which each block is block diaognal is zero.
+    cf. Eq. 45 of `arxiv:12212.06067 (2023) <https://arxiv.org/abs/arxiv:2212.06067v2>`_"""
     u_zero = np.zeros((n, n), dtype=np.complex128)
 
     u_n1 = unitary_group.rvs(n)
@@ -160,7 +165,8 @@ def test_mtl_associated_adjacency(n):
 
 @pytest.mark.parametrize("n", range(1, 8))
 def test_mtl_diagonal_trace(n):
-    """Make sure the mtl of A times a diagonal matrix gives the product of the norms of the diagonal matrix times the mtl of A"""
+    """Make sure the mtl of A times a diagonal matrix gives the product of the norms of the diagonal matrix times the mtl of A
+    cf. Eq. 41 of `arxiv:12212.06067 (2023) <https://arxiv.org/abs/arxiv:2212.06067v2>`_"""
     gamma = np.random.uniform(-1, 1, n) + 1.0j * np.random.uniform(-1, 1, n)
     product = np.prod([abs(i) ** 2 for i in gamma])
     gamma = np.diag(np.concatenate((gamma, gamma.conj())))
