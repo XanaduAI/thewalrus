@@ -1,5 +1,8 @@
 """
 Montrealer Python interface
+
+* Yanic Cardin and Nicolás Quesada. "Photon-number moments and cumulants of Gaussian states"
+  `arxiv:12212.06067 (2023) <https://arxiv.org/abs/arxiv:2212.06067v2>`_
 """
 import numpy as np
 import numba
@@ -100,14 +103,14 @@ def lmontrealer(Sigma, zeta):  # pragma: no cover
 
 
 def lmtl(A, zeta):
-    """Returns the loop Torontonian of an NxN matrix and an N-length vector.
+    """Returns the montrealer of an NxN matrix and an N-length vector.
 
     Args:
         A (array): an NxN array of even dimensions.
         zeta (array): an N-length vector of even dimensions
 
     Returns:
-        np.float64 or np.complex128: the loop torontonian of matrix A, vector gamma
+        np.float64 or np.complex128: the loop montrealer of matrix A, vector zeta
     """
 
     tor_input_checks(A, zeta)
@@ -117,14 +120,13 @@ def lmtl(A, zeta):
 
 
 def mtl(A):
-    """Returns the loop Torontonian of an NxN matrix and an N-length vector.
+    """Returns the montrealer of an NxN matrix.
 
     Args:
         A (array): an NxN array of even dimensions.
-        zeta (array): an N-length vector of even dimensions
 
     Returns:
-        np.float64 or np.complex128: the loop torontonian of matrix A, vector gamma
+        np.float64 or np.complex128: the montrealer of matrix A
     """
 
     tor_input_checks(A)

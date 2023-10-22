@@ -68,4 +68,4 @@
 
 * Will McCutcheon (Heriot-Watt University) - 🧅 Gaussian Onion Merchant
 
-* [Yanic Cardin](https://github.com/yaniccd) (Polytechnique Montréal) - 
+* [Yanic Cardin](https://github.com/yaniccd) (Polytechnique Montréal) - 🦜 Pirate of the permutations

@@ -357,9 +357,10 @@ def splitter(elem):
     net = [elem]
     for i in range(num_elem):
         left = (elem[j] for j in range(i))
-        middle = ((elem[i][0], elem[i][0]), (elem[i][1], elem[i][1]))
+        middle_left = ((elem[i][0], elem[i][0]),)
+        middle_right = ((elem[i][1], elem[i][1]),)
         right = (elem[j] for j in range(i + 1, num_elem))
-        net.append(tuple(left) + tuple(middle) + tuple(right))
+        net.append(tuple(middle_right) + tuple(right) + tuple(left) + tuple(middle_left))
     for i in net:
         yield i
 
@@ -375,3 +376,27 @@ def rspm(s):
     """
     gen = rpmp(s)
     return chain(*(splitter(i) for i in gen))
+
+
+def mtl(A, loop=False):
+    """Returns the Montrealer of an NxN matrix and an N-length vector.
+
+    Args:
+        A (array): an NxN array of even dimensions. Can be symbolic.
+        loop (boolean): if set to ``True``, the loop montrealer is returned
+
+    Returns:
+        np.float64, np.complex128 or sympy.core.add.Add: the Montrealer of matrix A.
+    """
+    n, _ = A.shape
+    net_sum = 0
+
+    perm = rspm(range(n)) if loop else rpmp(range(n))
+    for s in perm:
+        net_prod = 1
+        for a in s:
+            net_prod *= A[a[0], a[1]]
+
+        net_sum += net_prod
+
+    return net_sum
