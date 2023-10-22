@@ -44,7 +44,7 @@ def test_loop_montrealer_all_ones(n):
 @pytest.mark.parametrize("n", range(1, 8))
 def test_size_of_rpmp(n):
     """rpmp(2n) should have (2n-2)!! elements"""
-    terms_rpmp = sum(1 for _ in rpmp(range(2 * n)))
+    terms_rpmp = len(list(rpmp(range(2 * n))))
     terms_theo = factorial2(2 * n - 2)
     assert terms_rpmp == terms_theo
 
@@ -135,7 +135,7 @@ def test_mtl_permutation(n):
 
 @pytest.mark.parametrize("n", range(2, 5))
 def test_mtl_associated_adjacency(n):
-    """Make sure the mtl of the associated adjacency matrix is 0"""
+    """Make sure the mtl of a matrix in which each block is block diaognal is zero"""
     u_zero = np.zeros((n, n), dtype=np.complex128)
 
     u_n1 = unitary_group.rvs(n)
