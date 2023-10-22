@@ -6,10 +6,10 @@ Montrealer Python interface
 """
 import numpy as np
 import numba
-from thewalrus.quantum.conversions import Qmat, reduced_gaussian, Xmat
+from thewalrus.quantum.conversions import Xmat
+from thewalrus.charpoly import powertrace
 from ._hafnian import nb_ix
 from ._torontonian import tor_input_checks
-from thewalrus.charpoly import powertrace
 
 
 @numba.jit(nopython=True, cache=True)
@@ -70,7 +70,7 @@ def power_loop(Sigma, zeta, n):  # pragma: no cover
         (np.complex128 or np.float64): the product np.conj(zeta) @ Sigma^{n-1} @ zeta
     """
     vec = zeta
-    for i in range(n - 1):
+    for _ in range(n - 1):
         vec = Sigma @ vec
     return np.conj(zeta) @ vec
 
