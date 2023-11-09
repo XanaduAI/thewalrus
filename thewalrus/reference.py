@@ -345,7 +345,7 @@ def rpmp(s):
 
 
 def splitter(elem):
-    """Takes an element from rpmp and returns all the associated elements in rspm
+    """Takes an element from the restricted perfect matching permutations (rpmp) and returns all the associated elements in the restricted single pair matchings (rspm)
 
     Args:
         elem (tuple): tuple representing an element of rpmp
