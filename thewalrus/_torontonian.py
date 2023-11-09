@@ -21,10 +21,11 @@ from ._hafnian import reduction, find_kept_edges, nb_ix
 
 
 def tor_input_checks(A, loops=None):
-    """Checks the correcteness of the inputs for the torontonian/montrealer.
+    """Checks the correctness of the inputs for the torontonian/montrealer.
+
     Args:
-        A (array): an NxN array of even dimensions.
-        loops (array): optinal argument, an N-length vector of even dimensions.
+        A (array): an NxN array of even dimensions
+        loops (array): optional argument, an N-length vector of even dimensions
     """
     if not isinstance(A, np.ndarray):
         raise TypeError("Input matrix must be a NumPy array.")

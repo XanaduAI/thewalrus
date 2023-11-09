@@ -288,7 +288,7 @@ def mapper(x, objects):
     """Helper function to turn a permutation and bistring into an element of rpmp.
 
     Args:
-        x (tuple): tuple containing a permutation and a bistring.
+        x (tuple): tuple containing a permutation and a bistring
         objects (list): list objects to permute
 
     Returns:
@@ -313,10 +313,10 @@ def bitstrings(n):
     """Returns the bistrings from 0 to n/2
 
     Args:
-        n (int) : Twice the highest bitstring value.
+        n (int): Twice the highest bitstring value.
 
     Returns:
-        (iterator) : An iterable of all bistrings.
+        (iterator): An iterable of all bistrings.
     """
     for binary in map("".join, product("01", repeat=n - 1)):
         yield "0" + binary
@@ -329,7 +329,7 @@ def rpmp(s):
         s (tuple): tuple of labels to be used
 
     Returns:
-        generator: the set of restricted perfect matching permutations of the tuple s
+        generator: the set of restricted perfect matching permutations of the tuple ``s``
     """
     m = len(s) // 2
 
@@ -386,7 +386,7 @@ def mtl(A, loop=False):
         loop (boolean): if set to ``True``, the loop montrealer is returned
 
     Returns:
-        np.float64, np.complex128 or sympy.core.add.Add: the Montrealer of matrix A.
+        np.float64, np.complex128 or sympy.core.add.Add: the Montrealer of matrix ``A``.
     """
     n, _ = A.shape
     net_sum = 0

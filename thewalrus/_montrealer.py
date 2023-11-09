@@ -14,15 +14,14 @@ from ._torontonian import tor_input_checks
 
 @numba.jit(nopython=True, cache=True)
 def dec2bin(num, n):  # pragma: no cover
-    """Helper function to generate convert an integer into an element of the powerset of n objects.
+    """Helper function to convert an integer into an element of the power-set of ``n`` objects.
 
     Args:
-        num (int): label to convert.
-        n (int): number of elements in the set.
+        num (int): label to convert
+        n (int): number of elements in the set
 
     Returns:
-        (array): array containing the labels of the elements to be selected.
-
+        (array): array containing the labels of the elements to be selected
     """
     digits = np.zeros((n), dtype=type(num))
     nn = num
@@ -39,11 +38,10 @@ def montrealer(Sigma):  # pragma: no cover
     """Calculates the loop-montrealer of the zero-displacement Gaussian state with the given complex covariance matrix.
 
     Args:
-        A (array): adjacency matrix of the Gaussian state.
+        A (array): adjacency matrix of the Gaussian state
 
     Returns:
-        (np.complex128): the montrealer of A.
-
+        (np.complex128): the montrealer of A
     """
     n = len(Sigma) // 2
     tot_num = 2**n
@@ -60,7 +58,8 @@ def montrealer(Sigma):  # pragma: no cover
 
 @numba.jit(nopython=True)
 def power_loop(Sigma, zeta, n):  # pragma: no cover
-    """Auxiliary function to calculate the product np.conj(zeta) @ Sigma^{n-1} @ zeta.
+    """Auxiliary function to calculate the product ``np.conj(zeta) @ Sigma^{n-1} @ zeta``.
+
     Args:
         Sigma (array): square complex matrix
         zeta (array): complex vector
@@ -80,11 +79,11 @@ def lmontrealer(Sigma, zeta):  # pragma: no cover
     """Calculates the loop-montrealer of the displaced Gaussian state with the given complex covariance matrix and vector of displacements.
 
     Args:
-        Sigma (array): complex Glauber covariance matrix of the Gaussian state.
+        Sigma (array): complex Glauber covariance matrix of the Gaussian state
         zeta (array): vector of displacements
 
     Returns:
-        (np.complex128): the montrealer of A.
+        (np.complex128): the montrealer of ``A``
     """
     n = len(Sigma) // 2
     tot_num = 2**n
@@ -106,7 +105,7 @@ def lmtl(A, zeta):
     """Returns the montrealer of an NxN matrix and an N-length vector.
 
     Args:
-        A (array): an NxN array of even dimensions.
+        A (array): an NxN array of even dimensions
         zeta (array): an N-length vector of even dimensions
 
     Returns:
@@ -126,7 +125,7 @@ def mtl(A):
         A (array): an NxN array of even dimensions.
 
     Returns:
-        np.float64 or np.complex128: the montrealer of matrix A
+        np.float64 or np.complex128: the montrealer of matrix ``A``
     """
 
     tor_input_checks(A)
