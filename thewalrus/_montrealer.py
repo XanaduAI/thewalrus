@@ -26,7 +26,7 @@ def dec2bin(num, n):  # pragma: no cover
     digits = np.zeros((n), dtype=type(num))
     nn = num
     counter = -1
-    while nn >= 1:  # Should be >= 1, not > 1.
+    while nn >= 1:
         digits[counter] = nn % 2
         counter -= 1
         nn //= 2
@@ -38,10 +38,10 @@ def montrealer(Sigma):  # pragma: no cover
     """Calculates the loop-montrealer of the zero-displacement Gaussian state with the given complex covariance matrix.
 
     Args:
-        A (array): adjacency matrix of the Gaussian state
+        Sigma (array): adjacency matrix of the Gaussian state
 
     Returns:
-        (np.complex128): the montrealer of A
+        (np.complex128): the montrealer of ``Sigma``
     """
     n = len(Sigma) // 2
     tot_num = 2**n
@@ -83,7 +83,7 @@ def lmontrealer(Sigma, zeta):  # pragma: no cover
         zeta (array): vector of displacements
 
     Returns:
-        (np.complex128): the montrealer of ``A``
+        (np.complex128): the montrealer of ``Sigma``
     """
     n = len(Sigma) // 2
     tot_num = 2**n
