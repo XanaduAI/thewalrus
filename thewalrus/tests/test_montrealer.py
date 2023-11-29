@@ -19,6 +19,7 @@ Yanic Cardin and Nicolás Quesada. "Photon-number moments and cumulants of Gauss
 import pytest
 import numpy as np
 from thewalrus import mtl, lmtl
+from thewalrus.reference import mapper
 from thewalrus.quantum import Qmat, Xmat
 from thewalrus.reference import rspm, rpmp, mtl as mtl_symb
 from thewalrus.random import random_covariance
@@ -173,3 +174,8 @@ def test_mtl_diagonal_trace(n):
     V = random_covariance(n)
     Aad = Xmat(n) @ (Qmat(V) - np.identity(2 * n))
     assert np.allclose(mtl(gamma @ Aad @ gamma), product * mtl(Aad))
+
+
+def test_mapper_hard_coded():
+    """Tests the the mapper function for a particular hardcoded value"""
+    assert mapper(((1, 2, 3), "0000"), (0, 1, 2, 3, 4, 5, 6, 7)) == ((0, 5), (1, 6), (2, 7), (4, 3))
