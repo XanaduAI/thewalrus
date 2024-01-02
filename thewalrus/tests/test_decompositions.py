@@ -274,6 +274,7 @@ def test_takagi(n, datatype, svd_order):
         assert np.all(np.diff(r) >= 0)
 
 
+# pylint: too-many-arguments
 @pytest.mark.parametrize("n", [5, 10, 50])
 @pytest.mark.parametrize("datatype", [np.complex128, np.float64])
 @pytest.mark.parametrize("svd_order", [True, False])
