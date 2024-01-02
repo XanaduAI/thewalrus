@@ -279,18 +279,21 @@ def test_takagi(n, datatype, svd_order):
 @pytest.mark.parametrize("svd_order", [True, False])
 @pytest.mark.parametrize("half_rank", [0, 1])
 @pytest.mark.parametrize("phase", [0, 1])
-def test_degenerate(n, datatype, svd_order, half_rank, phase):
+@pytest.mark.parametrize("null_space", [0, 5, 10])
+def test_degenerate(n, datatype, svd_order, half_rank, phase, null_space):
     """Tests Takagi produces the correct result for very degenerate cases"""
     nhalf = n // 2
-    diags = [half_rank * np.random.rand()] * nhalf + [np.random.rand()] * (n - nhalf)
+    diags = (
+        [half_rank * np.random.rand()] * nhalf + [np.random.rand()] * (n - nhalf) + [0] * null_space
+    )
     if datatype is np.complex128:
-        U = haar_measure(n)
+        U = haar_measure(n + null_space)
     if datatype is np.float64:
-        U = np.exp(1j * phase) * haar_measure(n, real=True)
+        U = np.exp(1j * phase) * haar_measure(n + null_space, real=True)
     A = U @ np.diag(diags) @ U.T
     r, U = takagi(A, svd_order=svd_order)
     assert np.allclose(A, U @ np.diag(r) @ U.T)
-    assert np.allclose(U @ U.T.conj(), np.eye(n))
+    assert np.allclose(U @ U.T.conj(), np.eye(n + null_space))
     assert np.all(r >= 0)
     if svd_order is True:
         assert np.all(np.diff(r) <= 0)
