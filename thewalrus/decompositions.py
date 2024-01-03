@@ -166,7 +166,8 @@ def blochmessiah(S):
 
 def takagi(A, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
-    Note that the input matrix is internally symmetrized. If the input matrix is indeed symmetric this leaves it unchanged.
+    Note that the input matrix is internally symmetrized by taking its upper triangular part.
+    If the input matrix is indeed symmetric this leaves it unchanged.
     See `Carl Caves note. <http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf>`_
 
     Args:
@@ -181,8 +182,8 @@ def takagi(A, svd_order=True):
     n, m = A.shape
     if n != m:
         raise ValueError("The input matrix is not square")
-    # Here we force symmetrize the matrix
-    A = 0.5 * (A + A.T)
+    # Here we build a Symmetric matrix from the top right triangular part
+    A = np.triu(A) + np.triu(A, k=1).T
 
     A = np.real_if_close(A)
 
@@ -196,11 +197,12 @@ def takagi(A, svd_order=True):
         signs = (-1) ** (1 + np.heaviside(vals, 1))
         phases = np.sqrt(np.complex128(signs))
         Uc = U * phases  # One needs to readjust the phases
-        list_vals = [(vals[i], i) for i in range(len(vals))]
-        # And also rearrange the unitary and values so that they are decreasingly ordered
-        list_vals.sort(reverse=svd_order)
-        sorted_ls, permutation = zip(*list_vals)
-        return np.array(sorted_ls), Uc[:, np.array(permutation)]
+        # Find the permutation to sort in decreasing order
+        perm = np.argsort(vals)
+        # if svd_order reverse it
+        if svd_order:
+            perm = perm[::-1]
+        return vals[perm], Uc[:, perm]
 
     # Find the element with the largest absolute value
     pos = np.unravel_index(np.argmax(np.abs(A)), (n, n))
