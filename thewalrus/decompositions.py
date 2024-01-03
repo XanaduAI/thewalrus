@@ -194,7 +194,7 @@ def takagi(A, svd_order=True):
         # If the matrix A is real one can be more clever and use its eigendecomposition
         ls, U = np.linalg.eigh(A)
         vals = np.abs(ls)  # These are the Takagi eigenvalues
-        signs = (-1) ** (1 + np.heaviside(vals, 1))
+        signs = (-1) ** (1 + np.heaviside(ls, 1))
         phases = np.sqrt(np.complex128(signs))
         Uc = U * phases  # One needs to readjust the phases
         # Find the permutation to sort in decreasing order

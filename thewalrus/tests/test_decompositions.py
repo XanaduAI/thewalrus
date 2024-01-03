@@ -281,11 +281,14 @@ def test_takagi(n, datatype, svd_order):
 @pytest.mark.parametrize("half_rank", [0, 1])
 @pytest.mark.parametrize("phase", [0, 1])
 @pytest.mark.parametrize("null_space", [0, 5, 10])
-def test_degenerate(n, datatype, svd_order, half_rank, phase, null_space):
+@pytest.mark.parametrize("offset", [0, 0.5])
+def test_degenerate(n, datatype, svd_order, half_rank, phase, null_space, offset):
     """Tests Takagi produces the correct result for very degenerate cases"""
     nhalf = n // 2
     diags = (
-        [half_rank * np.random.rand()] * nhalf + [np.random.rand()] * (n - nhalf) + [0] * null_space
+        [half_rank * np.random.rand()] * nhalf
+        + [np.random.rand() - offset] * (n - nhalf)
+        + [0] * null_space
     )
     if datatype is np.complex128:
         U = haar_measure(n + null_space)
