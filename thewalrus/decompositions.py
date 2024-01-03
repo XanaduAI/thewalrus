@@ -222,10 +222,6 @@ def takagi(A, svd_order=True):
 
     u, d, v = np.linalg.svd(A)
     U = u @ sqrtm((v @ np.conjugate(u)).T)
-    # The line above could be simplifed to the line below if the product v @ np.conjugate(u) is diagonal
-    # Which it should be according to Caves http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf
-    # U = u * np.sqrt(0j + np.diag(v @ np.conjugate(u)))
-    # This however breaks test_degenerate
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
