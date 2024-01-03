@@ -193,14 +193,9 @@ def takagi(A, svd_order=True):
         # If the matrix A is real one can be more clever and use its eigendecomposition
         ls, U = np.linalg.eigh(A)
         vals = np.abs(ls)  # These are the Takagi eigenvalues
-        phases = (-1) ** np.heaviside(vals, 1)
-        phases = np.sqrt(np.complex128(phases))
-        Uc = U @ np.diag(phases)  # One needs to readjust the phases
-        signs = np.sign(Uc.real)[0]
-        for k, s in enumerate(signs):
-            if np.allclose(s, 0):
-                signs[k] = 1
-        Uc = np.real_if_close(Uc / signs)
+        signs = (-1) ** (1 + np.heaviside(vals, 1))
+        phases = np.sqrt(np.complex128(signs))
+        Uc = U * phases  # One needs to readjust the phases
         list_vals = [(vals[i], i) for i in range(len(vals))]
         # And also rearrange the unitary and values so that they are decreasingly ordered
         list_vals.sort(reverse=svd_order)
