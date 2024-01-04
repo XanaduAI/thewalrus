@@ -5,6 +5,7 @@
 * Adds the Takagi decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/363)
 
 * Adds the Montrealer and Loop Montrealer functions [(#363)](https://github.com/XanaduAI/thewalrus/pull/374).
+
 ### Breaking changes
 
 ### Improvements
@@ -17,6 +18,8 @@
 * Simplifies the internal working of Williamson decomposition [(#366)](https://github.com/XanaduAI/thewalrus/pull/338). 
 
 * Improves the handling of an edge case in Takagi [(#373)](https://github.com/XanaduAI/thewalrus/pull/373).
+
+* Adds extra tests for the Takagi decomposition [(#377)](https://github.com/XanaduAI/thewalrus/pull/377)
 
 ### Bug fixes
 

@@ -166,7 +166,8 @@ def blochmessiah(S):
 
 def takagi(A, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
-    Note that the input matrix is internally symmetrized. If the input matrix is indeed symmetric this leaves it unchanged.
+    Note that the input matrix is internally symmetrized by taking its upper triangular part.
+    If the input matrix is indeed symmetric this leaves it unchanged.
     See `Carl Caves note. <http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf>`_
 
     Args:
@@ -181,8 +182,8 @@ def takagi(A, svd_order=True):
     n, m = A.shape
     if n != m:
         raise ValueError("The input matrix is not square")
-    # Here we force symmetrize the matrix
-    A = 0.5 * (A + A.T)
+    # Here we build a Symmetric matrix from the top right triangular part
+    A = np.triu(A) + np.triu(A, k=1).T
 
     A = np.real_if_close(A)
 
@@ -192,24 +193,16 @@ def takagi(A, svd_order=True):
     if np.isrealobj(A):
         # If the matrix A is real one can be more clever and use its eigendecomposition
         ls, U = np.linalg.eigh(A)
-        U = U / np.exp(1j * np.angle(U)[0])
         vals = np.abs(ls)  # These are the Takagi eigenvalues
-        phases = -np.ones(vals.shape[0], dtype=np.complex128)
-        for j, l in enumerate(ls):
-            if np.allclose(l, 0) or l > 0:
-                phases[j] = 1
-        phases = np.sqrt(phases)
-        Uc = U @ np.diag(phases)  # One needs to readjust the phases
-        signs = np.sign(Uc.real)[0]
-        for k, s in enumerate(signs):
-            if np.allclose(s, 0):
-                signs[k] = 1
-        Uc = np.real_if_close(Uc / signs)
-        list_vals = [(vals[i], i) for i in range(len(vals))]
-        # And also rearrange the unitary and values so that they are decreasingly ordered
-        list_vals.sort(reverse=svd_order)
-        sorted_ls, permutation = zip(*list_vals)
-        return np.array(sorted_ls), Uc[:, np.array(permutation)]
+        signs = (-1) ** (1 + np.heaviside(ls, 1))
+        phases = np.sqrt(np.complex128(signs))
+        Uc = U * phases  # One needs to readjust the phases
+        # Find the permutation to sort in decreasing order
+        perm = np.argsort(vals)
+        # if svd_order reverse it
+        if svd_order:
+            perm = perm[::-1]
+        return vals[perm], Uc[:, perm]
 
     # Find the element with the largest absolute value
     pos = np.unravel_index(np.argmax(np.abs(A)), (n, n))
@@ -222,10 +215,6 @@ def takagi(A, svd_order=True):
 
     u, d, v = np.linalg.svd(A)
     U = u @ sqrtm((v @ np.conjugate(u)).T)
-    # The line above could be simplifed to the line below if the product v @ np.conjugate(u) is diagonal
-    # Which it should be according to Caves http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf
-    # U = u * np.sqrt(0j + np.diag(v @ np.conjugate(u)))
-    # This however breaks test_degenerate
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
