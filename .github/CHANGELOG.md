@@ -6,6 +6,8 @@
 
 ### Improvements
 
+* Further simplifies the implementation of `decompositions.williamson` and corrects its docstring [(#380)](https://github.com/XanaduAI/thewalrus/pull/380).
+
 ### Bug fixes
 
 ### Documentation
@@ -13,6 +15,8 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+Nicolas Quesada
 
 ---
 
