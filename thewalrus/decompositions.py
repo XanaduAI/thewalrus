@@ -53,7 +53,7 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     Returns:
         tuple[array,array]: ``(Db, S)`` where ``Db`` is a diagonal matrix
-            and ``S`` is a symplectic matrix such that :math:`V = S^T Db S`
+            and ``S`` is a symplectic matrix such that :math:`V = S Db S^T`
     """
     (n, m) = V.shape
 
@@ -73,7 +73,8 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     if not np.all(vals > 0):
         raise ValueError("Input matrix is not positive definite")
 
-    Mm12 = sqrtm(np.linalg.inv(V)).real
+    M12 = np.real_if_close(sqrtm(V))
+    Mm12 = np.linalg.inv(M12)
     r1 = Mm12 @ omega @ Mm12
     s1, K = schur(r1)
     # In what follows a permutation matrix perm1 is constructed so that the Schur matrix has
@@ -92,9 +93,9 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     dd = np.array([1 / s1t[2 * i, 2 * i + 1] for i in range(n)])
     dd = np.concatenate([dd, dd])
-    ddsqrt = np.sqrt(dd)
-    S = Mm12 @ Ktt * ddsqrt
-    return np.diag(dd), np.linalg.inv(S).T
+    ddsqrt = 1 / np.sqrt(dd)
+    S = M12 @ Ktt * ddsqrt
+    return np.diag(dd), S
 
 
 def symplectic_eigenvals(cov):
