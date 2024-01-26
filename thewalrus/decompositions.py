@@ -35,7 +35,7 @@ Code details
 """
 import numpy as np
 
-from scipy.linalg import block_diag, sqrtm, schur
+from scipy.linalg import block_diag, sqrtm, schur, polar
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -130,39 +130,19 @@ def blochmessiah(S):
 
     if not is_symplectic(S):
         raise ValueError("Input matrix is not symplectic.")
-
-    # Changing Basis
-    R = (1 / np.sqrt(2)) * np.block(
-        [[np.eye(N // 2), 1j * np.eye(N // 2)], [np.eye(N // 2), -1j * np.eye(N // 2)]]
-    )
-    Sc = R @ S @ np.conjugate(R).T
-    # Polar Decomposition
-    u1, d1, v1 = np.linalg.svd(Sc)
-    Sig = u1 @ np.diag(d1) @ np.conjugate(u1).T
-    Unitary = u1 @ v1
-    # Blocks of Unitary and Hermitian symplectics
-    alpha = Unitary[0 : N // 2, 0 : N // 2]
-    beta = Sig[0 : N // 2, N // 2 : N]
-    # Bloch-Messiah in this Basis
-    d2, takagibeta = takagi(beta)
-    sval = np.arcsinh(d2)
-    uf = block_diag(takagibeta, takagibeta.conj())
-    blc = np.conjugate(takagibeta).T @ alpha
-    vf = block_diag(blc, blc.conj())
-    df = np.block(
-        [
-            [np.diag(np.cosh(sval)), np.diag(np.sinh(sval))],
-            [np.diag(np.sinh(sval)), np.diag(np.cosh(sval))],
-        ]
-    )
-    # Rotating Back to Original Basis
-    uff = np.conjugate(R).T @ uf @ R
-    vff = np.conjugate(R).T @ vf @ R
-    dff = np.conjugate(R).T @ df @ R
-    dff = np.real_if_close(dff)
-    vff = np.real_if_close(vff)
-    uff = np.real_if_close(uff)
-    return uff, dff, vff
+    N = N // 2
+    V, P = polar(S, side="left")
+    A = P[:N, :N]
+    B = P[:N, N:]
+    C = P[N:, N:]
+    M = A - C + 1j * (B + B.T)
+    Lam, W = takagi(M)
+    Lam = 0.5 * Lam
+    O = np.block([[W.real, -W.imag], [W.imag, W.real]])
+    Q = O.T @ V
+    sqrt1pLam2 = np.sqrt(1 + Lam**2)
+    D = np.diag(np.concatenate([sqrt1pLam2 + Lam, sqrt1pLam2 - Lam]))
+    return O, D, Q
 
 
 def takagi(A, svd_order=True):
