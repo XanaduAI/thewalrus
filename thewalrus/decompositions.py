@@ -75,26 +75,24 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     M12 = np.real_if_close(sqrtm(V))
     Mm12 = np.linalg.inv(M12)
-    r1 = Mm12 @ omega @ Mm12
-    s1, K = schur(r1)
-    # In what follows a permutation matrix perm1 is constructed so that the Schur matrix has
+    Gamma = Mm12 @ omega @ Mm12
+    a, Otilde = schur(Gamma)
+    # In what follows a permutation matrix perm is constructed so that the Schur matrix has
     # only positive elements above the diagonal
-    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus a permutation perm2 is used
+    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus the permutation perm is updated
     # to go to the ordering x_1, ..., x_n, p_1, ... , p_n
-    perm1 = np.arange(2 * n)
+    perm = np.arange(2 * n)
     for i in range(n):
-        if s1[2 * i, 2 * i + 1] <= 0:
-            (perm1[2 * i], perm1[2 * i + 1]) = (perm1[2 * i + 1], perm1[2 * i])
+        if a[2 * i, 2 * i + 1] <= 0:
+            (perm[2 * i], perm[2 * i + 1]) = (perm[2 * i + 1], perm[2 * i])
 
-    perm2 = np.array([perm1[2 * i] for i in range(n)] + [perm1[2 * i + 1] for i in range(n)])
+    perm = np.array([perm[2 * i] for i in range(n)] + [perm[2 * i + 1] for i in range(n)])
 
-    Ktt = K[:, perm2]
-    s1t = s1[:, perm1][perm1]
-
-    dd = np.array([1 / s1t[2 * i, 2 * i + 1] for i in range(n)])
-    dd = np.concatenate([dd, dd])
+    O = Otilde[:, perm]
+    phi = np.abs(np.diag(a, k=1)[::2])
+    dd = np.concatenate([1 / phi, 1 / phi])
     ddsqrt = 1 / np.sqrt(dd)
-    S = M12 @ Ktt * ddsqrt
+    S = M12 @ O * ddsqrt
     return np.diag(dd), S
 
 
