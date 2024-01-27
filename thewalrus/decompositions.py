@@ -29,6 +29,7 @@ Summary
     williamson
     symplectic_eigenvals
     blochmessiah
+    takagi
 
 Code details
 ------------
