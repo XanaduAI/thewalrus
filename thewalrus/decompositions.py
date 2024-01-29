@@ -77,7 +77,7 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     M12 = np.real_if_close(sqrtm(V))
     Mm12 = np.linalg.inv(M12)
     Gamma = Mm12 @ omega @ Mm12
-    a, Otilde = schur(Gamma)
+    a, O = schur(Gamma)
     # In what follows a permutation matrix perm is constructed so that the Schur matrix has
     # only positive elements above the diagonal
     # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus the permutation perm is updated
@@ -89,7 +89,7 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     perm = np.array([perm[2 * i] for i in range(n)] + [perm[2 * i + 1] for i in range(n)])
 
-    O = Otilde[:, perm]
+    O = O[:, perm]
     phi = np.abs(np.diag(a, k=1)[::2])
     dd = np.concatenate([1 / phi, 1 / phi])
     ddsqrt = 1 / np.sqrt(dd)
@@ -106,7 +106,7 @@ def symplectic_eigenvals(cov):
     Returns:
         (array): symplectic eigenvalues
     """
-    M = int(len(cov) / 2)
+    M = len(cov) // 2
     Omega = sympmat(M)
     return np.real_if_close(-1j * np.linalg.eigvals(Omega @ cov))[::2]
 
