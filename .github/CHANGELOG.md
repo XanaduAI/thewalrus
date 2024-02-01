@@ -8,6 +8,9 @@
 
 * Further simplifies the implementation of `decompositions.williamson` and corrects its docstring [(#380)](https://github.com/XanaduAI/thewalrus/pull/380).
 
+* Further simplifies the implementation of `decompositions.blochmessiah` [(#381)](https://github.com/XanaduAI/thewalrus/pull/381).
+
+
 ### Bug fixes
 
 ### Documentation
