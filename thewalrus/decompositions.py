@@ -112,17 +112,17 @@ def symplectic_eigenvals(cov):
 
 
 def blochmessiah(S):
-    """Returns the Bloch-Messiah decomposition of a symplectic matrix S = uff @ dff @ vff
-       where uff and vff are orthogonal symplectic matrices and dff is a diagonal matrix
+    """Returns the Bloch-Messiah decomposition of a symplectic matrix S = O @ D @ Q
+       where O and Q are orthogonal symplectic matrices and D is a positive-definite diagonal matrix
        of the form diag(d1,d2,...,dn,d1^-1, d2^-1,...,dn^-1),
 
     Args:
         S (array[float]): 2N x 2N real symplectic matrix
 
     Returns:
-        tuple(array[float],  : orthogonal symplectic matrix uff
-              array[float],  : diagonal matrix dff
-              array[float])  : orthogonal symplectic matrix vff
+        tuple(array[float],  : orthogonal symplectic matrix O
+              array[float],  : diagonal matrix D
+              array[float])  : orthogonal symplectic matrix Q
     """
 
     N, _ = S.shape
