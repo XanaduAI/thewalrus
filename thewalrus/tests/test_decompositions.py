@@ -469,6 +469,8 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
     assert is_symplectic(FF)
     assert np.allclose(FF @ FF.T, np.identity(2 * dim))
     assert np.allclose(DD[:dim, :dim] @ DD[dim:, dim:], np.identity(dim))
+    assert np.allclose(DD[:dim, dim:], 0)
+    assert np.allclose(DD[dim:, :dim], 0)
     A = EE[:dim, :dim]
     B = EE[:dim, dim:]
     C = EE[dim:, :dim]
