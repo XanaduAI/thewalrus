@@ -2,6 +2,8 @@
 
 ### New features
 
+* Implements the pre-Iwazawa and Iwazawa decompositions for symplectic matrices [(#382)](https://github.com/XanaduAI/thewalrus/pull/382).
+
 ### Breaking changes
 
 ### Improvements
