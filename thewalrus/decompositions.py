@@ -30,6 +30,8 @@ Summary
     symplectic_eigenvals
     blochmessiah
     takagi
+    pre_iwazawa
+    iwazawa
 
 Code details
 ------------
@@ -198,3 +200,39 @@ def takagi(A, svd_order=True):
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
+
+
+def pre_iwazawa(S):
+    """Implements the pre-Iwazawa decomposition"""
+    N, _ = S.shape
+    N = N // 2
+    zerom = np.zeros([N, N])
+    idm = np.eye(N)
+    A = S[:N, :N]
+    B = S[:N, N:]
+    C = S[N:, :N]
+    D = S[N:, N:]
+    U, A0 = polar(A - 1j * B, side="left")
+    A0inv = np.linalg.inv(A0)
+    X = U.real
+    Y = -U.imag
+    C0 = (C @ A.T + D @ B.T) @ A0inv
+    E = np.block([[idm, zerom], [C0 @ A0inv, idm]])
+    D = np.block([[A0, zerom], [zerom, A0inv]])
+    F = np.block([[X, Y], [-Y, X]])
+    return E, D, F
+
+
+def iwazawa(S):
+    """Implements the Iwazawa decomposition"""
+    N, _ = S.shape
+    N = N // 2
+    E, D, F = pre_iwazawa(S)
+    DNN = D[:N, :N]
+    vals, O = np.linalg.eigh(DNN)
+    DD = np.diag(np.concatenate([vals, 1 / vals]))
+    zerom = np.zeros([N, N])
+    OO = np.block([[O, zerom], [zerom, O]])
+    EE = E @ OO
+    FF = OO.T @ F
+    return EE, DD, FF

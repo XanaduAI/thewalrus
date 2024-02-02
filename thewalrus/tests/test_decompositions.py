@@ -19,7 +19,7 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import williamson, blochmessiah, takagi
+from thewalrus.decompositions import williamson, blochmessiah, takagi, pre_iwazawa, iwazawa
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -441,3 +441,72 @@ def test_real_input_edge():
     # Now, reconstruct A, see
     Ar = u * l @ u.T
     assert np.allclose(A, Ar)
+
+
+@pytest.mark.parametrize("rank1", [2, 4, 5])
+@pytest.mark.parametrize("rank2", [2, 4, 5])
+@pytest.mark.parametrize("rankrand", [2, 4, 5])
+@pytest.mark.parametrize("rankzero", [2, 4, 5])
+def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
+    """Tests the pre_iwazawa decomposition"""
+    vals = np.array(
+        [np.random.rand(1)[0]] * rank1
+        + [np.random.rand(1)[0]] * rank2
+        + list(np.random.rand(rankrand))
+        + [1] * rankzero
+    )
+    dd = np.concatenate([vals, 1 / vals])
+    dim = len(vals)
+    U = haar_measure(dim)
+    O = np.block([[U.real, -U.imag], [U.imag, U.real]])
+    S = (O * dd) @ O.T
+    EE, DD, FF = pre_iwazawa(S)
+    assert np.allclose(EE @ DD @ FF, S)
+    assert is_symplectic(EE)
+    assert is_symplectic(FF)
+    assert is_symplectic(FF)
+    assert np.allclose(FF @ FF.T, np.identity(2 * dim))
+    assert np.allclose(DD[:dim, :dim] @ DD[dim:, dim:], np.identity(dim))
+    A = EE[:dim, :dim]
+    B = EE[:dim, dim:]
+    C = EE[dim:, :dim]
+    D = EE[dim:, dim:]
+    assert np.allclose(A, np.eye(dim))
+    assert np.allclose(B, 0)
+    assert np.allclose(C, C.T)
+    assert np.allclose(D, np.eye(dim))
+
+
+@pytest.mark.parametrize("rank1", [2, 4, 5])
+@pytest.mark.parametrize("rank2", [2, 4, 5])
+@pytest.mark.parametrize("rankrand", [2, 4, 5])
+@pytest.mark.parametrize("rankzero", [2, 4, 5])
+def test_iwazawa(rank1, rank2, rankrand, rankzero):
+    """Tests the pre_iwazawa decomposition"""
+    vals = np.array(
+        [np.random.rand(1)[0]] * rank1
+        + [np.random.rand(1)[0]] * rank2
+        + list(np.random.rand(rankrand))
+        + [1] * rankzero
+    )
+    dd = np.concatenate([vals, 1 / vals])
+    dim = len(vals)
+    U = haar_measure(dim)
+    O = np.block([[U.real, -U.imag], [U.imag, U.real]])
+    S = (O * dd) @ O.T
+    EE, DD, FF = iwazawa(S)
+    assert np.allclose(EE @ DD @ FF, S)
+    assert is_symplectic(EE)
+    assert is_symplectic(FF)
+    assert is_symplectic(FF)
+    assert np.allclose(FF @ FF.T, np.identity(2 * dim))
+    assert np.allclose(DD, np.diag(np.diag(DD)))
+    assert np.allclose(DD[:dim, :dim] @ DD[dim:, dim:], np.identity(dim))
+    A = EE[:dim, :dim]
+    B = EE[:dim, dim:]
+    C = EE[dim:, :dim]
+    D = EE[dim:, dim:]
+    assert np.allclose(B, 0)
+    XX = A.T @ C
+    assert np.allclose(XX, XX.T)
+    assert np.allclose(A @ D.T, np.eye(dim))
