@@ -203,7 +203,23 @@ def takagi(A, svd_order=True):
 
 
 def pre_iwazawa(S):
-    """Implements the pre-Iwazawa decomposition"""
+    """Pre-Iwazawa decomposition of a symplectic matrix.
+    See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+
+
+    Args:
+        S (array): the symplectic matrix
+
+    Returns:
+        tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S and,
+        E = np.block([[np.eye(N), np.zeros(N,N)],[X, np.eye(N)]]) with X == X.T,
+        D is block diagonal with the top left block being the inverse of the bottom right block,
+        F is symplectic orthogonal.
+    """
+
+    if not is_symplectic(S):
+        raise ValueError("Input matrix is not symplectic.")
+
     N, _ = S.shape
     N = N // 2
     zerom = np.zeros([N, N])
@@ -213,6 +229,7 @@ def pre_iwazawa(S):
     C = S[N:, :N]
     D = S[N:, N:]
     U, A0 = polar(A - 1j * B, side="left")
+    A0 = np.real_if_close(A0)
     A0inv = np.linalg.inv(A0)
     X = U.real
     Y = -U.imag
@@ -224,10 +241,23 @@ def pre_iwazawa(S):
 
 
 def iwazawa(S):
-    """Implements the Iwazawa decomposition"""
+    """Iwazawa decomposition of a symplectic matrix.
+    See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+
+
+    Args:
+        S (array): the symplectic matrix
+
+    Returns:
+        tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S,
+        EE = np.block([[AA, np.zeros(N,N)],[CC, np.linalg.inv(A.T)]]) with A.T @ C == C.T @ A,
+        DD is diagonal and symplectic,
+        FF is symplectic orthogonal.
+    """
+
+    E, D, F = pre_iwazawa(S)
     N, _ = S.shape
     N = N // 2
-    E, D, F = pre_iwazawa(S)
     DNN = D[:N, :N]
     vals, O = np.linalg.eigh(DNN)
     DD = np.diag(np.concatenate([vals, 1 / vals]))

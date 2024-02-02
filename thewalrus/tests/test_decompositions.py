@@ -482,7 +482,7 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
 @pytest.mark.parametrize("rankrand", [2, 4, 5])
 @pytest.mark.parametrize("rankzero", [2, 4, 5])
 def test_iwazawa(rank1, rank2, rankrand, rankzero):
-    """Tests the pre_iwazawa decomposition"""
+    """Tests the iwazawa decomposition"""
     vals = np.array(
         [np.random.rand(1)[0]] * rank1
         + [np.random.rand(1)[0]] * rank2
@@ -510,3 +510,17 @@ def test_iwazawa(rank1, rank2, rankrand, rankzero):
     XX = A.T @ C
     assert np.allclose(XX, XX.T)
     assert np.allclose(A @ D.T, np.eye(dim))
+
+
+def test_pre_iwazawa_error():
+    """Tests error is raised when input not symplectic"""
+    M = np.random.rand(4, 5)
+    with pytest.raises(ValueError, match="Input matrix is not symplectic."):
+        pre_iwazawa(M)
+
+
+def test_iwazawa_error():
+    """Tests error is raised when input not symplectic"""
+    M = np.random.rand(4, 5)
+    with pytest.raises(ValueError, match="Input matrix is not symplectic."):
+        iwazawa(M)
