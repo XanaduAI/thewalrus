@@ -458,8 +458,10 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
     dd = np.concatenate([vals, 1 / vals])
     dim = len(vals)
     U = haar_measure(dim)
+    V = haar_measure(dim)
     O = np.block([[U.real, -U.imag], [U.imag, U.real]])
-    S = (O * dd) @ O.T
+    P = np.block([[V.real, -V.imag], [V.imag, V.real]])
+    S = (O * dd) @ P
     EE, DD, FF = pre_iwazawa(S)
     assert np.allclose(EE @ DD @ FF, S)
     assert is_symplectic(EE)
@@ -492,8 +494,10 @@ def test_iwazawa(rank1, rank2, rankrand, rankzero):
     dd = np.concatenate([vals, 1 / vals])
     dim = len(vals)
     U = haar_measure(dim)
+    V = haar_measure(dim)
     O = np.block([[U.real, -U.imag], [U.imag, U.real]])
-    S = (O * dd) @ O.T
+    P = np.block([[V.real, -V.imag], [V.imag, V.real]])
+    S = (O * dd) @ P
     EE, DD, FF = iwazawa(S)
     assert np.allclose(EE @ DD @ FF, S)
     assert is_symplectic(EE)
