@@ -250,7 +250,7 @@ def iwazawa(S):
 
     Returns:
         tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S,
-        EE = np.block([[AA, np.zeros(N,N)],[CC, np.linalg.inv(A.T)]]) with A.T @ C == C.T @ A,
+        EE = np.block([[AA, np.zeros(N,N)],[CC, np.linalg.inv(A.T)]]) with A.T @ C == C.T @ A, and AA upper trinagular with ones in the diagonal
         DD is diagonal and symplectic,
         FF is symplectic orthogonal.
     """
