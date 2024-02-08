@@ -259,7 +259,7 @@ def iwazawa(S):
     N, _ = S.shape
     N = N // 2
     DNN = D[:N, :N]
-    Q, R = qr(DNN.T)
+    Q, R = qr(DNN)
     R = R.T
     Q = Q.T
     dR = np.diag(R)
