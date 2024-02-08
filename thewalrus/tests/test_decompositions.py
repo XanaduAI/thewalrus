@@ -447,7 +447,9 @@ def test_real_input_edge():
 @pytest.mark.parametrize("rank2", [2, 4, 5])
 @pytest.mark.parametrize("rankrand", [2, 4, 5])
 @pytest.mark.parametrize("rankzero", [2, 4, 5])
-def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
+@pytest.mark.parametrize("symmetric", [True, False])
+@pytest.mark.parametrize("unitary", [True, False])
+def test_pre_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
     """Tests the pre_iwazawa decomposition"""
     vals = np.array(
         [np.random.rand(1)[0]] * rank1
@@ -455,12 +457,18 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
         + list(np.random.rand(rankrand))
         + [1] * rankzero
     )
+    if unitary is True:
+        vals = np.ones_like(vals)
     dd = np.concatenate([vals, 1 / vals])
     dim = len(vals)
     U = haar_measure(dim)
-    V = haar_measure(dim)
     O = np.block([[U.real, -U.imag], [U.imag, U.real]])
-    P = np.block([[V.real, -V.imag], [V.imag, V.real]])
+    if symmetric is False:
+        V = haar_measure(dim)
+        P = np.block([[V.real, -V.imag], [V.imag, V.real]])
+    else:
+        P = O.T
+
     S = (O * dd) @ P
     EE, DD, FF = pre_iwazawa(S)
     assert np.allclose(EE @ DD @ FF, S)
@@ -485,7 +493,9 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero):
 @pytest.mark.parametrize("rank2", [2, 4, 5])
 @pytest.mark.parametrize("rankrand", [2, 4, 5])
 @pytest.mark.parametrize("rankzero", [2, 4, 5])
-def test_iwazawa(rank1, rank2, rankrand, rankzero):
+@pytest.mark.parametrize("symmetric", [True, False])
+@pytest.mark.parametrize("unitary", [True, False])
+def test_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
     """Tests the iwazawa decomposition"""
     vals = np.array(
         [np.random.rand(1)[0]] * rank1
@@ -493,12 +503,17 @@ def test_iwazawa(rank1, rank2, rankrand, rankzero):
         + list(np.random.rand(rankrand))
         + [1] * rankzero
     )
+    if unitary is True:
+        vals = np.ones_like(vals)
     dd = np.concatenate([vals, 1 / vals])
     dim = len(vals)
     U = haar_measure(dim)
-    V = haar_measure(dim)
     O = np.block([[U.real, -U.imag], [U.imag, U.real]])
-    P = np.block([[V.real, -V.imag], [V.imag, V.real]])
+    if symmetric is False:
+        V = haar_measure(dim)
+        P = np.block([[V.real, -V.imag], [V.imag, V.real]])
+    else:
+        P = O.T
     S = (O * dd) @ P
     EE, DD, FF = iwazawa(S)
     assert np.allclose(EE @ DD @ FF, S)
