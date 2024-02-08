@@ -21,7 +21,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Nicolas Quesada
+Will McCutcheon, Nicolas Quesada
 
 ---
 

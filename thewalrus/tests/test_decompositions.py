@@ -516,6 +516,9 @@ def test_iwazawa(rank1, rank2, rankrand, rankzero):
     XX = A.T @ C
     assert np.allclose(XX, XX.T)
     assert np.allclose(A @ D.T, np.eye(dim))
+    assert np.allclose(np.diag(EE), 1)
+    assert np.allclose(np.triu(A), A)
+    assert np.allclose(np.tril(D), D)
 
 
 def test_pre_iwazawa_error():

@@ -38,7 +38,7 @@ Code details
 """
 import numpy as np
 
-from scipy.linalg import sqrtm, schur, polar
+from scipy.linalg import sqrtm, schur, polar, rq
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -228,11 +228,11 @@ def pre_iwazawa(S):
     B = S[:N, N:]
     C = S[N:, :N]
     D = S[N:, N:]
-    U, A0 = polar(A - 1j * B, side="left")
-    A0 = np.real_if_close(A0)
+    A0 = sqrtm(A @ A.T + B @ B.T)
     A0inv = np.linalg.inv(A0)
+    U = A0inv @ (A + 1j * B)
     X = U.real
-    Y = -U.imag
+    Y = U.imag
     C0 = (C @ A.T + D @ B.T) @ A0inv
     E = np.block([[idm, zerom], [C0 @ A0inv, idm]])
     D = np.block([[A0, zerom], [zerom, A0inv]])
@@ -259,10 +259,17 @@ def iwazawa(S):
     N, _ = S.shape
     N = N // 2
     DNN = D[:N, :N]
-    vals, O = np.linalg.eigh(DNN)
-    DD = np.diag(np.concatenate([vals, 1 / vals]))
+    R, Q = rq(DNN)
+    dR = np.diag(R)
+    dd = np.abs(dR)
+    ds = np.sign(dR)
+    R = R * (1 / dR)
+    RinvT = np.linalg.inv(R).T
+    DD = np.diag(np.concatenate([dd, 1 / dd]))
     zerom = np.zeros([N, N])
-    OO = np.block([[O, zerom], [zerom, O]])
+    OO = np.block([[R, zerom], [zerom, RinvT]])
+    Q = ds[:, None] * Q
+    AA = np.block([[Q, zerom], [zerom, Q]])
     EE = E @ OO
-    FF = OO.T @ F
+    FF = AA @ F
     return EE, DD, FF
