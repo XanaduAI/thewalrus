@@ -38,7 +38,7 @@ Code details
 """
 import numpy as np
 
-from scipy.linalg import sqrtm, schur, polar, rq
+from scipy.linalg import sqrtm, schur, polar, qr
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -259,7 +259,9 @@ def iwazawa(S):
     N, _ = S.shape
     N = N // 2
     DNN = D[:N, :N]
-    R, Q = rq(DNN)
+    Q, R = qr(DNN.T)
+    R = R.T
+    Q = Q.T
     dR = np.diag(R)
     dd = np.abs(dR)
     ds = np.sign(dR)
