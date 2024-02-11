@@ -30,8 +30,8 @@ Summary
     symplectic_eigenvals
     blochmessiah
     takagi
-    pre_iwazawa
-    iwazawa
+    pre_iwasawa
+    iwasawa
 
 Code details
 ------------
@@ -202,8 +202,8 @@ def takagi(A, svd_order=True):
     return d, U
 
 
-def pre_iwazawa(S):
-    """Pre-Iwazawa decomposition of a symplectic matrix.
+def pre_iwasawa(S):
+    """Pre-iwasawa decomposition of a symplectic matrix.
     See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
 
 
@@ -240,8 +240,8 @@ def pre_iwazawa(S):
     return E, D, F
 
 
-def iwazawa(S):
-    """Iwazawa decomposition of a symplectic matrix.
+def iwasawa(S):
+    """iwasawa decomposition of a symplectic matrix.
     See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
 
 
@@ -255,7 +255,7 @@ def iwazawa(S):
         FF is symplectic orthogonal.
     """
 
-    E, D, F = pre_iwazawa(S)
+    E, D, F = pre_iwasawa(S)
     N, _ = S.shape
     N = N // 2
     DNN = D[:N, :N]

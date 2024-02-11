@@ -19,7 +19,7 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import williamson, blochmessiah, takagi, pre_iwazawa, iwazawa
+from thewalrus.decompositions import williamson, blochmessiah, takagi, pre_iwasawa, iwasawa
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -449,8 +449,8 @@ def test_real_input_edge():
 @pytest.mark.parametrize("rankzero", [2, 4, 5])
 @pytest.mark.parametrize("symmetric", [True, False])
 @pytest.mark.parametrize("unitary", [True, False])
-def test_pre_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
-    """Tests the pre_iwazawa decomposition"""
+def test_pre_iwasawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
+    """Tests the pre_iwasawa decomposition"""
     vals = np.array(
         [np.random.rand(1)[0]] * rank1
         + [np.random.rand(1)[0]] * rank2
@@ -470,7 +470,7 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
         P = O.T
 
     S = (O * dd) @ P
-    EE, DD, FF = pre_iwazawa(S)
+    EE, DD, FF = pre_iwasawa(S)
     assert np.allclose(EE @ DD @ FF, S)
     assert is_symplectic(EE)
     assert is_symplectic(FF)
@@ -495,8 +495,8 @@ def test_pre_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
 @pytest.mark.parametrize("rankzero", [2, 4, 5])
 @pytest.mark.parametrize("symmetric", [True, False])
 @pytest.mark.parametrize("unitary", [True, False])
-def test_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
-    """Tests the iwazawa decomposition"""
+def test_iwasawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
+    """Tests the iwasawa decomposition"""
     vals = np.array(
         [np.random.rand(1)[0]] * rank1
         + [np.random.rand(1)[0]] * rank2
@@ -515,7 +515,7 @@ def test_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
     else:
         P = O.T
     S = (O * dd) @ P
-    EE, DD, FF = iwazawa(S)
+    EE, DD, FF = iwasawa(S)
     assert np.allclose(EE @ DD @ FF, S)
     assert is_symplectic(EE)
     assert is_symplectic(FF)
@@ -536,15 +536,35 @@ def test_iwazawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
     assert np.allclose(np.triu(D), D)
 
 
-def test_pre_iwazawa_error():
+def test_pre_iwasawa_error():
     """Tests error is raised when input not symplectic"""
     M = np.random.rand(4, 5)
     with pytest.raises(ValueError, match="Input matrix is not symplectic."):
-        pre_iwazawa(M)
+        pre_iwasawa(M)
 
 
-def test_iwazawa_error():
+def test_iwasawa_error():
     """Tests error is raised when input not symplectic"""
     M = np.random.rand(4, 5)
     with pytest.raises(ValueError, match="Input matrix is not symplectic."):
-        iwazawa(M)
+        iwasawa(M)
+
+def test_iwasawa2x2():
+    """Compares numerics against exact result for 2x2 matrices in Arvind 1995"""
+    num_tests = 100
+    for _ in range(num_tests):
+        S = random_symplectic(1)
+        A,N,K = iwasawa(S)
+        a = S[0,0]
+        b = S[0,1]
+        c = S[1,0]
+        d = S[1,1]
+        eta = a**2 + b**2
+        xi = (a*c+b*d)/eta
+        eta = np.sqrt(eta)
+        AA = np.array([[1,0],[xi,1]])
+        NN = np.diag([eta,1/eta])
+        KK = np.array([[a,b],[-b,a]])/eta
+        assert np.allclose(A, AA)
+        assert np.allclose(K, KK)
+        assert np.allclose(N, NN)
