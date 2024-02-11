@@ -549,22 +549,23 @@ def test_iwasawa_error():
     with pytest.raises(ValueError, match="Input matrix is not symplectic."):
         iwasawa(M)
 
+
 def test_iwasawa2x2():
     """Compares numerics against exact result for 2x2 matrices in Arvind 1995"""
     num_tests = 100
     for _ in range(num_tests):
         S = random_symplectic(1)
-        A,N,K = iwasawa(S)
-        a = S[0,0]
-        b = S[0,1]
-        c = S[1,0]
-        d = S[1,1]
+        A, N, K = iwasawa(S)
+        a = S[0, 0]
+        b = S[0, 1]
+        c = S[1, 0]
+        d = S[1, 1]
         eta = a**2 + b**2
-        xi = (a*c+b*d)/eta
+        xi = (a * c + b * d) / eta
         eta = np.sqrt(eta)
-        AA = np.array([[1,0],[xi,1]])
-        NN = np.diag([eta,1/eta])
-        KK = np.array([[a,b],[-b,a]])/eta
+        AA = np.array([[1, 0], [xi, 1]])
+        NN = np.diag([eta, 1 / eta])
+        KK = np.array([[a, b], [-b, a]]) / eta
         assert np.allclose(A, AA)
         assert np.allclose(K, KK)
         assert np.allclose(N, NN)
