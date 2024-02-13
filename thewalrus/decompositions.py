@@ -230,9 +230,8 @@ def pre_iwasawa(S):
     D = S[N:, N:]
     A0 = sqrtm(A @ A.T + B @ B.T)
     A0inv = np.linalg.inv(A0)
-    U = A0inv @ (A + 1j * B)
-    X = U.real
-    Y = U.imag
+    X = A0inv @ A
+    Y = A0inv @ B
     C0 = (C @ A.T + D @ B.T) @ A0inv
     E = np.block([[idm, zerom], [C0 @ A0inv, idm]])
     D = np.block([[A0, zerom], [zerom, A0inv]])
