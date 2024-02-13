@@ -20,6 +20,30 @@ from thewalrus.quantum.conversions import Qmat, reduced_gaussian
 from ._hafnian import reduction, find_kept_edges, nb_ix
 
 
+def tor_input_checks(A, loops=None):
+    """Checks the correctness of the inputs for the torontonian/montrealer.
+
+    Args:
+        A (array): an NxN array of even dimensions
+        loops (array): optional argument, an N-length vector of even dimensions
+    """
+    if not isinstance(A, np.ndarray):
+        raise TypeError("Input matrix must be a NumPy array.")
+    matshape = A.shape
+
+    if matshape[0] != matshape[1]:
+        raise ValueError("Input matrix must be square.")
+
+    if matshape[0] % 2 != 0:
+        raise ValueError("matrix dimension must be even")
+
+    if loops is not None:
+        if not isinstance(loops, np.ndarray):
+            raise TypeError("Input matrix must be a NumPy array.")
+        if matshape[0] != len(loops):
+            raise ValueError("gamma must be a vector matching the dimension of A")
+
+
 def tor(A, recursive=True):
     """Returns the Torontonian of a matrix.
 
@@ -30,16 +54,7 @@ def tor(A, recursive=True):
     Returns:
         np.float64 or np.complex128: the torontonian of matrix A.
     """
-    if not isinstance(A, np.ndarray):
-        raise TypeError("Input matrix must be a NumPy array.")
-
-    matshape = A.shape
-
-    if matshape[0] != matshape[1]:
-        raise ValueError("Input matrix must be square.")
-
-    if matshape[0] % 2 != 0:
-        raise ValueError("matrix dimension must be even")
+    tor_input_checks(A)
     return rec_torontonian(A) if recursive else numba_tor(A)
 
 
@@ -54,23 +69,7 @@ def ltor(A, gamma, recursive=True):
     Returns:
         np.float64 or np.complex128: the loop torontonian of matrix A, vector gamma
     """
-
-    if not isinstance(A, np.ndarray):
-        raise TypeError("Input matrix must be a NumPy array.")
-
-    if not isinstance(gamma, np.ndarray):
-        raise TypeError("Input matrix must be a NumPy array.")
-
-    matshape = A.shape
-
-    if matshape[0] != matshape[1]:
-        raise ValueError("Input matrix must be square.")
-
-    if matshape[0] != len(gamma):
-        raise ValueError("gamma must be a vector matching the dimension of A")
-
-    if matshape[0] % 2 != 0:
-        raise ValueError("matrix dimension must be even")
+    tor_input_checks(A, gamma)
 
     return rec_ltorontonian(A, gamma) if recursive else numba_ltor(A, gamma)
 

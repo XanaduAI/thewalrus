@@ -36,7 +36,7 @@ Code details
 """
 import numpy as np
 
-from scipy.linalg import block_diag, sqrtm, schur
+from scipy.linalg import sqrtm, schur, polar
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -54,7 +54,7 @@ def williamson(V, rtol=1e-05, atol=1e-08):
 
     Returns:
         tuple[array,array]: ``(Db, S)`` where ``Db`` is a diagonal matrix
-            and ``S`` is a symplectic matrix such that :math:`V = S^T Db S`
+            and ``S`` is a symplectic matrix such that :math:`V = S Db S^T`
     """
     (n, m) = V.shape
 
@@ -74,28 +74,27 @@ def williamson(V, rtol=1e-05, atol=1e-08):
     if not np.all(vals > 0):
         raise ValueError("Input matrix is not positive definite")
 
-    Mm12 = sqrtm(np.linalg.inv(V)).real
-    r1 = Mm12 @ omega @ Mm12
-    s1, K = schur(r1)
-    # In what follows a permutation matrix perm1 is constructed so that the Schur matrix has
+    M12 = np.real_if_close(sqrtm(V))
+    Mm12 = np.linalg.inv(M12)
+    Gamma = Mm12 @ omega @ Mm12
+    a, O = schur(Gamma)
+    # In what follows a permutation matrix perm is constructed so that the Schur matrix has
     # only positive elements above the diagonal
-    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus a permutation perm2 is used
+    # Also the Schur matrix uses the x_1,p_1, ..., x_n,p_n  ordering thus the permutation perm is updated
     # to go to the ordering x_1, ..., x_n, p_1, ... , p_n
-    perm1 = np.arange(2 * n)
+    perm = np.arange(2 * n)
     for i in range(n):
-        if s1[2 * i, 2 * i + 1] <= 0:
-            (perm1[2 * i], perm1[2 * i + 1]) = (perm1[2 * i + 1], perm1[2 * i])
+        if a[2 * i, 2 * i + 1] <= 0:
+            (perm[2 * i], perm[2 * i + 1]) = (perm[2 * i + 1], perm[2 * i])
 
-    perm2 = np.array([perm1[2 * i] for i in range(n)] + [perm1[2 * i + 1] for i in range(n)])
+    perm = np.array([perm[2 * i] for i in range(n)] + [perm[2 * i + 1] for i in range(n)])
 
-    Ktt = K[:, perm2]
-    s1t = s1[:, perm1][perm1]
-
-    dd = np.array([1 / s1t[2 * i, 2 * i + 1] for i in range(n)])
-    dd = np.concatenate([dd, dd])
-    ddsqrt = np.sqrt(dd)
-    S = Mm12 @ Ktt * ddsqrt
-    return np.diag(dd), np.linalg.inv(S).T
+    O = O[:, perm]
+    phi = np.abs(np.diag(a, k=1)[::2])
+    dd = np.concatenate([1 / phi, 1 / phi])
+    ddsqrt = 1 / np.sqrt(dd)
+    S = M12 @ O * ddsqrt
+    return np.diag(dd), S
 
 
 def symplectic_eigenvals(cov):
@@ -107,67 +106,48 @@ def symplectic_eigenvals(cov):
     Returns:
         (array): symplectic eigenvalues
     """
-    M = int(len(cov) / 2)
+    M = len(cov) // 2
     Omega = sympmat(M)
     return np.real_if_close(-1j * np.linalg.eigvals(Omega @ cov))[::2]
 
 
 def blochmessiah(S):
-    """Returns the Bloch-Messiah decomposition of a symplectic matrix S = uff @ dff @ vff
-       where uff and vff are orthogonal symplectic matrices and dff is a diagonal matrix
+    """Returns the Bloch-Messiah decomposition of a symplectic matrix S = O @ D @ Q
+       where O and Q are orthogonal symplectic matrices and D is a positive-definite diagonal matrix
        of the form diag(d1,d2,...,dn,d1^-1, d2^-1,...,dn^-1),
 
     Args:
         S (array[float]): 2N x 2N real symplectic matrix
 
     Returns:
-        tuple(array[float],  : orthogonal symplectic matrix uff
-              array[float],  : diagonal matrix dff
-              array[float])  : orthogonal symplectic matrix vff
+        tuple(array[float],  : orthogonal symplectic matrix O
+              array[float],  : diagonal matrix D
+              array[float])  : orthogonal symplectic matrix Q
     """
 
     N, _ = S.shape
 
     if not is_symplectic(S):
         raise ValueError("Input matrix is not symplectic.")
-
-    # Changing Basis
-    R = (1 / np.sqrt(2)) * np.block(
-        [[np.eye(N // 2), 1j * np.eye(N // 2)], [np.eye(N // 2), -1j * np.eye(N // 2)]]
-    )
-    Sc = R @ S @ np.conjugate(R).T
-    # Polar Decomposition
-    u1, d1, v1 = np.linalg.svd(Sc)
-    Sig = u1 @ np.diag(d1) @ np.conjugate(u1).T
-    Unitary = u1 @ v1
-    # Blocks of Unitary and Hermitian symplectics
-    alpha = Unitary[0 : N // 2, 0 : N // 2]
-    beta = Sig[0 : N // 2, N // 2 : N]
-    # Bloch-Messiah in this Basis
-    d2, takagibeta = takagi(beta)
-    sval = np.arcsinh(d2)
-    uf = block_diag(takagibeta, takagibeta.conj())
-    blc = np.conjugate(takagibeta).T @ alpha
-    vf = block_diag(blc, blc.conj())
-    df = np.block(
-        [
-            [np.diag(np.cosh(sval)), np.diag(np.sinh(sval))],
-            [np.diag(np.sinh(sval)), np.diag(np.cosh(sval))],
-        ]
-    )
-    # Rotating Back to Original Basis
-    uff = np.conjugate(R).T @ uf @ R
-    vff = np.conjugate(R).T @ vf @ R
-    dff = np.conjugate(R).T @ df @ R
-    dff = np.real_if_close(dff)
-    vff = np.real_if_close(vff)
-    uff = np.real_if_close(uff)
-    return uff, dff, vff
+    N = N // 2
+    V, P = polar(S, side="left")
+    A = P[:N, :N]
+    B = P[:N, N:]
+    C = P[N:, N:]
+    M = A - C + 1j * (B + B.T)
+    Lam, W = takagi(M)
+    Lam = 0.5 * Lam
+    O = np.block([[W.real, -W.imag], [W.imag, W.real]])
+    Q = O.T @ V
+    sqrt1pLam2 = np.sqrt(1 + Lam**2)
+    D = np.diag(np.concatenate([sqrt1pLam2 + Lam, sqrt1pLam2 - Lam]))
+    return O, D, Q
 
 
 def takagi(A, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
-    Note that the input matrix is internally symmetrized. If the input matrix is indeed symmetric this leaves it unchanged.
+    Note that the input matrix is internally symmetrized by taking its upper triangular part.
+    If the input matrix is indeed symmetric this leaves it unchanged.
     See `Carl Caves note. <http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf>`_
 
     Args:
@@ -182,8 +162,8 @@ def takagi(A, svd_order=True):
     n, m = A.shape
     if n != m:
         raise ValueError("The input matrix is not square")
-    # Here we force symmetrize the matrix
-    A = 0.5 * (A + A.T)
+    # Here we build a Symmetric matrix from the top right triangular part
+    A = np.triu(A) + np.triu(A, k=1).T
 
     A = np.real_if_close(A)
 
@@ -193,26 +173,21 @@ def takagi(A, svd_order=True):
     if np.isrealobj(A):
         # If the matrix A is real one can be more clever and use its eigendecomposition
         ls, U = np.linalg.eigh(A)
-        U = U / np.exp(1j * np.angle(U)[0])
         vals = np.abs(ls)  # These are the Takagi eigenvalues
-        phases = -np.ones(vals.shape[0], dtype=np.complex128)
-        for j, l in enumerate(ls):
-            if np.allclose(l, 0) or l > 0:
-                phases[j] = 1
-        phases = np.sqrt(phases)
-        Uc = U @ np.diag(phases)  # One needs to readjust the phases
-        signs = np.sign(Uc.real)[0]
-        for k, s in enumerate(signs):
-            if np.allclose(s, 0):
-                signs[k] = 1
-        Uc = np.real_if_close(Uc / signs)
-        list_vals = [(vals[i], i) for i in range(len(vals))]
-        # And also rearrange the unitary and values so that they are decreasingly ordered
-        list_vals.sort(reverse=svd_order)
-        sorted_ls, permutation = zip(*list_vals)
-        return np.array(sorted_ls), Uc[:, np.array(permutation)]
+        signs = (-1) ** (1 + np.heaviside(ls, 1))
+        phases = np.sqrt(np.complex128(signs))
+        Uc = U * phases  # One needs to readjust the phases
+        # Find the permutation to sort in decreasing order
+        perm = np.argsort(vals)
+        # if svd_order reverse it
+        if svd_order:
+            perm = perm[::-1]
+        return vals[perm], Uc[:, perm]
 
-    phi = np.angle(A[0, 0])
+    # Find the element with the largest absolute value
+    pos = np.unravel_index(np.argmax(np.abs(A)), (n, n))
+    # Use it to find whether the input is a global phase times a real matrix
+    phi = np.angle(A[pos])
     Amr = np.real_if_close(np.exp(-1j * phi) * A)
     if np.isrealobj(Amr):
         vals, U = takagi(Amr, svd_order=svd_order)
@@ -220,10 +195,6 @@ def takagi(A, svd_order=True):
 
     u, d, v = np.linalg.svd(A)
     U = u @ sqrtm((v @ np.conjugate(u)).T)
-    # The line above could be simplifed to the line below if the product v @ np.conjugate(u) is diagonal
-    # Which it should be according to Caves http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf
-    # U = u * np.sqrt(0j + np.diag(np.conjugate(u) @ v))
-    # This however breaks test_degenerate
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
