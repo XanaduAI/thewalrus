@@ -26,10 +26,10 @@ Summary
 -------
 
 .. autosummary::
-    williamson
-    symplectic_eigenvals
     blochmessiah
+    symplectic_eigenvals
     takagi
+    williamson
 
 Code details
 ------------
