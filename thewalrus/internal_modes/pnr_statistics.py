@@ -26,7 +26,6 @@ from ..quantum import Qmat, Amat
 from ..symplectic import passive_transformation
 from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix, f_from_matrix, get_AX_S
 from ..charpoly import powertrace
-from thewalrus import reduction
 
 from .utils import (
     spatial_reps_to_schmidt_reps,
