@@ -251,7 +251,7 @@ def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cu
     for i in range(cutoff):
         patt_long = [i] + N_nums
         probs[i] = fact * np.real(
-            haf_blocked(A, blocks=blocks, repeats=patt_long) #/ np.prod(fac(patt_long))
+            haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(fac(patt_long))
         )
 
     if normalize:
@@ -313,12 +313,11 @@ def dm_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hb
         for j in range(i+1):
             if (i-j)%2==0:
                 patt_long = [j] + N_nums +[(i-j)//2]
-                print(patt_long[:-1])
                 new_blocks = np.concatenate((blocks, np.array([2+blocks[-1]])),axis=0)
                 perm = list(range(num_modes)) + list(range(block_size)) + list(range(num_modes,2*num_modes)) + list(range(block_size))
                 Aperm = A[:, perm][perm]
                 dm[i,j] = fact * np.real(
-                    haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long) #/ (np.prod(fac(patt_long[:-1]))*np.sqrt(fac(i)*fac(j)))
+                    haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long) / (np.prod(fac(patt_long[1:-1]))*np.sqrt(fac(i)*fac(j)))
                 )
                 dm[j,i] = np.conj(dm[i,j])
             else:
