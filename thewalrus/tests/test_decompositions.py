@@ -496,7 +496,7 @@ def test_pre_iwasawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
 @pytest.mark.parametrize("symmetric", [True, False])
 @pytest.mark.parametrize("unitary", [True, False])
 def test_iwasawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
-    """Tests the iwasawa decomposition"""
+    """Tests the Iwasawa decomposition"""
     vals = np.array(
         [np.random.rand(1)[0]] * rank1
         + [np.random.rand(1)[0]] * rank2

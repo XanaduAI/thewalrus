@@ -240,7 +240,7 @@ def pre_iwasawa(S):
 
 
 def iwasawa(S):
-    """iwasawa decomposition of a symplectic matrix.
+    """Iwasawa decomposition of a symplectic matrix.
     See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
 
 
