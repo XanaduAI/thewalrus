@@ -30,13 +30,15 @@ Summary
     symplectic_eigenvals
     blochmessiah
     takagi
+    pre_iwasawa
+    iwasawa
 
 Code details
 ------------
 """
 import numpy as np
 
-from scipy.linalg import sqrtm, schur, polar
+from scipy.linalg import sqrtm, schur, polar, qr
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -198,3 +200,77 @@ def takagi(A, svd_order=True):
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
+
+
+def pre_iwasawa(S):
+    """Pre-Iwasawa decomposition of a symplectic matrix.
+    See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+
+
+    Args:
+        S (array): the symplectic matrix
+
+    Returns:
+        tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S and,
+        E = np.block([[np.eye(N), np.zeros(N,N)],[X, np.eye(N)]]) with X == X.T,
+        D is block diagonal with the top left block being the inverse of the bottom right block,
+        F is symplectic orthogonal.
+    """
+
+    if not is_symplectic(S):
+        raise ValueError("Input matrix is not symplectic.")
+
+    N, _ = S.shape
+    N = N // 2
+    zerom = np.zeros([N, N])
+    idm = np.eye(N)
+    A = S[:N, :N]
+    B = S[:N, N:]
+    C = S[N:, :N]
+    D = S[N:, N:]
+    A0 = sqrtm(A @ A.T + B @ B.T)
+    A0inv = np.linalg.inv(A0)
+    X = A0inv @ A
+    Y = A0inv @ B
+    C0 = (C @ A.T + D @ B.T) @ A0inv
+    E = np.block([[idm, zerom], [C0 @ A0inv, idm]])
+    D = np.block([[A0, zerom], [zerom, A0inv]])
+    F = np.block([[X, Y], [-Y, X]])
+    return E, D, F
+
+
+def iwasawa(S):
+    """Iwasawa decomposition of a symplectic matrix.
+    See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+
+
+    Args:
+        S (array): the symplectic matrix
+
+    Returns:
+        tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S,
+        EE = np.block([[AA, np.zeros(N,N)],[CC, np.linalg.inv(A.T)]]) with A.T @ C == C.T @ A, and AA upper trinagular with ones in the diagonal
+        DD is diagonal and symplectic,
+        FF is symplectic orthogonal.
+    """
+
+    E, D, F = pre_iwasawa(S)
+    N, _ = S.shape
+    N = N // 2
+    DNN = D[:N, :N]
+    Q, R = qr(DNN)
+    R = R.T
+    Q = Q.T
+    dR = np.diag(R)
+    dd = np.abs(dR)
+    ds = np.sign(dR)
+    R = R * (1 / dR)
+    RinvT = np.linalg.inv(R).T
+    DD = np.diag(np.concatenate([dd, 1 / dd]))
+    zerom = np.zeros([N, N])
+    OO = np.block([[R, zerom], [zerom, RinvT]])
+    Q = ds[:, None] * Q
+    AA = np.block([[Q, zerom], [zerom, Q]])
+    EE = E @ OO
+    FF = AA @ F
+    return EE, DD, FF
