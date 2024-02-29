@@ -203,7 +203,7 @@ def takagi(A, svd_order=True):
 
 
 def pre_iwasawa(S):
-    """Pre-iwasawa decomposition of a symplectic matrix.
+    """Pre-Iwasawa decomposition of a symplectic matrix.
     See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
 
 
