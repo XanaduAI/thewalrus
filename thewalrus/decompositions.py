@@ -22,6 +22,10 @@ Decompositions
 This module implements common shared matrix decompositions that are
 used to perform gate decompositions.
 
+For mathematical details of these decompositions see
+
+`Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
+
 Summary
 -------
 
@@ -46,8 +50,7 @@ from thewalrus.quantum.gaussian_checks import is_symplectic
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
-    See `this thread <https://math.stackexchange.com/questions/1171842/finding-the-symplectic-matrix-in-williamsons-theorem/2682630#2682630>`_
-    and the `Williamson decomposition documentation <https://strawberryfields.ai/photonics/conventions/decompositions.html#williamson-decomposition>`_
+    See `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
 
     Args:
         V (array[float]): positive definite symmetric (real) matrix
@@ -116,7 +119,10 @@ def symplectic_eigenvals(cov):
 def blochmessiah(S):
     """Returns the Bloch-Messiah decomposition of a symplectic matrix S = O @ D @ Q
        where O and Q are orthogonal symplectic matrices and D is a positive-definite diagonal matrix
-       of the form diag(d1,d2,...,dn,d1^-1, d2^-1,...,dn^-1),
+       of the form diag(d1,d2,...,dn,d1^-1, d2^-1,...,dn^-1).
+
+       See `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
+
 
     Args:
         S (array[float]): 2N x 2N real symplectic matrix
@@ -150,7 +156,8 @@ def takagi(A, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized by taking its upper triangular part.
     If the input matrix is indeed symmetric this leaves it unchanged.
-    See `Carl Caves note. <http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf>`_
+
+    See `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
 
     Args:
         A (array): square, symmetric matrix
@@ -205,6 +212,7 @@ def takagi(A, svd_order=True):
 def pre_iwasawa(S):
     """Pre-Iwasawa decomposition of a symplectic matrix.
     See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+    and `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
 
 
     Args:
@@ -242,6 +250,7 @@ def pre_iwasawa(S):
 def iwasawa(S):
     """Iwasawa decomposition of a symplectic matrix.
     See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+    and `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
 
 
     Args:
