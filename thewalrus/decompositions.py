@@ -25,7 +25,7 @@ used to perform gate decompositions.
 For mathematical details of these decompositions see
 
 `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
-
+:cite:`houde2024matrix`
 Summary
 -------
 
