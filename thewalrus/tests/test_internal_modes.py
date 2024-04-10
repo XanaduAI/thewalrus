@@ -1171,6 +1171,7 @@ def test_mixed_heralded_photon(nh, method):
     assert np.allclose(np.diag(dm_modea), p_a)
     assert np.allclose(np.diag(dm_modeb), p_b)
 
+
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
 def test_pure_gkp(method):
     """test pure gkp state density matrix using 2 methods from the walrus against
@@ -1229,11 +1230,14 @@ def test_pure_gkp(method):
     rho3 /= np.trace(rho3)
     assert np.allclose(rho1, rho2, atol=2.5e-4)
     assert np.allclose(rho1, rho3, atol=5.5e-4)
-    assert np.allclose(rho2, rho3, atol=4.8e-4) # For the method "non-recursive" the absolute max difference is 1e-8
-    #probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
-    #assert np.allclose(np.diag(rho1), probs)
+    assert np.allclose(
+        rho2, rho3, atol=4.8e-4
+    )  # For the method "non-recursive" the absolute max difference is 1e-8
+    # probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
+    # assert np.allclose(np.diag(rho1), probs)
 
     #### Note that the tolerances are higher than they should be.
+
 
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
 def test_lossy_gkp(method):
@@ -1292,6 +1296,7 @@ def test_lossy_gkp(method):
     assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
     probs = probabilities_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
     assert np.allclose(np.diag(rho_loss1), probs)
+
 
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
 def test_vac_schmidt_modes_gkp(method):
@@ -1353,6 +1358,7 @@ def test_vac_schmidt_modes_gkp(method):
     assert np.allclose(rho1, rho_big, atol=4e-4)
     probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
     assert np.allclose(np.diag(rho1), probs)
+
 
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
 def test_density_matrix_error(method):
