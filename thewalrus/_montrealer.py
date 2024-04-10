@@ -1,8 +1,8 @@
 """
 Montrealer Python interface
 
-* Yanic Cardin and Nicolás Quesada. "Photon-number moments and cumulants of Gaussian states"
-  `arxiv:12212.06067 (2023) <https://arxiv.org/abs/2212.06067>`_
+* See Yanic Cardin and Nicolás Quesada. "Photon-number moments and cumulants of Gaussian states"
+  `arxiv:12212.06067 (2023) <https://arxiv.org/abs/2212.06067>`_ :cite:`cardin2022photon`
 """
 import numpy as np
 import numba
