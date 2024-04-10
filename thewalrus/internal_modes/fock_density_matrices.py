@@ -17,6 +17,7 @@ Set of functions for calculating Fock basis density matrices for heralded states
 
 import numpy as np
 import numba
+from scipy.special import factorial as fac
 
 from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
@@ -26,6 +27,8 @@ from .utils import (
     fact,
     project_onto_local_oscillator,
 )
+from .pnr_statistics import haf_blocked
+from ..quantum import Qmat, Amat
 
 
 # pylint: disable=too-many-arguments, too-many-statements
@@ -140,7 +143,9 @@ def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, 
     return rho
 
 
-def density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
+def density_matrix_single_mode(
+    cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2, method="recursive"
+):
     """
     calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
     where each mode contains K internal modes.
@@ -152,6 +157,7 @@ def density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, c
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
         hbar (float): the value of hbar (default 2)
+        method (str): which method to use, "recursive" or "direct"
     Returns:
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
@@ -178,4 +184,115 @@ def density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, c
     for i in range(K):
         U_K[i::K, i::K] = Uswap
     _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
-    return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
+
+    # N_nums = list(pattern.values())
+    if method == "recursive":
+        return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
+    cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
+    num_modes = len(cov) // 2
+    A = Amat(cov)
+    Q = Qmat(cov)
+    fact = 1 / np.sqrt(np.linalg.det(Q).real)
+    blocks = np.arange(K * M).reshape([M, K])
+    dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
+    num_modes = M * K
+    block_size = K
+    for i in range(cutoff):
+        for j in range(i + 1):
+            if (i - j) % 2 == 0:
+                patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
+                new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
+                perm = (
+                    list(range(num_modes))
+                    + list(range(block_size))
+                    + list(range(num_modes, 2 * num_modes))
+                    + list(range(block_size))
+                )
+                Aperm = A[:, perm][perm]
+                dm[j, i] = (
+                    fact
+                    * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
+                    / (np.prod(fac(patt_long[1:-1])) * np.sqrt(fac(i) * fac(j)))
+                )
+                dm[i, j] = np.conj(dm[j, i])
+            else:
+                dm[i, j] = 0
+                dm[j, i] = 0
+    if normalize:
+        dm = dm / np.trace(dm)
+    return dm
+
+
+def dm_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
+    """
+    Calculates the diagonal of the density matrix, hence the name probabilities, of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
+    where each mode contains K internal modes.
+
+    Args:
+        cov (array): 2MK x 2MK covariance matrix
+        pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
+        normalize (bool): whether to normalise the output density matrix
+        LO_overlap (array): overlap between internal modes and local oscillator
+        cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
+        hbar (float): the value of hbar (default 2)
+    Returns:
+        array[complex]: (cutoff+1, cutoff+1) dimension density matrix
+    """
+
+    # The lines until A = Amat(...) are copies from density_matrix_single_mode
+    cov = np.array(cov).astype(np.float64)
+    M = len(pattern) + 1
+    K = cov.shape[0] // (2 * M)
+    if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
+        raise ValueError("Keys of pattern must correspond to all but one spatial mode")
+    N_nums = list(pattern.values())
+    HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
+    if LO_overlap is not None:
+        if not K == LO_overlap.shape[0]:
+            raise ValueError("Number of overlaps with LO must match number of internal modes")
+        if not (np.linalg.norm(LO_overlap) < 1 or np.allclose(np.linalg.norm(LO_overlap), 1)):
+            raise ValueError("Norm of overlaps must not be greater than 1")
+
+    # swapping the spatial modes around such that we are heralding in spatial mode 0
+    Uswap = np.zeros((M, M))
+    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
+    for j, k in enumerate(swapV):
+        Uswap[j][k] = 1
+    U_K = np.zeros((M * K, M * K))
+    for i in range(K):
+        U_K[i::K, i::K] = Uswap
+    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
+
+    cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
+    num_modes = len(cov) // 2
+    A = Amat(cov)
+    Q = Qmat(cov)
+    fact = 1 / np.sqrt(np.linalg.det(Q).real)
+    blocks = np.arange(K * M).reshape([M, K])
+    dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
+    num_modes = M * K
+    block_size = K
+    for i in range(cutoff):
+        for j in range(i + 1):
+            if (i - j) % 2 == 0:
+                patt_long = [j] + N_nums + [(i - j) // 2]
+                new_blocks = np.concatenate((blocks, np.array([1 + blocks[-1]])), axis=0)
+                perm = (
+                    list(range(num_modes))
+                    + list(range(block_size))
+                    + list(range(num_modes, 2 * num_modes))
+                    + list(range(block_size))
+                )
+                Aperm = A[:, perm][perm]
+                dm[i, j] = (
+                    fact
+                    * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
+                    / (np.prod(fac(patt_long[1:-1])) * np.sqrt(fac(i) * fac(j)))
+                )
+                dm[j, i] = np.conj(dm[i, j])
+            else:
+                dm[i, j] = 0
+                dm[j, i] = 0
+    if normalize:
+        dm = dm / np.trace(dm)
+    return dm

@@ -258,7 +258,6 @@ def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cu
     return probs
 
 
-
 def dm_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
     """
     Calculates the diagonal of the density matrix, hence the name probabilities, of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
@@ -300,28 +299,35 @@ def dm_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hb
     _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
 
     cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
-    num_modes = len(cov)//2
+    num_modes = len(cov) // 2
     A = Amat(cov)
     Q = Qmat(cov)
     fact = 1 / np.sqrt(np.linalg.det(Q).real)
     blocks = np.arange(K * M).reshape([M, K])
     dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
-    num_modes = M*K
+    num_modes = M * K
     block_size = K
     for i in range(cutoff):
-        for j in range(i+1):
-            if (i-j)%2==0:
-                patt_long = [j] + N_nums +[(i-j)//2]
-                new_blocks = np.concatenate((blocks, np.array([2+blocks[-1]])),axis=0)
-                perm = list(range(num_modes)) + list(range(block_size)) + list(range(num_modes,2*num_modes)) + list(range(block_size))
-                Aperm = A[:, perm][perm]
-                dm[i,j] = fact * np.real(
-                    haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long) / (np.prod(fac(patt_long[1:-1]))*np.sqrt(fac(i)*fac(j)))
+        for j in range(i + 1):
+            if (i - j) % 2 == 0:
+                patt_long = [j] + N_nums + [(i - j) // 2]
+                new_blocks = np.concatenate((blocks, np.array([1 + blocks[-1]])), axis=0)
+                perm = (
+                    list(range(num_modes))
+                    + list(range(block_size))
+                    + list(range(num_modes, 2 * num_modes))
+                    + list(range(block_size))
                 )
-                dm[j,i] = np.conj(dm[i,j])
+                Aperm = A[:, perm][perm]
+                dm[i, j] = (
+                    fact
+                    * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
+                    / (np.prod(fac(patt_long[1:-1])) * np.sqrt(fac(i) * fac(j)))
+                )
+                dm[j, i] = np.conj(dm[i, j])
             else:
-                dm[i,j] = 0
-                dm[j,i] = 0
+                dm[i, j] = 0
+                dm[j, i] = 0
     if normalize:
         dm = dm / np.trace(dm)
     return dm
