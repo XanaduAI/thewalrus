@@ -17,7 +17,7 @@ Set of functions for calculating Fock basis density matrices for heralded states
 
 import numpy as np
 import numba
-from scipy.special import factorial as fac
+from scipy.special import factorial
 
 from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
@@ -192,7 +192,7 @@ def density_matrix_single_mode(
     num_modes = len(cov) // 2
     A = Amat(cov)
     Q = Qmat(cov)
-    fact = 1 / np.sqrt(np.linalg.det(Q).real)
+    pref = 1 / np.sqrt(np.linalg.det(Q).real)
     blocks = np.arange(K * M).reshape([M, K])
     dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
     num_modes = M * K
@@ -210,9 +210,9 @@ def density_matrix_single_mode(
                 )
                 Aperm = A[:, perm][perm]
                 dm[j, i] = (
-                    fact
+                    pref
                     * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
-                    / (np.prod(fac(patt_long[1:-1])) * np.sqrt(fac(i) * fac(j)))
+                    / (np.prod(factorial(patt_long[1:-1])) * np.sqrt(factorial(i) * factorial(j)))
                 )
                 dm[i, j] = np.conj(dm[j, i])
             else:
