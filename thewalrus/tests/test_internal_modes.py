@@ -1364,7 +1364,7 @@ def test_vac_schmidt_modes_gkp(method):
     big_cov = np.eye(2 * M * K, dtype=np.complex128)
     big_cov[::K, ::K] = cov
 
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method="method")
+    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
