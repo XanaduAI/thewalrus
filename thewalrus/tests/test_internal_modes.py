@@ -1368,7 +1368,11 @@ def test_vac_schmidt_modes_gkp(method):
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
-    probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
+    probs = np.diag(
+        density_matrix_single_mode(
+            big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+        )
+    )
     assert np.allclose(np.diag(rho1), probs)
 
 
