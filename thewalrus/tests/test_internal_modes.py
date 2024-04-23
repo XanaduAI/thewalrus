@@ -28,7 +28,7 @@ from scipy.special import factorial
 
 from repoze.lru import lru_cache
 
-from thewalrus import low_rank_hafnian, reduction
+from thewalrus import low_rank_hafnian, reduction, hafnian
 
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
@@ -50,7 +50,7 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode, haf_blocked
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -1532,3 +1532,19 @@ def test_unknown_method_in_density_matrix_single_mode():
     cutoff = 10
     with pytest.raises(ValueError, match="Unknown method for density_matrix_single_mode"):
         density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="Coo coo ca choo")
+
+def test_haf_blocked():
+    """Tests that haf blocked is the sum of many hafnians"""
+    n = 6
+    B = np.random.rand(n,n)+ 1j*np.random.rand(n,n)
+    A = B + B.T
+    reps_list = [[i, 3-i,4] for i in range(4)]
+    haf_sum = 0j
+    for reps in reps_list:
+        repreps = reps + reps
+        haf = hafnian(reduction(A, repreps))
+        haf_sum += haf / np.product(factorial(reps))
+    blocks = ((0,1),(2,))
+    repeats = (3,4)
+    haf_val = haf_blocked(A, blocks=blocks, repeats=repeats)/np.product(factorial(repeats))
+    assert np.allclose(haf_sum, haf_val)
