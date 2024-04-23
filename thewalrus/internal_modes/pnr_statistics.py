@@ -170,7 +170,7 @@ def haf_blocked(A, blocks, repeats):
 
 
 @numba.jit(nopython=True)
-def _haf_blocked_numba(A, blocks, repeats_p):
+def _haf_blocked_numba(A, blocks, repeats_p):  # pragma: no cover
     """Calculates the hafnian of the matrix with a given block and repetition pattern.
 
     Args:
