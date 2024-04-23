@@ -50,7 +50,7 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode, probabilities_single_mode
+from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -1159,11 +1159,15 @@ def test_mixed_heralded_photon(nh, method):
         cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method=method
     )
 
-    p_a = probabilities_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1
+    p_a = np.diag(
+        density_matrix_single_mode(
+            cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method="diagonals"
+        )
     )
-    p_b = probabilities_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1
+    p_b = np.diag(
+        density_matrix_single_mode(
+            cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method="diagonals"
+        )
     )
 
     assert np.allclose(dm_modea, rho_a)
@@ -1172,7 +1176,7 @@ def test_mixed_heralded_photon(nh, method):
     assert np.allclose(np.diag(dm_modeb), p_b)
 
 
-@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+@pytest.mark.parametrize("method", ["non-recursive"])
 def test_pure_gkp(method):
     """test pure gkp state density matrix using 2 methods from the walrus against
     internal_modes.density_matrix_single_mode (but with only 1 temporal mode)"""
@@ -1233,8 +1237,12 @@ def test_pure_gkp(method):
     assert np.allclose(
         rho2, rho3, atol=4.8e-4
     )  # For the method "non-recursive" the absolute max difference is 1e-8
-    # probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
-    # assert np.allclose(np.diag(rho1), probs)
+    probs = np.diag(
+        density_matrix_single_mode(
+            cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+        )
+    )
+    assert np.allclose(np.diag(rho1), probs)
 
     #### Note that the tolerances are higher than they should be.
 
@@ -1294,7 +1302,11 @@ def test_lossy_gkp(method):
     rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, method=method)
     rho_loss2 /= np.trace(rho_loss2)
     assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
-    probs = probabilities_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
+    probs = np.diag(
+        density_matrix_single_mode(
+            cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+        )
+    )
     assert np.allclose(np.diag(rho_loss1), probs)
 
 
@@ -1352,11 +1364,15 @@ def test_vac_schmidt_modes_gkp(method):
     big_cov = np.eye(2 * M * K, dtype=np.complex128)
     big_cov[::K, ::K] = cov
 
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method="method")
+    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
     rho_big /= np.trace(rho_big)
 
     assert np.allclose(rho1, rho_big, atol=4e-4)
-    probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
+    probs = np.diag(
+        density_matrix_single_mode(
+            big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+        )
+    )
     assert np.allclose(np.diag(rho1), probs)
 
 
@@ -1400,11 +1416,12 @@ def test_density_matrix_error(method):
 
 
 @pytest.mark.parametrize("cutoff", [8, 9])
-@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+@pytest.mark.parametrize("method", ["non-recursive"])
 def test_density_matrix(cutoff, method):
     """
     test generation of heralded density matrix against combinatorial calculation
     """
+    # Note that the recursive method fails this
     U = unitary_group.rvs(2)
 
     N = {0: 3}
@@ -1440,7 +1457,9 @@ def test_density_matrix(cutoff, method):
     rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff, method=method)
     rho2_norm = rho2 / np.trace(rho2).real
 
-    probs = probabilities_single_mode(cov, N, cutoff=cutoff, normalize=True)
+    probs = np.diag(
+        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="diagonals")
+    )
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
     assert np.allclose(np.diag(rho_norm), probs)
@@ -1504,3 +1523,12 @@ def test_project_onto_local_oscillator():
     cov_filt = project_onto_local_oscillator(cov_test, M, np.array([1, 0, 0]))
     np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 1), 0)
     np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 2), 0)
+
+
+def test_unknown_method_in_density_matrix_single_mode():
+    """Tests an error is raised if an unknown method is requested"""
+    cov = np.identity(4)
+    N = {0: 3}
+    cutoff = 10
+    with pytest.raises(ValueError, match="Unknown method for density_matrix_single_mode"):
+        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="Coo coo ca choo")

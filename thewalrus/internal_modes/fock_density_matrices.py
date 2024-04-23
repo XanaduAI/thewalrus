@@ -17,7 +17,7 @@ Set of functions for calculating Fock basis density matrices for heralded states
 
 import numpy as np
 import numba
-from scipy.special import factorial as fac
+from scipy.special import factorial
 
 from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
@@ -33,7 +33,9 @@ from ..quantum import Qmat, Amat
 
 # pylint: disable=too-many-arguments, too-many-statements
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
+def _density_matrix_single_mode(
+    cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2
+):  # pragma: no cover
     """
     numba function (use the wrapper function: density_matrix_multimode)
 
@@ -188,36 +190,46 @@ def density_matrix_single_mode(
     # N_nums = list(pattern.values())
     if method == "recursive":
         return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
-    cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
-    num_modes = len(cov) // 2
-    A = Amat(cov)
-    Q = Qmat(cov)
-    fact = 1 / np.sqrt(np.linalg.det(Q).real)
-    blocks = np.arange(K * M).reshape([M, K])
-    dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
-    num_modes = M * K
-    block_size = K
-    for i in range(cutoff):
-        for j in range(i + 1):
-            if (i - j) % 2 == 0:
-                patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
-                new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
-                perm = (
-                    list(range(num_modes))
-                    + list(range(block_size))
-                    + list(range(num_modes, 2 * num_modes))
-                    + list(range(block_size))
-                )
-                Aperm = A[:, perm][perm]
-                dm[j, i] = (
-                    fact
-                    * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
-                    / (np.prod(fac(patt_long[1:-1])) * np.sqrt(fac(i) * fac(j)))
-                )
-                dm[i, j] = np.conj(dm[j, i])
+    elif method == "non-recursive" or method == "diagonals":
+        cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
+        num_modes = len(cov) // 2
+        A = Amat(cov)
+        Q = Qmat(cov)
+        pref = 1 / np.sqrt(np.linalg.det(Q).real)
+        blocks = np.arange(K * M).reshape([M, K])
+        dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
+        num_modes = M * K
+        block_size = K
+        for i in range(cutoff):
+            if method == "diagonals":
+                lower_limit = i
             else:
-                dm[i, j] = 0
-                dm[j, i] = 0
-    if normalize:
-        dm = dm / np.trace(dm)
-    return dm
+                lower_limit = 0
+            for j in range(lower_limit, i + 1):
+                if (i - j) % 2 == 0:
+                    patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
+                    new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
+                    perm = (
+                        list(range(num_modes))
+                        + list(range(block_size))
+                        + list(range(num_modes, 2 * num_modes))
+                        + list(range(block_size))
+                    )
+                    Aperm = A[:, perm][perm]
+                    dm[j, i] = (
+                        pref
+                        * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
+                        / (
+                            np.prod(factorial(patt_long[1:-1]))
+                            * np.sqrt(factorial(i) * factorial(j))
+                        )
+                    )
+                    dm[i, j] = np.conj(dm[j, i])
+                else:
+                    dm[i, j] = 0
+                    dm[j, i] = 0
+        if normalize:
+            dm = dm / np.trace(dm)
+        return dm
+    else:
+        raise ValueError("Unknown method for density_matrix_single_mode")
