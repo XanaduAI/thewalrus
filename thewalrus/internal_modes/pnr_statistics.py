@@ -35,7 +35,7 @@ from .utils import (
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def hafkd(As, edge_reps, K=1):
+def hafkd(As, edge_reps, K=1):  # pragma: no cover
     r"""
     generalised version of hafnian to include multiple internal modes
 
@@ -129,7 +129,7 @@ def pnr_prob(covs, i, hbar=2):
 
 
 @numba.jit(nopython=True, cache=True)
-def finite_difference_operator_coeffs(der_order, m, u=None, v=None):
+def finite_difference_operator_coeffs(der_order, m, u=None, v=None):  # pragma: no cover
     """Returns the mth coefficient of the finite difference operator of given derivative order.
     For details see:  E. T. Bax, Finite-difference algorithms for counting problems. PhD thesis, Caltech, 1998.
 

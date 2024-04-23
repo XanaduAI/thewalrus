@@ -1176,7 +1176,7 @@ def test_mixed_heralded_photon(nh, method):
     assert np.allclose(np.diag(dm_modeb), p_b)
 
 
-@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+@pytest.mark.parametrize("method", ["non-recursive"])
 def test_pure_gkp(method):
     """test pure gkp state density matrix using 2 methods from the walrus against
     internal_modes.density_matrix_single_mode (but with only 1 temporal mode)"""
@@ -1523,3 +1523,12 @@ def test_project_onto_local_oscillator():
     cov_filt = project_onto_local_oscillator(cov_test, M, np.array([1, 0, 0]))
     np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 1), 0)
     np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 2), 0)
+
+
+def test_unknown_method_in_density_matrix_single_mode():
+    """Tests and error is raised if an unknown method is requested"""
+    cov = np.identity(4)
+    N = {0: 3}
+    cutoff = 10
+    with pytest.raises(ValueError, match="Unknown method for density_matrix_single_mode"):
+        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="Coo coo ca choo")

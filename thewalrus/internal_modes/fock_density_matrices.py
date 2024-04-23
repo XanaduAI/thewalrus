@@ -33,7 +33,7 @@ from ..quantum import Qmat, Amat
 
 # pylint: disable=too-many-arguments, too-many-statements
 @numba.jit(nopython=True, parallel=True, cache=True)
-def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
+def _density_matrix_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):  # pragma: no cover
     """
     numba function (use the wrapper function: density_matrix_multimode)
 

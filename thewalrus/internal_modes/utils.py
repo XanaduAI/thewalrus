@@ -20,7 +20,7 @@ fact = np.array([factorial(i) for i in range(110)], dtype=np.float64)
 
 
 @numba.jit(nopython=True, cache=True)
-def spatial_modes_to_schmidt_modes(spatial_modes, K):
+def spatial_modes_to_schmidt_modes(spatial_modes, K):  # pragma: no cover
     """
     returns index of schmidt modes corresponding to the give spatial modes.
     e.g. if there are K=3 schmidt modes and spatial_modes=[0,2]
@@ -42,7 +42,7 @@ def spatial_modes_to_schmidt_modes(spatial_modes, K):
 
 
 @numba.jit(nopython=True, cache=True)
-def spatial_reps_to_schmidt_reps(spatial_reps, K):
+def spatial_reps_to_schmidt_reps(spatial_reps, K):  # pragma: no cover
     """
     returns reps of schmidt modes corresponding to the give spatial reps.
     e.g. if there are K=3 schmidt modes and spatial_reps=[1,2]
@@ -107,7 +107,7 @@ def nb_block(X):  # pragma: no cover
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def project_onto_local_oscillator(cov, M, LO_overlap=None, hbar=2):
+def project_onto_local_oscillator(cov, M, LO_overlap=None, hbar=2):  # pragma: no cover
     """Projects a given covariance matrix into the relevant internal mode in the first external mode.
 
     Args:
