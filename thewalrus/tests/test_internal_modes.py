@@ -1526,7 +1526,7 @@ def test_project_onto_local_oscillator():
 
 
 def test_unknown_method_in_density_matrix_single_mode():
-    """Tests and error is raised if an unknown method is requested"""
+    """Tests an error is raised if an unknown method is requested"""
     cov = np.identity(4)
     N = {0: 3}
     cutoff = 10
