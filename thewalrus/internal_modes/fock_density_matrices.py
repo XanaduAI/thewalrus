@@ -79,13 +79,13 @@ def _density_matrix_single_mode(
     x = np.array(x)
     Ax = nb_ix(A, x, x)  # A[np.ix_(x, x)]
 
-    edge_reps = np.array([half_c, half_c, 1] + list(pattern))
+    edge_reps = np.array([half_c, half_c, 1] + pattern)
     n_edges = 3 + K * len(pattern)
 
     assert n_edges == Ax.shape[0] // 2 == 3 + K * (M - 1)
 
     N_max = 2 * edge_reps.sum()
-    N_fixed = 2 * np.sum(pattern)
+    N_fixed = 2 * sum(pattern)
 
     steps = np.prod(edge_reps + 1)
 
@@ -130,7 +130,7 @@ def _density_matrix_single_mode(
         haf_arr += haf_arr_new
 
     rho = (
-        (-1) ** pattern.sum() * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[pattern]))
+        (-1) ** sum(pattern) * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[np.array(pattern)]))
     )
 
     for n in range(cutoff):
@@ -168,7 +168,7 @@ def density_matrix_single_mode(
     K = cov.shape[0] // (2 * M)
     if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
         raise ValueError("Keys of pattern must correspond to all but one spatial mode")
-    N_nums = np.array(list(pattern.values()))
+    N_nums = list(pattern.values())
     HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
     if LO_overlap is not None:
         if not K == LO_overlap.shape[0]:
@@ -188,19 +188,18 @@ def density_matrix_single_mode(
         return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
     if method in ["non-recursive", "diagonals"]:
         cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
-        num_modes = len(cov) // 2
         A = Amat(cov)
         Q = Qmat(cov)
         pref = 1 / np.sqrt(np.linalg.det(Q).real)
         blocks = np.arange(K * M).reshape([M, K])
         dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
-        num_modes = M * K
-        block_size = K
         if method == "non-recursive":
+            num_modes = M * K
+            block_size = K
             for i in range(cutoff):
                 for j in range(i + 1):
                     if (i - j) % 2 == 0:
-                        patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
+                        patt_long = [j] + N_nums + [(i - j) // 2]
                         new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
                         perm = (
                             list(range(num_modes))
@@ -223,7 +222,7 @@ def density_matrix_single_mode(
                         dm[j, i] = 0
         else:
             for i in range(cutoff):
-                patt_long = (i,) + tuple(N_nums)
+                patt_long = [i] + N_nums
                 dm[i, i] = pref * np.real(
                     haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(factorial(patt_long))
                 )
