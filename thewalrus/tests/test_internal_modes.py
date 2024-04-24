@@ -1541,8 +1541,6 @@ def test_haf_blocked(n1, n2):
     n = 6
     B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
     A = B + B.T
-    n1 = 3
-    n2 = 4
     reps_list = [[i, n1 - i, n2] for i in range(n1 + 1)]
     haf_sum = 0j
     for reps in reps_list:
