@@ -130,7 +130,9 @@ def _density_matrix_single_mode(
         haf_arr += haf_arr_new
 
     rho = (
-        (-1) ** sum(pattern) * haf_arr / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[np.array(pattern)]))
+        (-1) ** sum(pattern)
+        * haf_arr
+        / (np.sqrt(np.linalg.det(Q).real) * np.prod(fact[np.array(pattern)]))
     )
 
     for n in range(cutoff):
