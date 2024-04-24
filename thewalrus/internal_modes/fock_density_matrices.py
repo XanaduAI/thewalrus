@@ -221,7 +221,7 @@ def density_matrix_single_mode(
                 UserWarning,
             )
         if normalize:
-             vals = vals / np.trace(vals).real
+            vals = vals / np.trace(vals).real
         return vals
     if method in ["non-recursive", "diagonals"]:
         cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
@@ -261,7 +261,10 @@ def density_matrix_single_mode(
         else:
             for i in range(cutoff):
                 patt_long = (i,) + tuple(N_nums)
-                dm[i, i] = pref * haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(factorial(patt_long)
+                dm[i, i] = (
+                    pref
+                    * haf_blocked(A, blocks=blocks, repeats=patt_long)
+                    / np.prod(factorial(patt_long))
                 )
         if normalize:
             dm = dm / np.trace(dm)

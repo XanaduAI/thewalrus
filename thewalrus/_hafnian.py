@@ -273,7 +273,7 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def f_from_powertrace(powertraces, n): # pragma: no cover
+def f_from_powertrace(powertraces, n):  # pragma: no cover
     """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from the powertraces.
 
     Args:

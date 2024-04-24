@@ -1472,6 +1472,7 @@ def test_check_probabilities(atol):
     probs[0] = -1j * 10 * atol * np.sum(probs[0:])
     assert not check_probabilities(probs, atol)
 
+
 @pytest.mark.parametrize("cutoff", [43, 44])
 @pytest.mark.parametrize("method", ["recursive", "non-recursive", "diagonals"])
 def test_warning_non_recursive_gives_negative_probs(cutoff, method):
@@ -1513,12 +1514,20 @@ def test_warning_non_recursive_gives_negative_probs(cutoff, method):
     Z = S2 @ Usymp @ S1
     cov = Z @ Z.T
     if method == "recursive":
-        with pytest.warns(UserWarning, match="Some of the diagonal elements of the density matrix are significantly"):
-            result = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method)
+        with pytest.warns(
+            UserWarning,
+            match="Some of the diagonal elements of the density matrix are significantly",
+        ):
+            result = density_matrix_single_mode(
+                cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method
+            )
         assert not check_probabilities(np.diag(result))
     else:
-        result = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method)
+        result = density_matrix_single_mode(
+            cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method
+        )
         assert check_probabilities(np.diag(result))
+
 
 @pytest.mark.parametrize("cutoff", [8, 9])
 @pytest.mark.parametrize("method", ["non-recursive"])
