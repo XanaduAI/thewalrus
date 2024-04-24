@@ -190,7 +190,7 @@ def density_matrix_single_mode(
     # N_nums = list(pattern.values())
     if method == "recursive":
         return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
-    elif method == "non-recursive" or method == "diagonals":
+    if method in ["non-recursive", "diagonals"]:
         cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
         num_modes = len(cov) // 2
         A = Amat(cov)
@@ -238,5 +238,5 @@ def density_matrix_single_mode(
         if normalize:
             dm = dm / np.trace(dm)
         return dm
-    else:
-        raise ValueError("Unknown method for density_matrix_single_mode")
+
+    raise ValueError("Unknown method for density_matrix_single_mode")
