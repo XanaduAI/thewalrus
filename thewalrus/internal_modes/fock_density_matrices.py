@@ -144,11 +144,11 @@ def _density_matrix_single_mode(
 
 def check_probabilities(probs, atol=1e-08):
     """
-    Convinience function for checking that the input is close enough to a probability distribution.
+    Convenience function for checking that the input is close enough to a probability distribution.
 
     Args:
         probs (array): probabilities to be tested.
-        atol (array): absolute tolerance relative to the normalization.
+        atol (float): absolute tolerance relative to the normalization.
 
     Returns:
         (boolean): whether the test passed or not.
@@ -186,7 +186,7 @@ def density_matrix_single_mode(
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
         hbar (float): the value of hbar (default 2)
-        method (str): which method to use, "recursive", "direct" or "diagonals"
+        method (str): which method to use, "recursive", "non-recursive" or "diagonals"
         atol (float): value for raising warning when testing for valid probabilities
     Returns:
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
@@ -215,9 +215,9 @@ def density_matrix_single_mode(
 
     if method == "recursive":
         vals = _density_matrix_single_mode(cov, N_nums, LO_overlap, cutoff, hbar)
-        if check_probabilities(np.diag(vals)) is False:
+        if check_probabilities(np.diag(vals), atol=atol) is False:
             warnings.warn(
-                "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts",
+                "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts. Try using the "non-recursive" method instead.",
                 UserWarning,
             )
         if normalize:
