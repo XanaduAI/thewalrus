@@ -1162,12 +1162,22 @@ def test_mixed_heralded_photon(nh, method, herald):
 
     p_a = np.diag(
         density_matrix_single_mode(
-            cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method="diagonals"
+            cov,
+            {herald: nh},
+            normalize=True,
+            LO_overlap=LO_overlapa,
+            cutoff=nh + 1,
+            method="diagonals",
         )
     )
     p_b = np.diag(
         density_matrix_single_mode(
-            cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method="diagonals"
+            cov,
+            {herald: nh},
+            normalize=True,
+            LO_overlap=LO_overlapb,
+            cutoff=nh + 1,
+            method="diagonals",
         )
     )
 
