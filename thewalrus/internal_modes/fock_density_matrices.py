@@ -206,28 +206,35 @@ def density_matrix_single_mode(
             else:
                 lower_limit = 0
             for j in range(lower_limit, i + 1):
-                if (i - j) % 2 == 0:
-                    patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
-                    new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
-                    perm = (
-                        list(range(num_modes))
-                        + list(range(block_size))
-                        + list(range(num_modes, 2 * num_modes))
-                        + list(range(block_size))
-                    )
-                    Aperm = A[:, perm][perm]
-                    dm[j, i] = (
-                        pref
-                        * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
-                        / (
-                            np.prod(factorial(patt_long[1:-1]))
-                            * np.sqrt(factorial(i) * factorial(j))
+                if method == "non-recursive":
+                    if (i - j) % 2 == 0:
+                        patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
+                        new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
+                        perm = (
+                            list(range(num_modes))
+                            + list(range(block_size))
+                            + list(range(num_modes, 2 * num_modes))
+                            + list(range(block_size))
                         )
+                        Aperm = A[:, perm][perm]
+                        dm[j, i] = (
+                            pref
+                            * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
+                            / (
+                                np.prod(factorial(patt_long[1:-1]))
+                                * np.sqrt(factorial(i) * factorial(j))
+                            )
+                        )
+                        dm[i, j] = np.conj(dm[j, i])
+                    else:
+                        dm[i, j] = 0
+                        dm[j, i] = 0
+                if method == "diagonals":
+                    patt_long = (i,) + tuple(N_nums)
+                    dm[i, i] = pref * np.real(
+                        haf_blocked(A, blocks=blocks, repeats=patt_long)
+                        / np.prod(factorial(patt_long))
                     )
-                    dm[i, j] = np.conj(dm[j, i])
-                else:
-                    dm[i, j] = 0
-                    dm[j, i] = 0
         if normalize:
             dm = dm / np.trace(dm)
         return dm
