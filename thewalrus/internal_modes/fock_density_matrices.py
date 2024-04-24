@@ -262,7 +262,10 @@ def density_matrix_single_mode(
         else:
             for i in range(cutoff):
                 patt_long = [i] + N_nums
-                dm[i, i] = pref * haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(factorial(patt_long))
+                dm[i, i] = (
+                    pref
+                    * haf_blocked(A, blocks=blocks, repeats=patt_long)
+                    / np.prod(factorial(patt_long))
                 )
         if normalize:
             dm = dm / np.trace(dm)
