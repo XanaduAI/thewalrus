@@ -50,7 +50,12 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode, haf_blocked
+from thewalrus.internal_modes import (
+    pnr_prob,
+    density_matrix_single_mode,
+    haf_blocked,
+    check_probabilities,
+)
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -1446,6 +1451,82 @@ def test_haf_blocked(n1, n2):
     repeats = (n1, n2)
     haf_val = haf_blocked(A, blocks=blocks, repeats=repeats) / np.product(factorial(repeats))
     assert np.allclose(haf_sum, haf_val)
+
+
+@pytest.mark.parametrize("atol", [1e-08, 1e-07, 1e-06])
+def test_check_probabilities(atol):
+    """Tests for check_probabilities"""
+    probs = np.random.rand(10) + 0j
+    assert check_probabilities(probs, atol)
+    probs[0] = -1
+    assert not check_probabilities(probs, atol)
+    probs[0] = -0.1 * atol * np.sum(probs[0:])
+    assert check_probabilities(probs, atol)
+    probs[0] = -10 * atol * np.sum(probs[0:])
+    assert not check_probabilities(probs, atol)
+    probs = np.random.rand(10) + 0j
+    probs[0] = -1j
+    assert not check_probabilities(probs, atol)
+    probs[0] = -1j * 0.1 * atol * np.sum(probs[0:])
+    assert check_probabilities(probs, atol)
+    probs[0] = -1j * 10 * atol * np.sum(probs[0:])
+    assert not check_probabilities(probs, atol)
+
+
+@pytest.mark.parametrize("cutoff", [43, 44])
+@pytest.mark.parametrize("method", ["recursive", "non-recursive", "diagonals"])
+def test_warning_non_recursive_gives_negative_probs(cutoff, method):
+    """"""
+    m1, m2 = 5, 7
+    params = np.array(
+        [
+            -1.38155106,
+            -1.21699567,
+            0.7798817,
+            1.04182349,
+            0.87702211,
+            0.90243916,
+            1.48353639,
+            1.6962906,
+            -0.24251599,
+            0.1958,
+        ]
+    )
+    sq_r = params[:3]
+    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
+    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
+    sq_virt = params[9]
+
+    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    BS1, BS2, BS3 = (
+        beam_splitter(bs_theta1, bs_phi1),
+        beam_splitter(bs_theta2, bs_phi2),
+        beam_splitter(bs_theta3, bs_phi3),
+    )
+    Usymp1, Usymp2, Usymp3 = (
+        expand(BS1, [0, 1], 3),
+        expand(BS2, [1, 2], 3),
+        expand(BS3, [0, 1], 3),
+    )
+    Usymp = Usymp3 @ Usymp2 @ Usymp1
+    r2 = np.array([0, 0, sq_virt])
+    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    Z = S2 @ Usymp @ S1
+    cov = Z @ Z.T
+    if method == "recursive":
+        with pytest.warns(
+            UserWarning,
+            match="Some of the diagonal elements of the density matrix are significantly",
+        ):
+            result = density_matrix_single_mode(
+                cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method
+            )
+        assert not check_probabilities(np.diag(result))
+    else:
+        result = density_matrix_single_mode(
+            cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method
+        )
+        assert check_probabilities(np.diag(result))
 
 
 @pytest.mark.parametrize("cutoff", [8, 9])

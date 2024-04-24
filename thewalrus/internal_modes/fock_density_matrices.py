@@ -15,6 +15,7 @@
 Set of functions for calculating Fock basis density matrices for heralded states created by PNR measurements on Gaussian states with multiple internal modes
 """
 
+import warnings
 import numpy as np
 import numba
 from scipy.special import factorial
@@ -33,7 +34,7 @@ from ..quantum import Qmat, Amat
 # pylint: disable=too-many-arguments, too-many-statements
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _density_matrix_single_mode(
-    cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2
+    cov, pattern, LO_overlap=None, cutoff=13, hbar=2
 ):  # pragma: no cover
     """
     numba function (use the wrapper function: density_matrix_multimode)
@@ -44,7 +45,6 @@ def _density_matrix_single_mode(
     Args:
         cov (array): 2MK x 2MK covariance matrix
         pattern (array): M-1 length array of the heralding pattern
-        normalize (bool): whether to normalise the output density matrix
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
         hbar (float): the value of hbar (default 2)
@@ -141,16 +141,44 @@ def _density_matrix_single_mode(
 
     rho = rho[:cutoff, :cutoff]
 
-    if normalize:
-        return rho / np.trace(rho).real
     return rho
 
 
+def check_probabilities(probs, atol=1e-08):
+    """
+    Convenience function for checking that the input is close enough to a probability distribution.
+
+    Args:
+        probs (array): probabilities to be tested.
+        atol (float): absolute tolerance relative to the normalization.
+
+    Returns:
+        (boolean): whether the test passed or not.
+    """
+    real_probs = probs.real
+    imag_probs = probs.imag
+    pos_probs = real_probs[real_probs > 0]
+    neg_probs = real_probs[real_probs < 0]
+    net_prob = sum(pos_probs)
+    if np.any(np.abs(imag_probs) > atol * net_prob):
+        return False
+    if np.any(np.abs(neg_probs) > atol * net_prob):
+        return False
+    return True
+
+
 def density_matrix_single_mode(
-    cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2, method="recursive"
+    cov,
+    pattern,
+    normalize=False,
+    LO_overlap=None,
+    cutoff=13,
+    hbar=2,
+    method="recursive",
+    atol=1e-08,
 ):
     """
-    calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
+    Calculates density matrix of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
     where each mode contains K internal modes.
 
     Args:
@@ -160,7 +188,8 @@ def density_matrix_single_mode(
         LO_overlap (array): overlap between internal modes and local oscillator
         cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
         hbar (float): the value of hbar (default 2)
-        method (str): which method to use, "recursive" or "direct"
+        method (str): which method to use, "recursive", "non-recursive" or "diagonals"
+        atol (float): value for raising warning when testing for valid probabilities
     Returns:
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
@@ -187,7 +216,15 @@ def density_matrix_single_mode(
         cov = cov[:, double_perm][double_perm]
 
     if method == "recursive":
-        return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
+        vals = _density_matrix_single_mode(cov, N_nums, LO_overlap, cutoff, hbar)
+        if check_probabilities(np.diag(vals), atol=atol) is False:
+            warnings.warn(
+                "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts. Try using the `non-recursive` method instead.",
+                UserWarning,
+            )
+        if normalize:
+            vals = vals / np.trace(vals).real
+        return vals
     if method in ["non-recursive", "diagonals"]:
         cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
         A = Amat(cov)
