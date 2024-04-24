@@ -1320,6 +1320,7 @@ def test_lossy_gkp(method):
     )
     assert np.allclose(np.diag(rho_loss1), probs)
 
+
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
 def test_density_matrix_error(method):
     """Testing value errors in density_matrix_single_mode"""
@@ -1357,7 +1358,6 @@ def test_density_matrix_error(method):
 
     with pytest.raises(ValueError, match="Norm of overlaps must not be greater than 1"):
         density_matrix_single_mode(cov, N, LO_overlap=LO_overlap2)
-
 
 
 def test_density_matrix_LO():
@@ -1497,7 +1497,6 @@ def test_density_matrix(cutoff, method):
 
     assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
     assert np.allclose(np.diag(rho_norm), probs)
-
 
 
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
