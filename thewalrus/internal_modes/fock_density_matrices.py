@@ -19,7 +19,6 @@ import numpy as np
 import numba
 from scipy.special import factorial
 
-from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
 from .utils import (
     nb_Qmat,
@@ -178,19 +177,16 @@ def density_matrix_single_mode(
             raise ValueError("Norm of overlaps must not be greater than 1")
 
     # swapping the spatial modes around such that we are heralding in spatial mode 0
-    Uswap = np.zeros((M, M))
-    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
-    for j, k in enumerate(swapV):
-        Uswap[j][k] = 1
-    U_K = np.zeros((M * K, M * K))
-    for i in range(K):
-        U_K[i::K, i::K] = Uswap
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
+    if HM != 0:
+        swapV = list(range(M))
+        (swapV[0], swapV[HM]) = (swapV[HM], swapV[0])
+        perm = (np.arange(M * K).reshape(M, K))[swapV].flatten()
+        double_perm = np.concatenate([perm, perm + M * K])
+        cov = cov[:, double_perm][double_perm]
 
-    # N_nums = list(pattern.values())
     if method == "recursive":
         return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
-    elif method == "non-recursive" or method == "diagonals":
+    if method in ["non-recursive", "diagonals"]:
         cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
         num_modes = len(cov) // 2
         A = Amat(cov)
@@ -200,36 +196,39 @@ def density_matrix_single_mode(
         dm = np.zeros([cutoff, cutoff], dtype=np.complex128)
         num_modes = M * K
         block_size = K
-        for i in range(cutoff):
-            if method == "diagonals":
-                lower_limit = i
-            else:
-                lower_limit = 0
-            for j in range(lower_limit, i + 1):
-                if (i - j) % 2 == 0:
-                    patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
-                    new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
-                    perm = (
-                        list(range(num_modes))
-                        + list(range(block_size))
-                        + list(range(num_modes, 2 * num_modes))
-                        + list(range(block_size))
-                    )
-                    Aperm = A[:, perm][perm]
-                    dm[j, i] = (
-                        pref
-                        * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
-                        / (
-                            np.prod(factorial(patt_long[1:-1]))
-                            * np.sqrt(factorial(i) * factorial(j))
+        if method == "non-recursive":
+            for i in range(cutoff):
+                for j in range(i + 1):
+                    if (i - j) % 2 == 0:
+                        patt_long = list((j,) + tuple(N_nums) + ((i - j) // 2,))
+                        new_blocks = np.concatenate((blocks, np.array([K + blocks[-1]])), axis=0)
+                        perm = (
+                            list(range(num_modes))
+                            + list(range(block_size))
+                            + list(range(num_modes, 2 * num_modes))
+                            + list(range(block_size))
                         )
-                    )
-                    dm[i, j] = np.conj(dm[j, i])
-                else:
-                    dm[i, j] = 0
-                    dm[j, i] = 0
+                        Aperm = A[:, perm][perm]
+                        dm[j, i] = (
+                            pref
+                            * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
+                            / (
+                                np.prod(factorial(patt_long[1:-1]))
+                                * np.sqrt(factorial(i) * factorial(j))
+                            )
+                        )
+                        dm[i, j] = np.conj(dm[j, i])
+                    else:
+                        dm[i, j] = 0
+                        dm[j, i] = 0
+        else:
+            for i in range(cutoff):
+                patt_long = (i,) + tuple(N_nums)
+                dm[i, i] = pref * np.real(
+                    haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(factorial(patt_long))
+                )
         if normalize:
             dm = dm / np.trace(dm)
         return dm
-    else:
-        raise ValueError("Unknown method for density_matrix_single_mode")
+
+    raise ValueError("Unknown method for density_matrix_single_mode")

@@ -28,7 +28,7 @@ from scipy.special import factorial
 
 from repoze.lru import lru_cache
 
-from thewalrus import low_rank_hafnian, reduction
+from thewalrus import low_rank_hafnian, reduction, hafnian
 
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
@@ -50,7 +50,7 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode
+from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode, haf_blocked
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -1132,7 +1132,8 @@ def test_LO_overlaps(r, S, phi):
 
 @pytest.mark.parametrize("nh", [1, 2, 3, 4])
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
-def test_mixed_heralded_photon(nh, method):
+@pytest.mark.parametrize("herald", [0, 1])
+def test_mixed_heralded_photon(nh, method, herald):
     """test code for generating heralded fock states from squeezed states with 2 internal modes"""
     na = 1
     nb = 0.5
@@ -1153,20 +1154,30 @@ def test_mixed_heralded_photon(nh, method):
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
     rho_a = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method=method
+        cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method=method
     )
     rho_b = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method=method
+        cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method=method
     )
 
     p_a = np.diag(
         density_matrix_single_mode(
-            cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method="diagonals"
+            cov,
+            {herald: nh},
+            normalize=True,
+            LO_overlap=LO_overlapa,
+            cutoff=nh + 1,
+            method="diagonals",
         )
     )
     p_b = np.diag(
         density_matrix_single_mode(
-            cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method="diagonals"
+            cov,
+            {herald: nh},
+            normalize=True,
+            LO_overlap=LO_overlapb,
+            cutoff=nh + 1,
+            method="diagonals",
         )
     )
 
@@ -1311,72 +1322,6 @@ def test_lossy_gkp(method):
 
 
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
-def test_vac_schmidt_modes_gkp(method):
-    """
-    add vacuum schmidt modes and check it doesn't change the state
-    """
-    m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
-
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
-    mu = np.zeros([len(cov)])
-
-    cutoff = 26
-    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
-
-    rho1 = np.outer(psi, psi.conj())
-    rho1 /= np.trace(rho1)
-
-    M = 3
-    K = 5
-    big_cov = np.eye(2 * M * K, dtype=np.complex128)
-    big_cov[::K, ::K] = cov
-
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
-    rho_big /= np.trace(rho_big)
-
-    assert np.allclose(rho1, rho_big, atol=4e-4)
-    probs = np.diag(
-        density_matrix_single_mode(
-            big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
-        )
-    )
-    assert np.allclose(np.diag(rho1), probs)
-
-
-@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
 def test_density_matrix_error(method):
     """Testing value errors in density_matrix_single_mode"""
     U = unitary_group.rvs(2)
@@ -1413,56 +1358,6 @@ def test_density_matrix_error(method):
 
     with pytest.raises(ValueError, match="Norm of overlaps must not be greater than 1"):
         density_matrix_single_mode(cov, N, LO_overlap=LO_overlap2)
-
-
-@pytest.mark.parametrize("cutoff", [8, 9])
-@pytest.mark.parametrize("method", ["non-recursive"])
-def test_density_matrix(cutoff, method):
-    """
-    test generation of heralded density matrix against combinatorial calculation
-    """
-    # Note that the recursive method fails this
-    U = unitary_group.rvs(2)
-
-    N = {0: 3}
-
-    efficiency = 1 * np.ones(2)
-
-    noise = None
-
-    n0 = 2.9267754749886055
-    n1 = 2.592138225047742
-    zs0 = np.array([np.arcsinh(np.sqrt(n0))])
-    zs1 = np.array([np.arcsinh(np.sqrt(n1))])
-    rjs = [zs0, zs1]
-
-    O = np.identity(2, dtype=np.complex128)
-    S = 0.8 * np.exp(0 * 1j)
-    O[0, 1] = S.conj()
-    O[1, 0] = S
-
-    dm = heralded_density_matrix(
-        rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
-    )
-
-    rho = np.zeros((cutoff, cutoff), dtype=np.complex128)
-    for i in range(cutoff):
-        for j in range(cutoff):
-            rho[i, j] = sum(dm[i, j, m, m] for m in range(cutoff))
-
-    rho_norm = rho / np.trace(rho)
-
-    cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
-
-    rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff, method=method)
-    rho2_norm = rho2 / np.trace(rho2).real
-
-    probs = np.diag(
-        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="diagonals")
-    )
-
-    assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
-    assert np.allclose(np.diag(rho_norm), probs)
 
 
 def test_density_matrix_LO():
@@ -1532,3 +1427,139 @@ def test_unknown_method_in_density_matrix_single_mode():
     cutoff = 10
     with pytest.raises(ValueError, match="Unknown method for density_matrix_single_mode"):
         density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="Coo coo ca choo")
+
+
+@pytest.mark.parametrize("n1", [0, 1, 2, 3])
+@pytest.mark.parametrize("n2", [0, 1, 2, 3, 4])
+def test_haf_blocked(n1, n2):
+    """Tests that haf blocked is the sum of many hafnians"""
+    n = 6
+    B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    A = B + B.T
+    reps_list = [[i, n1 - i, n2] for i in range(n1 + 1)]
+    haf_sum = 0j
+    for reps in reps_list:
+        repreps = reps + reps
+        haf = hafnian(reduction(A, repreps))
+        haf_sum += haf / np.product(factorial(reps))
+    blocks = ((0, 1), (2,))
+    repeats = (n1, n2)
+    haf_val = haf_blocked(A, blocks=blocks, repeats=repeats) / np.product(factorial(repeats))
+    assert np.allclose(haf_sum, haf_val)
+
+
+@pytest.mark.parametrize("cutoff", [8, 9])
+@pytest.mark.parametrize("method", ["non-recursive"])
+def test_density_matrix(cutoff, method):
+    """
+    test generation of heralded density matrix against combinatorial calculation
+    """
+    # Note that the recursive method fails this
+    # Note this test is super slow
+    U = unitary_group.rvs(2)
+
+    N = {0: 3}
+
+    efficiency = 1 * np.ones(2)
+
+    noise = None
+
+    n0 = 2.9267754749886055
+    n1 = 2.592138225047742
+    zs0 = np.array([np.arcsinh(np.sqrt(n0))])
+    zs1 = np.array([np.arcsinh(np.sqrt(n1))])
+    rjs = [zs0, zs1]
+
+    O = np.identity(2, dtype=np.complex128)
+    S = 0.8 * np.exp(0 * 1j)
+    O[0, 1] = S.conj()
+    O[1, 0] = S
+
+    dm = heralded_density_matrix(
+        rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
+    )
+
+    rho = np.zeros((cutoff, cutoff), dtype=np.complex128)
+    for i in range(cutoff):
+        for j in range(cutoff):
+            rho[i, j] = sum(dm[i, j, m, m] for m in range(cutoff))
+
+    rho_norm = rho / np.trace(rho)
+
+    cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
+
+    rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff, method=method)
+    rho2_norm = rho2 / np.trace(rho2).real
+
+    probs = np.diag(
+        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="diagonals")
+    )
+
+    assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
+    assert np.allclose(np.diag(rho_norm), probs)
+
+
+@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+def test_vac_schmidt_modes_gkp(method):
+    """
+    add vacuum schmidt modes and check it doesn't change the state
+    """
+    m1, m2 = 5, 7
+    params = np.array(
+        [
+            -1.38155106,
+            -1.21699567,
+            0.7798817,
+            1.04182349,
+            0.87702211,
+            0.90243916,
+            1.48353639,
+            1.6962906,
+            -0.24251599,
+            0.1958,
+        ]
+    )
+    sq_r = params[:3]
+    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
+    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
+    sq_virt = params[9]
+
+    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
+    BS1, BS2, BS3 = (
+        beam_splitter(bs_theta1, bs_phi1),
+        beam_splitter(bs_theta2, bs_phi2),
+        beam_splitter(bs_theta3, bs_phi3),
+    )
+    Usymp1, Usymp2, Usymp3 = (
+        expand(BS1, [0, 1], 3),
+        expand(BS2, [1, 2], 3),
+        expand(BS3, [0, 1], 3),
+    )
+    Usymp = Usymp3 @ Usymp2 @ Usymp1
+    r2 = np.array([0, 0, sq_virt])
+    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
+    Z = S2 @ Usymp @ S1
+    cov = Z @ Z.T
+    mu = np.zeros([len(cov)])
+
+    cutoff = 26
+    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
+
+    rho1 = np.outer(psi, psi.conj())
+    rho1 /= np.trace(rho1)
+
+    M = 3
+    K = 5
+    big_cov = np.eye(2 * M * K, dtype=np.complex128)
+    big_cov[::K, ::K] = cov
+
+    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
+    rho_big /= np.trace(rho_big)
+
+    assert np.allclose(rho1, rho_big, atol=4e-4)
+    probs = np.diag(
+        density_matrix_single_mode(
+            big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+        )
+    )
+    assert np.allclose(np.diag(rho1), probs)
