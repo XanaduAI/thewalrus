@@ -217,7 +217,7 @@ def density_matrix_single_mode(
         vals = _density_matrix_single_mode(cov, N_nums, LO_overlap, cutoff, hbar)
         if check_probabilities(np.diag(vals), atol=atol) is False:
             warnings.warn(
-                "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts. Try using the "non-recursive" method instead.",
+                "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts. Try using the `non-recursive` method instead.",
                 UserWarning,
             )
         if normalize:
