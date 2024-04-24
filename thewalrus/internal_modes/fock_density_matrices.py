@@ -177,11 +177,12 @@ def density_matrix_single_mode(
             raise ValueError("Norm of overlaps must not be greater than 1")
 
     # swapping the spatial modes around such that we are heralding in spatial mode 0
-    swapV = list(range(M))
-    (swapV[0], swapV[HM]) = (swapV[HM], swapV[0])
-    perm = (np.arange(M * K).reshape(M, K))[swapV].flatten()
-    double_perm = np.concatenate([perm, perm + M * K])
-    cov = cov[:, double_perm][double_perm]
+    if HM != 0:
+        swapV = list(range(M))
+        (swapV[0], swapV[HM]) = (swapV[HM], swapV[0])
+        perm = (np.arange(M * K).reshape(M, K))[swapV].flatten()
+        double_perm = np.concatenate([perm, perm + M * K])
+        cov = cov[:, double_perm][double_perm]
 
     if method == "recursive":
         return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
