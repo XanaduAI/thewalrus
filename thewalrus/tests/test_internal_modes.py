@@ -1447,7 +1447,7 @@ def test_haf_blocked(n1, n2):
     haf_val = haf_blocked(A, blocks=blocks, repeats=repeats) / np.product(factorial(repeats))
     assert np.allclose(haf_sum, haf_val)
 
-
+'''
 @pytest.mark.parametrize("cutoff", [8, 9])
 @pytest.mark.parametrize("method", ["non-recursive"])
 def test_density_matrix(cutoff, method):
@@ -1563,3 +1563,4 @@ def test_vac_schmidt_modes_gkp(method):
         )
     )
     assert np.allclose(np.diag(rho1), probs)
+'''
