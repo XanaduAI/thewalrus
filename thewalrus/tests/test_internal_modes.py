@@ -1132,7 +1132,8 @@ def test_LO_overlaps(r, S, phi):
 
 @pytest.mark.parametrize("nh", [1, 2, 3, 4])
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
-def test_mixed_heralded_photon(nh, method):
+@pytest.mark.parametrize("herald", [0, 1])
+def test_mixed_heralded_photon(nh, method, herald):
     """test code for generating heralded fock states from squeezed states with 2 internal modes"""
     na = 1
     nb = 0.5
@@ -1153,20 +1154,20 @@ def test_mixed_heralded_photon(nh, method):
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
     rho_a = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method=method
+        cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method=method
     )
     rho_b = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method=method
+        cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method=method
     )
 
     p_a = np.diag(
         density_matrix_single_mode(
-            cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method="diagonals"
+            cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method="diagonals"
         )
     )
     p_b = np.diag(
         density_matrix_single_mode(
-            cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method="diagonals"
+            cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method="diagonals"
         )
     )
 

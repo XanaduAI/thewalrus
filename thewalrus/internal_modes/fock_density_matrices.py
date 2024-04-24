@@ -19,7 +19,6 @@ import numpy as np
 import numba
 from scipy.special import factorial
 
-from ..symplectic import passive_transformation
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
 from .utils import (
     nb_Qmat,
@@ -178,16 +177,12 @@ def density_matrix_single_mode(
             raise ValueError("Norm of overlaps must not be greater than 1")
 
     # swapping the spatial modes around such that we are heralding in spatial mode 0
-    Uswap = np.zeros((M, M))
-    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
-    for j, k in enumerate(swapV):
-        Uswap[j][k] = 1
-    U_K = np.zeros((M * K, M * K))
-    for i in range(K):
-        U_K[i::K, i::K] = Uswap
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
+    swapV = list(range(M))
+    (swapV[0], swapV[HM]) = (swapV[HM], swapV[0])
+    perm = (np.arange(M * K).reshape(M, K))[swapV].flatten()
+    double_perm = np.concatenate([perm, perm + M * K])
+    cov = cov[:, double_perm][double_perm]
 
-    # N_nums = list(pattern.values())
     if method == "recursive":
         return _density_matrix_single_mode(cov, N_nums, normalize, LO_overlap, cutoff, hbar)
     if method in ["non-recursive", "diagonals"]:
