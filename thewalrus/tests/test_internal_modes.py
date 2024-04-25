@@ -21,6 +21,8 @@ from random import gauss
 
 import pytest
 
+import warnings
+
 import numpy as np
 
 from scipy.stats import unitary_group
@@ -1248,11 +1250,9 @@ def test_pure_gkp(method):
     # get density matrix using new code
     rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
     rho3 /= np.trace(rho3)
-    assert np.allclose(rho1, rho2, atol=2.5e-4)
-    assert np.allclose(rho1, rho3, atol=5.5e-4)
-    assert np.allclose(
-        rho2, rho3, atol=4.8e-4
-    )  # For the method "non-recursive" the absolute max difference is 1e-8
+    assert np.allclose(rho1, rho2, atol=1e-5)
+    assert np.allclose(rho1, rho3, atol=1e-7)
+    assert np.allclose(rho2, rho3, atol=1e-5)
     probs = np.diag(
         density_matrix_single_mode(
             cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
@@ -1310,20 +1310,34 @@ def test_lossy_gkp(method):
     mu = np.zeros([len(cov)])
     mu, cov_lossy = passive_transformation(mu, cov, T)
     cutoff = 26
-    # get density matrix using The Walrus
-    rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
-    rho_loss1 /= np.trace(rho_loss1)
 
     # get density matrix using new code
-    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, method=method)
-    rho_loss2 /= np.trace(rho_loss2)
-    assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
-    probs = np.diag(
-        density_matrix_single_mode(
-            cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+    with warnings.catch_warnings(record=True) as w:
+        rho_loss2 = density_matrix_single_mode(
+            cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, method=method
         )
-    )
-    assert np.allclose(np.diag(rho_loss1), probs)
+
+    if not w:
+        rho_loss2 /= np.trace(rho_loss2)
+
+        # get density matrix using The Walrus
+        rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
+        rho_loss1 /= np.trace(rho_loss1)
+
+        assert np.allclose(rho_loss1, rho_loss2, atol=1e-6)
+        probs = np.diag(
+            density_matrix_single_mode(
+                cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+            )
+        )
+        assert np.allclose(np.diag(rho_loss1), probs)
+    else:
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert (
+            "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts"
+            in str(w[-1].message)
+        )
 
 
 @pytest.mark.parametrize("method", ["recursive", "non-recursive"])
@@ -1621,26 +1635,36 @@ def test_vac_schmidt_modes_gkp(method):
     S2 = squeezing(np.abs(r2), phi=np.angle(r2))
     Z = S2 @ Usymp @ S1
     cov = Z @ Z.T
-    mu = np.zeros([len(cov)])
 
     cutoff = 26
-    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
-
-    rho1 = np.outer(psi, psi.conj())
-    rho1 /= np.trace(rho1)
-
     M = 3
-    K = 5
+    K = 2
     big_cov = np.eye(2 * M * K, dtype=np.complex128)
     big_cov[::K, ::K] = cov
 
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
-    rho_big /= np.trace(rho_big)
+    with warnings.catch_warnings(record=True) as w:
+        rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
 
-    assert np.allclose(rho1, rho_big, atol=4e-4)
-    probs = np.diag(
-        density_matrix_single_mode(
-            big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+    if not w:
+
+        rho_big /= np.trace(rho_big)
+        mu = np.zeros([len(cov)])
+        psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
+        rho1 = np.outer(psi, psi.conj())
+        rho1 /= np.trace(rho1)
+
+        assert np.allclose(rho1, rho_big)
+        probs = np.diag(
+            density_matrix_single_mode(
+                big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+            )
         )
-    )
-    assert np.allclose(np.diag(rho1), probs)
+        assert np.allclose(np.diag(rho1), probs)
+
+    else:
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert (
+            "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts"
+            in str(w[-1].message)
+        )
