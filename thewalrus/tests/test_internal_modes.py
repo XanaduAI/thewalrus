@@ -1646,7 +1646,6 @@ def test_vac_schmidt_modes_gkp(method):
         rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
 
     if not w:
-
         rho_big /= np.trace(rho_big)
         mu = np.zeros([len(cov)])
         psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
