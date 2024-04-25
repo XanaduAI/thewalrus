@@ -43,8 +43,6 @@ from thewalrus.quantum import (
     photon_number_mean,
 )
 from thewalrus.symplectic import (
-    beam_splitter,
-    expand,
     expand_vector,
     interferometer,
     passive_transformation,
@@ -783,6 +781,59 @@ def heralded_density_matrix_LO(
     return dm_tot
 
 
+cov_GKP = np.array(
+    [
+        [
+            5.001704445459101,
+            0.151011758711464,
+            -3.127290249474347,
+            -3.936637405114638,
+            -0.57864296172685,
+            0.450799394542715,
+        ],
+        [
+            0.151011758711464,
+            4.886332140124718,
+            -3.69458049355115,
+            -1.324427069753437,
+            3.787236006416474,
+            -0.308586867998343,
+        ],
+        [
+            -3.127290249474347,
+            -3.69458049355115,
+            4.798271999353696,
+            3.427053075180216,
+            -2.383935783718123,
+            0.054102871202804,
+        ],
+        [
+            -3.936637405114638,
+            -1.324427069753437,
+            3.427053075180216,
+            5.562028064251478,
+            1.900253353977648,
+            2.973239591157635,
+        ],
+        [
+            -0.57864296172685,
+            3.787236006416474,
+            -2.383935783718123,
+            1.900253353977648,
+            6.150123369748809,
+            3.652194847109764,
+        ],
+        [
+            0.450799394542715,
+            -0.308586867998343,
+            0.054102871202804,
+            2.973239591157635,
+            3.652194847109764,
+            5.434248595349832,
+        ],
+    ]
+)
+
 #############################
 # Test functions start here #
 #############################
@@ -1200,42 +1251,7 @@ def test_pure_gkp(method):
     internal_modes.density_matrix_single_mode (but with only 1 temporal mode)"""
 
     m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
-
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
-
+    cov = cov_GKP
     cutoff = 26
     mu = np.zeros([len(cov)])
 
@@ -1270,41 +1286,8 @@ def test_lossy_gkp(method):
     """
 
     m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
 
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
+    cov = cov_GKP
     eta = 0.95
     T = np.diag([np.sqrt(eta)] * 3)
     mu = np.zeros([len(cov)])
@@ -1492,41 +1475,7 @@ def test_check_probabilities(atol):
 def test_warning_non_recursive_gives_negative_probs(cutoff, method):
     """"""
     m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
-
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
+    cov = cov_GKP
     if method == "recursive":
         with pytest.warns(
             UserWarning,
@@ -1600,41 +1549,7 @@ def test_vac_schmidt_modes_gkp(method):
     add vacuum schmidt modes and check it doesn't change the state
     """
     m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
-
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
+    cov = cov_GKP
 
     cutoff = 26
     M = 3
