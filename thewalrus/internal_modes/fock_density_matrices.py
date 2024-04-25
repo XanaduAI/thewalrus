@@ -194,7 +194,7 @@ def density_matrix_single_mode(
         array[complex]: (cutoff+1, cutoff+1) dimension density matrix
     """
 
-    cov = np.array(cov).astype(np.float64)
+    cov = np.array(cov.real).astype(np.float64)
     M = len(pattern) + 1
     K = cov.shape[0] // (2 * M)
     if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
@@ -267,6 +267,11 @@ def density_matrix_single_mode(
                     * haf_blocked(A, blocks=blocks, repeats=patt_long)
                     / np.prod(factorial(patt_long))
                 )
+        if check_probabilities(np.diag(dm)) is False:
+            warnings.warn(
+                "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts.",
+                UserWarning,
+            )
         if normalize:
             dm = dm / np.trace(dm)
         return dm
