@@ -256,9 +256,6 @@ def density_matrix_single_mode(
                             )
                         )
                         dm[i, j] = np.conj(dm[j, i])
-                    else:
-                        dm[i, j] = 0
-                        dm[j, i] = 0
         else:
             for i in range(cutoff):
                 patt_long = (i,) + N_nums
