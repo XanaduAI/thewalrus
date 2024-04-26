@@ -18,7 +18,6 @@ Set of functions for calculating Fock basis density matrices for heralded states
 import warnings
 import numpy as np
 import numba
-from scipy.special import factorial
 
 from .._hafnian import nb_binom, nb_ix, find_kept_edges, f_from_matrix
 from .utils import (
@@ -251,8 +250,8 @@ def density_matrix_single_mode(
                             pref
                             * haf_blocked(Aperm, blocks=new_blocks, repeats=patt_long)
                             / (
-                                np.prod(factorial(patt_long[1:-1]))
-                                * np.sqrt(factorial(i) * factorial(j))
+                                np.prod(fact[np.array(patt_long[1:-1])])
+                                * np.sqrt(fact[i] * fact[j])
                             )
                         )
                         dm[i, j] = np.conj(dm[j, i])
@@ -262,7 +261,7 @@ def density_matrix_single_mode(
                 dm[i, i] = (
                     pref
                     * haf_blocked(A, blocks=blocks, repeats=patt_long)
-                    / np.prod(factorial(patt_long))
+                    / np.prod(fact[np.array(patt_long)])
                 )
         if check_probabilities(np.diag(dm)) is False:
             warnings.warn(
