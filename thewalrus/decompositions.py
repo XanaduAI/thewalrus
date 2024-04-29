@@ -22,6 +22,10 @@ Decompositions
 This module implements common shared matrix decompositions that are
 used to perform gate decompositions.
 
+For mathematical details of these decompositions see
+
+`Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
+:cite:`houde2024matrix`
 Summary
 -------
 
@@ -30,13 +34,15 @@ Summary
     symplectic_eigenvals
     takagi
     williamson
+    pre_iwasawa
+    iwasawa
 
 Code details
 ------------
 """
 import numpy as np
 
-from scipy.linalg import sqrtm, schur, polar
+from scipy.linalg import sqrtm, schur, polar, qr
 from thewalrus.symplectic import sympmat
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -44,8 +50,7 @@ from thewalrus.quantum.gaussian_checks import is_symplectic
 def williamson(V, rtol=1e-05, atol=1e-08):
     r"""Williamson decomposition of positive-definite (real) symmetric matrix.
 
-    See `this thread <https://math.stackexchange.com/questions/1171842/finding-the-symplectic-matrix-in-williamsons-theorem/2682630#2682630>`_
-    and the `Williamson decomposition documentation <https://strawberryfields.ai/photonics/conventions/decompositions.html#williamson-decomposition>`_
+    See `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
 
     Args:
         V (array[float]): positive definite symmetric (real) matrix
@@ -114,7 +119,10 @@ def symplectic_eigenvals(cov):
 def blochmessiah(S):
     """Returns the Bloch-Messiah decomposition of a symplectic matrix S = O @ D @ Q
        where O and Q are orthogonal symplectic matrices and D is a positive-definite diagonal matrix
-       of the form diag(d1,d2,...,dn,d1^-1, d2^-1,...,dn^-1),
+       of the form diag(d1,d2,...,dn,d1^-1, d2^-1,...,dn^-1).
+
+       See `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
+
 
     Args:
         S (array[float]): 2N x 2N real symplectic matrix
@@ -148,7 +156,8 @@ def takagi(A, svd_order=True):
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized by taking its upper triangular part.
     If the input matrix is indeed symmetric this leaves it unchanged.
-    See `Carl Caves note. <http://info.phys.unm.edu/~caves/courses/qinfo-s17/lectures/polarsingularAutonne.pdf>`_
+
+    See `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
 
     Args:
         A (array): square, symmetric matrix
@@ -198,3 +207,79 @@ def takagi(A, svd_order=True):
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
+
+
+def pre_iwasawa(S):
+    """Pre-Iwasawa decomposition of a symplectic matrix.
+    See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+    and `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
+
+
+    Args:
+        S (array): the symplectic matrix
+
+    Returns:
+        tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S and,
+        E = np.block([[np.eye(N), np.zeros(N,N)],[X, np.eye(N)]]) with X == X.T,
+        D is block diagonal with the top left block being the inverse of the bottom right block,
+        F is symplectic orthogonal.
+    """
+
+    if not is_symplectic(S):
+        raise ValueError("Input matrix is not symplectic.")
+
+    N, _ = S.shape
+    N = N // 2
+    zerom = np.zeros([N, N])
+    idm = np.eye(N)
+    A = S[:N, :N]
+    B = S[:N, N:]
+    C = S[N:, :N]
+    D = S[N:, N:]
+    A0 = sqrtm(A @ A.T + B @ B.T)
+    A0inv = np.linalg.inv(A0)
+    X = A0inv @ A
+    Y = A0inv @ B
+    C0 = (C @ A.T + D @ B.T) @ A0inv
+    E = np.block([[idm, zerom], [C0 @ A0inv, idm]])
+    D = np.block([[A0, zerom], [zerom, A0inv]])
+    F = np.block([[X, Y], [-Y, X]])
+    return E, D, F
+
+
+def iwasawa(S):
+    """Iwasawa decomposition of a symplectic matrix.
+    See `Arvind et al. The Real Symplectic Groups in Quantum Mechanics and Optics <https://arxiv.org/pdf/quant-ph/9509002.pdf>`_
+    and `Houde et al. Matrix decompositions in Quantum Optics: Takagi/Autonne, Bloch-Messiah/Euler, Iwasawa, and Williamson <https://arxiv.org/abs/2403.04596>`_
+
+
+    Args:
+        S (array): the symplectic matrix
+
+    Returns:
+        tuple[array, array, array]: (E,D,F) symplectic matrices such that E @ D @ F = S,
+        EE = np.block([[AA, np.zeros(N,N)],[CC, np.linalg.inv(A.T)]]) with A.T @ C == C.T @ A, and AA upper trinagular with ones in the diagonal
+        DD is diagonal and symplectic,
+        FF is symplectic orthogonal.
+    """
+
+    E, D, F = pre_iwasawa(S)
+    N, _ = S.shape
+    N = N // 2
+    DNN = D[:N, :N]
+    Q, R = qr(DNN)
+    R = R.T
+    Q = Q.T
+    dR = np.diag(R)
+    dd = np.abs(dR)
+    ds = np.sign(dR)
+    R = R * (1 / dR)
+    RinvT = np.linalg.inv(R).T
+    DD = np.diag(np.concatenate([dd, 1 / dd]))
+    zerom = np.zeros([N, N])
+    OO = np.block([[R, zerom], [zerom, RinvT]])
+    Q = ds[:, None] * Q
+    AA = np.block([[Q, zerom], [zerom, Q]])
+    EE = E @ OO
+    FF = AA @ F
+    return EE, DD, FF
