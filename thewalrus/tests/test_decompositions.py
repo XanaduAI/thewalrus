@@ -19,7 +19,7 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import williamson, blochmessiah, takagi, pre_iwasawa, iwasawa
+from thewalrus.decompositions import williamson, blochmessiah, takagi
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -274,30 +274,23 @@ def test_takagi(n, datatype, svd_order):
         assert np.all(np.diff(r) >= 0)
 
 
-# pylint: disable=too-many-arguments
 @pytest.mark.parametrize("n", [5, 10, 50])
 @pytest.mark.parametrize("datatype", [np.complex128, np.float64])
 @pytest.mark.parametrize("svd_order", [True, False])
 @pytest.mark.parametrize("half_rank", [0, 1])
 @pytest.mark.parametrize("phase", [0, 1])
-@pytest.mark.parametrize("null_space", [0, 5, 10])
-@pytest.mark.parametrize("offset", [0, 0.5])
-def test_degenerate(n, datatype, svd_order, half_rank, phase, null_space, offset):
+def test_degenerate(n, datatype, svd_order, half_rank, phase):
     """Tests Takagi produces the correct result for very degenerate cases"""
     nhalf = n // 2
-    diags = (
-        [half_rank * np.random.rand()] * nhalf
-        + [np.random.rand() - offset] * (n - nhalf)
-        + [0] * null_space
-    )
+    diags = [half_rank * np.random.rand()] * nhalf + [np.random.rand()] * (n - nhalf)
     if datatype is np.complex128:
-        U = haar_measure(n + null_space)
+        U = haar_measure(n)
     if datatype is np.float64:
-        U = np.exp(1j * phase) * haar_measure(n + null_space, real=True)
+        U = np.exp(1j * phase) * haar_measure(n, real=True)
     A = U @ np.diag(diags) @ U.T
     r, U = takagi(A, svd_order=svd_order)
     assert np.allclose(A, U @ np.diag(r) @ U.T)
-    assert np.allclose(U @ U.T.conj(), np.eye(n + null_space))
+    assert np.allclose(U @ U.T.conj(), np.eye(n))
     assert np.all(r >= 0)
     if svd_order is True:
         assert np.all(np.diff(r) <= 0)
@@ -401,171 +394,3 @@ def test_real_degenerate():
     rl, U = takagi(mat)
     assert np.allclose(U @ U.conj().T, np.eye(len(mat)))
     assert np.allclose(U @ np.diag(rl) @ U.T, mat)
-
-
-@pytest.mark.parametrize("n", [5, 10, 50])
-@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
-@pytest.mark.parametrize("svd_order", [True, False])
-def test_autonne_takagi(n, datatype, svd_order):
-    """Checks the correctness of the Autonne decomposition function"""
-    if datatype is np.complex128:
-        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
-    if datatype is np.float64:
-        A = np.random.rand(n, n)
-    A += A.T
-    r, U = takagi(A, svd_order=svd_order)
-    assert np.allclose(A, U @ np.diag(r) @ U.T)
-    assert np.all(r >= 0)
-    if svd_order is True:
-        assert np.all(np.diff(r) <= 0)
-    else:
-        assert np.all(np.diff(r) >= 0)
-
-
-@pytest.mark.parametrize("size", [10, 20, 100])
-def test_flat_phase(size):
-    """Test that the correct decomposition is obtained even if the first entry is 0"""
-    A = np.random.rand(size, size) + 1j * np.random.rand(size, size)
-    A += A.T
-    A[0, 0] = 0
-    l, u = takagi(A)
-    assert np.allclose(A, u * l @ u.T)
-
-
-def test_real_input_edge():
-    """Adapted from https://math.stackexchange.com/questions/4418925/why-does-this-algorithm-for-the-takagi-factorization-fail-here"""
-    rng = np.random.default_rng(0)  # Important for reproducibility
-    A = (rng.random((100, 100)) - 0.5) * 114
-    A = A * A.T  # make A symmetric
-    l, u = takagi(A)
-    # Now, reconstruct A, see
-    Ar = u * l @ u.T
-    assert np.allclose(A, Ar)
-
-
-@pytest.mark.parametrize("rank1", [2, 4, 5])
-@pytest.mark.parametrize("rank2", [2, 4, 5])
-@pytest.mark.parametrize("rankrand", [2, 4, 5])
-@pytest.mark.parametrize("rankzero", [2, 4, 5])
-@pytest.mark.parametrize("symmetric", [True, False])
-@pytest.mark.parametrize("unitary", [True, False])
-def test_pre_iwasawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
-    """Tests the pre_iwasawa decomposition"""
-    vals = np.array(
-        [np.random.rand(1)[0]] * rank1
-        + [np.random.rand(1)[0]] * rank2
-        + list(np.random.rand(rankrand))
-        + [1] * rankzero
-    )
-    if unitary is True:
-        vals = np.ones_like(vals)
-    dd = np.concatenate([vals, 1 / vals])
-    dim = len(vals)
-    U = haar_measure(dim)
-    O = np.block([[U.real, -U.imag], [U.imag, U.real]])
-    if symmetric is False:
-        V = haar_measure(dim)
-        P = np.block([[V.real, -V.imag], [V.imag, V.real]])
-    else:
-        P = O.T
-
-    S = (O * dd) @ P
-    EE, DD, FF = pre_iwasawa(S)
-    assert np.allclose(EE @ DD @ FF, S)
-    assert is_symplectic(EE)
-    assert is_symplectic(FF)
-    assert is_symplectic(FF)
-    assert np.allclose(FF @ FF.T, np.identity(2 * dim))
-    assert np.allclose(DD[:dim, :dim] @ DD[dim:, dim:], np.identity(dim))
-    assert np.allclose(DD[:dim, dim:], 0)
-    assert np.allclose(DD[dim:, :dim], 0)
-    A = EE[:dim, :dim]
-    B = EE[:dim, dim:]
-    C = EE[dim:, :dim]
-    D = EE[dim:, dim:]
-    assert np.allclose(A, np.eye(dim))
-    assert np.allclose(B, 0)
-    assert np.allclose(C, C.T)
-    assert np.allclose(D, np.eye(dim))
-
-
-@pytest.mark.parametrize("rank1", [2, 4, 5])
-@pytest.mark.parametrize("rank2", [2, 4, 5])
-@pytest.mark.parametrize("rankrand", [2, 4, 5])
-@pytest.mark.parametrize("rankzero", [2, 4, 5])
-@pytest.mark.parametrize("symmetric", [True, False])
-@pytest.mark.parametrize("unitary", [True, False])
-def test_iwasawa(rank1, rank2, rankrand, rankzero, symmetric, unitary):
-    """Tests the Iwasawa decomposition"""
-    vals = np.array(
-        [np.random.rand(1)[0]] * rank1
-        + [np.random.rand(1)[0]] * rank2
-        + list(np.random.rand(rankrand))
-        + [1] * rankzero
-    )
-    if unitary is True:
-        vals = np.ones_like(vals)
-    dd = np.concatenate([vals, 1 / vals])
-    dim = len(vals)
-    U = haar_measure(dim)
-    O = np.block([[U.real, -U.imag], [U.imag, U.real]])
-    if symmetric is False:
-        V = haar_measure(dim)
-        P = np.block([[V.real, -V.imag], [V.imag, V.real]])
-    else:
-        P = O.T
-    S = (O * dd) @ P
-    EE, DD, FF = iwasawa(S)
-    assert np.allclose(EE @ DD @ FF, S)
-    assert is_symplectic(EE)
-    assert is_symplectic(FF)
-    assert is_symplectic(FF)
-    assert np.allclose(FF @ FF.T, np.identity(2 * dim))
-    assert np.allclose(DD, np.diag(np.diag(DD)))
-    assert np.allclose(DD[:dim, :dim] @ DD[dim:, dim:], np.identity(dim))
-    A = EE[:dim, :dim]
-    B = EE[:dim, dim:]
-    C = EE[dim:, :dim]
-    D = EE[dim:, dim:]
-    assert np.allclose(B, 0)
-    XX = A.T @ C
-    assert np.allclose(XX, XX.T)
-    assert np.allclose(A @ D.T, np.eye(dim))
-    assert np.allclose(np.diag(EE), 1)
-    assert np.allclose(np.tril(A), A)
-    assert np.allclose(np.triu(D), D)
-
-
-def test_pre_iwasawa_error():
-    """Tests error is raised when input not symplectic"""
-    M = np.random.rand(4, 5)
-    with pytest.raises(ValueError, match="Input matrix is not symplectic."):
-        pre_iwasawa(M)
-
-
-def test_iwasawa_error():
-    """Tests error is raised when input not symplectic"""
-    M = np.random.rand(4, 5)
-    with pytest.raises(ValueError, match="Input matrix is not symplectic."):
-        iwasawa(M)
-
-
-def test_iwasawa2x2():
-    """Compares numerics against exact result for 2x2 matrices in Arvind 1995"""
-    num_tests = 100
-    for _ in range(num_tests):
-        S = random_symplectic(1)
-        A, N, K = iwasawa(S)
-        a = S[0, 0]
-        b = S[0, 1]
-        c = S[1, 0]
-        d = S[1, 1]
-        eta = a**2 + b**2
-        xi = (a * c + b * d) / eta
-        eta = np.sqrt(eta)
-        AA = np.array([[1, 0], [xi, 1]])
-        NN = np.diag([eta, 1 / eta])
-        KK = np.array([[a, b], [-b, a]]) / eta
-        assert np.allclose(A, AA)
-        assert np.allclose(K, KK)
-        assert np.allclose(N, NN)

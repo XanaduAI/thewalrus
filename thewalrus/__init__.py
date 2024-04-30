@@ -132,12 +132,6 @@ from ._torontonian import (
     rec_torontonian,
     rec_ltorontonian,
 )
-
-from ._montrealer import (
-    mtl,
-    lmtl,
-)
-
 from ._version import __version__
 
 
@@ -158,8 +152,6 @@ __all__ = [
     "reduction",
     "hermite_multidimensional",
     "grad_hermite_multidimensional",
-    "mtl",
-    "lmtl",
     "version",
 ]
 
