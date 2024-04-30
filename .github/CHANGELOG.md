@@ -1,17 +1,19 @@
-# Release 0.22.0-dev
+# Release 0.21.0-dev
 
 ### New features
 
-* Implements the pre-Iwasawa and Iwasawa decompositions for symplectic matrices [(#382)](https://github.com/XanaduAI/thewalrus/pull/382).
+* Adds the Takagi decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/338)
 
 ### Breaking changes
 
 ### Improvements
 
-* Further simplifies the implementation of `decompositions.williamson` and corrects its docstring [(#380)](https://github.com/XanaduAI/thewalrus/pull/380).
 
-* Further simplifies the implementation of `decompositions.blochmessiah` [(#381)](https://github.com/XanaduAI/thewalrus/pull/381).
+* Tighten power-trace bound of odd loop Hafnian. [(#362)](https://github.com/XanaduAI/thewalrus/pull/362)
 
+* Simplifies the internal working of Bloch-Messiah decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/338). 
+
+* Simplifies the internal working of Williamson decomposition [(#366)](https://github.com/XanaduAI/thewalrus/pull/338). 
 
 ### Bug fixes
 
@@ -19,37 +21,9 @@
 
 ### Contributors
 
-This release contains contributions from (in alphabetical order):
+This release contains contributions from (in alphabetical order): 
 
-Will McCutcheon, Nicolas Quesada
-
----
-
-# Release 0.21.0
-
-### New features
-
-* Adds the Takagi decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/363)
-
-* Adds the Montrealer and Loop Montrealer functions [(#363)](https://github.com/XanaduAI/thewalrus/pull/374).
-
-### Improvements
-
-* Tighten power-trace bound of odd loop Hafnian. [(#362)](https://github.com/XanaduAI/thewalrus/pull/362)
-
-* Simplifies the internal working of Bloch-Messiah decomposition [(#363)](https://github.com/XanaduAI/thewalrus/pull/338).
-
-* Simplifies the internal working of Williamson decomposition [(#366)](https://github.com/XanaduAI/thewalrus/pull/338).
-
-* Improves the handling of an edge case in Takagi [(#373)](https://github.com/XanaduAI/thewalrus/pull/373).
-
-* Adds extra tests for the Takagi decomposition [(#377)](https://github.com/XanaduAI/thewalrus/pull/377)
-
-### Contributors
-
-This release contains contributions from (in alphabetical order):
-
-Yanic Cardin, Gregory Morse, Nicolas Quesada
+Gregory Morse, Nicolas Quesada
 
 ---
 
