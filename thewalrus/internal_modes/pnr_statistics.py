@@ -22,20 +22,18 @@ import numba
 
 from scipy.special import factorial as fac
 
-from ..quantum import Qmat, Amat
-from ..symplectic import passive_transformation
+from ..quantum import Qmat
 from .._hafnian import find_kept_edges, nb_binom, f_from_powertrace, nb_ix, f_from_matrix, get_AX_S
 from ..charpoly import powertrace
 
 from .utils import (
     spatial_reps_to_schmidt_reps,
     spatial_modes_to_schmidt_modes,
-    project_onto_local_oscillator,
 )
 
 
 @numba.jit(nopython=True, parallel=True, cache=True)
-def hafkd(As, edge_reps, K=1):
+def hafkd(As, edge_reps, K=1):  # pragma: no cover
     r"""
     generalised version of hafnian to include multiple internal modes
 
@@ -129,7 +127,7 @@ def pnr_prob(covs, i, hbar=2):
 
 
 @numba.jit(nopython=True, cache=True)
-def finite_difference_operator_coeffs(der_order, m, u=None, v=None):
+def finite_difference_operator_coeffs(der_order, m, u=None, v=None):  # pragma: no cover
     """Returns the mth coefficient of the finite difference operator of given derivative order.
     For details see:  E. T. Bax, Finite-difference algorithms for counting problems. PhD thesis, Caltech, 1998.
 
@@ -165,12 +163,12 @@ def haf_blocked(A, blocks, repeats):
     """
     # Note that the two lines below cannot be done inside numba hence the need for this function
     repeats = tuple(val + 1 for val in repeats)
-    blocks = [np.array(val, dtype=np.int32) for val in blocks]
+    blocks = numba.typed.List([np.array(val, dtype=np.int32) for val in blocks])
     return _haf_blocked_numba(A, blocks, repeats)
 
 
 @numba.jit(nopython=True)
-def _haf_blocked_numba(A, blocks, repeats_p):
+def _haf_blocked_numba(A, blocks, repeats_p):  # pragma: no cover
     """Calculates the hafnian of the matrix with a given block and repetition pattern.
 
     Args:
@@ -195,64 +193,5 @@ def _haf_blocked_numba(A, blocks, repeats_p):
             for mode in block:
                 coeff_vect[mode] = val
         AX_S = get_AX_S(coeff_vect, A)
-
         netsum += coeff_pref * f_from_matrix(AX_S, 2 * n)[n]
     return netsum
-
-
-def probabilities_single_mode(cov, pattern, normalize=False, LO_overlap=None, cutoff=13, hbar=2):
-    """
-    Calculates the diagonal of the density matrix, hence the name probabilities, of first mode when heralded by pattern on a zero-displaced, M-mode Gaussian state
-    where each mode contains K internal modes.
-
-    Args:
-        cov (array): 2MK x 2MK covariance matrix
-        pattern (dict): heralding pattern total photon number in the spatial modes (int), indexed by spatial mode
-        normalize (bool): whether to normalise the output density matrix
-        LO_overlap (array): overlap between internal modes and local oscillator
-        cutoff (int): photon number cutoff. Should be odd. Even numbers will be rounded up to an odd number
-        hbar (float): the value of hbar (default 2)
-    Returns:
-        array[complex]: (cutoff+1, cutoff+1) dimension density matrix
-    """
-
-    # The lines until A = Amat(...) are copies from density_matrix_single_mode
-    cov = np.array(cov).astype(np.float64)
-    M = len(pattern) + 1
-    K = cov.shape[0] // (2 * M)
-    if not set(list(pattern.keys())).issubset(set(list(np.arange(M)))):
-        raise ValueError("Keys of pattern must correspond to all but one spatial mode")
-    N_nums = list(pattern.values())
-    HM = list(set(list(np.arange(M))).difference(list(pattern.keys())))[0]
-    if LO_overlap is not None:
-        if not K == LO_overlap.shape[0]:
-            raise ValueError("Number of overlaps with LO must match number of internal modes")
-        if not (np.linalg.norm(LO_overlap) < 1 or np.allclose(np.linalg.norm(LO_overlap), 1)):
-            raise ValueError("Norm of overlaps must not be greater than 1")
-
-    # swapping the spatial modes around such that we are heralding in spatial mode 0
-    Uswap = np.zeros((M, M))
-    swapV = np.concatenate((np.array([HM]), np.arange(HM), np.arange(HM + 1, M)))
-    for j, k in enumerate(swapV):
-        Uswap[j][k] = 1
-    U_K = np.zeros((M * K, M * K))
-    for i in range(K):
-        U_K[i::K, i::K] = Uswap
-    _, cov = passive_transformation(np.zeros(cov.shape[0]), cov, U_K, hbar=hbar)
-
-    cov = project_onto_local_oscillator(cov, M, LO_overlap=LO_overlap, hbar=hbar)
-
-    A = Amat(cov)
-    Q = Qmat(cov)
-    fact = 1 / np.sqrt(np.linalg.det(Q).real)
-    blocks = np.arange(K * M).reshape([M, K])
-    probs = np.zeros([cutoff])
-    for i in range(cutoff):
-        patt_long = [i] + N_nums
-        probs[i] = fact * np.real(
-            haf_blocked(A, blocks=blocks, repeats=patt_long) / np.prod(fac(patt_long))
-        )
-
-    if normalize:
-        probs = probs / np.sum(probs)
-    return probs

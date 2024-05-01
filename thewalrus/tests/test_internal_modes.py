@@ -21,6 +21,8 @@ from random import gauss
 
 import pytest
 
+import warnings
+
 import numpy as np
 
 from scipy.stats import unitary_group
@@ -28,7 +30,7 @@ from scipy.special import factorial
 
 from repoze.lru import lru_cache
 
-from thewalrus import low_rank_hafnian, reduction
+from thewalrus import low_rank_hafnian, reduction, hafnian
 
 from thewalrus.decompositions import takagi
 from thewalrus.random import random_covariance
@@ -41,8 +43,6 @@ from thewalrus.quantum import (
     photon_number_mean,
 )
 from thewalrus.symplectic import (
-    beam_splitter,
-    expand,
     expand_vector,
     interferometer,
     passive_transformation,
@@ -50,7 +50,12 @@ from thewalrus.symplectic import (
     squeezing,
 )
 
-from thewalrus.internal_modes import pnr_prob, density_matrix_single_mode, probabilities_single_mode
+from thewalrus.internal_modes import (
+    pnr_prob,
+    density_matrix_single_mode,
+    haf_blocked,
+    check_probabilities,
+)
 from thewalrus.internal_modes.prepare_cov import (
     O_matrix,
     orthonormal_basis,
@@ -776,6 +781,59 @@ def heralded_density_matrix_LO(
     return dm_tot
 
 
+cov_GKP = np.array(
+    [
+        [
+            5.001704445459101,
+            0.151011758711464,
+            -3.127290249474347,
+            -3.936637405114638,
+            -0.57864296172685,
+            0.450799394542715,
+        ],
+        [
+            0.151011758711464,
+            4.886332140124718,
+            -3.69458049355115,
+            -1.324427069753437,
+            3.787236006416474,
+            -0.308586867998343,
+        ],
+        [
+            -3.127290249474347,
+            -3.69458049355115,
+            4.798271999353696,
+            3.427053075180216,
+            -2.383935783718123,
+            0.054102871202804,
+        ],
+        [
+            -3.936637405114638,
+            -1.324427069753437,
+            3.427053075180216,
+            5.562028064251478,
+            1.900253353977648,
+            2.973239591157635,
+        ],
+        [
+            -0.57864296172685,
+            3.787236006416474,
+            -2.383935783718123,
+            1.900253353977648,
+            6.150123369748809,
+            3.652194847109764,
+        ],
+        [
+            0.450799394542715,
+            -0.308586867998343,
+            0.054102871202804,
+            2.973239591157635,
+            3.652194847109764,
+            5.434248595349832,
+        ],
+    ]
+)
+
 #############################
 # Test functions start here #
 #############################
@@ -1131,7 +1189,9 @@ def test_LO_overlaps(r, S, phi):
 
 
 @pytest.mark.parametrize("nh", [1, 2, 3, 4])
-def test_mixed_heralded_photon(nh):
+@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+@pytest.mark.parametrize("herald", [0, 1])
+def test_mixed_heralded_photon(nh, method, herald):
     """test code for generating heralded fock states from squeezed states with 2 internal modes"""
     na = 1
     nb = 0.5
@@ -1152,17 +1212,31 @@ def test_mixed_heralded_photon(nh):
     LO_overlapa = LO_overlaps(chis, chis[0])
     LO_overlapb = LO_overlaps(chis, chis[1])
     rho_a = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1
+        cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1, method=method
     )
     rho_b = density_matrix_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1
+        cov, {herald: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1, method=method
     )
 
-    p_a = probabilities_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapa, cutoff=nh + 1
+    p_a = np.diag(
+        density_matrix_single_mode(
+            cov,
+            {herald: nh},
+            normalize=True,
+            LO_overlap=LO_overlapa,
+            cutoff=nh + 1,
+            method="diagonals",
+        )
     )
-    p_b = probabilities_single_mode(
-        cov, {1: nh}, normalize=True, LO_overlap=LO_overlapb, cutoff=nh + 1
+    p_b = np.diag(
+        density_matrix_single_mode(
+            cov,
+            {herald: nh},
+            normalize=True,
+            LO_overlap=LO_overlapb,
+            cutoff=nh + 1,
+            method="diagonals",
+        )
     )
 
     assert np.allclose(dm_modea, rho_a)
@@ -1171,47 +1245,13 @@ def test_mixed_heralded_photon(nh):
     assert np.allclose(np.diag(dm_modeb), p_b)
 
 
-def test_pure_gkp():
+@pytest.mark.parametrize("method", ["non-recursive"])
+def test_pure_gkp(method):
     """test pure gkp state density matrix using 2 methods from the walrus against
     internal_modes.density_matrix_single_mode (but with only 1 temporal mode)"""
 
     m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
-
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
-
+    cov = cov_GKP
     cutoff = 26
     mu = np.zeros([len(cov)])
 
@@ -1224,137 +1264,67 @@ def test_pure_gkp():
     rho2 /= np.trace(rho2)
 
     # get density matrix using new code
-    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff)
+    rho3 = density_matrix_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
     rho3 /= np.trace(rho3)
-    assert np.allclose(rho1, rho2, atol=2.5e-4)
-    assert np.allclose(rho1, rho3, atol=5.5e-4)
-    assert np.allclose(rho2, rho3, atol=4.8e-4)
-    probs = probabilities_single_mode(cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
+    assert np.allclose(rho1, rho2, atol=1e-5)
+    assert np.allclose(rho1, rho3, atol=1e-7)
+    assert np.allclose(rho2, rho3, atol=1e-5)
+    probs = np.diag(
+        density_matrix_single_mode(
+            cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+        )
+    )
     assert np.allclose(np.diag(rho1), probs)
 
     #### Note that the tolerances are higher than they should be.
 
 
-def test_lossy_gkp():
+@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+def test_lossy_gkp(method):
     """
     test against thewalrus for lossy gkp state generation
     """
 
     m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
 
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
+    cov = cov_GKP
     eta = 0.95
     T = np.diag([np.sqrt(eta)] * 3)
     mu = np.zeros([len(cov)])
     mu, cov_lossy = passive_transformation(mu, cov, T)
     cutoff = 26
-    # get density matrix using The Walrus
-    rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
-    rho_loss1 /= np.trace(rho_loss1)
 
     # get density matrix using new code
-    rho_loss2 = density_matrix_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff)
-    rho_loss2 /= np.trace(rho_loss2)
-    assert np.allclose(rho_loss1, rho_loss2, atol=2.7e-4)
-    probs = probabilities_single_mode(cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
-    assert np.allclose(np.diag(rho_loss1), probs)
+    with warnings.catch_warnings(record=True) as w:
+        rho_loss2 = density_matrix_single_mode(
+            cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, method=method
+        )
+
+    if not w:
+        rho_loss2 /= np.trace(rho_loss2)
+
+        # get density matrix using The Walrus
+        rho_loss1 = density_matrix(mu, cov_lossy, post_select={1: m1, 2: m2}, cutoff=cutoff)
+        rho_loss1 /= np.trace(rho_loss1)
+
+        assert np.allclose(rho_loss1, rho_loss2, atol=1e-6)
+        probs = np.diag(
+            density_matrix_single_mode(
+                cov_lossy, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+            )
+        )
+        assert np.allclose(np.diag(rho_loss1), probs)
+    else:
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert (
+            "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts"
+            in str(w[-1].message)
+        )
 
 
-def test_vac_schmidt_modes_gkp():
-    """
-    add vacuum schmidt modes and check it doesn't change the state
-    """
-    m1, m2 = 5, 7
-    params = np.array(
-        [
-            -1.38155106,
-            -1.21699567,
-            0.7798817,
-            1.04182349,
-            0.87702211,
-            0.90243916,
-            1.48353639,
-            1.6962906,
-            -0.24251599,
-            0.1958,
-        ]
-    )
-    sq_r = params[:3]
-    bs_theta1, bs_theta2, bs_theta3 = params[3:6]
-    bs_phi1, bs_phi2, bs_phi3 = params[6:9]
-    sq_virt = params[9]
-
-    S1 = squeezing(np.abs(sq_r), phi=np.angle(sq_r))
-    BS1, BS2, BS3 = (
-        beam_splitter(bs_theta1, bs_phi1),
-        beam_splitter(bs_theta2, bs_phi2),
-        beam_splitter(bs_theta3, bs_phi3),
-    )
-    Usymp1, Usymp2, Usymp3 = (
-        expand(BS1, [0, 1], 3),
-        expand(BS2, [1, 2], 3),
-        expand(BS3, [0, 1], 3),
-    )
-    Usymp = Usymp3 @ Usymp2 @ Usymp1
-    r2 = np.array([0, 0, sq_virt])
-    S2 = squeezing(np.abs(r2), phi=np.angle(r2))
-    Z = S2 @ Usymp @ S1
-    cov = Z @ Z.T
-    mu = np.zeros([len(cov)])
-
-    cutoff = 26
-    psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
-
-    rho1 = np.outer(psi, psi.conj())
-    rho1 /= np.trace(rho1)
-
-    M = 3
-    K = 5
-    big_cov = np.eye(2 * M * K, dtype=np.complex128)
-    big_cov[::K, ::K] = cov
-
-    rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff)
-    rho_big /= np.trace(rho_big)
-
-    assert np.allclose(rho1, rho_big, atol=4e-4)
-    probs = probabilities_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True)
-    assert np.allclose(np.diag(rho1), probs)
-
-
-def test_density_matrix_error():
+@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+def test_density_matrix_error(method):
     """Testing value errors in density_matrix_single_mode"""
     U = unitary_group.rvs(2)
     zs0 = np.array([np.arcsinh(np.sqrt(2.927))])
@@ -1372,7 +1342,7 @@ def test_density_matrix_error():
     with pytest.raises(
         ValueError, match="Keys of pattern must correspond to all but one spatial mode"
     ):
-        density_matrix_single_mode(cov, pattern)
+        density_matrix_single_mode(cov, pattern, method=method)
 
     K = cov.shape[0] // (2 * len(pattern))
 
@@ -1390,52 +1360,6 @@ def test_density_matrix_error():
 
     with pytest.raises(ValueError, match="Norm of overlaps must not be greater than 1"):
         density_matrix_single_mode(cov, N, LO_overlap=LO_overlap2)
-
-
-@pytest.mark.parametrize("cutoff", [8, 9])
-def test_density_matrix(cutoff):
-    """
-    test generation of heralded density matrix against combinatorial calculation
-    """
-    U = unitary_group.rvs(2)
-
-    N = {0: 3}
-
-    efficiency = 1 * np.ones(2)
-
-    noise = None
-
-    n0 = 2.9267754749886055
-    n1 = 2.592138225047742
-    zs0 = np.array([np.arcsinh(np.sqrt(n0))])
-    zs1 = np.array([np.arcsinh(np.sqrt(n1))])
-    rjs = [zs0, zs1]
-
-    O = np.identity(2, dtype=np.complex128)
-    S = 0.8 * np.exp(0 * 1j)
-    O[0, 1] = S.conj()
-    O[1, 0] = S
-
-    dm = heralded_density_matrix(
-        rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
-    )
-
-    rho = np.zeros((cutoff, cutoff), dtype=np.complex128)
-    for i in range(cutoff):
-        for j in range(cutoff):
-            rho[i, j] = sum(dm[i, j, m, m] for m in range(cutoff))
-
-    rho_norm = rho / np.trace(rho)
-
-    cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
-
-    rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff)
-    rho2_norm = rho2 / np.trace(rho2).real
-
-    probs = probabilities_single_mode(cov, N, cutoff=cutoff, normalize=True)
-
-    assert np.allclose(rho_norm, rho2_norm, atol=1e-6, rtol=1e-6)
-    assert np.allclose(np.diag(rho_norm), probs)
 
 
 def test_density_matrix_LO():
@@ -1496,3 +1420,407 @@ def test_project_onto_local_oscillator():
     cov_filt = project_onto_local_oscillator(cov_test, M, np.array([1, 0, 0]))
     np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 1), 0)
     np.allclose(photon_number_mean(np.zeros(len(cov_filt)), cov_filt, 2), 0)
+
+
+def test_unknown_method_in_density_matrix_single_mode():
+    """Tests an error is raised if an unknown method is requested"""
+    cov = np.identity(4)
+    N = {0: 3}
+    cutoff = 10
+    with pytest.raises(ValueError, match="Unknown method for density_matrix_single_mode"):
+        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="Coo coo ca choo")
+
+
+@pytest.mark.parametrize("n1", [0, 1, 2, 3])
+@pytest.mark.parametrize("n2", [0, 1, 2, 3, 4])
+def test_haf_blocked(n1, n2):
+    """Tests that haf blocked is the sum of many hafnians"""
+    n = 6
+    B = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    A = B + B.T
+    reps_list = [[i, n1 - i, n2] for i in range(n1 + 1)]
+    haf_sum = 0j
+    for reps in reps_list:
+        repreps = reps + reps
+        haf = hafnian(reduction(A, repreps))
+        haf_sum += haf / np.product(factorial(reps))
+    blocks = ((0, 1), (2,))
+    repeats = (n1, n2)
+    haf_val = haf_blocked(A, blocks=blocks, repeats=repeats) / np.product(factorial(repeats))
+    assert np.allclose(haf_sum, haf_val)
+
+
+@pytest.mark.parametrize("atol", [1e-08, 1e-07, 1e-06])
+def test_check_probabilities(atol):
+    """Tests for check_probabilities"""
+    probs = np.random.rand(10) + 0j
+    assert check_probabilities(probs, atol)
+    probs[0] = -1
+    assert not check_probabilities(probs, atol)
+    probs[0] = -0.1 * atol * np.sum(probs[0:])
+    assert check_probabilities(probs, atol)
+    probs[0] = -10 * atol * np.sum(probs[0:])
+    assert not check_probabilities(probs, atol)
+    probs = np.random.rand(10) + 0j
+    probs[0] = -1j
+    assert not check_probabilities(probs, atol)
+    probs[0] = -1j * 0.1 * atol * np.sum(probs[0:])
+    assert check_probabilities(probs, atol)
+    probs[0] = -1j * 10 * atol * np.sum(probs[0:])
+    assert not check_probabilities(probs, atol)
+
+
+@pytest.mark.parametrize("cutoff", [43, 44])
+@pytest.mark.parametrize("method", ["recursive", "non-recursive", "diagonals"])
+def test_warning_non_recursive_gives_negative_probs(cutoff, method):
+    """"""
+    m1, m2 = 5, 7
+    cov = cov_GKP
+    if method == "recursive":
+        with pytest.warns(
+            UserWarning,
+            match="Some of the diagonal elements of the density matrix are significantly",
+        ):
+            result = density_matrix_single_mode(
+                cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method
+            )
+        assert not check_probabilities(np.diag(result))
+    else:
+        result = density_matrix_single_mode(
+            cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=False, method=method
+        )
+        assert check_probabilities(np.diag(result))
+
+
+def get_data_for_test_density_matrix(rjs, O, U, N, efficiency, noise, cutoff, thresh=5e-3):
+    """This function was used to get the density matrix from the combinatorics method for test_density_matrix.
+    It is too slow to run each time the test is called."""
+    dm = heralded_density_matrix(
+        rjs, O, U, N, efficiency=efficiency, noise=noise, Ncutoff=cutoff, thresh=5e-3
+    )
+
+    rho = np.zeros((cutoff, cutoff), dtype=np.complex128)
+    for i in range(cutoff):
+        for j in range(cutoff):
+            rho[i, j] = sum(dm[i, j, m, m] for m in range(cutoff))
+    print(rho)
+    return rho
+
+
+@pytest.mark.parametrize("cutoff", [7, 14])
+@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+def test_density_matrix(cutoff, method):
+    """
+    test generation of heralded density matrix against combinatorial calculation
+    """
+    # Note that the recursive method fails this
+    # Note this test is super slow
+    U = np.array(
+        [
+            [-0.17686085 - 0.95448175j, 0.07408023 + 0.22846652j],
+            [-0.19035914 - 0.14645213j, -0.83978485 - 0.48690509j],
+        ]
+    )
+
+    N = {0: 3}
+
+    n0 = 2.9267754749886055
+    n1 = 2.592138225047742
+    zs0 = np.array([np.arcsinh(np.sqrt(n0))])
+    zs1 = np.array([np.arcsinh(np.sqrt(n1))])
+    rjs = [zs0, zs1]
+
+    O = np.identity(2, dtype=np.complex128)
+    S = 0.8 * np.exp(0 * 1j)
+    O[0, 1] = S.conj()
+    O[1, 0] = S
+
+    # The array rho was found by running the below code with cutoff=14
+    # efficiency = 1 * np.ones(2)
+    # noise = None
+    # rho = get_data_for_test_density_matrix(rjs, O, U, N, efficiency, noise, cutoff, thresh=5e-3)
+
+    rho = np.array(
+        [
+            [
+                3.84685496e-03 + 1.57386852e-17j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.26142022e-03 + 1.36144823e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.75913855e-05 - 1.16981180e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                6.12809160e-04 + 5.85480468e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -6.73144077e-04 + 3.60975870e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                3.38341546e-04 - 4.49835103e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                1.30847348e-04 + 4.59788865e-04j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                2.57588928e-03 - 1.06062117e-17j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.17890919e-03 + 2.07824010e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.03780952e-03 - 1.73700395e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                1.65524809e-03 - 3.65561350e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -6.31599098e-04 + 1.17102553e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -5.60967830e-04 - 8.96335486e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                8.33367309e-04 - 3.50332243e-05j,
+            ],
+            [
+                -1.26142022e-03 - 1.36144823e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                1.07569883e-03 + 3.97940351e-19j,
+                0.00000000e00 + 0.00000000e00j,
+                -5.17653858e-04 + 6.03798018e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.22504162e-04 - 6.19382231e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                4.67210887e-04 + 2.17535761e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.66203923e-04 + 2.15349716e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                1.80089157e-05 - 3.50355223e-04j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                -1.17890919e-03 - 2.07824010e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                2.23606684e-03 - 2.23224741e-17j,
+                0.00000000e00 + 0.00000000e00j,
+                -9.42804562e-04 + 1.66177863e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -8.09115015e-04 - 1.35407353e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                1.27872091e-03 - 2.86880037e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -4.86154949e-04 + 9.03167026e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -4.34165675e-04 - 6.91399239e-04j,
+            ],
+            [
+                -3.75913855e-05 + 1.16981180e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -5.17653858e-04 - 6.03798018e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                6.69768368e-04 - 1.59365905e-16j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.44393038e-04 + 4.66707530e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.67374708e-04 - 4.71511757e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                4.16149038e-04 + 9.65540618e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.54188656e-04 + 2.56240974e-04j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                -1.03780952e-03 + 1.73700395e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -9.42804562e-04 - 1.66177863e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                1.64706147e-03 - 5.72569664e-16j,
+                0.00000000e00 + 0.00000000e00j,
+                -6.76831429e-04 + 1.19329023e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -5.76005181e-04 - 9.63085879e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                9.07540830e-04 - 2.11378071e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.44497178e-04 + 6.42275784e-04j,
+            ],
+            [
+                6.12809160e-04 - 5.85480468e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.22504162e-04 + 6.19382231e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.44393038e-04 - 4.66707530e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                5.31318751e-04 + 2.11228596e-15j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.63001296e-04 + 3.95892140e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.71195346e-04 - 3.79191094e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                3.55293827e-04 + 4.32374510e-05j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                1.65524809e-03 + 3.65561350e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -8.09115015e-04 + 1.35407353e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                -6.76831429e-04 - 1.19329023e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                1.15264725e-03 - 5.60335347e-15j,
+                0.00000000e00 + 0.00000000e00j,
+                -4.68945127e-04 + 8.27309863e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.98676376e-04 - 6.65517176e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                6.27857729e-04 - 1.54341340e-05j,
+            ],
+            [
+                -6.73144077e-04 - 3.60975870e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                4.67210887e-04 - 2.17535761e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.67374708e-04 + 4.71511757e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.63001296e-04 - 3.95892140e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                4.35333816e-04 - 8.69600931e-15j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.05250916e-04 + 3.28593785e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.52754672e-04 - 3.00920905e-04j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                -6.31599098e-04 - 1.17102553e-03j,
+                0.00000000e00 + 0.00000000e00j,
+                1.27872091e-03 + 2.86880036e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -5.76005181e-04 + 9.63085879e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -4.68945127e-04 - 8.27309863e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                7.91174440e-04 - 4.65246872e-14j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.20647635e-04 + 5.66236870e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.73323158e-04 - 4.55265120e-04j,
+            ],
+            [
+                3.38341546e-04 + 4.49835101e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.66203921e-04 - 2.15349716e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                4.16149019e-04 - 9.65540682e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.71195346e-04 + 3.79191094e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.05250916e-04 - 3.28593785e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                3.48930543e-04 + 2.79625189e-16j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.58264598e-04 + 2.62784636e-04j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                -5.60967829e-04 + 8.96335486e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -4.86154947e-04 - 9.03167028e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                9.07540826e-04 + 2.11378064e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.98676376e-04 + 6.65517176e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.20647635e-04 - 5.66236870e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                5.39452660e-04 - 2.88172084e-14j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.18381413e-04 + 3.86119833e-04j,
+            ],
+            [
+                1.30847347e-04 - 4.59788869e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                1.80089634e-05 + 3.50355199e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.54188655e-04 - 2.56241019e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                3.55293827e-04 - 4.32374510e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.52754672e-04 + 3.00920905e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -1.58264598e-04 - 2.62784636e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                2.71698768e-04 + 2.07762536e-12j,
+                0.00000000e00 + 0.00000000e00j,
+            ],
+            [
+                0.00000000e00 + 0.00000000e00j,
+                8.33367316e-04 + 3.50332180e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -4.34165694e-04 + 6.91399240e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -3.44497178e-04 - 6.42275830e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                6.27857729e-04 + 1.54341345e-05j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.73323159e-04 + 4.55265120e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                -2.18381412e-04 - 3.86119833e-04j,
+                0.00000000e00 + 0.00000000e00j,
+                3.67476249e-04 - 2.73852411e-13j,
+            ],
+        ]
+    )
+    rho = rho[:, list(range(cutoff))][list(range(cutoff))]
+
+    rho_norm = rho / np.trace(rho)
+
+    cov = prepare_cov(rjs, U, O=O, thresh=5e-3)
+
+    rho2 = density_matrix_single_mode(cov, N, cutoff=cutoff, method=method)
+    rho2_norm = rho2 / np.trace(rho2).real
+
+    probs = np.diag(
+        density_matrix_single_mode(cov, N, cutoff=cutoff, normalize=True, method="diagonals")
+    )
+
+    assert np.allclose(rho_norm, rho2_norm)
+    assert np.allclose(np.diag(rho_norm), probs)
+
+
+@pytest.mark.parametrize("method", ["recursive", "non-recursive"])
+def test_vac_schmidt_modes_gkp(method):
+    """
+    add vacuum schmidt modes and check it doesn't change the state
+    """
+    m1, m2 = 5, 7
+    cov = cov_GKP
+
+    cutoff = 26
+    M = 3
+    K = 2
+    big_cov = np.eye(2 * M * K, dtype=np.complex128)
+    big_cov[::K, ::K] = cov
+
+    with warnings.catch_warnings(record=True) as w:
+        rho_big = density_matrix_single_mode(big_cov, {1: m1, 2: m2}, cutoff=cutoff, method=method)
+
+    if not w:
+        rho_big /= np.trace(rho_big)
+        mu = np.zeros([len(cov)])
+        psi = state_vector(mu, cov, post_select={1: m1, 2: m2}, cutoff=cutoff)
+        rho1 = np.outer(psi, psi.conj())
+        rho1 /= np.trace(rho1)
+
+        assert np.allclose(rho1, rho_big)
+        probs = np.diag(
+            density_matrix_single_mode(
+                big_cov, {1: m1, 2: m2}, cutoff=cutoff, normalize=True, method="diagonals"
+            )
+        )
+        assert np.allclose(np.diag(rho1), probs)
+
+    else:
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert (
+            "Some of the diagonal elements of the density matrix are significantly negative or have significant imaginary parts"
+            in str(w[-1].message)
+        )

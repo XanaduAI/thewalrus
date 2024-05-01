@@ -15,6 +15,6 @@
 Functions to do internal modes/distinguishable GBS
 """
 
-from .pnr_statistics import pnr_prob, probabilities_single_mode
-from .fock_density_matrices import density_matrix_single_mode
+from .pnr_statistics import pnr_prob, haf_blocked
+from .fock_density_matrices import density_matrix_single_mode, check_probabilities
 from .prepare_cov import *
