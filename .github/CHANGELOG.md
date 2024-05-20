@@ -4,7 +4,7 @@
 
 * Implements the pre-Iwasawa and Iwasawa decompositions for symplectic matrices [(#382)](https://github.com/XanaduAI/thewalrus/pull/382).
 
-* Implements the Godsil-Gutman estimator for the Hafnian of symmetric nonnegative matrices. 
+* Implements the Godsil-Gutman estimator for the Hafnian of symmetric nonnegative matrices [(#392)](https://github.com/XanaduAI/thewalrus/pull/392). 
 
 ### Breaking changes
 
