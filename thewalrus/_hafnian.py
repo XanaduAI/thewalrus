@@ -721,6 +721,7 @@ def hafnian(
     rtol=1e-05,
     atol=1e-08,
     num_samples=1000,
+    approx=False,
     method="glynn",
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
@@ -733,11 +734,15 @@ def hafnian(
         method (string): Set this to ``"glynn"`` to use the
             glynn formula,
             or ``"inclexcl"`` to use the inclusion exclusion principle,
-            or ``"recursive"`` to use a recursive algorithm,
-            or ``"barvinok"`` to use an approximate Barvinok estimator (non-negative matrices only),
+            or ``"recursive"`` to use a recursive algorithm.
+        If ``approx`` is ``True``, one can use approximate methods:
+            (default) ``"barvinok"`` to use an approximate Barvinok estimator (non-negative matrices only),
             or ``"godsilgutman"`` to use an approximate Godsil-Gutman estimator (non-negative matrices only).
         rtol (float): the relative tolerance parameter used in ``np.allclose``
         atol (float): the absolute tolerance parameter used in ``np.allclose``
+        approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note
+            that the approximation algorithm can only be applied to matrices ``A`` that only have
+            non-negative entries.
         num_samples (int): If ``method=barvinok`` or ``method=godsilgutman``, the approximation
             algorithm performs ``num_samples`` iterations for estimation of the hafnian
             of the non-negative matrix ``A``.
@@ -797,14 +802,17 @@ def hafnian(
 
         return A[0, 1] * A[2, 3] + A[0, 2] * A[1, 3] + A[0, 3] * A[1, 2]
 
-    if method in {"godsilgutman", "barvinok"}:
+    if approx:
         if np.any(np.iscomplex(A)):
             raise ValueError("Input matrix must be real")
 
         if np.any(A < 0):
             raise ValueError("Input matrix must not have negative entries")
 
-        return hafnian_approx(A, num_samples=num_samples, method=method)
+        if method == "godsilgutman":
+            return hafnian_approx(A, num_samples=num_samples, method=method)
+        else:
+            return hafnian_approx(A, num_samples=num_samples, method="barvinok")
 
     if loop:
         if method == "recursive":
