@@ -9,7 +9,7 @@ examples/*ipynp*
 .eggs/*
 *.egg-info*
 thewalrus.egg-info
-*/__pycache__/*
+__pycache__
 thewalrus/*.so
 
 tests/*.o

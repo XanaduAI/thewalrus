@@ -90,7 +90,7 @@ def _density_matrix_single_mode(
 
     haf_arr = np.zeros((cutoff + 1, cutoff + 1), dtype=np.complex128)
     for j in numba.prange(steps):
-        haf_arr_new = np.zeros_like(haf_arr)
+        haf_arr_new = np.zeros((cutoff + 1, cutoff + 1), dtype=np.complex128)
         kept_edges = find_kept_edges(j, edge_reps)
 
         edges_sum = kept_edges.sum()
@@ -103,7 +103,6 @@ def _density_matrix_single_mode(
 
         glynn_edges_heralding = spatial_reps_to_schmidt_reps(glynn_edges[3:], K) - (K - 1)
         edge_weights = np.concatenate((glynn_edges[:3], glynn_edges_heralding))
-        assert len(edge_weights) == n_edges
 
         AX_S = np.empty_like(Ax)
         AX_S[:, :n_edges] = edge_weights * Ax[:, n_edges:]
