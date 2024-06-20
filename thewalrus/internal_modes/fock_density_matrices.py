@@ -104,6 +104,9 @@ def _density_matrix_single_mode(
         glynn_edges_heralding = spatial_reps_to_schmidt_reps(glynn_edges[3:], K) - (K - 1)
         edge_weights = np.concatenate((glynn_edges[:3], glynn_edges_heralding))
 
+        # assertions are not allowed in numba.prange contexts, but the below should always be true
+        # assert len(edge_weights) == n_edges
+
         AX_S = np.empty_like(Ax)
         AX_S[:, :n_edges] = edge_weights * Ax[:, n_edges:]
         AX_S[:, n_edges:] = edge_weights * Ax[:, :n_edges]
