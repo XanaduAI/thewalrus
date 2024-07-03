@@ -15,6 +15,8 @@
 
 ### Bug fixes
 
+* Added tolerance parameter to `deecompositions.takagi` to prevent from incorrect Autonne-Takagi decomposition, which happened with some matrices.
+
 ### Documentation
 
 ### Contributors
