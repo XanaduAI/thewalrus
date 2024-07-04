@@ -176,7 +176,8 @@ def takagi(A, svd_order=True, tol=1e-16):
     A = np.triu(A) + np.triu(A, k=1).T
 
     # Kill small values in the matrix A. This was installed because takagi decomposition did not work at some matrix A with small values.
-    A = np.where(np.abs(A.real) <= tol, 0, A.real) + np.where(np.abs(A.imag) <= tol, 0, A.imag)
+    rtol = tol * np.amax(np.abs(A))
+    A = np.where(np.abs(A.real) <= rtol, 0, A.real) + np.where(np.abs(A.imag) <= rtol, 0, A.imag)
 
     if np.allclose(A, 0):
         return np.zeros(n), np.eye(n)
