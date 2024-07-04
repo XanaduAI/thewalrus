@@ -15,7 +15,7 @@
 
 ### Bug fixes
 
-* Added tolerance parameter to `deecompositions.takagi` to prevent from incorrect Autonne-Takagi decomposition, which happened with some matrices.
+* Added tolerance parameter to `deecompositions.takagi` to prevent from incorrect Autonne-Takagi decomposition, which happened with some matrices. [(#393)](https://github.com/XanaduAI/thewalrus/pull/393)
 
 ### Documentation
 
