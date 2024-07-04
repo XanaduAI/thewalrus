@@ -230,7 +230,7 @@ def state_prep(eps, W, thresh=1e-4, hbar=2):
 
 def LO_overlaps(chis, LO_shape):
     r"""
-    Computes the overlap integral between the orthonormal moes and the local oscillator shape
+    Computes the overlap integral between the orthonormal modes and the local oscillator shape
 
     Args:
         chis (list[array]): list of the temporal functions for the new orthonormal basis
