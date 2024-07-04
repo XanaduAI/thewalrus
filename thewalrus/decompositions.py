@@ -162,7 +162,7 @@ def takagi(A, svd_order=True, tol=1e-16):
     Args:
         A (array): square, symmetric matrix
         svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or ascending (``False``) order.
-        tol (float): tolerance parameter to kill the small values in the maatix A. This was installed because takagi decomposition did not work at some matrix A.
+        tol (float): tolerance parameter to kill small values in the matrix A. This was installed because takagi decomposition did not work at some matrix A.
 
     Returns:
         tuple[array, array]: (r, U), where r are the singular values,
@@ -175,6 +175,7 @@ def takagi(A, svd_order=True, tol=1e-16):
     # Here we build a Symmetric matrix from the top right triangular part
     A = np.triu(A) + np.triu(A, k=1).T
 
+    # Kill small values in the matrix A. This was installed because takagi decomposition did not work at some matrix A with small values.
     A = np.where(np.abs(A.real) <= tol, 0, A.real) + np.where(np.abs(A.imag) <= tol, 0, A.imag)
 
     if np.allclose(A, 0):
