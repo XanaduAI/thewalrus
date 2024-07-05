@@ -15,6 +15,8 @@
 
 ### Bug fixes
 
+* Add the calculation method of `takagi` when the matrix is diagonal. 
+
 ### Documentation
 
 ### Contributors

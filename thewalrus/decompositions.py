@@ -202,6 +202,15 @@ def takagi(A, svd_order=True):
         vals, U = takagi(Amr, svd_order=svd_order)
         return vals, U * np.exp(1j * phi / 2)
 
+    # If the matrix is diagonal, Takagi decomposition is easy
+    if np.allclose(A, np.diag(np.diag(A))):
+        d = np.diag(A)
+        U = np.diag(np.exp(1j * 0.5 * np.angle(d)))
+        l = np.abs(d)
+        if svd_order is False:
+            return l[::-1], U[:, ::-1]
+        return l, U
+
     u, d, v = np.linalg.svd(A)
     U = u @ sqrtm((v @ np.conjugate(u)).T)
     if svd_order is False:
