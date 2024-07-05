@@ -19,7 +19,13 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import williamson, blochmessiah, takagi, pre_iwasawa, iwasawa
+from thewalrus.decompositions import (
+    williamson,
+    blochmessiah,
+    takagi,
+    pre_iwasawa,
+    iwasawa,
+)
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
@@ -48,7 +54,9 @@ class TestWilliamsonDecomposition:
 
             # interferometer 1
             U1 = haar_measure(n)
-            S1 = np.vstack([np.hstack([U1.real, -U1.imag]), np.hstack([U1.imag, U1.real])])
+            S1 = np.vstack(
+                [np.hstack([U1.real, -U1.imag]), np.hstack([U1.imag, U1.real])]
+            )
 
             # squeezing
             r = np.log(0.2 * np.arange(n) + 2)
@@ -56,7 +64,9 @@ class TestWilliamsonDecomposition:
 
             # interferometer 2
             U2 = haar_measure(n)
-            S2 = np.vstack([np.hstack([U2.real, -U2.imag]), np.hstack([U2.imag, U2.real])])
+            S2 = np.vstack(
+                [np.hstack([U2.real, -U2.imag]), np.hstack([U2.imag, U2.real])]
+            )
 
             # final symplectic
             S_final = S2 @ Sq @ S1
@@ -99,7 +109,9 @@ class TestWilliamsonDecomposition:
         """Test that the graph_embed decomposition raises exception if not even number of rows"""
         A = np.random.rand(5, 5) + 1j * np.random.rand(5, 5)
         A += A.T
-        with pytest.raises(ValueError, match="must have an even number of rows/columns"):
+        with pytest.raises(
+            ValueError, match="must have an even number of rows/columns"
+        ):
             williamson(A)
 
     def test_positive_definite_validation(self):
@@ -172,7 +184,9 @@ class TestBlochMessiahDecomposition:
 
             # interferometer 1
             U1 = haar_measure(n)
-            S1 = np.vstack([np.hstack([U1.real, -U1.imag]), np.hstack([U1.imag, U1.real])])
+            S1 = np.vstack(
+                [np.hstack([U1.real, -U1.imag]), np.hstack([U1.imag, U1.real])]
+            )
 
             Sq = np.identity(2 * n)
             if not passive:
@@ -182,7 +196,9 @@ class TestBlochMessiahDecomposition:
 
             # interferometer 2
             U2 = haar_measure(n)
-            S2 = np.vstack([np.hstack([U2.real, -U2.imag]), np.hstack([U2.imag, U2.real])])
+            S2 = np.vstack(
+                [np.hstack([U2.real, -U2.imag]), np.hstack([U2.imag, U2.real])]
+            )
 
             # final symplectic
             S_final = S2 @ Sq @ S1
@@ -323,16 +339,34 @@ def test_takagi_error():
     with pytest.raises(ValueError, match="The input matrix is not square"):
         takagi(A)
 
+
 def test_takagi_diagonal_matrix():
     """Test the takagi decomposition works well for a specific matrix that was not deecomposed accuratelyin a previous version.
     See more info in PR #393 (https://github.com/XanaduAI/thewalrus/pull/393)"""
-    A = np.array([[-8.4509484628125742e-01+1.0349426984742664e-16j,  6.3637197288239186e-17-7.4398922703555097e-33j,  2.6734481396039929e-32+1.7155650257063576e-35j],
-                  [ 6.3637197288239186e-17-7.4398922703555097e-33j, -2.0594021562561332e-01+2.2863956908382538e-17j, -5.8325863096557049e-17+1.6949718400585382e-18j],
-                  [ 2.6734481396039929e-32+1.7155650257063576e-35j, -5.8325863096557049e-17+1.6949718400585382e-18j,  4.4171453199503476e-02+1.0022350742842835e-02j]])
+    A = np.array(
+        [
+            [
+                -8.4509484628125742e-01 + 1.0349426984742664e-16j,
+                6.3637197288239186e-17 - 7.4398922703555097e-33j,
+                2.6734481396039929e-32 + 1.7155650257063576e-35j,
+            ],
+            [
+                6.3637197288239186e-17 - 7.4398922703555097e-33j,
+                -2.0594021562561332e-01 + 2.2863956908382538e-17j,
+                -5.8325863096557049e-17 + 1.6949718400585382e-18j,
+            ],
+            [
+                2.6734481396039929e-32 + 1.7155650257063576e-35j,
+                -5.8325863096557049e-17 + 1.6949718400585382e-18j,
+                4.4171453199503476e-02 + 1.0022350742842835e-02j,
+            ],
+        ]
+    )
     d, U = takagi(A)
     assert np.allclose(A, U @ np.diag(d) @ U.T)
     assert np.allclose(U @ np.conjugate(U).T, np.eye(len(U)))
     assert np.all(d >= 0)
+
 
 def test_real_degenerate():
     """Verify that the Takagi decomposition returns a matrix that is unitary and results in a
