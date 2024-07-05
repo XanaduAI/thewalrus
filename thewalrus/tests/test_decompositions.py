@@ -334,7 +334,8 @@ def test_takagi_error():
         takagi(A)
 
 
-def test_takagi_diagonal_matrix():
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_takagi_diagonal_matrix(svd_order):
     """Test the takagi decomposition works well for a specific matrix that was not decomposed accurately in a previous implementation.
     See more info in PR #393 (https://github.com/XanaduAI/thewalrus/pull/393)"""
     A = np.array(
@@ -356,7 +357,7 @@ def test_takagi_diagonal_matrix():
             ],
         ]
     )
-    d, U = takagi(A)
+    d, U = takagi(A, svd_order=svd_order)
     assert np.allclose(A, U @ np.diag(d) @ U.T)
     assert np.allclose(U @ np.conjugate(U).T, np.eye(len(U)))
     assert np.all(d >= 0)
