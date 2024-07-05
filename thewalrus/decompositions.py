@@ -153,6 +153,7 @@ def blochmessiah(S):
 
 
 def takagi(A, svd_order=True):
+    # pylint: disable=too-many-return-statements
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized by taking its upper triangular part.
     If the input matrix is indeed symmetric this leaves it unchanged.
@@ -207,10 +208,11 @@ def takagi(A, svd_order=True):
         d = np.diag(A)
         U = np.diag(np.exp(1j * 0.5 * np.angle(d)))
         l = np.abs(d)
-        l = np.sort(l)
-        U = U[np.argsort(l)]
+        idx = np.argsort(l)
+        l = l[idx]
+        U = U[idx]
         if svd_order:
-            return l[::-1], U[:, ::-1]
+            return l[::-1], U[::-1, :]
         return l, U
 
     u, d, v = np.linalg.svd(A)

@@ -19,13 +19,7 @@ from scipy.linalg import block_diag
 
 from thewalrus.random import random_interferometer as haar_measure
 from thewalrus.random import random_symplectic
-from thewalrus.decompositions import (
-    williamson,
-    blochmessiah,
-    takagi,
-    pre_iwasawa,
-    iwasawa,
-)
+from thewalrus.decompositions import williamson, blochmessiah, takagi, pre_iwasawa, iwasawa
 from thewalrus.symplectic import sympmat as omega
 from thewalrus.quantum.gaussian_checks import is_symplectic
 
