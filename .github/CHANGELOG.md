@@ -15,7 +15,7 @@
 
 ### Bug fixes
 
-* Add the calculation method of `takagi` when the matrix is diagonal. 
+* Add the calculation method of `takagi` when the matrix is diagonal. [(#394)](https://github.com/XanaduAI/thewalrus/pull/394)
 
 ### Documentation
 
