@@ -323,7 +323,7 @@ def test_takagi_error():
     with pytest.raises(ValueError, match="The input matrix is not square"):
         takagi(A)
 
-def test_takagi_sepcific_matrix():
+def test_takagi_diagonal_matrix():
     """Test the takagi decomposition works well for a specific matrix that was not deecomposed accuratelyin a previous version.
     See more info in PR #393 (https://github.com/XanaduAI/thewalrus/pull/393)"""
     A = np.array([[-8.4509484628125742e-01+1.0349426984742664e-16j,  6.3637197288239186e-17-7.4398922703555097e-33j,  2.6734481396039929e-32+1.7155650257063576e-35j],
