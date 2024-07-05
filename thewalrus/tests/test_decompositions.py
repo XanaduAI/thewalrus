@@ -341,7 +341,7 @@ def test_takagi_error():
 
 
 def test_takagi_diagonal_matrix():
-    """Test the takagi decomposition works well for a specific matrix that was not deecomposed accuratelyin a previous version.
+    """Test the takagi decomposition works well for a specific matrix that was not decomposed accurately in a previous implementation.
     See more info in PR #393 (https://github.com/XanaduAI/thewalrus/pull/393)"""
     A = np.array(
         [
