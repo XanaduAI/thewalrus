@@ -203,11 +203,13 @@ def takagi(A, svd_order=True):
         return vals, U * np.exp(1j * phi / 2)
 
     # If the matrix is diagonal, Takagi decomposition is easy
-    if np.allclose(A, np.diag(np.diag(A))):
+    if np.allclose(A, np.diag(np.diag(A)), rtol=1e-16):
         d = np.diag(A)
         U = np.diag(np.exp(1j * 0.5 * np.angle(d)))
         l = np.abs(d)
-        if svd_order is False:
+        l = np.sort(l)
+        U = U[np.argsort(l)]
+        if svd_order:
             return l[::-1], U[:, ::-1]
         return l, U
 
