@@ -171,6 +171,9 @@ def reduced_state(mu, cov, modes):
     """
     N = len(mu) // 2
 
+    if type(modes) == np.ndarray:
+        modes = modes.tolist()
+
     if modes == list(range(N)):
         # reduced state is full state
         return mu, cov
