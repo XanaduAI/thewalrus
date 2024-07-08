@@ -152,7 +152,7 @@ def blochmessiah(S):
     return O, D, Q
 
 
-def takagi(A, svd_order=True):
+def takagi(A, svd_order=True, rtol=1e-16):
     # pylint: disable=too-many-return-statements
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized by taking its upper triangular part.
@@ -163,6 +163,7 @@ def takagi(A, svd_order=True):
     Args:
         A (array): square, symmetric matrix
         svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or ascending (``False``) order.
+        rtol (float): relative tolerance when judging if the matrix is diagonal or not.
 
     Returns:
         tuple[array, array]: (r, U), where r are the singular values,
@@ -204,7 +205,7 @@ def takagi(A, svd_order=True):
         return vals, U * np.exp(1j * phi / 2)
 
     # If the matrix is diagonal, Takagi decomposition is easy
-    if np.allclose(A, np.diag(np.diag(A)), rtol=1e-16):
+    if np.allclose(A, np.diag(np.diag(A)), rtol=rtol):
         d = np.diag(A)
         l = np.abs(d)
         idx = np.argsort(l)
