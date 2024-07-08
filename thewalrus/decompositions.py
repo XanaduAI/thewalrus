@@ -163,7 +163,7 @@ def takagi(A, svd_order=True, rtol=1e-16):
     Args:
         A (array): square, symmetric matrix
         svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or ascending (``False``) order.
-        rtol (float): relative tolerance when judging if the matrix is diagonal or not.
+        rtol (float): the relative tolerance parameter used in ``np.allclose`` when judging if the matrix is diagonal or not. Default to 1e-16.
 
     Returns:
         tuple[array, array]: (r, U), where r are the singular values,
