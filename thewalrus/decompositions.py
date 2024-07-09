@@ -30,10 +30,10 @@ Summary
 -------
 
 .. autosummary::
-    williamson
-    symplectic_eigenvals
     blochmessiah
+    symplectic_eigenvals
     takagi
+    williamson
     pre_iwasawa
     iwasawa
 

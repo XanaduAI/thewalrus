@@ -23,6 +23,7 @@ import numpy as np
 from thewalrus import charpoly
 
 
+# pylint: disable=consider-using-in
 @numba.jit(nopython=True, cache=True)
 def nb_binom(n, k):  # pragma: no cover
     """Numba version of binomial coefficient function.
@@ -36,7 +37,7 @@ def nb_binom(n, k):  # pragma: no cover
     """
     if k < 0 or k > n:
         return 0
-    if k in (0, n):
+    if k == 0 or k == n:
         return 1
     binom = 1
     for i in range(min(k, n - k)):
@@ -181,8 +182,8 @@ def find_kept_edges(j, reps):  # pragma: no cover
 
 
 @numba.jit(nopython=True, cache=True)
-def f(A, n):  # pragma: no cover
-    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
+def f_from_matrix(A, n):  # pragma: no cover
+    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from a general matrix.
 
     Args:
         A (array): a two-dimensional matrix
@@ -191,22 +192,8 @@ def f(A, n):  # pragma: no cover
     Returns:
         array: polynomial coefficients
     """
-    # Compute combinations in O(n^2log n) time
-    # code translated from thewalrus matlab script
-    count = 0
-    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
-    comb[0, 0] = 1
-    powtrace = charpoly.powertrace(A, n // 2 + 1)
-    for i in range(1, n // 2 + 1):
-        factor = powtrace[i] / (2 * i)
-        powfactor = 1
-        count = 1 - count
-        comb[count, :] = comb[1 - count, :]
-        for j in range(1, n // (2 * i) + 1):
-            powfactor *= factor / j
-            for k in range(i * j + 1, n // 2 + 2):
-                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
-    return comb[count, :]
+    powertraces = charpoly.powertrace(A, n // 2 + 1)
+    return f_from_powertrace(powertraces, n)
 
 
 @numba.jit(nopython=True, cache=True)
@@ -280,6 +267,33 @@ def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
         for j in range(1, n // i + 1):
             powfactor *= factor / j
             for k in range(i * j + 1, n + 2):
+                comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
+
+    return comb[count, :]
+
+
+@numba.jit(nopython=True, cache=True)
+def f_from_powertrace(powertraces, n):  # pragma: no cover
+    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula from the powertraces.
+
+    Args:
+        pow_traces (array): traces of a matrix to power 0 to n/2
+        n (int): number of polynomial coefficients to compute
+
+    Returns:
+        array: polynomial coefficients
+    """
+    count = 0
+    comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
+    comb[0, 0] = 1
+    for i in range(1, n // 2 + 1):
+        factor = powertraces[i] / (2 * i)
+        powfactor = 1.0
+        count = 1 - count
+        comb[count, :] = comb[1 - count, :]
+        for j in range(1, n // (2 * i) + 1):
+            powfactor = powfactor * factor / j
+            for k in range(i * j + 1, n // 2 + 2):
                 comb[count, k - 1] += comb[1 - count, k - i * j - 1] * powfactor
 
     return comb[count, :]
@@ -457,7 +471,7 @@ def _calc_hafnian(A, edge_reps, glynn=True):  # pragma: no cover
 
         if glynn and kept_edges[0] == 0:
             prefac *= 0.5
-        Hnew = prefac * f(AX_S, N)[N // 2]
+        Hnew = prefac * f_from_matrix(AX_S, N)[N // 2]
 
         H += Hnew
 
@@ -936,6 +950,7 @@ def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=
     return _haf(A, reps=rpt, glynn=glynn)
 
 
+# pylint: disable=consider-using-generator
 def hafnian_banded(A, loop=False, rtol=1e-05, atol=1e-08):
     """Returns the loop hafnian of a banded matrix.
     For the derivation see Section V of `'Efficient sampling from shallow Gaussian quantum-optical
