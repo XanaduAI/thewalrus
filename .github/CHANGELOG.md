@@ -17,6 +17,8 @@
 
 * Add the calculation method of `takagi` when the matrix is diagonal. [(#394)](https://github.com/XanaduAI/thewalrus/pull/394)
 
+* Add the lines for avoiding the comparison of np.ndarray and list. [(#395)](https://github.com/XanaduAI/thewalrus/pull/395)
+
 ### Documentation
 
 ### Contributors

@@ -367,6 +367,15 @@ class TestReducedState:
         assert np.allclose(res[0], expected[0], atol=tol, rtol=0)
         assert np.allclose(res[1], expected[1], atol=tol, rtol=0)
 
+    def test_ndarray(self, hbar, tol):
+        """Test numpy.ndarray in the third argument of `reduced_state` is converted to list correctly"""
+        mu, cov = symplectic.vacuum_state(4, hbar=hbar)
+        res = symplectic.reduced_state(mu, cov, np.array([0, 1, 2, 3]))
+        expected = np.zeros([8]), np.identity(8) * hbar / 2
+
+        assert np.allclose(res[0], expected[0], atol=tol, rtol=0)
+        assert np.allclose(res[1], expected[1], atol=tol, rtol=0)
+
 
 class TestLossChannel:
     """Tests for the loss channel"""
