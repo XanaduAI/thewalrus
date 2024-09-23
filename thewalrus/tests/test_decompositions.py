@@ -324,6 +324,35 @@ def test_takagi_error():
         takagi(A)
 
 
+@pytest.mark.parametrize("svd_order", [True, False])
+def test_takagi_diagonal_matrix(svd_order):
+    """Test the takagi decomposition works well for a specific matrix that was not decomposed accurately in a previous implementation.
+    See more info in PR #393 (https://github.com/XanaduAI/thewalrus/pull/393)"""
+    A = np.array(
+        [
+            [
+                -8.4509484628125742e-01 + 1.0349426984742664e-16j,
+                6.3637197288239186e-17 - 7.4398922703555097e-33j,
+                2.6734481396039929e-32 + 1.7155650257063576e-35j,
+            ],
+            [
+                6.3637197288239186e-17 - 7.4398922703555097e-33j,
+                -2.0594021562561332e-01 + 2.2863956908382538e-17j,
+                -5.8325863096557049e-17 + 1.6949718400585382e-18j,
+            ],
+            [
+                2.6734481396039929e-32 + 1.7155650257063576e-35j,
+                -5.8325863096557049e-17 + 1.6949718400585382e-18j,
+                4.4171453199503476e-02 + 1.0022350742842835e-02j,
+            ],
+        ]
+    )
+    d, U = takagi(A, svd_order=svd_order)
+    assert np.allclose(A, U @ np.diag(d) @ U.T)
+    assert np.allclose(U @ np.conjugate(U).T, np.eye(len(U)))
+    assert np.all(d >= 0)
+
+
 def test_real_degenerate():
     """Verify that the Takagi decomposition returns a matrix that is unitary and results in a
     correct decomposition when input a real but highly degenerate matrix. This test uses the
