@@ -18,8 +18,8 @@ import warnings
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
-import numba
 import numpy as np
+import numba
 from thewalrus import charpoly
 
 
