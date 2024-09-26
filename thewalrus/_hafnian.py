@@ -811,7 +811,6 @@ def hafnian(
 
         if method == "godsilgutman":
             return hafnian_approx(A, num_samples=num_samples, method=method)
-        
         return hafnian_approx(A, num_samples=num_samples, method="barvinok")
 
     if loop:

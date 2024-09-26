@@ -13,9 +13,8 @@
 # limitations under the License.
 """Tests for the hafnian_approx Python function"""
 # pylint: disable=redefined-outer-name
-import pytest
-
 import numpy as np
+import pytest
 from scipy.special import factorial2, factorial as fac
 
 from thewalrus import hafnian
