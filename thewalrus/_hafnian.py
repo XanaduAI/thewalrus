@@ -18,8 +18,8 @@ import warnings
 from functools import lru_cache
 from collections import Counter
 from itertools import chain, combinations
-import numba
 import numpy as np
+import numba
 from thewalrus import charpoly
 
 
@@ -720,8 +720,8 @@ def hafnian(
     loop=False,
     rtol=1e-05,
     atol=1e-08,
-    approx=False,
     num_samples=1000,
+    approx=False,
     method="glynn",
 ):  # pylint: disable=too-many-arguments
     """Returns the hafnian of a matrix.
@@ -735,13 +735,17 @@ def hafnian(
             glynn formula,
             or ``"inclexcl"`` to use the inclusion exclusion principle,
             or ``"recursive"`` to use a recursive algorithm.
+        If ``approx`` is ``True``, one can use approximate methods:
+            (default) ``"barvinok"`` to use an approximate Barvinok estimator (non-negative matrices only),
+            or ``"godsilgutman"`` to use an approximate Godsil-Gutman estimator (non-negative matrices only).
         rtol (float): the relative tolerance parameter used in ``np.allclose``
         atol (float): the absolute tolerance parameter used in ``np.allclose``
         approx (bool): If ``True``, an approximation algorithm is used to estimate the hafnian. Note
             that the approximation algorithm can only be applied to matrices ``A`` that only have
             non-negative entries.
-        num_samples (int): If ``approx=True``, the approximation algorithm performs ``num_samples``
-            iterations for estimation of the hafnian of the non-negative matrix ``A``
+        num_samples (int): If ``method=barvinok`` or ``method=godsilgutman``, the approximation
+            algorithm performs ``num_samples`` iterations for estimation of the hafnian
+            of the non-negative matrix ``A``.
 
     Returns:
         int or float or complex: the hafnian of matrix ``A``
@@ -805,7 +809,9 @@ def hafnian(
         if np.any(A < 0):
             raise ValueError("Input matrix must not have negative entries")
 
-        return hafnian_approx(A, num_samples=num_samples)
+        if method == "godsilgutman":
+            return hafnian_approx(A, num_samples=num_samples, method=method)
+        return hafnian_approx(A, num_samples=num_samples, method="barvinok")
 
     if loop:
         if method == "recursive":
@@ -1046,13 +1052,17 @@ def solve(b, s, w, g, n):  # pragma: no cover
 
 
 @numba.jit(nopython=True)
-def _one_det(B):  # pragma: no cover
+def _one_det(B, method="barvinok"):  # pragma: no cover
     """Calculates the determinant of an antisymmetric matrix with entries distributed
     according to a normal distribution, with scale equal to the entries of the symmetric matrix
     given as input.
 
     Args:
         B (array[float]): symmetric matrix
+        method (string): can take the following values denoting different estimators:
+            ``"barvinok"`` has a higher variance, but better bounds for single-shot estimates,
+            ``"godsilgutman"`` has a lower variance, but can fail to provide a nontrivial estimate with a small
+        number of shots.
 
     Returns:
         float: determinant of the samples antisymmetric matrix
@@ -1061,25 +1071,33 @@ def _one_det(B):  # pragma: no cover
     n, m = B.shape
     for i in range(n):
         for j in range(m):
-            mat[i, j] = B[i, j] * np.random.normal()
+            if method == "barvinok":
+                mat[i, j] = B[i, j] * np.random.normal()
+            elif method == "godsilgutman":
+                mat[i, j] = B[i, j] * (-1)**np.random.randint(2)
+            else:
+                raise ValueError()
             mat[j, i] = -mat[i, j]
     return np.linalg.det(mat)
 
 
 @numba.jit(nopython=True)
-def hafnian_approx(A, num_samples=1000):  # pragma: no cover
+def hafnian_approx(A, num_samples=1000, method="barvinok"):  # pragma: no cover
     """Returns the approximation to the hafnian of a matrix with non-negative entries.
 
-    The approximation follows the stochastic Barvinok's approximation allowing the
+    The approximation follows the stochastic approximation allowing the
     hafnian can be approximated as the sum of determinants of matrices.
     The accuracy of the approximation increases with increasing number of iterations.
 
     Args:
         B (array[float]): a symmetric matrix
-
+        method (string): can take the following values denoting different estimators:
+            ``"barvinok"`` has a higher variance, but better bounds for single-shot estimates,
+            ``"godsilgutman"`` has a lower variance, but can fail to provide a nontrivial estimate with a small
+        number of shots.
     Returns:
         float: approximate hafnian of the input
     """
 
     sqrtA = np.sqrt(A)
-    return np.array([_one_det(sqrtA) for _ in range(num_samples)]).mean()
+    return np.array([_one_det(sqrtA, method=method) for _ in range(num_samples)]).mean()
