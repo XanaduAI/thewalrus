@@ -1,0 +1,37 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/anaconda
+{
+	"name": "The Walrus",
+	"dockerFile": "dev.Dockerfile",
+	"postCreateCommand": "/bin/zsh ./.devcontainer/post-install.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-python.pylint",
+				"ms-toolsai.jupyter",
+				"eamodio.gitlens",
+				"GitHub.vscode-pull-request-github",
+				"mutantdino.resourcemonitor",
+				"njpwerner.autodocstring"
+			],
+			"settings": {
+                "python.testing.pytestArgs": [
+                    "tests"
+                ],
+                "python.testing.unittestEnabled": false,
+                "python.testing.pytestEnabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.linting.enabled": true,
+				"python.languageServer": "Pylance",
+				"python.defaultInterpreterPath": "/usr/local/bin/python",
+				"python.terminal.executeInFileDir": true,
+				"code-runner.fileDirectoryAsCwd": true,
+				"terminal.integrated.env.linux": {"PYTHONPATH": "/workspaces/thewalrus"},
+				"autoDocstring.docstringFormat": "google"
+            }
+		}
+	},
+	"remoteUser": "root"
+}
