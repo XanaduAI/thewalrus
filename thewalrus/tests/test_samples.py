@@ -89,7 +89,7 @@ class TestHafnianSampling:
     def test_hafnian_sample_states_nans(self):
         """test exception is raised if not a numpy array"""
         with pytest.raises(ValueError, match="Covariance matrix must not contain NaNs."):
-            hafnian_sample_state(np.array([[0, 5], [0, np.NaN]]), samples=20)
+            hafnian_sample_state(np.array([[0, 5], [0, np.nan]]), samples=20)
 
     def test_single_squeezed_state_hafnian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -293,7 +293,7 @@ class TestHafnianSampling:
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
-        zeros = np.zeros(n_modes, dtype=np.int)
+        zeros = np.zeros(n_modes, dtype=int)
         samples = sample_func(
             sigma, samples=n_samples
         )  # hafnian_sample_classical_state(sigma, samples=n_samples)
@@ -342,7 +342,7 @@ class TestTorontonianSampling:
     def test_torontonian_samples_nans(self):
         """test exception is raised if not a numpy array"""
         with pytest.raises(ValueError, match="Covariance matrix must not contain NaNs."):
-            torontonian_sample_state(np.array([[0, 5], [0, np.NaN]]), samples=20)
+            torontonian_sample_state(np.array([[0, 5], [0, np.nan]]), samples=20)
 
     def test_single_squeezed_state_torontonian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -419,7 +419,7 @@ class TestTorontonianSampling:
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
-        zeros = np.zeros(n_modes, dtype=np.int)
+        zeros = np.zeros(n_modes, dtype=int)
         samples = sample_func(sigma, samples=n_samples)
         for i in range(n_samples):
             assert np.all(samples[i] == zeros)

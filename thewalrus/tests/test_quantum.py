@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for The Walrus quantum functions"""
 # pylint: disable=no-self-use,redefined-outer-name
+import math
 from itertools import product
 
 import pytest
@@ -586,7 +587,7 @@ def test_pure_state_amplitude_two_mode_squeezed(i, j):
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
-    mu = np.zeros([4], dtype=np.complex)
+    mu = np.zeros([4], dtype=complex)
     if i != j:
         exact = 0.0
     else:
@@ -603,7 +604,7 @@ def test_pure_state_amplitude_coherent(i):
     mu = np.array([1.0, 2.0])
     beta = complex_to_real_displacements(mu)
     alpha = beta[0]
-    exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha**i / np.sqrt(np.math.factorial(i))
+    exact = np.exp(-0.5 * np.abs(alpha) ** 2) * alpha**i / np.sqrt(math.factorial(i))
     num = pure_state_amplitude(mu, cov, [i])
     assert np.allclose(exact, num)
 
@@ -700,7 +701,7 @@ def test_state_vector_two_mode_squeezed():
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
-    mu = np.zeros([4], dtype=np.complex)
+    mu = np.zeros([4], dtype=complex)
     exact = np.array(
         [
             (np.exp(1j * i * phase) * (nbar / (1.0 + nbar)) ** (i / 2) / np.sqrt(1.0 + nbar))
@@ -719,7 +720,7 @@ def test_state_vector_two_mode_squeezed_post():
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
-    mu = np.zeros([4], dtype=np.complex)
+    mu = np.zeros([4], dtype=complex)
     exact = np.diag(
         np.array(
             [
@@ -744,7 +745,7 @@ def test_state_vector_coherent():
     alpha = beta[0]
     exact = np.array(
         [
-            (np.exp(-0.5 * np.abs(alpha) ** 2) * alpha**i / np.sqrt(np.math.factorial(i)))
+            (np.exp(-0.5 * np.abs(alpha) ** 2) * alpha**i / np.sqrt(math.factorial(i)))
             for i in range(cutoff)
         ]
     )
@@ -759,7 +760,7 @@ def test_state_vector_two_mode_squeezed_post_normalize():
     phase = np.pi / 8
     r = np.arcsinh(np.sqrt(nbar))
     cov = two_mode_squeezing(2 * r, phase)
-    mu = np.zeros([4], dtype=np.complex)
+    mu = np.zeros([4], dtype=complex)
     exact = np.diag(
         np.array(
             [
@@ -1214,7 +1215,7 @@ def test_loss_is_nonnegative_matrix(eta):
     """Test the loss matrix is a nonnegative matrix"""
     n = 50
     M = loss_mat(eta, n)
-    assert np.alltrue(M >= 0.0)
+    assert np.all(M >= 0.0)
 
 
 @pytest.mark.parametrize("eta", [-1.0, 2.0])
@@ -1762,8 +1763,8 @@ def test_marginal_probs_are_normalized():
 
     result = n_body_marginals(means, cov, cutoff, 3)
     for tensor in result:
-        assert np.alltrue(np.round(tensor, 14) >= 0.0)
-        assert np.alltrue(tensor <= 1.0)
+        assert np.all(np.round(tensor, 14) >= 0.0)
+        assert np.all(tensor <= 1.0)
 
 
 def test_correct_indexing_n_body_marginals():

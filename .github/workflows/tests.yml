@@ -17,16 +17,16 @@ jobs:
           access_token: ${{ github.token }}
 
       - name: Checkout The Walrus
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: '3.12'
 
       - name: Install dependencies
+        shell: bash
         run: |
-          python3 -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-cov pytest-randomly wheel codecov
 
@@ -38,9 +38,9 @@ jobs:
         run: python3 -m pytest thewalrus --randomly-seed=137 --cov=thewalrus --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
+          disable_search: true
           fail_ci_if_error: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

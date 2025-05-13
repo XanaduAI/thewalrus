@@ -1,5 +1,5 @@
-dask[delayed]==2022.2.1
-numba==0.55.1
-numpy==1.21.5
-scipy==1.8.0
-sympy==1.10
+dask[delayed]==2025.4.1
+numba==0.61.2
+numpy==2.2.5
+scipy==1.15.3
+sympy==1.14.0
