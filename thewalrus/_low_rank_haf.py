@@ -83,6 +83,6 @@ def low_rank_hafnian(G):
         facts = 1
         for i, pi in enumerate(c):
             monomial *= x[i] ** (2 * pi)
-            facts = facts * factorial2(2 * pi - 1)
+            facts = facts * factorial2(2 * pi - 1, extend="complex")
         haf_val += complex(poly.coeff(monomial) * facts)
     return haf_val
