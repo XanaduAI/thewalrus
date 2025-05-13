@@ -96,7 +96,7 @@ def hermite_multidimensional(
     Rt = np.real_if_close(R)
     yt = np.real_if_close(y)
 
-    dtype = np.find_common_type([Rt.dtype.name, yt.dtype.name], [np.array(C).dtype.name])
+    dtype = np.result_type(Rt, yt, C)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
 
@@ -153,7 +153,7 @@ def interferometer(R, cutoff, C=1, renorm=True, make_tensor=True, rtol=1e-05, at
 
     Rt = np.real_if_close(R)
 
-    dtype = np.find_common_type([Rt.dtype.name], [np.array(C).dtype.name])
+    dtype = np.result_type(Rt, C)
     array = np.zeros(cutoffs, dtype=dtype)
     array[(0,) * num_indices] = C
 
@@ -400,9 +400,7 @@ def grad_hermite_multidimensional(G, R, y, C=1, renorm=True, dtype=None):
         array[data type], array[data type], array[data type]: the gradients of the multidimensional Hermite polynomials with respect to C, R and y
     """
     if dtype is None:
-        dtype = np.find_common_type(
-            [G.dtype.name, R.dtype.name, y.dtype.name], [np.array(C).dtype.name]
-        )
+        dtype = np.result_type(G, R, y, C)
     n, _ = R.shape
     if y.shape[0] != n:
         raise ValueError(
