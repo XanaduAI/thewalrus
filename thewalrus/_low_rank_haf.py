@@ -67,7 +67,7 @@ def low_rank_hafnian(G):
     if n % 2 != 0:
         return 0
     if r == 1:
-        return factorial2(n - 1) * np.prod(G)
+        return factorial2(n - 1, extend="complex") * np.prod(G)
     poly = 1
     x = symbols("x0:" + str(r))
     for k in range(n):
