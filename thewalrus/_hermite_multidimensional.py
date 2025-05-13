@@ -231,7 +231,7 @@ def dec(tup: Tuple[int], i: int) -> Tuple[int, ...]:  # pragma: no cover
 
 @jit(nopython=True)
 def remove(
-    pattern: Tuple[int, ...]
+    pattern: Tuple[int, ...],
 ) -> Generator[Tuple[int, Tuple[int, ...]], None, None]:  # pragma: no cover
     r"""returns a generator for all the possible ways to decrease elements of the given tuple by 1
     Args:
