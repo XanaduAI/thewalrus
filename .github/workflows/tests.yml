@@ -31,7 +31,8 @@ jobs:
         shell: bash
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-randomly wheel codecov
+          pip install -r requirements-dev.txt
+          pip install pytest-cov wheel codecov
 
       - name: Install The Walrus
         run: |
