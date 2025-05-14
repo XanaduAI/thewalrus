@@ -44,7 +44,7 @@ Features
 Installation
 ============
 
-The Walrus requires Python version 3.7, 3.8, 3.9, or 3.10. Installation of The Walrus, as
+The Walrus requires Python version 3.12. Installation of The Walrus, as
 well as all dependencies, can be done using pip:
 
 .. code-block:: bash
@@ -57,12 +57,12 @@ Compiling from source
 
 The Walrus has the following dependencies:
 
-* `Python <http://python.org/>`_ >= 3.7
-* `NumPy <http://numpy.org/>`_  >= 1.19.2
-* `Numba <https://numba.pydata.org/>`_ >= 0.49.1
-* `SciPy <https://scipy.org/>`_ >=1.2.1
-* `SymPy <https://www.sympy.org/>`_ >=1.5.1
-* `Dask[delayed] <https://docs.dask.org/>`_
+* `Python <http://python.org/>`_ >= 3.12
+* `NumPy <http://numpy.org/>`_  >= 2.2.5
+* `Numba <https://numba.pydata.org/>`_ >= 0.61.2
+* `SciPy <https://scipy.org/>`_ >=1.15.3
+* `SymPy <https://www.sympy.org/>`_ >=1.14.0
+* `Dask[delayed] <https://docs.dask.org/>`_ >=2025.4.1
 
 You can compile the latest development version by cloning the git repository, and installing using
 pip in development mode.
