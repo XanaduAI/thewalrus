@@ -6,7 +6,7 @@
 
 ### Breaking changes
 
-* Upgrades to `numpy` 2 and Python 3.12 [(#398)](https://github.com/XanaduAI/thewalrus/pull/398).
+* Upgrades to `numpy` 2 [(#398)](https://github.com/XanaduAI/thewalrus/pull/398).
 
 ### Improvements
 
