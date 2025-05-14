@@ -102,10 +102,10 @@ class TestHafnianSampling:
 
         n_cut = 10
         samples = hafnian_sample_state(sigma, samples=n_samples, cutoff=n_cut)
-        bins = np.arange(0, max(samples) + 1, 1)
+        bins = np.arange(0, np.max(samples) + 1, 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
-        nm = max(samples) // 2
+        nm = np.max(samples) // 2
 
         x = nbinom.pmf(np.arange(0, nm, 1), 0.5, np.tanh(np.arcsinh(np.sqrt(mean_n))) ** 2)
         x2 = np.zeros(2 * len(x))

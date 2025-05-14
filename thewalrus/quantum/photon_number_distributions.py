@@ -14,7 +14,7 @@
 """
 Functions for calculating the photon number distributions of various states.
 """
-
+import warnings
 import numpy as np
 from scipy.stats import nbinom
 from scipy.special import binom, hyp2f1
@@ -175,6 +175,9 @@ def characteristic_function(
         # Note that we check that the sum of the last *two* values does not change the net
         # sum much, this is because for eta=0 the distribution does not have support over
         # the odd integers.
+        if old_tot_sum == 0:
+            prev_addend = addend
+            continue
         ratio = (addend + prev_addend) / old_tot_sum
         if ratio < delta:
             converged = True
