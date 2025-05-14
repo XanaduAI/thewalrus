@@ -1130,7 +1130,7 @@ def test_pnd_squeeze_displace(tol, r, phi, alpha, hbar):
     )
 
     mean_analytic = np.abs(alpha) ** 2 + np.sinh(r) ** 2
-    assert np.isclose(float(pnd_cov), pnd_cov_analytic, atol=tol, rtol=0)
+    assert np.isclose(float(pnd_cov.item()), pnd_cov_analytic, atol=tol, rtol=0)
     assert np.isclose(photon_number_mean(mu, cov, 0, hbar=hbar), mean_analytic, atol=tol, rtol=0)
 
 

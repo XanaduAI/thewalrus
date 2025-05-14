@@ -309,7 +309,7 @@ class TestHafnianSampling:
         mean_n = 0.5
         sigma = (2 * mean_n + 1) * np.identity(2)
         samples = sample_func(sigma, samples=n_samples)
-        bins = np.arange(0, max(samples), 1)
+        bins = np.arange(0, np.max(samples), 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
 

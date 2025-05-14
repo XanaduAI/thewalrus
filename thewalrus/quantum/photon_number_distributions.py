@@ -173,7 +173,7 @@ def characteristic_function(
         tot_sum += addend
         i += 1
         # Note that we check that the sum of the last *two* values does not change the net
-        # sum much, this is because for eta=0 the distrobution does not have support over
+        # sum much, this is because for eta=0 the distribution does not have support over
         # the odd integers.
         ratio = (addend + prev_addend) / old_tot_sum
         if ratio < delta:
