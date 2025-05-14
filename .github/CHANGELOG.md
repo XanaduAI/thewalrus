@@ -27,7 +27,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Luke Helt, Will McCutcheon, Nicolas Quesada
+L.G. Helt, Will McCutcheon, Nicolas Quesada
 
 ---
 

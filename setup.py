@@ -35,7 +35,7 @@ info = {
     "install_requires": [
         "dask[delayed]",
         "numba>=0.61.2,<1",
-        "numpy>=2.2.5,<3",
+        "numpy>=2.0.0,<3",
         "scipy>=1.15.3,<2",
         "sympy>=1.14.0,<2",
     ],
