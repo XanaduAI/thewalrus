@@ -109,6 +109,12 @@ def decompose_cov(cov):
     T = S @ S.T
     DmI = D - np.eye(2 * m)
     DmI[abs(DmI) < 1e-11] = 0.0  # remove slightly negative values
+    if any(np.isnan(DmI)):
+        raise RuntimeError(f"nan in {DmI=}")
+    if any(np.isinf(DmI)):
+        raise RuntimeError(f"inf in {DmI=}")
+    if any(DmI < 0):
+        raise RuntimeError(f"negative values in {DmI=}")
     sqrtW = S @ np.sqrt(DmI)
     return T, sqrtW
 
