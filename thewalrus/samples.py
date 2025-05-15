@@ -383,9 +383,7 @@ def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, paralle
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel and sys.platform == "darwin":
-        raise NotImplementedError(
-            "hafnian_sample_graph with parallel=True does not run on macos"
-        )
+        raise NotImplementedError("hafnian_sample_graph with parallel=True does not run on macos")
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return hafnian_sample_state(
