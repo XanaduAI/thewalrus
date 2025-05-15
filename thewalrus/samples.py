@@ -52,6 +52,8 @@ Code details
 ------------
 """
 # pylint: disable=too-many-arguments
+import sys
+
 import dask
 import numpy as np
 from scipy.special import factorial as fac
@@ -348,6 +350,10 @@ def hafnian_sample_state(
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel:
+        if sys.platform == "darwin":
+            raise NotImplementedError(
+                "hafnian_sample_state with parallel=True does not run on macos"
+            )
         params = [[cov, 1, mean, hbar, cutoff, max_photons]] * samples
         compute_list = []
         for p in params:
@@ -376,6 +382,10 @@ def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, paralle
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
+    if parallel and sys.platform == "darwin":
+        raise NotImplementedError(
+            "hafnian_sample_graph with parallel=True does not run on macos"
+        )
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return hafnian_sample_state(
@@ -561,6 +571,10 @@ def torontonian_sample_state(
         mu = np.zeros(2 * M, dtype=np.float64)
 
     if parallel:
+        if sys.platform == "darwin":
+            raise NotImplementedError(
+                "torontonian_sample_state with parallel=True does not run on macos"
+            )
         params = [[cov, 1, mu, hbar, max_photons, fanout, cutoff]] * samples
         compute_list = []
         for p in params:
@@ -590,6 +604,10 @@ def torontonian_sample_graph(
     Returns:
         np.array[int]: photon number samples from the Torontonian of the Gaussian state
     """
+    if parallel and sys.platform == "darwin":
+        raise NotImplementedError(
+            "torontonian_sample_graph with parallel=True does not run on macos"
+        )
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return torontonian_sample_state(
