@@ -236,7 +236,7 @@ class TestHafnianSampling:
     @pytest.mark.parametrize("parallel", [True, False])
     @pytest.mark.skipif(
         lambda parallel: parallel is True and sys.platform == "darwin",
-        reason="does not run on macos"
+        reason="does not run on macos",
     )
     def test_single_pm_graphs(self, parallel):
         """Tests that the number of photons is the same for modes i and n-i
@@ -452,7 +452,7 @@ class TestTorontonianSampling:
     @pytest.mark.parametrize("parallel", [True, False])
     @pytest.mark.skipif(
         lambda parallel: parallel is True and sys.platform == "darwin",
-        reason="does not run on macos"
+        reason="does not run on macos",
     )
     def test_torontonian_sample_graph(self, parallel):
         """Test torontonian sampling from a graph"""
