@@ -13,9 +13,10 @@
 # limitations under the License.
 """Tests for the hafnian sampling functions"""
 # pylint: disable=no-self-use,redefined-outer-name
-import pytest
+import sys
 
 import numpy as np
+import pytest
 from scipy.stats import nbinom
 
 from thewalrus.samples import (
@@ -233,6 +234,10 @@ class TestHafnianSampling:
         assert np.allclose(mean_n, approx_mean_n, rtol=2e-1)
 
     @pytest.mark.parametrize("parallel", [True, False])
+    @pytest.mark.skipif(
+        lambda parallel: parallel is True and sys.platform == "darwin",
+        reason="does not run on macos"
+    )
     def test_single_pm_graphs(self, parallel):
         """Tests that the number of photons is the same for modes i and n-i
         in the special case of a graph with one single perfect matching
@@ -445,6 +450,10 @@ class TestTorontonianSampling:
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
     @pytest.mark.parametrize("parallel", [True, False])
+    @pytest.mark.skipif(
+        lambda parallel: parallel is True and sys.platform == "darwin",
+        reason="does not run on macos"
+    )
     def test_torontonian_sample_graph(self, parallel):
         """Test torontonian sampling from a graph"""
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
