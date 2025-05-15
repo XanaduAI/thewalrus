@@ -1,12 +1,19 @@
-name: tests
+name: tests_full
 on:
-  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
-  python-tests-pr:
-    name: python
-    if: github.event.pull_request.merged != true
-    runs-on: ubuntu-latest
+  python-tests-merged:
+    name: python-master
+    if: github.event.pull_request.merged ==true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Cancel Previous Runs
@@ -20,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         shell: bash
