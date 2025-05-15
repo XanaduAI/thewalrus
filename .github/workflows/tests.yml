@@ -6,8 +6,9 @@ on:
   pull_request:
 
 jobs:
-  python-tests:
+  python-tests-pr:
     name: python
+    if: github.event.pull_request.merged != true
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +29,54 @@ jobs:
         shell: bash
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-randomly wheel codecov
+          pip install -r requirements-dev.txt
+          pip install pytest-cov wheel codecov
+
+      - name: Install The Walrus
+        run: |
+          pip install -e .
+
+      - name: Run tests
+        run: python3 -m pytest thewalrus --randomly-seed=137 --cov=thewalrus --cov-report term-missing --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          disable_search: true
+          fail_ci_if_error: true
+
+  python-tests-merged:
+    name: python-master
+    if: github.event.pull_request.merged ==true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout The Walrus
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install pytest-cov wheel codecov
 
       - name: Install The Walrus
         run: |

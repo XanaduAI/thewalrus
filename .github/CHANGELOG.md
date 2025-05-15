@@ -1,10 +1,12 @@
-# Release 0.22.0-dev
+# Release 0.22.0
 
 ### New features
 
 * Implements the pre-Iwasawa and Iwasawa decompositions for symplectic matrices [(#382)](https://github.com/XanaduAI/thewalrus/pull/382).
 
 ### Breaking changes
+
+* Upgrades to `numpy` 2 [(#398)](https://github.com/XanaduAI/thewalrus/pull/398).
 
 ### Improvements
 
@@ -25,7 +27,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-Will McCutcheon, Nicolas Quesada
+L.G. Helt, Will McCutcheon, Nicolas Quesada
 
 ---
 
