@@ -146,26 +146,35 @@ def photon_number_covmat(mu, cov, hbar=2):
     return pnd_cov
 
 
-def photon_number_expectation(mu, cov, modes, hbar=2):
-    r"""Calculates the expectation value of the product of the number operator of the modes in a Gaussian state.
+def photon_number_expectation(mu, cov, modes, powers=None, hbar=2):
+    r"""Calculates the expectation value of the product of the number operators raised to the specified powers for the modes in a Gaussian state..
 
     Args:
         mu (array): length-:math:`2N` means vector in xp-ordering.
         cov (array): :math:`2N\times 2N` covariance matrix in xp-ordering.
         modes (list): list of modes
+        powers (list): list of powers. If None, the expectation value of the product of the number operators is calculated, with each element corresponding to all modes set to 1.
         hbar (float): value of hbar in the uncertainty relation.
 
     Returns:
         (float): expectation value of the product of the number operators of the modes.
     """
-    n, _ = cov.shape
-    n_modes = n // 2
-    rpt = np.zeros([n], dtype=int)
-    for i in modes:
-        rpt[i] = 1
-        rpt[i + n_modes] = 1
+    if powers is None:
+        powers = [1] * len(modes)
 
-    return normal_ordered_expectation(mu, cov, rpt, hbar=hbar)
+    if len(modes) != len(powers):
+        raise ValueError("Length of modes and powers must be the same.")
+
+    mu_red, cov_red = reduced_gaussian(mu, cov, modes)
+    possible_items = [range(1, p + 1) for p in powers]
+
+    result = 0
+    for item in product(*possible_items):
+        rpt = list(item) + list(item)
+        term = normal_ordered_expectation(mu_red, cov_red, rpt, hbar=hbar)
+        result += term
+
+    return result
 
 
 def photon_number_squared_expectation(mu, cov, modes, hbar=2):
@@ -181,15 +190,8 @@ def photon_number_squared_expectation(mu, cov, modes, hbar=2):
     Returns:
         (float): expectation value of the square of the product of the number operator of the modes.
     """
-    n_modes = len(modes)
-
-    mu_red, cov_red = reduced_gaussian(mu, cov, modes)
-    result = 0
-    for item in product([1, 2], repeat=n_modes):
-        rpt = item + item
-        term = normal_ordered_expectation(mu_red, cov_red, rpt, hbar=hbar)
-        result += term
-    return result
+    powers = [2] * len(modes)
+    return photon_number_expectation(mu, cov, modes, powers, hbar=hbar)
 
 
 def normal_ordered_expectation(mu, cov, rpt, hbar=2):
