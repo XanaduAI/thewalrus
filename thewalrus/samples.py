@@ -108,8 +108,8 @@ def decompose_cov(cov):
     D, S = williamson(cov)
     T = S @ S.T
     DmI = D - np.eye(2 * m)
-    DmI[abs(DmI) < 1e-11] = 0.0  # remove slightly negative values
-    sqrtW = S @ np.sqrt(DmI)
+    DmI[abs(DmI) < 1e-11] = 0.0  # remove small values
+    sqrtW = S @ np.emath.sqrt(DmI)
     return T, sqrtW
 
 
