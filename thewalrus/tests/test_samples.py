@@ -20,6 +20,7 @@ import pytest
 from scipy.stats import nbinom
 
 from thewalrus.samples import (
+    decompose_cov,
     hafnian_sample_state,
     hafnian_sample_graph,
     torontonian_sample_state,
@@ -552,3 +553,20 @@ def test_hafnian_sample_graph_rank_one():
     mode_means = samples.mean(axis=0)
     # Check that the mean photon number of each of the modes are correct
     assert np.allclose(mode_means, n_mean * ps, atol=10 / np.sqrt(n_samples))
+
+
+def test_decompose_cov():
+    """Test that passing correct hbar to decompose_cov yields expected decomposition."""
+    # quantum covariance matrix with hbar=1.7
+    cov = np.array(
+        [
+            [1.839360402, 0.0, 0.0, 1.631179539],
+            [0.0, 1.839360402, 1.631179539, 0.0],
+            [0.0, 1.631179539, 1.839360402, 0.0],
+            [1.631179539, 0.0, 0.0, 1.839360402],
+        ],
+    )
+    T, sqrtW = decompose_cov(cov, hbar=2)
+    assert not np.allclose(T + sqrtW**2, cov)
+    T, sqrtW = decompose_cov(cov, hbar=1.7)
+    assert np.allclose(T + sqrtW**2, cov)
