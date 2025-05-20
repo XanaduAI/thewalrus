@@ -1,13 +1,12 @@
 name: tests_full
 on:
-  push:
-    branches:
-      - master
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   python-tests-merged:
     name: python-master
-    if: github.event.pull_request.merged ==true
+    if: github.event.review.state == 'approved'
     strategy:
       fail-fast: false
       matrix:
