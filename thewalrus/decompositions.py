@@ -227,7 +227,7 @@ def takagi(A, svd_order=True, rtol=1e-16):
     mid = z_angles[idx] + 0.5 * z_diffs[idx]
     # Get shift angle in (-pi, pi]
     shift_angle = np.mod(-mid, 2 * np.pi) - np.pi
-    # Rotate z to shift midpoint of largest arc to ±π
+    # Rotate z to shift midpoint of largest arc to ±pi
     shift_angle = np.ones(n) * shift_angle
     z @= np.diag(np.exp(1j * shift_angle))
     # Undo rotation from ±π
