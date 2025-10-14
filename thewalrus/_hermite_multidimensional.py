@@ -247,7 +247,7 @@ def remove(
 # saving the time to recompute square roots
 SQRT = np.sqrt(np.arange(1000))
 _SQRT = np.sqrt(np.arange(1000))
-_SQRT[0] = 1.0 # avoid division by zero
+_SQRT[0] = 1.0  # avoid division by zero
 SQRT_INV = 1 / _SQRT
 
 
@@ -327,6 +327,7 @@ def _hermite_multidimensional_renorm(R, y, G):  # pragma: no cover
 
     # reshape back to original shape
     return G.reshape(shape)
+
 
 @jit(nopython=True)
 def _hermite_multidimensional(R, y, G):  # pragma: no cover
