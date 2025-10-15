@@ -6,7 +6,7 @@
 
 ### Improvements
 
-* Improved speed of `hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
+* Improved speed of `_hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
 
 ### Bug fixes
 
