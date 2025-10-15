@@ -28,6 +28,7 @@ Summary
         displacement
         squeezing
         beamsplitter
+        beamsplitter_stable
         two_mode_squeezing
         mzgate
         grad_displacement
@@ -39,6 +40,7 @@ Summary
 Code details
 ------------
 """
+
 import numpy as np
 
 from numba import jit
@@ -454,6 +456,95 @@ def mzgate(theta, phi, cutoff, dtype=np.complex128):  # pragma: no cover
                         + R[1, 3] * sqrt[n] / sqrt[q] * Z[m, n - 1, p, q - 1]
                     )
     return Z
+
+
+SQRT = np.sqrt(np.arange(1000))
+_SQRT = np.sqrt(np.arange(1000))
+_SQRT[0] = 1.0  # to avoid division by zero
+INV_SQRT = 1 / _SQRT
+
+
+@jit(nopython=True)
+def beamsplitter_stable(theta, phi, shape):  # pragma: no cover  # noqa: C901
+    r"""
+    Stable implementation of the Fock representation of the beamsplitter that
+    averages contributions from all available pivots for ecah amplitude.
+    It is numerically stable up to arbitrary cutoffs (or you will likely
+    run out of memory before incurring in numerical issues).
+    The shape order is (out_0, out_1, in_0, in_1), assuming it acts on modes 0 and 1.
+
+    Args:
+        theta (float): beamsplitter angle
+        phi (float): beamsplitter phase
+        shape (tuple[int, int, int, int]): shape of the Fock representation
+
+    Returns:
+        array (ComplexTensor): The Fock representation of the gate
+    """
+    ct = np.cos(theta)
+    st = np.sin(theta) * np.exp(1j * phi)
+    stc = np.conj(st)
+
+    M, N, P, Q = shape
+    G = np.zeros(shape, dtype=np.complex128)
+    G[0, 0, 0, 0] = 1.0 + 0.0j
+
+    # rank 3
+    for m in range(M):
+        for n in range(min(N, P - m)):
+            p = m + n
+            val = 0
+            pivots = 0
+            if m > 0:  # pivot at (m-1, n, p, 0)
+                val += ct * SQRT[p] * INV_SQRT[m] * G[m - 1, n, p - 1, 0]
+                pivots += 1
+            if n > 0:  # pivot at (m, n-1, p, 0)
+                val += st * SQRT[p] * INV_SQRT[n] * G[m, n - 1, p - 1, 0]
+                pivots += 1
+            if p > 0:  # pivot at (m, n, p-1, 0)
+                val += (
+                    ct * SQRT[m] * INV_SQRT[p] * G[m - 1, n, p - 1, 0]
+                    + st * SQRT[n] * INV_SQRT[p] * G[m, n - 1, p - 1, 0]
+                )
+                pivots += 1
+            if m > 0 or n > 0 or p > 0:
+                G[m, n, p, 0] = val / pivots
+
+    # rank 4
+    for m in range(M):
+        for n in range(N):
+            for p in range(max(0, m + n - Q), min(P, m + n)):
+                q = m + n - p
+                if 0 < q < Q:
+                    val = 0
+                    pivots = 0
+                    if m > 0:
+                        val += (
+                            ct * SQRT[p] * INV_SQRT[m] * G[m - 1, n, p - 1, q]
+                            - stc * SQRT[q] * INV_SQRT[m] * G[m - 1, n, p, q - 1]
+                        )
+                        pivots += 1
+                    if n > 0:
+                        val += (
+                            st * SQRT[p] * INV_SQRT[n] * G[m, n - 1, p - 1, q]
+                            + ct * SQRT[q] * INV_SQRT[n] * G[m, n - 1, p, q - 1]
+                        )
+                        pivots += 1
+                    if p > 0:
+                        val += (
+                            ct * SQRT[m] * INV_SQRT[p] * G[m - 1, n, p - 1, q]
+                            + st * SQRT[n] * INV_SQRT[p] * G[m, n - 1, p - 1, q]
+                        )
+                        pivots += 1
+                    if q > 0:
+                        val += (
+                            -stc * SQRT[m] * INV_SQRT[q] * G[m - 1, n, p, q - 1]
+                            + ct * SQRT[n] * INV_SQRT[q] * G[m, n - 1, p, q - 1]
+                        )
+                        pivots += 1
+                    if m > 0 or n > 0 or p > 0 or q > 0:
+                        G[m, n, p, q] = val / pivots
+    return G
 
 
 @jit(nopython=True)
