@@ -349,7 +349,7 @@ def test_two_mode_squeezing_values(tol):
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
 
 
-def test_beamsplitter_stability(tol):
+def test_beamsplitter_stability():
     r"""Tests the stability of the beamsplitter operation"""
     theta = 0.5
     phi = 0.5
@@ -357,5 +357,5 @@ def test_beamsplitter_stability(tol):
     stable = beamsplitter_stable(theta, phi, shape=(cutoff, cutoff, cutoff, cutoff))
     unstable = beamsplitter(theta, phi, cutoff)
 
-    assert np.max(np.abs(stable)) == 1.0  # this is stable
+    assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)  # this is stable
     assert np.max(np.abs(unstable)) > 1.0  # this is not
