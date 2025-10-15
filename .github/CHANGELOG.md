@@ -6,6 +6,8 @@
 
 ### Improvements
 
+* Improved speed of `hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
+
 ### Bug fixes
 
 * Adds hbar to `decompose_cov`, so that it does not always silently assume hbar=2 even when working with quantum covariance matrices generated with hbar!=2 [(#402)](https://github.com/XanaduAI/thewalrus/pull/402).
