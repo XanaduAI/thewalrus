@@ -2,6 +2,8 @@
 
 ### New features
 
+* Adds the `beamsplitter_stable` function to the `fock_gradients` module [(#405)](https://github.com/XanaduAI/thewalrus/pull/405).
+
 ### Breaking changes
 
 ### Improvements
