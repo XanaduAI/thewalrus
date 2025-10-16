@@ -324,7 +324,7 @@ def beamsplitter(theta, phi, cutoff, dtype=np.complex128):
     else:
         raise ValueError(f"Invalid cutoff type: {type(cutoff)}")
 
-    return _beamsplitter_stable(theta, phi, shape)
+    return _beamsplitter_stable(theta, phi, shape, dtype)
 
 
 SQRT = np.sqrt(np.arange(1000))
@@ -334,7 +334,7 @@ INV_SQRT = 1 / _SQRT
 
 
 @jit(nopython=True)
-def _beamsplitter_stable(theta, phi, shape):  # pragma: no cover # pylint: disable=too-many-branches
+def _beamsplitter_stable(theta, phi, shape, dtype=np.complex128):  # pragma: no cover # pylint: disable=too-many-branches
     r"""
     Stable implementation of the Fock representation of the beamsplitter that
     averages contributions from all available pivots for ecah amplitude.
@@ -346,6 +346,7 @@ def _beamsplitter_stable(theta, phi, shape):  # pragma: no cover # pylint: disab
         theta (float): beamsplitter angle
         phi (float): beamsplitter phase
         shape (tuple[int, int, int, int]): shape of the Fock representation
+        dtype (data type): Specifies the data type used for the calculation
 
     Returns:
         array (ComplexTensor): The Fock representation of the gate
@@ -355,7 +356,7 @@ def _beamsplitter_stable(theta, phi, shape):  # pragma: no cover # pylint: disab
     stc = np.conj(st)
 
     M, N, P, Q = shape
-    G = np.zeros(shape, dtype=np.complex128)
+    G = np.zeros(shape, dtype=dtype)
     G[0, 0, 0, 0] = 1.0 + 0.0j
 
     # rank 3

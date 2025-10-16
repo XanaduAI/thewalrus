@@ -313,6 +313,10 @@ def test_beamsplitter_stability():
     cutoff = 70
     stable = beamsplitter(theta, phi, cutoff)
     assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)
+    assert stable.dtype == np.complex128
+    stable = beamsplitter(theta, phi, cutoff, dtype=np.complex64)
+    assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)
+    assert stable.dtype == np.complex64
 
 
 def test_mzgate_values(tol):
