@@ -22,7 +22,6 @@ from thewalrus.fock_gradients import (
     grad_two_mode_squeezing,
     beamsplitter,
     grad_beamsplitter,
-    beamsplitter_stable,
     mzgate,
     grad_mzgate,
 )
@@ -307,14 +306,13 @@ def test_beamsplitter_values(tol):
     assert np.allclose(U, U_rec, atol=tol, rtol=0)
 
 
-def test_stable_beamsplitter_values(tol):
-    r"""Test that the stable beamsplitter's values are equal to the non-stable
-    beamsplitter up to cutoff of 30.
-    """
-    d = 30
-    BS = beamsplitter_stable(theta=0.5, phi=0.5, shape=(d, d, d, d))
-    expected = beamsplitter(theta=0.5, phi=0.5, cutoff=d)
-    assert np.allclose(BS, expected, atol=tol)
+def test_beamsplitter_stability():
+    r"""Tests the stability of the beamsplitter operation"""
+    theta = np.random.rand()
+    phi = np.random.rand()
+    cutoff = 70
+    stable = beamsplitter(theta, phi, cutoff)
+    assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)
 
 
 def test_mzgate_values(tol):
@@ -347,15 +345,3 @@ def test_two_mode_squeezing_values(tol):
     T = two_mode_squeezing(r, theta, cutoff)
     expected = ((np.tanh(r) * np.exp(1j * theta)) ** np.arange(cutoff)) / np.cosh(r)
     assert np.allclose(np.diag(T[:, :, 0, 0]), expected, atol=tol, rtol=0)
-
-
-def test_beamsplitter_stability():
-    r"""Tests the stability of the beamsplitter operation"""
-    theta = 0.5
-    phi = 0.5
-    cutoff = 70
-    stable = beamsplitter_stable(theta, phi, shape=(cutoff, cutoff, cutoff, cutoff))
-    unstable = beamsplitter(theta, phi, cutoff)
-
-    assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)  # this is stable
-    assert np.max(np.abs(unstable)) > 1.0  # this is not
