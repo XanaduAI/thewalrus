@@ -298,4 +298,3 @@ def iwasawa(S):
     EE = E @ OO
     FF = AA @ F
     return EE, DD, FF
-
