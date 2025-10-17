@@ -334,7 +334,9 @@ INV_SQRT = 1 / _SQRT
 
 
 @jit(nopython=True)
-def _beamsplitter_stable(theta, phi, shape, dtype=np.complex128):  # pragma: no cover # pylint: disable=too-many-branches
+def _beamsplitter_stable(
+    theta, phi, shape, dtype=np.complex128
+):  # pragma: no cover # pylint: disable=too-many-branches
     r"""
     Stable implementation of the Fock representation of the beamsplitter that
     averages contributions from all available pivots for ecah amplitude.
