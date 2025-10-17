@@ -2,11 +2,11 @@
 
 ### New features
 
-* Adds the `beamsplitter_stable` function to the `fock_gradients` module [(#405)](https://github.com/XanaduAI/thewalrus/pull/405).
-
 ### Breaking changes
 
 ### Improvements
+
+* Improve the stability of `beamsplitter` function in the `fock_gradients` module. Also the cutoff argument can be any tuple. [(#405)](https://github.com/XanaduAI/thewalrus/pull/405).
 
 ### Bug fixes
 
