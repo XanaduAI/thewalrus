@@ -28,7 +28,6 @@ Summary
         displacement
         squeezing
         beamsplitter
-        beamsplitter_stable
         two_mode_squeezing
         mzgate
         grad_displacement
