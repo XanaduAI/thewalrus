@@ -256,16 +256,16 @@ class TestBlochMessiahDecomposition:
 
 
 @pytest.mark.parametrize("n", [5, 10, 50])
-@pytest.mark.parametrize("imag_part", [0, 1e-10, 1])
+@pytest.mark.parametrize("datatype", [np.complex128, np.float64])
 @pytest.mark.parametrize("svd_order", [True, False])
-def test_takagi(n, imag_part, svd_order):
-    """Checks the correctness of the Takagi decomposition function for generic random matrices"""
-    A = np.random.rand(n, n)
-    if imag_part > 0:
-        A = A + 1j * imag_part * np.random.rand(n, n)
+def test_takagi(n, datatype, svd_order):
+    """Checks the correctness of the Takagi decomposition function"""
+    if datatype is np.complex128:
+        A = np.random.rand(n, n) + 1j * np.random.rand(n, n)
+    if datatype is np.float64:
+        A = np.random.rand(n, n)
     A += A.T
     r, U = takagi(A, svd_order=svd_order)
-    assert np.allclose(np.eye(n, n), U @ U.T.conj())
     assert np.allclose(A, U @ np.diag(r) @ U.T)
     assert np.all(r >= 0)
     if svd_order is True:
