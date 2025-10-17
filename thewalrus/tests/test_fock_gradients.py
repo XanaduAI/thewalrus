@@ -311,7 +311,7 @@ def test_beamsplitter_stability():
     theta = np.random.rand()
     phi = np.random.rand()
     cutoff = 70
-    stable = beamsplitter(theta, phi, cutoff)
+    stable = beamsplitter(theta, phi, (cutoff, cutoff, cutoff, cutoff))
     assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)
     assert stable.dtype == np.complex128
     stable = beamsplitter(theta, phi, cutoff, dtype=np.complex64)
