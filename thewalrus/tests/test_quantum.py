@@ -361,7 +361,14 @@ def test_density_matrix_squeezed():
         ]
     )
     assert np.allclose(res, expected)
+def test_density_matrix_vacuum_custom_cutoff():
+    """Test custom cutoff"""
+    mu = np.zeros([4])
+    V = np.identity(4)
 
+    res = density_matrix(mu, V, cutoff=[5, 3])
+
+    assert res.shape == (5, 5, 3, 3)
 
 def test_coherent_squeezed():
     """Test density matrix for a squeezed displaced state"""

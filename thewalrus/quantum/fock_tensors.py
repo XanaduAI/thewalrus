@@ -257,8 +257,9 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
             is calculated directly using (multidimensional) Hermite polynomials, which is significantly faster
             than calculating one hafnian at a time.
         normalize (bool): If ``True``, a post-selected density matrix is re-normalized.
-        cutoff (dim): the final length (i.e., Hilbert space dimension) of each
-            mode in the density matrix.
+        cutoff (list[int] or int): the final length (i.e., Hilbert space dimension) of each
+            mode in the density matrix. if int, all modes have the same final length. If list[int], each mode can have
+            a custom final length
         hbar (float): the value of :math:`\hbar` in the commutation
             relation :math:`[\x,\p]=i\hbar`.
 
@@ -266,6 +267,8 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         np.array[complex]: the density matrix of the Gaussian state
     """
     N = len(mu) // 2
+    if type(cutoff) is int:
+        cutoff = [cutoff] * N
     pref = _prefactor(mu, cov, hbar=hbar)
 
     if post_select is None:
@@ -273,17 +276,18 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
 
         if np.allclose(mu, np.zeros_like(mu)):
-            tensor = pref * hermite_multidimensional(-A, cutoff, renorm=True, modified=True)
+            tensor = pref * hermite_multidimensional(-A, [idx for _ in range(2)  for idx in cutoff], renorm=True, modified=True)
             return tensor.transpose(sf_order)
         beta = complex_to_real_displacements(mu, hbar=hbar)
         y = beta - A @ beta.conj()
-        tensor = pref * hermite_multidimensional(-A, cutoff, y=y, renorm=True, modified=True)
+        tensor = pref * hermite_multidimensional(-A, [idx for _ in range(2)  for idx in cutoff], y=y, renorm=True, modified=True)
         return tensor.transpose(sf_order)
 
     M = N - len(post_select)
-    rho = np.zeros([cutoff] * (2 * M), dtype=np.complex128)
+    cutoff = [cutoff[i] for i in range(N) if not (i in post_select)]
+    rho = np.zeros([elem for _ in range(2) for elem in cutoff], dtype=np.complex128)
 
-    for idx in product(range(cutoff), repeat=2 * M):
+    for idx in product(*[range(n) for n in cutoff], repeat=2):
         el = []
 
         counter = count(0)
@@ -304,7 +308,8 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     if normalize:
         # construct the standard 2D density matrix, and take the trace
         new_ax = np.arange(2 * M).reshape([M, 2]).T.flatten()
-        tr = np.trace(rho.transpose(new_ax).reshape([cutoff**M, cutoff**M])).real
+        rho = rho.transpose(new_ax).reshape([np.prod(cutoff), np.prod(cutoff)])
+        tr = np.trace(rho).real
         # renormalize
         rho /= tr
 
