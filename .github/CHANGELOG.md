@@ -6,7 +6,12 @@
 
 ### Improvements
 
-* Improve the stability of `beamsplitter` function in the `fock_gradients` module. Also the cutoff argument can be any tuple. [(#405)](https://github.com/XanaduAI/thewalrus/pull/405).
+* Improved the stability of `beamsplitter` function in the `fock_gradients` module. [(#405)](https://github.com/XanaduAI/thewalrus/pull/405).
+
+* Cutoff argument of beamsplitter can be the exact shape (tuple of 4 ints). [(#405)](https://github.com/XanaduAI/thewalrus/pull/405).
+
+* Improved speed of `_hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
+
 
 ### Bug fixes
 
