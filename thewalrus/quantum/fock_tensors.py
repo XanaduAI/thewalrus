@@ -285,7 +285,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
 
     M = N - len(post_select)
     cutoff = [cutoff[i] for i in range(N) if not i in post_select]
-    rho = np.zeros([elem for _ in range(2) for elem in cutoff], dtype=np.complex128)
+    rho = np.zeros(cutoff * 2, dtype=np.complex128)
 
     for idx in product(*[range(n) for n in cutoff], repeat=2):
         el = []
