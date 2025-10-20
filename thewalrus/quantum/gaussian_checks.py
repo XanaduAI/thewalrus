@@ -109,7 +109,7 @@ def fidelity(mu1, cov1, mu2, cov2, hbar=2, rtol=1e-05, atol=1e-08):
     For the derivation see  `'Quantum Fidelity for Arbitrary Gaussian States', Banchi et al. <10.1103/PhysRevLett.115.260501>`_.
 
     The actual implementation used here corresponds to the *square* of Eq. 112 of
-    `'Gaussian states and operations - a quick reference', Brask <https://arxiv.org/abs/2102.05748>`_. This equation can be used for mixed and pure states.
+    `'Gaussian states and operations - a quick reference', Brask <https://arxiv.org/abs/2102.05748v2>`_. This equation can be used for mixed and pure states.
 
     Args:
         mu1 (array): vector of means of the first state
