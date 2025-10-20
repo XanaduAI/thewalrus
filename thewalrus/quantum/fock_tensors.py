@@ -267,24 +267,24 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         np.array[complex]: the density matrix of the Gaussian state
     """
     N = len(mu) // 2
-    if type(cutoff) is int:
+    if isinstance(cutoff, int):
         cutoff = [cutoff] * N
     pref = _prefactor(mu, cov, hbar=hbar)
 
     if post_select is None:
         A = Amat(cov, hbar=hbar).conj()
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
-
+        cutoff_modified = [elem for _ in range(2)  for elem in cutoff]
         if np.allclose(mu, np.zeros_like(mu)):
-            tensor = pref * hermite_multidimensional(-A, [idx for _ in range(2)  for idx in cutoff], renorm=True, modified=True)
+            tensor = pref * hermite_multidimensional(-A, cutoff_modified, renorm=True, modified=True)
             return tensor.transpose(sf_order)
         beta = complex_to_real_displacements(mu, hbar=hbar)
         y = beta - A @ beta.conj()
-        tensor = pref * hermite_multidimensional(-A, [idx for _ in range(2)  for idx in cutoff], y=y, renorm=True, modified=True)
+        tensor = pref * hermite_multidimensional(-A, cutoff_modified, y=y, renorm=True, modified=True)
         return tensor.transpose(sf_order)
 
     M = N - len(post_select)
-    cutoff = [cutoff[i] for i in range(N) if not (i in post_select)]
+    cutoff = [cutoff[i] for i in range(N) if not i in post_select]
     rho = np.zeros([elem for _ in range(2) for elem in cutoff], dtype=np.complex128)
 
     for idx in product(*[range(n) for n in cutoff], repeat=2):
