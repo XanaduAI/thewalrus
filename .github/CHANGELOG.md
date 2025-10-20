@@ -1,3 +1,25 @@
+# Release 0.24.0-dev
+
+### New features
+
+### Breaking changes
+
+### Improvements
+
+### Bug fixes
+
+* Adds support of the 'list' type of 'cutoff' argument for the 'density_matrix(mu, cov, post_select, normalize, cutoff, hbar)' function from 'fock_tensors.py'. It enables to perform larger simulations by decreasing required RAM.[(#406)](https://github.com/XanaduAI/thewalrus/pull/406).
+
+### Documentation
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+Ivan Solomakhin
+
+---
+
 # Release 0.23.0-dev
 
 ### New features
