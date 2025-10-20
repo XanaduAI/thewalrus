@@ -13,12 +13,14 @@
 # limitations under the License.
 """Tests for the hafnian sampling functions"""
 # pylint: disable=no-self-use,redefined-outer-name
-import pytest
+import sys
 
 import numpy as np
+import pytest
 from scipy.stats import nbinom
 
 from thewalrus.samples import (
+    decompose_cov,
     hafnian_sample_state,
     hafnian_sample_graph,
     torontonian_sample_state,
@@ -89,7 +91,7 @@ class TestHafnianSampling:
     def test_hafnian_sample_states_nans(self):
         """test exception is raised if not a numpy array"""
         with pytest.raises(ValueError, match="Covariance matrix must not contain NaNs."):
-            hafnian_sample_state(np.array([[0, 5], [0, np.NaN]]), samples=20)
+            hafnian_sample_state(np.array([[0, 5], [0, np.nan]]), samples=20)
 
     def test_single_squeezed_state_hafnian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -102,10 +104,10 @@ class TestHafnianSampling:
 
         n_cut = 10
         samples = hafnian_sample_state(sigma, samples=n_samples, cutoff=n_cut)
-        bins = np.arange(0, max(samples) + 1, 1)
+        bins = np.arange(0, np.max(samples) + 1, 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
-        nm = max(samples) // 2
+        nm = np.max(samples) // 2
 
         x = nbinom.pmf(np.arange(0, nm, 1), 0.5, np.tanh(np.arcsinh(np.sqrt(mean_n))) ** 2)
         x2 = np.zeros(2 * len(x))
@@ -233,6 +235,10 @@ class TestHafnianSampling:
         assert np.allclose(mean_n, approx_mean_n, rtol=2e-1)
 
     @pytest.mark.parametrize("parallel", [True, False])
+    @pytest.mark.skipif(
+        (lambda parallel: parallel is True) and (sys.platform == "darwin"),
+        reason="does not run on macos",
+    )
     def test_single_pm_graphs(self, parallel):
         """Tests that the number of photons is the same for modes i and n-i
         in the special case of a graph with one single perfect matching
@@ -293,7 +299,7 @@ class TestHafnianSampling:
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
-        zeros = np.zeros(n_modes, dtype=np.int)
+        zeros = np.zeros(n_modes, dtype=int)
         samples = sample_func(
             sigma, samples=n_samples
         )  # hafnian_sample_classical_state(sigma, samples=n_samples)
@@ -309,7 +315,7 @@ class TestHafnianSampling:
         mean_n = 0.5
         sigma = (2 * mean_n + 1) * np.identity(2)
         samples = sample_func(sigma, samples=n_samples)
-        bins = np.arange(0, max(samples), 1)
+        bins = np.arange(0, np.max(samples), 1)
         (freq, _) = np.histogram(samples, bins=bins)
         rel_freq = freq / n_samples
 
@@ -342,7 +348,7 @@ class TestTorontonianSampling:
     def test_torontonian_samples_nans(self):
         """test exception is raised if not a numpy array"""
         with pytest.raises(ValueError, match="Covariance matrix must not contain NaNs."):
-            torontonian_sample_state(np.array([[0, 5], [0, np.NaN]]), samples=20)
+            torontonian_sample_state(np.array([[0, 5], [0, np.nan]]), samples=20)
 
     def test_single_squeezed_state_torontonian(self):
         """Test the sampling routines by comparing the photon number frequencies and the exact
@@ -419,7 +425,7 @@ class TestTorontonianSampling:
         n_samples = 100
         n_modes = 10
         sigma = np.identity(2 * n_modes)
-        zeros = np.zeros(n_modes, dtype=np.int)
+        zeros = np.zeros(n_modes, dtype=int)
         samples = sample_func(sigma, samples=n_samples)
         for i in range(n_samples):
             assert np.all(samples[i] == zeros)
@@ -445,6 +451,10 @@ class TestTorontonianSampling:
         assert np.all(np.abs(rel_freq - probs) < rel_tol / np.sqrt(n_samples))
 
     @pytest.mark.parametrize("parallel", [True, False])
+    @pytest.mark.skipif(
+        (lambda parallel: parallel is True) and (sys.platform == "darwin"),
+        reason="does not run on macos",
+    )
     def test_torontonian_sample_graph(self, parallel):
         """Test torontonian sampling from a graph"""
         A = np.array([[0, 3.0 + 4j], [3.0 + 4j, 0]])
@@ -543,3 +553,20 @@ def test_hafnian_sample_graph_rank_one():
     mode_means = samples.mean(axis=0)
     # Check that the mean photon number of each of the modes are correct
     assert np.allclose(mode_means, n_mean * ps, atol=10 / np.sqrt(n_samples))
+
+
+def test_decompose_cov():
+    """Test that passing correct hbar to decompose_cov yields expected decomposition."""
+    # quantum covariance matrix with hbar=1.7
+    cov = np.array(
+        [
+            [1.839360402, 0.0, 0.0, 1.631179539],
+            [0.0, 1.839360402, 1.631179539, 0.0],
+            [0.0, 1.631179539, 1.839360402, 0.0],
+            [1.631179539, 0.0, 0.0, 1.839360402],
+        ],
+    )
+    T, sqrtW = decompose_cov(cov, hbar=2)
+    assert not np.allclose(T + sqrtW**2, cov)
+    T, sqrtW = decompose_cov(cov, hbar=1.7)
+    assert np.allclose(T + sqrtW**2, cov)

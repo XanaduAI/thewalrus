@@ -56,6 +56,6 @@ def random_matrix(dtype):
         if not np.issubdtype(dtype, np.complexfloating):
             A = A.real
 
-        return dtype(A)
+        return A.astype(dtype)
 
     return _wrapper

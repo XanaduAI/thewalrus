@@ -47,7 +47,7 @@ class TestReferenceHafnian:
         r"""Checks that the hafnian of the all ones matrix of size n is (n-1)!!"""
         M = np.ones([n, n])
         if n % 2 == 0:
-            assert np.allclose(factorial2(n - 1), hafnian(M))
+            assert np.allclose(factorial2(n - 1, extend="complex"), hafnian(M))
         else:
             assert np.allclose(0, hafnian(M))
 

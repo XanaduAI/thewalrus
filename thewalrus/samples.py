@@ -52,6 +52,8 @@ Code details
 ------------
 """
 # pylint: disable=too-many-arguments
+import sys
+
 import dask
 import numpy as np
 from scipy.special import factorial as fac
@@ -90,7 +92,7 @@ __all__ = [
 
 
 # pylint: disable=too-many-branches
-def decompose_cov(cov):
+def decompose_cov(cov, hbar=2):
     r"""Decompose the convariance matrix using the Williamson decomposition method.
     Code contributed by `Jake F.F. Bulmer <https://github.com/jakeffbulmer/gbs>`_ based on
     `arXiv:2108.01622 <https://arxiv.org/abs/2010.15595>`_.
@@ -99,6 +101,8 @@ def decompose_cov(cov):
         cov (array): a :math:`2N\times 2N` covariance matrix
             representing an :math:`N` mode quantum state. This can be obtained
             via the ``scovmavxp`` method of the Gaussian backend of Strawberry Fields.
+        hbar (float): (default 2) the value of :math:`\hbar` in the commutation
+            relation :math:`[\x,\p]=i\hbar`.
 
     Return:
         T (array): Result of S x S.T.
@@ -106,9 +110,9 @@ def decompose_cov(cov):
     """
     m = cov.shape[0] // 2
     D, S = williamson(cov)
-    T = S @ S.T
-    DmI = D - np.eye(2 * m)
-    DmI[abs(DmI) < 1e-11] = 0.0  # remove slightly negative values
+    T = hbar / 2 * S @ S.T
+    DmI = D - hbar / 2 * np.eye(2 * m)
+    DmI[abs(DmI) < 1e-10] = 0.0  # remove slightly negative values
     sqrtW = S @ np.sqrt(DmI)
     return T, sqrtW
 
@@ -229,7 +233,7 @@ def generate_hafnian_sample(cov, mean=None, hbar=2, cutoff=12, max_photons=8):
     mu = mu[oo]
     cov = cov[np.ix_(oo, oo)]
 
-    T, sqrtW = decompose_cov(cov)
+    T, sqrtW = decompose_cov(cov, hbar=hbar)
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
     B = Amat(T)[:M, :M]
     det_outcomes = np.arange(cutoff + 1)
@@ -348,6 +352,10 @@ def hafnian_sample_state(
         np.array[int]: photon number samples from the Gaussian state
     """
     if parallel:
+        if sys.platform == "darwin":
+            raise NotImplementedError(
+                "hafnian_sample_state with parallel=True does not run on macos"
+            )
         params = [[cov, 1, mean, hbar, cutoff, max_photons]] * samples
         compute_list = []
         for p in params:
@@ -376,6 +384,8 @@ def hafnian_sample_graph(A, n_mean, samples=1, cutoff=5, max_photons=30, paralle
     Returns:
         np.array[int]: photon number samples from the Gaussian state
     """
+    if parallel and sys.platform == "darwin":
+        raise NotImplementedError("hafnian_sample_graph with parallel=True does not run on macos")
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return hafnian_sample_state(
@@ -423,7 +433,7 @@ def generate_torontonian_sample(cov, mu=None, hbar=2, max_photons=30, fanout=10,
 
     mu = mu[oo]
     cov = cov[np.ix_(oo, oo)]
-    T, sqrtW = decompose_cov(cov)
+    T, sqrtW = decompose_cov(cov, hbar=hbar)
     chol_T_I = np.linalg.cholesky(T + np.eye(2 * M))
     B = Amat(T)[:M, :M] / fanout
 
@@ -561,6 +571,10 @@ def torontonian_sample_state(
         mu = np.zeros(2 * M, dtype=np.float64)
 
     if parallel:
+        if sys.platform == "darwin":
+            raise NotImplementedError(
+                "torontonian_sample_state with parallel=True does not run on macos"
+            )
         params = [[cov, 1, mu, hbar, max_photons, fanout, cutoff]] * samples
         compute_list = []
         for p in params:
@@ -590,6 +604,10 @@ def torontonian_sample_graph(
     Returns:
         np.array[int]: photon number samples from the Torontonian of the Gaussian state
     """
+    if parallel and sys.platform == "darwin":
+        raise NotImplementedError(
+            "torontonian_sample_graph with parallel=True does not run on macos"
+        )
     Q = gen_Qmat_from_graph(A, n_mean)
     cov = Covmat(Q, hbar=2)
     return torontonian_sample_state(
