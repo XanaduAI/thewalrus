@@ -274,7 +274,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
     if post_select is None:
         A = Amat(cov, hbar=hbar).conj()
         sf_order = tuple(chain.from_iterable([[i, i + N] for i in range(N)]))
-        cutoff_modified = [elem for _ in range(2)  for elem in cutoff]
+        cutoff_modified = cutoff * 2
         if np.allclose(mu, np.zeros_like(mu)):
             tensor = pref * hermite_multidimensional(-A, cutoff_modified, renorm=True, modified=True)
             return tensor.transpose(sf_order)
