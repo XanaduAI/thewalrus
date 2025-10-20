@@ -244,10 +244,14 @@ def remove(
             yield p, dec(pattern, p)
 
 
-SQRT = np.sqrt(np.arange(1000))  # saving the time to recompute square roots
+# saving the time to recompute square roots
+SQRT = np.sqrt(np.arange(1000))
+_SQRT = np.sqrt(np.arange(1000))
+_SQRT[0] = 1.0  # avoid division by zero
+SQRT_INV = 1 / _SQRT
 
 
-@jit(nopython=True)
+@jit(nopython=True, fastmath=True)
 def _hermite_multidimensional_renorm(R, y, G):  # pragma: no cover
     r"""Numba-compiled function to fill an array with the Hermite polynomials. It expects an array
     initialized with zeros everywhere except at index (0,...,0) (i.e. the seed value).
@@ -260,19 +264,69 @@ def _hermite_multidimensional_renorm(R, y, G):  # pragma: no cover
     Returns:
         array[complex]: the multidimensional Hermite polynomials
     """
-    indices = np.ndindex(G.shape)
-    next(indices)  # skip the first index (0,...,0)
-    for idx in indices:
+    # numba doesn't like tuples
+    shape_arr = np.array(G.shape)
+    D = y.shape[-1]
+
+    # calculate the strides (e.g. (100,10,1) for shape (10,10,10))
+    strides = np.ones_like(shape_arr)
+    for i in range(D - 1, 0, -1):
+        strides[i - 1] = strides[i] * shape_arr[i]
+
+    # flatten output tensor
+    shape = G.shape
+    G = G.ravel()
+
+    # initialize the n-dim index
+    nd_index = np.ndindex(shape)
+
+    # skip corresponding first index (supposed to be already filled)
+    next(nd_index)
+
+    # Iterate over the indices smaller than max(strides) with pivot bound check.
+    # The check is needed only if the flat index is smaller than the largest stride.
+    # Afterwards it will be safe to get the pivot by subtracting the first (largest) stride.
+    for flat_index in range(1, strides[0]):
+        index = next(nd_index)
+
         i = 0
-        for i, val in enumerate(idx):
-            if val > 0:
+        # calculate (flat) pivot
+        for s in strides:
+            pivot = flat_index - s
+            if pivot >= 0:  # if pivot not outside array
                 break
-        ki = dec(idx, i)
-        u = y[i] * G[ki]
-        for l, kl in remove(ki):
-            u -= SQRT[ki[l]] * R[i, l] * G[kl]
-        G[idx] = u / SQRT[idx[i]]
-    return G
+            i += 1
+
+        # contribution from pivot
+        value_at_index = y[i] * G[pivot]
+
+        # contributions from pivot's lower neighbours
+        # note the first is when j=i which needs a -1 in the sqrt from delta_ij
+        value_at_index -= R[i, i] * SQRT[index[i] - 1] * G[pivot - strides[i]]
+        for j in range(i + 1, D):
+            value_at_index -= R[i, j] * SQRT[index[j]] * G[pivot - strides[j]]
+        G[flat_index] = value_at_index * SQRT_INV[index[i]]
+
+    # Iterate over the rest of the indices.
+    # Now i can always be 0 (largest stride), and we don't need bounds check
+    for flat_index in range(strides[0], len(G)):
+        index = next(nd_index)
+
+        # pivot can be calculated without bounds check
+        pivot = flat_index - strides[0]
+
+        # contribution from pivot
+        value_at_index = y[0] * G[pivot]
+
+        # contribution from pivot's lower neighbours
+        # note the first is when j=0 which needs a -1 in the sqrt from delta_0j
+        value_at_index -= R[0, 0] * SQRT[index[0] - 1] * G[pivot - strides[0]]
+        for j in range(1, D):
+            value_at_index -= R[0, j] * SQRT[index[j]] * G[pivot - strides[j]]
+        G[flat_index] = value_at_index * SQRT_INV[index[0]]
+
+    # reshape back to original shape
+    return G.reshape(shape)
 
 
 @jit(nopython=True)
@@ -338,7 +392,7 @@ def _interferometer_renorm(R, G):  # pragma: no cover
             u = 0
             for l, kl in remove(ki):
                 u -= SQRT[ki[l]] * R[i, l] * G[kl]
-            G[idx] = u / SQRT[idx[i]]
+            G[idx] = u * SQRT_INV[idx[i]]
 
     return G
 
@@ -448,8 +502,8 @@ def _grad_hermite_multidimensional_renorm(R, y, G, dG_dR, dG_dy):  # pragma: no 
             dy -= SQRT[ki[l]] * dG_dy[kl] * R[i, l]
             dR -= SQRT[ki[l]] * R[i, l] * dG_dR[kl]
             dR[i, l] -= SQRT[ki[l]] * G[kl]
-        dG_dR[idx] = dR / SQRT[idx[i]]
-        dG_dy[idx] = dy / SQRT[idx[i]]
+        dG_dR[idx] = dR * SQRT_INV[idx[i]]
+        dG_dy[idx] = dy * SQRT_INV[idx[i]]
     return dG_dR, dG_dy
 
 
