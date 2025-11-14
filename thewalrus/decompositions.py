@@ -217,8 +217,24 @@ def takagi(A, svd_order=True, rtol=1e-16):
             return l[::-1], U[:, ::-1]
         return l, U
 
-    u, d, v = np.linalg.svd(A)
-    U = u @ sqrtm((v @ np.conjugate(u)).T)
+    u, d, vh = np.linalg.svd(A)
+    z = vh @ u.conj()
+    T, Q = schur(z, output="complex")
+    z_eigvals = np.diag(T)
+    # Get sorted z angles in [0, 2π)
+    z_angles = np.sort(np.unique(np.mod(np.angle(z_eigvals), 2 * np.pi)))
+    # Get midpoint of largest arc
+    z_diffs = np.diff(z_angles, append=z_angles[0] + 2 * np.pi)
+    idx = np.argmax(z_diffs)
+    mid = z_angles[idx] + 0.5 * z_diffs[idx]
+    # Get shift angle in (-pi, pi]
+    shift_angle = np.mod(-mid, 2 * np.pi) - np.pi
+    # Rotate eigenvalues to shift midpoint of largest arc to ±pi
+    z_eigvals_shifted = z_eigvals * np.exp(1j * shift_angle)
+    sqrt_z_eigvals_shifted = np.sqrt(z_eigvals_shifted)
+    sqrt_z_shifted = Q @ np.diag(sqrt_z_eigvals_shifted) @ Q.conj().T
+    # Undo rotation from ±pi
+    U = u @ sqrt_z_shifted @ np.diag(np.exp(-0.5j * shift_angle * np.ones(n)))
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
