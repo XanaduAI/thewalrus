@@ -219,7 +219,7 @@ def takagi(A, svd_order=True, rtol=1e-16):
 
     u, d, vh = np.linalg.svd(A)
     z = vh @ u.conj()
-    T, Q = schur(z, output='complex')
+    T, Q = schur(z, output="complex")
     z_eigvals = np.diag(T)
     # Get sorted z angles in [0, 2π)
     z_angles = np.sort(np.unique(np.mod(np.angle(z_eigvals), 2 * np.pi)))
