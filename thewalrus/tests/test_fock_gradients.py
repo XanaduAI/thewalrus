@@ -286,9 +286,9 @@ def test_S2_selection_rules(tol):
 
 def test_beamsplitter_values(tol):
     r"""Test that the representation of an interferometer in the single
-    excitation manifold is precisely the unitary matrix that represents it
-    mode in space. This test in particular checks that the BS gate is
-    consistent with strawberryfields
+    excitation manifold is precisely the unitary matrix that represents it.
+    This test in particular checks that the BS gate is consistent
+    with strawberryfields
     """
     nmodes = 2
     vec_list = np.identity(nmodes, dtype=int).tolist()
@@ -304,6 +304,19 @@ def test_beamsplitter_values(tol):
         for j, vec_j in enumerate(vec_list):
             U_rec[i, j] = T[tuple(vec_i + vec_j)]
     assert np.allclose(U, U_rec, atol=tol, rtol=0)
+
+
+def test_beamsplitter_stability():
+    r"""Tests the stability of the beamsplitter operation"""
+    theta = np.random.rand()
+    phi = np.random.rand()
+    cutoff = 70
+    stable = beamsplitter(theta, phi, (cutoff, cutoff, cutoff, cutoff))
+    assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)
+    assert stable.dtype == np.complex128
+    stable = beamsplitter(theta, phi, cutoff, dtype=np.complex64)
+    assert np.isclose(np.max(np.abs(stable)), 1.0, atol=1e-5, rtol=0)
+    assert stable.dtype == np.complex64
 
 
 def test_mzgate_values(tol):
