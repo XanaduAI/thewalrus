@@ -1,4 +1,5 @@
 """Functions for computing grouped click probabilities"""
+
 import numpy as np
 from numba import jit
 

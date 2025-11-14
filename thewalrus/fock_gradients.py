@@ -25,16 +25,16 @@ Summary
 -------
 
 .. autosummary::
-	displacement
-	squeezing
-	beamsplitter
-	two_mode_squeezing
-	mzgate
-	grad_displacement
-	grad_squeezing
-	grad_beamsplitter
-	grad_two_mode_squeezing
-	grad_mzgate
+        displacement
+        squeezing
+        beamsplitter
+        two_mode_squeezing
+        mzgate
+        grad_displacement
+        grad_squeezing
+        grad_beamsplitter
+        grad_two_mode_squeezing
+        grad_mzgate
 
 Code details
 ------------

@@ -66,7 +66,7 @@ def test_dist_thermal():
     ls, O = rescale_adjacency_matrix_thermal(A, n_mean)
 
     samples = np.array(generate_thermal_samples(ls, O, num_samples=n_samples))
-    bins = np.arange(0, max(samples), 1)
+    bins = np.arange(0, np.max(samples), 1)
     (freq, _) = np.histogram(samples, bins=bins)
     rel_freq = freq / n_samples
     expected = (1 / (1 + n_mean)) * (n_mean / (1 + n_mean)) ** (np.arange(len(rel_freq)))

@@ -1,4 +1,5 @@
 """Test for the grouped click probability function"""
+
 from itertools import product
 import numpy as np
 import pytest
