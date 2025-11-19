@@ -51,7 +51,7 @@ As was done before for the hafnian we introduce the set of single pair matchings
 
 .. math::
 
-  \text{SPM}(4) = \big\{ (0,1)(2,3),\ (0,2)(1,3),\ (0,3),(1,2),\ (0,0)(1,1)(2,3), \ (0,1)(2,2)(3,3),\\
+  \text{SPM}(4) = \big\{ (0,1)(2,3),\ (0,2)(1,3),\ (0,3)(1,2),\ (0,0)(1,1)(2,3), \ (0,1)(2,2)(3,3),\\
   (0,0)(2,2)(1,3),\ (0,2)(1,1)(3,3),\ (0,0)(3,3)(1,2),\ (0,3)(1,1)(2,2),\ (0,0)(1,1)(2,2)(3,3)\big\}.
 
 
@@ -65,7 +65,7 @@ For a graph with 4 vertices they are
 
 
 
-Note that there is a one to one correspondence (a bijection) between the elements in :math:`\text{SPM}(n)` and the number of matchings of a graph with :math:`n` vertices :math:`H(n)`. To see why this is the case, note that any element of :math:`\text{SPM}(n)` can be converted into a matching by removing all the vertices that are loops. For example, to the following element :math:`(0,0)(2,2)(1,3)` we associate the matching :math:`(1,2)`. Note that this mapping is one-to-one since, given a matching, we can always add as loops all the other vertices that are not part of the matching. Using this bijection we conclude that the number of elements in :math:`\text{SPM}(n)` is `(see The On-Line Encyclopedia of Integer Sequences) <https://oeis.org/A000085>`_
+Note that there is a one to one correspondence (a bijection) between the elements in :math:`\text{SPM}(n)` and the set of matchings of a graph with :math:`n` vertices :math:`H(n)`. To see why this is the case, note that any element of :math:`\text{SPM}(n)` can be converted into a matching by removing all the vertices that are loops. For example, to the following element :math:`(0,0)(2,2)(1,3)` we associate the matching :math:`(1,3)`. Note that this mapping is one-to-one since, given a matching, we can always add as loops all the other vertices that are not part of the matching. Using this bijection we conclude that the number of elements in :math:`\text{SPM}(n)` is `(see The On-Line Encyclopedia of Integer Sequences) <https://oeis.org/A000085>`_
 
 .. math::
 
