@@ -36,6 +36,7 @@ Code details
 """
 import numpy as np
 import numba
+from thewalrus import charpoly
 from thewalrus._hafnian import (
     precompute_binoms,
     matched_reps,
@@ -99,8 +100,9 @@ def _calc_loop_hafnian_batch_even(
 
         AX_S_copy = AX_S.copy()
 
-        f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
-        f_odd = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_max, oddloop, oddVX_S)
+        powtrace_arr = charpoly.powertrace(AX_S_copy, N_max // 2 + 1)
+        f_even = f_loop(AX_S, XD_S, D_S, N_max, powtrace_arr)
+        f_odd = f_loop_odd(AX_S, XD_S, D_S, N_max, oddloop, oddVX_S, powtrace_arr)
 
         for N_det in range(2 * kept_edges[0], 2 * batch_max + odd_cutoff + 1):
             N = N_fixed + N_det
@@ -177,16 +179,16 @@ def _calc_loop_hafnian_batch_odd(
         AX_S, XD_S, D_S, oddVX_S = get_submatrices(delta, A, D, oddV)
 
         AX_S_copy = AX_S.copy()
+        powtrace_arr = charpoly.powertrace(AX_S_copy, N_max // 2 + 2)
 
         if kept_edges[0] == 0 and kept_edges[1] == 0:
             oddVX_S0 = get_submatrix_batch_odd0(delta, oddV0)
             plus_minus = (-1) ** (N_fixed // 2 - edges_sum)
-            f = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0)[N_fixed]
+            f = f_loop_odd(AX_S, XD_S, D_S, N_fixed, oddloop0, oddVX_S0, powtrace_arr)[N_fixed]
             H_batch[0] += binom_prod * plus_minus * f
 
-        f_even = f_loop(AX_S_copy, AX_S, XD_S, D_S, N_max)
-        f_odd = f_loop_odd(AX_S_copy, AX_S, XD_S, D_S, N_max, oddloop, oddVX_S)
-
+        f_even = f_loop(AX_S, XD_S, D_S, N_max, powtrace_arr)
+        f_odd = f_loop_odd(AX_S, XD_S, D_S, N_max, oddloop, oddVX_S, powtrace_arr)
         for N_det in range(2 * kept_edges[0] + 1, 2 * batch_max + even_cutoff + 2):
             N = N_fixed + N_det
             plus_minus = (-1) ** (N // 2 - edges_sum)
