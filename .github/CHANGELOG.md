@@ -6,7 +6,7 @@
 
 ### Improvements
 
-* Improved speed of `loop_hafnian_batch_gamma` by 2-6x by hoisting powertrace computation outside inner loops [(#408)](https://github.com/XanaduAI/thewalrus/pull/408).
+* Improved speed of `loop_hafnian_batch_gamma` by 2-6x by hoisting powertrace computation outside inner loops [(#409)](https://github.com/XanaduAI/thewalrus/pull/409).
 
 * Improved speed of `_hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
 
