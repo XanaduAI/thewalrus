@@ -209,30 +209,28 @@ def f(A, n):  # pragma: no cover
     return comb[count, :]
 
 
-@numba.jit(nopython=True, cache=True)
-def f_loop(AX, AX_S, XD_S, D_S, n):  # pragma: no cover
-    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula.
+@numba.jit(nopython=True, cache=True) # type: ignore
+def f_loop(AX_S, XD_S, D_S, n, powtrace_arr):
+    """
+    Evaluate polynomial coefficients using pre-computed powertrace.
 
     Args:
-        AX (array): two-dimensional matrix
-        AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
-        XD_S (array): diagonal multiplied by ``X``
-        D_S (array): diagonal
-        n (int): number of polynomial coefficients to compute
+        AX_S: AX_S with weights given by repetitions and excluded rows removed
+        XD_S: diagonal multiplied by X
+        D_S: diagonal
+        n: number of polynomial coefficients to compute
+        powtrace_arr: pre-computed power traces of AX matrix
 
     Returns:
         array: polynomial coefficients
     """
-    # Compute combinations in O(n^2log n) time
-    # code translated from thewalrus matlab script
     count = 0
     comb = np.zeros((2, n // 2 + 1), dtype=np.complex128)
     comb[0, 0] = 1
-    powtrace = charpoly.powertrace(AX, n // 2 + 1)
     for i in range(1, n // 2 + 1):
-        factor = powtrace[i] / (2 * i) + (XD_S @ D_S) / 2
+        factor = powtrace_arr[i] / (2 * i) + (XD_S @ D_S) / 2
         XD_S = XD_S @ AX_S
-        powfactor = 1
+        powfactor = 1.0
         count = 1 - count
         comb[count, :] = comb[1 - count, :]
         for j in range(1, n // (2 * i) + 1):
@@ -242,39 +240,37 @@ def f_loop(AX, AX_S, XD_S, D_S, n):  # pragma: no cover
     return comb[count, :]
 
 
-# pylint: disable = too-many-arguments
+# pylint: disable = too-many-arguments, too-many-positional-arguments
 @numba.jit(nopython=True, cache=True)
-def f_loop_odd(AX, AX_S, XD_S, D_S, n, oddloop, oddVX_S):  # pragma: no cover
-    """Evaluate the polynomial coefficients of the function in the eigenvalue-trace formula
-    when there is a self-edge in the fixed perfect matching.
+def f_loop_odd(AX_S, XD_S, D_S, n, oddloop, oddVX_S, powtrace_arr):
+    """
+    Evaluate polynomial coefficients for odd case using pre-computed powertrace.
 
     Args:
-        AX (array): two-dimensional matrix
-        AX_S (array): ``AX_S`` with weights given by repetitions and excluded rows removed
-        XD_S (array): diagonal multiplied by ``X``
-        D_S (array): diagonal
-        n (int): number of polynomial coefficients to compute
-        oddloop (float): weight of self-edge
-        oddVX_S (array): vector corresponding to matrix at the index of the self-edge
+        AX_S: AX_S with weights given by repetitions and excluded rows removed
+        XD_S: diagonal multiplied by X
+        D_S: diagonal
+        n: number of polynomial coefficients to compute
+        oddloop: weight of self-edge
+        oddVX_S: vector corresponding to matrix at the index of the self-edge
+        powtrace_arr: pre-computed power traces of AX matrix
 
     Returns:
         array: polynomial coefficients
     """
-
     count = 0
     comb = np.zeros((2, n + 1), dtype=np.complex128)
     comb[0, 0] = 1
-    powtrace = charpoly.powertrace(AX, n // 2 + 1)
     for i in range(1, n + 1):
         if i == 1:
             factor = oddloop
         elif i % 2 == 0:
-            factor = powtrace[i // 2] / i + (XD_S @ D_S) / 2
+            factor = powtrace_arr[i // 2] / i + (XD_S @ D_S) / 2
         else:
             factor = oddVX_S @ D_S
             D_S = AX_S @ D_S
 
-        powfactor = 1
+        powfactor = 1.0
         count = 1 - count
         comb[count, :] = comb[1 - count, :]
         for j in range(1, n // i + 1):
@@ -555,17 +551,16 @@ def _calc_loop_hafnian(A, D, edge_reps, oddloop=None, oddV=None, glynn=True):  #
             kept_edges = 2 * kept_edges - edge_reps
 
         AX_S, XD_S, D_S, oddVX_S = get_submatrices(kept_edges, A, D, oddV)
-        AX = AX_S.copy()
 
         prefac = (-1.0) ** (N // 2 - edge_sum) * binom_prod
-
+        AX_S_copy = AX_S.copy()
+        powtrace_arr = charpoly.powertrace(AX_S_copy, N // 2 + 1)
         if oddloop is not None:
-            Hnew = prefac * f_loop_odd(AX, AX_S, XD_S, D_S, N, oddloop, oddVX_S)[N]
+            Hnew = prefac * f_loop_odd(AX_S, XD_S, D_S, N, oddloop, oddVX_S, powtrace_arr)[N]
         else:
             if glynn and kept_edges[0] == 0:
                 prefac *= 0.5
-            Hnew = prefac * f_loop(AX, AX_S, XD_S, D_S, N)[N // 2]
-
+            Hnew = prefac * f_loop(AX_S, XD_S, D_S, N, powtrace_arr)[N // 2]
         H += Hnew
 
     if glynn:
@@ -746,7 +741,7 @@ def hafnian(
     Returns:
         int or float or complex: the hafnian of matrix ``A``
     """
-    # pylint: disable=too-many-return-statements,too-many-branches
+    # pylint: disable=too-many-return-statements,too-many-branches, possibly-used-before-assignment
     input_validation(A, rtol=rtol, atol=atol)
 
     matshape = A.shape
@@ -860,7 +855,7 @@ def hafnian_sparse(A, D=None, loop=False):
 
     return lhaf(D)
 
-
+# pylint: disable=too-many-positional-arguments
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=True):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 
