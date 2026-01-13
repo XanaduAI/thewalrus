@@ -214,9 +214,6 @@ def f_loop(AX_S, XD_S, D_S, n, powtrace_arr):
     """
     Evaluate polynomial coefficients using pre-computed powertrace.
 
-    OPTIMIZATION 1: Instead of computing powertrace(AX) internally,
-    we accept it as a parameter to avoid redundant computation.
-
     Args:
         AX_S: AX_S with weights given by repetitions and excluded rows removed
         XD_S: diagonal multiplied by X
@@ -248,10 +245,6 @@ def f_loop(AX_S, XD_S, D_S, n, powtrace_arr):
 def f_loop_odd(AX_S, XD_S, D_S, n, oddloop, oddVX_S, powtrace_arr):
     """
     Evaluate polynomial coefficients for odd case using pre-computed powertrace.
-
-    OPTIMIZATION 1: Instead of computing powertrace(AX) internally,
-    we accept it as a parameter to avoid redundant computation when
-    both f_loop and f_loop_odd need the same powertrace.
 
     Args:
         AX_S: AX_S with weights given by repetitions and excluded rows removed

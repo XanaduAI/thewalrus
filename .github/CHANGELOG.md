@@ -6,6 +6,8 @@
 
 ### Improvements
 
+* Improved speed of `loop_hafnian_batch_gamma` by 2-6x by hoisting powertrace computation outside inner loops [(#408)](https://github.com/XanaduAI/thewalrus/pull/408).
+
 * Improved speed of `_hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
 
 ### Bug fixes
@@ -20,8 +22,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-T.H. Dodd, L.G. Helt, F. Miatto, A. Motamedi
-
+T.H. Dodd, L.G. Helt, S. Madsen, F. Miatto, A. Motamedi
 ---
 
 # Release 0.22.0
