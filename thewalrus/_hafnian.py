@@ -243,7 +243,7 @@ def f_loop(AX_S, XD_S, D_S, n, powtrace_arr):
     return comb[count, :]
 
 
-# pylint: disable = too-many-arguments
+# pylint: disable = too-many-arguments, too-many-positional-arguments
 @numba.jit(nopython=True, cache=True)
 def f_loop_odd(AX_S, XD_S, D_S, n, oddloop, oddVX_S, powtrace_arr):
     """
@@ -748,7 +748,7 @@ def hafnian(
     Returns:
         int or float or complex: the hafnian of matrix ``A``
     """
-    # pylint: disable=too-many-return-statements,too-many-branches
+    # pylint: disable=too-many-return-statements,too-many-branches, possibly-used-before-assignment
     input_validation(A, rtol=rtol, atol=atol)
 
     matshape = A.shape
@@ -862,7 +862,7 @@ def hafnian_sparse(A, D=None, loop=False):
 
     return lhaf(D)
 
-
+# pylint: disable=too-many-positional-arguments
 def hafnian_repeated(A, rpt, mu=None, loop=False, rtol=1e-05, atol=1e-08, glynn=True):
     r"""Returns the hafnian of matrix with repeated rows/columns.
 

@@ -48,7 +48,7 @@ from thewalrus._hafnian import (
 )
 
 
-# pylint: disable = too-many-arguments, not-an-iterable
+# pylint: disable = too-many-arguments, not-an-iterable, too-many-positional-arguments
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_even(
     A, D, fixed_edge_reps, batch_max, odd_cutoff, glynn=True
@@ -125,7 +125,7 @@ def _calc_loop_hafnian_batch_even(
     return H_batch
 
 
-# pylint: disable = too-many-arguments, not-an-iterable
+# pylint: disable = too-many-arguments, not-an-iterable, too-many-positional-arguments
 @numba.jit(nopython=True, parallel=True, cache=True)
 def _calc_loop_hafnian_batch_odd(
     A, D, fixed_edge_reps, batch_max, even_cutoff, glynn=True
@@ -249,7 +249,7 @@ def add_batch_edges_odd(fixed_edges, oddmode):
         return np.array([1, oddmode, 1, 1], dtype=int)
     n_edges = fixed_edges.shape[0]
     edges = np.zeros(n_edges + 4, dtype=int)
-    new_edge = max(max(fixed_edges), oddmode) + 1
+    new_edge = max(*fixed_edges, oddmode) + 1
     edges[0] = new_edge
     edges[1] = oddmode
     edges[2 : n_edges // 2 + 2] = fixed_edges[: n_edges // 2]
