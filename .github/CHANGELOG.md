@@ -7,11 +7,13 @@
 ### Improvements
 
 * Improved speed of `_hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
-* Adds support of the 'list' type of 'cutoff' argument for the 'density_matrix(mu, cov, post_select, normalize, cutoff, hbar)' function from 'fock_tensors.py'. It enables to perform larger simulations by decreasing required RAM [(#406)](https://github.com/XanaduAI/thewalrus/pull/406).
+* Allow 'cutoff' to be a list of ints for the 'density_matrix(mu, cov, post_select, normalize, cutoff, hbar)' function from 'fock_tensors.py'. It enables to perform larger simulations by decreasing required RAM [(#406)](https://github.com/XanaduAI/thewalrus/pull/406).
 
 ### Bug fixes
 
 * Adds hbar to `decompose_cov`, so that it does not always silently assume hbar=2 even when working with quantum covariance matrices generated with hbar!=2 [(#402)](https://github.com/XanaduAI/thewalrus/pull/402).
+
+* Fixes bug in `takagi` which incorrectly computed the unitary W matrix. [#403](https://github.com/XanaduAI/thewalrus/pull/403)
 
 ### Documentation
 
@@ -19,7 +21,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-L.G. Helt, F. Miatto, Ivan Solomakhin
+T.H. Dodd, L.G. Helt, F. Miatto, A. Motamedi, Ivan Solomakhin
 
 ---
 
