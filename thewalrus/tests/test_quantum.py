@@ -93,7 +93,10 @@ def test_reduced_gaussian(n):
     assert np.all(
         res[1]
         == np.array(
-            [[(N + 1) * n, (N + 1) * n + m], [(N + 1) * n + N * m, (N + 1) * n + N * m + m]]
+            [
+                [(N + 1) * n, (N + 1) * n + m],
+                [(N + 1) * n + N * m, (N + 1) * n + N * m + m],
+            ]
         )
     )
 
@@ -361,6 +364,16 @@ def test_density_matrix_squeezed():
         ]
     )
     assert np.allclose(res, expected)
+
+
+def test_density_matrix_vacuum_custom_cutoff():
+    """Test custom cutoff"""
+    mu = np.zeros([4])
+    V = np.identity(4)
+
+    res = density_matrix(mu, V, cutoff=[5, 3])
+
+    assert res.shape == (5, 5, 3, 3)
 
 
 def test_coherent_squeezed():
@@ -895,11 +908,35 @@ def test_single_mode_squeezing(choi_r, tol):
     # np.array(squeeze(40,r).data.todense())[0:5,0:5]
     expected = np.array(
         [
-            [0.80501818 + 0.0j, 0.0 + 0.0j, 0.43352515 + 0.0j, 0.0 + 0.0j, 0.2859358 + 0.0j],
+            [
+                0.80501818 + 0.0j,
+                0.0 + 0.0j,
+                0.43352515 + 0.0j,
+                0.0 + 0.0j,
+                0.2859358 + 0.0j,
+            ],
             [0.0 + 0.0j, 0.52169547 + 0.0j, 0.0 + 0.0j, 0.48661591 + 0.0j, 0.0 + 0.0j],
-            [-0.43352515 + 0.0j, 0.0 + 0.0j, 0.10462138 + 0.0j, 0.0 + 0.0j, 0.29199268 + 0.0j],
-            [0.0 + 0.0j, -0.48661591 + 0.0j, 0.0 + 0.0j, -0.23479643 + 0.0j, 0.0 + 0.0j],
-            [0.2859358 + 0.0j, 0.0 + 0.0j, -0.29199268 + 0.0j, 0.0 + 0.0j, -0.34474749 + 0.0j],
+            [
+                -0.43352515 + 0.0j,
+                0.0 + 0.0j,
+                0.10462138 + 0.0j,
+                0.0 + 0.0j,
+                0.29199268 + 0.0j,
+            ],
+            [
+                0.0 + 0.0j,
+                -0.48661591 + 0.0j,
+                0.0 + 0.0j,
+                -0.23479643 + 0.0j,
+                0.0 + 0.0j,
+            ],
+            [
+                0.2859358 + 0.0j,
+                0.0 + 0.0j,
+                -0.29199268 + 0.0j,
+                0.0 + 0.0j,
+                -0.34474749 + 0.0j,
+            ],
         ]
     )
     T = fock_tensor(S, alphas, cutoff, choi_r=choi_r)
@@ -1223,7 +1260,8 @@ def test_loss_value_error(eta):
     """Tests the correct error is raised"""
     n = 50
     with pytest.raises(
-        ValueError, match="The transmission parameter eta should be a number between 0 and 1."
+        ValueError,
+        match="The transmission parameter eta should be a number between 0 and 1.",
     ):
         loss_mat(eta, n)
 
@@ -1471,7 +1509,18 @@ def test_expt_two_mode_squeezed(r, phi):
         [2, 2, 0, 0],
         [0, 0, 2, 2],
     ]
-    expected = [1, a, np.conj(a), adxa, adxa, a2, np.conj(a2), adxbdxab, ad2bd2, np.conj(ad2bd2)]
+    expected = [
+        1,
+        a,
+        np.conj(a),
+        adxa,
+        adxa,
+        a2,
+        np.conj(a2),
+        adxbdxab,
+        ad2bd2,
+        np.conj(ad2bd2),
+    ]
     for pattern, value in zip(patterns, expected):
         result = normal_ordered_expectation(means, cov, pattern, hbar=hbar)
         assert np.allclose(result, value)
@@ -1590,7 +1639,8 @@ def test_non_physical_cov_in_tvd():
     """Test the correct error is raised when an unphysical covariance matrix is passed to tvd_cutoff_bound"""
     A = np.array([[1, 2], [3, 4]])
     with pytest.raises(
-        ValueError, match="The input covariance matrix violates the uncertainty relation."
+        ValueError,
+        match="The input covariance matrix violates the uncertainty relation.",
     ):
         tvd_cutoff_bounds(np.zeros(2), A, 10)
 
@@ -1786,7 +1836,8 @@ def test_n_body_marginals_mismatch_shape():
     cov = squeezing([2 * r1, 0, 2 * r2])
     mu = np.zeros([4])
     with pytest.raises(
-        ValueError, match="The covariance matrix and vector of means have incompatible dimensions"
+        ValueError,
+        match="The covariance matrix and vector of means have incompatible dimensions",
     ):
         n_body_marginals(mu, cov, 4, 3)
 
@@ -1808,7 +1859,8 @@ def test_n_body_marginals_too_high_correlation():
     cov = squeezing([2 * r1, 0, 2 * r2])
     mu = np.zeros([6])
     with pytest.raises(
-        ValueError, match="The order of the correlations is higher than the number of modes"
+        ValueError,
+        match="The order of the correlations is higher than the number of modes",
     ):
         n_body_marginals(mu, cov, 4, 4)
 

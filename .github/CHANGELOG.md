@@ -7,6 +7,7 @@
 ### Improvements
 
 * Improved speed of `_hermite_multidimensional_renorm` by 4x [(#404)](https://github.com/XanaduAI/thewalrus/pull/404).
+* Allow 'cutoff' to be a list of ints for the 'density_matrix(mu, cov, post_select, normalize, cutoff, hbar)' function from 'fock_tensors.py'. It enables to perform larger simulations by decreasing required RAM [(#406)](https://github.com/XanaduAI/thewalrus/pull/406).
 
 ### Bug fixes
 
@@ -20,7 +21,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-T.H. Dodd, L.G. Helt, F. Miatto, A. Motamedi
+T.H. Dodd, L.G. Helt, F. Miatto, A. Motamedi, Ivan Solomakhin
 
 ---
 
