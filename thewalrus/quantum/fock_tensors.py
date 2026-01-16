@@ -46,9 +46,7 @@ from .conversions import (
 from .gaussian_checks import is_classical_cov, is_pure_cov, is_valid_cov
 
 
-def pure_state_amplitude(
-    mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True
-):
+def pure_state_amplitude(mu, cov, i, include_prefactor=True, tol=1e-10, hbar=2, check_purity=True):
     r"""Returns the :math:`\langle i | \psi\rangle` element of the state ket
     of a Gaussian state defined by covariance matrix cov.
 
@@ -70,9 +68,7 @@ def pure_state_amplitude(
     """
     if check_purity:
         if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
-            raise ValueError(
-                "The covariance matrix does not correspond to a pure state"
-            )
+            raise ValueError("The covariance matrix does not correspond to a pure state")
 
     rpt = i
     beta = complex_to_real_displacements(mu, hbar=hbar)
@@ -100,23 +96,14 @@ def pure_state_amplitude(
             haf = hafnian_repeated(B, rpt, mu=gamma, loop=True)
 
     if include_prefactor:
-        pref = np.exp(
-            -0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj())
-        )
+        pref = np.exp(-0.5 * (np.linalg.norm(alpha) ** 2 - alpha.conj() @ B @ alpha.conj()))
         haf *= pref
 
     return haf / np.sqrt(np.prod(fac(rpt)) * np.sqrt(np.linalg.det(Q)))
 
 
 def state_vector(
-    mu,
-    cov,
-    post_select=None,
-    normalize=False,
-    cutoff=5,
-    hbar=2,
-    check_purity=True,
-    **kwargs
+    mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2, check_purity=True, **kwargs
 ):
     r"""Returns the state vector of a (PNR post-selected) Gaussian state.
 
@@ -155,9 +142,7 @@ def state_vector(
     """
     if check_purity:
         if not is_pure_cov(cov, hbar=hbar, rtol=1e-05, atol=1e-08):
-            raise ValueError(
-                "The covariance matrix does not correspond to a pure state"
-            )
+            raise ValueError("The covariance matrix does not correspond to a pure state")
 
     beta = complex_to_real_displacements(mu, hbar=hbar)
     A = Amat(cov, hbar=hbar)
@@ -183,11 +168,7 @@ def state_vector(
             gamma = rescaling * gamma
             denom = np.sqrt(np.sqrt(np.linalg.det(Q / np.cosh(choi_r)).real))
 
-        psi = (
-            pref
-            * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True)
-            / denom
-        )
+        psi = pref * hafnian_batched(B.conj(), cutoff, mu=gamma.conj(), renorm=True) / denom
     else:
         M = N - len(post_select)
         psi = np.zeros([cutoff] * (M), dtype=np.complex128)
@@ -197,10 +178,7 @@ def state_vector(
 
             counter = count(0)
             modes = (np.arange(N)).tolist()
-            el = [
-                post_select[i] if i in post_select else idx[next(counter)]
-                for i in modes
-            ]
+            el = [post_select[i] if i in post_select else idx[next(counter)] for i in modes]
             psi[idx] = pure_state_amplitude(
                 mu, cov, el, check_purity=False, include_prefactor=False, hbar=hbar
             )
@@ -331,9 +309,7 @@ def density_matrix(mu, cov, post_select=None, normalize=False, cutoff=5, hbar=2)
         sf_idx = np.array(idx).reshape(2, -1)
         sf_el = tuple(sf_idx[::-1].T.flatten())
 
-        rho[sf_el] = density_matrix_element(
-            mu, cov, el0, el1, include_prefactor=False, hbar=hbar
-        )
+        rho[sf_el] = density_matrix_element(mu, cov, el0, el1, include_prefactor=False, hbar=hbar)
 
     rho *= pref
 
@@ -384,9 +360,7 @@ def fock_tensor(
     m, _ = S.shape
     l = m // 2
     if l != len(alpha):
-        raise ValueError(
-            "The matrix S and the vector alpha do not have compatible dimensions"
-        )
+        raise ValueError("The matrix S and the vector alpha do not have compatible dimensions")
     # Check if S corresponds to an interferometer, if so use optimized routines
     if np.allclose(S @ S.T, np.identity(m), rtol=rtol, atol=atol) and np.allclose(
         alpha, 0, rtol=rtol, atol=atol
@@ -401,9 +375,7 @@ def fock_tensor(
         ch = np.cosh(choi_r) * np.identity(l)
         sh = np.sinh(choi_r) * np.identity(l)
         zh = np.zeros([l, l])
-        Schoi = np.block(
-            [[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]]
-        )
+        Schoi = np.block([[ch, sh, zh, zh], [sh, ch, zh, zh], [zh, zh, ch, -sh], [zh, zh, -sh, ch]])
         # And then its Choi expanded symplectic
         S_exp = expand(S, list(range(l)), 2 * l) @ Schoi
         # And this is the corresponding covariance matrix
@@ -448,19 +420,14 @@ def probabilities(mu, cov, cutoff, parallel=False, hbar=2.0, rtol=1e-05, atol=1e
     if is_pure_cov(
         cov, hbar=hbar, rtol=rtol, atol=atol
     ):  # Check if the covariance matrix cov is pure
-        return (
-            np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False))
-            ** 2
-        )
+        return np.abs(state_vector(mu, cov, cutoff=cutoff, hbar=hbar, check_purity=False)) ** 2
     num_modes = len(mu) // 2
 
     if parallel:
         compute_list = []
         # create a list of parallelizable computations
         for i in product(range(cutoff), repeat=num_modes):
-            compute_list.append(
-                dask.delayed(density_matrix_element)(mu, cov, i, i, hbar=hbar)
-            )
+            compute_list.append(dask.delayed(density_matrix_element)(mu, cov, i, i, hbar=hbar))
 
         probs = np.maximum(
             0.0, np.real_if_close(dask.compute(*compute_list, scheduler="processes"))
@@ -490,9 +457,7 @@ def loss_mat(eta, cutoff):  # pragma: no cover
     # If full transmission return the identity
 
     if eta < 0.0 or eta > 1.0:
-        raise ValueError(
-            "The transmission parameter eta should be a number between 0 and 1."
-        )
+        raise ValueError("The transmission parameter eta should be a number between 0 and 1.")
 
     if eta == 1.0:
         return np.identity(cutoff)
@@ -629,9 +594,7 @@ def _prefactor(mu, cov, hbar=2):
     return np.exp(-0.5 * beta @ Qinv @ beta.conj()) / np.sqrt(np.linalg.det(Q))
 
 
-def tvd_cutoff_bounds(
-    mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-05, atol=1e-08
-):
+def tvd_cutoff_bounds(mu, cov, cutoff, hbar=2, check_is_valid_cov=True, rtol=1e-05, atol=1e-08):
     r"""Gives bounds of the total variation distance between the exact Gaussian Boson Sampling
     distribution extending to infinity in Fock space and the ones truncated by any value between 0
     and the user provided cutoff.
@@ -653,16 +616,12 @@ def tvd_cutoff_bounds(
     """
     if check_is_valid_cov:
         if not is_valid_cov(cov, hbar=hbar, rtol=rtol, atol=atol):
-            raise ValueError(
-                "The input covariance matrix violates the uncertainty relation."
-            )
+            raise ValueError("The input covariance matrix violates the uncertainty relation.")
     nmodes = cov.shape[0] // 2
     bounds = np.zeros([cutoff])
     for i in range(nmodes):
         mu_red, cov_red = reduced_state(mu, cov, [i])
-        ps = np.real_if_close(
-            np.diag(density_matrix(mu_red, cov_red, cutoff=cutoff, hbar=hbar))
-        )
+        ps = np.real_if_close(np.diag(density_matrix(mu_red, cov_red, cutoff=cutoff, hbar=hbar)))
         bounds += 1 - np.cumsum(ps)
     return bounds
 
@@ -705,16 +664,12 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
     """
     M = len(mean)
     if (M, M) != cov.shape:
-        raise ValueError(
-            "The covariance matrix and vector of means have incompatible dimensions"
-        )
+        raise ValueError("The covariance matrix and vector of means have incompatible dimensions")
     if M % 2 != 0:
         raise ValueError("The vector of means is not of even dimensions")
     M = M // 2
     if M < n:
-        raise ValueError(
-            "The order of the correlations is higher than the number of modes"
-        )
+        raise ValueError("The order of the correlations is higher than the number of modes")
 
     marginal = [np.zeros(([M] * i) + ([cutoff] * i)) for i in range(1, n + 1)]
 
@@ -722,16 +677,10 @@ def n_body_marginals(mean, cov, cutoff, n, hbar=2):
         modes = list(set(ind))
         acc = len(modes) - 1
         if list(ind) == sorted(ind):
-            sub_mean, sub_cov = reduced_state(
-                mean, cov, modes
-            )  # this happens in phase space
-            marginal[acc][tuple(modes)] = probabilities(
-                sub_mean, sub_cov, cutoff, hbar=hbar
-            )
+            sub_mean, sub_cov = reduced_state(mean, cov, modes)  # this happens in phase space
+            marginal[acc][tuple(modes)] = probabilities(sub_mean, sub_cov, cutoff, hbar=hbar)
         else:
             modes_usrt = list(OrderedDict.fromkeys(ind))
             perm = np.argsort(modes_usrt)
-            marginal[acc][tuple(modes_usrt)] = marginal[acc][tuple(modes)].transpose(
-                perm
-            )
+            marginal[acc][tuple(modes_usrt)] = marginal[acc][tuple(modes)].transpose(perm)
     return marginal
